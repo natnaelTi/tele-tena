@@ -1,0 +1,6 @@
+[pre_model_sync]
+
+[post_model_sync]
+tele_tena.patches.v1_0_command_storage
+tele_tena.patches.v1_1_native_catalog
+tele_tena.patches.v1_2_catalog_adoption_check

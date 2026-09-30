@@ -1,0 +1,20 @@
+import re
+import frappe
+from frappe.model.document import Document
+from tele_tena.backoffice import approver
+
+
+class TeleTenaService(Document):
+    def validate(self):
+        approver()
+        if not isinstance(self.service_key, str) or not re.fullmatch(r'[a-z0-9-]{1,80}', self.service_key):
+            frappe.throw('Invalid service identifier')
+        if not self.service_label or len(self.service_label.strip()) > 120:
+            frappe.throw('Invalid service label')
+        self.service_label = self.service_label.strip()
+        previous = self.get_doc_before_save()
+        if previous and previous.service_key != self.service_key:
+            frappe.throw('Service identifier is immutable')
+
+    def on_trash(self):
+        frappe.throw('Deactivate services instead of deleting records', frappe.PermissionError)

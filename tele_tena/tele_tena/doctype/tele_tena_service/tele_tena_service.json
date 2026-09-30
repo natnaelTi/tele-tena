@@ -1,0 +1,49 @@
+{
+  "doctype": "DocType",
+  "name": "Tele Tena Service",
+  "module": "Tele Tena",
+  "fields": [
+    {
+      "fieldname": "service_key",
+      "label": "Service Identifier",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "unique": 1,
+      "read_only": 0
+    },
+    {
+      "fieldname": "service_label",
+      "label": "Service Name",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "active",
+      "label": "Active",
+      "fieldtype": "Check",
+      "default": "1"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "Tele Tena Approver",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    },
+    {
+      "role": "Tele Tena Patient",
+      "read": 1
+    },
+    {
+      "role": "Tele Tena Clinician",
+      "read": 1
+    }
+  ],
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "allow_rename": 0,
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "autoname": "field:service_key"
+}
