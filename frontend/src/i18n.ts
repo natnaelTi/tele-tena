@@ -1,4 +1,5 @@
 export const en = {
+  scopeRevoked: 'Revoked', serviceScopeRequired: 'The clinician is not approved for this service.', scopeService: 'Service scope to review', serviceScopes: 'Approved service scopes', approveScope: 'Approve service scope', revokeScope: 'Revoke service scope',
   timezone: 'Dates and times use', outsideAvailability: 'This session does not fit within the clinician’s availability. Choose a start from the displayed window, allowing for the full session duration.',
   appointmentConflict: 'This time overlaps an existing appointment. Choose another time.', insufficientFunds: 'Your available simulated funds are insufficient for this session.',
   approvalRequired: 'The clinician is not currently approved for new bookings.', previewChanged: 'Your saved profile changed. Review the disclosure preview again.', offeringChanged: 'The price or duration changed. Refresh the offering and review it again.',
@@ -28,6 +29,7 @@ export const en = {
 export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
 export const am: Record<Key, string> = {
+  scopeRevoked: 'ተሰርዟል', serviceScopeRequired: 'ሐኪሙ ለዚህ አገልግሎት አልጸደቀም።', scopeService: 'የሚገመገመው አገልግሎት', serviceScopes: 'የጸደቁ አገልግሎቶች', approveScope: 'የአገልግሎት ፈቃድ አጽድቅ', revokeScope: 'የአገልግሎት ፈቃድ ሰርዝ',
   timezone: 'ቀን እና ሰዓት የሚጠቀሙት', outsideAvailability: 'ቀጠሮው በሐኪሙ የሚገኝበት ሰዓት ውስጥ አይገባም። ሙሉ ቆይታውን የሚያስችል ሰዓት ይምረጡ።',
   appointmentConflict: 'ይህ ሰዓት ከሌላ ቀጠሮ ጋር ይደራረባል።', insufficientFunds: 'የሚገኘው የማስመሰያ ሂሳብ በቂ አይደለም።', approvalRequired: 'ሐኪሙ ለአዲስ ቀጠሮ አልጸደቀም።',
   previewChanged: 'መገለጫዎ ተቀይሯል። ቅድመ እይታውን እንደገና ይመልከቱ።', offeringChanged: 'ዋጋው ወይም ቆይታው ተቀይሯል። አድሰው እንደገና ይመልከቱ።',
@@ -50,6 +52,7 @@ export const am: Record<Key, string> = {
   credentials:'የልማት ማሳያ መለያዎችን ይጠቀሙ። የስልክ OTP አልተተገበረም።',
 }
 export const om: Record<Key, string> = {
+  scopeRevoked: 'Haqame', serviceScopeRequired: 'Ogeessi tajaajila kanaaf hin raggaane.', scopeService: 'Tajaajila gamaaggamu', serviceScopes: 'Tajaajiloota raggaʼan', approveScope: 'Tajaajila raggaasisi', revokeScope: 'Hayyama tajaajilaa haqi',
   timezone: 'Guyyaa fi saʼaatiin kan fayyadaman', outsideAvailability: 'Beellamni yeroo ogeessi jiru keessatti hin seenu. Yeroo dheerina marii guutuu dandaʼu filadhu.',
   appointmentConflict: 'Yeroon kun beellama biraa waliin wal irra buʼa. Yeroo biraa filadhu.', insufficientFunds: 'Qarshiin fakkeeffame jiru marii kanaaf gahaa miti.', approvalRequired: 'Ogeessi beellama haaraaf hin raggaane.',
   previewChanged: 'Ibsi kee jijjiirame. Qoodinsa irra deebiʼii ilaali.', offeringChanged: 'Gatiin ykn dheerinni yeroo jijjiirame. Haaromsiitii irra deebiʼii ilaali.',
