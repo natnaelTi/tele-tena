@@ -1,6 +1,7 @@
 # Architecture decision 001 — Frappe-backed PWA
 
-Status: accepted direction; installed-version compatibility pending.
+Status: accepted direction; foundation installation verified on Frappe 15.121.2
+and ERPNext 15.121.6. Product workflow compatibility remains to be tested.
 
 React + TypeScript + Vite talks to a dedicated custom Frappe application. ERPNext
 provides accounting. Frappe RQ workers and scheduler handle jobs. No Django or Celery.

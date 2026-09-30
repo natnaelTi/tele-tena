@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       proxy: {
-        '/api': { target: env.FRAPPE_DEV_URL || 'http://127.0.0.1:8000', changeOrigin: true },
+        '/api': { target: env.FRAPPE_DEV_URL || 'http://127.0.0.1:8000', changeOrigin: true, headers: { 'X-Frappe-Site-Name': env.FRAPPE_DEV_SITE || 'erp.localhost' } },
       },
     },
   }

@@ -7,4 +7,4 @@ from tele_tena import __version__
 def status():
     if frappe.session.user == "Guest":
         frappe.throw("Authentication required", frappe.PermissionError)
-    return {"application": "tele-tena", "version": __version__}
+    return {"application": "tele-tena", "version": __version__, "site": frappe.local.site, "user": frappe.session.user}
