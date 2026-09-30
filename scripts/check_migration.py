@@ -34,11 +34,13 @@ for attempt in (1, 2):
     assert snapshot() == before, 'Migration changed legacy records'
 frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
 frappe.connect()
-for patch in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check'):
+for patch in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_consultations', 'v1_4_consultation_close_state'):
     assert frappe.db.exists('Patch Log', {'patch': 'tele_tena.patches.' + patch})
 for row in frappe.db.sql('SELECT id,label,active FROM tt_service', as_dict=True):
     migrated = frappe.db.get_value('Tele Tena Service', row.id, ['service_label', 'active'])
     assert migrated == (row.label, row.active), 'Catalog migration mismatch'
 assert frappe.db.count('Tele Tena Service Scope') == 0, 'Migration inferred scopes'
+assert frappe.db.sql("SHOW TABLES LIKE 'tt_consultation'")
+assert frappe.db.sql("SHOW COLUMNS FROM tt_consultation LIKE 'room_closed'")
 frappe.destroy()
-print('PASS: additive upgrade, three numbered Patch Log entries, catalog copy, no inferred scopes, repeat migration and all legacy records preserved')
+print('PASS: additive upgrade, five numbered Patch Log entries, catalog copy, consultation storage/close marker, no inferred scopes, repeat migration and all legacy records preserved')
