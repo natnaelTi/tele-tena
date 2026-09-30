@@ -1,0 +1,19 @@
+let csrf = ''
+export function setCsrf(token: string) { csrf = token }
+export async function api<T>(method: string, data: Record<string, unknown> = {}, post = false): Promise<T> {
+  const path = method.startsWith('frappe.') ? '/api/method/' + method : '/api/method/tele_tena.api.journey.' + method
+  const query = new URLSearchParams(Object.entries(data).map(([k, v]) => [k, String(v)]))
+  const response = await fetch(path + (!post && query.size ? '?' + query : ''), {
+    method: post ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
+    headers: post ? { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': csrf } : {},
+    body: post ? JSON.stringify(data) : undefined,
+  })
+  if (!response.ok) throw new Error('Request failed')
+  const result = await response.json()
+  return result.message as T
+}
+export async function signIn(email: string, password: string) {
+  const response = await fetch('/api/method/login', { method: 'POST', credentials: 'same-origin', cache: 'no-store',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usr: email, pwd: password }) })
+  if (!response.ok) throw new Error('Sign in failed')
+}
