@@ -3,7 +3,8 @@
 The only canonical development working copy is:
 `/home/frappe/frappe/frappe-bench/apps/tele_tena`.
 The original `/home/frappe/projects/tele-tena` is retained as an unchanged source
-snapshot; do not develop there. Work on `feat/project-foundation` in the bench copy.
+snapshot; do not develop there. Foundation is on `feat/project-foundation`; milestone 1 is on
+`feat/milestone-1-booking`, based on the unmerged foundation.
 
 The isolated development site is `erp.localhost`. Observed installation versions:
 Bench 5.31.0, Frappe 15.121.2, ERPNext 15.121.6, tele_tena 0.1.0.
@@ -35,9 +36,18 @@ Do not rerun get-app over the existing canonical directory.
 From apps/tele_tena/frontend run npm ci then npm run dev. Its /api proxy targets
 http://127.0.0.1:8000 by default. Set FRAPPE_DEV_URL locally if your bench uses another
 address. For multiple sites ensure the development hostname selects the correct site.
-The foundation screen tests an authenticated endpoint; it does not implement login yet.
-An unauthenticated response is expected until the session integration is implemented.
+Vite sends `X-Frappe-Site-Name: erp.localhost`; override with `FRAPPE_DEV_SITE`
+for a different isolated site. The React journey signs in through Frappe password
+authentication and obtains its session CSRF token for POST commands.
+See [milestone review](milestone-1-verification.md) for isolated synthetic accounts.
 
 LiveKit credentials belong on the backend only; SMS credentials likewise. No secrets
 are needed for the current scaffold. Use provider secret storage or untracked local
 configuration, never chat messages or committed files.
+
+Milestone schema is managed by `tele_tena.schema.install` in after_install and
+after_migrate hooks. Run normal `bench --site erp.localhost migrate` after checkout,
+then `bench --site erp.localhost clear-cache`. The development CLI fixture command
+`bench --site erp.localhost execute tele_tena.development.setup` creates isolated
+accounts and rotates their passwords into a mode-600 file in /tmp; it does not
+reset profiles, appointments or ledger entries. No web authentication bypass exists.
