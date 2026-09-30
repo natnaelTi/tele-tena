@@ -6,5 +6,4 @@ app_email = ""
 required_apps = ["erpnext"]
 
 after_install = "tele_tena.schema.install"
-after_migrate = "tele_tena.schema.install"
 after_request = ["tele_tena.privacy.no_store"]

@@ -156,15 +156,17 @@ def session():
 
 
 @command
-def save_profile(kind, display_name, adult, history='', share_name=False, share_history=False):
+def save_profile(kind, display_name, adult, history='', share_name=None, share_history=None):
     if kind not in ('patient', 'clinician'):
         fail('Unsupported profile type')
     user = actor('Tele Tena ' + kind.title())
     if not boolean(adult):
         fail('Adults 18+ only')
-    existing = rows('SELECT kind FROM tt_profile WHERE user=%s FOR UPDATE', (user,))
+    existing = rows('SELECT kind,share_name,share_history FROM tt_profile WHERE user=%s FOR UPDATE', (user,))
     if existing and existing[0].kind != kind:
         fail('Profile type cannot change')
+    share_name = existing[0].share_name if share_name is None and existing else (False if share_name is None else share_name)
+    share_history = existing[0].share_history if share_history is None and existing else (False if share_history is None else share_history)
     name = text(display_name, 120)
     history = text(history, 4000, False) if kind == 'patient' else ''
     frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history)
@@ -214,22 +216,57 @@ def save_service(service, label):
     actor('Tele Tena Approver')
     if not re.fullmatch(r'[a-z0-9-]{1,80}', service):
         fail('Invalid service identifier')
-    frappe.db.sql('''INSERT INTO tt_service (id,label,active) VALUES (%s,%s,1)
-        ON DUPLICATE KEY UPDATE label=VALUES(label),active=1''', (service, text(label, 120)))
+    if frappe.db.exists('Tele Tena Service', service):
+        doc = frappe.get_doc('Tele Tena Service', service)
+        doc.service_label, doc.active = text(label, 120), 1
+        doc.save()
+    else:
+        frappe.get_doc(dict(doctype='Tele Tena Service', service_key=service,
+                            service_label=text(label, 120), active=1)).insert()
     return {'saved': True}
+
+
+@command
+def review_service_scope(clinician, service, decision):
+    actor('Tele Tena Approver')
+    if decision not in ('Approved', 'Revoked'):
+        fail('Invalid service scope decision')
+    from tele_tena.backoffice import scope_name
+    name = scope_name(clinician, service)
+    if frappe.db.exists('Tele Tena Service Scope', name):
+        doc = frappe.get_doc('Tele Tena Service Scope', name)
+        doc.status = decision
+        doc.save()
+    else:
+        frappe.get_doc(dict(doctype='Tele Tena Service Scope', clinician=clinician,
+                            service=service, status=decision)).insert()
+    return {'status': decision}
+
+
+@query()
+def service_scopes():
+    actor('Tele Tena Approver')
+    return frappe.get_list('Tele Tena Service Scope', fields=['clinician', 'service', 'status'])
+
+
+def approved_service(clinician, service, lock=False):
+    scopes = rows("SELECT name FROM `tabTele Tena Service Scope` WHERE clinician=%s AND service=%s AND status='Approved'" + (' FOR UPDATE' if lock else ''), (clinician, service))
+    if not scopes:
+        fail('Clinician is not approved for this service', 'service_scope_required')
 
 
 @query()
 def services():
     actor()
-    return rows('SELECT id,label FROM tt_service WHERE active=1 ORDER BY label')
+    return rows('SELECT name AS id,service_label AS label FROM `tabTele Tena Service` WHERE active=1 ORDER BY service_label')
 
 
 @command
 def publish(service, price, minutes):
     p = profile('clinician', True)
     approved(p.user, True)
-    one('SELECT id FROM tt_service WHERE id=%s AND active=1', (service,))
+    approved_service(p.user, service, True)
+    one('SELECT name FROM `tabTele Tena Service` WHERE name=%s AND active=1', (service,))
     fee, duration = integer(price, 1, 100000000), integer(minutes, 5, 240)
     frappe.db.sql('''INSERT INTO tt_offering (id,clinician,service,price,minutes,active) VALUES (%s,%s,%s,%s,%s,1)
         ON DUPLICATE KEY UPDATE price=VALUES(price),minutes=VALUES(minutes),active=1''',
@@ -255,13 +292,14 @@ def add_availability(start, end):
 @query()
 def discover(service=None):
     actor('Tele Tena Patient')
-    return rows('''SELECT o.id,o.clinician,p.display_name,o.service,s.label,o.price,o.minutes
+    return rows('''SELECT o.id,o.clinician,p.display_name,o.service,s.service_label AS label,o.price,o.minutes
         FROM tt_offering o JOIN tt_profile p ON p.user=o.clinician
-        JOIN tt_application a ON a.user=o.clinician JOIN tt_service s ON s.id=o.service
+        JOIN tt_application a ON a.user=o.clinician JOIN `tabTele Tena Service` s ON s.name=o.service
         JOIN tabUser u ON u.name=o.clinician
         WHERE a.status='Approved' AND o.active=1 AND s.active=1 AND u.enabled=1
+        AND EXISTS (SELECT 1 FROM `tabTele Tena Service Scope` sc WHERE sc.clinician=o.clinician AND sc.service=o.service AND sc.status='Approved')
         AND EXISTS (SELECT 1 FROM `tabHas Role` r WHERE r.parent=o.clinician AND r.role='Tele Tena Clinician')
-        AND (%s IS NULL OR o.service=%s) ORDER BY s.label,p.display_name''', (service or None, service or None))
+        AND (%s IS NULL OR o.service=%s) ORDER BY s.service_label,p.display_name''', (service or None, service or None))
 
 
 @query()
@@ -269,6 +307,7 @@ def windows(offering):
     actor('Tele Tena Patient')
     o = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (offering,))
     approved(o.clinician)
+    approved_service(o.clinician, o.service)
     available = rows('SELECT start,end FROM tt_availability WHERE clinician=%s AND end>UTC_TIMESTAMP() ORDER BY start', (o.clinician,))
     busy = rows('SELECT start,end FROM tt_appointment WHERE clinician=%s AND end>UTC_TIMESTAMP()', (o.clinician,))
     # Publish occupied times only, never identities or disclosures.
@@ -304,11 +343,11 @@ def simulated_deposit(amount, retry_key):
     if wallet.available + wallet.reserved + amount > 1000000000:
         fail('Demo balance limit exceeded')
     frappe.db.sql('UPDATE tt_wallet SET available=available+%s WHERE patient=%s', (amount, p.user))
-    ledger(p.user, 'Deposit', amount, reference)
+    simulation_log(p.user, 'Deposit', amount, reference)
     return {'simulated': True}
 
 
-def ledger(patient, kind, amount, reference):
+def simulation_log(patient, kind, amount, reference):
     frappe.db.sql('INSERT INTO tt_ledger (id,patient,kind,amount,reference,created) VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))',
                   (str(uuid.uuid4()), patient, kind, amount, reference))
 
@@ -318,14 +357,11 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     p = profile('patient', True)
     selected = choices(sharing)
-    shared = disclosure(p, request_text, selected)
     if isinstance(expected_disclosure, str):
         try:
             expected_disclosure = json.loads(expected_disclosure)
         except ValueError:
             fail('Invalid disclosure preview')
-    if expected_disclosure != shared:
-        fail('Profile changed; review disclosure again', 'preview_changed')
     start = instant(start)
     key = text(retry_key, 80)
     payload = json.dumps([offering, iso(start), request_text, selected, expected_price, expected_minutes, expected_disclosure], sort_keys=True)
@@ -336,11 +372,15 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         if prior[0].payload_hash != digest:
             fail('Retry key payload changed', 'retry_changed')
         return {'id': prior[0].id, 'simulated': True}
+    shared = disclosure(p, request_text, selected)
+    if expected_disclosure != shared:
+        fail('Profile changed; review disclosure again', 'preview_changed')
     o = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (offering,))
     # All scheduling mutations acquire the clinician profile lock, across services.
     one('SELECT user FROM tt_profile WHERE user=%s AND kind=%s FOR UPDATE', (o.clinician, 'clinician'))
     approved(o.clinician, True)
-    o = one('SELECT o.*,s.label FROM tt_offering o JOIN tt_service s ON s.id=o.service WHERE o.id=%s AND o.active=1 AND s.active=1 FOR UPDATE', (offering,))
+    approved_service(o.clinician, o.service, True)
+    o = one('SELECT o.*,s.service_label AS label FROM tt_offering o JOIN `tabTele Tena Service` s ON s.name=o.service WHERE o.id=%s AND o.active=1 AND s.active=1 FOR UPDATE', (offering,))
     if integer(expected_price, 1, 100000000) != o.price or integer(expected_minutes, 5, 240) != o.minutes:
         fail('Offering changed; review price and duration again', 'offering_changed')
     end = start + timedelta(minutes=o.minutes)
@@ -358,7 +398,7 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         (appointment, p.user, o.clinician, offering, start, end, o.price, o.minutes, o.label,
          json.dumps(shared), json.dumps(selected), key, digest))
     frappe.db.sql('UPDATE tt_wallet SET available=available-%s,reserved=reserved+%s WHERE patient=%s', (o.price, o.price, p.user))
-    ledger(p.user, 'Reservation', o.price, 'booking:' + appointment)
+    simulation_log(p.user, 'Reservation', o.price, 'booking:' + appointment)
     return {'id': appointment, 'simulated': True}
 
 
