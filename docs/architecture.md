@@ -33,3 +33,14 @@ new code. Do not create a DocType per specialty or fork framework core.
 PWA installation is planned, not implemented in this foundation. Cache static assets
 only; no clinical data, tokens, API responses or offline financial commands. No guarantee
 of background calling on locked mobile devices.
+
+## Milestone 1 storage implementation
+
+App-owned InnoDB tables (`tt_*`) back the authorized command/query APIs. Private
+records have no generic DocType, Desk, report, export or file interface. Installation
+and migration use the framework DDL method; runtime commands never perform DDL
+or commit intermediate state. A global booking gate, followed by patient/wallet
+and clinician locks, provides explicit low-volume serialization. Wallet values
+and immutable ledger amounts use BIGINT minor units; no ERPNext posting or real
+settlement is active. Role provisioning is administrator-controlled; the isolated
+review fixtures use normal Frappe password sessions, not a web login bypass.

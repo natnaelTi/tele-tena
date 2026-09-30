@@ -52,7 +52,8 @@ Application Pending -> Approved/Rejected; resubmission -> Pending. Revocation
 blocks new bookings; existing participant snapshots remain accessible.
 Offering publishes after approval. Booking and balance reservation commit together.
 No completion/earnings/cancellation implementation in this milestone.
-Patient wallet then clinician locks serialize spending and scheduling across
+A singleton booking gate serializes this low-volume demonstration. Patient wallet
+then clinician locks serialize spending and scheduling across
 all offerings. Half-open intervals allow back-to-back sessions. Unique patient/key
 makes retries idempotent; changed payload with same key fails. Command exceptions
 roll back savepoints; no intermediate commits. Deposits work only on erp.localhost
@@ -70,3 +71,6 @@ with explicit tele_tena_simulation_enabled configuration.
 6. English keys and provisional Amharic/Afaan Oromo copy marked for native review.
 7. Real MariaDB transactional and authenticated HTTP/CSRF/generic API checks,
    plus frontend build/lint and Python syntax; unrun checks explicitly documented.
+
+Approval/application and offering changes append versioned audit evidence. The
+booking gate favors correctness over throughput; higher-volume scheduling is deferred.
