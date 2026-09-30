@@ -15,7 +15,7 @@ type Disclosure = { request: string; name?: string; history?: string }
 type Appointment = { id: string; start: string; end: string; state: string; price: number; minutes: number; service_label: string; disclosure: Disclosure }
 type Window = { start: string; end: string }
 const money = (minor: number) => `${Math.floor(minor / 100)}.${String(minor % 100).padStart(2, '0')}`
-const errorKeys: Record<string, Key> = { service_scope_required: 'serviceScopeRequired', outside_availability: 'outsideAvailability', appointment_conflict: 'appointmentConflict', insufficient_funds: 'insufficientFunds', approval_required: 'approvalRequired', preview_changed: 'previewChanged', offering_changed: 'offeringChanged', future_required: 'futureRequired', retry_changed: 'retryChanged', concurrent_update: 'concurrentUpdate', outside_join_window: 'callOutsideWindow', consultation_ended: 'callEnded', appointment_inactive: 'callUnavailable' }
+const errorKeys: Record<string, Key> = { service_scope_required: 'serviceScopeRequired', outside_availability: 'outsideAvailability', appointment_conflict: 'appointmentConflict', insufficient_funds: 'insufficientFunds', approval_required: 'approvalRequired', preview_changed: 'previewChanged', offering_changed: 'offeringChanged', future_required: 'futureRequired', retry_changed: 'retryChanged', concurrent_update: 'concurrentUpdate', outside_join_window: 'callOutsideWindow', consultation_ended: 'callEnded', appointment_inactive: 'callUnavailable', invalid_availability_window: 'invalidAvailabilityWindow', availability_overlap: 'availabilityOverlap' }
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 const date = (utc: string) => new Date(utc).toLocaleString()
 
@@ -139,7 +139,7 @@ export default function App() {
           <label>{t('price')}<input type="number" min="1" max="100000000" step="1" required value={price} onChange={e => setPrice(e.target.value)} /></label>
           <label>{t('minutes')}<input type="number" min="5" max="240" step="1" required value={minutes} onChange={e => setMinutes(e.target.value)} /></label>{button('publish')}
         </form></section>
-        <section><h2>{t('availability')}</h2><form onSubmit={e => submit(e, async () => { await api('add_availability', { start: new Date(start).toISOString(), end: new Date(end).toISOString() }, true); await refresh() })}>
+        <section><h2>{t('availability')}</h2><p>{t('availabilityTiming')}</p><form onSubmit={e => submit(e, async () => { await api('add_availability', { start: new Date(start).toISOString(), end: new Date(end).toISOString() }, true); await refresh() })}>
           <label>{t('start')}<input required type="datetime-local" value={start} onChange={e => change(() => setStart(e.target.value))} /></label>
           <label>{t('end')}<input required type="datetime-local" value={end} onChange={e => setEnd(e.target.value)} /></label>{button('addWindow')}
         </form></section>

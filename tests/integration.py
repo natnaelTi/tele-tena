@@ -242,6 +242,23 @@ class Integration(unittest.TestCase):
         self.assertNotEqual(client.post(method + 'review', json={'clinician': USERS['c3'], 'decision': 'Approved'}).status_code, 200)
         client.post(BASE + '/api/method/logout')
 
+    def test_07b_availability_rejections_are_specific(self):
+        client = requests.Session()
+        method = BASE + '/api/method/tele_tena.api.journey.'
+        self.assertEqual(client.post(BASE + '/api/method/login', data={'usr': USERS['c1'], 'pwd': PASSWORD}).status_code, 200)
+        csrf = client.get(method + 'session').json()['message']['csrf_token']
+        client.headers['X-Frappe-CSRF-Token'] = csrf
+        past = datetime.now(timezone.utc) - timedelta(minutes=1)
+        response = client.post(method + 'add_availability', json={
+            'start': past.isoformat(), 'end': (past + timedelta(minutes=30)).isoformat()
+        })
+        self.assertEqual(response.json()['tele_tena_error'], 'invalid_availability_window')
+        response = client.post(method + 'add_availability', json={
+            'start': at(1), 'end': at(2)
+        })
+        self.assertEqual(response.json()['tele_tena_error'], 'availability_overlap')
+        client.post(BASE + '/api/method/logout')
+
     def test_08_selected_history_and_stale_preview(self):
         self.fund('p1', 1200)
         login('p1')
