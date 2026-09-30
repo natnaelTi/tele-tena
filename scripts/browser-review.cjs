@@ -55,6 +55,8 @@ async function main() {
     const application = page.locator('article').filter({ has: page.getByRole('heading', { name: 'clinician-demo@example.invalid', exact: true }) })
     await application.getByRole('button', { name: 'Approve', exact: true }).click(); await settled()
     await application.getByText('Application status: Approved').waitFor()
+    await page.getByLabel('Service scope to review', { exact: true }).selectOption('general-consultation')
+    await application.getByRole('button', { name: 'Approve service scope', exact: true }).click(); await settled()
     await logout()
     await login('clinician')
     checkpoint = 'publish'

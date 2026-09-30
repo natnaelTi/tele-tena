@@ -66,6 +66,7 @@ class Integration(unittest.TestCase):
         api.save_service(PREFIX, 'Synthetic test consultation')
         for kind in ('c1', 'c2'):
             api.review(USERS[kind], 'Approved')
+            api.review_service_scope(USERS[kind], PREFIX, 'Approved')
             login(kind)
             api.publish(PREFIX, 600, 30)
             api.add_availability(at(), at(12))
@@ -76,6 +77,13 @@ class Integration(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         frappe.db.rollback()
+        scope_names = frappe.db.sql('SELECT name FROM `tabTele Tena Service Scope` WHERE clinician IN %s', (tuple(USERS.values()),), pluck=True)
+        for name in scope_names:
+            frappe.db.sql('DELETE FROM tabVersion WHERE ref_doctype=%s AND docname=%s', ('Tele Tena Service Scope', name))
+            frappe.db.sql('DELETE FROM `tabTele Tena Service Scope` WHERE name=%s', (name,))
+        for name in (PREFIX, PREFIX + '-other'):
+            frappe.db.sql('DELETE FROM tabVersion WHERE ref_doctype=%s AND docname=%s', ('Tele Tena Service', name))
+            frappe.db.sql('DELETE FROM `tabTele Tena Service` WHERE name=%s', (name,))
         # Explicit synthetic fixture cleanup; never touch non-test records.
         for table, field in (('audit', 'subject'), ('ledger', 'patient'), ('appointment', 'patient'), ('wallet', 'patient'),
                              ('availability', 'clinician'), ('offering', 'clinician'), ('application', 'user'), ('profile', 'user')):
@@ -142,7 +150,7 @@ class Integration(unittest.TestCase):
         self.fund('p2', 1200)
         login('p2')
         before = dict(api.wallet())
-        with patch.object(api, 'ledger', side_effect=RuntimeError('Injected synthetic failure')):
+        with patch.object(api, 'simulation_log', side_effect=RuntimeError('Injected synthetic failure')):
             with self.assertRaises(RuntimeError):
                 api.book(**booking(self.offers['c2'], at(2), 'failure'))
         # Commit after failure proves rollback isn't merely deferred to request cleanup.
@@ -152,7 +160,7 @@ class Integration(unittest.TestCase):
         self.assertEqual(api.rows('SELECT id FROM tt_ledger WHERE patient=%s AND kind=%s', (USERS['p2'], 'Reservation')), [])
         with self.assertRaises(frappe.ValidationError):
             api.book(**booking(self.offers['c2'], at(23)))
-        with patch.object(api, 'ledger', side_effect=RuntimeError('Deposit failure')):
+        with patch.object(api, 'simulation_log', side_effect=RuntimeError('Deposit failure')):
             with self.assertRaises(RuntimeError):
                 api.simulated_deposit(100, 'failed-deposit')
         self.assertEqual(dict(api.wallet()), before)
@@ -277,6 +285,119 @@ class Integration(unittest.TestCase):
         self.assertEqual(api.wallet()['available'], before)
         with self.assertRaises(frappe.ValidationError):
             api.simulated_deposit(101, 'same-deposit')
+
+    def test_11_general_approval_does_not_grant_service_scope(self):
+        self.fund('p1', 1200)
+        login('admin')
+        other = PREFIX + '-other'
+        api.save_service(other, 'Synthetic unapproved specialty')
+        login('c1')
+        with self.assertRaises(frappe.ValidationError):
+            api.publish(other, 600, 30)
+        # Simulate an existing/stale offering; no scope inferred from its existence.
+        stale = secrets.token_hex(16)
+        frappe.db.sql('INSERT INTO tt_offering (id,clinician,service,price,minutes,active) VALUES (%s,%s,%s,600,30,1)', (stale, USERS['c1'], other))
+        login('p1')
+        before = dict(api.wallet())
+        self.assertEqual(api.discover(other), [])
+        with self.assertRaises(frappe.ValidationError):
+            api.windows(stale)
+        with self.assertRaises(frappe.ValidationError):
+            api.book(**booking(stale, at(8), 'unapproved-service'))
+        self.assertEqual(dict(api.wallet()), before)
+        login('admin')
+        api.review_service_scope(USERS['c1'], other, 'Approved')
+        login('c1')
+        api.publish(other, 600, 30)
+        login('p1')
+        self.assertIn(stale, [o.id for o in api.discover(other)])
+        login('admin')
+        api.review_service_scope(USERS['c1'], other, 'Revoked')
+        login('p1')
+        self.assertEqual(api.discover(other), [])
+        with self.assertRaises(frappe.ValidationError):
+            api.book(**booking(stale, at(8), 'revoked-service'))
+        self.assertEqual(dict(api.wallet()), before)
+
+    def test_12_successful_retry_precedes_mutable_profile_validation(self):
+        self.fund('p1', 1200)
+        login('p1')
+        api.save_profile('patient', 'Synthetic Original', True, history='Synthetic original history')
+        args = booking(self.offers['c1'], at(8), 'retry-profile')
+        args['sharing'] = {'name': True, 'history': True}
+        args['expected_disclosure'] = {'request': args['request_text'], 'name': 'Synthetic Original', 'history': 'Synthetic original history'}
+        result = api.book(**args)
+        frappe.db.commit()
+        before = dict(api.wallet())
+        api.save_profile('patient', 'Synthetic Changed', True, history='Synthetic changed history', share_name=True, share_history=True)
+        frappe.db.commit()
+        self.assertEqual(api.book(**args)['id'], result['id'])
+        self.assertEqual(dict(api.wallet()), before)
+        self.assertEqual(api.one('SELECT COUNT(*) AS n FROM tt_ledger WHERE reference=%s', ('booking:' + result['id'],)).n, 1)
+        for changed in ({'request_text': 'Changed synthetic request'}, {'expected_disclosure': {'request': args['request_text']}}, {'sharing': {'name': False, 'history': True}}):
+            with self.assertRaises(frappe.ValidationError):
+                api.book(**{**args, **changed})
+        # HTTP uses another connection; release locks held by direct test calls.
+        frappe.db.commit()
+        client = requests.Session()
+        self.assertEqual(client.post(BASE + '/api/method/login', data={'usr': USERS['p1'], 'pwd': PASSWORD}).status_code, 200)
+        method = BASE + '/api/method/tele_tena.api.journey.'
+        token = client.get(method + 'session').json()['message']['csrf_token']
+        client.headers['X-Frappe-CSRF-Token'] = token
+        replay = client.post(method + 'book', json=args)
+        self.assertEqual(replay.status_code, 200, replay.json().get('tele_tena_error', 'unknown'))
+        self.assertEqual(replay.json()['message']['id'], result['id'])
+        changed = client.post(method + 'book', json={**args, 'request_text': 'Different synthetic HTTP retry'})
+        self.assertNotEqual(changed.status_code, 200)
+        self.assertEqual(changed.json()['tele_tena_error'], 'retry_changed')
+        client.post(BASE + '/api/method/logout')
+        # Current eligibility changes do not undo a successful command's replay.
+        login('admin')
+        api.review_service_scope(USERS['c1'], PREFIX, 'Revoked')
+        login('p1')
+        self.assertEqual(api.book(**args)['id'], result['id'])
+        self.assertEqual(dict(api.wallet()), before)
+
+    def test_13_request_overrides_never_change_profile_defaults(self):
+        self.fund('p1', 1200)
+        login('p1')
+        api.save_profile('patient', 'Synthetic Defaults', True, history='Synthetic default history', share_name=True, share_history=True)
+        api.book(**booking(self.offers['c2'], at(11), 'privacy-override'))
+        p = api.profile('patient')
+        self.assertEqual((p.share_name, p.share_history), (1, 1))
+        # Omitted defaults during an unrelated profile edit preserve saved defaults.
+        api.save_profile('patient', 'Synthetic Edited', True, history='Synthetic edited history')
+        p = api.profile('patient')
+        self.assertEqual((p.share_name, p.share_history), (1, 1))
+        record = next(a for a in api.appointments() if a.start == api.iso(api.instant(at(11))))
+        self.assertEqual(record.choices, {'name': False, 'history': False})
+        self.assertEqual(record.disclosure, {'request': 'Synthetic request'})
+
+    def test_14_native_permissions_validation_versions_and_migration_copy(self):
+        from tele_tena.backoffice import scope_name
+        from tele_tena.patches.v1_1_native_catalog import execute
+        login('admin')
+        name = scope_name(USERS['c1'], PREFIX)
+        api.review_service_scope(USERS['c1'], PREFIX, 'Revoked')
+        self.assertGreater(frappe.db.count('Version', {'ref_doctype': 'Tele Tena Service Scope', 'docname': name}), 0)
+        login('p1')
+        self.assertFalse(frappe.has_permission('Tele Tena Service Scope', 'read'))
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_doc('Tele Tena Service Scope', name).save()
+        # Dual-role approvers cannot self-approve through generic native writes.
+        frappe.set_user('Administrator')
+        frappe.get_doc('User', USERS['c1']).add_roles('Tele Tena Approver')
+        login('c1')
+        doc = frappe.get_doc('Tele Tena Service Scope', name)
+        doc.status = 'Approved'
+        with self.assertRaises(frappe.PermissionError):
+            doc.save()
+        login('admin')
+        service = frappe.get_doc('Tele Tena Service', PREFIX)
+        service.service_label = 'Synthetic edited native label'
+        service.save()
+        execute()
+        self.assertEqual(frappe.db.get_value('Tele Tena Service', PREFIX, 'service_label'), 'Synthetic edited native label')
 
 
 if __name__ == '__main__':
