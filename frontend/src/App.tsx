@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useState } from 'react'
 import type { FormEvent } from 'react'
-import { api, setCsrf, signIn } from './api'
+import { ApiError, api, setCsrf, signIn } from './api'
 import { locales } from './i18n'
 import type { Key } from './i18n'
 import './App.css'
@@ -14,6 +14,8 @@ type Disclosure = { request: string; name?: string; history?: string }
 type Appointment = { id: string; start: string; end: string; state: string; price: number; minutes: number; service_label: string; disclosure: Disclosure }
 type Window = { start: string; end: string }
 const money = (minor: number) => `${Math.floor(minor / 100)}.${String(minor % 100).padStart(2, '0')}`
+const errorKeys: Record<string, Key> = { outside_availability: 'outsideAvailability', appointment_conflict: 'appointmentConflict', insufficient_funds: 'insufficientFunds', approval_required: 'approvalRequired', preview_changed: 'previewChanged', offering_changed: 'offeringChanged', future_required: 'futureRequired', retry_changed: 'retryChanged', concurrent_update: 'concurrentUpdate' }
+const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 const date = (utc: string) => new Date(utc).toLocaleString()
 
 export default function App() {
@@ -83,7 +85,7 @@ export default function App() {
   function change(update: () => void) { setPreview(null); setRetryKey(crypto.randomUUID()); update() }
   async function run(action: () => Promise<void>) {
     setWorking(true); setMessage('')
-    try { await action(); setMessage('success') } catch { setMessage('failure') }
+    try { await action(); setMessage('success') } catch (error) { setMessage(error instanceof ApiError ? errorKeys[error.code] || 'failure' : 'failure') }
     finally { setWorking(false) }
   }
   function submit(event: FormEvent, action: () => Promise<void>) { event.preventDefault(); void run(action) }
@@ -139,7 +141,7 @@ export default function App() {
         <section><h2>{t('discovery')}</h2><label>{t('service')}<select aria-label={t('service')} value={filter} onChange={e => { const next = e.target.value; setFilter(next); setOffer(null); void run(async () => { setOffers(await api('discover', next ? { service: next } : {})) }) }}><option value="">{t('all')}</option>{services.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}</select></label>
           {offers.length === 0 && <p>{t('noOffer')}</p>}{offers.map(o => <article key={o.id}><h3>{o.display_name} · {o.label}</h3><p>ETB {money(o.price)} · {o.minutes} {t('duration')}</p><button disabled={working} onClick={() => void run(async () => { change(() => setOffer(o)); setWindows(await api('windows', { offering: o.id })) })}>{t('choose')}</button></article>)}
         </section>
-        {offer && <section><h2>{offer.display_name} · {offer.label}</h2><p>ETB {money(offer.price)} · {offer.minutes} {t('duration')}</p><h3>{t('windows')}</h3>{windows.windows.map(w => <p key={w.start}>{date(w.start)} – {date(w.end)}</p>)}<h3>{t('busy')}</h3>{windows.busy.map(w => <p key={w.start}>{date(w.start)} – {date(w.end)}</p>)}
+        {offer && <section><h2>{offer.display_name} · {offer.label}</h2><p>ETB {money(offer.price)} · {offer.minutes} {t('duration')}</p><p>{t('timezone')}: {timezone}</p><h3>{t('windows')}</h3>{windows.windows.map(w => <p key={w.start}>{date(w.start)} – {date(w.end)}</p>)}<h3>{t('busy')}</h3>{windows.busy.map(w => <p key={w.start}>{date(w.start)} – {date(w.end)}</p>)}
           <label>{t('start')}<input type="datetime-local" required value={start} onChange={e => change(() => setStart(e.target.value))} /></label>
           <label>{t('request')}<textarea required maxLength={2000} value={request} onChange={e => change(() => setRequest(e.target.value))} /></label><h3>{t('sharing')}</h3>
           <label className="check"><input type="checkbox" checked={shareName} onChange={e => change(() => setShareName(e.target.checked))} />{t('shareName')}</label>

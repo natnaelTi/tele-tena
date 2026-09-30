@@ -55,10 +55,10 @@ accessible names: fixed with explicit translated aria labels and rerun successfu
 5. Sign in as patient. Existing available/reserved balances are simulated ETB 50/50.
    Click **Add simulated ETB 100**. Under **Find an approved clinician**, choose
    Synthetic Clinician / Synthetic general consultation (ETB 50, 30 minutes).
-6. Existing availability is 2026-10-04 09:00–12:00 UTC (12:00–15:00 Nairobi/Addis).
-   The first 09:00–09:30 UTC slot is already booked. Enter **2026-10-04 12:30**
+6. Existing availability is 2026-10-04 06:00–09:00 UTC (09:00–12:00 Nairobi/Addis).
+   The first 06:00–06:30 UTC slot is already booked. Enter **2026-10-04 10:00**
    in the Start field if your browser uses Nairobi/Addis local time; otherwise
-   enter the local equivalent of **09:30 UTC**. Enter a synthetic request. Leave
+   enter the local equivalent of **07:00 UTC**. Enter a synthetic request. Leave
    name/history unchecked. Click **Preview exact disclosure**, inspect request-only
    content, then **Confirm appointment and reserve simulated funds**.
 7. Expect available/reserved ETB 100/100 after that one additional deposit/booking.
@@ -86,3 +86,18 @@ simulation flag; no production funding route exists. No cancellation, settlement
 refund, rescheduling or completion transitions. Framework Administrator remains
 an infrastructure superuser. The global booking gate limits throughput intentionally.
 Private storage is app-owned SQL with command APIs, not editable Desk DocTypes.
+
+Review correction: the initial Chromium context inherited Africa/Nairobi, while
+the script printed its local input as UTC. The original suggested 12:30 Nairobi
+start was outside the persisted window. Corrected above; future browser fixture
+runs explicitly use a UTC context. Existing appointments/funds were preserved.
+
+Follow-up booking error fix: ran `scripts/browser-booking-error.cjs` with an
+explicit Africa/Nairobi context against the retained fixtures. Reproduced the
+12:30 local outside-window rejection; asserted the translated specific error,
+visible timezone, unchanged wallet/appointment count and preview invalidation
+when changing to 10:00. Did not book or consume that review slot. Re-ran all
+10 backend tests (including an authenticated HTTP error-code assertion), frontend
+build/lint, Python compileall and whitespace checks successfully. The full
+fixture-creation browser script was not rerun because it changes retained review
+records; its future runs now explicitly use UTC rather than inherited timezone.

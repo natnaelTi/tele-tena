@@ -1,4 +1,8 @@
 export const en = {
+  timezone: 'Dates and times use', outsideAvailability: 'This session does not fit within the clinician’s availability. Choose a start from the displayed window, allowing for the full session duration.',
+  appointmentConflict: 'This time overlaps an existing appointment. Choose another time.', insufficientFunds: 'Your available simulated funds are insufficient for this session.',
+  approvalRequired: 'The clinician is not currently approved for new bookings.', previewChanged: 'Your saved profile changed. Review the disclosure preview again.', offeringChanged: 'The price or duration changed. Refresh the offering and review it again.',
+  futureRequired: 'Choose a future appointment time.', retryChanged: 'This submission key was already used with different details. Start a new booking.', concurrentUpdate: 'A concurrent update interrupted this request. Retry with the same inputs.',
   title: 'Tele-tena · synthetic demonstration', warning: 'Synthetic data and simulated ETB only. No real consultations or payments.',
   review: 'Amharic and Afaan Oromo translations are provisional and require human review.', language: 'Language',
   login: 'Sign in', logout: 'Sign out', email: 'Email', password: 'Password', authenticated: 'Authenticated development account',
@@ -24,6 +28,10 @@ export const en = {
 export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
 export const am: Record<Key, string> = {
+  timezone: 'ቀን እና ሰዓት የሚጠቀሙት', outsideAvailability: 'ቀጠሮው በሐኪሙ የሚገኝበት ሰዓት ውስጥ አይገባም። ሙሉ ቆይታውን የሚያስችል ሰዓት ይምረጡ።',
+  appointmentConflict: 'ይህ ሰዓት ከሌላ ቀጠሮ ጋር ይደራረባል።', insufficientFunds: 'የሚገኘው የማስመሰያ ሂሳብ በቂ አይደለም።', approvalRequired: 'ሐኪሙ ለአዲስ ቀጠሮ አልጸደቀም።',
+  previewChanged: 'መገለጫዎ ተቀይሯል። ቅድመ እይታውን እንደገና ይመልከቱ።', offeringChanged: 'ዋጋው ወይም ቆይታው ተቀይሯል። አድሰው እንደገና ይመልከቱ።',
+  futureRequired: 'የወደፊት ቀጠሮ ይምረጡ።', retryChanged: 'ይህ መለያ በተለየ መረጃ ተጠቅሟል። አዲስ ቀጠሮ ይጀምሩ።', concurrentUpdate: 'ሌላ ማዘመን ጥያቄውን አቋርጧል። በተመሳሳይ መረጃ ይሞክሩ።',
   title:'ቴሌ-ጤና · ሰው ሠራሽ ማሳያ', warning:'ሰው ሠራሽ መረጃ እና የማስመሰያ ብር ብቻ። እውነተኛ ምክክር ወይም ክፍያ የለም።',
   review:en.review, language:'ቋንቋ', login:'ግባ', logout:'ውጣ', email:'ኢሜይል', password:'የይለፍ ቃል', authenticated:'የልማት መለያ',
   profile:'የእርስዎ መገለጫ', name:'የማሳያ ስም', adult:'ዕድሜዬ 18 ወይም ከዚያ በላይ ነው', history:'ሰው ሠራሽ የሕክምና ታሪክ (አማራጭ)',
@@ -42,6 +50,10 @@ export const am: Record<Key, string> = {
   credentials:'የልማት ማሳያ መለያዎችን ይጠቀሙ። የስልክ OTP አልተተገበረም።',
 }
 export const om: Record<Key, string> = {
+  timezone: 'Guyyaa fi saʼaatiin kan fayyadaman', outsideAvailability: 'Beellamni yeroo ogeessi jiru keessatti hin seenu. Yeroo dheerina marii guutuu dandaʼu filadhu.',
+  appointmentConflict: 'Yeroon kun beellama biraa waliin wal irra buʼa. Yeroo biraa filadhu.', insufficientFunds: 'Qarshiin fakkeeffame jiru marii kanaaf gahaa miti.', approvalRequired: 'Ogeessi beellama haaraaf hin raggaane.',
+  previewChanged: 'Ibsi kee jijjiirame. Qoodinsa irra deebiʼii ilaali.', offeringChanged: 'Gatiin ykn dheerinni yeroo jijjiirame. Haaromsiitii irra deebiʼii ilaali.',
+  futureRequired: 'Yeroo beellamaa gara fuulduraa filadhu.', retryChanged: 'Eenyummeessaan kun odeeffannoo addaatiin fayyadameera. Beellama haaraa jalqabi.', concurrentUpdate: 'Haaromsi biraa gaaffii kana addaan kute. Odeeffannoo wal fakkaatuun irra deebiʼi.',
   title:'Tele-tena · agarsiisa namtolchee', warning:'Odeeffannoo namtolchee fi qarshii fakkeeffame qofa. Marii ykn kaffaltii dhugaa hin qabu.',
   review:en.review, language:'Afaan', login:'Seeni', logout:'Baʼi', email:'Imeelii', password:'Jecha icciitii', authenticated:'Herrega misoomaa',
   profile:'Ibsa kee', name:'Maqaa agarsiisaa', adult:'Umuriin koo 18 ykn isaa ol', history:'Seenaa fayyaa namtolchee (filannoo)', shareName:'Maqaa koo qoodi',

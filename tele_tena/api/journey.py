@@ -10,7 +10,8 @@ import frappe
 from frappe.sessions import get_csrf_token
 
 
-def fail(message):
+def fail(message, code='invalid_input'):
+    frappe.local.response['tele_tena_error'] = code
     frappe.throw(message, frappe.ValidationError)
 
 
@@ -45,7 +46,7 @@ def profile(kind, lock=False):
 def approved(user, lock=False):
     app = one('SELECT status FROM tt_application WHERE user=%s' + (' FOR UPDATE' if lock else ''), (user,))
     if app.status != 'Approved':
-        fail('Clinician approval required')
+        fail('Clinician approval required', 'approval_required')
     if 'Tele Tena Clinician' not in frappe.get_roles(user) or not frappe.db.get_value('User', user, 'enabled'):
         fail('Clinician unavailable')
 
@@ -77,7 +78,7 @@ def command(fn):
             return fn(*args, **kwargs)
         except frappe.QueryDeadlockError:
             frappe.db.rollback()
-            fail('Concurrent update; retry with the same submission key')
+            fail('Concurrent update; retry with the same submission key', 'concurrent_update')
         except (frappe.PermissionError, frappe.ValidationError):
             frappe.db.rollback(save_point=savepoint)
             raise
@@ -298,7 +299,7 @@ def simulated_deposit(amount, retry_key):
     previous = rows('SELECT amount FROM tt_ledger WHERE reference=%s', (reference,))
     if previous:
         if previous[0].amount != amount:
-            fail('Retry key payload changed')
+            fail('Retry key payload changed', 'retry_changed')
         return {'simulated': True}
     if wallet.available + wallet.reserved + amount > 1000000000:
         fail('Demo balance limit exceeded')
@@ -324,7 +325,7 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         except ValueError:
             fail('Invalid disclosure preview')
     if expected_disclosure != shared:
-        fail('Profile changed; review disclosure again')
+        fail('Profile changed; review disclosure again', 'preview_changed')
     start = instant(start)
     key = text(retry_key, 80)
     payload = json.dumps([offering, iso(start), request_text, selected, expected_price, expected_minutes, expected_disclosure], sort_keys=True)
@@ -333,7 +334,7 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     prior = rows('SELECT id,payload_hash FROM tt_appointment WHERE patient=%s AND retry_key=%s FOR UPDATE', (p.user, key))
     if prior:
         if prior[0].payload_hash != digest:
-            fail('Retry key payload changed')
+            fail('Retry key payload changed', 'retry_changed')
         return {'id': prior[0].id, 'simulated': True}
     o = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (offering,))
     # All scheduling mutations acquire the clinician profile lock, across services.
@@ -341,16 +342,16 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     approved(o.clinician, True)
     o = one('SELECT o.*,s.label FROM tt_offering o JOIN tt_service s ON s.id=o.service WHERE o.id=%s AND o.active=1 AND s.active=1 FOR UPDATE', (offering,))
     if integer(expected_price, 1, 100000000) != o.price or integer(expected_minutes, 5, 240) != o.minutes:
-        fail('Offering changed; review price and duration again')
+        fail('Offering changed; review price and duration again', 'offering_changed')
     end = start + timedelta(minutes=o.minutes)
     if start <= datetime.now(timezone.utc).replace(tzinfo=None):
-        fail('Appointment must be in the future')
+        fail('Appointment must be in the future', 'future_required')
     if not rows('SELECT id FROM tt_availability WHERE clinician=%s AND start<=%s AND end>=%s FOR UPDATE', (o.clinician, start, end)):
-        fail('Outside availability')
+        fail('Outside availability', 'outside_availability')
     if rows('SELECT id FROM tt_appointment WHERE (clinician=%s OR patient=%s) AND start<%s AND end>%s FOR UPDATE', (o.clinician, p.user, end, start)):
-        fail('Appointment conflict')
+        fail('Appointment conflict', 'appointment_conflict')
     if wallet.available < o.price:
-        fail('Insufficient simulated funds')
+        fail('Insufficient simulated funds', 'insufficient_funds')
     appointment = str(uuid.uuid4())
     frappe.db.sql('''INSERT INTO tt_appointment (id,patient,clinician,offering,start,end,state,price,minutes,
         service_label,disclosure,choices,retry_key,payload_hash) VALUES (%s,%s,%s,%s,%s,%s,'Booked',%s,%s,%s,%s,%s,%s,%s)''',

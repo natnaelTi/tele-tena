@@ -1,3 +1,7 @@
+export class ApiError extends Error {
+  code: string
+  constructor(code: string) { super('Request failed'); this.code = code }
+}
 let csrf = ''
 export function setCsrf(token: string) { csrf = token }
 export async function api<T>(method: string, data: Record<string, unknown> = {}, post = false): Promise<T> {
@@ -8,7 +12,10 @@ export async function api<T>(method: string, data: Record<string, unknown> = {},
     headers: post ? { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': csrf } : {},
     body: post ? JSON.stringify(data) : undefined,
   })
-  if (!response.ok) throw new Error('Request failed')
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new ApiError(typeof error.tele_tena_error === 'string' ? error.tele_tena_error : 'unknown')
+  }
   const result = await response.json()
   return result.message as T
 }

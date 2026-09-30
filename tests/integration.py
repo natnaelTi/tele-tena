@@ -223,6 +223,9 @@ class Integration(unittest.TestCase):
         self.assertEqual(client.get(method + 'save_profile', params=payload).status_code, 403)
         for resource in ('tt_profile', 'tt_wallet', 'tt_appointment', 'tt_ledger'):
             self.assertNotEqual(client.get(BASE + '/api/resource/' + resource).status_code, 200)
+        rejection = client.post(method + 'book', json=booking(self.offers['c2'], at(23), 'http-window'))
+        self.assertNotEqual(rejection.status_code, 200)
+        self.assertEqual(rejection.json()['tele_tena_error'], 'outside_availability')
         other = client.get(method + 'wallet', params={'patient': USERS['p2']})
         self.assertEqual(other.status_code, 200)
         self.assertEqual(other.json()['message']['available'], api.one('SELECT available FROM tt_wallet WHERE patient=%s', (USERS['p1'],)).available)

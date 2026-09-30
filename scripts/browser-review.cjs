@@ -12,7 +12,7 @@ let checkpoint = 'launch'
 
 async function main() {
   const browser = await chromium.launch({ headless: true })
-  const context = await browser.newContext()
+  const context = await browser.newContext({ timezoneId: 'UTC' })
   const page = await context.newPage()
   const errors = []
   page.on('pageerror', () => errors.push('Browser page exception'))
