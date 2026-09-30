@@ -1,5 +1,6 @@
-import { useEffect, useEffectEvent, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
+import type { Room as LiveKitRoom } from 'livekit-client'
 import { ApiError, api, setCsrf, signIn } from './api'
 import { locales } from './i18n'
 import type { Key } from './i18n'
@@ -14,7 +15,7 @@ type Disclosure = { request: string; name?: string; history?: string }
 type Appointment = { id: string; start: string; end: string; state: string; price: number; minutes: number; service_label: string; disclosure: Disclosure }
 type Window = { start: string; end: string }
 const money = (minor: number) => `${Math.floor(minor / 100)}.${String(minor % 100).padStart(2, '0')}`
-const errorKeys: Record<string, Key> = { service_scope_required: 'serviceScopeRequired', outside_availability: 'outsideAvailability', appointment_conflict: 'appointmentConflict', insufficient_funds: 'insufficientFunds', approval_required: 'approvalRequired', preview_changed: 'previewChanged', offering_changed: 'offeringChanged', future_required: 'futureRequired', retry_changed: 'retryChanged', concurrent_update: 'concurrentUpdate' }
+const errorKeys: Record<string, Key> = { service_scope_required: 'serviceScopeRequired', outside_availability: 'outsideAvailability', appointment_conflict: 'appointmentConflict', insufficient_funds: 'insufficientFunds', approval_required: 'approvalRequired', preview_changed: 'previewChanged', offering_changed: 'offeringChanged', future_required: 'futureRequired', retry_changed: 'retryChanged', concurrent_update: 'concurrentUpdate', outside_join_window: 'callOutsideWindow', consultation_ended: 'callEnded', appointment_inactive: 'callUnavailable' }
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 const date = (utc: string) => new Date(utc).toLocaleString()
 
@@ -164,7 +165,117 @@ export default function App() {
         </section>}
       </>}
       {(patient || clinician) && !session.profile && <p>{t('noProfile')}</p>}
-      {session.profile && <section><h2>{t('appointments')}</h2>{appointments.length === 0 && <p>{t('empty')}</p>}{appointments.map(a => <article key={a.id}><h3>{a.service_label} · {t('booked')}</h3><p>{date(a.start)} – {date(a.end)} · ETB {money(a.price)} · {a.minutes} {t('duration')}</p>{disclosureView(a.disclosure)}</article>)}</section>}
+      {session.profile && <section><h2>{t('appointments')}</h2>{appointments.length === 0 && <p>{t('empty')}</p>}{appointments.map(a => <article key={a.id}><h3>{a.service_label} · {t('booked')}</h3><p>{date(a.start)} – {date(a.end)} · ETB {money(a.price)} · {a.minutes} {t('duration')}</p>{disclosureView(a.disclosure)}<Consultation appointment={a} t={t} /></article>)}</section>}
     </>}
   </main>
+}
+
+type ConsultationInfo = { state: 'Not started' | 'Open' | 'Ended'; role: 'patient' | 'clinician'; can_join: boolean; can_end: boolean; room_close_pending: boolean }
+function Consultation({ appointment, t }: { appointment: Appointment; t: (key: Key) => string }) {
+  const [info, setInfo] = useState<ConsultationInfo | null>(null)
+  const [status, setStatus] = useState<Key>('callNotStarted')
+  const [checked, setChecked] = useState(false)
+  const [audioOnly, setAudioOnly] = useState(false)
+  const [muted, setMuted] = useState(false)
+  const [cameraOn, setCameraOn] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const preview = useRef<HTMLVideoElement>(null)
+  const remote = useRef<HTMLDivElement>(null)
+  const roomRef = useRef<LiveKitRoom | null>(null)
+  const previewStream = useRef<MediaStream | null>(null)
+
+  const refresh = useCallback(async () => {
+    try {
+      const next = await api<ConsultationInfo>('tele_tena.api.consultations.consultation', { appointment: appointment.id })
+      setInfo(next)
+      setStatus(next.state === 'Ended' ? next.room_close_pending ? 'callClosePending' : 'callEnded' : !next.can_join ? 'callOutsideWindow' : next.state === 'Open' ? 'callReady' : 'callNotStarted')
+    } catch { setStatus('callUnavailable') }
+  }, [appointment.id])
+  useEffect(() => {
+    void Promise.resolve().then(refresh)
+    const timer = window.setInterval(() => void refresh(), 5000)
+    return () => { window.clearInterval(timer); void leave(false); stopPreview() }
+  }, [appointment.id, refresh])
+  function stopPreview() {
+    previewStream.current?.getTracks().forEach(track => track.stop())
+    previewStream.current = null
+    if (preview.current) preview.current.srcObject = null
+    setChecked(false)
+  }
+  async function checkDevices() {
+    stopPreview()
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: !audioOnly })
+      previewStream.current = stream
+      if (preview.current && !audioOnly) { preview.current.srcObject = stream; await preview.current.play().catch(() => undefined) }
+      setChecked(true); setStatus('callReady')
+    } catch { setStatus('callDeviceError') }
+  }
+  async function join() {
+    setBusy(true); setStatus('callConnecting')
+    try {
+      const issued = await api<{ url: string; token: string; audio_only: boolean }>('tele_tena.api.consultations.join',
+        { appointment: appointment.id, audio_only: audioOnly ? 1 : 0 }, true)
+      const { Room, RoomEvent } = await import('livekit-client')
+      const room = new Room({ adaptiveStream: true, dynacast: true })
+      roomRef.current = room
+      room.on(RoomEvent.Reconnecting, () => setStatus('callReconnecting'))
+      room.on(RoomEvent.Reconnected, () => setStatus('callConnected'))
+      room.on(RoomEvent.Disconnected, () => { setStatus('callDisconnected'); roomRef.current = null })
+      room.on(RoomEvent.TrackSubscribed, (track) => {
+        if (remote.current) remote.current.appendChild(track.attach())
+      })
+      room.on(RoomEvent.TrackUnsubscribed, (track) => track.detach().forEach(element => element.remove()))
+      await room.connect(issued.url, issued.token)
+      stopPreview()
+      await room.localParticipant.setMicrophoneEnabled(true)
+      if (!audioOnly) await room.localParticipant.setCameraEnabled(true)
+      setMuted(false); setCameraOn(!audioOnly); setStatus('callConnected')
+    } catch { setStatus('callConnectError') }
+    finally { setBusy(false) }
+  }
+  async function leave(showStatus = true) {
+    const room = roomRef.current
+    roomRef.current = null
+    if (room) await room.disconnect()
+    stopPreview()
+    if (showStatus) setStatus('callDisconnected')
+  }
+  async function end() {
+    setBusy(true)
+    try {
+      await api('tele_tena.api.consultations.end', { appointment: appointment.id }, true)
+      await leave(false); setStatus('callEnded'); await refresh()
+    } catch { setStatus('callClosePending') }
+    finally { setBusy(false) }
+  }
+  async function toggleMute() {
+    const next = !muted
+    await roomRef.current?.localParticipant.setMicrophoneEnabled(!next)
+    setMuted(next)
+  }
+  async function toggleCamera() {
+    const next = !cameraOn
+    await roomRef.current?.localParticipant.setCameraEnabled(next)
+    setCameraOn(next)
+  }
+  const connected = Boolean(roomRef.current)
+  return <section className="consultation" aria-label={t('consultation')}>
+    <h4>{t('consultation')}</h4><p role="status">{t(status)}</p>
+    {!connected && info?.state !== 'Ended' && <>
+      <label className="check"><input type="checkbox" checked={audioOnly} onChange={e => { setAudioOnly(e.target.checked); setChecked(false) }} />{t('audioOnly')}</label>
+      <button disabled={busy || !info?.can_join} onClick={() => void checkDevices()}>{t(audioOnly ? 'checkMicrophone' : 'checkDevices')}</button>
+      {!audioOnly && <video ref={preview} autoPlay muted playsInline className="call-video" aria-label={t('localPreview')} />}
+      <button disabled={busy || !checked || !info?.can_join} onClick={() => void join()}>{t('joinCall')}</button>
+      <button type="button" disabled={busy} onClick={() => void refresh()}>{t('refreshCall')}</button>
+    </>}
+    <div ref={remote} className="call-remote" aria-label={t('remoteMedia')} />
+    {connected && <div className="call-controls">
+      <button type="button" onClick={() => void toggleMute()}>{t(muted ? 'unmute' : 'mute')}</button>
+      {!audioOnly && <button type="button" onClick={() => void toggleCamera()}>{t(cameraOn ? 'cameraOff' : 'cameraOn')}</button>}
+      <button type="button" onClick={() => void leave()}>{t('leaveCall')}</button>
+      {info?.can_end && <button type="button" disabled={busy} onClick={() => void end()}>{t('endConsultation')}</button>}
+    </div>}
+    {info?.can_end && !connected && <button type="button" disabled={busy} onClick={() => void end()}>{t('endConsultation')}</button>}
+  </section>
 }

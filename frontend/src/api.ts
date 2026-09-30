@@ -5,7 +5,7 @@ export class ApiError extends Error {
 let csrf = ''
 export function setCsrf(token: string) { csrf = token }
 export async function api<T>(method: string, data: Record<string, unknown> = {}, post = false): Promise<T> {
-  const path = method.startsWith('frappe.') ? '/api/method/' + method : '/api/method/tele_tena.api.journey.' + method
+  const path = method.startsWith('frappe.') || method.startsWith('tele_tena.') ? '/api/method/' + method : '/api/method/tele_tena.api.journey.' + method
   const query = new URLSearchParams(Object.entries(data).map(([k, v]) => [k, String(v)]))
   const response = await fetch(path + (!post && query.size ? '?' + query : ''), {
     method: post ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',

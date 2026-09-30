@@ -25,10 +25,28 @@ export const en = {
   loading: 'Working…', noProfile: 'Save your profile to continue.', noOffer: 'No approved offerings yet.',
   requestField: 'Request', nameField: 'Name', historyField: 'History', previewNote: 'Changing inputs clears the preview. Confirmed disclosures are saved snapshots.',
   credentials: 'Use the isolated synthetic accounts from the local credentials file. Phone OTP is not implemented.',
+  consultation: 'Secure voice and video consultation', callNotStarted: 'Not started', callReady: 'Devices checked. Ready to join.',
+  callConnecting: 'Connecting…', callConnected: 'Connected', callReconnecting: 'Connection interrupted. Reconnecting…',
+  callDisconnected: 'You left the consultation. Rejoin is available during the permitted window.', callEnded: 'The clinician ended this consultation.',
+  callDeviceError: 'Camera or microphone access failed. Check browser permissions and try again.', callConnectError: 'Could not connect. Check the connection and retry.',
+  callClosePending: 'The consultation is ended. Room closure is pending; retry End consultation to confirm.',
+  callOutsideWindow: 'This appointment is outside its permitted join window.', callUnavailable: 'Consultation unavailable for this account or appointment.',
+  audioOnly: 'Audio only (microphone; no camera)', checkDevices: 'Check microphone and camera', checkMicrophone: 'Check microphone', localPreview: 'Local camera preview',
+  joinCall: 'Join consultation', refreshCall: 'Refresh call status', remoteMedia: 'Other participant media', mute: 'Mute microphone',
+  unmute: 'Unmute microphone', cameraOff: 'Turn camera off', cameraOn: 'Turn camera on', leaveCall: 'Leave (consultation stays open)',
+  endConsultation: 'End consultation for both participants',
 } as const
 export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
 export const am: Record<Key, string> = {
+  consultation:'ደህንነቱ የተጠበቀ የድምፅና ቪዲዮ ምክክር', callNotStarted:'አልተጀመረም', callReady:'መሣሪያዎቹ ተፈትሸዋል። ለመግባት ዝግጁ ነው።',
+  callConnecting:'በመገናኘት ላይ…', callConnected:'ተገናኝቷል', callReconnecting:'ግንኙነቱ ተቋርጧል። እንደገና በመገናኘት ላይ…',
+  callDisconnected:'ከምክክሩ ወጥተዋል። በተፈቀደው ጊዜ እንደገና መግባት ይችላሉ።', callEnded:'ሐኪሙ ይህን ምክክር አቋርጧል።',
+  callDeviceError:'ካሜራ ወይም ማይክሮፎን አልተከፈተም። የአሳሹን ፈቃድ ያረጋግጡ።', callConnectError:'መገናኘት አልተቻለም። ግንኙነቱን ያረጋግጡ።',
+  callClosePending:'ምክክሩ ተጠናቋል። የክፍሉ መዘጋት በመጠባበቅ ላይ ነው።', callOutsideWindow:'ይህ ቀጠሮ በተፈቀደው የመግቢያ ጊዜ ውስጥ አይደለም።',
+  callUnavailable:'ምክክሩ ለዚህ መለያ ወይም ቀጠሮ አይገኝም።', audioOnly:'ድምፅ ብቻ (ማይክሮፎን፤ ካሜራ የለም)',
+  checkDevices:'ማይክሮፎንና ካሜራ ፈትሽ', checkMicrophone:'ማይክሮፎን ፈትሽ', localPreview:'የካሜራ ቅድመ እይታ', joinCall:'ወደ ምክክሩ ግባ', refreshCall:'የጥሪ ሁኔታ አድስ', remoteMedia:'የሌላው ተሳታፊ ሚዲያ',
+  mute:'ማይክሮፎን ዝጋ', unmute:'ማይክሮፎን ክፈት', cameraOff:'ካሜራ ዝጋ', cameraOn:'ካሜራ ክፈት', leaveCall:'ውጣ (ምክክሩ ክፍት ይቆያል)', endConsultation:'ለሁለቱም ምክክሩን ጨርስ',
   scopeRevoked: 'ተሰርዟል', serviceScopeRequired: 'ሐኪሙ ለዚህ አገልግሎት አልጸደቀም።', scopeService: 'የሚገመገመው አገልግሎት', serviceScopes: 'የጸደቁ አገልግሎቶች', approveScope: 'የአገልግሎት ፈቃድ አጽድቅ', revokeScope: 'የአገልግሎት ፈቃድ ሰርዝ',
   timezone: 'ቀን እና ሰዓት የሚጠቀሙት', outsideAvailability: 'ቀጠሮው በሐኪሙ የሚገኝበት ሰዓት ውስጥ አይገባም። ሙሉ ቆይታውን የሚያስችል ሰዓት ይምረጡ።',
   appointmentConflict: 'ይህ ሰዓት ከሌላ ቀጠሮ ጋር ይደራረባል።', insufficientFunds: 'የሚገኘው የማስመሰያ ሂሳብ በቂ አይደለም።', approvalRequired: 'ሐኪሙ ለአዲስ ቀጠሮ አልጸደቀም።',
@@ -52,6 +70,14 @@ export const am: Record<Key, string> = {
   credentials:'የልማት ማሳያ መለያዎችን ይጠቀሙ። የስልክ OTP አልተተገበረም።',
 }
 export const om: Record<Key, string> = {
+  consultation:'Mariin sagalee fi viidiyoo nageenya qabu', callNotStarted:'Hin jalqabamne', callReady:'Meeshaaleen ilaalaman. Seenuuf qophaaʼe.',
+  callConnecting:'Wal qunnamaa jira…', callConnected:'Wal qabame', callReconnecting:'Wal qunnamtiin cite. Deebiʼee wal qunnamaa jira…',
+  callDisconnected:'Mariirraa baate. Yeroo hayyamame keessatti deebiʼuu dandeessa.', callEnded:'Ogeessi marii kana xumure.',
+  callDeviceError:'Kaameraan ykn maayikiroofoniin hin banamne. Hayyama braawzarii ilaali.', callConnectError:'Wal qunnamuun hin dandaʼamne. Deebiʼii yaali.',
+  callClosePending:'Mariin xumurame. Cufamuun kutaa eegamaa jira; xumura irra deebiʼi.', callOutsideWindow:'Beellamni kun yeroo seenuu hayyamame keessa miti.',
+  callUnavailable:'Marii kana herregni ykn beellamni kun argachuu hin dandaʼu.', audioOnly:'Sagalee qofa (maayikiroofonii; kaameraa hin jiru)',
+  checkDevices:'Maayikiroofonii fi kaameraa ilaali', checkMicrophone:'Maayikiroofonii ilaali', localPreview:'Dur-ilaalcha kaameraa', joinCall:'Marii seeni', refreshCall:'Haala bilbilaa haaromsi', remoteMedia:'Miidiyaa hirmaataa biraa',
+  mute:'Maayikiroofonii cufi', unmute:'Maayikiroofonii bani', cameraOff:'Kaameraa cufi', cameraOn:'Kaameraa bani', leaveCall:'Baʼi (mariin banaa hafa)', endConsultation:'Marii hirmaattota lamaaniif xumuri',
   scopeRevoked: 'Haqame', serviceScopeRequired: 'Ogeessi tajaajila kanaaf hin raggaane.', scopeService: 'Tajaajila gamaaggamu', serviceScopes: 'Tajaajiloota raggaʼan', approveScope: 'Tajaajila raggaasisi', revokeScope: 'Hayyama tajaajilaa haqi',
   timezone: 'Guyyaa fi saʼaatiin kan fayyadaman', outsideAvailability: 'Beellamni yeroo ogeessi jiru keessatti hin seenu. Yeroo dheerina marii guutuu dandaʼu filadhu.',
   appointmentConflict: 'Yeroon kun beellama biraa waliin wal irra buʼa. Yeroo biraa filadhu.', insufficientFunds: 'Qarshiin fakkeeffame jiru marii kanaaf gahaa miti.', approvalRequired: 'Ogeessi beellama haaraaf hin raggaane.',
