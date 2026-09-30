@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+node_modules/
+frontend/dist/
+.env
+.env.*
+!.env.example
+site_config.json
+common_site_config.json
+*.sql
+*.sql.gz
+*.log
+coverage/
+.DS_Store
