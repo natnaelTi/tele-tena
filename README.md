@@ -2,8 +2,9 @@
 
 Ethiopia-first consultation platform: custom Frappe app + ERPNext accounting + React PWA.
 
-**Status: verified synthetic milestone 1 demonstration.** Approved clinician discovery,
-disclosure preview, direct booking and simulated fund reservation are connected.
+**Status: verified synthetic milestone 1 demonstration.** Approved clinician discovery within approved service scopes, disclosure preview, direct booking and simulated fund
+reservation are connected. The simulation transaction log is not the planned
+double-entry subledger or ERPNext accounting integration.
 No phone OTP, real payments, PWA installation or LiveKit integration.
 See [review steps and test results](docs/milestone-1-verification.md).
 

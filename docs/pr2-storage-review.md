@@ -29,6 +29,8 @@ Use immutable numbered Frappe post-model-sync patches and Patch Log entries:
 `v1_1_native_catalog` copies catalog identifiers/labels/active flags into native
 Service documents. Keep `tt_service` as an untouched legacy migration source,
 not a second writable catalog. Runtime catalog APIs use the native table only.
+`v1_2_catalog_adoption_check` completes adoption on benches that recorded an
+early draft of the catalog patch; it also copies only missing documents.
 Fresh installation bootstraps the same schema/copy routines after model sync,
 because Frappe marks install-time patches complete before after_install. No DROP,
 TRUNCATE, identifier rewriting, financial recalculation or record deletion.

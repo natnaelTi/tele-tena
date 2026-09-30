@@ -51,7 +51,9 @@ accessible names: fixed with explicit translated aria labels and rerun successfu
    already exist. To review approval again, enter a synthetic credential statement
    and click **Submit for manual approval**; status becomes Pending. Sign out.
 4. Sign in as approver. Find the clinician application, click **Approve**. The
-   **Service catalog** already contains `general-consultation`. Sign out.
+   **Service catalog** already contains `general-consultation`. Select it under
+   **Service scope to review** and click **Approve service scope** for this clinician;
+   general approval alone no longer allows the offering. Sign out.
 5. Sign in as patient. Existing available/reserved balances are simulated ETB 50/50.
    Click **Add simulated ETB 100**. Under **Find an approved clinician**, choose
    Synthetic Clinician / Synthetic general consultation (ETB 50, 30 minutes).
@@ -101,3 +103,8 @@ when changing to 10:00. Did not book or consume that review slot. Re-ran all
 build/lint, Python compileall and whitespace checks successfully. The full
 fixture-creation browser script was not rerun because it changes retained review
 records; its future runs now explicitly use UTC rather than inherited timezone.
+
+PR #2 review follow-up: historical references above to a ledger mean only the
+simulation transaction log, not a double-entry financial subledger. The catalog
+and service scopes now use native DocTypes; private storage remains command-only.
+Current review checks and the fresh-site result are recorded in pr2-review-verification.md.

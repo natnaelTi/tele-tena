@@ -17,7 +17,8 @@ cookies and CSRF must follow the installed Frappe version's supported behavior.
 Modules: identity/consent; providers/affiliations; service catalog; marketplace;
 scheduling; consultations/records; financial subledger; trust/operations.
 
-Operational ledger owns spendable/reserved funds and clinician earnings. ERPNext owns
+The planned double-entry operational subledger will own spendable/reserved funds
+and clinician earnings; it is not implemented by the simulation event log. ERPNext owns
 financial reporting. Define posting mappings, durable retry references and reconciliation;
 never independently calculate two authoritative spendable balances. Regulatory/provider
 approval of stored funds is still outstanding. Demo money is simulated only.
@@ -36,11 +37,21 @@ of background calling on locked mobile devices.
 
 ## Milestone 1 storage implementation
 
-App-owned InnoDB tables (`tt_*`) back the authorized command/query APIs. Private
+App-owned InnoDB tables (`tt_*`) back the private authorized command/query APIs. Private
 records have no generic DocType, Desk, report, export or file interface. Installation
 and migration use the framework DDL method; runtime commands never perform DDL
 or commit intermediate state. A global booking gate, followed by patient/wallet
 and clinician locks, provides explicit low-volume serialization. Wallet values
-and immutable ledger amounts use BIGINT minor units; no ERPNext posting or real
+and simulation transaction-log amounts use BIGINT minor units; no ERPNext posting or real
 settlement is active. Role provisioning is administrator-controlled; the isolated
 review fixtures use normal Frappe password sessions, not a web login bypass.
+
+## PR #2 review adjustment
+
+Service configuration and per-clinician service approvals now use native versioned
+Frappe DocTypes, with approver permissions and validation shared by generic APIs
+and React commands. General approval never supplies a service scope. Legacy catalog
+rows and all private transactional records remain preserved. Numbered post-model-sync
+patches record adoption; repeated after_migrate DDL is removed. See
+[storage review](pr2-storage-review.md) for the smallest staged back-office adjustment
+and explicit limits of the simulation log versus the future double-entry subledger.

@@ -15,7 +15,8 @@ approval is an attestation, not automated credential verification.
 
 ## Data model
 Frappe User authentication and Tele Tena Patient/Clinician/Approver roles.
-App-owned SQL tables expose only explicit authorized command/query APIs, keeping
+Native Service and Service Scope DocTypes provide bounded back-office configuration.
+Private app-owned SQL tables expose only explicit authorized command/query APIs, keeping
 private content out of generic DocType list/export/report/file routes. No files
 or attachments. Framework Administrator is a trusted infrastructure superuser;
 ordinary approvers receive no private patient read API.
@@ -24,12 +25,14 @@ ordinary approvers receive no private patient read API.
   optional synthetic history and global name/history sharing defaults.
 - Application: unique clinician, credential statement, Pending/Approved/Rejected.
 - Service: identifier, label, active.
+- Service scope: native clinician/service approval, Approved/Revoked; independent
+  of general approval and never inferred from an existing offering.
 - Offering: unique clinician/service, price minor units, fixed minutes, active.
 - Availability: clinician, UTC start/end; nonoverlapping windows.
 - Appointment: participants/offering, UTC start/end, Booked, immutable price,
   duration/service/disclosure snapshot, patient-scoped retry key and payload hash.
 - Simulated wallet: unique patient, available/reserved integer ETB minor units.
-- Immutable simulated ledger: deposits/reservations with unique references;
+- Append-only simulation transaction log (not a double-entry subledger): deposits/reservations with unique references;
   no edit/delete, real settlement or production funding route.
 
 ## Permission matrix
@@ -38,7 +41,7 @@ ordinary approvers receive no private patient read API.
 | Guest | Frappe login; no app access |
 | Patient | Own profile/defaults, approved discovery/windows, own preview/bookings/wallet; development-only simulated deposit |
 | Pending/rejected clinician | Own profile/application; no publication/bookings |
-| Approved clinician | Own offering/windows; own bookings with authorized snapshots only |
+| Approved clinician with approved service scope | Own scoped offering/windows; own bookings with authorized snapshots only |
 | Approver | Applications and manual approval; catalog; no patient history/wallet/disclosure API |
 | Other accounts | No cross-account private data access |
 
@@ -50,7 +53,7 @@ Frappe session CSRF enforcement; token retrieved from authenticated session.
 ## Workflow and transaction rules
 Application Pending -> Approved/Rejected; resubmission -> Pending. Revocation
 blocks new bookings; existing participant snapshots remain accessible.
-Offering publishes after approval. Booking and balance reservation commit together.
+Offering publishes only after general approval and approval of its specific service. Booking and balance reservation commit together.
 No completion/earnings/cancellation implementation in this milestone.
 A singleton booking gate serializes this low-volume demonstration. Patient wallet
 then clinician locks serialize spending and scheduling across
@@ -67,10 +70,15 @@ with explicit tele_tena_simulation_enabled configuration.
 4. Concurrent overlaps yield one booking; concurrent spend never overdraws; retry
    creates one booking and one reservation.
 5. Insufficient funds, invalid times, stale approval and injected failure leave
-   no partial wallet, appointment or ledger state.
+   no partial wallet, appointment or simulation-log state.
 6. English keys and provisional Amharic/Afaan Oromo copy marked for native review.
 7. Real MariaDB transactional and authenticated HTTP/CSRF/generic API checks,
    plus frontend build/lint and Python syntax; unrun checks explicitly documented.
 
 Approval/application and offering changes append versioned audit evidence. The
 booking gate favors correctness over throughput; higher-volume scheduling is deferred.
+
+PR #2 correction: matching successful retries return before validating current
+profile disclosures or service eligibility, preserving existing payload hashes.
+Global privacy defaults are separate from request controls and booking never writes
+those defaults. See pr2-storage-review.md for migration and accounting decisions.

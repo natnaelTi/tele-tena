@@ -45,9 +45,10 @@ LiveKit credentials belong on the backend only; SMS credentials likewise. No sec
 are needed for the current scaffold. Use provider secret storage or untracked local
 configuration, never chat messages or committed files.
 
-Milestone schema is managed by `tele_tena.schema.install` in after_install and
-after_migrate hooks. Run normal `bench --site erp.localhost migrate` after checkout,
+Fresh-install bootstrap is `tele_tena.schema.install` in after_install. Upgrades
+use numbered Frappe post-model-sync patches recorded in Patch Log; native service
+and scope models use standard model sync. There is no recurring after_migrate DDL. Run normal `bench --site erp.localhost migrate` after checkout,
 then `bench --site erp.localhost clear-cache`. The development CLI fixture command
 `bench --site erp.localhost execute tele_tena.development.setup` creates isolated
 accounts and rotates their passwords into a mode-600 file in /tmp; it does not
-reset profiles, appointments or ledger entries. No web authentication bypass exists.
+reset profiles, appointments or simulation transaction-log entries. No web authentication bypass exists.
