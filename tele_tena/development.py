@@ -2,7 +2,10 @@
 import json
 import os
 import secrets
+import getpass
+import tempfile
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import frappe
 from frappe.utils.password import update_password
@@ -39,3 +42,39 @@ def setup():
     update_site_config('tele_tena_simulation_enabled', True)
     frappe.db.commit()
     return {'credentials_file': str(path), 'synthetic': True}
+
+
+def configure_livekit():
+    """Interactive local-only secret setup; never echoes or returns secret values."""
+    if frappe.local.site != 'erp.localhost':
+        frappe.throw('LiveKit setup is restricted to erp.localhost')
+    if frappe.session.user != 'Administrator':
+        frappe.throw('Administrator required', frappe.PermissionError)
+    url = input('LiveKit public connection URL (wss://; ws://localhost for local development): ').strip()
+    key = getpass.getpass('LiveKit API key: ').strip()
+    secret = getpass.getpass('LiveKit API secret: ')
+    confirm = getpass.getpass('Repeat LiveKit API secret: ')
+    parsed = urlsplit(url)
+    local = parsed.hostname in ('localhost', '127.0.0.1', '::1')
+    if parsed.scheme != 'wss' and not (local and parsed.scheme == 'ws'):
+        frappe.throw('Use wss, except ws is allowed for a loopback development server')
+    if not parsed.netloc or parsed.username or parsed.password or not key or len(secret) < 16 or secret != confirm:
+        frappe.throw('Invalid URL/key/secret or secret confirmation')
+    target = Path(frappe.get_site_path('private', 'tele_tena_livekit.json'))
+    target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(target.parent, 0o700)
+    if target.is_symlink():
+        frappe.throw('Refusing a symlinked LiveKit secret path')
+    fd, temporary = tempfile.mkstemp(prefix='.tele-tena-livekit-', dir=target.parent)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, 'w') as stream:
+            json.dump({'url': url, 'api_key': key, 'api_secret': secret}, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, target)
+        os.chmod(target, 0o600)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    return {'configured': True, 'path': str(target), 'mode': '0600'}

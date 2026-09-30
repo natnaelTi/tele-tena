@@ -47,5 +47,9 @@ def install():
     # exact versioned routines; subsequent upgrades run through Frappe Patch Log.
     from tele_tena.patches.v1_0_command_storage import execute as baseline
     from tele_tena.patches.v1_1_native_catalog import execute as catalog
+    from tele_tena.patches.v1_3_consultations import execute as consultations
+    from tele_tena.patches.v1_4_consultation_close_state import execute as consultation_close_state
     baseline()
     catalog()
+    consultations()
+    consultation_close_state()
