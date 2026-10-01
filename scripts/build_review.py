@@ -11,6 +11,8 @@ import subprocess
 
 APP = Path(__file__).resolve().parents[1]
 FRONTEND = APP / 'frontend'
+assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=APP, text=True).strip(), \
+    'Commit or preserve local changes before building a release; the artifact must identify an exact clean checkout'
 # Reject local env files: Vite otherwise embeds VITE_* values automatically.
 assert not list(FRONTEND.glob('.env*')), 'Remove frontend .env files before a release build'
 env = {k: v for k, v in os.environ.items() if not k.startswith('VITE_')}
