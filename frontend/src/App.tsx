@@ -32,7 +32,7 @@ import Showcase from "./pages/Showcase";
 import "./App.css";
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.PROD ? "/teletena" : "/"}>
       <SessionProvider>
         <LocaleProvider>
           <a className="skip-link" href="#main-content">

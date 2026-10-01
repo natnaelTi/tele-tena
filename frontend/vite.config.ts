@@ -5,6 +5,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
     plugins: [react()],
+    base: mode === "production" ? "/assets/tele_tena/review/" : "/",
     server: {
       proxy: {
         '/api': { target: env.FRAPPE_DEV_URL || 'http://127.0.0.1:8000', changeOrigin: true, headers: { 'X-Frappe-Site-Name': env.FRAPPE_DEV_SITE || 'erp.localhost' } },

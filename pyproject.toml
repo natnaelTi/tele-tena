@@ -7,6 +7,7 @@ name = "tele_tena"
 authors = [{name = "Tele-tena contributors"}]
 dynamic = ["version", "description"]
 requires-python = ">=3.10"
+dependencies = ["livekit-api==1.2.1", "livekit-protocol==1.1.27"]
 
 [tool.flit.module]
 name = "tele_tena"
