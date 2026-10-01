@@ -3,8 +3,10 @@
 The only canonical development working copy is:
 `/home/frappe/frappe/frappe-bench/apps/tele_tena`.
 The original `/home/frappe/projects/tele-tena` is retained as an unchanged source
-snapshot; do not develop there. Foundation is on `feat/project-foundation`; milestone 1 is on
-`feat/milestone-1-booking`, based on the unmerged foundation.
+snapshot; do not develop there. `main` contains the reviewed foundation and
+milestone 1 merges. PR #3 remains open and unmerged on
+`feat/milestone-2-consultations`; phone access is developed separately from
+`main` on `feat/phone-otp`.
 
 The isolated development site is `erp.localhost`. Observed installation versions:
 Bench 5.31.0, Frappe 15.121.2, ERPNext 15.121.6, tele_tena 0.1.0.
@@ -69,6 +71,12 @@ put only the Vite application behind a temporary authenticated HTTPS tunnel and
 keep the Bench/Frappe admin interface bound to loopback; never tunnel port 8000.
 Review the tunnel provider's privacy settings before use and use synthetic
 accounts only.
+
+For a local SMS Ethiopia credential, run
+`bench --site erp.localhost execute tele_tena.development.configure_sms` in an
+interactive terminal. It prompts invisibly, writes a mode-600 backend-only file,
+prints no secret and sends no message. Live testing still requires a consenting
+recipient whitelisted with the provider; automated tests mock the adapter.
 
 Fresh-install bootstrap is `tele_tena.schema.install` in after_install. Upgrades
 use numbered Frappe post-model-sync patches recorded in Patch Log; native service

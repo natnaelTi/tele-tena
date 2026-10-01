@@ -6,3 +6,4 @@ tele_tena.patches.v1_1_native_catalog
 tele_tena.patches.v1_2_catalog_adoption_check
 tele_tena.patches.v1_3_consultations
 tele_tena.patches.v1_4_consultation_close_state
+tele_tena.patches.v1_3_phone_auth

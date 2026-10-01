@@ -24,3 +24,17 @@ export async function signIn(email: string, password: string) {
     headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usr: email, pwd: password }) })
   if (!response.ok) throw new Error('Sign in failed')
 }
+
+export async function phoneAuth<T>(method: string, data: Record<string, unknown>, csrf?: string): Promise<T> {
+  const bootstrap = method === 'csrf_token'
+  const response = await fetch('/api/method/tele_tena.api.phone_auth.' + method, {
+    method: bootstrap ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store',
+    headers: bootstrap ? {} : { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': csrf || '' },
+    body: bootstrap ? undefined : JSON.stringify(data),
+  })
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({}))
+    throw new ApiError(typeof result.tele_tena_error === 'string' ? result.tele_tena_error : 'unknown')
+  }
+  return (await response.json()).message as T
+}

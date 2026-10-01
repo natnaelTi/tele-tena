@@ -1,8 +1,8 @@
 """CLI-only synthetic fixture setup, strictly isolated from production sites."""
 import json
+import getpass
 import os
 import secrets
-import getpass
 import tempfile
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -78,3 +78,33 @@ def configure_livekit():
         if os.path.exists(temporary):
             os.unlink(temporary)
     return {'configured': True, 'path': str(target), 'mode': '0600'}
+
+def configure_sms():
+    """Prompt locally for provider credentials; development site only, never echoes key."""
+    if frappe.local.site != 'erp.localhost':
+        frappe.throw('SMS setup helper is restricted to erp.localhost')
+    if frappe.session.user != 'Administrator':
+        frappe.throw('Administrator required', frappe.PermissionError)
+    path = Path(frappe.get_site_path('private', 'tele_tena_sms.json'))
+    if path.is_symlink():
+        frappe.throw('SMS credential path may not be a symbolic link')
+    key = getpass.getpass('SMS Ethiopia API key (input hidden): ').strip()
+    if not key or '\n' in key or len(key) > 512:
+        frappe.throw('A valid SMS API key is required')
+    config = {'api_key': key}
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(path.parent, 0o700)
+    fd, temporary = tempfile.mkstemp(prefix='.tele-tena-sms-', dir=path.parent)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, 'w') as stream:
+            json.dump(config, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+        os.chmod(path, 0o600)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    return {'configured': True, 'credentials_file': 'private/tele_tena_sms.json',
+            'provider': 'SMSEthiopia', 'live_send_performed': False}
