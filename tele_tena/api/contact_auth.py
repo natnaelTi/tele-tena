@@ -5,25 +5,12 @@ import json
 import re
 import secrets
 import uuid
-from contextlib import contextmanager
 from datetime import timedelta
 
 import frappe
 from tele_tena import email_delivery, sms
 from tele_tena.api import phone_auth as otp
 from tele_tena.api.journey import actor, boolean, command, fail, query, text
-
-
-@contextmanager
-def _registration_authority():
-    # This private command boundary accepts only server-constructed User documents.
-    # It never exposes administrator context to a caller or generic DocType endpoint.
-    original = frappe.session.user
-    try:
-        frappe.set_user('Administrator')
-        yield
-    finally:
-        frappe.set_user(original)
 
 
 def normalize(channel, contact):
@@ -84,7 +71,12 @@ def request_code(channel, contact, request_id):
     frappe.db.sql('UPDATE tt_otp_challenge SET dispatch_state=%s WHERE id=%s', (state, challenge))
     frappe.db.commit()
     # Outcome never depends on whether an account exists. Accepted is not delivered.
-    return {**_result(challenge), 'delivery': state.lower()}
+    messages = {
+        'Accepted': 'The mail provider accepted the code; delivery to your inbox is not guaranteed.',
+        'Rejected': 'The mail provider could not send to this address. Check the spelling and try again after the cooldown.',
+        'Uncertain': 'We could not confirm delivery. If the code arrives, use it here; wait before requesting another.',
+    }
+    return {**_result(challenge), 'delivery_state': state.lower(), 'message': messages[state]}
 
 
 def _identity(channel, contact):
@@ -101,7 +93,8 @@ def _identity(channel, contact):
             fail('This account is unavailable', 'account_unavailable')
     else:
         user = contact if channel == 'email' else 'contact-' + secrets.token_hex(20) + '@accounts.tele-tena.invalid'
-        with _registration_authority():
+        from tele_tena.account_context import authorized_user_change
+        with authorized_user_change():
             doc = frappe.get_doc(dict(doctype='User', email=user, first_name='TeleTena member',
                                      user_type='Website User', enabled=1, send_welcome_email=0, roles=[]))
             doc.insert()
@@ -185,7 +178,8 @@ def save_onboarding(kind, step, answers, complete=0):
         if kind == 'clinician':
             text(clean.get('statement', ''), 2000)
         role = 'Tele Tena Patient' if kind == 'patient' else 'Tele Tena Applicant'
-        with _registration_authority():
+        from tele_tena.account_context import authorized_user_change
+        with authorized_user_change():
             frappe.get_doc('User', user).add_roles(role)
         frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history)
             VALUES (%s,%s,%s,'',%s,%s)''', (user, kind, name, clean['share_name'], clean['share_history']))

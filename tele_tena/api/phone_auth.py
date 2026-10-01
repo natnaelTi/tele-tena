@@ -157,43 +157,6 @@ def request_code(phone, purpose, request_id):
     return _generic_result(challenge_id)
 
 
-def _new_user(phone, display_name, kind, statement=''):
-    """Create a phone-verified account with a fixed, least-privilege role set."""
-    from tele_tena.api import journey
-
-    phone_digest = _keyed('account', phone)
-    email = 'phone-' + phone_digest[:40] + '@accounts.tele-tena.invalid'
-    if frappe.db.exists('User', email):
-        _json_error('Phone account unavailable', 'signup_unavailable')
-    roles = [{'role': 'Tele Tena Patient'}] if kind == 'patient' else [{'role': 'Tele Tena Applicant'}]
-    doc = frappe.get_doc({
-        'doctype': 'User', 'email': email, 'first_name': display_name,
-        'user_type': 'Website User', 'enabled': 1, 'send_welcome_email': 0,
-        'roles': roles,
-    })
-    # Public registration is an explicit, OTP-gated account-creation command.
-    # No user-provided role/profile fields are accepted; roles above are fixed.
-    from tele_tena.api.contact_auth import _registration_authority
-    with _registration_authority():
-        doc.insert()
-    user = doc.name
-    frappe.db.sql('INSERT INTO tt_phone_identity (user,phone,verified_at,created) VALUES (%s,%s,UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))',
-                  (user, phone))
-    frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history)
-        VALUES (%s,%s,%s,'',0,0)''', (user, kind, display_name))
-    if kind == 'patient':
-        frappe.db.sql('INSERT INTO tt_wallet (patient) VALUES (%s)', (user,))
-    else:
-        frappe.db.sql("INSERT INTO tt_application (user,statement,status) VALUES (%s,%s,'Pending')",
-                      (user, statement))
-    # Do not copy the phone or OTP into audit evidence.
-    frappe.db.sql('''INSERT INTO tt_audit (id,actor,subject,action,evidence,created)
-        VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))''',
-        (str(uuid.uuid4()), user, user, 'PhoneSignup',
-         '{"phone_verified":true,"adult_attested":true,"kind":"' + kind + '"}'))
-    return user
-
-
 def _establish_login(user):
     manager = getattr(frappe.local, 'login_manager', None)
     if manager is None:
@@ -204,7 +167,7 @@ def _establish_login(user):
 
 @frappe.whitelist(allow_guest=True, methods=['POST'])
 def verify_code(phone, challenge_id, code, purpose, display_name='', adult=0, statement=''):
-    """Verify and consume once; sign in only the mapped or newly-created account."""
+    """Verify a phone, then continue only into an owner-only onboarding draft."""
     if purpose not in ('patient_signup', 'clinician_application', 'login'):
         _json_error('Invalid verification', 'otp_invalid')
     phone = normalize_phone(phone)
@@ -212,18 +175,9 @@ def verify_code(phone, challenge_id, code, purpose, display_name='', adult=0, st
         _json_error('Invalid verification', 'otp_invalid')
     if not isinstance(code, str) or not re.fullmatch(r'[0-9]{6}', code):
         code = ''
-    if purpose == 'patient_signup':
-        display_name = text(display_name, 120)
-        if not boolean(adult):
-            _json_error('Adult confirmation is required', 'adult_required')
-    elif purpose == 'clinician_application':
-        display_name = text(display_name, 120)
-        statement = text(statement, 2000)
-        if not boolean(adult):
-            _json_error('Adult confirmation is required', 'adult_required')
     phone_digest = _keyed('phone', phone)
-    row = frappe.db.sql('SELECT * FROM tt_otp_challenge WHERE id=%s FOR UPDATE',
-                        (challenge_id,), as_dict=True)
+    frappe.db.sql('SELECT id FROM tt_otp_gate WHERE id=1 FOR UPDATE')
+    row = frappe.db.sql('SELECT * FROM tt_otp_challenge WHERE id=%s FOR UPDATE', (challenge_id,), as_dict=True)
     if not row:
         _json_error('Verification code is invalid or expired', 'otp_invalid')
     challenge = row[0]
@@ -235,11 +189,8 @@ def verify_code(phone, challenge_id, code, purpose, display_name='', adult=0, st
     peer = _peer_ip()
     verify_allowed = (_increment_limit('verify-phone', phone_digest, _now(), 900, VERIFY_PHONE_WINDOW_LIMIT)
                       and _increment_limit('verify-ip', peer, _now(), 900, VERIFY_IP_WINDOW_LIMIT))
-    if not verify_allowed:
-        frappe.db.commit()
-        _json_error('Verification code is invalid or expired', 'otp_invalid')
     expected = _otp_digest(challenge.id, phone_digest, purpose, code)
-    if not hmac.compare_digest(challenge.otp_digest, expected):
+    if not verify_allowed or not hmac.compare_digest(challenge.otp_digest, expected):
         frappe.db.sql('UPDATE tt_otp_challenge SET attempts=attempts+1 WHERE id=%s', (challenge.id,))
         frappe.db.commit()
         _json_error('Verification code is invalid or expired', 'otp_invalid')
@@ -250,11 +201,14 @@ def verify_code(phone, challenge_id, code, purpose, display_name='', adult=0, st
             _json_error('Verification code is invalid or expired', 'otp_invalid')
         user = found[0][0]
     else:
-        if frappe.db.sql('SELECT user FROM tt_phone_identity WHERE phone=%s FOR UPDATE', (phone,)):
-            _json_error('Verification code is invalid or expired', 'otp_invalid')
-        user = _new_user(phone, display_name, 'patient' if purpose == 'patient_signup' else 'clinician', statement)
+        # Signup is contact proof only. Caller-supplied name, role, statement and
+        # adult flag cannot complete onboarding or create any profile/role.
+        from tele_tena.api import contact_auth
+        user = contact_auth._identity('phone', phone)
+        frappe.db.sql('''INSERT IGNORE INTO tt_phone_identity (user,phone,verified_at,created)
+            VALUES (%s,%s,UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))''', (user, phone))
     frappe.db.sql('UPDATE tt_otp_challenge SET consumed=UTC_TIMESTAMP(6),attempts=attempts+1 WHERE id=%s',
                   (challenge.id,))
     frappe.db.commit()
     _establish_login(user)
-    return {'authenticated': True}
+    return {'authenticated': True, 'onboarding_required': purpose != 'login'}

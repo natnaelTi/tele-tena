@@ -84,6 +84,21 @@ class ContactAuth(unittest.TestCase):
         self.assertNotIn('Tele Tena Clinician', frappe.get_roles(user))
         frappe.db.commit()
 
+    def test_request_response_does_not_reveal_contact_lookup_or_delivery(self):
+        first_contact = self.contact
+        second_contact = 'another-' + secrets.token_hex(8) + '@example.invalid'
+        self.contacts.append(second_contact)
+        with patch('tele_tena.email_delivery.send_code', side_effect=[None, TimeoutError]):
+            first = auth.request_code('email', first_contact, secrets.token_hex(20))
+            second = auth.request_code('email', second_contact, secrets.token_hex(20))
+        self.challenges.extend([first['challenge_id'], second['challenge_id']])
+        self.assertEqual(set(first) - {'challenge_id', 'message'}, set(second) - {'challenge_id', 'message'})
+        self.assertEqual(first['delivery_state'], 'accepted')
+        self.assertEqual(second['delivery_state'], 'uncertain')
+        self.assertNotIn('account', first['message'].lower())
+        self.assertNotIn('account', second['message'].lower())
+        self.assertEqual(first['resend_after'], second['resend_after'])
+
     def test_single_use_attempts_and_role_injection(self):
         result, code = self.challenge()
         with self.assertRaises(frappe.ValidationError):
@@ -108,7 +123,7 @@ class ContactAuth(unittest.TestCase):
             again = auth.request_code('email', self.contact, request)
             self.assertEqual(delivery.call_count, 1)
             self.assertEqual(result['challenge_id'], again['challenge_id'])
-            self.assertEqual(result['delivery'], 'uncertain')
+            self.assertEqual(result['delivery_state'], 'uncertain')
             code = delivery.call_args.args[1]
         self.challenges.append(result['challenge_id'])
         row = frappe.db.sql('SELECT otp_digest,dispatch_state FROM tt_otp_challenge WHERE id=%s', (result['challenge_id'],))[0]

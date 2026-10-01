@@ -97,8 +97,8 @@ class Integration(unittest.TestCase):
                     frappe.db.sql('DELETE FROM tt_consultation WHERE appointment IN (SELECT id FROM tt_appointment WHERE patient=%s OR clinician=%s)', (email, email))
                 frappe.db.sql(f'DELETE FROM tt_{table} WHERE {field}=%s', (email,))
         for email in PHONE_AUTH_TEST_USERS:
-            for table, field in (('audit', 'subject'), ('phone_identity', 'user'), ('wallet', 'patient'),
-                                 ('application', 'user'), ('profile', 'user')):
+            for table, field in (('audit', 'subject'), ('phone_identity', 'user'), ('contact_identity', 'user'),
+                                 ('onboarding', 'user'), ('wallet', 'patient'), ('application', 'user'), ('profile', 'user')):
                 frappe.db.sql(f'DELETE FROM tt_{table} WHERE {field}=%s', (email,))
             if frappe.db.exists('User', email):
                 frappe.delete_doc('User', email)
@@ -658,22 +658,25 @@ class Integration(unittest.TestCase):
             challenge = api.one('SELECT * FROM tt_otp_challenge WHERE id=%s', (response['challenge_id'],))
             self.assertEqual(challenge.dispatch_state, 'Accepted')
             self.assertNotIn(sent[0][1], json.dumps(dict(challenge), default=str))
-            with self.assertRaises(frappe.ValidationError):
-                phone_auth.verify_code(phone, response['challenge_id'], sent[0][1], 'patient_signup',
-                                       display_name='Synthetic OTP Patient', adult=0)
             user = phone_auth.verify_code(phone, response['challenge_id'], sent[0][1], 'patient_signup',
-                                          display_name='Synthetic OTP Patient', adult=1)['authenticated']
+                                          display_name='Attacker-controlled name', adult=0)['authenticated']
             self.assertTrue(user)
             phone_user = frappe.session.user
             PHONE_AUTH_TEST_USERS.append(phone_user)
             self.assertEqual(frappe.get_value('User', phone_user, 'user_type'), 'Website User')
             roles = set(frappe.get_roles(phone_user))
-            self.assertIn('Tele Tena Patient', roles)
+            self.assertNotIn('Tele Tena Patient', roles)
             self.assertNotIn('Tele Tena Clinician', roles)
             self.assertNotIn('Tele Tena Approver', roles)
+            self.assertFalse(frappe.db.exists('tt_profile', phone_user))
             self.assertEqual(api.one('SELECT phone FROM tt_phone_identity WHERE user=%s',
                                      (phone_user,)).phone, phone)
-            self.assertEqual(api.one('SELECT kind FROM tt_profile WHERE user=%s', (phone_user,)).kind, 'patient')
+            from tele_tena.api import contact_auth
+            with self.assertRaises(frappe.ValidationError):
+                contact_auth.save_onboarding('patient', 3, {'name': 'Synthetic alias', 'adult': True, 'consent': False}, 1)
+            frappe.set_user(phone_user)
+            contact_auth.save_onboarding('patient', 3, {'name': 'Synthetic alias', 'adult': True, 'consent': True}, 1)
+            self.assertIn('Tele Tena Patient', set(frappe.get_roles(phone_user)))
             self.assertEqual(api.one('SELECT attempts FROM tt_otp_challenge WHERE id=%s',
                                      (response['challenge_id'],)).attempts, 1)
             with self.assertRaises(frappe.ValidationError):
@@ -700,15 +703,17 @@ class Integration(unittest.TestCase):
             with self.assertRaises(frappe.ValidationError):
                 phone_auth.verify_code(phone, response['challenge_id'], sent[0], 'patient_signup',
                                        display_name='Synthetic applicant', adult=1)
-            with self.assertRaises(frappe.ValidationError):
-                phone_auth.verify_code(phone, response['challenge_id'], sent[0], 'clinician_application',
-                                       display_name='Synthetic applicant', statement='Synthetic application', adult=0)
             phone_auth.verify_code(phone, response['challenge_id'], sent[0], 'clinician_application',
-                                   display_name='Synthetic applicant', statement='Synthetic application', adult=1)
+                                   display_name='Attacker name', statement='Unreviewed claim', adult=0)
             phone_user = frappe.session.user
             PHONE_AUTH_TEST_USERS.append(phone_user)
-            self.assertIn('Tele Tena Applicant', frappe.get_roles(phone_user))
+            self.assertNotIn('Tele Tena Applicant', frappe.get_roles(phone_user))
             self.assertNotIn('Tele Tena Clinician', frappe.get_roles(phone_user))
+            self.assertFalse(frappe.db.exists('tt_application', phone_user))
+            from tele_tena.api import contact_auth
+            frappe.set_user(phone_user)
+            contact_auth.save_onboarding('clinician', 3, {'name': 'Synthetic applicant', 'statement': 'Synthetic application', 'adult': True, 'consent': True}, 1)
+            self.assertIn('Tele Tena Applicant', frappe.get_roles(phone_user))
             self.assertEqual(api.one('SELECT status FROM tt_application WHERE user=%s', (phone_user,)).status, 'Pending')
             login('admin')
             api.review(phone_user, 'Approved')

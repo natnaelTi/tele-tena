@@ -214,14 +214,15 @@ def review(clinician, decision):
                   (decision, reviewer, clinician))
     # This one role transition is part of the approver-guarded command. Public
     # phone signup itself assigns only Patient or non-privileged Applicant.
-    user_doc = frappe.get_doc('User', clinician)
-    user_doc.flags.ignore_permissions = True
-    if decision == 'Approved':
-        user_doc.add_roles('Tele Tena Clinician')
-        user_doc.remove_roles('Tele Tena Applicant')
-    else:
-        user_doc.remove_roles('Tele Tena Clinician')
-        user_doc.add_roles('Tele Tena Applicant')
+    from tele_tena.account_context import authorized_user_change
+    with authorized_user_change():
+        user_doc = frappe.get_doc('User', clinician)
+        if decision == 'Approved':
+            user_doc.add_roles('Tele Tena Clinician')
+            user_doc.remove_roles('Tele Tena Applicant')
+        else:
+            user_doc.remove_roles('Tele Tena Clinician')
+            user_doc.add_roles('Tele Tena Applicant')
     audit(clinician, 'Review', {'status': decision})
     return {'status': decision}
 
@@ -443,3 +444,19 @@ def appointments():
 def audit(subject, action, evidence):
     frappe.db.sql('INSERT INTO tt_audit (id,actor,subject,action,evidence,created) VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))',
                   (str(uuid.uuid4()), actor(), subject, action, json.dumps(evidence)))
+
+
+@query()
+def practice():
+    """Owner-only practice summary; no cross-clinician clinical information."""
+    user = actor()
+    p = one('SELECT kind FROM tt_profile WHERE user=%s', (user,))
+    if p.kind != 'clinician':
+        frappe.throw('Clinician profile required', frappe.PermissionError)
+    applications = rows('SELECT status,statement FROM tt_application WHERE user=%s', (user,))
+    offerings = rows('''SELECT o.id,o.service,o.price,o.minutes,o.active,s.service_label label
+        FROM tt_offering o JOIN `tabTele Tena Service` s ON s.name=o.service
+        WHERE o.clinician=%s''', (user,))
+    available = rows('SELECT start,end FROM tt_availability WHERE clinician=%s AND end>UTC_TIMESTAMP() ORDER BY start', (user,))
+    return {'application': applications[0] if applications else None, 'offerings': offerings,
+            'availability': [{'start': iso(row.start), 'end': iso(row.end)} for row in available]}
