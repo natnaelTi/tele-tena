@@ -31,12 +31,47 @@ automated media check created random local-only credentials and removed them.
 - The temporary LiveKit server process, generated credential file, config and
   temporary browser fixtures were removed. No local LiveKit credentials remain.
 
-This branch did not repeat the disposable new-site installation test that was
+At the original milestone baseline, this branch did not repeat the disposable new-site installation test that was
 run for PR #2. The new consultation tables are included in both normal versioned
 migration and fresh-install bootstrap, but a new disposable site was not created
 for milestone 2. No physical phones, actual cameras/microphones, mobile network,
-reconnection under packet loss, hosted LiveKit project or human two-device test
-was available. SMS/phone OTP remains incomplete.
+reconnection under packet loss or human two-device test was available. SMS/phone
+OTP remains incomplete. Hosted-project review results are recorded below.
+
+## PR #3 review follow-up (2026-10-01)
+
+- `../../env/bin/python tests/integration.py`: all 18 tests passed, including
+  per-clinician service scopes, request-level sharing isolation, replay before
+  mutable-profile validation, exact Cloud revocation parameters for both
+  opaque identities, and serialized Join/End requests.
+- `npm run build` and `npm run lint`: passed. The LiveKit client chunk remains
+  517.62 kB minified, above Vite's advisory threshold.
+- Python compilation, JavaScript syntax checks, and `git diff --check`: passed.
+- Hosted LiveKit Cloud cached-token browser regression: passed. Two independent
+  synthetic browser sessions each obtained an initial and a refreshed
+  participant token; after clinician End, direct SDK reconnect attempts with
+  all four cached tokens were rejected. The patient had left before End, so
+  this also verifies revocation for a departed participant. The check used
+  the configured hosted `*.livekit.cloud` project, not a self-hosted server.
+- Hosted fake-media browser checks exercised device-mode preview cleanup,
+  connection/publication failure cleanup, duplicate Join/unmount handling,
+  two-way audio/video elements, polling while connected, and patient
+  Leave/rejoin. The integrated browser script did not finish cleanly at its
+  final End-control assertion. After correcting its appointment-scoped media
+  selector, a focused hosted browser regression covering Join, patient
+  Leave/rejoin, and clinician End passed and confirmed both session views
+  ended. Treat this as focused automated fake-device evidence; it is not a
+  clean pass of the complete browser script and is not human/device testing.
+- Existing appointments and simulated balances were preserved. Browser runs
+  used only synthetic test accounts/appointments and removed their temporary
+  fixture records on completion.
+- Self-hosted tests do not prove Cloud cached-token revocation: LiveKit
+  documents revocation through `RemoveParticipant` as a Cloud behavior. On
+  self-hosted deployments, deleting the room does not invalidate a cached
+  signed token; an existing token may reconnect until expiration. Cloud End
+  uses a 30-second future revocation cutoff (within Cloud's documented ±60-second
+  bound), attempts revocation for both appointment identities, and remains
+  retryable if closure fails.
 
 ## Local LiveKit setup
 

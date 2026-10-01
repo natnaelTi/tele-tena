@@ -26,6 +26,7 @@ export const en = {
   requestField: 'Request', nameField: 'Name', historyField: 'History', previewNote: 'Changing inputs clears the preview. Confirmed disclosures are saved snapshots.',
   credentials: 'Use the isolated synthetic accounts from the local credentials file. Phone OTP is not implemented.',
   consultation: 'Secure voice and video consultation', callNotStarted: 'Not started', callReady: 'Devices checked. Ready to join.',
+  sessionLifecycle: 'Consultation status', mediaStatus: 'Media connection', callNotConnected: 'Not connected', callToggleError: 'That microphone or camera change failed. Check device permissions and retry.',
   callConnecting: 'Connecting…', callConnected: 'Connected', callReconnecting: 'Connection interrupted. Reconnecting…',
   callDisconnected: 'You left the consultation. Rejoin is available during the permitted window.', callEnded: 'The clinician ended this consultation.',
   callDeviceError: 'Camera or microphone access failed. Check browser permissions and try again.', callConnectError: 'Could not connect. Check the connection and retry.',
@@ -39,6 +40,7 @@ export const en = {
 export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
 export const am: Record<Key, string> = {
+  sessionLifecycle:'የምክክሩ ሁኔታ', mediaStatus:'የሚዲያ ግንኙነት', callNotConnected:'አልተገናኘም', callToggleError:'ማይክሮፎኑን ወይም ካሜራውን መቀየር አልተሳካም። ፈቃዱን ያረጋግጡና እንደገና ይሞክሩ።',
   consultation:'ደህንነቱ የተጠበቀ የድምፅና ቪዲዮ ምክክር', callNotStarted:'አልተጀመረም', callReady:'መሣሪያዎቹ ተፈትሸዋል። ለመግባት ዝግጁ ነው።',
   callConnecting:'በመገናኘት ላይ…', callConnected:'ተገናኝቷል', callReconnecting:'ግንኙነቱ ተቋርጧል። እንደገና በመገናኘት ላይ…',
   callDisconnected:'ከምክክሩ ወጥተዋል። በተፈቀደው ጊዜ እንደገና መግባት ይችላሉ።', callEnded:'ሐኪሙ ይህን ምክክር አቋርጧል።',
@@ -70,6 +72,7 @@ export const am: Record<Key, string> = {
   credentials:'የልማት ማሳያ መለያዎችን ይጠቀሙ። የስልክ OTP አልተተገበረም።',
 }
 export const om: Record<Key, string> = {
+  sessionLifecycle:'Haala marii', mediaStatus:'Walqunnamtii miidiyaa', callNotConnected:'Hin wal qabamne', callToggleError:'Mikirofoonii ykn kaameraa jijjiiruun hin milkoofne. Hayyama meeshaalee ilaalii irra deebiʼi yaali.',
   consultation:'Mariin sagalee fi viidiyoo nageenya qabu', callNotStarted:'Hin jalqabamne', callReady:'Meeshaaleen ilaalaman. Seenuuf qophaaʼe.',
   callConnecting:'Wal qunnamaa jira…', callConnected:'Wal qabame', callReconnecting:'Wal qunnamtiin cite. Deebiʼee wal qunnamaa jira…',
   callDisconnected:'Mariirraa baate. Yeroo hayyamame keessatti deebiʼuu dandeessa.', callEnded:'Ogeessi marii kana xumure.',
