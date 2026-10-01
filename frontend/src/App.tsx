@@ -181,7 +181,7 @@ export default function App() {
         </section>}
       </>}
       {(patient || clinician) && !session.profile && activeTab === 'profile' && <p className="empty-state">{t('noProfile')}</p>}
-      {session.profile && activeTab === 'appointments' && <section><h2>{t('appointments')}</h2><TimezoneNote label={t('timezoneLabel')} timezone={timezone} />{appointments.length === 0 && <EmptyState>{t('empty')}</EmptyState>}{appointments.map(a => <Card key={a.id}><h3>{a.service_label} · {t('booked')}</h3><p>{date(a.start)} – {date(a.end)} · ETB {money(a.price)} · {a.minutes} {t('duration')}</p>{disclosureView(a.disclosure)}<Consultation appointment={a} t={t} /></Card>)}</section>}
+      {session.profile && activeTab === 'appointments' && <section><h2>{t('appointments')}</h2><TimezoneNote label={t('timezoneLabel')} timezone={timezone} />{appointments.length === 0 && <EmptyState>{t('empty')}</EmptyState>}{appointments.map(a => <Card key={a.id} data-appointment-id={a.id}><h3>{a.service_label} · {t('booked')}</h3><p>{date(a.start)} – {date(a.end)} · ETB {money(a.price)} · {a.minutes} {t('duration')}</p>{disclosureView(a.disclosure)}<Consultation appointment={a} t={t} /></Card>)}</section>}
     </>}
   </main>
 }

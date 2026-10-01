@@ -33,6 +33,7 @@ async function main() {
       })))
       throw new Error('synthetic login did not complete')
     }
+    await page.getByRole('button', { name: 'Appointments', exact: true }).click()
   }
   const card = page => page.locator(`[data-appointment-id="${fixture.appointment_id}"]`)
   const patientCard = () => card(patient)
@@ -167,7 +168,7 @@ async function main() {
       await endButton.click()
       try {
         await call(clinician).getByText(/Consultation status:/).filter({ hasText: 'The clinician ended this consultation' }).waitFor({ timeout: 15000 })
-        await call(patient).getByRole('button', { name: 'Refresh call status' }).click()
+        checkpoint = 'patient observes End through lifecycle polling'
         await call(patient).getByText(/Consultation status:/).filter({ hasText: 'The clinician ended this consultation' }).waitFor({ timeout: 15000 })
       } catch {
         diagnostic = JSON.stringify({ endResponse, clinician: await call(clinician).evaluate(node => node.innerText),
@@ -257,8 +258,13 @@ async function main() {
       diagnostic = 'clinician end status: ' + (await clinicianStatus.textContent())
       throw new Error('end status failed')
     }
-    await call(patient).getByRole('button', { name: 'Refresh call status' }).click()
+    checkpoint = 'patient observes End through lifecycle polling'
     await call(patient).getByText(/Consultation status:/).filter({ hasText: 'The clinician ended this consultation' }).waitFor({ timeout: 30000 })
+    checkpoint = 'ended sessions have no active media elements or Join controls'
+    for (const page of [patient, clinician]) {
+      assert.equal(await call(page).getByRole('button', { name: 'Join consultation', exact: true }).count(), 0)
+      assert.equal(await call(page).locator('.call-remote audio, .call-remote video').count(), 0)
+    }
     assert.deepEqual(errors, [])
     console.log('PASS: two independent Chromium contexts exchanged fake-device audio/video; patient leave/rejoin worked; clinician end closed both sessions')
   } finally {

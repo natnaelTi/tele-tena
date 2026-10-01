@@ -32,6 +32,7 @@ async function main() {
       })))
       throw new Error('synthetic login did not complete')
     }
+    await page.getByRole('button', { name: 'Appointments', exact: true }).click()
   }
   const card = page => page.locator(`[data-appointment-id="${fixture.appointment_id}"]`)
   const call = page => card(page).locator('.consultation')
