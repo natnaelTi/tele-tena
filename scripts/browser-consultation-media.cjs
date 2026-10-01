@@ -5,7 +5,7 @@ const fs = require('node:fs')
 const assert = require('node:assert/strict')
 const fixture = JSON.parse(fs.readFileSync(process.env.TELE_TENA_CALL_FIXTURE, 'utf8'))
 fs.mkdirSync('/tmp/tele-tena-presentation-review', {recursive:true})
-const base = 'http://127.0.0.1:5173'
+const base = process.env.TELE_TENA_BROWSER_BASE || 'http://127.0.0.1:5173'
 let checkpoint = 'launch'
 let diagnostic = ''
 
