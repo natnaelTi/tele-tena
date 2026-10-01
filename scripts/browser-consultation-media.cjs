@@ -20,21 +20,17 @@ async function main() {
   patient.on('pageerror', () => errors.push('patient page exception'))
   clinician.on('pageerror', () => errors.push('clinician page exception'))
   async function login(page, kind) {
-    checkpoint = 'login ' + kind
-    await page.goto(base)
+    checkpoint = 'sign in through explicit password alternative'
+    await page.goto(base + '/sign-in')
+    await page.getByRole('button', { name: 'Use email instead', exact: true }).click()
+    await page.getByRole('button', { name: 'Use password instead', exact: true }).click()
     await page.getByLabel('Email', { exact: true }).fill(fixture.users[kind])
     await page.getByLabel('Password', { exact: true }).fill(fixture.password)
     await page.getByRole('button', { name: 'Sign in', exact: true }).click()
-    try { await page.getByText('Authenticated development account', { exact: false }).waitFor({ timeout: 15000 }) }
-    catch {
-      diagnostic = JSON.stringify(await page.evaluate(() => ({
-        headings: [...document.querySelectorAll('h1,h2')].map(node => node.innerText),
-        status: [...document.querySelectorAll('[role=status]')].map(node => node.innerText),
-      })))
-      throw new Error('synthetic login did not complete')
-    }
-    await page.getByRole('button', { name: 'Appointments', exact: true }).click()
+    await page.getByRole('button', { name: 'Sign out', exact: true }).waitFor({ timeout: 15000 })
+    await page.goto(base + (kind.startsWith('p') ? '/patient' : '/clinician') + '/consultations/' + fixture.appointment_id)
   }
+
   const card = page => page.locator(`[data-appointment-id="${fixture.appointment_id}"]`)
   const patientCard = () => card(patient)
   const clinicianCard = () => card(clinician)
@@ -82,7 +78,7 @@ async function main() {
     checkpoint = 'publication failure stopped local preview tracks'
     assert(await page.evaluate(() => window.__testFailedPreview.getTracks().every(track => track.readyState === 'ended')))
     checkpoint = 'publication failure left no connected controls'
-    assert.equal(await call(page).getByRole('button', { name: /Leave \(/ }).count(), 0)
+    assert.equal(await call(page).getByRole('button', { name: /Leave/ }).count(), 0)
     await page.evaluate(() => {
       delete navigator.mediaDevices.getUserMedia
       delete window.__testFailedPreview
@@ -101,7 +97,7 @@ async function main() {
     await call(page).getByRole('button', { name: 'Join consultation' }).click()
     await call(page).getByRole('status').filter({ hasText: 'Could not connect' }).waitFor({ timeout: 20000 })
     assert(await call(page).locator('.call-video').evaluate(video => video.__testConnectionPreview.getTracks().every(track => track.readyState === 'ended')))
-    assert.equal(await call(page).getByRole('button', { name: /Leave \(/ }).count(), 0)
+    assert.equal(await call(page).getByRole('button', { name: /Leave/ }).count(), 0)
     await page.unroute('**/api/method/tele_tena.api.consultations.join')
   }
   async function doubleJoinAndUnmountBeforeToken(page) {
@@ -131,7 +127,7 @@ async function main() {
     try {
       assert.equal(requests, 1, 'rapid duplicate Join must issue only one token request')
       await page.getByRole('button', { name: 'Sign out', exact: true }).click()
-      await page.getByRole('button', { name: 'Sign in', exact: true }).waitFor()
+      await page.getByRole('button', { name: 'Continue', exact: true }).waitFor()
       assert(await page.evaluate(() => window.__lateJoinPreview.getTracks().every(track => track.readyState === 'ended')))
     } finally {
       releaseResolve()
@@ -148,10 +144,10 @@ async function main() {
     if (process.env.TELE_TENA_MEDIA_PHASE === 'end') {
       await prepareAndJoin(patient)
       await prepareAndJoin(clinician)
-      await call(patient).getByRole('button', { name: /Leave \(/ }).click()
+      await call(patient).getByRole('button', { name: /Leave/ }).click()
       await call(patient).getByRole('status').filter({ hasText: 'You left the consultation' }).waitFor()
       await prepareAndJoin(patient)
-      const endButton = call(clinician).getByRole('button', { name: 'End consultation for both participants' })
+      const endButton = call(clinician).getByRole('button', { name: 'End for everyone' })
       try { await endButton.waitFor({ timeout: 10000 }) }
       catch {
         diagnostic = JSON.stringify(await call(clinician).evaluate(node => ({
@@ -166,6 +162,7 @@ async function main() {
         if (response.url().includes('tele_tena.api.consultations.end')) endResponse = response.status()
       })
       await endButton.click()
+    await clinician.getByRole('dialog').getByRole('button', { name: 'End for everyone', exact: true }).click()
       try {
         await call(clinician).getByText(/Consultation status:/).filter({ hasText: 'The clinician ended this consultation' }).waitFor({ timeout: 15000 })
         checkpoint = 'patient observes End through lifecycle polling'
@@ -220,6 +217,14 @@ async function main() {
     await prepareAndJoin(patient)
     checkpoint = 'clinician joins'
     await prepareAndJoin(clinician)
+    checkpoint = 'capture connected call at responsive widths'
+    for (const page of [patient, clinician]) {
+      for (const width of [390, 768, 1440]) {
+        await page.setViewportSize({ width, height: 960 })
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
+        await page.screenshot({ path: `/tmp/tele-tena-redesign-review/live-call-${width}-${page === patient ? 'patient' : 'clinician'}.png`, fullPage: true })
+      }
+    }
     checkpoint = 'two-way remote media'
     diagnostic = JSON.stringify(await Promise.all([patient, clinician].map(async (page) => ({
       status: await call(page).getByRole('status').textContent(),
@@ -237,11 +242,11 @@ async function main() {
     await new Promise(resolve => setTimeout(resolve, 6000))
     for (const page of [patient, clinician]) assert.match(await call(page).getByRole('status').innerText(), /Connected/)
     checkpoint = 'participant leave and rejoin'
-    await call(patient).getByRole('button', { name: /Leave \(/ }).click()
+    await call(patient).getByRole('button', { name: /Leave/ }).click()
     await call(patient).getByRole('status').filter({ hasText: 'You left the consultation' }).waitFor()
     await prepareAndJoin(patient)
     checkpoint = 'clinician ends both-sided room'
-    const endButton = call(clinician).getByRole('button', { name: 'End consultation for both participants' })
+    const endButton = call(clinician).getByRole('button', { name: 'End for everyone' })
     try { await endButton.waitFor({ timeout: 10000 }) }
     catch {
       diagnostic = JSON.stringify(await call(clinician).evaluate(node => ({
@@ -252,6 +257,7 @@ async function main() {
       throw new Error('clinician End control did not become available')
     }
     await endButton.click()
+    await clinician.getByRole('dialog').getByRole('button', { name: 'End for everyone', exact: true }).click()
     const clinicianStatus = call(clinician).getByText(/Consultation status:/)
     try { await clinicianStatus.filter({ hasText: 'The clinician ended this consultation' }).waitFor({ timeout: 12000 }) }
     catch {

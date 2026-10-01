@@ -20,20 +20,17 @@ async function main() {
   const errors = []
   pages.forEach(page => page.on('pageerror', () => errors.push('page exception')))
   async function login(page, kind) {
-    await page.goto(base)
+    checkpoint = 'sign in through explicit password alternative'
+    await page.goto(base + '/sign-in')
+    await page.getByRole('button', { name: 'Use email instead', exact: true }).click()
+    await page.getByRole('button', { name: 'Use password instead', exact: true }).click()
     await page.getByLabel('Email', { exact: true }).fill(fixture.users[kind])
     await page.getByLabel('Password', { exact: true }).fill(fixture.password)
     await page.getByRole('button', { name: 'Sign in', exact: true }).click()
-    try { await page.getByText('Authenticated development account', { exact: false }).waitFor({ timeout: 15000 }) }
-    catch {
-      diagnostic = JSON.stringify(await page.evaluate(() => ({
-        headings: [...document.querySelectorAll('h1,h2')].map(node => node.innerText),
-        status: [...document.querySelectorAll('[role=status]')].map(node => node.innerText),
-      })))
-      throw new Error('synthetic login did not complete')
-    }
-    await page.getByRole('button', { name: 'Appointments', exact: true }).click()
+    await page.getByRole('button', { name: 'Sign out', exact: true }).waitFor({ timeout: 15000 })
+    await page.goto(base + (kind.startsWith('p') ? '/patient' : '/clinician') + '/consultations/' + fixture.appointment_id)
   }
+
   const card = page => page.locator(`[data-appointment-id="${fixture.appointment_id}"]`)
   const call = page => card(page).locator('.consultation')
   async function join(page) {
@@ -94,11 +91,12 @@ async function main() {
     assert.ok(sdkUrl, 'LiveKit browser SDK module should be loaded')
 
     checkpoint = 'patient leaves before End'
-    await call(pages[0]).getByRole('button', { name: /Leave \(/ }).click()
+    await call(pages[0]).getByRole('button', { name: /Leave/ }).click()
     await call(pages[0]).getByRole('status').filter({ hasText: 'You left the consultation' }).waitFor()
     checkpoint = 'clinician Ends and Cloud revokes both aliases'
     const endResponsePromise = pages[1].waitForResponse(response => response.url().includes('tele_tena.api.consultations.end'))
-    await call(pages[1]).getByRole('button', { name: 'End consultation for both participants' }).click()
+    await call(pages[1]).getByRole('button', { name: 'End for everyone' }).click()
+    await pages[1].getByRole('dialog').getByRole('button', { name: 'End for everyone', exact: true }).click()
     const endResponse = await endResponsePromise
     let endError = ''
     if (!endResponse.ok()) {

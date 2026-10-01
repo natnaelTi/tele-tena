@@ -1,9 +1,6 @@
 # Tele-tena MVP delivery tracker
 
-Updated 2026-10-01 against merged `main` (PR #2 merge). PR #3 remains open and
-unmerged on `feat/milestone-2-consultations`; its hosted-browser End assertion is
-a release blocker for voice/video. The SMS phase is being developed separately
-from main. Statuses describe implementation evidence, not production readiness.
+Updated 2026-10-01 on `feat/mvp-consolidation`, integrating PRs #3, #4 and #5 in dependency order. PR #3 hosted Cloud Leave/rejoin/End and cached-token assertions now pass in automated two-browser fake-media runs. This branch is not yet merged. Status describes demonstration evidence, not production readiness.
 
 **Status meanings:** `implemented` means code and listed checks cover the
 demonstration behavior; `partial` means a narrower slice exists or has a known
@@ -13,7 +10,7 @@ do not release/claim the feature until the stated blocker is resolved.
 | Agreed MVP requirement | Status | Evidence / remaining work |
 |---|---|---|
 | Adults 18+, patient and clinician profiles, private synthetic history, distinct account/disclosure identity | partial | Milestone 1 profiles; phone signup requires an adult attestation, while the attestation is not independent age verification. Existing development accounts continue to work. |
-| Phone possession OTP, expiry, single use, rate/abuse controls, clinician application entry | implemented | Phase 1 in `phone-otp.md`; mocked provider/API tests pass. Live provider credentials and a consenting whitelisted recipient are still required before any SMS send. OTP is not credential verification. |
+| Phone/email possession codes, expiry, single use, rate/abuse controls and separated onboarding | partial | `contact_auth.py`, `email_delivery.py`, v1_5 migration, 7 contact-auth and 24 integration regressions. SMS/email send adapters are mocked. SMTP and SMS credentials/consenting recipients are not configured or live-tested. Professional evidence intake is narrative only; code proves contact possession, not credential verification. |
 | Clinician approval and per-service approval | implemented | Manual approver flow and native Service Scope DocType; PR #2 review verification and MariaDB integration tests. |
 | Independent clinicians and multi-clinic affiliations without implied record access | partial | Single-clinician ownership and no affiliation-based access currently; clinic/partner workspace, membership and multiple affiliations not built. |
 | Service definitions, approved clinician offerings, published ETB price and fixed duration | implemented | Native Service and Service Scope; scoped publication/discovery/booking and stale-ID regression checks. |
@@ -25,7 +22,7 @@ do not release/claim the feature until the stated blocker is resolved.
 | Global disclosure defaults, request override and exact per-request preview | implemented | Separate defaults/override, immutable booking snapshot, privacy and profile-edit regression tests. |
 | Public review identity separate from account and clinical disclosure identity | pending | Reviews/ratings not implemented. |
 | Couples participation with individual consent and optional mutual relationship link | pending | No shared appointment, separate participant permissions, or consent workflow. Payment/partner relationship must not grant record access. |
-| Authorized human voice/video, audio-only, mute/camera, Leave and clinician End | blocked | Implemented on PR #3 with hosted Cloud token revocation and focused fake-media tests, but the complete hosted browser journey still fails at its final End-control assertion. Keep PR #3 open; resolve and rerun full demonstration acceptance before release. |
+| Authorized human voice/video, audio-only, mute/camera, Leave and clinician End | partial | Hosted Cloud browser test passed for independent Chromium contexts with fake devices, Leave/rejoin/End and original/refreshed token rejection for both identities, including a departed participant. End test root cause was a stale “Refresh” click after polling; fixed without removing assertions. Human/device testing remains. This remains a demo, not clinical readiness. |
 | No recording/transcription by default; no automatic charge/release from connection time | implemented | No recorder/transcriber/agent/automatic extension charge/release path in PR #3; keep this invariant in all call work. |
 | Clinician notes, patient-authorized summary, email link to authenticated summary, follow-up booking | pending | Not implemented. Summary notification body must not contain sensitive clinical data. |
 | Completed-session ratings/reviews | pending | No completed-session lifecycle or rating API/UI. |
@@ -36,40 +33,17 @@ do not release/claim the feature until the stated blocker is resolved.
 | Refund unused funds using verified supported route | pending | No cancellation/refund workflow. Existing reservations stay as recorded. |
 | ERPNext accounting/reporting integration, durable posting references/retries and reconciliation | pending | ERPNext is the agreed accounting system, but no posting or reconciliation exists. Never treat simulation events as accounting completion. |
 | English, Amharic and Afaan Oromo UI translation | partial | Existing journey keys in all three languages; Amharic/Afaan Oromo strings are provisional and need native review. OTP adds keys under Phase 1. |
-| Responsive accessible patient, clinician and administrator journeys/design system | partial | `docs/design-system.md` and `feat/design-system` now contain tokens, shared components, focused role navigation, domain API wrappers and in-memory journeys. Build/lint pass; mocked Chromium review is unverified because required browser system libraries are missing. Continue review in the dependent design-system PR. |
+| Responsive accessible patient, clinician and administrator journeys/design system | partial | New routes/layouts, original local brand, tokens/components, hosted Playwright 1.63 Chromium and connected booking/onboarding journeys. Synthetic screens captured/inspected at 390/768/1440 plus 320 and 200% zoom; no horizontal overflow. New narrative is partly English in Amharic/Oromo pending translation review. Human device/assistive-tech review remains. |
 | Production safety/escalation, credential verification, hosting and regulated financial/provider readiness | pending | Product contract marks these unresolved/deferred. Demo uses synthetic accounts/data and is not production clinical readiness. |
 
-## Delivery sequence
+## Current delivery and remaining sequence
 
-1. **Phone OTP/access** — `feat/phone-otp` from merged main. Contract and
-   acceptance evidence are in `docs/phone-otp.md`. Implementation is
-   checkpointed; provider tests are mocked. Open a PR; live sending remains
-   gated on local credentials and a consenting whitelisted recipient. Do not
-   merge automatically.
-2. **React design system and focused journeys** — `feat/design-system` is based
-   on the checkpointed `feat/phone-otp` branch; its PR explicitly depends on PR
-   #4. `docs/design-system.md` contains the acceptance contract. Finish the
-   responsive/browser review once browser dependencies are available. No
-   clinical/authenticated API caching. Connect only real APIs; show unfinished
-   behavior as unavailable rather than fabricated.
-3. **Discovery/marketplace** — clinician profiles, previous clinicians,
-   relevance/proximity constraints, private open requests/offers and visibility.
-4. **Booking lifecycle** — automatic/manual confirmation, holds and expiry,
-   rescheduling, cancellation policy snapshots, releases/refunds and disputes.
-5. **Clinical records and shared care** — notes, approved summaries, follow-ups,
-   couples links and individual consent.
-6. **Trust and finance** — ratings, responsiveness, pending/available earnings,
-   simulated withdrawal, authorized extensions with explicit mutual consent and
-   reservation. Design the double-entry/ERPNext boundary separately.
-7. **Corrected LiveKit acceptance** — resolve PR #3 release blocker, then pass
-   authorized two-party join/media/Leave/End, token-revocation and full browser
-   demonstration acceptance. No merge or deployment is implied by a phase.
+1. Contact verification and onboarding are implemented on the consolidation branch. Live delivery awaits secure local configuration and a consenting recipient. Do not treat codes as SMS/email delivery proof or professional approval.
+2. The TeleTena design and focused React journeys are implemented on this same review branch. Hosted browser screenshots and regression evidence are recorded in `docs/consolidation-verification.md`.
+3. Discovery, previous clinicians, private requests and offers.
+4. Automatic/manual booking, expiry, rescheduling, cancellation rules and simulated reservation releases/refunds.
+5. Notes, approved summaries, follow-ups and couples consent.
+6. Ratings, responsiveness, pending earnings, simulated withdrawals and explicitly authorized extensions.
+7. Any change to calls must retain LiveKit Cloud revocation, both identity aliases, cutoff/concurrency behavior and the full hosted End regression. PR #3’s source branch remains preserved while consolidation is reviewed.
 
-## Readiness boundary
-
-Current booking funds and deposits are simulated demo records only. SMS API
-acceptance is not delivery, and OTP is not clinician credential approval.
-Production payment activation, real-money safeguarding, double-entry records,
-ERPNext posting, reconciliation, dispute operations and provider/regulatory
-approval remain unimplemented. No release or launch claim should blur these
-boundaries.
+Demonstration funding is not real-money readiness. `tt_ledger` is a simulation transaction log, not a double-entry subledger or ERPNext posting integration. Live SMS, SMTP, credential verification, payout, human/device call testing and production readiness remain outstanding.
