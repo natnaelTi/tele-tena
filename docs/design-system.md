@@ -218,3 +218,9 @@ Use the React Brand component for the locally typeset Manrope wordmark. SVG
 lockups use the same font with a sans-serif fallback; no external asset requests.
 Manrope and Noto Sans Ethiopic are distributed locally through their Fontsource
 packages with included SIL Open Font License files. No Google Fonts runtime calls.
+
+### Review deployment URL
+
+The packaged release runs at `/teletena/` with the existing design and persistent
+demonstration ribbon. Use router links within its basename and `BASE_URL` for
+public assets; do not hardcode development hosts or expose provider secrets.

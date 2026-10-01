@@ -49,3 +49,12 @@ do not release/claim the feature until the stated blocker is resolved.
 7. Any change to calls must retain LiveKit Cloud revocation, both identity aliases, cutoff/concurrency behavior and the full hosted End regression. PR #3’s source branch remains preserved while consolidation is reviewed.
 
 Demonstration funding is not real-money readiness. `tt_ledger` is a simulation transaction log, not a double-entry subledger or ERPNext posting integration. Live SMS, SMTP, credential verification, payout, human/device call testing and production readiness remain outstanding.
+
+## Selfmade review packaging
+
+Deployment packaging is a separate feature branch dependent on **open PR #7** at
+`84bd972`. It does not imply main contains the presentation release. Frappe-served
+assets, namespaced routes, site-bound invited review mode and an explicit synthetic
+seed are included; local verification is tracked in `review-deployment-verification.md`.
+Remote Selfmade compatibility, installation, HTTPS/device checks and live delivery
+remain pending. No earnings or separate redesign work is included.
