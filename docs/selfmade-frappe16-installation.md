@@ -31,14 +31,14 @@ restarts. Site-only configuration does not isolate process/dependency changes.
 
 Run as `smcs`, not root, from a normal shell with the deployment's existing Bench
 command available. Stop on failure; execute sections individually and inspect
-results. `INSTALL_SHA` below must be set to the full reviewed installation commit
-from the verification report; this explicit gate prevents installing a branch tip.
+results. `INSTALL_SHA` below pins the verified installation commit; do not replace it
+with a branch tip. Later documentation-only commits record the pin and cleanup.
 
 ```bash
 set -euo pipefail
 umask 077
 cd /home/smcs/frappe-bench
-INSTALL_SHA='REPLACE_WITH_FULL_REVIEWED_INSTALLATION_SHA'
+INSTALL_SHA='bba5ed9f15bd0b140967618ed2bd982c31a76c1b'
 [[ "$INSTALL_SHA" =~ ^[0-9a-f]{40}$ ]]
 test "$(env/bin/python -c 'import platform; print(platform.python_version())')" = 3.14.2
 test "$(node --version)" = v24.13.0

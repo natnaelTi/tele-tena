@@ -10,7 +10,8 @@ is included. There were **no required product-code or schema compatibility fixes
 Changes are isolated-test tooling, a shared-dependency installation guard, CI
 runtime coverage, manifests and operator documentation.
 
-Installation SHA: **recorded in the final pin update below**. Do not substitute
+Installation SHA: **`bba5ed9f15bd0b140967618ed2bd982c31a76c1b`**. Later documentation-only
+commits record this pin and cleanup; they contain no runtime changes. Do not substitute
 main; it does not contain this release. The exact host command sequence is
 [selfmade-frappe16-installation.md](selfmade-frappe16-installation.md).
 
@@ -77,7 +78,7 @@ MariaDB10.6 client and isolated Bench CLI. Integration base was explicitly
 | `tests/dependency_checkpoint.py` | 3 passed on Python3.14.2 and original Python3.12.3 |
 | `scripts/check_review_site.py` | Passed seed idempotency/site binding, repeat migrations, HTTP permissions, browser, Cloud and RQ checks |
 | `scripts/check_migration.py` with disposable review-site override | Two further migrations preserve every command/OTP/consultation/onboarding/presentation table fingerprint and service scopes; eight Patch Log entries checked |
-| `scripts/build_review.py` with locked npm dependencies | Passed Node24.13.0 production build; packaged source ba674b7 then compatibility tooling commit0e51874 |
+| `scripts/build_review.py` with locked npm dependencies | Passed Node24.13.0 production build; packaged source ba674b7, tooling commit0e51874, then final installation commit `bba5ed9` |
 | `bench build --apps frappe,erpnext,tele_tena --production` | Passed target framework/ERPNext asset build, local bench only |
 | `npm --prefix frontend run lint` | Passed exit0 with existing React warnings; not warning-free |
 | `node tests/service_worker.mjs` | Both development and packaged cache-exclusion tests passed |
@@ -157,4 +158,18 @@ remains valid for unchanged product code. New dependency-guard tests passed on
 Python3.12.3; CI now covers Python3.12/3.14.2 syntax/guard tests and locked frontend
 builds on Node22.23.3/24.13.0. CI is not a substitute for the local full-stack run.
 
-Cleanup status and final installation pin are appended after verification.
+The final installation artifact at `bba5ed9` was rebuilt and its built browser
+journey, direct-link refresh, logout, scoped PWA/offline behavior and exact private
+credential exclusion scan passed again. Final cleanup status is recorded below.
+
+
+## Cleanup completed
+
+Both disposable databases and site directories were removed, including copied
+LiveKit credentials and generated review passwords. The temporary database
+administrator was dropped and its mode-600 credential file removed. Isolated
+Gunicorn, Redis and MariaDB processes were stopped; ports8017/8018/16379/16380
+have no remaining listeners. Disposable database storage was removed. Code
+worktree, runtime binaries, private diagnostic logs and committed evidence remain.
+The original development records/config/provider-credential fingerprint comparison
+passed again after cleanup, and its app/framework worktrees were unchanged.

@@ -21,6 +21,7 @@
     "Local Bench CLI 5.31.0 separately installed; remote CLI version not supplied"
   ],
   "frontend_lock_sha256": "b353d6c1c949cb5dc999f3a9df45b6319bb111190a2870773de55f1e54cf2139",
+  "installation_commit": "bba5ed9f15bd0b140967618ed2bd982c31a76c1b",
   "node": "24.13.0",
   "npm": "11.6.2",
   "python": "3.14.2",
