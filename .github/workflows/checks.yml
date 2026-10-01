@@ -30,3 +30,4 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m compileall -q tele_tena scripts tests
+      - run: python tests/dependency_checkpoint.py

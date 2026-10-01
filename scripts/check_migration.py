@@ -12,7 +12,8 @@ from tele_tena.schema import TABLES, PHONE_AUTH_TABLES
 from tele_tena.patches.v1_6_presentation_release import TABLES as PRESENTATION_TABLES
 
 BENCH = Path(__file__).resolve().parents[3]
-SITE = 'erp.localhost'
+SITE = os.environ.get('TELE_TENA_TEST_SITE', 'erp.localhost')
+assert SITE in ('erp.localhost', 'tele-tena-pr2-test.localhost'), 'Disposable/development sites only'
 os.chdir(BENCH / 'sites')
 
 

@@ -3,6 +3,13 @@
 Status: accepted direction; foundation installation verified on Frappe 15.121.2
 and ERPNext 15.121.6. Product workflow compatibility remains to be tested.
 
+Deployment checkpoint update: the presentation/deployment release now also passed
+isolated compatibility tests on the exact Selfmade Frappe16.2.1/ERPNext16.1.0 commits,
+Python3.14.2, Node24.13.0, MariaDB10.6.22 and Redis6.0.16. See
+`frappe16-compatibility-verification.md` for tested workflows and explicit host/TLS
+differences. This does not authorize upgrading the retained development bench or
+changing shared remote dependencies.
+
 React + TypeScript + Vite talks to a dedicated custom Frappe application. ERPNext
 provides accounting. Frappe RQ workers and scheduler handle jobs. No Django or Celery.
 MariaDB and framework versions must match the user's isolated WSL bench; do not upgrade

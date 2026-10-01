@@ -56,5 +56,8 @@ Deployment packaging is a separate feature branch dependent on **open PR #7** at
 `84bd972`. It does not imply main contains the presentation release. Frappe-served
 assets, namespaced routes, site-bound invited review mode and an explicit synthetic
 seed are included; local verification is tracked in `review-deployment-verification.md`.
-Remote Selfmade compatibility, installation, HTTPS/device checks and live delivery
-remain pending. No earnings or separate redesign work is included.
+The supplied Selfmade framework/runtime versions passed isolated local compatibility
+checks, including hosted Cloud End/revocation and RQ2 expiry; see
+`frappe16-compatibility-verification.md`. Remote shared-package resolution, installation,
+HTTPS/device checks and live delivery remain pending. No earnings or separate
+redesign work is included. PR #8 and its PR #7 dependency remain open and unmerged.
