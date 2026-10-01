@@ -1,4 +1,5 @@
-import { Link, Navigate, NavLink, Outlet } from "react-router-dom";
+import { Link, Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import {
   CalendarDays,
   ClipboardCheck,
@@ -16,15 +17,12 @@ import { Button, InlineNotice, Skeleton } from "../components/ui";
 import { LanguageSelect, useLocale } from "../hooks/useLocale";
 import { useSession } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
+import WorkspaceTour from "../components/WorkspaceTour";
 export function DemoBar() {
-  const { w } = useLocale();
   return (
-    <div className="demo-bar">
-      <span className="demo-dot" />
-      {w("Demo environment")}
-      <span className="demo-detail">
-        Synthetic information · no real payments
-      </span>
+    <div className="demo-bar" role="note" aria-label="Demonstration environment">
+      <span className="demo-dot" aria-hidden="true" />
+      Demonstration environment — no real payments or clinical care.
     </div>
   );
 }
@@ -129,12 +127,14 @@ export function WorkspaceLayout({
 }) {
   const { session, refresh } = useSession();
   const { w } = useLocale();
+  const location = useLocation();
   const items =
     kind === "patient"
       ? patientNav
       : kind === "clinician"
         ? clinicianNav
         : adminNav;
+  useEffect(()=>{const revealActive=()=>{if(window.matchMedia("(max-width: 800px)").matches){document.querySelector<HTMLElement>(".workspace-nav a.active")?.scrollIntoView({block:"nearest",inline:"center"});}};revealActive();window.addEventListener("resize",revealActive);return()=>window.removeEventListener("resize",revealActive);},[location.pathname]);
   if (kind === "admin" && !session?.roles.includes("Tele Tena Approver"))
     return (
       <main className="container">
@@ -156,9 +156,9 @@ export function WorkspaceLayout({
               ? "Clinician workspace"
               : "Your space for care"}
         </div>
-        <nav aria-label="Workspace">
+        <nav className={`workspace-nav workspace-nav-${kind}`} aria-label="Workspace">
           {items.map(([to, label, Icon]) => (
-            <NavLink key={to} to={to} end>
+            <NavLink key={to} to={to} end data-tour={to==="/patient"?"patient-home":to==="/patient/discovery"?"patient-discovery":to==="/patient/appointments"?"patient-appointments":to==="/patient/account"?"patient-account":to==="/clinician"?"clinician-today":to==="/clinician/availability"?"clinician-availability":to==="/clinician/appointments"?"clinician-appointments":to==="/clinician/care"?"clinician-care":to==="/admin"?"reviewer-applications":to==="/admin/scopes"?"reviewer-scopes":undefined}>
               <Icon size={20} />
               <span>{w(label)}</span>
             </NavLink>
@@ -190,6 +190,7 @@ export function WorkspaceLayout({
           </span>
           <LanguageSelect />
         </header>
+        <WorkspaceTour role={kind} />
         <main className="workspace-main" id="main-content">
           <Outlet />
         </main>
