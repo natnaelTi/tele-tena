@@ -31,6 +31,8 @@ def _result(challenge_id):
 
 @frappe.whitelist(allow_guest=True, methods=['POST'])
 def request_code(channel, contact, request_id):
+    from tele_tena.review import guard_contact_access
+    guard_contact_access()
     contact = normalize(channel, contact)
     if not isinstance(request_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{20,100}', request_id):
         fail('Invalid request', 'invalid_request')
@@ -109,6 +111,8 @@ def _identity(channel, contact):
 
 @frappe.whitelist(allow_guest=True, methods=['POST'])
 def verify_code(channel, contact, challenge_id, code):
+    from tele_tena.review import guard_contact_access
+    guard_contact_access()
     contact = normalize(channel, contact)
     digest = otp._keyed('contact:' + channel, contact)
     purpose = 'contact_' + channel

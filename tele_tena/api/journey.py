@@ -376,7 +376,8 @@ def preview(request_text, sharing):
 
 
 def simulation_enabled():
-    return frappe.local.site == 'erp.localhost' and bool(frappe.conf.get('tele_tena_simulation_enabled'))
+    from tele_tena.review import enabled
+    return enabled() or (frappe.local.site == 'erp.localhost' and bool(frappe.conf.get('tele_tena_simulation_enabled')))
 
 
 @command

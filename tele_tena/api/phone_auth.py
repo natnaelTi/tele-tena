@@ -100,6 +100,8 @@ def csrf_token():
 
 @frappe.whitelist(allow_guest=True, methods=['POST'])
 def request_code(phone, purpose, request_id):
+    from tele_tena.review import guard_contact_access
+    guard_contact_access()
     """Create one challenge and make at most one bounded provider request."""
     if purpose not in ('patient_signup', 'clinician_application', 'login'):
         _json_error('Unsupported verification purpose', 'invalid_request')
@@ -167,6 +169,8 @@ def _establish_login(user):
 
 @frappe.whitelist(allow_guest=True, methods=['POST'])
 def verify_code(phone, challenge_id, code, purpose, display_name='', adult=0, statement=''):
+    from tele_tena.review import guard_contact_access
+    guard_contact_access()
     """Verify a phone, then continue only into an owner-only onboarding draft."""
     if purpose not in ('patient_signup', 'clinician_application', 'login'):
         _json_error('Invalid verification', 'otp_invalid')
