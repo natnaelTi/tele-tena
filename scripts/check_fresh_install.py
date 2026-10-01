@@ -95,13 +95,14 @@ try:
     assert {'frappe', 'erpnext', 'tele_tena'} <= set(frappe.get_installed_apps())
     from tele_tena.schema import TABLES
     assert all('tt_' + table in frappe.db.get_tables(cached=False) for table in TABLES)
+    assert 'tt_consultation' in frappe.db.get_tables(cached=False)
     assert frappe.db.exists('DocType', 'Tele Tena Service')
     assert frappe.db.exists('DocType', 'Tele Tena Service Scope')
     assert frappe.db.count('Tele Tena Service Scope') == 0
     assert frappe.db.sql('SELECT COUNT(*) FROM tt_wallet')[0][0] == 0
     for role in ('Tele Tena Patient', 'Tele Tena Clinician', 'Tele Tena Approver'):
         assert frappe.db.exists('Role', role)
-    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check'):
+    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_consultations', 'v1_4_consultation_close_state'):
         assert frappe.db.exists('Patch Log', {'patch': 'tele_tena.patches.' + version})
     from tele_tena.api import journey
     assert not journey.simulation_enabled(), 'Simulation unexpectedly enabled on disposable site'
@@ -114,7 +115,7 @@ try:
     frappe.destroy()
     assert retained_fingerprint() == retained_before, 'Retained development records changed'
     passed = True
-    print('PASS: fresh Frappe + ERPNext + tele_tena install, native models, roles, command tables, three recorded migrations, guest denial and disabled simulation; retained development records unchanged')
+    print('PASS: fresh Frappe + ERPNext + tele_tena install, native models, roles, consultation and command tables, five recorded migrations, guest denial and disabled simulation; retained development records unchanged')
 except Exception as error:
     print('Fresh installation failed (' + type(error).__name__ + '); credential contents withheld')
     raise SystemExit(1)

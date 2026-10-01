@@ -45,6 +45,31 @@ LiveKit credentials belong on the backend only; SMS credentials likewise. No sec
 are needed for the current scaffold. Use provider secret storage or untracked local
 configuration, never chat messages or committed files.
 
+For the LiveKit consultation demo, configure credentials interactively in a Bench
+terminal as the normal Linux user (the API secret prompt is hidden):
+
+```sh
+cd /home/frappe/frappe/frappe-bench
+bench --site erp.localhost execute tele_tena.development.configure_livekit
+```
+
+Enter the LiveKit **public WebSocket connection URL** (`wss://...` for a hosted
+project), API key and API secret when prompted. The command writes only to
+`sites/erp.localhost/private/tele_tena_livekit.json` with directory mode 700 and
+file mode 600; it prints only a safe configured/path/mode result. It refuses
+non-loopback `ws://` URLs, does not change site config, and is restricted to
+`erp.localhost`. Do not copy values into React, Vite variables, shell arguments,
+logs or Git. The browser receives only the public URL and a short-lived,
+appointment-scoped participant token. To replace credentials, rerun the command.
+To disable credentials locally, remove that one private file as the normal user.
+
+For local development only, `ws://localhost` or `ws://127.0.0.1` is accepted.
+Remote phone browsers need HTTPS for camera/microphone permission. If needed,
+put only the Vite application behind a temporary authenticated HTTPS tunnel and
+keep the Bench/Frappe admin interface bound to loopback; never tunnel port 8000.
+Review the tunnel provider's privacy settings before use and use synthetic
+accounts only.
+
 Fresh-install bootstrap is `tele_tena.schema.install` in after_install. Upgrades
 use numbered Frappe post-model-sync patches recorded in Patch Log; native service
 and scope models use standard model sync. There is no recurring after_migrate DDL. Run normal `bench --site erp.localhost migrate` after checkout,

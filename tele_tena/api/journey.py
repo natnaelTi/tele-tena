@@ -281,9 +281,9 @@ def add_availability(start, end):
     approved(p.user, True)
     start, end = instant(start), instant(end)
     if start <= datetime.now(timezone.utc).replace(tzinfo=None) or end <= start or end - start > timedelta(days=1):
-        fail('Choose a future window of at most one day')
+        fail('Choose a future window of at most one day', 'invalid_availability_window')
     if rows('SELECT id FROM tt_availability WHERE clinician=%s AND start<%s AND end>%s', (p.user, end, start)):
-        fail('Availability overlaps an existing window')
+        fail('Availability overlaps an existing window', 'availability_overlap')
     frappe.db.sql('INSERT INTO tt_availability (id,clinician,start,end) VALUES (%s,%s,%s,%s)',
                   (str(uuid.uuid4()), p.user, start, end))
     return {'saved': True}
