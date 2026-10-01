@@ -38,37 +38,20 @@ tracked below and in the release verification report. Artifacts use synthetic in
 
 ## Presentation release
 
-Detailed states and default policies: [presentation-release-model.md](presentation-release-model.md).
-The next release requires itemized evidence in `docs/presentation-readiness-verification.md`.
-Do not mark an item complete without API and rendered-journey checks.
+Detailed states and demonstration policies: [presentation-release-model.md](presentation-release-model.md).
+Run evidence is itemized in [presentation-readiness-verification.md](presentation-readiness-verification.md).
 
-- [ ] Weekly schedule recurrence, exceptions, timezone conversion, global clinician conflict check, valid-slot booking and manual-confirmation reservation lifecycle.
-- [ ] Distinct server-enforced appointment/call/documentation states; explicit completion and authorized cancellation/release.
-- [ ] Private notes, separately published summaries, revision and visibility history, follow-up booking.
-- [ ] Status-aware consultation detail and focused audio/video room.
-- [ ] Clinician care directory and encounter-scoped disclosure history.
-- [ ] Focused account sections and backed wallet summaries; no fabricated earnings.
-- [ ] Admin names/status/scopes/resume evidence with permission-checked private upload/download.
-- [ ] Public-only static cache, offline page and safe deferred service-worker updates.
-- [ ] Persisted, dismissible and replayable role-specific tours with all three language keys.
-- [ ] Screenshot/browser verification at 320, 390, 768, 1440px and 200% equivalent; keyboard/touch/language checks.
-
-## Presentation release
-
-Detailed states and default policies: [presentation-release-model.md](presentation-release-model.md).
-The next release requires new itemized evidence in `docs/presentation-readiness-verification.md`.
-Do not mark an item complete without its API and rendered journey checks.
-
-- [ ] Weekly schedule recurrence, exceptions, timezone conversion, global clinician conflict check, valid-slot booking and manual-confirmation reservation lifecycle.
-- [ ] Distinct server-enforced appointment/call/documentation states; explicit completion and authorized cancellation/release.
-- [ ] Private notes, separately published summaries, revision and visibility history, follow-up booking.
-- [ ] Status-aware consultation detail and focused audio/video room.
-- [ ] Clinician care directory and encounter-scoped disclosure history.
-- [ ] Focused account sections and backed wallet summaries; no fabricated earnings.
-- [ ] Admin names/status/scopes/resume evidence with permission-checked private upload/download.
-- [ ] Public-only static cache, offline page and safe deferred service-worker updates.
-- [ ] Persisted, dismissible and replayable role-specific tours with all three language keys.
-- [ ] Screenshot/browser verification at 320, 390, 768, 1440px and 200% equivalent; keyboard/touch/language checks.
+- [x] Weekly schedule recurrence, exceptions, timezone conversion, global clinician conflict check, valid-slot booking and manual-confirmation reservation lifecycle.
+- [x] Distinct server-enforced appointment/call/documentation states; explicit completion and authorized cancellation/release.
+- [x] Private notes, separately published summaries, revision and visibility history, follow-up booking.
+- [x] Status-aware consultation detail and focused audio/video room; hosted cached-token End/revocation check passed.
+- [x] Clinician care directory and encounter-scoped disclosure history.
+- [x] Focused account sections and backed wallet summaries; no fabricated earnings.
+- [x] Admin names/status/scopes/resume evidence with permission-checked private upload/download.
+- [x] Public-only static cache, offline page and no forced service-worker reload.
+- [x] Persisted, dismissible and replayable role-specific tours with English, Amharic and Afaan Oromo copy.
+- [x] Synthetic screenshot/browser journeys at 320, 390, 768 and 1440 px, plus the 200%-equivalent narrow-layout check, keyboard flows, language samples and offline navigation.
+- [ ] Human translation review, physical-device media and PWA installation review.
 
 ## Historical merge gate
 PR #6 passed the hosted LiveKit and local checks and merged as `7222836`. Source PRs

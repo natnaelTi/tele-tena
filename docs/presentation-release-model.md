@@ -63,9 +63,13 @@ not rewrite them. Changing or pausing schedule rules never edits appointments.
 Only the treating clinician may read/edit a consultation's private note. The
 patient-facing query selects published summary revisions only and never selects
 the private-note column. Approver and clinic roles gain no clinical access.
-Care-directory rows are appointment/encounter-scoped and carry only that booking's
-disclosure snapshot. They do not return account IDs or join separately masked
-encounters. Resume PDFs are private, max 5 MiB, magic-checked server-side, and
+Care-directory results group only encounters for the same treating clinician
+whose bookings explicitly shared the exact same non-empty alias. No patient
+account identifier is returned. A masked encounter is keyed and opened only by
+its opaque appointment reference and is never joined to another encounter;
+different disclosed aliases remain separate groups. Each detail response carries
+that booking's disclosure snapshot. Resume PDFs are private, max 5 MiB,
+magic-checked server-side, and
 downloaded through an authorization-checking endpoint; evidence does not establish
 credential validity.
 
@@ -76,4 +80,3 @@ Replay is always available. No tour executes a mutation. The service worker stor
 the public shell assets and generic offline document only; APIs, authenticated
 responses, private files and financial/clinical data remain network-only. It never
 forces a page reload; updates wait for the client's normal close lifecycle.
-

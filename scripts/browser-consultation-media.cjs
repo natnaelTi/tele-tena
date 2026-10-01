@@ -4,6 +4,7 @@ const { chromium } = require('playwright')
 const fs = require('node:fs')
 const assert = require('node:assert/strict')
 const fixture = JSON.parse(fs.readFileSync(process.env.TELE_TENA_CALL_FIXTURE, 'utf8'))
+fs.mkdirSync('/tmp/tele-tena-presentation-review', {recursive:true})
 const base = 'http://127.0.0.1:5173'
 let checkpoint = 'launch'
 let diagnostic = ''
@@ -29,12 +30,17 @@ async function main() {
     await page.getByRole('button', { name: 'Sign in', exact: true }).click()
     await page.getByRole('button', { name: 'Sign out', exact: true }).waitFor({ timeout: 15000 })
     await page.goto(base + (kind.startsWith('p') ? '/patient' : '/clinician') + '/consultations/' + fixture.appointment_id)
+    await page.getByRole('link', {name:'Join consultation', exact:true}).click()
+    await page.locator(`[data-appointment-id="${fixture.appointment_id}"] .consultation`).waitFor()
   }
 
   const card = page => page.locator(`[data-appointment-id="${fixture.appointment_id}"]`)
   const patientCard = () => card(patient)
   const clinicianCard = () => card(clinician)
   const call = page => card(page).locator('.consultation')
+  async function capture(page,name,widths=[320,390,768,1440]){
+    for(const width of widths){await page.setViewportSize({width,height:960});await page.evaluate(()=>document.fonts.ready);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`${name} overflows at ${width}`);await page.screenshot({path:`/tmp/tele-tena-presentation-review/${name}-${width}.png`,fullPage:true})}
+  }
   async function prepareAndJoin(page) {
     await call(page).getByRole('button', { name: 'Check microphone and camera' }).click()
     let joinResponses = 0
@@ -101,7 +107,9 @@ async function main() {
     await page.unroute('**/api/method/tele_tena.api.consultations.join')
   }
   async function doubleJoinAndUnmountBeforeToken(page) {
+    checkpoint='duplicate join preflight check'
     await call(page).getByRole('button', { name: 'Check microphone and camera' }).click()
+    checkpoint='duplicate join media preview ready'
     await call(page).getByRole('status').filter({ hasText: 'Devices checked' }).waitFor()
     await call(page).locator('.call-video').evaluate(video => { window.__lateJoinPreview = video.srcObject })
     let requests = 0
@@ -120,14 +128,19 @@ async function main() {
       await held
       await route.fulfill({ response, json: payload }).catch(() => undefined)
     })
+    checkpoint='issue and hold the duplicated join request'
     const button = call(page).getByRole('button', { name: 'Join consultation' })
     await button.evaluate(node => { node.click(); node.click() })
     await entered
+    checkpoint='assert duplicate join was blocked and navigate away'
     await new Promise(resolve => setTimeout(resolve, 250))
     try {
       assert.equal(requests, 1, 'rapid duplicate Join must issue only one token request')
-      await page.getByRole('button', { name: 'Sign out', exact: true }).click()
-      await page.getByRole('button', { name: 'Continue', exact: true }).waitFor()
+      await page.getByRole('link',{name:'Back to consultation details'}).click()
+      checkpoint='call view unmounted'
+      await page.getByRole('link',{name:'Back to appointments'}).click()
+      await page.getByRole('heading', {name:'Appointments', exact:true}).waitFor()
+      checkpoint='late result stopped the preview'
       assert(await page.evaluate(() => window.__lateJoinPreview.getTracks().every(track => track.readyState === 'ended')))
     } finally {
       releaseResolve()
@@ -135,7 +148,10 @@ async function main() {
     }
     await new Promise(resolve => setTimeout(resolve, 1000))
     assert.equal(livekitSockets, 0, 'late token response after component unmount must not connect')
-    await login(page, 'c1')
+    checkpoint='return to appointment details after the held response'
+    await page.goto(base+'/clinician/consultations/'+fixture.appointment_id)
+    await page.getByRole('link', {name:'Join consultation', exact:true}).click()
+    await call(page).waitFor()
   }
   try {
     await Promise.all([login(patient, 'p1'), login(clinician, 'c1')])
@@ -219,10 +235,10 @@ async function main() {
     await prepareAndJoin(clinician)
     checkpoint = 'capture connected call at responsive widths'
     for (const page of [patient, clinician]) {
-      for (const width of [390, 768, 1440]) {
+      for (const width of [320, 390, 768, 1440]) {
         await page.setViewportSize({ width, height: 960 })
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
-        await page.screenshot({ path: `/tmp/tele-tena-redesign-review/live-call-${width}-${page === patient ? 'patient' : 'clinician'}.png`, fullPage: true })
+        await page.screenshot({ path: `/tmp/tele-tena-presentation-review/video-call-${width}-${page === patient ? 'patient' : 'clinician'}.png`, fullPage: true })
       }
     }
     checkpoint = 'two-way remote media'
@@ -241,6 +257,15 @@ async function main() {
     checkpoint = 'polling preserves connected media status'
     await new Promise(resolve => setTimeout(resolve, 6000))
     for (const page of [patient, clinician]) assert.match(await call(page).getByRole('status').innerText(), /Connected/)
+    checkpoint = 'audio-only presentation derives from existing audio track'
+    await call(patient).getByRole('button', {name: 'Audio only', exact: true}).click()
+    await call(patient).locator('.audio-participant').waitFor()
+    for(const width of [320,390,768,1440]){await patient.setViewportSize({width,height:960});assert.equal(await patient.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await patient.screenshot({path:`/tmp/tele-tena-presentation-review/audio-only-${width}.png`,fullPage:true})}
+    await call(patient).getByRole('button', {name: 'Turn video on', exact: true}).click()
+    await call(patient).getByRole('button', {name: 'Check microphone and camera', exact: true}).click()
+    await call(patient).getByRole('status').filter({hasText:'Devices checked'}).waitFor()
+    await call(patient).getByRole('button', {name:'Join consultation', exact:true}).click()
+    await call(patient).getByRole('status').filter({hasText:'Connected'}).waitFor({timeout:45000})
     checkpoint = 'participant leave and rejoin'
     await call(patient).getByRole('button', { name: /Leave/ }).click()
     await call(patient).getByRole('status').filter({ hasText: 'You left the consultation' }).waitFor()
@@ -271,6 +296,23 @@ async function main() {
       assert.equal(await call(page).getByRole('button', { name: 'Join consultation', exact: true }).count(), 0)
       assert.equal(await call(page).locator('.call-remote audio, .call-remote video').count(), 0)
     }
+    checkpoint = 'post-call private note draft and explicit completion'
+    await clinician.goto(base+'/clinician/consultations/'+fixture.appointment_id)
+    await clinician.getByRole('heading',{name:'Consultation notes',exact:true}).waitFor()
+    await capture(clinician,'end-of-call-notes')
+    const noteFields=clinician.locator('.note-editor textarea')
+    await noteFields.nth(0).fill('Synthetic private consultation note')
+    await noteFields.nth(1).fill('Synthetic patient summary and next steps')
+    await clinician.getByRole('button',{name:'Preview patient summary',exact:true}).click()
+    await clinician.getByText('Synthetic patient summary and next steps',{exact:true}).waitFor()
+    clinician.once('dialog',dialog=>dialog.accept())
+    await clinician.getByRole('button',{name:'Finalize consultation',exact:true}).click()
+    await clinician.getByText('Consultation finalized.',{exact:true}).waitFor()
+    await capture(clinician,'completed-consultation-clinician')
+    await patient.goto(base+'/patient/consultations/'+fixture.appointment_id)
+    await patient.getByText('Synthetic patient summary and next steps',{exact:true}).waitFor()
+    assert.equal(await patient.getByText('Synthetic private consultation note',{exact:true}).count(),0)
+    await capture(patient,'completed-consultation-patient')
     assert.deepEqual(errors, [])
     console.log('PASS: two independent Chromium contexts exchanged fake-device audio/video; patient leave/rejoin worked; clinician end closed both sessions')
   } finally {
@@ -278,8 +320,9 @@ async function main() {
   }
 }
 
-main().catch(() => {
+main().catch(error => {
   // Intentionally omit exception details: SDK/network errors may include URLs or token context.
-  console.error(`FAIL: consultation browser checkpoint ${checkpoint}${diagnostic ? ` ${diagnostic}` : ''}`)
+  const safeReason=error?.name==='AssertionError'?String(error.message).slice(0,180):String(error?.name||'interaction failure')
+  console.error(`FAIL: consultation browser checkpoint ${checkpoint} (${safeReason})${diagnostic ? ` ${diagnostic}` : ''}`)
   process.exitCode = 1
 })

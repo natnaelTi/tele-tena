@@ -29,6 +29,8 @@ async function main() {
     await page.getByRole('button', { name: 'Sign in', exact: true }).click()
     await page.getByRole('button', { name: 'Sign out', exact: true }).waitFor({ timeout: 15000 })
     await page.goto(base + (kind.startsWith('p') ? '/patient' : '/clinician') + '/consultations/' + fixture.appointment_id)
+    await page.getByRole('link', {name:'Join consultation', exact:true}).click()
+    await page.locator(`[data-appointment-id="${fixture.appointment_id}"] .consultation`).waitFor()
   }
 
   const card = page => page.locator(`[data-appointment-id="${fixture.appointment_id}"]`)

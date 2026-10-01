@@ -1,6 +1,6 @@
 # Tele-tena MVP delivery tracker
 
-Updated 2026-10-01 on merged `main` at PR #6 merge `7222836`. PRs #3/#4 are merged through preserved ancestry; PR #5 was superseded. The hosted LiveKit Cloud End/rejoin/cached-token assertions passed with automated two-browser fake-media. Status describes demonstration evidence, not production readiness. Presentation release work is tracked separately in `docs/presentation-readiness-verification.md`.
+Updated 2026-10-01 on the presentation feature branch based on merged `main` at PR #6 merge `7222836`. PRs #3/#4 are merged through preserved ancestry; PR #5 was superseded. The hosted LiveKit Cloud End/rejoin/cached-token assertions passed with automated two-browser fake-media. Status describes demonstration evidence, not production readiness. Presentation release implementation and verification are tracked in `docs/presentation-readiness-verification.md`.
 
 **Status meanings:** `implemented` means code and listed checks cover the
 demonstration behavior; `partial` means a narrower slice exists or has a known
@@ -18,32 +18,33 @@ do not release/claim the feature until the stated blocker is resolved.
 | Previous clinicians and repeat care discovery | pending | Not represented in current journey/API. |
 | Private open patient requests and clinician offers, isolated from competing clinicians | pending | No request board, offer visibility, offer acceptance, or offer fee/time/format/expiry snapshot. |
 | Free patient discovery/booking and bring-your-own-patient links | partial | Current demo supports direct discovery/booking; clinician referral links/acquisition attribution not built. |
-| Automatic/manual booking confirmation, slot holds/expiry and mutual rescheduling | partial | Direct booking confirms immediately with transactional slot reservation. Holds, expiry, confirmation policy choice, and mutual rescheduling are absent. |
+| Automatic/manual booking confirmation, slot holds/expiry and mutual rescheduling | partial | Recurring server-generated slots, configurable automatic/manual confirmation, atomic slot/fund holds and 24-hour demonstration expiry/release are implemented and regression tested. Mutual rescheduling is not implemented. |
 | Global disclosure defaults, request override and exact per-request preview | implemented | Separate defaults/override, immutable booking snapshot, privacy and profile-edit regression tests. |
 | Public review identity separate from account and clinical disclosure identity | pending | Reviews/ratings not implemented. |
 | Couples participation with individual consent and optional mutual relationship link | pending | No shared appointment, separate participant permissions, or consent workflow. Payment/partner relationship must not grant record access. |
 | Authorized human voice/video, audio-only, mute/camera, Leave and clinician End | partial | Hosted Cloud browser test passed for independent Chromium contexts with fake devices, Leave/rejoin/End and original/refreshed token rejection for both identities, including a departed participant. End test root cause was a stale “Refresh” click after polling; fixed without removing assertions. Human/device testing remains. This remains a demo, not clinical readiness. |
 | No recording/transcription by default; no automatic charge/release from connection time | implemented | No recorder/transcriber/agent/automatic extension charge/release path in PR #3; keep this invariant in all call work. |
-| Clinician notes, patient-authorized summary, email link to authenticated summary, follow-up booking | pending | Not implemented. Summary notification body must not contain sensitive clinical data. |
+| Clinician notes, patient-authorized summary, email link to authenticated summary, follow-up booking | partial | Private versioned clinician notes, separately published summary revisions, direct API privacy and same-clinician follow-up booking are implemented/tested. Email notification/link is not implemented. |
 | Completed-session ratings/reviews | pending | No completed-session lifecycle or rating API/UI. |
-| Cancellation rules differ by actor; bounded clinician policy, immutable accepted snapshot, disputes/earnings hold | pending | No cancellation, policy versions or dispute hold. No policy windows/caps are assumed. |
+| Cancellation rules differ by actor; bounded clinician policy, immutable accepted snapshot, disputes/earnings hold | partial | Authorized pre-start cancellation, accepted demo policy snapshot and exact-once full simulated reservation release are implemented. This is one explicit demo policy, not the requested actor-specific production policy or disputes/earnings hold. |
 | Simulated patient deposit and atomic available/reserved booking balance | implemented | Labeled development-only simulation, integer minor units, MariaDB atomicity and rollback tests. Not real-money funding. |
 | Double-entry operational subledger, clinician pending/available earnings, authorized extensions and explicit consent/funds reservation | pending | Current `tt_ledger` is only an append-only simulation transaction log. No double-entry subledger or extension flow; see `pr2-storage-review.md`. |
 | Simulated withdrawals/payout processing and configured withholding | pending | No earnings or payout workflow. External settlement is not instant and requires separate design. |
-| Refund unused funds using verified supported route | pending | No cancellation/refund workflow. Existing reservations stay as recorded. |
+| Refund unused funds using verified supported route | partial | Demo pre-start release restores simulated balance exactly once; no real refund rails or production refund policy exist. |
 | ERPNext accounting/reporting integration, durable posting references/retries and reconciliation | pending | ERPNext is the agreed accounting system, but no posting or reconciliation exists. Never treat simulation events as accounting completion. |
 | English, Amharic and Afaan Oromo UI translation | partial | Existing journey keys in all three languages; Amharic/Afaan Oromo strings are provisional and need native review. OTP adds keys under Phase 1. |
 | Responsive accessible patient, clinician and administrator journeys/design system | partial | New routes/layouts, original local brand, tokens/components, hosted Playwright 1.63 Chromium and connected booking/onboarding journeys. Synthetic screens captured/inspected at 390/768/1440 plus 320 and 200% zoom; no horizontal overflow. New narrative is partly English in Amharic/Oromo pending translation review. Human device/assistive-tech review remains. |
-| Presentation release: recurrence scheduling, bookings, lifecycle, notes, detail pages, private resumes, directory, PWA and tours | pending | State and policy model is recorded in `presentation-release-model.md`; implementation and evidence are tracked in `presentation-readiness-verification.md`. |
+| Role-specific tours with persisted dismissal/replay and permission-aware steps | implemented | Per-user/role/version progress, patient/clinician/applicant/approver tours, route-safety handling, dismiss persistence, replay, route transitions and missing-target recovery passed API/browser checks; screenshots at 320/390/768/1440 are in `/tmp/tele-tena-presentation-review/`. |
+| Presentation release: recurrence scheduling, bookings, lifecycle, notes, detail pages, private resumes, directory, PWA and tours | partial | APIs and connected React flows passed integration, visual, hosted LiveKit, migration-preservation and separate fresh-install checks. Human/device validation, translated-copy review and product areas listed as pending below remain outstanding; see `presentation-readiness-verification.md`. |
 | Production safety/escalation, credential verification, hosting and regulated financial/provider readiness | pending | Product contract marks these unresolved/deferred. Demo uses synthetic accounts/data and is not production clinical readiness. |
 
 ## Current delivery and remaining sequence
 
 1. Contact verification and onboarding are implemented on the consolidation branch. Live delivery awaits secure local configuration and a consenting recipient. Do not treat codes as SMS/email delivery proof or professional approval.
-2. The TeleTena design and focused React journeys are implemented on this same review branch. Hosted browser screenshots and regression evidence are recorded in `docs/consolidation-verification.md`.
+2. The TeleTena design and focused React journeys are implemented on merged main through PR #6 (`7222836`). This presentation feature branch extends that baseline; its new visual and behavioral evidence is in `docs/presentation-readiness-verification.md`.
 3. Discovery, previous clinicians, private requests and offers.
-4. Automatic/manual booking, expiry, rescheduling, cancellation rules and simulated reservation releases/refunds.
-5. Notes, approved summaries, follow-ups and couples consent.
+4. Mutual rescheduling, actor-specific production cancellation policy, no-show actions, and production refund rules. This branch adds only an explicit pre-start demonstration cancellation/release policy.
+5. Couples consent and sensitive-summary notification/email delivery. This branch adds private notes, separately approved summaries and same-clinician follow-up booking.
 6. Ratings, responsiveness, pending earnings, simulated withdrawals and explicitly authorized extensions.
 7. Any change to calls must retain LiveKit Cloud revocation, both identity aliases, cutoff/concurrency behavior and the full hosted End regression. PR #3’s source branch remains preserved while consolidation is reviewed.
 

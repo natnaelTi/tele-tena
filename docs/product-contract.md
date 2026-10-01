@@ -71,3 +71,25 @@ The one persistent “Demonstration environment — no real payments or clinical
 ribbon communicates the boundary. Ordinary totals use “Balance”; activity detail
 identifies simulated deposits/reservations/releases. This copy choice does not
 enable real payments.
+
+## Presentation behavior now implemented
+
+Clinicians can publish IANA-timezone weekly schedules with date exceptions,
+multiple intervals, buffers and confirmation preference. Patients may choose
+only server-generated, still-open slots; booking serializes conflicts and fund
+reservation. Existing appointments retain their saved instant and policy/disclosure
+snapshots when schedule rules change.
+
+Appointment, call and documentation status are distinct. End closes the call and
+revokes participant identities but does not complete a consultation or release
+earnings. The treating clinician explicitly saves and finalizes versioned private
+notes and may separately publish a patient summary. Patients receive only
+published summary revisions. Reviewers may access private PDF application
+evidence, but neither that role nor a clinic relationship grants patient-record
+access. The PWA provides only public static caching and a generic offline page;
+it never reports that offline changes were saved.
+
+These are demonstration workflows. Mutual rescheduling, no-show decisions,
+notifications, real payments/accounting, clinician earnings, physical-device
+call quality and production clinical readiness remain outside the implemented
+contract; the delivery tracker is authoritative for pending scope.
