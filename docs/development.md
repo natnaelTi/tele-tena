@@ -3,8 +3,10 @@
 The only canonical development working copy is:
 `/home/frappe/frappe/frappe-bench/apps/tele_tena`.
 The original `/home/frappe/projects/tele-tena` is retained as an unchanged source
-snapshot; do not develop there. Foundation is on `feat/project-foundation`; milestone 1 is on
-`feat/milestone-1-booking`, based on the unmerged foundation.
+snapshot; do not develop there. `main` contains the reviewed foundation and
+milestone 1 merges. PR #3 remains open and unmerged on
+`feat/milestone-2-consultations`; phone access is developed separately from
+`main` on `feat/phone-otp`.
 
 The isolated development site is `erp.localhost`. Observed installation versions:
 Bench 5.31.0, Frappe 15.121.2, ERPNext 15.121.6, tele_tena 0.1.0.
@@ -45,6 +47,37 @@ LiveKit credentials belong on the backend only; SMS credentials likewise. No sec
 are needed for the current scaffold. Use provider secret storage or untracked local
 configuration, never chat messages or committed files.
 
+For the LiveKit consultation demo, configure credentials interactively in a Bench
+terminal as the normal Linux user (the API secret prompt is hidden):
+
+```sh
+cd /home/frappe/frappe/frappe-bench
+bench --site erp.localhost execute tele_tena.development.configure_livekit
+```
+
+Enter the LiveKit **public WebSocket connection URL** (`wss://...` for a hosted
+project), API key and API secret when prompted. The command writes only to
+`sites/erp.localhost/private/tele_tena_livekit.json` with directory mode 700 and
+file mode 600; it prints only a safe configured/path/mode result. It refuses
+non-loopback `ws://` URLs, does not change site config, and is restricted to
+`erp.localhost`. Do not copy values into React, Vite variables, shell arguments,
+logs or Git. The browser receives only the public URL and a short-lived,
+appointment-scoped participant token. To replace credentials, rerun the command.
+To disable credentials locally, remove that one private file as the normal user.
+
+For local development only, `ws://localhost` or `ws://127.0.0.1` is accepted.
+Remote phone browsers need HTTPS for camera/microphone permission. If needed,
+put only the Vite application behind a temporary authenticated HTTPS tunnel and
+keep the Bench/Frappe admin interface bound to loopback; never tunnel port 8000.
+Review the tunnel provider's privacy settings before use and use synthetic
+accounts only.
+
+For a local SMS Ethiopia credential, run
+`bench --site erp.localhost execute tele_tena.development.configure_sms` in an
+interactive terminal. It prompts invisibly, writes a mode-600 backend-only file,
+prints no secret and sends no message. Live testing still requires a consenting
+recipient whitelisted with the provider; automated tests mock the adapter.
+
 Fresh-install bootstrap is `tele_tena.schema.install` in after_install. Upgrades
 use numbered Frappe post-model-sync patches recorded in Patch Log; native service
 and scope models use standard model sync. There is no recurring after_migrate DDL. Run normal `bench --site erp.localhost migrate` after checkout,
@@ -52,3 +85,29 @@ then `bench --site erp.localhost clear-cache`. The development CLI fixture comma
 `bench --site erp.localhost execute tele_tena.development.setup` creates isolated
 accounts and rotates their passwords into a mode-600 file in /tmp; it does not
 reset profiles, appointments or simulation transaction-log entries. No web authentication bypass exists.
+
+## Email OTP and verified-contact onboarding
+From the Bench directory, configure SMTP locally with:
+
+```sh
+bench --site erp.localhost execute tele_tena.development.configure_email
+```
+
+The helper prompts for host, TLS port (465 or 587) and verified sender, then prompts
+invisibly for SMTP username and password/app password. It writes only a mode-600
+`sites/erp.localhost/private/tele_tena_email.json` file. Never put these values in
+frontend variables, CLI arguments, Git, screenshots or chat. Your email provider
+must allow authenticated SMTP for the verified sender; configure SPF/DKIM as required
+by that provider. No email provider is presumed configured by installing this app.
+
+The backend sends a bounded TLS-protected message directly, without storing a
+plaintext OTP in Frappe Email Queue. SMTP acceptance is not inbox delivery. Timeout
+or rejection does not trigger automatic resend. Automated tests mock delivery;
+no live email-delivery claim is made until a consenting inbox is tested.
+
+The phone/email entry flow verifies contact possession before onboarding. A new
+verified user has an owner-only draft and no Patient/Clinician role. Completing
+patient consent grants the fixed Patient role; submitting a clinician application
+grants Applicant only. Per-service approval remains mandatory. Password-based
+development accounts remain available under Sign in → Use email instead →
+Use password instead. Guest session responses are a normal signed-out state.

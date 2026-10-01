@@ -1,8 +1,11 @@
 """CLI-only synthetic fixture setup, strictly isolated from production sites."""
 import json
+import getpass
 import os
 import secrets
+import tempfile
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import frappe
 from frappe.utils.password import update_password
@@ -39,3 +42,100 @@ def setup():
     update_site_config('tele_tena_simulation_enabled', True)
     frappe.db.commit()
     return {'credentials_file': str(path), 'synthetic': True}
+
+
+def configure_livekit():
+    """Interactive local-only secret setup; never echoes or returns secret values."""
+    if frappe.local.site != 'erp.localhost':
+        frappe.throw('LiveKit setup is restricted to erp.localhost')
+    if frappe.session.user != 'Administrator':
+        frappe.throw('Administrator required', frappe.PermissionError)
+    url = input('LiveKit public connection URL (wss://; ws://localhost for local development): ').strip()
+    key = getpass.getpass('LiveKit API key: ').strip()
+    secret = getpass.getpass('LiveKit API secret: ')
+    confirm = getpass.getpass('Repeat LiveKit API secret: ')
+    parsed = urlsplit(url)
+    local = parsed.hostname in ('localhost', '127.0.0.1', '::1')
+    if parsed.scheme != 'wss' and not (local and parsed.scheme == 'ws'):
+        frappe.throw('Use wss, except ws is allowed for a loopback development server')
+    if not parsed.netloc or parsed.username or parsed.password or not key or len(secret) < 16 or secret != confirm:
+        frappe.throw('Invalid URL/key/secret or secret confirmation')
+    target = Path(frappe.get_site_path('private', 'tele_tena_livekit.json'))
+    target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(target.parent, 0o700)
+    if target.is_symlink():
+        frappe.throw('Refusing a symlinked LiveKit secret path')
+    fd, temporary = tempfile.mkstemp(prefix='.tele-tena-livekit-', dir=target.parent)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, 'w') as stream:
+            json.dump({'url': url, 'api_key': key, 'api_secret': secret}, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, target)
+        os.chmod(target, 0o600)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    return {'configured': True, 'path': str(target), 'mode': '0600'}
+
+def configure_sms():
+    """Prompt locally for provider credentials; development site only, never echoes key."""
+    if frappe.local.site != 'erp.localhost':
+        frappe.throw('SMS setup helper is restricted to erp.localhost')
+    if frappe.session.user != 'Administrator':
+        frappe.throw('Administrator required', frappe.PermissionError)
+    path = Path(frappe.get_site_path('private', 'tele_tena_sms.json'))
+    if path.is_symlink():
+        frappe.throw('SMS credential path may not be a symbolic link')
+    key = getpass.getpass('SMS Ethiopia API key (input hidden): ').strip()
+    if not key or '\n' in key or len(key) > 512:
+        frappe.throw('A valid SMS API key is required')
+    config = {'api_key': key}
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    os.chmod(path.parent, 0o700)
+    fd, temporary = tempfile.mkstemp(prefix='.tele-tena-sms-', dir=path.parent)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, 'w') as stream:
+            json.dump(config, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+        os.chmod(path, 0o600)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    return {'configured': True, 'credentials_file': 'private/tele_tena_sms.json',
+            'provider': 'SMSEthiopia', 'live_send_performed': False}
+
+
+def configure_email():
+    """Local SMTP secret setup; direct TLS-only delivery, no queued plaintext codes."""
+    if frappe.local.site != 'erp.localhost' or frappe.session.user != 'Administrator':
+        frappe.throw('Local administrator setup required', frappe.PermissionError)
+    host = input('SMTP hostname: ').strip()
+    port = input('SMTP TLS port (465 or 587): ').strip()
+    sender = input('Verified sender email address: ').strip()
+    username = getpass.getpass('SMTP username (hidden): ').strip()
+    password = getpass.getpass('SMTP password/app password (hidden): ')
+    if port not in ('465', '587') or not host or '@' not in sender or not username or not password:
+        frappe.throw('Incomplete SMTP configuration')
+    if any('\n' in value or '\r' in value for value in (host, sender, username)):
+        frappe.throw('Invalid SMTP configuration')
+    target = Path(frappe.get_site_path('private', 'tele_tena_email.json'))
+    if target.is_symlink():
+        frappe.throw('Refusing symlinked secret path')
+    target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix='.tele-tena-email-', dir=target.parent)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, 'w') as output:
+            json.dump(dict(host=host, port=int(port), sender=sender, username=username, password=password), output)
+            output.flush()
+            os.fsync(output.fileno())
+        os.replace(temporary, target)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    return {'configured': True}

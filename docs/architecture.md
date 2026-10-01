@@ -55,3 +55,30 @@ rows and all private transactional records remain preserved. Numbered post-model
 patches record adoption; repeated after_migrate DDL is removed. See
 [storage review](pr2-storage-review.md) for the smallest staged back-office adjustment
 and explicit limits of the simulation log versus the future double-entry subledger.
+
+## Milestone 2 consultation storage
+
+`tt_consultation` is an additive, versioned app-owned table keyed by the booked
+appointment. It holds a random room name and opaque participant identities, while
+the appointment-to-account map remains in private application storage. The
+`v1_3_consultations` and `v1_4_consultation_close_state` patches are included in
+fresh-install bootstrap and normal Patch Log migration. Frappe issues room-scoped LiveKit participant tokens after
+checking the session account against the appointment; the browser never receives
+the backend API key or secret. The five-minute token lifetime and 15-minute early /
+30-minute late join limits are configurable demo values, not approved policy.
+
+Join and End take the appointment row lock in the same order. End commits the
+Ended state before provider operations, then LiveKit Cloud `RemoveParticipant`
+revokes both opaque identities (including a participant who has left) using an
+explicit cutoff 30 seconds ahead, followed by room deletion. This covers tokens
+refreshed between the application commit and provider revocation. Provider errors
+leave closure visibly retryable; End retries revocation for both identities and
+room deletion. The cutoff is intentionally within LiveKit Cloud's documented
+±60-second acceptance range ([participant management](https://docs.livekit.io/intro/basics/rooms-participants-tracks/participants/),
+[token revocation](https://docs.livekit.io/frontends/reference/tokens-grants/)).
+LiveKit documents token revocation as Cloud-only. Self-hosted
+deletion disconnects active clients but does not invalidate cached tokens, which
+may remain usable until their short TTL expires. Participant leave remains an
+ordinary disconnect and leaves the consultation Open for authorized rejoin. No
+clinical notes, recording, transcript, billing action, or
+earnings posting is part of this table or workflow.

@@ -181,7 +181,10 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
 
 @command
 def apply(statement):
-    p = profile('clinician', True)
+    user = actor()
+    p = one('SELECT * FROM tt_profile WHERE user=%s FOR UPDATE', (user,))
+    if p.kind != 'clinician':
+        frappe.throw('Clinician profile required', frappe.PermissionError)
     frappe.db.sql('''INSERT INTO tt_application (user,statement,status) VALUES (%s,%s,'Pending')
         ON DUPLICATE KEY UPDATE statement=VALUES(statement),status='Pending',reviewed_by=NULL,reviewed_at=NULL''',
         (p.user, text(statement, 2000)))
@@ -194,7 +197,9 @@ def applications():
     user = actor()
     if 'Tele Tena Approver' in frappe.get_roles(user):
         return rows('SELECT a.*,p.display_name FROM tt_application a JOIN tt_profile p ON p.user=a.user')
-    profile('clinician')
+    p = one('SELECT kind FROM tt_profile WHERE user=%s', (user,))
+    if p.kind != 'clinician':
+        frappe.throw('Clinician application unavailable', frappe.PermissionError)
     return rows('SELECT * FROM tt_application WHERE user=%s', (user,))
 
 
@@ -207,6 +212,17 @@ def review(clinician, decision):
     one('SELECT user FROM tt_application WHERE user=%s FOR UPDATE', (clinician,))
     frappe.db.sql('UPDATE tt_application SET status=%s,reviewed_by=%s,reviewed_at=UTC_TIMESTAMP(6) WHERE user=%s',
                   (decision, reviewer, clinician))
+    # This one role transition is part of the approver-guarded command. Public
+    # phone signup itself assigns only Patient or non-privileged Applicant.
+    from tele_tena.account_context import authorized_user_change
+    with authorized_user_change():
+        user_doc = frappe.get_doc('User', clinician)
+        if decision == 'Approved':
+            user_doc.add_roles('Tele Tena Clinician')
+            user_doc.remove_roles('Tele Tena Applicant')
+        else:
+            user_doc.remove_roles('Tele Tena Clinician')
+            user_doc.add_roles('Tele Tena Applicant')
     audit(clinician, 'Review', {'status': decision})
     return {'status': decision}
 
@@ -281,9 +297,9 @@ def add_availability(start, end):
     approved(p.user, True)
     start, end = instant(start), instant(end)
     if start <= datetime.now(timezone.utc).replace(tzinfo=None) or end <= start or end - start > timedelta(days=1):
-        fail('Choose a future window of at most one day')
+        fail('Choose a future window of at most one day', 'invalid_availability_window')
     if rows('SELECT id FROM tt_availability WHERE clinician=%s AND start<%s AND end>%s', (p.user, end, start)):
-        fail('Availability overlaps an existing window')
+        fail('Availability overlaps an existing window', 'availability_overlap')
     frappe.db.sql('INSERT INTO tt_availability (id,clinician,start,end) VALUES (%s,%s,%s,%s)',
                   (str(uuid.uuid4()), p.user, start, end))
     return {'saved': True}
@@ -428,3 +444,19 @@ def appointments():
 def audit(subject, action, evidence):
     frappe.db.sql('INSERT INTO tt_audit (id,actor,subject,action,evidence,created) VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))',
                   (str(uuid.uuid4()), actor(), subject, action, json.dumps(evidence)))
+
+
+@query()
+def practice():
+    """Owner-only practice summary; no cross-clinician clinical information."""
+    user = actor()
+    p = one('SELECT kind FROM tt_profile WHERE user=%s', (user,))
+    if p.kind != 'clinician':
+        frappe.throw('Clinician profile required', frappe.PermissionError)
+    applications = rows('SELECT status,statement FROM tt_application WHERE user=%s', (user,))
+    offerings = rows('''SELECT o.id,o.service,o.price,o.minutes,o.active,s.service_label label
+        FROM tt_offering o JOIN `tabTele Tena Service` s ON s.name=o.service
+        WHERE o.clinician=%s''', (user,))
+    available = rows('SELECT start,end FROM tt_availability WHERE clinician=%s AND end>UTC_TIMESTAMP() ORDER BY start', (user,))
+    return {'application': applications[0] if applications else None, 'offerings': offerings,
+            'availability': [{'start': iso(row.start), 'end': iso(row.end)} for row in available]}
