@@ -108,3 +108,34 @@ def configure_sms():
             os.unlink(temporary)
     return {'configured': True, 'credentials_file': 'private/tele_tena_sms.json',
             'provider': 'SMSEthiopia', 'live_send_performed': False}
+
+
+def configure_email():
+    """Local SMTP secret setup; direct TLS-only delivery, no queued plaintext codes."""
+    if frappe.local.site != 'erp.localhost' or frappe.session.user != 'Administrator':
+        frappe.throw('Local administrator setup required', frappe.PermissionError)
+    host = input('SMTP hostname: ').strip()
+    port = input('SMTP TLS port (465 or 587): ').strip()
+    sender = input('Verified sender email address: ').strip()
+    username = getpass.getpass('SMTP username (hidden): ').strip()
+    password = getpass.getpass('SMTP password/app password (hidden): ')
+    if port not in ('465', '587') or not host or '@' not in sender or not username or not password:
+        frappe.throw('Incomplete SMTP configuration')
+    if any('\n' in value or '\r' in value for value in (host, sender, username)):
+        frappe.throw('Invalid SMTP configuration')
+    target = Path(frappe.get_site_path('private', 'tele_tena_email.json'))
+    if target.is_symlink():
+        frappe.throw('Refusing symlinked secret path')
+    target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix='.tele-tena-email-', dir=target.parent)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, 'w') as output:
+            json.dump(dict(host=host, port=int(port), sender=sender, username=username, password=password), output)
+            output.flush()
+            os.fsync(output.fileno())
+        os.replace(temporary, target)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    return {'configured': True}

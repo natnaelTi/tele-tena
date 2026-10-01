@@ -85,3 +85,29 @@ then `bench --site erp.localhost clear-cache`. The development CLI fixture comma
 `bench --site erp.localhost execute tele_tena.development.setup` creates isolated
 accounts and rotates their passwords into a mode-600 file in /tmp; it does not
 reset profiles, appointments or simulation transaction-log entries. No web authentication bypass exists.
+
+## Email OTP and verified-contact onboarding
+From the Bench directory, configure SMTP locally with:
+
+```sh
+bench --site erp.localhost execute tele_tena.development.configure_email
+```
+
+The helper prompts for host, TLS port (465 or 587) and verified sender, then prompts
+invisibly for SMTP username and password/app password. It writes only a mode-600
+`sites/erp.localhost/private/tele_tena_email.json` file. Never put these values in
+frontend variables, CLI arguments, Git, screenshots or chat. Your email provider
+must allow authenticated SMTP for the verified sender; configure SPF/DKIM as required
+by that provider. No email provider is presumed configured by installing this app.
+
+The backend sends a bounded TLS-protected message directly, without storing a
+plaintext OTP in Frappe Email Queue. SMTP acceptance is not inbox delivery. Timeout
+or rejection does not trigger automatic resend. Automated tests mock delivery;
+no live email-delivery claim is made until a consenting inbox is tested.
+
+The phone/email entry flow verifies contact possession before onboarding. A new
+verified user has an owner-only draft and no Patient/Clinician role. Completing
+patient consent grants the fixed Patient role; submitting a clinician application
+grants Applicant only. Per-service approval remains mandatory. Password-based
+development accounts remain available under Sign in → Use email instead →
+Use password instead. Guest session responses are a normal signed-out state.

@@ -173,9 +173,9 @@ def _new_user(phone, display_name, kind, statement=''):
     })
     # Public registration is an explicit, OTP-gated account-creation command.
     # No user-provided role/profile fields are accepted; roles above are fixed.
-    doc.flags.ignore_permissions = True
-    doc.flags.ignore_password_policy = True
-    doc.insert()
+    from tele_tena.api.contact_auth import _registration_authority
+    with _registration_authority():
+        doc.insert()
     user = doc.name
     frappe.db.sql('INSERT INTO tt_phone_identity (user,phone,verified_at,created) VALUES (%s,%s,UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))',
                   (user, phone))
@@ -248,7 +248,7 @@ def verify_code(phone, challenge_id, code, purpose, display_name='', adult=0, st
         found = frappe.db.sql('SELECT user FROM tt_phone_identity WHERE phone=%s FOR UPDATE', (phone,))
         if not found:
             _json_error('Verification code is invalid or expired', 'otp_invalid')
-        user = found[0].user
+        user = found[0][0]
     else:
         if frappe.db.sql('SELECT user FROM tt_phone_identity WHERE phone=%s FOR UPDATE', (phone,)):
             _json_error('Verification code is invalid or expired', 'otp_invalid')

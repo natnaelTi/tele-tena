@@ -71,3 +71,5 @@ def install():
     consultations()
     consultation_close_state()
     phone_auth()
+    from tele_tena.patches.v1_5_contact_onboarding import execute as contact_onboarding
+    contact_onboarding()
