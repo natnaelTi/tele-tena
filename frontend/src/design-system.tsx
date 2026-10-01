@@ -1,5 +1,5 @@
-import { useEffect, useId, useRef } from 'react'
-import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react'
+import { cloneElement, isValidElement, useEffect, useId, useRef } from 'react'
+import type { ButtonHTMLAttributes, HTMLAttributes, ReactElement, ReactNode } from 'react'
 
 export function Panel({ children, className = '', ...props }: HTMLAttributes<HTMLElement> & { children: ReactNode }) {
   return <section className={`panel ${className}`.trim()} {...props}>{children}</section>
@@ -30,7 +30,11 @@ export function Field({ id, label, hint, error, children }: {
 }) {
   const hintId = hint ? `${id}-hint` : undefined
   const errorId = error ? `${id}-error` : undefined
-  return <div className="field-group"><label htmlFor={id}>{label}</label>{children}
+  const controlProps = { id, 'aria-describedby': [hintId, errorId].filter(Boolean).join(' ') || undefined, 'aria-invalid': error ? true : undefined }
+  const control = isValidElement(children)
+    ? cloneElement(children as ReactElement<{ id?: string; 'aria-describedby'?: string; 'aria-invalid'?: boolean }>, controlProps)
+    : children
+  return <div className="field-group"><label htmlFor={id}>{label}</label>{control}
     {hint && <small className="field-hint" id={hintId}>{hint}</small>}
     {error && <small className="error-state" id={errorId}>{error}</small>}
   </div>
