@@ -1,8 +1,8 @@
 # TeleTena redesign acceptance record
 
 Authoritative requirements are in [design-system.md](design-system.md). An
-unchecked item is not a pass. This branch remains under review until its PR checks
-complete. Artifacts use synthetic information only.
+unchecked item is not a pass. This record documents the merged PR #6 baseline. Presentation release acceptance is
+tracked below and in the release verification report. Artifacts use synthetic information only.
 
 - [x] Save the supplied specification and require both frontend design documents in AGENTS.md.
 - [x] Fetch and inspect main and PR #3/#4/#5, verification reports, dependencies and working tree. Preserve source branches and data.
@@ -70,8 +70,7 @@ Do not mark an item complete without its API and rendered journey checks.
 - [ ] Persisted, dismissible and replayable role-specific tours with all three language keys.
 - [ ] Screenshot/browser verification at 320, 390, 768, 1440px and 200% equivalent; keyboard/touch/language checks.
 
-## Merge gate
-Merge the consolidation only when hosted call checks pass on the final commit, all
-local regressions/build checks pass, and GitHub reports successful required checks.
-Do not deploy to production. Preserve PR #3/#4/#5 branches until this merge accounts
-for their changes; then mark their PRs superseded without deleting source branches.
+## Historical merge gate
+PR #6 passed the hosted LiveKit and local checks and merged as `7222836`. Source PRs
+#3/#4 merged through preserved ancestry; #5 was superseded. The new presentation PR
+uses its own acceptance record. No production deployment is authorized.
