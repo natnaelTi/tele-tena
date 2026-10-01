@@ -7,3 +7,7 @@ required_apps = ["erpnext"]
 
 after_install = "tele_tena.schema.install"
 after_request = ["tele_tena.privacy.no_store"]
+
+scheduler_events = {
+    "all": ["tele_tena.api.presentation.expire_pending_appointments"],
+}

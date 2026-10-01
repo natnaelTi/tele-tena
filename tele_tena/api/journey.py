@@ -180,15 +180,30 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
 
 
 @command
-def apply(statement):
+def apply(statement, requested_services='[]'):
     user = actor()
     p = one('SELECT * FROM tt_profile WHERE user=%s FOR UPDATE', (user,))
     if p.kind != 'clinician':
         frappe.throw('Clinician profile required', frappe.PermissionError)
-    frappe.db.sql('''INSERT INTO tt_application (user,statement,status) VALUES (%s,%s,'Pending')
-        ON DUPLICATE KEY UPDATE statement=VALUES(statement),status='Pending',reviewed_by=NULL,reviewed_at=NULL''',
-        (p.user, text(statement, 2000)))
-    audit(p.user, 'Application', {'statement': text(statement, 2000), 'status': 'Pending'})
+    if isinstance(requested_services, str):
+        try:
+            requested_services = json.loads(requested_services)
+        except ValueError:
+            fail('Invalid requested service scopes')
+    if not isinstance(requested_services, list) or len(requested_services) > 30:
+        fail('Invalid requested service scopes')
+    requested = sorted(set(text(service, 80) for service in requested_services))
+    for service in requested:
+        if not rows('SELECT name FROM `tabTele Tena Service` WHERE name=%s AND active=1', (service,)):
+            fail('Choose from available services')
+    statement = text(statement, 2000)
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    frappe.db.sql('''INSERT INTO tt_application (user,statement,status,requested_services,submitted_at)
+        VALUES (%s,%s,'Pending',%s,%s) ON DUPLICATE KEY UPDATE statement=VALUES(statement),
+        status='Pending',reviewed_by=NULL,reviewed_at=NULL,requested_services=VALUES(requested_services),
+        submitted_at=VALUES(submitted_at)''',
+        (p.user, statement, json.dumps(requested), now))
+    audit(p.user, 'Application', {'status': 'Pending', 'requested_services': requested})
     return {'status': 'Pending'}
 
 
@@ -196,7 +211,27 @@ def apply(statement):
 def applications():
     user = actor()
     if 'Tele Tena Approver' in frappe.get_roles(user):
-        return rows('SELECT a.*,p.display_name FROM tt_application a JOIN tt_profile p ON p.user=a.user')
+        result = rows('''SELECT a.*,p.display_name FROM tt_application a
+            JOIN tt_profile p ON p.user=a.user ORDER BY a.submitted_at IS NULL,a.submitted_at,a.user''')
+        for item in result:
+            try:
+                item.requested_services = json.loads(item.requested_services or '[]')
+            except ValueError:
+                item.requested_services = []
+            item.requested_service_labels = []
+            for service in item.requested_services:
+                label = rows('SELECT service_label FROM `tabTele Tena Service` WHERE name=%s', (service,))
+                item.requested_service_labels.append(label[0].service_label if label else 'Unavailable service')
+            evidence = rows('SELECT content_size,revision,uploaded_at FROM tt_resume_evidence WHERE clinician=%s',
+                            (item.user,))
+            item.resume_uploaded = bool(evidence)
+            item.resume_size = evidence[0].content_size if evidence else None
+            item.resume_revision = evidence[0].revision if evidence else None
+            item.submission_date_available = bool(item.submitted_at)
+            item.evidence_complete = bool(item.statement.strip() and evidence)
+            item.verified_contacts = rows('SELECT channel,contact,verified_at FROM tt_contact_identity WHERE user=%s',
+                                          (item.user,))
+        return result
     p = one('SELECT kind FROM tt_profile WHERE user=%s', (user,))
     if p.kind != 'clinician':
         frappe.throw('Clinician application unavailable', frappe.PermissionError)
@@ -308,9 +343,11 @@ def add_availability(start, end):
 @query()
 def discover(service=None):
     actor('Tele Tena Patient')
-    return rows('''SELECT o.id,o.clinician,p.display_name,o.service,s.service_label AS label,o.price,o.minutes
+    return rows('''SELECT o.id,o.clinician,p.display_name,o.service,s.service_label AS label,o.price,o.minutes,
+        sc.id AS schedule_id,sc.timezone AS schedule_timezone,sc.consultation_format
         FROM tt_offering o JOIN tt_profile p ON p.user=o.clinician
         JOIN tt_application a ON a.user=o.clinician JOIN `tabTele Tena Service` s ON s.name=o.service
+        LEFT JOIN tt_schedule sc ON sc.offering=o.id AND sc.status='Published'
         JOIN tabUser u ON u.name=o.clinician
         WHERE a.status='Approved' AND o.active=1 AND s.active=1 AND u.enabled=1
         AND EXISTS (SELECT 1 FROM `tabTele Tena Service Scope` sc WHERE sc.clinician=o.clinician AND sc.service=o.service AND sc.status='Approved')
@@ -369,7 +406,8 @@ def simulation_log(patient, kind, amount, reference):
 
 
 @command
-def book(offering, start, request_text, sharing, retry_key, expected_price, expected_minutes, expected_disclosure):
+def book(offering, start, request_text, sharing, retry_key, expected_price, expected_minutes,
+         expected_disclosure, booked_timezone='UTC'):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     p = profile('patient', True)
     selected = choices(sharing)
@@ -380,7 +418,8 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
             fail('Invalid disclosure preview')
     start = instant(start)
     key = text(retry_key, 80)
-    payload = json.dumps([offering, iso(start), request_text, selected, expected_price, expected_minutes, expected_disclosure], sort_keys=True)
+    payload = json.dumps([offering, iso(start), request_text, selected, expected_price,
+                          expected_minutes, expected_disclosure, booked_timezone], sort_keys=True)
     digest = hashlib.sha256(payload.encode()).hexdigest()
     wallet = one('SELECT * FROM tt_wallet WHERE patient=%s FOR UPDATE', (p.user,))
     prior = rows('SELECT id,payload_hash FROM tt_appointment WHERE patient=%s AND retry_key=%s FOR UPDATE', (p.user, key))
@@ -402,20 +441,52 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     end = start + timedelta(minutes=o.minutes)
     if start <= datetime.now(timezone.utc).replace(tzinfo=None):
         fail('Appointment must be in the future', 'future_required')
-    if not rows('SELECT id FROM tt_availability WHERE clinician=%s AND start<=%s AND end>=%s FOR UPDATE', (o.clinician, start, end)):
-        fail('Outside availability', 'outside_availability')
-    if rows('SELECT id FROM tt_appointment WHERE (clinician=%s OR patient=%s) AND start<%s AND end>%s FOR UPDATE', (o.clinician, p.user, end, start)):
+    from tele_tena.api import scheduling
+    schedule = scheduling.validate_slot(o, start, p.user, lock=True)
+    schedule_timezone = schedule.timezone if schedule else scheduling._zone(booked_timezone).key
+    before = int(schedule.buffer_before) if schedule else 0
+    after = int(schedule.buffer_after) if schedule else 0
+    if rows('''SELECT id FROM tt_appointment WHERE
+        ((clinician=%s AND state IN ('Booked','PendingConfirmation')
+          AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6))
+          AND DATE_SUB(start,INTERVAL buffer_before MINUTE)<%s
+          AND DATE_ADD(end,INTERVAL buffer_after MINUTE)>%s)
+         OR (patient=%s AND state IN ('Booked','PendingConfirmation')
+          AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6)) AND start<%s AND end>%s))
+        FOR UPDATE''', (o.clinician, end + timedelta(minutes=after),
+                       start - timedelta(minutes=before), p.user, end, start)):
         fail('Appointment conflict', 'appointment_conflict')
     if wallet.available < o.price:
         fail('Insufficient simulated funds', 'insufficient_funds')
     appointment = str(uuid.uuid4())
+    mode = schedule.confirmation_mode if schedule else 'automatic'
+    expires = None
+    state = 'Booked'
+    confirmed = datetime.now(timezone.utc).replace(tzinfo=None) if mode == 'automatic' else None
+    if mode == 'manual':
+        hours = int(frappe.conf.get('tele_tena_pending_expiry_hours', 24))
+        hours = max(1, min(168, hours))
+        expires = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=hours)
+        state = 'PendingConfirmation'
+    policy = {'version': 'demo-full-release-before-start-v1',
+              'cancel_before_start': 'full_simulated_reservation_release',
+              'cancellation_cutoff': iso(start)}
+    created = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_appointment (id,patient,clinician,offering,start,end,state,price,minutes,
-        service_label,disclosure,choices,retry_key,payload_hash) VALUES (%s,%s,%s,%s,%s,%s,'Booked',%s,%s,%s,%s,%s,%s,%s)''',
-        (appointment, p.user, o.clinician, offering, start, end, o.price, o.minutes, o.label,
-         json.dumps(shared), json.dumps(selected), key, digest))
+        service_label,disclosure,choices,retry_key,payload_hash,timezone,schedule_id,confirmation_mode,
+        expires_at,confirmed_at,consultation_format,buffer_before,buffer_after,policy_snapshot,created)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+        (appointment, p.user, o.clinician, offering, start, end, state, o.price, o.minutes, o.label,
+         json.dumps(shared), json.dumps(selected), key, digest, schedule_timezone,
+         schedule.id if schedule else None, mode, expires, confirmed,
+         schedule.consultation_format if schedule else 'video', before, after, json.dumps(policy), created))
+    frappe.db.sql('''INSERT INTO tt_appointment_event (id,appointment,event_type,actor,created)
+        VALUES (%s,%s,%s,%s,%s)''', (str(uuid.uuid4()), appointment,
+        'Requested' if state == 'PendingConfirmation' else 'Booked', p.user, created))
     frappe.db.sql('UPDATE tt_wallet SET available=available-%s,reserved=reserved+%s WHERE patient=%s', (o.price, o.price, p.user))
     simulation_log(p.user, 'Reservation', o.price, 'booking:' + appointment)
-    return {'id': appointment, 'simulated': True}
+    return {'id': appointment, 'state': state, 'expires_at': iso(expires) if expires else None,
+            'simulated': True}
 
 
 @query()
@@ -432,12 +503,28 @@ def appointments():
     profile(p.kind)
     field = 'patient' if p.kind == 'patient' else 'clinician'
     # Clinician never receives patient account identity, history or mutable profile.
-    result = rows(f'''SELECT id,start,end,state,price,minutes,service_label,disclosure,choices
-        FROM tt_appointment WHERE {field}=%s ORDER BY start''', (user,))
+    result = rows(f'''SELECT a.id,a.start,a.end,a.state,a.price,a.minutes,a.service_label,a.disclosure,a.choices,
+        a.timezone,a.consultation_format,a.confirmation_mode,a.expires_at,a.confirmed_at,
+        a.cancelled_by,a.cancelled_at,a.cancel_reason,a.policy_snapshot,
+        c.state AS call_state,c.ended AS call_ended,n.status AS documentation_state
+        FROM tt_appointment a LEFT JOIN tt_consultation c ON c.appointment=a.id
+        LEFT JOIN tt_consultation_note n ON n.appointment=a.id
+        WHERE a.{field}=%s ORDER BY a.start''', (user,))
     for appointment in result:
         appointment.start, appointment.end = iso(appointment.start), iso(appointment.end)
         appointment.disclosure = json.loads(appointment.disclosure)
         appointment.choices = json.loads(appointment.choices)
+        appointment.cancelled_at = iso(appointment.cancelled_at) if appointment.cancelled_at else None
+        appointment.call_ended = iso(appointment.call_ended) if appointment.call_ended else None
+        appointment.expires_at = iso(appointment.expires_at) if appointment.expires_at else None
+        appointment.confirmed_at = iso(appointment.confirmed_at) if appointment.confirmed_at else None
+        appointment.policy_snapshot = json.loads(appointment.policy_snapshot) if appointment.policy_snapshot else None
+        if p.kind == 'patient':
+            identity = rows('SELECT display_name FROM tt_profile WHERE user=%s AND kind=%s',
+                            (appointment.clinician, 'clinician'))
+            appointment.display_identity = identity[0].display_name if identity else 'Your clinician'
+        else:
+            appointment.display_identity = appointment.disclosure.get('name') or 'Private patient'
     return result
 
 
@@ -458,5 +545,8 @@ def practice():
         FROM tt_offering o JOIN `tabTele Tena Service` s ON s.name=o.service
         WHERE o.clinician=%s''', (user,))
     available = rows('SELECT start,end FROM tt_availability WHERE clinician=%s AND end>UTC_TIMESTAMP() ORDER BY start', (user,))
+    from tele_tena.api.scheduling import schedules as clinician_schedules
+    schedule_rows = clinician_schedules() if 'Tele Tena Clinician' in frappe.get_roles(user) else []
     return {'application': applications[0] if applications else None, 'offerings': offerings,
-            'availability': [{'start': iso(row.start), 'end': iso(row.end)} for row in available]}
+            'availability': [{'start': iso(row.start), 'end': iso(row.end)} for row in available],
+            'schedules': schedule_rows}

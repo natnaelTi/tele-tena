@@ -9,6 +9,7 @@ import sys
 
 import frappe
 from tele_tena.schema import TABLES, PHONE_AUTH_TABLES
+from tele_tena.patches.v1_6_presentation_release import TABLES as PRESENTATION_TABLES
 
 BENCH = Path(__file__).resolve().parents[3]
 SITE = 'erp.localhost'
@@ -19,7 +20,7 @@ def snapshot():
     frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
     frappe.connect()
     result = {}
-    for table in (*TABLES, *PHONE_AUTH_TABLES, 'consultation', 'contact_identity', 'onboarding'):
+    for table in (*TABLES, *PHONE_AUTH_TABLES, *PRESENTATION_TABLES, 'consultation', 'contact_identity', 'onboarding'):
         records = frappe.db.sql(f'SELECT * FROM tt_{table}', as_dict=True)
         encoded = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in records)
         result[table] = hashlib.sha256(json.dumps(encoded).encode()).digest()
@@ -40,9 +41,10 @@ for attempt in (1, 2):
     assert snapshot() == before, 'Migration changed legacy records'
 frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
 frappe.connect()
-for patch in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state', 'v1_5_contact_onboarding'):
+for patch in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state', 'v1_5_contact_onboarding', 'v1_6_presentation_release'):
     assert frappe.db.exists('Patch Log', {'patch': 'tele_tena.patches.' + patch})
-for table in ('tt_phone_identity', 'tt_otp_challenge', 'tt_otp_rate_limit', 'tt_otp_gate'):
+for table in ('tt_phone_identity', 'tt_otp_challenge', 'tt_otp_rate_limit', 'tt_otp_gate',
+              *(f'tt_{name}' for name in PRESENTATION_TABLES)):
     assert table in frappe.db.get_tables(cached=False), 'Missing phone-auth table'
 key_path = Path(frappe.get_site_path('private', 'tele_tena_otp.key'))
 assert key_path.is_file() and not key_path.is_symlink()
@@ -56,4 +58,4 @@ scope_after = sorted(tuple(row) for row in frappe.db.sql('''SELECT name,clinicia
     creation,modified FROM `tabTele Tena Service Scope`'''))
 assert scope_after == scope_before, 'Migration changed service scopes'
 frappe.destroy()
-print('PASS: additive upgrade, seven numbered Patch Log entries, phone-auth tables/key, catalog copy, no scope changes, repeat migration and all existing command/OTP/consultation/onboarding records preserved')
+print('PASS: additive upgrade, eight numbered Patch Log entries, phone-auth and presentation tables/key, catalog copy, no scope changes, repeat migration and all existing command/OTP/consultation/onboarding/presentation records preserved')

@@ -1,0 +1,554 @@
+"""State transitions and privacy-scoped presentation release APIs."""
+import base64
+import hashlib
+import json
+import re
+import uuid
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+import frappe
+
+from tele_tena.api.journey import actor, fail, integer, iso, one, profile, query, rows, text
+
+DEMO_CANCELLATION_POLICY = 'demo-full-release-before-start-v1'
+TOUR_VERSION = 1
+MAX_RESUME_BYTES = 5 * 1024 * 1024
+
+
+def _event(appointment, event_type, event_actor=None, reason=None):
+    frappe.db.sql('''INSERT INTO tt_appointment_event
+        (id,appointment,event_type,actor,reason,created) VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))''',
+        (str(uuid.uuid4()), appointment, event_type, event_actor or actor(), reason))
+
+
+def _authorized(appointment, lock=False):
+    user = actor()
+    item = rows('''SELECT * FROM tt_appointment WHERE id=%s AND (patient=%s OR clinician=%s)''',
+                (appointment, user, user))
+    if not item:
+        frappe.throw('Appointment unavailable', frappe.PermissionError)
+    item = item[0]
+    if user == item.patient:
+        if 'Tele Tena Patient' not in frappe.get_roles(user):
+            frappe.throw('Appointment unavailable', frappe.PermissionError)
+        role = 'patient'
+    else:
+        if 'Tele Tena Clinician' not in frappe.get_roles(user):
+            frappe.throw('Appointment unavailable', frappe.PermissionError)
+        role = 'clinician'
+    if lock:
+        item = one('''SELECT * FROM tt_appointment WHERE id=%s
+            AND (patient=%s OR clinician=%s) FOR UPDATE''', (appointment, user, user))
+    return item, user, role
+
+
+def _wallet_release(item, reference_suffix):
+    wallet = one('SELECT available,reserved FROM tt_wallet WHERE patient=%s FOR UPDATE', (item.patient,))
+    reference = 'release:' + item.id
+    if rows('SELECT id FROM tt_ledger WHERE reference=%s', (reference,)):
+        return False
+    if int(wallet.reserved) < int(item.price):
+        fail('Reservation is inconsistent; contact support', 'reservation_inconsistent')
+    frappe.db.sql('UPDATE tt_wallet SET available=available+%s,reserved=reserved-%s WHERE patient=%s',
+                  (item.price, item.price, item.patient))
+    from tele_tena.api.journey import simulation_log
+    simulation_log(item.patient, 'Release', item.price, reference)
+    return True
+
+
+@frappe.whitelist(methods=['POST'])
+def respond_to_request(appointment, decision):
+    clinician = actor('Tele Tena Clinician')
+    if decision not in ('confirm', 'decline'):
+        fail('Choose confirm or decline')
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    item, _, role = _authorized(appointment, True)
+    if role != 'clinician' or item.clinician != clinician:
+        frappe.throw('Appointment unavailable', frappe.PermissionError)
+    if item.state != 'PendingConfirmation':
+        if decision == 'confirm' and item.state == 'Booked':
+            return {'state': item.state, 'idempotent': True}
+        if decision == 'decline' and item.state == 'Cancelled' and item.cancelled_by == clinician:
+            return {'state': item.state, 'idempotent': True}
+        fail('This request is no longer awaiting a response', 'request_resolved')
+    if item.expires_at and item.expires_at <= datetime.now(timezone.utc).replace(tzinfo=None):
+        _wallet_release(item, 'expiry')
+        frappe.db.sql("UPDATE tt_appointment SET state='Expired' WHERE id=%s", (item.id,))
+        _event(item.id, 'Expired', 'System')
+        return {'state': 'Expired'}
+    if decision == 'confirm':
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql("UPDATE tt_appointment SET state='Booked',confirmed_at=%s WHERE id=%s", (now, item.id))
+        _event(item.id, 'Confirmed', clinician)
+        return {'state': 'Booked'}
+    _wallet_release(item, 'decline')
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    frappe.db.sql("UPDATE tt_appointment SET state='Cancelled',cancelled_by=%s,cancelled_at=%s,cancel_reason=%s WHERE id=%s",
+                  (clinician, now, 'Clinician declined the request', item.id))
+    _event(item.id, 'Declined', clinician, 'Clinician declined the request')
+    return {'state': 'Cancelled'}
+
+
+@frappe.whitelist(methods=['POST'])
+def cancel_appointment(appointment, reason):
+    user = actor()
+    reason = text(reason, 500, required=False)
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    item, _, role = _authorized(appointment, True)
+    if role == 'clinician' and item.clinician != user:
+        frappe.throw('Appointment unavailable', frappe.PermissionError)
+    if item.state == 'Cancelled' and item.cancelled_by == user and item.cancel_reason == reason:
+        return {'state': 'Cancelled', 'idempotent': True}
+    if item.state not in ('Booked', 'PendingConfirmation'):
+        fail('This appointment cannot be cancelled in its current state', 'cancellation_unavailable')
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    if item.start <= now:
+        fail('Cancellations are available before the scheduled start', 'cancellation_cutoff')
+    snapshot = json.loads(item.policy_snapshot) if item.policy_snapshot else {}
+    if snapshot.get('version') != DEMO_CANCELLATION_POLICY:
+        fail('The accepted cancellation policy is unavailable', 'policy_unavailable')
+    _wallet_release(item, 'cancel')
+    frappe.db.sql("UPDATE tt_appointment SET state='Cancelled',cancelled_by=%s,cancelled_at=%s,cancel_reason=%s WHERE id=%s",
+                  (user, now, reason, item.id))
+    _event(item.id, 'Cancelled', user, reason)
+    return {'state': 'Cancelled', 'released': True}
+
+
+def expire_pending_appointments():
+    """Scheduled expiry; all paths serialize with booking and cancellation."""
+    candidates = rows("SELECT id FROM tt_appointment WHERE state='PendingConfirmation' "
+                      "AND expires_at<=UTC_TIMESTAMP(6) ORDER BY expires_at LIMIT 100")
+    for candidate in candidates:
+        savepoint = 'tt_expire_' + uuid.uuid4().hex
+        frappe.db.savepoint(savepoint)
+        try:
+            one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+            current = rows("SELECT * FROM tt_appointment WHERE id=%s FOR UPDATE", (candidate.id,))
+            if not current or current[0].state != 'PendingConfirmation' or not current[0].expires_at \
+                    or current[0].expires_at > datetime.now(timezone.utc).replace(tzinfo=None):
+                frappe.db.rollback(save_point=savepoint)
+                continue
+            item = current[0]
+            _wallet_release(item, 'expiry')
+            frappe.db.sql("UPDATE tt_appointment SET state='Expired' WHERE id=%s", (item.id,))
+            _event(item.id, 'Expired', 'System')
+            frappe.db.commit()
+        except Exception:
+            frappe.db.rollback(save_point=savepoint)
+            raise
+
+
+@query()
+def appointment_detail(appointment):
+    item, user, role = _authorized(appointment)
+    from tele_tena.api.consultations import _window
+    call = rows('SELECT state,created,ended FROM tt_consultation WHERE appointment=%s', (item.id,))
+    note = rows('SELECT status,current_revision FROM tt_consultation_note WHERE appointment=%s', (item.id,))
+    events = rows('''SELECT event_type,actor,reason,created FROM tt_appointment_event
+        WHERE appointment=%s ORDER BY created,id''', (item.id,))
+    disclosure = json.loads(item.disclosure)
+    selected = {
+        'id': item.id,
+        'status': item.state,
+        'service': item.service_label,
+        'start': iso(item.start),
+        'end': iso(item.end),
+        'timezone': item.timezone,
+        'format': item.consultation_format,
+        'booked_minutes': item.minutes,
+        'price': item.price,
+        'currency': 'ETB',
+        'confirmation_mode': item.confirmation_mode,
+        'expires_at': iso(item.expires_at) if item.expires_at else None,
+        'disclosure': disclosure,
+        'call_state': call[0].state if call else 'NotStarted',
+        'can_join': item.state == 'Booked' and _window(item) and not (call and call[0].state == 'Ended'),
+        'call_room_created_at': iso(call[0].created) if call else None,
+        'call_ended_at': iso(call[0].ended) if call and call[0].ended else None,
+        'actual_connected_time_available': False,
+        'documentation_state': note[0].status if note else 'None',
+        'patient_summary_revisions': [],
+        'cancellation': {
+            'actor': ('You' if item.cancelled_by == user else
+                      'Care team' if role == 'patient' else 'Patient') if item.cancelled_by else None,
+            'at': iso(item.cancelled_at) if item.cancelled_at else None,
+            'reason': item.cancel_reason,
+            'policy': json.loads(item.policy_snapshot) if item.policy_snapshot else None,
+        },
+        'timeline': [{'event': e.event_type, 'actor': 'You' if e.actor == user else
+                      ('System' if e.actor == 'System' else
+                       'Care team' if role == 'patient' else 'Patient'),
+                      'reason': e.reason, 'at': iso(e.created)} for e in events],
+        'can_cancel': item.state in ('Booked', 'PendingConfirmation') and
+                      item.start > datetime.now(timezone.utc).replace(tzinfo=None),
+        'can_respond': role == 'clinician' and item.state == 'PendingConfirmation',
+        'offering': item.offering,
+    }
+    if role == 'patient':
+        clinician = one('SELECT display_name FROM tt_profile WHERE user=%s AND kind=%s',
+                        (item.clinician, 'clinician'))
+        selected['clinician'] = clinician.display_name
+        # Critically, this SELECT never reads private_note.
+        revisions = rows('''SELECT revision,patient_summary,created FROM tt_note_revision
+            WHERE appointment=%s AND summary_published=1 ORDER BY revision''', (item.id,))
+        selected['patient_summary_revisions'] = [
+            {'revision': r.revision, 'summary': r.patient_summary, 'published_at': iso(r.created)}
+            for r in revisions]
+    else:
+        selected['patient_identity'] = disclosure.get('name') or 'Private patient'
+        selected['sharing_snapshot'] = disclosure
+        if note:
+            current = rows('''SELECT revision,private_note,patient_summary,summary_published,author,created
+                FROM tt_note_revision WHERE appointment=%s AND revision=%s''',
+                (item.id, note[0].current_revision))
+            if current:
+                selected['private_note'] = {
+                    'revision': current[0].revision,
+                    'text': current[0].private_note,
+                    'patient_summary': current[0].patient_summary,
+                    'summary_published': bool(current[0].summary_published),
+                    'author': 'You' if current[0].author == user else 'Treating clinician',
+                }
+        selected['prior_shared_revisions'] = [
+            {'revision': r.revision, 'published_at': iso(r.created)}
+            for r in rows('''SELECT revision,created FROM tt_note_revision
+                WHERE appointment=%s AND summary_published=1 ORDER BY revision''', (item.id,))]
+    return selected
+
+
+@frappe.whitelist(methods=['POST'])
+def save_note_draft(appointment, private_note, patient_summary):
+    clinician = actor('Tele Tena Clinician')
+    private_note = text(private_note, 12000, required=False)
+    patient_summary = text(patient_summary, 6000, required=False)
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    item, _, role = _authorized(appointment, True)
+    if role != 'clinician' or item.clinician != clinician:
+        frappe.throw('Consultation record unavailable', frappe.PermissionError)
+    call = rows("SELECT state FROM tt_consultation WHERE appointment=%s", (item.id,))
+    if not call or call[0].state != 'Ended' or item.state not in ('Booked', 'Completed'):
+        fail('End the consultation before documenting it', 'documentation_not_ready')
+    existing = rows('SELECT status,current_revision FROM tt_consultation_note WHERE appointment=%s FOR UPDATE',
+                     (item.id,))
+    revision = (int(existing[0].current_revision) if existing else 0) + 1
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    frappe.db.sql('''INSERT INTO tt_note_revision
+        (id,appointment,clinician,revision,private_note,patient_summary,summary_published,author,created)
+        VALUES (%s,%s,%s,%s,%s,%s,0,%s,%s)''',
+        (str(uuid.uuid4()), item.id, clinician, revision, private_note, patient_summary, clinician, now))
+    if existing:
+        frappe.db.sql("UPDATE tt_consultation_note SET status='Draft',current_revision=%s,modified=%s WHERE appointment=%s",
+                      (revision, now, item.id))
+    else:
+        frappe.db.sql("INSERT INTO tt_consultation_note (appointment,clinician,status,current_revision,created,modified) VALUES (%s,%s,'Draft',%s,%s,%s)",
+                      (item.id, clinician, revision, now, now))
+    _event(item.id, 'DocumentationDraftSaved', clinician)
+    return {'status': 'Draft', 'revision': revision}
+
+
+@frappe.whitelist(methods=['POST'])
+def preview_patient_summary(appointment, summary=None):
+    clinician = actor('Tele Tena Clinician')
+    item, _, role = _authorized(appointment)
+    if role != 'clinician' or item.clinician != clinician:
+        frappe.throw('Consultation record unavailable', frappe.PermissionError)
+    note = one('SELECT current_revision,status FROM tt_consultation_note WHERE appointment=%s', (item.id,))
+    revision = one('''SELECT revision,patient_summary FROM tt_note_revision
+        WHERE appointment=%s AND revision=%s''', (item.id, note.current_revision))
+    visible = text(summary, 6000, required=False) if summary is not None else revision.patient_summary
+    return {'revision': revision.revision, 'summary': visible,
+            'note_status': note.status, 'preview_only': True}
+
+
+@frappe.whitelist(methods=['POST'])
+def finalize_consultation(appointment, publish_summary=0):
+    clinician = actor('Tele Tena Clinician')
+    publish = publish_summary in (True, 1, '1')
+    if publish_summary not in (True, False, 0, 1, '0', '1'):
+        fail('Choose whether to publish the patient summary')
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    item, _, role = _authorized(appointment, True)
+    if role != 'clinician' or item.clinician != clinician:
+        frappe.throw('Consultation record unavailable', frappe.PermissionError)
+    call = rows("SELECT state FROM tt_consultation WHERE appointment=%s", (item.id,))
+    note = one('SELECT current_revision,status FROM tt_consultation_note WHERE appointment=%s FOR UPDATE', (item.id,))
+    if not call or call[0].state != 'Ended' or note.status != 'Draft':
+        fail('Save a documentation draft after ending the call', 'documentation_not_ready')
+    current = one('''SELECT * FROM tt_note_revision WHERE appointment=%s AND revision=%s''',
+                  (item.id, note.current_revision))
+    if publish and not current.patient_summary.strip():
+        fail('Add a patient summary before publishing it', 'summary_required')
+    finalized_revision = int(note.current_revision) + 1
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    frappe.db.sql('''INSERT INTO tt_note_revision
+        (id,appointment,clinician,revision,private_note,patient_summary,summary_published,author,created)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+        (str(uuid.uuid4()), item.id, clinician, finalized_revision, current.private_note,
+         current.patient_summary, int(publish), clinician, now))
+    frappe.db.sql("UPDATE tt_consultation_note SET status='Finalized',current_revision=%s,modified=%s WHERE appointment=%s",
+                  (finalized_revision, now, item.id))
+    if item.state != 'Completed':
+        frappe.db.sql("UPDATE tt_appointment SET state='Completed' WHERE id=%s", (item.id,))
+        _event(item.id, 'Completed', clinician)
+    _event(item.id, 'DocumentationFinalized', clinician)
+    return {'status': 'Finalized', 'revision': finalized_revision,
+            'patient_summary_published': publish}
+
+
+@query()
+def care_directory(search='', service='', status='', from_date='', to_date='', page=1, page_size=20):
+    clinician = actor('Tele Tena Clinician')
+    profile('clinician')
+    search = text(search, 120, required=False)
+    page = integer(page, 1, 100000)
+    page_size = integer(page_size, 5, 50)
+    allowed = ('PendingConfirmation', 'Booked', 'Cancelled', 'Expired', 'Completed', 'NoShow')
+    if status and status not in allowed:
+        fail('Invalid care status filter')
+    if service and not frappe.db.exists('Tele Tena Service', service):
+        fail('Invalid service filter')
+    try:
+        if from_date:
+            datetime.strptime(from_date, '%Y-%m-%d')
+        if to_date:
+            datetime.strptime(to_date, '%Y-%m-%d')
+    except ValueError:
+        fail('Invalid date filter')
+    where = ['a.clinician=%s']
+    params = [clinician]
+    if status:
+        where.append('a.state=%s'); params.append(status)
+    if service:
+        where.append('a.offering IN (SELECT id FROM tt_offering WHERE service=%s)'); params.append(service)
+    if from_date:
+        where.append('DATE(a.start)>=%s'); params.append(from_date)
+    if to_date:
+        where.append('DATE(a.start)<=%s'); params.append(to_date)
+    if search:
+        where.append("JSON_UNQUOTE(JSON_EXTRACT(a.disclosure,'$.name')) LIKE %s")
+        params.append('%' + search.replace('%', '\\%').replace('_', '\\_') + '%')
+    sql_where = ' AND '.join(where)
+    found = rows('''SELECT a.id,a.start,a.end,a.state,a.service_label,a.disclosure,a.timezone,a.minutes,
+        a.price,c.state call_state,n.status documentation_state
+        FROM tt_appointment a LEFT JOIN tt_consultation c ON c.appointment=a.id
+        LEFT JOIN tt_consultation_note n ON n.appointment=a.id WHERE ''' + sql_where +
+        ' ORDER BY a.start DESC,a.id', tuple(params))
+    groups = {}
+    for item in found:
+        disclosure = json.loads(item.disclosure)
+        name = disclosure.get('name')
+        key = 'shared:' + name if name else 'encounter:' + item.id
+        group = groups.setdefault(key, {'id': item.id, 'patient_label': name or 'Private patient',
+                                        'encounters': [], 'last_consultation': None,
+                                        'next_appointment': None, 'service_label': item.service_label,
+                                        'state': item.state, 'disclosure': disclosure,
+                                        'start': item.start, 'timezone': item.timezone})
+        group['encounters'].append(item.id)
+        if item.start < datetime.now(timezone.utc).replace(tzinfo=None) and (
+                item.state == 'Completed' or item.call_state == 'Ended'):
+            if not group['last_consultation'] or item.start > group['last_consultation']:
+                group['last_consultation'] = item.start
+        elif item.state in ('Booked', 'PendingConfirmation') and (
+                not group['next_appointment'] or item.start < group['next_appointment']):
+            group['next_appointment'] = item.start
+        if item.start > group['start']:
+            group.update(id=item.id, service_label=item.service_label, state=item.state,
+                         disclosure=disclosure, start=item.start, timezone=item.timezone)
+    found = list(groups.values())
+    for item in found:
+        item['start'] = iso(item['start'])
+        item['last_consultation'] = iso(item['last_consultation']) if item['last_consultation'] else None
+        item['next_appointment'] = iso(item['next_appointment']) if item['next_appointment'] else None
+        item['encounter_count'] = len(item['encounters'])
+    total = len(found)
+    found = found[(page - 1) * page_size:page * page_size]
+    return {'rows': found, 'total': total, 'page': page, 'page_size': page_size,
+            'pages': (total + page_size - 1) // page_size}
+
+
+@query()
+def care_patient_record(appointment):
+    item, clinician, role = _authorized(appointment)
+    if role != 'clinician':
+        frappe.throw('Care record unavailable', frappe.PermissionError)
+    disclosure = json.loads(item.disclosure)
+    shared_name = disclosure.get('name')
+    if shared_name:
+        matches = rows('''SELECT id FROM tt_appointment WHERE clinician=%s
+            AND JSON_UNQUOTE(JSON_EXTRACT(disclosure,'$.name'))=%s ORDER BY start DESC''',
+            (clinician, shared_name))
+    else:
+        matches = [{'id': item.id}]
+    return {'patient_label': shared_name or 'Private patient',
+            'encounters': [appointment_detail(row['id']) for row in matches]}
+
+
+@query()
+def care_detail(appointment):
+    item, _, role = _authorized(appointment)
+    if role != 'clinician':
+        frappe.throw('Care record unavailable', frappe.PermissionError)
+    return appointment_detail(appointment)
+
+
+@query()
+def preferences():
+    user = actor()
+    result = rows('SELECT locale,timezone,notification_preferences FROM tt_preferences WHERE user=%s', (user,))
+    return result[0] if result else {'locale': 'en', 'timezone': None, 'notification_preferences': None}
+
+
+@frappe.whitelist(methods=['POST'])
+def save_preferences(locale, timezone_name):
+    user = actor()
+    if locale not in ('en', 'am', 'om'):
+        fail('Choose an available language')
+    if timezone_name:
+        try:
+            zone = ZoneInfo(timezone_name)
+        except (ZoneInfoNotFoundError, ValueError):
+            fail('Choose a valid timezone')
+        timezone_name = zone.key
+    frappe.db.sql('''INSERT INTO tt_preferences (user,locale,timezone,modified)
+        VALUES (%s,%s,%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
+        locale=VALUES(locale),timezone=VALUES(timezone),modified=VALUES(modified)''',
+        (user, locale, timezone_name or None))
+    return {'locale': locale, 'timezone': timezone_name or None, 'saved': True}
+
+
+@query()
+def wallet_summary():
+    patient = actor('Tele Tena Patient')
+    profile('patient')
+    wallet = one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
+    activity = rows('''SELECT kind,amount,created FROM tt_ledger
+        WHERE patient=%s ORDER BY created DESC,id DESC LIMIT 50''', (patient,))
+    for item in activity:
+        item.created = iso(item.created)
+    return {'available': wallet.available, 'reserved': wallet.reserved, 'currency': 'ETB',
+            'activity': activity}
+
+
+TOURS = {
+    'patient': {'patient-home', 'patient-discovery', 'patient-appointments', 'patient-account'},
+    'clinician': {'clinician-today', 'clinician-availability', 'clinician-notes', 'clinician-care', 'clinician-account'},
+    'approver': {'reviewer-applications', 'reviewer-scopes'},
+    'applicant': {'clinician-onboarding'},
+}
+
+
+def _tour_role(user):
+    roles = set(frappe.get_roles(user))
+    if 'Tele Tena Approver' in roles:
+        return 'approver'
+    if 'Tele Tena Clinician' in roles:
+        return 'clinician'
+    if 'Tele Tena Patient' in roles:
+        return 'patient'
+    p = rows('SELECT kind FROM tt_profile WHERE user=%s', (user,))
+    if p and p[0].kind == 'clinician':
+        return 'applicant'
+    draft = rows('SELECT kind,completed FROM tt_onboarding WHERE user=%s', (user,))
+    return 'applicant' if draft and draft[0].kind == 'clinician' and not draft[0].completed else None
+
+
+@query()
+def tour_state(tour_id):
+    user = actor()
+    role = _tour_role(user)
+    if not role or tour_id not in TOURS[role]:
+        frappe.throw('Tour unavailable', frappe.PermissionError)
+    saved = rows('''SELECT state FROM tt_tour_progress
+        WHERE user=%s AND role=%s AND tour_id=%s AND version=%s''',
+        (user, role, tour_id, TOUR_VERSION))
+    return {'role': role, 'tour_id': tour_id, 'version': TOUR_VERSION,
+            'state': saved[0].state if saved else None}
+
+
+@frappe.whitelist(methods=['POST'])
+def save_tour_state(tour_id, state):
+    user = actor()
+    role = _tour_role(user)
+    if not role or tour_id not in TOURS[role] or state not in ('Dismissed', 'Completed'):
+        frappe.throw('Tour unavailable', frappe.PermissionError)
+    frappe.db.sql('''INSERT INTO tt_tour_progress (user,role,tour_id,version,state,modified)
+        VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
+        state=VALUES(state),modified=VALUES(modified)''',
+        (user, role, tour_id, TOUR_VERSION, state))
+    return {'state': state, 'saved': True}
+
+
+def _resume_owner():
+    user = actor()
+    p = rows('SELECT kind FROM tt_profile WHERE user=%s', (user,))
+    draft = rows('SELECT kind,completed FROM tt_onboarding WHERE user=%s', (user,))
+    if not ((p and p[0].kind == 'clinician') or
+            (draft and draft[0].kind == 'clinician' and not draft[0].completed)):
+        frappe.throw('Resume unavailable', frappe.PermissionError)
+    return user
+
+
+@query()
+def resume_status():
+    user = _resume_owner()
+    found = rows('SELECT filename,content_size,revision,uploaded_at FROM tt_resume_evidence WHERE clinician=%s', (user,))
+    return {'uploaded': bool(found), **(dict(found[0]) if found else {})}
+
+
+@frappe.whitelist(methods=['POST'])
+def upload_resume(filename, content_base64):
+    user = _resume_owner()
+    if not isinstance(filename, str) or len(filename) > 255 or not filename.lower().endswith('.pdf'):
+        fail('Upload a PDF resume')
+    filename = re.sub(r'[^A-Za-z0-9 ._()-]', '_', filename.split('/')[-1].split('\\')[-1])[:180]
+    if not isinstance(content_base64, str) or len(content_base64) > ((MAX_RESUME_BYTES + 2) // 3) * 4 + 8:
+        fail('The PDF must be 5 MiB or smaller')
+    try:
+        content = base64.b64decode(content_base64, validate=True)
+    except (ValueError, TypeError):
+        fail('Invalid PDF data')
+    if (not content or len(content) > MAX_RESUME_BYTES or not content.startswith(b'%PDF-')
+            or b'%%EOF' not in content[-1024:]):
+        fail('The uploaded file is not a valid PDF within the 5 MiB limit')
+    app = rows('SELECT status FROM tt_application WHERE user=%s', (user,))
+    if app and app[0].status not in ('Rejected',):
+        fail('Resume changes are available before application submission')
+    old = rows('SELECT revision FROM tt_resume_evidence WHERE clinician=%s FOR UPDATE', (user,))
+    revision = int(old[0].revision) + 1 if old else 1
+    frappe.db.sql('''INSERT INTO tt_resume_evidence
+        (clinician,filename,content,content_size,content_sha256,revision,uploaded_by,uploaded_at)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
+        filename=VALUES(filename),content=VALUES(content),content_size=VALUES(content_size),
+        content_sha256=VALUES(content_sha256),revision=VALUES(revision),uploaded_by=VALUES(uploaded_by),
+        uploaded_at=VALUES(uploaded_at)''',
+        (user, filename, content, len(content), hashlib.sha256(content).hexdigest(), revision, user))
+    return {'uploaded': True, 'filename': filename, 'size': len(content), 'revision': revision}
+
+
+@frappe.whitelist(methods=['POST'])
+def remove_resume():
+    user = _resume_owner()
+    app = rows('SELECT status FROM tt_application WHERE user=%s', (user,))
+    if app and app[0].status not in ('Rejected',):
+        fail('Resume removal is available before application submission')
+    frappe.db.sql('DELETE FROM tt_resume_evidence WHERE clinician=%s', (user,))
+    return {'removed': True}
+
+
+@frappe.whitelist()
+def download_resume(clinician):
+    user = actor()
+    if user != clinician and 'Tele Tena Approver' not in frappe.get_roles(user):
+        frappe.throw('Resume unavailable', frappe.PermissionError)
+    if user == clinician:
+        _resume_owner()
+    elif not rows('SELECT user FROM tt_application WHERE user=%s', (clinician,)):
+        frappe.throw('Resume unavailable', frappe.PermissionError)
+    found = rows('SELECT filename,content FROM tt_resume_evidence WHERE clinician=%s', (clinician,))
+    if not found:
+        frappe.throw('Resume unavailable', frappe.DoesNotExistError)
+    frappe.local.response.filename = found[0].filename
+    frappe.local.response.filecontent = bytes(found[0].content)
+    frappe.local.response.type = 'download'
+    frappe.local.response.display_content_as = 'attachment'
