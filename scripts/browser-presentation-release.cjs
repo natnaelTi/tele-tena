@@ -160,6 +160,10 @@ async function main() {
     await clinician.getByRole('heading', { name: 'Today', exact: true }).waitFor()
     await capture(clinician, 'clinician-today')
     for (const route of ['availability', 'services', 'care']) { await clinician.goto(base + '/clinician/' + route); await capture(clinician, 'clinician-' + route) }
+    await clinician.getByRole('link',{name:'View record',exact:true}).first().click()
+    await clinician.getByRole('link',{name:'Open consultation',exact:true}).waitFor()
+    assert.equal((await clinician.locator('body').innerText()).includes(fixture.users.p1),false,'care record must not expose the patient account identifier')
+    await capture(clinician,'care-record')
     checkpoint = 'consultation preflight'
     await patient.goto(base + '/patient/consultations/' + fixture.appointment_id)
     await patient.getByRole('heading', {name: 'Synthetic test consultation', exact: true}).waitFor()

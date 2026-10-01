@@ -1,7 +1,8 @@
 # Presentation release verification
 
 Verification run on `feat/presentation-ready-release`, based on merged main
-`7222836` (PR #6). Screenshots use synthetic fixtures and are stored outside Git
+`7222836` (PR #6); review PR: [#7](https://github.com/natnaelTi/tele-tena/pull/7).
+Screenshots use synthetic fixtures and are stored outside Git
 at `/tmp/tele-tena-presentation-review/`. Automated fake-media is identified
 separately from human/device testing.
 
@@ -45,7 +46,7 @@ All names below are PNGs in `/tmp/tele-tena-presentation-review/`:
 - `appointments-{320,390,768,1440}.png`, `consultation-detail-*`, `call-preflight-screen-*`
 - `end-of-call-notes-*`, `completed-consultation-clinician-*`, `completed-consultation-patient-*`
 - `video-call-{width}-{patient,clinician}.png`, `audio-only-{320,390,768,1440}.png`
-- `clinician-care-*`, `payments-*`, `administrator-review-*`
+- `clinician-care-*`, `care-record-*`, `payments-*`, `administrator-review-*`
 - `tour-patient-*`, `tour-clinician-*`, `tour-administrator-*`, `offline-state-390.png`
 - `homepage-*`, `phone-entry-*`, `code-entry-*`, `email-alternative-*`, onboarding, profile and language showcase captures.
 
