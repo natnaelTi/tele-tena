@@ -171,3 +171,13 @@ Inspected https://www.headspace.com/ and https://linear.app/ on 2026-10-01.
 Take approachable task-oriented care navigation from the former; compact hierarchy
 and disciplined content grouping from the latter. All brand art and layouts here
 are original. No third-party marks, illustrations, metrics or testimonials copied.
+
+## Brand implementation
+Local `frontend/public/brand/` contains symbol, horizontal lockup, monochrome,
+reversed and favicon SVGs. Two opposed rounded speech forms share a vertical
+negative-space rhythm that suggests a lowercase t. Minimum symbol size 16 px;
+preferred interface size 32–40 px. Clear space is one quarter of symbol height.
+Use the React Brand component for the locally typeset Manrope wordmark. SVG
+lockups use the same font with a sans-serif fallback; no external asset requests.
+Manrope and Noto Sans Ethiopic are distributed locally through their Fontsource
+packages with included SIL Open Font License files. No Google Fonts runtime calls.
