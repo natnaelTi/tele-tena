@@ -1,6 +1,9 @@
 # Tele-tena engineering instructions
 
 Read docs/product-contract.md and docs/architecture.md before changing workflows.
+For all frontend work, follow docs/design-system.md and docs/design-acceptance.md.
+The TeleTena design specification is authoritative; rendered-browser evidence is
+required before visual acceptance. Build/lint alone do not establish acceptance.
 Use focused feature branches, conventional commits, and pull requests. Never force-push
 or modify Frappe/ERPNext core. Refactor separately when practical; preserve behavior
 with meaningful tests. Do not declare features working on the basis of UI alone.
