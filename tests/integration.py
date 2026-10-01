@@ -28,7 +28,9 @@ SITE = 'erp.localhost'
 PREFIX = 'tt-test-' + secrets.token_hex(5)
 USERS = {kind: PREFIX + '-' + kind + '@example.invalid' for kind in ('p1', 'p2', 'c1', 'c2', 'c3', 'admin')}
 PASSWORD = secrets.token_urlsafe(24)
-BASE = 'http://127.0.0.1:5173'
+BASE = os.environ.get('TELE_TENA_TEST_BASE', 'http://127.0.0.1:5173')
+from urllib.parse import urlsplit
+assert urlsplit(BASE).hostname in ('127.0.0.1', 'localhost'), 'Integration tests require a loopback server'
 
 
 def connect():
