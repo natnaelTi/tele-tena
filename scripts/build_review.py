@@ -17,6 +17,9 @@ env = {k: v for k, v in os.environ.items() if not k.startswith('VITE_')}
 subprocess.run(['npm', 'ci'], cwd=FRONTEND, env=env, check=True)
 subprocess.run(['npm', 'run', 'build'], cwd=FRONTEND, env=env, check=True)
 dist = FRONTEND / 'dist'
+(dist / 'licenses').mkdir(exist_ok=True)
+for font in ('manrope', 'noto-sans-ethiopic'):
+    shutil.copyfile(FRONTEND / 'node_modules/@fontsource' / font / 'LICENSE', dist / 'licenses' / (font + '.txt'))
 manifest = json.loads((dist / 'manifest.webmanifest').read_text())
 manifest.update(id='/teletena/', start_url='/teletena/', scope='/teletena/')
 for icon in manifest['icons']:
