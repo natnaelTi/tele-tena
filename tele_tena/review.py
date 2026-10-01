@@ -48,6 +48,8 @@ def write_private(path, value):
 
 def configure():
     cli(False)
+    if frappe.conf.get('developer_mode') or frappe.conf.get('ignore_csrf'):
+        raise ValueError('Review requires developer mode and CSRF bypass to be disabled')
     site = frappe.local.site
     confirmation = input('Dedicated synthetic review site: type its exact site name: ').strip()
     if confirmation != site or site == 'erp.localhost':
