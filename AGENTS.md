@@ -17,7 +17,11 @@ Use synthetic fixtures. Never log clinical text, OTPs, authorization headers or 
 No recording/transcription by default. No authenticated API or clinical-data PWA caching.
 
 Money uses integer minor units or exact decimals, never binary float. Balance checks,
-reservations and booking conflict checks must be transactional. External notifications
+reservations and booking conflict checks must be transactional. In demonstration UI,
+use the single persistent, accessible “Demonstration environment — no real payments
+or clinical care” ribbon. Use normal labels such as “Balance” and “Add funds”; do not
+repeat simulation language beside every amount. Keep simulated transactions clearly
+distinct in activity details, APIs and storage. External notifications
 must be authenticated and idempotent. Corrections reverse ledger entries; no silent edits.
 Simulation must be labeled and inaccessible as a real-money funding route.
 

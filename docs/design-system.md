@@ -74,8 +74,11 @@ consultation”, “Leave”, “End for everyone”. No developer-facing copy s
 “Refresh persisted data”, “authenticated development account”, “create an adult
 patient account”, or “minor units”. Do not promise anonymity, guaranteed outcomes,
 unsupported credentials or unimplemented capabilities.
-Use one compact persistent **Demo environment** indicator. **Simulated balance**
-beside financial amounts. Translation review is an accessible secondary notice.
+Use one compact persistent **“Demonstration environment — no real payments or
+clinical care”** indicator, also present in focused/mobile layouts. Use ordinary
+labels such as **Balance**, **Payments** and **Add funds**; identify demo deposits,
+reservations and releases in activity detail. Translation review is an accessible
+secondary notice.
 No repeated large warnings; genuine errors stay visible and actionable.
 
 ## Public homepage — /
@@ -151,6 +154,40 @@ actions never hover-only. Contrast/readability in all three languages.
 Use routes/layouts/feature components/hooks, not monolithic App.tsx. Separate
 server state, form state and UI state. Secrets/authorization stay backend-only.
 Never weaken tests or permissions for visual results. No clinical/API offline cache.
+
+## Presentation release additions
+
+Scheduling, appointment/call/note states, cancellation defaults, privacy scopes
+and accepted demo timing values are defined in [presentation-release-model.md](presentation-release-model.md).
+The schedule editor is a weekly recurrence with timezone, multiple intervals,
+date exceptions, breaks, notice/horizon, buffers, duration and confirmation mode.
+Desktop uses a week calendar beside its editor; mobile uses agenda and compact
+editing steps. Time entry remains accessible without drag. Patient slot choice
+uses real server-generated slots and preserves the disclosure -> price -> confirm
+sequence.
+
+Use status labels for `Upcoming`, `Needs action`, `In progress` and `Past` with
+explicit appointment/call/documentation badges. No badge is inferred as a database
+transition from the clock alone. The consultation detail view is state-aware; the
+LiveKit room is a focused route. Audio-only replaces video with a permitted alias
+surface and activity derived from the existing participant audio track only.
+
+Consultation notes have separate private clinician and patient-visible fields.
+They are server-persisted, revisioned and never cached in local storage. Patient
+responses contain only published summary revisions. A persistent share history
+explains if a prior revision was visible. Resume upload is private PDF only, at
+most 5 MiB, and is evidence for review, never proof of a credential.
+
+The installable PWA caches public, versioned static assets and the generic offline
+page only. `/api/`, private files, consultation routes and authenticated responses
+are network-only. Updates wait for existing clients to close; an active consultation
+is never reloaded by the service worker. Offline UI never claims a mutation saved.
+
+Guided walkthroughs are versioned, per-user/per-role server preferences with a
+replayable Help & tours entry. They do not submit, approve, book, disclose or pay.
+Steps use stable target identifiers, support missing-target recovery and do not
+start during OTP, calls or note editing. English, Amharic and Afaan Oromo copy is
+required; provisional strings are marked for review.
 
 ## Acceptance and integration gates
 Install/fix browser dependencies with installed Playwright's supported setup.

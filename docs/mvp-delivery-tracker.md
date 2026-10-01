@@ -1,6 +1,6 @@
 # Tele-tena MVP delivery tracker
 
-Updated 2026-10-01 on `feat/mvp-consolidation`, integrating PRs #3, #4 and #5 in dependency order. PR #3 hosted Cloud Leave/rejoin/End and cached-token assertions now pass in automated two-browser fake-media runs. This branch is not yet merged. Status describes demonstration evidence, not production readiness.
+Updated 2026-10-01 on merged `main` at PR #6 merge `7222836`. PRs #3/#4 are merged through preserved ancestry; PR #5 was superseded. The hosted LiveKit Cloud End/rejoin/cached-token assertions passed with automated two-browser fake-media. Status describes demonstration evidence, not production readiness. Presentation release work is tracked separately in `docs/presentation-readiness-verification.md`.
 
 **Status meanings:** `implemented` means code and listed checks cover the
 demonstration behavior; `partial` means a narrower slice exists or has a known
@@ -34,6 +34,7 @@ do not release/claim the feature until the stated blocker is resolved.
 | ERPNext accounting/reporting integration, durable posting references/retries and reconciliation | pending | ERPNext is the agreed accounting system, but no posting or reconciliation exists. Never treat simulation events as accounting completion. |
 | English, Amharic and Afaan Oromo UI translation | partial | Existing journey keys in all three languages; Amharic/Afaan Oromo strings are provisional and need native review. OTP adds keys under Phase 1. |
 | Responsive accessible patient, clinician and administrator journeys/design system | partial | New routes/layouts, original local brand, tokens/components, hosted Playwright 1.63 Chromium and connected booking/onboarding journeys. Synthetic screens captured/inspected at 390/768/1440 plus 320 and 200% zoom; no horizontal overflow. New narrative is partly English in Amharic/Oromo pending translation review. Human device/assistive-tech review remains. |
+| Presentation release: recurrence scheduling, bookings, lifecycle, notes, detail pages, private resumes, directory, PWA and tours | pending | State and policy model is recorded in `presentation-release-model.md`; implementation and evidence are tracked in `presentation-readiness-verification.md`. |
 | Production safety/escalation, credential verification, hosting and regulated financial/provider readiness | pending | Product contract marks these unresolved/deferred. Demo uses synthetic accounts/data and is not production clinical readiness. |
 
 ## Current delivery and remaining sequence
