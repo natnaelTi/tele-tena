@@ -12,8 +12,8 @@ do not release/claim the feature until the stated blocker is resolved.
 
 | Agreed MVP requirement | Status | Evidence / remaining work |
 |---|---|---|
-| Adults 18+, patient and clinician profiles, private synthetic history, distinct account/disclosure identity | partial | Milestone 1 profiles and adult attestation; no verified-phone onboarding yet; existing email accounts continue to work. |
-| Phone possession OTP, expiry, single use, rate/abuse controls, clinician application entry | pending | Phase 1 contract in `phone-otp.md`; provider credential and live whitelist check still require operator input. OTP is not credential verification. |
+| Adults 18+, patient and clinician profiles, private synthetic history, distinct account/disclosure identity | partial | Milestone 1 profiles; phone signup requires an adult attestation, while the attestation is not independent age verification. Existing development accounts continue to work. |
+| Phone possession OTP, expiry, single use, rate/abuse controls, clinician application entry | implemented | Phase 1 in `phone-otp.md`; mocked provider/API tests pass. Live provider credentials and a consenting whitelisted recipient are still required before any SMS send. OTP is not credential verification. |
 | Clinician approval and per-service approval | implemented | Manual approver flow and native Service Scope DocType; PR #2 review verification and MariaDB integration tests. |
 | Independent clinicians and multi-clinic affiliations without implied record access | partial | Single-clinician ownership and no affiliation-based access currently; clinic/partner workspace, membership and multiple affiliations not built. |
 | Service definitions, approved clinician offerings, published ETB price and fixed duration | implemented | Native Service and Service Scope; scoped publication/discovery/booking and stale-ID regression checks. |
@@ -41,9 +41,11 @@ do not release/claim the feature until the stated blocker is resolved.
 
 ## Delivery sequence
 
-1. **Phone OTP/access** — `feat/phone-otp` from merged main. Record criteria in
-   `docs/phone-otp.md`; mock provider tests only until local key and consenting
-   whitelisted recipient are supplied. Open a PR; do not merge automatically.
+1. **Phone OTP/access** — `feat/phone-otp` from merged main. Contract and
+   acceptance evidence are in `docs/phone-otp.md`. Implementation is
+   checkpointed; provider tests are mocked. Open a PR; live sending remains
+   gated on local credentials and a consenting whitelisted recipient. Do not
+   merge automatically.
 2. **React design system and focused journeys** — after Phase 1 PR is opened,
    create a distinct branch with an explicit dependency on the phone-auth API
    shape. No clinical/authenticated API caching. Connect only real APIs; show

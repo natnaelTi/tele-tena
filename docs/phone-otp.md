@@ -1,6 +1,7 @@
 # Phase 1: phone verification and onboarding
 
-Status: implementation contract, recorded before code changes on 2026-10-01.
+Status: implemented demonstration flow; provider delivery has not been tested.
+Contract recorded before code changes on 2026-10-01.
 This work is on `feat/phone-otp` from merged `main` (PR #2 merge); it does not
 depend on PR #3. This is an account-access feature, not a phone-OTP claim for
 clinical consent or professional verification.
@@ -23,10 +24,12 @@ clinical consent or professional verification.
   include it in audit evidence. Guest endpoints deny by default except the
   narrowly scoped request/verify/signup flow, with Frappe CSRF and generic
   responses that do not disclose whether a phone/account exists.
-- SMS API keys and OTP-HMAC key are backend-only local secrets in a mode-600
-  file below the selected site's private directory. The helper reads secrets
-  invisibly. The browser receives only a generic request result and challenge
-  handle, never the provider key or OTP.
+- The SMS API key is held backend-only in a mode-600 file below the selected
+  site's private directory; the setup helper reads it invisibly. A separate
+  per-site OTP-HMAC key is generated once by the versioned migration into its
+  own mode-600 private file and is never exposed to the browser. The browser
+  receives only a generic request result and challenge handle, never either key
+  or the OTP.
 - SMS provider acceptance is not carrier delivery. The app never labels an
   accepted send as delivered.
 
@@ -80,7 +83,8 @@ login is not bypassed or replaced.
 
 - Six decimal digits, five-minute challenge expiry, five verification attempts.
 - Sixty-second resend cooldown; at most three sends per phone per 15 minutes and
-  ten per direct IP per 15 minutes, with a conservative daily phone cap.
+  ten per direct IP per 15 minutes, at most five sends per phone per day, and
+  ten verification attempts per phone / twenty per direct IP per 15 minutes.
 - Provider call timeout is bounded and called once per idempotency key. Accepted,
   rejected and uncertain are distinct internal states. No background retry of a
   send whose outcome is unknown.
@@ -114,7 +118,19 @@ test SMS to whitelisted numbers; before any live send the operator must enter th
 key through the local helper and name a consenting whitelisted test recipient.
 No trial-credit messages are sent by automated tests.
 
-## Acceptance criteria before Phase 1 PR
+## Local credential setup
+
+On the development Bench, run
+`bench --site erp.localhost execute tele_tena.development.configure_sms` in a
+terminal. The helper prompts with hidden input and stores only the key in
+`sites/erp.localhost/private/tele_tena_sms.json` (mode 600); its output contains
+no credential and it does not send a message. Do not put the key in a shell
+argument, frontend variable, chat, or repository file. This local helper is
+restricted to `erp.localhost` and the Administrator account. Before live testing,
+confirm a consenting recipient is on the provider's whitelist; no live send is
+part of this checkpoint.
+
+## Acceptance criteria and checkpoint evidence
 
 1. Phone normalization produces one Ethiopian E.164 form from supported local
    and international input; invalid/non-mobile and unsupported numbers fail
@@ -140,3 +156,13 @@ No trial-credit messages are sent by automated tests.
 8. No live provider test is performed until the user enters credentials locally
    and selects a consenting whitelisted recipient. Migration adds versioned
    schema and preserves all existing profiles, appointments and balances.
+
+Verification on 2026-10-01: `tests/integration.py` passed all 20 MariaDB/API
+tests, including the previous booking/privacy concurrency regressions and six
+phone-auth/provider tests. `frontend`: `npm run build` and `npm run lint` passed;
+`python3 -m compileall -q tele_tena tests scripts` and `git diff --check` passed.
+The additive `v1_3_phone_auth` migration and migration-preservation checker passed
+on `erp.localhost` before this run. Provider HTTP behavior was mocked; no real
+SMS, carrier delivery, sender/template requirement, provider authentication
+account, or live whitelist was verified. Fresh-site installation and external
+production-like SMS abuse testing remain outstanding.

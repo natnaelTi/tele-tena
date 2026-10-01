@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useState } from 'react'
 import type { FormEvent } from 'react'
-import { ApiError, api, setCsrf, signIn } from './api'
+import { ApiError, api, phoneAuth, setCsrf, signIn } from './api'
 import { locales } from './i18n'
 import type { Key } from './i18n'
 import './App.css'
@@ -14,7 +14,7 @@ type Disclosure = { request: string; name?: string; history?: string }
 type Appointment = { id: string; start: string; end: string; state: string; price: number; minutes: number; service_label: string; disclosure: Disclosure }
 type Window = { start: string; end: string }
 const money = (minor: number) => `${Math.floor(minor / 100)}.${String(minor % 100).padStart(2, '0')}`
-const errorKeys: Record<string, Key> = { service_scope_required: 'serviceScopeRequired', outside_availability: 'outsideAvailability', appointment_conflict: 'appointmentConflict', insufficient_funds: 'insufficientFunds', approval_required: 'approvalRequired', preview_changed: 'previewChanged', offering_changed: 'offeringChanged', future_required: 'futureRequired', retry_changed: 'retryChanged', concurrent_update: 'concurrentUpdate' }
+const errorKeys: Record<string, Key> = { service_scope_required: 'serviceScopeRequired', outside_availability: 'outsideAvailability', appointment_conflict: 'appointmentConflict', insufficient_funds: 'insufficientFunds', approval_required: 'approvalRequired', preview_changed: 'previewChanged', offering_changed: 'offeringChanged', future_required: 'futureRequired', retry_changed: 'retryChanged', concurrent_update: 'concurrentUpdate', invalid_phone: 'invalidPhone', otp_invalid: 'otpInvalid', adult_required: 'adultRequired' }
 const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 const date = (utc: string) => new Date(utc).toLocaleString()
 
@@ -80,7 +80,7 @@ export default function App() {
       setOffers(await api<Offer[]>('discover', filter ? { service: filter } : {}))
       if (current.profile) setBalance(await api('wallet'))
     }
-    if (current.roles.includes('Tele Tena Approver') || (current.profile && current.roles.includes('Tele Tena Clinician'))) {
+    if (current.roles.includes('Tele Tena Approver') || current.profile?.kind === 'clinician') {
       setApplications(await api('applications'))
     }
     if (current.roles.includes('Tele Tena Approver')) setScopes(await api('service_scopes'))
@@ -102,10 +102,10 @@ export default function App() {
     <header><h1>{t('title')}</h1><label>{t('language')} <select aria-label={t('language')} value={locale} onChange={e => setLocale(e.target.value as keyof typeof locales)}><option value="en">English</option><option value="am">አማርኛ</option><option value="om">Afaan Oromo</option></select></label></header>
     <p className="banner">{t('warning')}</p><p className="notice">{t('review')}</p>
     <p role="status">{working ? t('loading') : message ? t(message) : ''}</p>
-    {!session ? <section><h2>{t('login')}</h2><p>{t('credentials')}</p><form onSubmit={e => submit(e, async () => { await signIn(email, password); setPassword(''); await refresh(true, true) })}>
+    {!session ? <><section><h2>{t('login')}</h2><p>{t('credentials')}</p><form onSubmit={e => submit(e, async () => { await signIn(email, password); setPassword(''); await refresh(true, true) })}>
       <label>{t('email')}<input type="email" autoComplete="username" required value={email} onChange={e => setEmail(e.target.value)} /></label>
       <label>{t('password')}<input type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} /></label>{button('login')}
-    </form></section> : <>
+    </form></section><PhoneOnboarding t={t} run={run} authenticated={() => refresh(true, true)} /></> : <>
       <nav><span>{t('authenticated')}: {session.user}</span><button disabled={working} onClick={() => void run(async () => { await api('frappe.handler.logout', {}, true); clearPrivateState() })}>{t('logout')}</button><button disabled={working} onClick={() => void run(() => refresh())}>{t('refresh')}</button></nav>
       {(patient || clinician) && <section><h2>{t('profile')} · {t(kind)}</h2><form onSubmit={e => submit(e, async () => {
         await api('save_profile', { kind, display_name: name, adult, history, share_name: defaultShareName, share_history: defaultShareHistory }, true); await refresh(true)
@@ -143,6 +143,7 @@ export default function App() {
           <label>{t('end')}<input required type="datetime-local" value={end} onChange={e => setEnd(e.target.value)} /></label>{button('addWindow')}
         </form></section>
       </>}
+      {!clinician && session.profile?.kind === 'clinician' && <section><h2>{t('application')}</h2>{applications.map(a => <p key={a.user}>{t('status')}: {t(a.status.toLowerCase() as Key)}</p>)}<p>{t('clinicianActivationPending')}</p></section>}
       {patient && session.profile && <>
         <section><h2>{t('wallet')}</h2><p>{t('available')}: ETB {money(balance.available)} · {t('reserved')}: ETB {money(balance.reserved)}</p>
           {session.simulation && <button disabled={working} onClick={() => void run(async () => { await api('simulated_deposit', { amount: 10000, retry_key: depositKey }, true); setDepositKey(crypto.randomUUID()); await refresh() })}>{t('deposit')}</button>}
@@ -167,4 +168,71 @@ export default function App() {
       {session.profile && <section><h2>{t('appointments')}</h2>{appointments.length === 0 && <p>{t('empty')}</p>}{appointments.map(a => <article key={a.id}><h3>{a.service_label} · {t('booked')}</h3><p>{date(a.start)} – {date(a.end)} · ETB {money(a.price)} · {a.minutes} {t('duration')}</p>{disclosureView(a.disclosure)}</article>)}</section>}
     </>}
   </main>
+}
+
+function PhoneOnboarding({ t, run, authenticated }: {
+  t: (key: Key) => string
+  run: (action: () => Promise<void>) => Promise<void>
+  authenticated: () => Promise<void>
+}) {
+  const [purpose, setPurpose] = useState<'patient_signup' | 'clinician_application' | 'login'>('patient_signup')
+  const [phone, setPhone] = useState('')
+  const [displayName, setDisplayName] = useState('')
+  const [adult, setAdult] = useState(false)
+  const [statement, setStatement] = useState('')
+  const [code, setCode] = useState('')
+  const [challenge, setChallenge] = useState('')
+  const [requested, setRequested] = useState(false)
+  const [requestId, setRequestId] = useState(() => crypto.randomUUID())
+  const [csrf, setCsrf] = useState('')
+  const signup = purpose !== 'login'
+
+  async function requestCode(event: FormEvent) {
+    event.preventDefault()
+    await run(async () => {
+      const token = csrf || (await phoneAuth<{ csrf_token: string }>('csrf_token', {})).csrf_token
+      setCsrf(token)
+      const result = await phoneAuth<{ requested: boolean; challenge_id: string }>('request_code',
+        { phone, purpose, request_id: requestId }, token)
+      setChallenge(result.challenge_id)
+      setRequested(true)
+    })
+  }
+
+  async function verifyCode(event: FormEvent) {
+    event.preventDefault()
+    await run(async () => {
+      await phoneAuth('verify_code', { phone, purpose, challenge_id: challenge, code,
+        display_name: displayName, adult: adult ? 1 : 0, statement }, csrf)
+      setCode('')
+      await authenticated()
+    })
+  }
+
+  return <section aria-label={t('phoneAccess')}>
+    <h2>{t('phoneAccess')}</h2><p>{t('phoneNotice')}</p>
+    <form onSubmit={requestCode}>
+      <label>{t('phonePurpose')}<select value={purpose} onChange={event => {
+        setPurpose(event.target.value as typeof purpose); setChallenge(''); setRequested(false); setCode(''); setRequestId(crypto.randomUUID())
+      }}>
+        <option value="patient_signup">{t('patientSignup')}</option>
+        <option value="clinician_application">{t('clinicianApplication')}</option>
+        <option value="login">{t('phoneLogin')}</option>
+      </select></label>
+      <label>{t('phone')}<input type="tel" inputMode="tel" autoComplete="tel" required value={phone}
+        onChange={event => { setPhone(event.target.value); setChallenge(''); setRequested(false); setCode(''); setRequestId(crypto.randomUUID()) }} /></label>
+      {signup && <>
+        <label>{t('name')}<input required maxLength={120} value={displayName} onChange={event => setDisplayName(event.target.value)} /></label>
+        <label className="check"><input type="checkbox" checked={adult} onChange={event => setAdult(event.target.checked)} />{t('adult')}</label>
+      </>}
+      {purpose === 'clinician_application' && <label>{t('statement')}<textarea required maxLength={2000} value={statement} onChange={event => setStatement(event.target.value)} /></label>}
+      <button type="submit">{t('requestCode')}</button>
+    </form>
+    {requested && <form onSubmit={verifyCode}>
+      <p>{t('codeRequested')}</p>
+      <label>{t('verificationCode')}<input type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={event => setCode(event.target.value)} /></label>
+      <button type="submit" disabled={!challenge}>{t('verifyCode')}</button>
+      <button type="button" onClick={() => { setChallenge(''); setRequested(false); setCode(''); setRequestId(crypto.randomUUID()) }}>{t('requestAnotherCode')}</button>
+    </form>}
+  </section>
 }

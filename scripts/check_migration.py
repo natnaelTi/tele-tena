@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import stat
 import subprocess
 import sys
 
@@ -27,6 +28,11 @@ def snapshot():
 
 
 before = snapshot()
+frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
+frappe.connect()
+scope_before = sorted(tuple(row) for row in frappe.db.sql('''SELECT name,clinician,service,status,
+    creation,modified FROM `tabTele Tena Service Scope`'''))
+frappe.destroy()
 for attempt in (1, 2):
     with open(f'/tmp/tele-tena-pr2-migrate-{attempt}.log', 'w') as output:
         status = subprocess.run(['bench', '--site', SITE, 'migrate', '--skip-search-index'], cwd=BENCH, stdout=output, stderr=subprocess.STDOUT)
@@ -34,11 +40,18 @@ for attempt in (1, 2):
     assert snapshot() == before, 'Migration changed legacy records'
 frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
 frappe.connect()
-for patch in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check'):
+for patch in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth'):
     assert frappe.db.exists('Patch Log', {'patch': 'tele_tena.patches.' + patch})
+for table in ('tt_phone_identity', 'tt_otp_challenge', 'tt_otp_rate_limit', 'tt_otp_gate'):
+    assert table in frappe.db.get_tables(cached=False), 'Missing phone-auth table'
+key_path = Path(frappe.get_site_path('private', 'tele_tena_otp.key'))
+assert key_path.is_file() and not key_path.is_symlink()
+assert stat.S_IMODE(key_path.stat().st_mode) == 0o600
 for row in frappe.db.sql('SELECT id,label,active FROM tt_service', as_dict=True):
     migrated = frappe.db.get_value('Tele Tena Service', row.id, ['service_label', 'active'])
     assert migrated == (row.label, row.active), 'Catalog migration mismatch'
-assert frappe.db.count('Tele Tena Service Scope') == 0, 'Migration inferred scopes'
+scope_after = sorted(tuple(row) for row in frappe.db.sql('''SELECT name,clinician,service,status,
+    creation,modified FROM `tabTele Tena Service Scope`'''))
+assert scope_after == scope_before, 'Migration changed service scopes'
 frappe.destroy()
-print('PASS: additive upgrade, three numbered Patch Log entries, catalog copy, no inferred scopes, repeat migration and all legacy records preserved')
+print('PASS: additive upgrade, four numbered Patch Log entries, phone-auth tables/key, catalog copy, no scope changes, repeat migration and all existing records preserved')

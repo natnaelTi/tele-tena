@@ -24,7 +24,13 @@ export const en = {
   failure: 'Request failed. Check approval, availability, funds and your inputs. Retry a booking with the same inputs after a connection failure.',
   loading: 'Working…', noProfile: 'Save your profile to continue.', noOffer: 'No approved offerings yet.',
   requestField: 'Request', nameField: 'Name', historyField: 'History', previewNote: 'Changing inputs clears the preview. Confirmed disclosures are saved snapshots.',
-  credentials: 'Use the isolated synthetic accounts from the local credentials file. Phone OTP is not implemented.',
+  credentials: 'Existing development accounts can continue to sign in with email and password.',
+  phoneAccess: 'Phone access and signup', phoneNotice: 'We only use your number for this request. A verification text may be delayed; do not share its code.',
+  phonePurpose: 'I want to', patientSignup: 'Create an adult patient account', clinicianApplication: 'Apply as a clinician', phoneLogin: 'Sign in with a verified phone',
+  phone: 'Ethiopian mobile number', requestCode: 'Request verification code', codeRequested: 'If this number is eligible, a code was requested. Provider acceptance does not guarantee delivery.',
+  verificationCode: 'Six-digit verification code', verifyCode: 'Verify and continue', requestAnotherCode: 'Start another request',
+  invalidPhone: 'Enter a supported Ethiopian mobile number.', otpInvalid: 'The code is invalid, expired, already used, or unavailable. Request a new code after the waiting period.',
+  adultRequired: 'Confirm that you are 18 or older to continue.', clinicianActivationPending: 'Phone verification is not professional approval. An administrator must approve your application and separately provision clinician access and service scopes.',
 } as const
 export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
@@ -49,7 +55,13 @@ export const am: Record<Key, string> = {
   windows:'የሚገኙ ሰዓቶች', busy:'አስቀድሞ ተይዟል', appointments:'የእርስዎ ቀጠሮዎች', booked:'ተይዟል', empty:'ገና መረጃ የለም', refresh:'መረጃ አድስ',
   success:'ተሳክቶ ተቀምጧል', failure:'ጥያቄው አልተሳካም። ማጽደቅ፣ ሰዓት፣ ሂሳብ እና መረጃዎን ያረጋግጡ።', loading:'በመሥራት ላይ…', noProfile:'ለመቀጠል መገለጫዎን ያስቀምጡ።',
   noOffer:'ገና የጸደቀ አገልግሎት የለም።', requestField:'ጥያቄ', nameField:'ስም', historyField:'ታሪክ', previewNote:'ምርጫ ሲቀየር ቅድመ እይታው ይጸዳል።',
-  credentials:'የልማት ማሳያ መለያዎችን ይጠቀሙ። የስልክ OTP አልተተገበረም።',
+  credentials:'ያሉትን የልማት መለያዎች በኢሜይል እና በይለፍ ቃል መጠቀም ይችላሉ።',
+  phoneAccess:'በስልክ መግቢያ እና ምዝገባ', phoneNotice:'ቁጥርዎን ለዚህ ጥያቄ ብቻ እንጠቀማለን። የማረጋገጫ መልዕክት ሊዘገይ ይችላል፤ ኮዱን አያጋሩ።',
+  phonePurpose:'ምን ማድረግ ይፈልጋሉ', patientSignup:'የአዋቂ ታካሚ መለያ ፍጠር', clinicianApplication:'እንደ ሐኪም ማመልከት', phoneLogin:'በተረጋገጠ ስልክ ግባ',
+  phone:'የኢትዮጵያ ሞባይል ቁጥር', requestCode:'የማረጋገጫ ኮድ ጠይቅ', codeRequested:'ቁጥሩ ብቁ ከሆነ ኮድ ተጠይቋል። አቅራቢው መቀበሉ መድረሱን አያረጋግጥም።',
+  verificationCode:'የስድስት አሃዝ ማረጋገጫ ኮድ', verifyCode:'አረጋግጥ እና ቀጥል', requestAnotherCode:'አዲስ ጥያቄ ጀምር',
+  invalidPhone:'ትክክለኛ የኢትዮጵያ ሞባይል ቁጥር ያስገቡ።', otpInvalid:'ኮዱ ስህተት፣ ጊዜው ያለፈ፣ ቀድሞ የተጠቀመ ወይም የማይገኝ ነው። ከጥበቃው በኋላ አዲስ ኮድ ይጠይቁ።',
+  adultRequired:'ለመቀጠል 18 ዓመት ወይም ከዚያ በላይ መሆንዎን ያረጋግጡ።', clinicianActivationPending:'ስልክ ማረጋገጥ የሙያ ማጽደቅ አይደለም። አስተዳዳሪ ማመልከቻዎን ማጽደቅ እና የሐኪም መዳረሻን እና የአገልግሎት ፈቃዶችን በተለይ መስጠት አለበት።',
 }
 export const om: Record<Key, string> = {
   scopeRevoked: 'Haqame', serviceScopeRequired: 'Ogeessi tajaajila kanaaf hin raggaane.', scopeService: 'Tajaajila gamaaggamu', serviceScopes: 'Tajaajiloota raggaʼan', approveScope: 'Tajaajila raggaasisi', revokeScope: 'Hayyama tajaajilaa haqi',
@@ -70,6 +82,12 @@ export const om: Record<Key, string> = {
   book:'Beellama mirkaneessi fi qarshii fakkeeffame qabi', windows:'Yeroo banaa (yeroo naannoo)', busy:'Dursee qabame', appointments:'Beellamoota kee', booked:'Qabame', empty:'Galmeen hin jiru',
   refresh:'Odeeffannoo haaromsi', success:'Milkaaʼinaan ol kaaʼame', failure:'Gaaffiin hin milkoofne. Raggaasisa, yeroo, qarshii fi odeeffannoo kee mirkaneessi.', loading:'Hojjechaa…',
   noProfile:'Itti fufuuf ibsa kee ol kaaʼi.', noOffer:'Tajaajilli raggaʼe hin jiru.', requestField:'Gaaffii', nameField:'Maqaa', historyField:'Seenaa',
-  previewNote:'Filannoo jijjiiruun dur-ilaalcha haqa.', credentials:'Herregoota agarsiisa misoomaa fayyadami. OTP bilbilaa hin hojjetamne.',
+  previewNote:'Filannoo jijjiiruun dur-ilaalcha haqa.', credentials:'Herregoonni misoomaa jiran imeelii fi jecha icciitiin itti fufu.',
+  phoneAccess:'Seensa bilbilaa fi galmee', phoneNotice:'Lakkoofsa kee gaaffii kanaaf qofa fayyadamna. Ergaan mirkaneessaa turuu dandaʼa; koodii hin qoodin.',
+  phonePurpose:'Maal gochuu barbaadda', patientSignup:'Herrega dhukkubsataa nama gaʼe uumuu', clinicianApplication:'Ogeessa fayyaa taʼuuf iyyachuu', phoneLogin:'Bilbila mirkanaaʼeen seenuu',
+  phone:'Lakkoofsa moobaayilaa Itoophiyaa', requestCode:'Koodii mirkaneessaa gaafadhu', codeRequested:'Lakkoofsi kun yoo hayyamame koodiin gaafatameera. Deebiin dhiyeessaa geessuu hin mirkaneessu.',
+  verificationCode:'Koodii mirkaneessaa lakkoofsa jaʼa', verifyCode:'Mirkaneessi itti fufi', requestAnotherCode:'Gaaffii haaraa jalqabi',
+  invalidPhone:'Lakkoofsa moobaayilaa Itoophiyaa sirrii galchi.', otpInvalid:'Koodiin dogoggora, yeroon isaa darbe, duraan fayyadame ykn hin jiru. Yeroo eegumsaa booda koodii haaraa gaafadhu.',
+  adultRequired:'Itti fufuuf umuriin kee waggaa 18 ykn isaa ol taʼuu mirkaneessi.', clinicianActivationPending:'Bilbila mirkaneessuun hayyama ogummaa miti. Bulchaan iyyata kee raggaasisee hayyama ogeessaa fi tajaajilaa addaan kennuu qaba.',
 }
 export const locales = { en, am, om }

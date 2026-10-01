@@ -181,7 +181,10 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
 
 @command
 def apply(statement):
-    p = profile('clinician', True)
+    user = actor()
+    p = one('SELECT * FROM tt_profile WHERE user=%s FOR UPDATE', (user,))
+    if p.kind != 'clinician':
+        frappe.throw('Clinician profile required', frappe.PermissionError)
     frappe.db.sql('''INSERT INTO tt_application (user,statement,status) VALUES (%s,%s,'Pending')
         ON DUPLICATE KEY UPDATE statement=VALUES(statement),status='Pending',reviewed_by=NULL,reviewed_at=NULL''',
         (p.user, text(statement, 2000)))
@@ -194,7 +197,9 @@ def applications():
     user = actor()
     if 'Tele Tena Approver' in frappe.get_roles(user):
         return rows('SELECT a.*,p.display_name FROM tt_application a JOIN tt_profile p ON p.user=a.user')
-    profile('clinician')
+    p = one('SELECT kind FROM tt_profile WHERE user=%s', (user,))
+    if p.kind != 'clinician':
+        frappe.throw('Clinician application unavailable', frappe.PermissionError)
     return rows('SELECT * FROM tt_application WHERE user=%s', (user,))
 
 
@@ -207,6 +212,16 @@ def review(clinician, decision):
     one('SELECT user FROM tt_application WHERE user=%s FOR UPDATE', (clinician,))
     frappe.db.sql('UPDATE tt_application SET status=%s,reviewed_by=%s,reviewed_at=UTC_TIMESTAMP(6) WHERE user=%s',
                   (decision, reviewer, clinician))
+    # This one role transition is part of the approver-guarded command. Public
+    # phone signup itself assigns only Patient or non-privileged Applicant.
+    user_doc = frappe.get_doc('User', clinician)
+    user_doc.flags.ignore_permissions = True
+    if decision == 'Approved':
+        user_doc.add_roles('Tele Tena Clinician')
+        user_doc.remove_roles('Tele Tena Applicant')
+    else:
+        user_doc.remove_roles('Tele Tena Clinician')
+        user_doc.add_roles('Tele Tena Applicant')
     audit(clinician, 'Review', {'status': decision})
     return {'status': decision}
 

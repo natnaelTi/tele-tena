@@ -31,6 +31,22 @@ TABLES = {
         created datetime(6) NOT NULL, CHECK (amount > 0)''',
 }
 
+# Added in numbered patch v1_3; never mutate the frozen v1_0 baseline.
+PHONE_AUTH_TABLES = {
+    'phone_identity': '''user varchar(140) PRIMARY KEY, phone varchar(20) NOT NULL UNIQUE,
+        verified_at datetime(6) NOT NULL, created datetime(6) NOT NULL''',
+    'otp_challenge': '''id varchar(36) PRIMARY KEY, phone_digest char(64) NOT NULL,
+        purpose varchar(32) NOT NULL, otp_digest char(64) NOT NULL,
+        request_digest char(64) NOT NULL, created datetime(6) NOT NULL,
+        expires datetime(6) NOT NULL, attempts int NOT NULL DEFAULT 0,
+        consumed datetime(6), dispatch_state varchar(20) NOT NULL,
+        dispatch_code varchar(40), UNIQUE KEY request_once (phone_digest,purpose,request_digest),
+        KEY phone_created (phone_digest,created), KEY challenge_expiry (expires)''',
+    'otp_rate_limit': '''bucket_key char(64) PRIMARY KEY, window_start datetime(6) NOT NULL,
+        attempts int NOT NULL''',
+    'otp_gate': 'id int PRIMARY KEY',
+}
+
 
 def create_tables():
     # Called by bench migrate/install; no web-accessible schema mutation.
@@ -47,5 +63,7 @@ def install():
     # exact versioned routines; subsequent upgrades run through Frappe Patch Log.
     from tele_tena.patches.v1_0_command_storage import execute as baseline
     from tele_tena.patches.v1_1_native_catalog import execute as catalog
+    from tele_tena.patches.v1_3_phone_auth import execute as phone_auth
     baseline()
     catalog()
+    phone_auth()
