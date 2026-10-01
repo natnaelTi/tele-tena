@@ -42,6 +42,7 @@ export const en = {
   verificationCode: 'Six-digit verification code', verifyCode: 'Verify and continue', requestAnotherCode: 'Start another request',
   invalidPhone: 'Enter a supported Ethiopian mobile number.', otpInvalid: 'The code is invalid, expired, already used, or unavailable. Request a new code after the waiting period.',
   adultRequired: 'Confirm that you are 18 or older to continue.', clinicianActivationPending: 'Phone verification is not professional approval. An administrator must approve your application and separately provision clinician access and service scopes.',
+  navLabel:'Your workspace', navProfile:'Profile and privacy', navCare:'Find care', navPractice:'Practice setup', navApprovals:'Applications and approvals', navCatalog:'Service catalog', navAppointments:'Appointments', timezoneLabel:'Times shown in', simulationLabel:'Demonstration only · simulated funds', workspacePatient:'Patient workspace', workspaceClinician:'Clinician workspace', workspaceApplicant:'Clinician application', workspaceAdmin:'Administrator workspace', loadingError:'Some information could not be loaded. Refresh to try again.',
 } as const
 export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
@@ -82,6 +83,7 @@ export const am: Record<Key, string> = {
   verificationCode:'የስድስት አሃዝ ማረጋገጫ ኮድ', verifyCode:'አረጋግጥ እና ቀጥል', requestAnotherCode:'አዲስ ጥያቄ ጀምር',
   invalidPhone:'ትክክለኛ የኢትዮጵያ ሞባይል ቁጥር ያስገቡ።', otpInvalid:'ኮዱ ስህተት፣ ጊዜው ያለፈ፣ ቀድሞ የተጠቀመ ወይም የማይገኝ ነው። ከጥበቃው በኋላ አዲስ ኮድ ይጠይቁ።',
   adultRequired:'ለመቀጠል 18 ዓመት ወይም ከዚያ በላይ መሆንዎን ያረጋግጡ።', clinicianActivationPending:'ስልክ ማረጋገጥ የሙያ ማጽደቅ አይደለም። አስተዳዳሪ ማመልከቻዎን ማጽደቅ እና የሐኪም መዳረሻን እና የአገልግሎት ፈቃዶችን በተለይ መስጠት አለበት።',
+  navLabel:'የእርስዎ የሥራ ቦታ', navProfile:'መገለጫ እና ግላዊነት', navCare:'እንክብካቤ ፈልግ', navPractice:'የሙያ ቅንብር', navApprovals:'ማመልከቻዎች እና ማጽደቂያ', navCatalog:'የአገልግሎት ዝርዝር', navAppointments:'ቀጠሮዎች', timezoneLabel:'ጊዜዎቹ የሚታዩት በ', simulationLabel:'የማሳያ ብቻ · የተመሳሰለ ገንዘብ', workspacePatient:'የታካሚ የሥራ ቦታ', workspaceClinician:'የሐኪም የሥራ ቦታ', workspaceApplicant:'የሐኪም ማመልከቻ', workspaceAdmin:'የአስተዳዳሪ የሥራ ቦታ', loadingError:'አንዳንድ መረጃ መጫን አልተቻለም። እንደገና ለመሞከር ያድሱ።',
 }
 export const om: Record<Key, string> = {
   sessionLifecycle:'Haala marii', mediaStatus:'Walqunnamtii miidiyaa', callNotConnected:'Hin wal qabamne', callToggleError:'Mikirofoonii ykn kaameraa jijjiiruun hin milkoofne. Hayyama meeshaalee ilaalii irra deebiʼi yaali.',
@@ -118,5 +120,6 @@ export const om: Record<Key, string> = {
   verificationCode:'Koodii mirkaneessaa lakkoofsa jaʼa', verifyCode:'Mirkaneessi itti fufi', requestAnotherCode:'Gaaffii haaraa jalqabi',
   invalidPhone:'Lakkoofsa moobaayilaa Itoophiyaa sirrii galchi.', otpInvalid:'Koodiin dogoggora, yeroon isaa darbe, duraan fayyadame ykn hin jiru. Yeroo eegumsaa booda koodii haaraa gaafadhu.',
   adultRequired:'Itti fufuuf umuriin kee waggaa 18 ykn isaa ol taʼuu mirkaneessi.', clinicianActivationPending:'Bilbila mirkaneessuun hayyama ogummaa miti. Bulchaan iyyata kee raggaasisee hayyama ogeessaa fi tajaajilaa addaan kennuu qaba.',
+  navLabel:'Bakka hojii kee', navProfile:'Ibsaa fi iccitii', navCare:'Tajaajila barbaadi', navPractice:'Qophii hojii', navApprovals:'Iyyata fi raggaasisa', navCatalog:'Tarree tajaajilaa', navAppointments:'Beellamoota', timezoneLabel:'Yeroon kun naannoo saʼaatii kana keessa', simulationLabel:'Agarsiisa qofa · maallaqa fakkeeffame', workspacePatient:'Bakka hojii dhukkubsataa', workspaceClinician:'Bakka hojii ogeessaa', workspaceApplicant:'Iyyata ogeessa fayyaa', workspaceAdmin:'Bakka hojii bulchaa', loadingError:'Odeeffannoon tokko tokko hin feʼamne. Haaromsuun irra deebiʼi yaali.',
 }
 export const locales = { en, am, om }
