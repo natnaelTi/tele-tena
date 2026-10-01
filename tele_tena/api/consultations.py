@@ -105,10 +105,16 @@ def join(appointment, audio_only=0):
 
 @frappe.whitelist(methods=['POST'])
 def end(appointment):
-    """Persist Ended before deleting the external room; repeated calls retry closure."""
+    """Serialize against Join, persist Ended, revoke both Cloud identities, close the room."""
     item, user, role = _authorized_appointment(appointment)
     if role != 'clinician':
         frappe.throw('Only the appointment clinician can end the consultation', frappe.PermissionError)
+    # Join takes this same lock first, so no token can be minted concurrently
+    # after the End transition has committed.
+    item = one('''SELECT id,patient,clinician,state FROM tt_appointment
+        WHERE id=%s AND (patient=%s OR clinician=%s) FOR UPDATE''', (item.id, user, user))
+    if item.state != 'Booked':
+        fail('Appointment is not active', 'appointment_inactive')
     session = frappe.db.sql('SELECT * FROM tt_consultation WHERE appointment=%s FOR UPDATE',
                             (item.id,), as_dict=True)
     if not session or session[0].state != 'Ended':
@@ -117,11 +123,13 @@ def end(appointment):
         frappe.db.sql("UPDATE tt_consultation SET state='Ended',ended_by=%s,ended=UTC_TIMESTAMP(6) WHERE appointment=%s",
                       (user, item.id))
     room_name = session[0].room_name
-    # The committed ended state denies token refreshes even if provider closure fails.
+    identities = (session[0].patient_identity, session[0].clinician_identity)
+    # The committed ended state denies new application tokens even if Cloud
+    # revocation or room closure fails; repeated End retries both operations.
     frappe.db.commit()
     from tele_tena.livekit import close_room
     try:
-        close_room(room_name)
+        close_room(room_name, identities)
     except Exception:
         frappe.throw('Consultation ended; room closure is pending. Retry ending to confirm closure',
                      frappe.ValidationError)

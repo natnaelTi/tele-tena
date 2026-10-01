@@ -500,7 +500,7 @@ class Integration(unittest.TestCase):
         with patch('tele_tena.livekit._credentials', return_value=('wss://example.invalid', 'key_123', 'x' * 32)), \
              patch('tele_tena.livekit.close_room') as close:
             self.assertEqual(consultations.end(booking_id), {'state': 'Ended'})
-            close.assert_called_once_with(row.room_name)
+            close.assert_called_once_with(row.room_name, (row.patient_identity, row.clinician_identity))
             self.assertFalse(consultations.consultation(booking_id)['room_close_pending'])
             self.assertEqual(consultations.end(booking_id), {'state': 'Ended'})
             self.assertEqual(close.call_count, 2)
@@ -508,6 +508,91 @@ class Integration(unittest.TestCase):
             with self.assertRaises(frappe.ValidationError):
                 consultations.join(booking_id)
         self.assertEqual(consultations.consultation(booking_id)['state'], 'Ended')
+
+    def test_16_cloud_close_revokes_both_opaque_identities_with_future_cutoffs(self):
+        from livekit import api as livekit_api
+        from tele_tena import livekit
+        class Room:
+            def __init__(self):
+                self.removed = []
+                self.deleted = []
+            async def remove_participant(self, request):
+                self.removed.append(request)
+            async def delete_room(self, request):
+                self.deleted.append(request)
+        class Client:
+            def __init__(self):
+                self.room = Room()
+                self.closed = False
+            async def aclose(self):
+                self.closed = True
+        client = Client()
+        before = int(datetime.now(timezone.utc).timestamp())
+        with patch('livekit.api.LiveKitAPI', return_value=client), \
+             patch('tele_tena.livekit._credentials', return_value=('wss://synthetic.livekit.cloud', 'key_123', 'x' * 32)):
+            livekit.close_room('opaque-room', ('opaque-patient', 'opaque-clinician'))
+        self.assertEqual([item.identity for item in client.room.removed], ['opaque-patient', 'opaque-clinician'])
+        self.assertTrue(all(item.room == 'opaque-room' for item in client.room.removed))
+        self.assertTrue(all(before + 29 <= item.revoke_token_ts <= before + 31 for item in client.room.removed))
+        self.assertEqual(len(client.room.deleted), 1)
+        self.assertTrue(client.closed)
+
+    def test_17_join_and_end_are_serialized_on_the_appointment(self):
+        from tele_tena.api import consultations
+        self.fund('p1', 600)
+        login('p1')
+        booking_id = api.book(**booking(self.offers['c1'], at(3), 'join-end-race'))['id']
+        frappe.db.commit()
+        token_entered = threading.Event()
+        allow_token = threading.Event()
+        ending_started = threading.Event()
+        ended = threading.Event()
+        outcome = {}
+        def issue_token(*args, **kwargs):
+            token_entered.set()
+            if not allow_token.wait(timeout=10):
+                raise RuntimeError('join race test timed out')
+            return 'synthetic-token'
+        def join_worker():
+            connect()
+            try:
+                login('p1')
+                with patch.object(consultations, '_window', return_value=True), \
+                     patch('tele_tena.livekit._credentials', return_value=('wss://example.invalid', 'key_123', 'x' * 32)), \
+                     patch('tele_tena.livekit.participant_token', side_effect=issue_token):
+                    outcome['join'] = consultations.join(booking_id)
+                frappe.db.commit()
+            finally:
+                frappe.destroy()
+        def end_worker():
+            connect()
+            try:
+                login('c1')
+                ending_started.set()
+                with patch('tele_tena.livekit.close_room'):
+                    outcome['end'] = consultations.end(booking_id)
+                frappe.db.commit()
+                ended.set()
+            finally:
+                frappe.destroy()
+        joining_thread = threading.Thread(target=join_worker)
+        ending_thread = threading.Thread(target=end_worker)
+        joining_thread.start()
+        self.assertTrue(token_entered.wait(timeout=10))
+        ending_thread.start()
+        self.assertTrue(ending_started.wait(timeout=10))
+        self.assertFalse(ended.wait(timeout=0.2), 'End must wait for the in-flight Join lock')
+        allow_token.set()
+        joining_thread.join(timeout=10)
+        ending_thread.join(timeout=10)
+        self.assertFalse(joining_thread.is_alive())
+        self.assertFalse(ending_thread.is_alive())
+        self.assertEqual(outcome['end'], {'state': 'Ended'})
+        login('p1')
+        self.assertEqual(consultations.consultation(booking_id)['state'], 'Ended')
+        with patch.object(consultations, '_window', return_value=True):
+            with self.assertRaises(frappe.ValidationError):
+                consultations.join(booking_id)
 
 
 if __name__ == '__main__':

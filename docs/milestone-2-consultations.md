@@ -54,8 +54,14 @@ rules. No automatic extension or automatic reservation release occurs.
 
 Server authorization checks session identity, participant side, Booked appointment,
 and current join window on every state/token request. Database uniqueness and a
-transactional create-if-absent mapping ensure one room per appointment. End is
-idempotent; room deletion is retried on repeated clinician end requests if needed.
+transactional create-if-absent mapping ensure one room per appointment. Join and
+End lock the appointment row in the same order. End is idempotent; on LiveKit
+Cloud it explicitly revokes both participant identities with `revoke_token_ts`
+before deleting the room, retrying both identities after partial provider
+failures. The cutoff is set 30 seconds ahead (within Cloud's documented 60-second
+limit) so tokens refreshed while End reaches the provider are rejected.
+Self-hosted LiveKit does not support token revocation: room deletion disconnects
+active users, but cached tokens can remain valid until expiry.
 
 ## Workflow states
 
@@ -96,6 +102,6 @@ idempotent; room deletion is retried on repeated clinician end requests if neede
 The early/late join limits, token TTL, room retention after disconnect, and any
 future session rescheduling/cancellation effects require product approval before
 pilot. This milestone uses only the configurable demonstration defaults above.
-LiveKit credentials and production hosting are not yet configured. HTTPS is
+Production hosting is not configured. HTTPS is
 required for remote mobile browser device access; development exposure must be
 limited to the application route and must not publish the Bench administrator UI.

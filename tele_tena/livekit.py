@@ -4,6 +4,7 @@ import json
 import os
 import re
 import stat
+import time
 from datetime import timedelta
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -63,15 +64,30 @@ def participant_token(room_name, identity, audio_only=False):
             )).to_jwt())
 
 
-def close_room(room_name):
-    """Delete a LiveKit room; repeated calls are safe for end retries."""
+def close_room(room_name, identities=()):
+    """On LiveKit Cloud revoke both aliases (including departed users), then delete."""
     import livekit.api
     url, key, secret = _credentials()
+    cloud = (urlsplit(url).hostname or '').endswith('.livekit.cloud')
 
     async def delete():
         client = livekit.api.LiveKitAPI(_api_url(url), key, secret)
         try:
+            failures = []
+            if cloud:
+                # Use a future cutoff to cover tokens refreshed between End's
+                # commit and this provider call. It is comfortably inside the
+                # Cloud API's documented 60-second acceptance window.
+                for identity in identities:
+                    cutoff = int(time.time()) + 30
+                    try:
+                        await client.room.remove_participant(livekit.api.RoomParticipantIdentity(
+                            room=room_name, identity=identity, revoke_token_ts=cutoff))
+                    except Exception as error:
+                        failures.append(error)
             await client.room.delete_room(livekit.api.DeleteRoomRequest(room=room_name))
+            if failures:
+                raise failures[0]
         finally:
             await client.aclose()
 
