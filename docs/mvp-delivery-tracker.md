@@ -36,7 +36,7 @@ do not release/claim the feature until the stated blocker is resolved.
 | Refund unused funds using verified supported route | pending | No cancellation/refund workflow. Existing reservations stay as recorded. |
 | ERPNext accounting/reporting integration, durable posting references/retries and reconciliation | pending | ERPNext is the agreed accounting system, but no posting or reconciliation exists. Never treat simulation events as accounting completion. |
 | English, Amharic and Afaan Oromo UI translation | partial | Existing journey keys in all three languages; Amharic/Afaan Oromo strings are provisional and need native review. OTP adds keys under Phase 1. |
-| Responsive accessible patient, clinician and administrator journeys/design system | pending | Current React app is a demonstration screen, not the planned reusable design system or focused portal navigation; scheduled after the OTP checkpoint. |
+| Responsive accessible patient, clinician and administrator journeys/design system | partial | `docs/design-system.md` and `feat/design-system` now contain tokens, shared components, focused role navigation, domain API wrappers and in-memory journeys. Build/lint pass; mocked Chromium review is unverified because required browser system libraries are missing. Continue review in the dependent design-system PR. |
 | Production safety/escalation, credential verification, hosting and regulated financial/provider readiness | pending | Product contract marks these unresolved/deferred. Demo uses synthetic accounts/data and is not production clinical readiness. |
 
 ## Delivery sequence
@@ -46,10 +46,12 @@ do not release/claim the feature until the stated blocker is resolved.
    checkpointed; provider tests are mocked. Open a PR; live sending remains
    gated on local credentials and a consenting whitelisted recipient. Do not
    merge automatically.
-2. **React design system and focused journeys** — after Phase 1 PR is opened,
-   create a distinct branch with an explicit dependency on the phone-auth API
-   shape. No clinical/authenticated API caching. Connect only real APIs; show
-   unfinished behavior as unavailable rather than fabricated.
+2. **React design system and focused journeys** — `feat/design-system` is based
+   on the checkpointed `feat/phone-otp` branch; its PR explicitly depends on PR
+   #4. `docs/design-system.md` contains the acceptance contract. Finish the
+   responsive/browser review once browser dependencies are available. No
+   clinical/authenticated API caching. Connect only real APIs; show unfinished
+   behavior as unavailable rather than fabricated.
 3. **Discovery/marketplace** — clinician profiles, previous clinicians,
    relevance/proximity constraints, private open requests/offers and visibility.
 4. **Booking lifecycle** — automatic/manual confirmation, holds and expiry,
