@@ -14,10 +14,16 @@ sites. Python packages and frontend assets are bench/image-wide even when data a
 configuration are site-specific. Do not upgrade a customer bench to accommodate this
 review. Do not install TeleTena into a customer site.
 
-Observed local baseline (not an assertion about Selfmade): Frappe **15.121.2**,
+The supplied Selfmade target has now been tested in a separate local Frappe 16
+environment. Use the [target-specific command sequence](selfmade-frappe16-installation.md)
+and [verification report](frappe16-compatibility-verification.md) for that installation.
+The following remains the original release baseline, not a limit to v15 support.
+
+Observed original local baseline (not an assertion about Selfmade): Frappe **15.121.2**,
 ERPNext **15.121.6**, Python **3.12.3**, Node **22.23.3**, MariaDB **10.11.14**,
 Redis server **7.0.15**, Gunicorn **23.0.0**. TeleTena declares Python >=3.10,
-but this release has only been verified on Python 3.12.3 and this Frappe 15 stack.
+with Python 3.12.3 verified on this Frappe 15 stack and Python 3.14.2 on the
+separately documented exact Frappe 16 target commits.
 Node >=22.12 is required by the locked Vite 8 build; use the observed Node version.
 ERPNext must be present on the image/bench **and installed on the review site**.
 LiveKit Python API **1.2.1** and protocol **1.1.27** are pinned in package metadata;
@@ -56,7 +62,8 @@ The operator must additionally verify/report (no secret values):
 - Site database/private/public-file backups, encryption-key backup, image/code
   snapshot retention and a tested restore procedure. Confirm available disk capacity.
 
-Only after this preflight can final host-specific installation commands be chosen.
+Selfmade's Bench preflight and host-specific commands are now recorded in the
+target-specific guide. The following Docker guidance applies only to other targets.
 For Docker, build a **new versioned custom image** including Frappe, ERPNext and
 TeleTena at pinned SHAs, Python dependencies, and generated assets. Use the existing
 supported site-creation/migration jobs and persistent asset/private-file volumes.
@@ -140,7 +147,9 @@ On a confirmed compatible Bench layout, the intended order is:
    review. Password review access does not depend on either provider.
 8. Enable the site's scheduler using the deployment-supported command (Bench:
    `bench --site REVIEW_SITE enable-scheduler`), ensure workers are live, and restart
-   only the identified review services to load new Python hooks. Configure DNS/TLS
+   the identified web/workers/scheduler services to load new Python hooks. On a
+   shared Bench these restarts affect every site; coordinate a maintenance window.
+   Configure DNS/TLS
    and the supported Frappe proxy template for this site. Do not generate or reload
    a shared server configuration before reviewing its impact on customer sites.
 
