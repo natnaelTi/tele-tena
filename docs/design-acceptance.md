@@ -17,6 +17,7 @@ tracked below and in the release verification report. Artifacts use synthetic in
 - [x] Local SIL OFL Manrope/Noto Sans Ethiopic assets; design colors, spacing and contrast measured.
 - [x] Shared buttons, icon buttons, fields, phone/OTP inputs, select, checkbox, radio, switch, cards, dialog/drawer, tabs, navigation, badges, notices, toast, skeleton, empty state, care/disclosure/booking summaries and call controls.
 - [x] Public home, distinct phone then code entry and email OTP/password choice.
+- [x] Hosted review sign-in reflects site delivery configuration: phone first when enabled and email password when SMTP code delivery is unavailable. Browser OTP sending is mocked; provider delivery is checked separately.
 - [x] Resumable adult patient and clinician application onboarding; synthetic professional narrative, no credential upload/verification.
 - [x] Focused patient home/discovery/appointments/privacy/payment and clinician Today/availability/services/care routes. Incomplete features identified in UI and tracker.
 - [x] Focused application/service-scope admin routes; no patient-record access from admin review.

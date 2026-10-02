@@ -102,6 +102,11 @@ Email selection reveals only email field. Email OTP is default; reveal password
 only after **Use password instead**. Implement real email verification and local
 delivery configuration; no pretend working OTP route. Expected guests are signed
 out, not load errors. Do not disclose account existence before contact ownership.
+On a hosted review site, offer email OTP only when its private SMTP configuration
+exists. Otherwise the email alternative opens password entry directly. Phone
+remains the single-field first step when SMS access is enabled. Distinguish SMS
+provider acceptance from receipt in the code step. New Amharic and Afaan Oromo
+sign-in labels are provisional pending native review.
 Existing verified users enter workspace; new users enter onboarding. Verified
 contact is distinct from completed onboarding. Preserve development password
 accounts; signup never grants clinician approval.

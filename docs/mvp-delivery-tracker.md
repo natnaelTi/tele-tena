@@ -11,6 +11,13 @@ do not release/claim the feature until the stated blocker is resolved.
 |---|---|---|
 | Adults 18+, patient and clinician profiles, private synthetic history, distinct account/disclosure identity | partial | Milestone 1 profiles; phone signup requires an adult attestation, while the attestation is not independent age verification. Existing development accounts continue to work. |
 | Phone/email possession codes, expiry, single use, rate/abuse controls and separated onboarding | partial | `contact_auth.py`, `email_delivery.py`, v1_5 migration, 7 contact-auth and 24 integration regressions. SMS/email send adapters are mocked. SMTP and SMS credentials/consenting recipients are not configured or live-tested. Professional evidence intake is narrative only; code proves contact possession, not credential verification. |
+
+Hosted review update: site-bound phone OTP, patient registration and clinician
+application switches are implemented with a rolling 24-hour site SMS attempt
+cap. Frappe's generic public signup remains off; reviewer password login stays
+available. SMS Ethiopia account authentication, whitelist, carrier receipt and
+actual code verification on the remote server still require the controlled live
+test in `selfmade-phone-access-update.md`. Provider acceptance is not delivery.
 | Clinician approval and per-service approval | implemented | Manual approver flow and native Service Scope DocType; PR #2 review verification and MariaDB integration tests. |
 | Independent clinicians and multi-clinic affiliations without implied record access | partial | Single-clinician ownership and no affiliation-based access currently; clinic/partner workspace, membership and multiple affiliations not built. |
 | Service definitions, approved clinician offerings, published ETB price and fixed duration | implemented | Native Service and Service Scope; scoped publication/discovery/booking and stale-ID regression checks. |

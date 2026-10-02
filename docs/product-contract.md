@@ -46,6 +46,13 @@ SMS provider, LiveKit credentials, translated clinical copy review, production h
 Labs, diagnostics, diaspora expert access and tourism are future workflows.
 The first demonstration uses synthetic data and is not production clinical readiness.
 
+Hosted review contact access is an explicit site-scoped option. Phone OTP sign-in,
+new adult patient registration and new clinician applications may be enabled
+independently on the bound review site. Contact proof starts guided onboarding;
+it does not grant clinician approval or service scopes. Reviewer password access
+and the single demonstration-environment disclosure remain in place. Public
+Frappe signup and real payments stay disabled. See `hosted-phone-access.md`.
+
 ## Presentation release operational rules (2026-10)
 
 Scheduling and lifecycle are governed by `presentation-release-model.md`. Weekly
