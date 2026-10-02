@@ -75,3 +75,5 @@ def install():
     contact_onboarding()
     from tele_tena.patches.v1_6_presentation_release import execute as presentation_release
     presentation_release()
+    from tele_tena.patches.v1_7_demo_subledger import execute as demo_subledger
+    demo_subledger()

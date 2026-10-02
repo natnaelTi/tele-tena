@@ -388,6 +388,8 @@ def simulated_deposit(amount, retry_key):
     amount = integer(amount, 1, 100000000)
     key = text(retry_key, 80)
     wallet = one('SELECT * FROM tt_wallet WHERE patient=%s FOR UPDATE', (p.user,))
+    from tele_tena.accounting import account_id, check_wallet_projection, post
+    check_wallet_projection(p.user, wallet)
     reference = 'deposit:' + hashlib.sha256((p.user + ':' + key).encode()).hexdigest()
     previous = rows('SELECT amount FROM tt_ledger WHERE reference=%s', (reference,))
     if previous:
@@ -398,6 +400,9 @@ def simulated_deposit(amount, retry_key):
         fail('Demo balance limit exceeded')
     frappe.db.sql('UPDATE tt_wallet SET available=available+%s WHERE patient=%s', (amount, p.user))
     simulation_log(p.user, 'Deposit', amount, reference)
+    post(reference, 'Deposit', reference, [
+        (account_id('', '', 'cash_clearing'), amount, 0),
+        (account_id('patient', p.user, 'available'), 0, amount)], {'simulated': True})
     return {'simulated': True}
 
 
@@ -423,6 +428,8 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
                           expected_minutes, expected_disclosure, booked_timezone], sort_keys=True)
     digest = hashlib.sha256(payload.encode()).hexdigest()
     wallet = one('SELECT * FROM tt_wallet WHERE patient=%s FOR UPDATE', (p.user,))
+    from tele_tena.accounting import account_id, check_wallet_projection, post
+    check_wallet_projection(p.user, wallet)
     prior = rows('SELECT id,payload_hash FROM tt_appointment WHERE patient=%s AND retry_key=%s FOR UPDATE', (p.user, key))
     if prior:
         if prior[0].payload_hash != digest:
@@ -469,9 +476,16 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         hours = max(1, min(168, hours))
         expires = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=hours)
         state = 'PendingConfirmation'
+    fee_bps = int(frappe.conf.get('tele_tena_demo_platform_fee_bps', 0))
+    dispute_minutes = int(frappe.conf.get('tele_tena_demo_dispute_window_minutes', 60))
+    if not 0 <= fee_bps <= 10000 or not 0 <= dispute_minutes <= 10080:
+        fail('Demonstration earnings policy configuration is invalid', 'financial_policy_invalid')
     policy = {'version': 'demo-full-release-before-start-v1',
               'cancel_before_start': 'full_simulated_reservation_release',
-              'cancellation_cutoff': iso(start)}
+              'cancellation_cutoff': iso(start),
+              'financial': {'version': 'demo-earnings-v1', 'fee_bps': fee_bps,
+                            'dispute_window_minutes': dispute_minutes,
+                            'external_settlement': False}}
     created = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_appointment (id,patient,clinician,offering,start,end,state,price,minutes,
         service_label,disclosure,choices,retry_key,payload_hash,timezone,schedule_id,confirmation_mode,
@@ -486,6 +500,9 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         'Requested' if state == 'PendingConfirmation' else 'Booked', p.user, created))
     frappe.db.sql('UPDATE tt_wallet SET available=available-%s,reserved=reserved+%s WHERE patient=%s', (o.price, o.price, p.user))
     simulation_log(p.user, 'Reservation', o.price, 'booking:' + appointment)
+    post('booking:' + appointment, 'Reservation', 'booking:' + appointment, [
+        (account_id('patient', p.user, 'available'), o.price, 0),
+        (account_id('patient', p.user, 'reserved'), 0, o.price)], {'appointment': appointment})
     return {'id': appointment, 'state': state, 'expires_at': iso(expires) if expires else None,
             'simulated': True}
 

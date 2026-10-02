@@ -1,11 +1,15 @@
 """State, recurring calendar and private-record regressions on isolated synthetic fixtures."""
 import base64
+import concurrent.futures
 import importlib.util
 import secrets
 import sys
 import unittest
+import threading
+import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
 APP = Path(__file__).resolve().parents[1]
@@ -72,8 +76,9 @@ class Presentation(unittest.TestCase):
         sharing = {'name': share_name, 'history': False}
         preview = journey.preview(request, sharing)['disclosure']
         start = slot['start']
+        price = int(journey.one('SELECT price FROM tt_offering WHERE id=%s', (offering,)).price)
         return journey.book(offering=offering, start=start, request_text=request, sharing=sharing,
-                            retry_key=key or secrets.token_hex(8), expected_price=600,
+                            retry_key=key or secrets.token_hex(8), expected_price=price,
                             expected_minutes=30, expected_disclosure=preview,
                             booked_timezone=slot['timezone'])
 
@@ -146,6 +151,146 @@ class Presentation(unittest.TestCase):
         after = frappe.db.sql('''SELECT weekday,start_local,end_local FROM tt_schedule_rule
             WHERE schedule_id=%s ORDER BY weekday,start_local''', (schedule_id,))
         self.assertEqual(after, before)
+
+    def test_balanced_earnings_dispute_release_and_payout(self):
+        from tele_tena import accounting
+        offering = fixtures.Integration.offers['c1']
+        fixtures.login('c1')
+        journey.publish(fixtures.PREFIX, 30000, 30)
+        with patch.dict(frappe.conf, {'tele_tena_demo_platform_fee_bps': 0,
+                                     'tele_tena_demo_dispute_window_minutes': 0}):
+            fixtures.login('p2')
+            before_wallet = journey.wallet()
+            self.fund_patient(kind='p2', amount=100000)
+            day, _, _ = self.make_schedule(mode='automatic', offering=offering)
+            slot = self.slots(offering, day)[0]
+            booked = self.book_slot(offering, slot, 'earnings-acceptance', who='p2')
+            patient = fixtures.USERS['p2']
+            self.assertEqual(journey.wallet()['available'], before_wallet['available'] + 70000)
+            self.assertEqual(journey.wallet()['reserved'], before_wallet['reserved'] + 30000)
+            self.assertEqual(accounting.balance('patient', patient, 'available'), before_wallet['available'] + 70000)
+            self.assertEqual(accounting.balance('patient', patient, 'reserved'), before_wallet['reserved'] + 30000)
+            now = datetime.now(timezone.utc).replace(tzinfo=None)
+            frappe.db.sql('''INSERT INTO tt_consultation
+                (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended)
+                VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s)''',
+                (booked['id'], str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex,
+                 uuid.uuid4().hex, now, now))
+            fixtures.login('c1')
+            presentation.save_note_draft(booked['id'], 'Synthetic private note', 'Synthetic patient summary')
+            presentation.finalize_consultation(booked['id'], 1)
+            self.assertEqual(presentation.finalize_consultation(booked['id'], 1)['idempotent'], True)
+            fixtures.login('p2')
+            self.assertEqual(journey.wallet()['reserved'], before_wallet['reserved'])
+            clinician = fixtures.USERS['c1']
+            before_pending = accounting.balance('clinician', clinician, 'pending') - 30000
+            self.assertGreaterEqual(before_pending, 0)
+            self.assertEqual(accounting.balance('clinician', clinician, 'pending'), before_pending + 30000)
+            self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s',
+                                         ('completion:' + booked['id'],)).n, 1)
+            fixtures.login('p2')
+            patient_refs = {item.event_ref for item in presentation.wallet_summary()['activity'] if hasattr(item, 'event_ref')}
+            fixtures.login('c1')
+            clinician_refs = {item.event_ref for item in accounting.clinician_earnings()['activity']}
+            self.assertIn('completion:' + booked['id'], patient_refs)
+            self.assertIn('completion:' + booked['id'], clinician_refs)
+            frappe.db.sql('UPDATE tt_earning SET release_at=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND WHERE appointment=%s',
+                          (booked['id'],))
+            frappe.db.commit()
+            accounting.release_eligible_earnings()
+            accounting.release_eligible_earnings()
+            self.assertEqual(accounting.balance('clinician', clinician, 'pending'), before_pending)
+            before_available = accounting.balance('clinician', clinician, 'earnings_available') - 30000
+            self.assertGreaterEqual(before_available, 0)
+            self.assertEqual(accounting.balance('clinician', clinician, 'earnings_available'), before_available + 30000)
+            payout = accounting.request_payout(20000, 'payout-acceptance')
+            balances = accounting.clinician_earnings()['balances']
+            self.assertEqual(balances['earnings_available'], before_available + 10000)
+            self.assertEqual(balances['payout_reserved'], 20000)
+            with self.assertRaises(frappe.ValidationError):
+                accounting.request_payout(20000, 'payout-insufficient')
+            self.assertEqual(accounting.cancel_payout(payout['id'], 'Synthetic cancel')['state'], 'Cancelled')
+            self.assertTrue(accounting.cancel_payout(payout['id'], 'Synthetic cancel')['idempotent'])
+            self.assertEqual(accounting.clinician_earnings()['balances']['earnings_available'], before_available + 30000)
+
+    def test_dispute_serializes_release_and_resolves_as_refund(self):
+        from tele_tena import accounting
+        offering = fixtures.Integration.offers['c1']
+        fixtures.login('c1')
+        journey.publish(fixtures.PREFIX, 600, 30)
+        with patch.dict(frappe.conf, {'tele_tena_demo_platform_fee_bps': 0,
+                                     'tele_tena_demo_dispute_window_minutes': 60}):
+            fixtures.login('p2')
+            before_wallet = journey.wallet()
+            self.fund_patient(kind='p2', amount=5000)
+            day, _, _ = self.make_schedule(mode='automatic', offering=offering)
+            booked = self.book_slot(offering, self.slots(offering, day, who='p2')[0], 'earnings-dispute', who='p2')
+            now = datetime.now(timezone.utc).replace(tzinfo=None)
+            frappe.db.sql('''INSERT INTO tt_consultation
+                (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended)
+                VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s)''',
+                (booked['id'], str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex,
+                 uuid.uuid4().hex, now, now))
+            fixtures.login('c1')
+            presentation.save_note_draft(booked['id'], 'Synthetic private note', 'Synthetic summary')
+            presentation.finalize_consultation(booked['id'], 0)
+            fixtures.login('p2')
+            self.assertEqual(accounting.open_earning_dispute(booked['id'], 'Synthetic dispute')['state'], 'Disputed')
+            frappe.db.sql('UPDATE tt_earning SET release_at=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND WHERE appointment=%s',
+                          (booked['id'],))
+            frappe.db.commit()
+            accounting.release_eligible_earnings()
+            clinician = fixtures.USERS['c1']
+            before_pending = accounting.balance('clinician', clinician, 'pending')
+            earning = journey.one('SELECT state FROM tt_earning WHERE appointment=%s', (booked['id'],))
+            self.assertEqual(earning.state, 'Disputed')
+            fixtures.login('admin')
+            self.assertEqual(accounting.resolve_earning_dispute(booked['id'], 'refund', 'Synthetic resolution')['resolution'], 'refund')
+            self.assertEqual(accounting.resolve_earning_dispute(booked['id'], 'refund', 'Synthetic resolution')['idempotent'], True)
+            self.assertEqual(accounting.balance('clinician', clinician, 'pending'), before_pending - 600)
+            fixtures.login('p2')
+            self.assertEqual(journey.wallet()['available'], before_wallet['available'] + 5000)
+            self.assertEqual(journey.wallet()['reserved'], before_wallet['reserved'])
+            self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s',
+                                         ('earning-refund:' + journey.one('SELECT id FROM tt_earning WHERE appointment=%s', (booked['id'],)).id,)).n, 1)
+
+    def test_concurrent_payouts_cannot_overreserve_earnings(self):
+        from tele_tena import accounting
+        clinician = fixtures.USERS['c2']
+        account = accounting.account_id('clinician', clinician, 'earnings_available')
+        control = accounting.account_id('', '', 'opening_control')
+        accounting.post('test-payout-opening:' + clinician, 'TestOpening',
+                        'test-payout-opening:' + clinician,
+                        [(control, 30000, 0), (account, 0, 30000)], {'synthetic': True})
+        frappe.db.commit()
+        barrier = threading.Barrier(2)
+        def request(key):
+            fixtures.connect()
+            try:
+                fixtures.login('c2')
+                barrier.wait(timeout=10)
+                result = accounting.request_payout(20000, key)
+                frappe.db.commit()
+                return 'ok', result['id']
+            except frappe.ValidationError:
+                frappe.db.rollback()
+                return 'insufficient', None
+            finally:
+                frappe.destroy()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(request, ('concurrent-payout-a', 'concurrent-payout-b')))
+        frappe.db.rollback()
+        self.assertEqual(sum(result[0] == 'ok' for result in results), 1)
+        self.assertEqual(accounting.balance('clinician', clinician, 'earnings_available'), 10000)
+        self.assertEqual(accounting.balance('clinician', clinician, 'payout_reserved'), 20000)
+        fixtures.login('c2')
+        self.assertEqual(len(accounting.clinician_earnings()['payouts']), 1)
+        fixtures.login('c1')
+        self.assertNotIn(results[0][1] or results[1][1],
+                         [item.id for item in accounting.clinician_earnings()['payouts']])
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            accounting.clinician_earnings()
 
     def test_02_manual_hold_confirm_cancel_and_expiry_release_once(self):
         self.fund_patient(amount=5000)

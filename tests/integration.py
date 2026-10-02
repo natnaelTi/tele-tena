@@ -87,6 +87,20 @@ class Integration(unittest.TestCase):
         frappe.set_user('Administrator')
         appointment_ids = frappe.db.sql('SELECT id FROM tt_appointment WHERE patient IN %s OR clinician IN %s',
                                        (tuple(USERS.values()), tuple(USERS.values())), pluck=True)
+        if appointment_ids:
+            frappe.db.sql('DELETE FROM tt_dispute WHERE earning IN (SELECT id FROM tt_earning WHERE appointment IN %s)',
+                          (tuple(appointment_ids),))
+            frappe.db.sql('DELETE FROM tt_earning WHERE appointment IN %s', (tuple(appointment_ids),))
+        frappe.db.sql('DELETE FROM tt_payout WHERE clinician IN %s', (tuple(USERS.values()),))
+        account_ids = frappe.db.sql('SELECT id FROM tt_financial_account WHERE owner IN %s',
+                                    (tuple(USERS.values()),), pluck=True)
+        if account_ids:
+            journal_ids = frappe.db.sql('SELECT DISTINCT journal_id FROM tt_journal_line WHERE account_id IN %s',
+                                        (tuple(account_ids),), pluck=True)
+            if journal_ids:
+                frappe.db.sql('DELETE FROM tt_journal_line WHERE journal_id IN %s', (tuple(journal_ids),))
+                frappe.db.sql('DELETE FROM tt_journal WHERE id IN %s', (tuple(journal_ids),))
+            frappe.db.sql('DELETE FROM tt_financial_account WHERE id IN %s', (tuple(account_ids),))
         for appointment in appointment_ids:
             frappe.db.sql('DELETE FROM tt_note_revision WHERE appointment=%s', (appointment,))
             frappe.db.sql('DELETE FROM tt_consultation_note WHERE appointment=%s', (appointment,))
