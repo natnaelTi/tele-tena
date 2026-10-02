@@ -4,7 +4,7 @@ const messages: Record<string, string> = {
   outside_availability:
     "Choose a time inside an available window, allowing for the full session.",
   appointment_conflict: "That time has just been booked. Choose another time.",
-  insufficient_funds: "Your simulated balance is too low for this session.",
+  insufficient_funds: "Your balance is too low for this session.",
   approval_required: "Approval is required before accepting bookings.",
   service_scope_required: "This service needs administrator approval.",
   invalid_availability_window:

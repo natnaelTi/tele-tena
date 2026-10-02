@@ -424,7 +424,7 @@ export function Payments() {
           }, "ETB 100 added to your balance.")
         }
       >
-        Add ETB 100
+        Add funds · ETB 100
       </Button>
       {action.success && (
         <InlineNotice tone="success">{action.success}</InlineNotice>
