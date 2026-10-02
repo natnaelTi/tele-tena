@@ -4,7 +4,7 @@ const { chromium } = require('playwright')
 const fs = require('node:fs')
 const assert = require('node:assert/strict')
 const fixture = JSON.parse(fs.readFileSync(process.env.TELE_TENA_CALL_FIXTURE, 'utf8'))
-const base = 'http://127.0.0.1:5173'
+const base = process.env.TELE_TENA_BROWSER_BASE || 'http://127.0.0.1:5173'
 let checkpoint = 'launch'
 let diagnostic = ''
 
@@ -89,7 +89,7 @@ async function main() {
     checkpoint = 'both participants receive refreshed tokens'
     const [patientRefreshedToken, clinicianRefreshedToken] = await Promise.all(pages.map(refreshToken))
     const sdkUrl = await pages[0].evaluate(() => performance.getEntriesByType('resource')
-      .map(entry => entry.name).find(url => url.includes('livekit-client') && url.includes('/node_modules/')))
+      .map(entry => entry.name).find(url => url.includes('livekit-client') && (url.includes('/node_modules/') || url.includes('/assets/tele_tena/review/assets/'))))
     assert.ok(sdkUrl, 'LiveKit browser SDK module should be loaded')
 
     checkpoint = 'patient leaves before End'

@@ -57,3 +57,10 @@ Run evidence is itemized in [presentation-readiness-verification.md](presentatio
 PR #6 passed the hosted LiveKit and local checks and merged as `7222836`. Source PRs
 #3/#4 merged through preserved ancestry; #5 was superseded. The new presentation PR
 uses its own acceptance record. No production deployment is authorized.
+
+## Review installation packaging
+
+The presentation identity and flows are unchanged. Production URLs add the
+`/teletena` namespace; root-relative API authorization remains on Frappe. Built
+browser verification and deployment limitations are recorded separately in
+`review-deployment-verification.md`, not inferred from prior Vite screenshots.

@@ -46,7 +46,7 @@ export default function Showcase() {
           {[16, 24, 32].map((size) => (
             <figure key={size}>
               <img
-                src="/brand/symbol.svg"
+                src={import.meta.env.BASE_URL + "brand/symbol.svg"}
                 width={size}
                 height={size}
                 alt={`TeleTena symbol at ${size} pixels`}
@@ -55,13 +55,13 @@ export default function Showcase() {
             </figure>
           ))}
           <img
-            src="/brand/mono-lockup.svg"
+            src={import.meta.env.BASE_URL + "brand/mono-lockup.svg"}
             width="210"
             alt="Monochrome TeleTena"
           />
           <div className="reversed-logo">
             <img
-              src="/brand/reversed-lockup.svg"
+              src={import.meta.env.BASE_URL + "brand/reversed-lockup.svg"}
               width="210"
               alt="Reversed TeleTena"
             />

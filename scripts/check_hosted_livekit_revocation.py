@@ -30,7 +30,9 @@ def write_private(path, value):
 
 
 def main():
-    frappe.init(site='erp.localhost', sites_path=str(BENCH / 'sites'))
+    site = os.environ.get('TELE_TENA_TEST_SITE', 'erp.localhost')
+    assert site in ('erp.localhost', 'tele-tena-pr2-test.localhost')
+    frappe.init(site=site, sites_path=str(BENCH / 'sites'))
     url, _, _ = livekit._credentials()
     host = (urlsplit(url).hostname or '').lower()
     if not (host.endswith('.livekit.cloud') or host == 'livekit.cloud'):
@@ -38,6 +40,7 @@ def main():
     spec = importlib.util.spec_from_file_location('consultation_fixtures', APP / 'tests/integration.py')
     fixtures = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(fixtures)
+    fixtures.SITE = site
     temporary = tempfile.TemporaryDirectory(prefix='tele-tena-cloud-revoke-')
     media_fixture_file = Path(temporary.name) / 'browser-media-fixture.json'
     revoke_fixture_file = Path(temporary.name) / 'browser-revocation-fixture.json'

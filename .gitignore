@@ -13,3 +13,5 @@ common_site_config.json
 *.log
 coverage/
 .DS_Store
+
+tele_tena/public/review/

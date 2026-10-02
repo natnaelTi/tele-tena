@@ -46,8 +46,7 @@ def setup():
 
 def configure_livekit():
     """Interactive local-only secret setup; never echoes or returns secret values."""
-    if frappe.local.site != 'erp.localhost':
-        frappe.throw('LiveKit setup is restricted to erp.localhost')
+    _configuration_site()
     if frappe.session.user != 'Administrator':
         frappe.throw('Administrator required', frappe.PermissionError)
     url = input('LiveKit public connection URL (wss://; ws://localhost for local development): ').strip()
@@ -81,8 +80,7 @@ def configure_livekit():
 
 def configure_sms():
     """Prompt locally for provider credentials; development site only, never echoes key."""
-    if frappe.local.site != 'erp.localhost':
-        frappe.throw('SMS setup helper is restricted to erp.localhost')
+    _configuration_site()
     if frappe.session.user != 'Administrator':
         frappe.throw('Administrator required', frappe.PermissionError)
     path = Path(frappe.get_site_path('private', 'tele_tena_sms.json'))
@@ -112,8 +110,7 @@ def configure_sms():
 
 def configure_email():
     """Local SMTP secret setup; direct TLS-only delivery, no queued plaintext codes."""
-    if frappe.local.site != 'erp.localhost' or frappe.session.user != 'Administrator':
-        frappe.throw('Local administrator setup required', frappe.PermissionError)
+    _configuration_site()
     host = input('SMTP hostname: ').strip()
     port = input('SMTP TLS port (465 or 587): ').strip()
     sender = input('Verified sender email address: ').strip()
@@ -139,3 +136,8 @@ def configure_email():
         if os.path.exists(temporary):
             os.unlink(temporary)
     return {'configured': True}
+
+
+def _configuration_site():
+    from tele_tena.review import cli
+    cli(require_enabled=frappe.local.site != 'erp.localhost')

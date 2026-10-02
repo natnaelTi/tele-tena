@@ -30,3 +30,16 @@ handlers.fetch({request:request("/clinician/care",{mode:"navigate"}),respondWith
 assert.deepEqual(await offlineResponse,{offline:true},"navigation falls back to the public offline page");
 assert.equal(cached.some(path=>path.startsWith("/api/")),false,"no API response entered the cache");
 console.log("PASS: service worker excludes APIs and authorization headers, caches public assets only, and serves an offline state for navigation");
+
+self.location.pathname='/teletena/sw.js';
+vm.runInNewContext(source,{self,caches,URL,Promise,fetch:async()=>{throw new Error('offline')}});
+for (const path of ['/api/method/login','/private/files/resume.pdf','/assets/frappe/test.js','/app','/login','/teletena/private.pdf']) {
+ let handled;
+ handlers.fetch({request:request(path),respondWith:value=>handled=value});
+ assert.equal(handled,undefined,'packaged worker bypasses '+path);
+}
+let assetHandled;
+cacheHit={public:true};
+handlers.fetch({request:request('/assets/tele_tena/review/assets/app-hash.js'),respondWith:value=>assetHandled=value});
+assert.deepEqual(await assetHandled,{public:true});
+console.log('PASS: packaged worker owns only TeleTena public assets and app navigation, not framework/private routes');

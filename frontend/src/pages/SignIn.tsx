@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, LockKeyhole } from "lucide-react";
-import { api, phoneAuth, setCsrf, signIn } from "../api";
+import { ApiError, api, phoneAuth, setCsrf, signIn } from "../api";
 import {
   Button,
   InlineNotice,
@@ -39,8 +39,9 @@ export default function SignIn() {
       const csrf = await phoneAuth<{ csrf_token: string }>("csrf_token", {});
       setCsrf(csrf.csrf_token);
       await task();
-    } catch {
+    } catch (error) {
       setError(
+        error instanceof ApiError && error.code === "review_password_required" ? "This review uses invited accounts. Choose Use email instead, then Use password instead." :
         "We couldn’t complete that step. Check your details and try again. Codes expire after five minutes.",
       );
     } finally {

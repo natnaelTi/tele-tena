@@ -82,3 +82,14 @@ may remain usable until their short TTL expires. Participant leave remains an
 ordinary disconnect and leaves the consultation Open for authorized rejoin. No
 clinical notes, recording, transcript, billing action, or
 earnings posting is part of this table or workflow.
+
+## Review packaging (dependent on unmerged PR #7)
+
+The production build lives in the app's public `review` assets, served by Frappe's
+normal `/assets/tele_tena/` mapping. A site-bound renderer owns only `/teletena/*`;
+React uses that basename and same-origin APIs. There is no Vite runtime requirement
+or catch-all proxy fallback. The service worker's scope is `/teletena/`, with an
+allowlist for this app's public assets only. HTML and authenticated responses are
+not cached. See `selfmade-review-deployment.md` for the dedicated-site/isolation gate,
+private CLI configuration, explicit synthetic seed and code-plus-data rollback.
+The review configuration does not enable public signup, real payments or clinical use.

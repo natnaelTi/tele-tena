@@ -47,6 +47,12 @@ def retained_fingerprint():
     for table in (*TABLES, *PRESENTATION_TABLES, 'phone_identity','otp_challenge','otp_rate_limit','otp_gate','consultation','contact_identity','onboarding'):
         records = frappe.db.sql(f'SELECT * FROM tt_{table}', as_dict=True)
         content[table] = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in records)
+    for table in ('tabTele Tena Service', 'tabTele Tena Service Scope'):
+        content[table] = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in frappe.db.sql(f'SELECT * FROM `{table}`', as_dict=True))
+    for name in ('site_config.json', 'private/tele_tena_livekit.json', 'private/tele_tena_sms.json', 'private/tele_tena_email.json'):
+        path = BENCH / 'sites/erp.localhost' / name
+        if path.is_file():
+            content[name] = hashlib.sha256(path.read_bytes()).hexdigest()
     digest = hashlib.sha256(json.dumps(content, sort_keys=True).encode()).digest()
     frappe.destroy()
     return digest
@@ -119,11 +125,20 @@ try:
         raise AssertionError('Guest app access was allowed')
     except frappe.PermissionError:
         pass
+    if os.environ.get('TELE_TENA_REVIEW_CHECK') == 'hold':
+        print('READY: disposable site retained for separate review verification. Press Enter only after checks finish to clean up.', flush=True)
+        input()
+    if os.environ.get('TELE_TENA_REVIEW_CHECK') == '1':
+        from check_review_site import verify
+        verify()
     frappe.destroy()
     assert retained_fingerprint() == retained_before, 'Retained development records changed'
     passed = True
-    print('PASS: fresh Frappe + ERPNext + tele_tena install, native models, roles, presentation schemas, eight migrations, guest denial and disabled simulation; retained development records unchanged')
+    print('PASS: fresh Frappe + ERPNext + tele_tena install, native models, roles, presentation schemas, eight migrations, guest denial and simulation disabled before explicit review setup; retained development records unchanged')
 except Exception as error:
+    import traceback
+    for frame in traceback.extract_tb(error.__traceback__):
+        print('Failure location:', Path(frame.filename).name, frame.lineno, frame.name)
     print('Fresh installation failed (' + type(error).__name__ + '); credential contents withheld')
     raise SystemExit(1)
 finally:
