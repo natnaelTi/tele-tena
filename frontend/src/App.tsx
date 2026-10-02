@@ -22,11 +22,12 @@ import {
   CareRecords,
   ClinicianToday,
   CareRecordDetail,
+  ClinicianEarnings,
   PendingFeature,
   Services,
 } from "./pages/Clinician";
 import Account from "./pages/Account";
-import { Applications, Scopes } from "./pages/Admin";
+import { Applications, FinancialDisputes, Scopes } from "./pages/Admin";
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
 import Showcase from "./pages/Showcase";
 import "./App.css";
@@ -103,19 +104,12 @@ export default function App() {
                 />
                 <Route path="care" element={<CareRecords />} />
                 <Route path="care/:id" element={<CareRecordDetail />} />
-                <Route
-                  path="earnings"
-                  element={
-                    <PendingFeature
-                      title="Earnings"
-                      description="Pending earnings, withdrawals and the double-entry subledger are not implemented. Reservations do not automatically release earnings."
-                    />
-                  }
-                />
+                <Route path="earnings" element={<ClinicianEarnings />} />
               </Route>
               <Route path="/admin" element={<WorkspaceLayout kind="admin" />}>
                 <Route index element={<Applications />} />
                 <Route path="scopes" element={<Scopes />} />
+                <Route path="financial-disputes" element={<FinancialDisputes />} />
                 <Route
                   path="exceptions"
                   element={

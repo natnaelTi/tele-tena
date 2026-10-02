@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { api } from "../api";
 import { journeyApi } from "../journey-api";
-import { PageTitle } from "../components/Domain";
+import { PageTitle, date, money } from "../components/Domain";
 import {
   Button,
   Card,
@@ -13,6 +14,7 @@ import {
 } from "../components/ui";
 import { useAction } from "../hooks/useAction";
 import { useResource } from "../hooks/useResource";
+import { useLocale } from "../hooks/useLocale";
 export function Applications() {
   const resource = useResource(journeyApi.applications);
   const action = useAction();
@@ -192,4 +194,24 @@ export function Scopes() {
       ))}
     </>
   );
+}
+
+type OpenDispute = { earning_id: string; appointment: string; net_minor: number; state: string; reason: string; opened_at: string };
+export function FinancialDisputes() {
+  const { w } = useLocale();
+  const resource = useResource(() => api<OpenDispute[]>("tele_tena.accounting.open_disputes"));
+  const action = useAction();
+  const [resolutionReason, setResolutionReason] = useState("");
+  return <>
+    <PageTitle title={w("Financial disputes")} description={w("Financial disputes review only payment concerns. No clinical note access is included.")} />
+    {action.error && <InlineNotice tone="danger">{action.error}</InlineNotice>}
+    {resource.error ? <InlineNotice tone="danger">Disputes could not be loaded. <Button onClick={() => void resource.refresh()}>Try again</Button></InlineNotice> : !resource.data ? <Skeleton /> : resource.data.length ? <div className="stack">{resource.data.map(item => <Card key={item.earning_id}>
+      <div className="row-between"><h2>ETB {money(item.net_minor)} {w("On hold")}</h2><StatusBadge tone="warning">{w("Disputed")}</StatusBadge></div>
+      <p className="supporting">{w("Opened")} {date(item.opened_at)} · {w("Payment concern")}</p>
+      <h3>Patient’s dispute reason</h3><p className="prewrap">{item.reason}</p>
+      <TextField label={w("Resolution record")} value={resolutionReason} onChange={e => setResolutionReason(e.target.value)} maxLength={500} hint={w("Record a short reason. This does not add or change clinical documentation.")} />
+      <div className="actions"><Button loading={action.busy} disabled={action.busy || !resolutionReason.trim()} onClick={() => void action.run(async () => { await api("tele_tena.accounting.resolve_earning_dispute", { appointment: item.appointment, resolution: "release", reason: resolutionReason }, true); setResolutionReason(""); await resource.refresh(); }, w("Hold resolved. Eligible release will run through the scheduled process."))}>{w("Release after review")}</Button><Button variant="secondary" loading={action.busy} disabled={action.busy || !resolutionReason.trim()} onClick={() => void action.run(async () => { await api("tele_tena.accounting.resolve_earning_dispute", { appointment: item.appointment, resolution: "refund", reason: resolutionReason }, true); setResolutionReason(""); await resource.refresh(); }, w("Refund recorded in the demonstration ledger."))}>{w("Refund patient")}</Button></div>
+    </Card>)}</div> : <EmptyState title={w("No open financial disputes.")} />}
+    {action.success && <InlineNotice tone="success">{action.success}</InlineNotice>}
+  </>;
 }

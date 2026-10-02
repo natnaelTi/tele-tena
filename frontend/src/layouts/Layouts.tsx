@@ -118,6 +118,7 @@ const clinicianNav = [
 const adminNav = [
   ["/admin", "Applications", ClipboardCheck],
   ["/admin/scopes", "Service scopes", Stethoscope],
+  ["/admin/financial-disputes", "Financial disputes", Wallet],
   ["/admin/exceptions", "Exceptions", Settings2],
 ] as const;
 export function WorkspaceLayout({
