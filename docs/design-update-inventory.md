@@ -36,17 +36,17 @@ still English. A build does not satisfy rendered visual acceptance.
 | PAT-7 | `/patient/payments` · `Patient.tsx` | Simulated balance and activity | Working demonstration | Available/reserved distinction; single persistent environment ribbon |
 | CLN-1 | `/clinician` · `Clinician.tsx` | Today, upcoming work and approval context | Working | Prioritized schedule, pending actions and honest empty state |
 | CLN-2 | `/clinician/appointments` | Same appointment groups with clinician actions | Working | Confirm/decline/cancel, notes-pending and call-state distinctions |
-| CLN-3 | `/clinician/availability` | Recurrence, intervals, exceptions, buffers, slot preview | Working | Desktop week editor; usable mobile day/agenda and explicit timezone |
+| CLN-3 | `/clinician/availability` | Recurrence, intervals, exceptions, buffers, slot preview | Working; fix also independently reviewable in PR #11 | Built production route passes save/reload/patient booking; timezone-aware desktop week grid and mobile agenda; see current screenshots and limits in `presentation-readiness-verification.md` |
 | CLN-4 | `/clinician/services` | Approved-scope offerings and ETB pricing | Working | Publication/approval status, fixed duration and clear save feedback |
 | CLN-5 | `/clinician/consultations/:id` | Scoped details and private note draft/finalize | Working | Post-End documentation, patient-visible preview and revision history |
 | CLN-6 | `/clinician/care` | Search/filter/sort/paginate encounter-scoped directory | Working | Table/card parity and masked identities throughout |
 | CLN-7 | `/clinician/care/:id` | Authorized encounter history and notes | Working | Historical disclosure snapshots; no cross-clinician record link |
 | CLN-8 | `/clinician/account` | Professional profile, practice links, resume evidence | Working; settings partial | Approval context, private upload/remove rules, validation |
 | CLN-9 | `/clinician/requests` | Honest pending-feature panel | Placeholder | Private requests/offers require backend implementation before product UI |
-| CLN-10 | `/clinician/earnings` | Honest pending-feature panel | Placeholder | No totals, withdrawals or earnings release without accounting backend |
+| CLN-10 | `/clinician/earnings` | Pending/available/reserved earnings, snapshotted release time, payout request and cancel | Implemented demonstration | Balanced subledger, retry-safe release, payout reserve/release and owner-only tests; no external transfer or Paid status |
 | ADM-1 | `/admin` · `Admin.tsx` | Application queue and authorized resume access | Working | Names first, evidence and requested scopes, approve/reject |
 | ADM-2 | `/admin/scopes` | Service catalog and separate scope decisions | Working | Approval/revocation; general approval never grants a service |
-| ADM-3 | `/admin/exceptions` | Honest pending-feature panel | Placeholder | No implied patient-record access or fabricated operations queue |
+| ADM-3 | `/admin/exceptions` | Authorized financial dispute queue | Partial | Financial-only reviewer permission and audited release/refund; no access to clinical notes, and post-release cases remain unsupported |
 | CALL-1 | `/consultation/:id/room` · `ConsultationPage.tsx` + `features/consultations/Consultation.tsx` | Preflight, two-person video/audio, Leave/rejoin, clinician End | Working demonstration | Focused responsive room, device/permission/reconnect/ended states, opaque aliases |
 | DEV-1 | `/showcase` · `Showcase.tsx` | Components/states; development-only | Working in dev only | Every changed component and locale; no public production link |
 | PWA-1 | Static offline page and manifest · `frontend/public` | Install metadata and public-static-only offline response | Working demonstration | Honest offline state, no cached API/private data, safe update around calls |
@@ -73,10 +73,11 @@ come from the forthcoming brief and product contract.
 
 | Capability | Current status |
 | --- | --- |
-| Clinician pending/available earnings, withdrawals, double-entry subledger, ERPNext posting/reconciliation | Not implemented; `tt_ledger` is a simulation transaction log only |
+| Clinician pending/available earnings, payout reservations and balanced demo subledger | Implemented for demonstration on this branch; `tt_ledger` remains a separate append-only simulation activity log |
+| ERPNext posting/reconciliation and external payout settlement | Not implemented; real-money operations remain disabled |
 | Private open requests/offers, offer expiry/acceptance, previous clinicians, natural-language matching/relevance/proximity | Not implemented; direct filtered discovery works |
 | Mutual rescheduling, couples' individual consent, ratings/reviews, paid or complimentary extensions | Not implemented |
-| Actor-specific production cancellation/refund policy, disputes and earnings holds | Not implemented; explicit full-release pre-start demonstration policy exists |
+| Actor-specific production cancellation/refund policy, post-release disputes and paid extensions | Not implemented; only explicit pre-start demo release and pre-release dispute holds exist |
 | Notification preferences/contact changes and authenticated email summary links | Not implemented |
 | Clinic/partner workspace and membership, clinician referral attribution | Not implemented; affiliation conveys no record permission |
 | Real payment/withdrawal rails, professional credential verification, clinical safety protocol | Not implemented; review remains demonstration only |
@@ -87,3 +88,44 @@ responsive screenshots, locale coverage, connected-flow test, permission check
 and any unimplemented dependency in the design verification report. This
 inventory is intentionally a starting checklist and does not authorize a
 missing backend capability by itself.
+
+## Current feature-branch coverage (`feat/next-design-update`)
+
+This table describes this iteration only. “Intentionally unchanged” means the
+existing merged behavior and identity were retained in this focused slice; it
+does not mean that the requested whole-product design acceptance is complete.
+
+| Inventory entry | Iteration status | Reason / evidence |
+|---|---|---|
+| PUB-1, PUB-2 | Intentionally unchanged | Public homepage and clinician invitation were preserved; no current-branch visual review was run. |
+| AUTH-1, AUTH-2, AUTH-3 | Intentionally unchanged | Phone, email, password and code flows were not rewritten; current site is invited-review mode. Hosted phone access is not visually reverified here. |
+| ONB-1, ONB-2 | Intentionally unchanged | Existing resumable patient and clinician onboarding preserved; no current-branch layout or locale review. |
+| PAT-1, PAT-2 | Intentionally unchanged | Home and discovery layout retained. |
+| PAT-3 | Verified | Current built browser journey completed slot selection through booking; selection/back-state and all locale variants were not exhaustively reviewed. |
+| PAT-4 | Partial | Status grouping copy was refined; a full rendered appointment-state matrix was not captured. |
+| PAT-5 | Partial | Primary status and patient-facing “Summary being prepared” wording were refined; all state-specific screenshots remain outstanding. |
+| PAT-6 | Partial | Account sections and repeated balance/help/notification cards were reduced; no current-branch rendered review. |
+| PAT-7 | Partial | Activity labels now distinguish old simulation log versus demo-subledger source in API output; current payments page visual review remains. |
+| CLN-1, CLN-2 | Partial | Appointment state/action hierarchy was refined; full desktop/mobile state matrix remains. |
+| CLN-3 | Verified | Built production route save/reload/booking, keyboard field, copy-day and date-only exception paths passed; 390/768/1440 layouts rendered without horizontal overflow. |
+| CLN-4 | Intentionally unchanged | Approved service offering flow retained; not visually reverified. |
+| CLN-5 | Partial | Ended-call/documentation action wording was refined; note lifecycle regression tests passed, but no current-branch visual capture. |
+| CLN-6, CLN-7 | Intentionally unchanged | Encounter-scoped care API and presentation retained; privacy tests passed; visual review remains. |
+| CLN-8 | Partial | Professional account section was streamlined; no current-branch visual review. |
+| CLN-9 | Intentionally unchanged | Honest unavailable state retained until private request/offer backend exists. |
+| CLN-10 | Implemented | Balanced demo journal, earnings lifecycle, holds and payout reservations are server-backed and covered by focused regressions; real settlement and a rendered earnings walkthrough remain out of scope. |
+| ADM-1, ADM-2 | Intentionally unchanged | Manual approval and per-service scope controls were preserved; no current-branch visual review. |
+| ADM-3 | Partial | Financial event labels were clarified and IDs removed from dispute cards; reviewer workflow and separation from private notes passed API tests, but no current-branch visual review. |
+| CALL-1 | Intentionally unchanged | LiveKit authorization and room presentation were not modified. Prior hosted Cloud evidence remains in the earlier report; it was not rerun here. |
+| DEV-1 | Intentionally unchanged | Showcase route remains development-only; no updated capture. |
+| PWA-1 | Verified (behavior only) | Both service-worker checks passed; visual/offline-install review was not repeated. |
+| SYS-1, SYS-2 | Partial | Compact tour invitation and replay duplication were improved; tour layout and all shared feedback components still need full visual review. |
+| UI-1, UI-2, UI-5 | Intentionally unchanged | Established shared controls, domain cards and hooks were preserved; this slice adds only calendar copy keys and usage. |
+| UI-3 | Partial | Tour invitation composition changed; persistence/route behavior has earlier evidence, but no post-change browser walkthrough. |
+| UI-4 | Intentionally unchanged | Call controls were preserved without weakening LiveKit behavior. |
+| SYS-3 | Verified (behavior only) | Service-worker privacy/scope regression passed; all-browser visual and install review remains. |
+
+English is the verified language for this iteration's new calendar and finance
+copy. Amharic and Afaan Oromo strings remain provisional, and the wider product
+contains existing English-only copy. The current design pass is therefore
+partial and is not a whole-product visual acceptance.

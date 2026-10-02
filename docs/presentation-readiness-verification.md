@@ -1,5 +1,101 @@
 # Presentation release verification
 
+## Update for `feat/next-design-update` (2026-10-02)
+
+This section supersedes the earlier PR #7 snapshot where it conflicts with the
+v1.7 earnings work or the availability follow-up. It records checks actually
+run against the current feature branch on the isolated Frappe 16.2.1 / ERPNext
+16.1.0 bench. The site and browser accounts are synthetic. Nothing was deployed
+to Selfmade.
+
+| Requirement | Current branch status | Evidence and remaining work |
+|---|---|---|
+| 1. Availability and patient booking | Implemented; focused browser verification passed | Production-built `/teletena/` clinician schedule save, request values, reload persistence, then a patient booking passed on 2026-10-02. Calendar edit/copy/date-only exception interaction passed. `tests/presentation.py` passed 12 cases for recurrence, DST, exceptions, conflicts, timezone snapshots and invalid-save atomicity. Rendered/inspected at 390, 768 and 1440 px. See [availability hotfix](availability-save-hotfix.md). |
+| 2. Appointment, call and documentation states | Implemented in API; presentation partially updated | 12 presentation and 18 selected integration regressions passed, covering explicit completion, exact-once reservations/releases and call lifecycle authorization. Appointment grouping and status copy changed on this branch. Full status-state screenshot matrix was not rerun. |
+| 3. Post-consultation notes | Implemented in the merged baseline; regression subset passed | The 12 presentation tests include private/shared note access and revisions; the 18 integration tests exercise consultation authorization. This branch did not change note persistence or privacy APIs. No new note-screen screenshot was captured here. |
+| 4. Consultation room | Intentionally unchanged | LiveKit media, Leave/rejoin and Cloud token revocation were verified in the prior hosted report with two fake-media browser contexts. The hosted Cloud run was not repeated on this branch; physical-device testing remains outstanding. |
+| 5. Consultation details | Partial presentation refinement | Changed dominant status and patient/clinician action wording. Backend snapshot and private-note access regressions passed. The full status-specific detail screenshot matrix was not rerun. |
+| 6. Product copy | Partial | Account, activity and payment labels were refined; the add-funds success copy now says “balance.” Some flows still contain repeated demo implementation language and newer copy is not consistently translated. |
+| 7. Care directory and patient record | Intentionally unchanged | Encounter authorization and privacy tests were part of the 12 presentation cases. No current-branch visual browser pass was run for this route. |
+| 8. Account and wallet summaries | Partial | Removed repeated wallet/help/notification placeholder cards from account tabs and limited the patient wallet summary to the account overview. No current-branch browser screenshot pass was run. |
+| 9. Admin review | Partial | Existing application review remains; financial activity now uses readable event labels and does not expose appointment IDs in dispute cards. Full current-branch admin browser verification was not run. |
+| 10. Private resume evidence | Intentionally unchanged | Private evidence authorization is covered by existing presentation tests. No upload/download visual or fresh-install test was repeated on this branch. |
+| 11. Mobile/PWA | Partial | `tests/service_worker.mjs` passed for both development and packaged modes. Calendar screenshots at 390/768/1440 have no horizontal page overflow. Other routes, 320 px and 200% zoom were not rerun. |
+| 12. Role tours | Partial | Invitation is now a compact single row and is hidden while the replay entry is available, reducing duplicated prompts. No post-change visual/accessibility browser pass was run. |
+| Earnings and payout lifecycle | Implemented as demonstration behavior; not real-money readiness | `tests/presentation.py` passed exact arithmetic, fee/window snapshot, dispute/release ordering and concurrent payout regressions. `tt_journal` is a balanced simulated subledger separate from `tt_ledger`; no ERPNext posting or real settlement. |
+
+### Current-branch checks
+
+- `frontend`: `npm run build` passed. Vite reports the LiveKit SDK chunk is
+  above 500 kB.
+- `frontend`: `npm run lint` exited successfully with React hook, Fast Refresh
+  and render-purity warnings; no lint errors.
+- `env/bin/python -m compileall -q tele_tena tests scripts` passed.
+- `node tests/service_worker.mjs` passed for packaged and development worker
+  scope and sensitive-endpoint exclusions.
+- `tests/presentation.py` — **12 passed** against the existing disposable site.
+  The test-process `frappe.enqueue` was a no-op because the local Redis queue
+  was already overloaded; no application code or worker configuration changed.
+- `tests/integration.py` selected cases 01–17 — **18 passed**, including
+  permission/scope, privacy, idempotency, transactional rollback, concurrent
+  booking/overspend, LiveKit authorization and end/join serialization. This
+  was not the full suite: legacy phone-auth cases were excluded because this
+  site deliberately disables them.
+- `scripts/browser-availability-regression.cjs` passed on the production-built
+  Frappe route using a new synthetic patient with a fresh balanced demo wallet.
+- `scripts/browser-availability-calendar.cjs` passed date-only edit and
+  accessible field focus/copy interactions on the production-built route.
+- `git diff --check` passed.
+- `scripts/check_financial_migration.py` currently **fails** on the shared
+  disposable review site, so this run does not establish repeat-migration
+  preservation. During the first browser attempt, the already-running manual
+  loopback worker served stale Python code and wrote legacy wallet/log events
+  without v1.7 journal postings. Inspection found one synthetic seeded wallet
+  at 60,000 available / 540,000 reserved while its journal projection is
+  260,000 / 240,000 minor units. Those records were preserved; no repair,
+  reseed or migration was run to disguise the mismatch. The worker was
+  restarted, and the passing browser booking used an isolated fresh synthetic
+  account. A clean second site is needed to repeat fresh-install and migration
+  preservation checks.
+- The hosted LiveKit Cloud revocation browser regression, fresh v1.7 site
+  installation, complete contact-auth suite, all-route visual review, and
+  hosted SMS delivery were not rerun for this branch.
+
+### Current screenshot evidence
+
+Rendered from the built React bundle served at `/teletena/`, synthetic clinician
+account, on 2026-10-02; screenshots were visually inspected:
+
+- [Availability, 390 px](screenshots/next-design-update/availability-390.png)
+- [Availability, 1440 px](screenshots/next-design-update/availability-1440.png)
+- [Date-specific exception editor, 1440 px](screenshots/next-design-update/date-exception-edit-1440.png)
+
+The 768 px screenshot was rendered and its `scrollWidth` equaled its viewport
+width, but it was not retained. At 390 and 768 px the agenda view is used; at
+1440 px the week grid is shown. The screenshot still includes a synthetic
+appointment and the demonstration ribbon. It is not evidence of a phone/device
+test or a complete visual acceptance pass.
+
+### Availability root cause and exact target state
+
+The previously reported save failure is a frontend/API payload mismatch, not a
+timezone or service-scope failure. The production-built editor sends
+`start_local` and `end_local`, while the original validator read `start` and
+`end`; the API therefore rejected populated time fields as missing. The focused
+compatibility mapping is in PR #11 and is also present in this feature branch.
+Current browser verification confirms save, reload, booking and visible date
+exception editing. Invalid interval saves fail before partial writes and remain
+covered by the presentation API regression.
+
+Selfmade was last operator-reported with app checkout SHA
+`8f7ab9cd8d5e779d17b632dc9afdae3e700ab3c6`; an earlier report named installed
+release SHA `bba5ed9f15bd0b140967618ed2bd982c31a76c1b`. These observations differ
+and no new remote check was performed. Do not prepare a deployment command from
+either value until the operator confirms the active installed commit. This
+branch and PR are not deployed.
+
+## Earlier PR #7 verification snapshot
+
 Verification run on `feat/presentation-ready-release`, based on merged main
 `7222836` (PR #6); review PR: [#7](https://github.com/natnaelTi/tele-tena/pull/7).
 Screenshots use synthetic fixtures and are stored outside Git

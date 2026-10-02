@@ -36,14 +36,14 @@ test in `selfmade-phone-access-update.md`. Provider acceptance is not delivery.
 | Completed-session ratings/reviews | pending | No completed-session lifecycle or rating API/UI. |
 | Cancellation rules differ by actor; bounded clinician policy, immutable accepted snapshot, disputes/earnings hold | partial | Authorized pre-start cancellation, accepted demo policy snapshot and exact-once full simulated reservation release are implemented. This is one explicit demo policy, not the requested actor-specific production policy or disputes/earnings hold. |
 | Simulated patient deposit and atomic available/reserved booking balance | implemented | Labeled development-only simulation, integer minor units, MariaDB atomicity and rollback tests. Not real-money funding. |
-| Double-entry operational subledger, clinician pending/available earnings, authorized extensions and explicit consent/funds reservation | pending | Current `tt_ledger` is only an append-only simulation transaction log. No double-entry subledger or extension flow; see `pr2-storage-review.md`. |
-| Simulated withdrawals/payout processing and configured withholding | pending | No earnings or payout workflow. External settlement is not instant and requires separate design. |
+| Balanced demonstration subledger, clinician pending/available earnings, authorized extensions and explicit consent/funds reservation | partial | v1.7 adds an immutable balanced demonstration journal distinct from the old `tt_ledger` activity log; booking, explicit finalization, dispute holds, scheduled release and payout reservations are tested. Paid extensions remain absent. This is not ERPNext accounting or real-money readiness. |
+| Simulated payouts and snapshotted withholding | partial | Zero-fee policy and dispute window are captured per booking; release is retry-safe; clinician payout request/cancel reserves/releases available funds exactly once. No external transfer, processing or paid state exists. Post-release refund and dispute workflows are deliberately unsupported pending authorized resolution. |
 | Refund unused funds using verified supported route | partial | Demo pre-start release restores simulated balance exactly once; no real refund rails or production refund policy exist. |
-| ERPNext accounting/reporting integration, durable posting references/retries and reconciliation | pending | ERPNext is the agreed accounting system, but no posting or reconciliation exists. Never treat simulation events as accounting completion. |
+| ERPNext accounting/reporting integration and production reconciliation | pending | The demonstration journal has durable references, balance checks and a migration preservation check, but no ERPNext posting, real custody or production reconciliation exists. |
 | English, Amharic and Afaan Oromo UI translation | partial | Existing journey keys in all three languages; Amharic/Afaan Oromo strings are provisional and need native review. OTP adds keys under Phase 1. |
 | Responsive accessible patient, clinician and administrator journeys/design system | partial | New routes/layouts, original local brand, tokens/components, hosted Playwright 1.63 Chromium and connected booking/onboarding journeys. Synthetic screens captured/inspected at 390/768/1440 plus 320 and 200% zoom; no horizontal overflow. New narrative is partly English in Amharic/Oromo pending translation review. Human device/assistive-tech review remains. |
 | Role-specific tours with persisted dismissal/replay and permission-aware steps | implemented | Per-user/role/version progress, patient/clinician/applicant/approver tours, route-safety handling, dismiss persistence, replay, route transitions and missing-target recovery passed API/browser checks; screenshots at 320/390/768/1440 are in `/tmp/tele-tena-presentation-review/`. |
-| Presentation release: recurrence scheduling, bookings, lifecycle, notes, detail pages, private resumes, directory, PWA and tours | partial | APIs and connected React flows passed integration, visual, hosted LiveKit, migration-preservation and separate fresh-install checks. Human/device validation, translated-copy review and product areas listed as pending below remain outstanding; see `presentation-readiness-verification.md`. |
+| Presentation release: recurrence scheduling, bookings, lifecycle, notes, detail pages, private resumes, directory, PWA and tours | partial | Existing API/React flows are connected. The availability save defect was reproduced as `start_local`/`end_local` versus API `start`/`end`; focused hotfix is PR #11 (open). The Frappe 16 browser save/reload/booking journey passes again after the fix. Broader layout/e2e work on this branch remains under review; see `presentation-readiness-verification.md`. |
 | Production safety/escalation, credential verification, hosting and regulated financial/provider readiness | pending | Product contract marks these unresolved/deferred. Demo uses synthetic accounts/data and is not production clinical readiness. |
 
 ## Current delivery and remaining sequence
@@ -56,16 +56,12 @@ test in `selfmade-phone-access-update.md`. Provider acceptance is not delivery.
 6. Ratings, responsiveness, pending earnings, simulated withdrawals and explicitly authorized extensions.
 7. Any change to calls must retain LiveKit Cloud revocation, both identity aliases, cutoff/concurrency behavior and the full hosted End regression. PR #3’s source branch remains preserved while consolidation is reviewed.
 
-Demonstration funding is not real-money readiness. `tt_ledger` is a simulation transaction log, not a double-entry subledger or ERPNext posting integration. Live SMS, SMTP, credential verification, payout, human/device call testing and production readiness remain outstanding.
+Demonstration funding is not real-money readiness. `tt_ledger` remains the simulation activity log, while v1.7 `tt_journal` is a separate balanced demonstration subledger; neither is ERPNext posting or settlement. Live SMS, SMTP, credential verification, physical-device call testing and production readiness remain outstanding.
 
 ## Selfmade review packaging
 
-Deployment packaging is a separate feature branch dependent on **open PR #7** at
-`84bd972`. It does not imply main contains the presentation release. Frappe-served
-assets, namespaced routes, site-bound invited review mode and an explicit synthetic
-seed are included; local verification is tracked in `review-deployment-verification.md`.
-The supplied Selfmade framework/runtime versions passed isolated local compatibility
-checks, including hosted Cloud End/revocation and RQ2 expiry; see
-`frappe16-compatibility-verification.md`. Remote shared-package resolution, installation,
-HTTPS/device checks and live delivery remain pending. No earnings or separate
-redesign work is included. PR #8 and its PR #7 dependency remain open and unmerged.
+Deployment packaging and compatible Frappe 16 work were merged through PRs #7–#10.
+Selfmade was separately reported installed at `bba5ed9f15bd0b140967618ed2bd982c31a76c1b`;
+the operator later reported actual app SHA `8f7ab9cd8d5e779d17b632dc9afdae3e700ab3c6`.
+No update is implied by local feature work. The current availability hotfix PR #11 is
+open and independent of the wider presentation improvement branch.

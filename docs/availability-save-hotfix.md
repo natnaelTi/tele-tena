@@ -48,3 +48,25 @@ The hosted Selfmade site is still pinned to the operator-reported commit
 changed. The hotfix PR is independently based on merged `main` and is safe to
 review separately from the ongoing design branch; deployment remains a separate
 operator action.
+
+## Follow-up calendar verification
+
+The design branch keeps the same API fix and uses a timezone-derived weekly
+calendar with recurring/date-only editing and a mobile agenda alternative. A
+second browser check exposed hit testing that blocked date overrides over a
+weekly availability block; date-only controls now sit above recurring blocks
+while already reserved appointment blocks remain protected. The check confirms
+clicking Monday 10:00 prepares a date-scoped 10:00–11:00 replacement, makes no
+implicit save, and leaves the change visibly unsaved.
+
+On 2026-10-02, the built production route passed clinician save, payload
+inspection, reload persistence and patient booking using a fresh synthetic
+patient. A separate calendar browser test passed accessible time-field focus,
+copy-to-day and date-only exception editing. `tests/presentation.py` passed 12
+cases; selected `tests/integration.py` cases 01–17 passed 18/18. The selected
+suite did not include the legacy phone-auth cases because this invited-review
+site deliberately disables phone access. The synthetic patient was created
+with a new balanced wallet; the old seeded patient was excluded after a stale
+manual test worker wrote wallet/log events without journals. No existing data
+was repaired or discarded. See the current-branch limits in
+`presentation-readiness-verification.md`.
