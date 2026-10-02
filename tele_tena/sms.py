@@ -29,7 +29,13 @@ def _config():
         raise SMSRejected('not_configured') from None
     if not isinstance(api_key, str) or not api_key.strip():
         raise SMSRejected('not_configured')
-    return api_key
+    header = config.get('auth_header', 'KEY')  # Existing private files used KEY.
+    scheme = config.get('auth_scheme', 'raw')
+    if header not in ('KEY', 'Authorization') or scheme not in ('raw', 'bearer'):
+        raise SMSRejected('not_configured')
+    if header == 'KEY' and scheme != 'raw':
+        raise SMSRejected('not_configured')
+    return {'api_key': api_key, 'auth_header': header, 'auth_scheme': scheme}
 
 
 def otp_hmac_key():
@@ -47,13 +53,17 @@ def otp_hmac_key():
 
 def send_otp(phone, code):
     """Send once; 2xx acceptance is not delivery and unknown outcomes are terminal."""
-    api_key = _config()
+    config = _config()
+    # Retain the original mock contract for pre-existing development regressions.
+    if isinstance(config, str):
+        config = {'api_key': config, 'auth_header': 'KEY', 'auth_scheme': 'raw'}
+    credential = ('Bearer ' if config['auth_scheme'] == 'bearer' else '') + config['api_key']
     if not re.fullmatch(r'\+251[79][0-9]{8}', phone) or not re.fullmatch(r'[0-9]{6}', code):
         raise SMSRejected('invalid_request')
     try:
         response = requests.post(
             SEND_URL,
-            headers={'KEY': api_key, 'Content-Type': 'application/json', 'Accept': 'application/json'},
+            headers={config['auth_header']: credential, 'Content-Type': 'application/json', 'Accept': 'application/json'},
             json={'msisdn': phone[1:],
                   'text': f'Tele-tena verification code: {code}. Expires in 5 minutes. Do not share this code.'},
             timeout=(3, 8),

@@ -17,6 +17,9 @@ async function main() {
     contexts.push(context)
     const page = await context.newPage()
     page.on('pageerror', () => errors.push('page exception'))
+    // This visual fixture mocks delivery capabilities along with its OTP send;
+    // backend provider readiness is covered separately.
+    await page.route('**/api/method/tele_tena.api.contact_auth.sign_in_options', route => route.fulfill({json:{message:{phone_otp:true,email_otp:true,patient_registration:true,clinician_registration:true}}}))
     if (kind) {
       await page.goto(base + '/sign-in')
       await page.getByRole('button', { name: 'Use email instead', exact: true }).click()

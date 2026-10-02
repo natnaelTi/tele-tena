@@ -82,7 +82,8 @@ def _increment_limit(kind, subject, now, seconds, limit):
 
 
 def _peer_ip():
-    # Never trust X-Forwarded-For without an explicit trusted-proxy deployment contract.
+    # WSGI peer only. Frappe request_ip can use an arbitrary X-Forwarded-For header.
+    # If this is a proxy address, the limit is conservatively shared by its users.
     request = getattr(frappe.local, 'request', None)
     return getattr(request, 'remote_addr', None) or 'unknown-peer'
 
@@ -90,6 +91,20 @@ def _peer_ip():
 def _eligible(phone, purpose):
     existing = frappe.db.sql('SELECT user FROM tt_phone_identity WHERE phone=%s', (phone,))
     return bool(existing) if purpose == 'login' else not bool(existing)
+
+
+def reserve_sms_budget(now):
+    """Called under tt_otp_gate before a provider attempt, including uncertain sends."""
+    from tele_tena.review import sms_cap
+    cap = sms_cap()
+    if cap <= 0:
+        return False
+    used = frappe.db.sql('''SELECT COUNT(*) FROM tt_otp_challenge
+        WHERE purpose IN ('contact_phone','patient_signup','clinician_application','login')
+        AND dispatch_state IN ('Sending','Accepted','Rejected','Uncertain')
+        AND created>%s''', (now - timedelta(hours=24),))[0][0]
+    # The caller inserts and commits Sending while still holding tt_otp_gate.
+    return used < cap
 
 
 @frappe.whitelist(allow_guest=True)
@@ -101,7 +116,7 @@ def csrf_token():
 @frappe.whitelist(allow_guest=True, methods=['POST'])
 def request_code(phone, purpose, request_id):
     from tele_tena.review import guard_contact_access
-    guard_contact_access()
+    guard_contact_access(legacy=True)
     """Create one challenge and make at most one bounded provider request."""
     if purpose not in ('patient_signup', 'clinician_application', 'login'):
         _json_error('Unsupported verification purpose', 'invalid_request')
@@ -133,7 +148,8 @@ def request_code(phone, purpose, request_id):
 
     challenge_id = str(uuid.uuid4())
     code = f'{secrets.randbelow(1_000_000):06d}'
-    dispatch_state = 'Sending' if _eligible(phone, purpose) else 'Suppressed'
+    eligible = _eligible(phone, purpose)
+    dispatch_state = 'Sending' if eligible and reserve_sms_budget(now) else 'Suppressed'
     frappe.db.sql('''INSERT INTO tt_otp_challenge
         (id,phone_digest,purpose,otp_digest,request_digest,created,expires,attempts,dispatch_state)
         VALUES (%s,%s,%s,%s,%s,%s,%s,0,%s)''',
@@ -170,7 +186,7 @@ def _establish_login(user):
 @frappe.whitelist(allow_guest=True, methods=['POST'])
 def verify_code(phone, challenge_id, code, purpose, display_name='', adult=0, statement=''):
     from tele_tena.review import guard_contact_access
-    guard_contact_access()
+    guard_contact_access(legacy=True)
     """Verify a phone, then continue only into an owner-only onboarding draft."""
     if purpose not in ('patient_signup', 'clinician_application', 'login'):
         _json_error('Invalid verification', 'otp_invalid')

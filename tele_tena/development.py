@@ -79,7 +79,7 @@ def configure_livekit():
     return {'configured': True, 'path': str(target), 'mode': '0600'}
 
 def configure_sms():
-    """Prompt locally for provider credentials; development site only, never echoes key."""
+    """Prompt locally for provider credentials and account-confirmed header."""
     _configuration_site()
     if frappe.session.user != 'Administrator':
         frappe.throw('Administrator required', frappe.PermissionError)
@@ -89,7 +89,15 @@ def configure_sms():
     key = getpass.getpass('SMS Ethiopia API key (input hidden): ').strip()
     if not key or '\n' in key or len(key) > 512:
         frappe.throw('A valid SMS API key is required')
-    config = {'api_key': key}
+    header = input('Account-confirmed API key header (KEY or Authorization): ').strip()
+    if header not in ('KEY', 'Authorization'):
+        frappe.throw('Choose the header specified by your provider account')
+    scheme = 'raw'
+    if header == 'Authorization':
+        scheme = input('Authorization value format (raw or bearer): ').strip().lower()
+        if scheme not in ('raw', 'bearer'):
+            frappe.throw('Choose raw or bearer from your provider account documentation')
+    config = {'api_key': key, 'auth_header': header, 'auth_scheme': scheme}
     path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     os.chmod(path.parent, 0o700)
     fd, temporary = tempfile.mkstemp(prefix='.tele-tena-sms-', dir=path.parent)
@@ -105,7 +113,7 @@ def configure_sms():
         if os.path.exists(temporary):
             os.unlink(temporary)
     return {'configured': True, 'credentials_file': 'private/tele_tena_sms.json',
-            'provider': 'SMSEthiopia', 'live_send_performed': False}
+            'provider': 'SMSEthiopia', 'auth_header': header, 'live_send_performed': False}
 
 
 def configure_email():

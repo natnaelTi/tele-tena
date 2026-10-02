@@ -17,8 +17,12 @@ const base='http://127.0.0.1:8017';
   assert.ok((await page.locator('img').first().getAttribute('src')).startsWith('/assets/tele_tena/review/'));
   await page.goto(base+'/teletena/patient/appointments');
   await page.waitForURL('**/teletena/sign-in');
-  await page.getByRole('button',{name:'Use email instead',exact:true}).click();
-  await page.getByRole('button',{name:'Use password instead',exact:true}).click();
+  // Invited review sites now show password entry directly when neither OTP
+  // delivery provider is enabled. Both account and logout checks remain real.
+  if(await page.getByRole('button',{name:'Use email instead',exact:true}).count())
+    await page.getByRole('button',{name:'Use email instead',exact:true}).click();
+  if(await page.getByRole('button',{name:'Use password instead',exact:true}).count())
+    await page.getByRole('button',{name:'Use password instead',exact:true}).click();
   await page.getByLabel('Email',{exact:true}).fill(fixture.users.patient);
   await page.getByLabel('Password',{exact:true}).fill(credentials[fixture.users.patient]);
   await page.getByRole('button',{name:'Sign in',exact:true}).click();

@@ -118,11 +118,13 @@ def verify():
         assert reviewer.get(BASE + resume, params={'clinician': applicant}).content.startswith(b'%PDF-')
         assert patient.get(BASE + resume, params={'clinician': applicant}).status_code == 403
         assert requests.get(BASE + resume, params={'clinician': applicant}).status_code == 403
-        for module in ('contact_auth', 'phone_auth'):
-            response = patient.post(BASE + '/api/method/tele_tena.api.' + module + '.request_code',
-                json=({'channel':'email','contact':'review@example.invalid','request_id':'a'*24} if module=='contact_auth'
-                      else {'phone':'+251911000001','purpose':'patient_signup','request_id':'a'*24}))
-            assert response.status_code == 403 and 'review_password_required' in response.text
+        for module, payload, error in (
+            ('contact_auth', {'channel':'phone','contact':'+251911000001','request_id':'a'*24}, 'review_password_required'),
+            ('contact_auth', {'channel':'email','contact':'review@example.invalid','request_id':'a'*24}, 'email_otp_unavailable'),
+            ('phone_auth', {'phone':'+251911000001','purpose':'patient_signup','request_id':'a'*24}, 'review_password_required'),
+        ):
+            response = patient.post(BASE + '/api/method/tele_tena.api.' + module + '.request_code', json=payload)
+            assert response.status_code == 403 and error in response.text
         # CSRF must still reject an authenticated mutation without its header.
         unsafe = requests.Session()
         unsafe.cookies.update(patient.cookies)

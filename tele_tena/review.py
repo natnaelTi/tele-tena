@@ -22,10 +22,78 @@ def cli(require_enabled=True):
         frappe.throw('This site is not explicitly configured for review', frappe.PermissionError)
 
 
-def guard_contact_access():
-    if enabled():
+def phone_enabled():
+    if frappe.local.site == 'erp.localhost':
+        return True
+    return enabled() and frappe.conf.get('tele_tena_phone_otp_enabled') is True
+
+
+def registration_enabled(kind):
+    if kind not in ('patient', 'clinician'):
+        return False
+    if frappe.local.site == 'erp.localhost':
+        return True
+    return enabled() and frappe.conf.get('tele_tena_' + kind + '_registration_enabled') is True
+
+
+def sms_cap():
+    """A review-site cap; malformed/missing config fails closed."""
+    if not enabled():
+        return 100
+    value = frappe.conf.get('tele_tena_sms_24h_cap', 20)
+    return value if type(value) is int and 1 <= value <= 100 else 0
+
+
+def guard_contact_access(channel='phone', legacy=False):
+    if frappe.local.site == 'erp.localhost':
+        return
+    if not enabled() or legacy or (channel == 'phone' and not phone_enabled()):
         frappe.local.response['tele_tena_error'] = 'review_password_required'
-        frappe.throw('This review uses invited accounts. Use email and password.', frappe.PermissionError)
+        frappe.throw('Phone verification is unavailable on this site.', frappe.PermissionError)
+    if channel == 'email':
+        from tele_tena import email_delivery
+        try:
+            email_delivery.configuration()
+        except email_delivery.DeliveryUnavailable:
+            frappe.local.response['tele_tena_error'] = 'email_otp_unavailable'
+            frappe.throw('Email code delivery is not configured; use your password.', frappe.PermissionError)
+
+
+def configure_contact_access():
+    """Local Administrator-only site flags; independent of review funding."""
+    cli()
+    if frappe.conf.get('developer_mode') or frappe.conf.get('ignore_csrf'):
+        raise ValueError('Developer mode and CSRF bypass must remain disabled')
+    site = frappe.local.site
+    if input('Type the exact review site name to update contact access: ').strip() != site:
+        raise ValueError('Site confirmation mismatch')
+
+    def choice(label):
+        answer = input(label + ' (yes/no): ').strip().lower()
+        if answer not in ('yes', 'no'):
+            raise ValueError('Answer yes or no')
+        return answer == 'yes'
+
+    phone = choice('Enable phone OTP sign-in')
+    patient = choice('Allow new adult patient registration')
+    clinician = choice('Allow new clinician applications')
+    cap_text = input('Maximum site-wide SMS send attempts per rolling 24 hours (1-100): ').strip()
+    if not cap_text.isascii() or not cap_text.isdecimal() or not 1 <= int(cap_text) <= 100:
+        raise ValueError('SMS cap must be a whole number from 1 to 100')
+    if phone:
+        from tele_tena import sms
+        sms._config()  # Fail before changing settings if the private key is absent.
+    from frappe.installer import update_site_config
+    for key, value in (
+        ('tele_tena_phone_otp_enabled', phone),
+        ('tele_tena_patient_registration_enabled', patient),
+        ('tele_tena_clinician_registration_enabled', clinician),
+        ('tele_tena_sms_24h_cap', int(cap_text)),
+    ):
+        update_site_config(key, value)
+    frappe.clear_cache()
+    return {'site': site, 'phone_otp': phone, 'patient_registration': patient,
+            'clinician_registration': clinician, 'sms_24h_cap': int(cap_text)}
 
 
 def write_private(path, value):

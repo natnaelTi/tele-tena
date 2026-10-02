@@ -120,6 +120,15 @@ No trial-credit messages are sent by automated tests.
 
 ## Local credential setup
 
+For the explicitly bound Selfmade review site, use the private helper and access
+switch described in `selfmade-phone-access-update.md`. That helper asks the
+operator to select the provider account's confirmed authentication header; the
+public examples still conflict. The hosted route uses `contact_auth` for both
+existing and new verified numbers. The legacy `phone_auth` signup routes remain
+closed on review sites. A rolling site-wide send-attempt cap adds to the phone
+and direct-peer limits below. The older development-site instructions here remain
+valid for `erp.localhost`.
+
 On the development Bench, run
 `bench --site erp.localhost execute tele_tena.development.configure_sms` in a
 terminal. The helper prompts with hidden input and stores only the key in

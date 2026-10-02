@@ -32,7 +32,7 @@ def _result(challenge_id):
 @frappe.whitelist(allow_guest=True, methods=['POST'])
 def request_code(channel, contact, request_id):
     from tele_tena.review import guard_contact_access
-    guard_contact_access()
+    guard_contact_access(channel)
     contact = normalize(channel, contact)
     if not isinstance(request_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{20,100}', request_id):
         fail('Invalid request', 'invalid_request')
@@ -55,6 +55,9 @@ def request_code(channel, contact, request_id):
         frappe.db.commit()
         # Rate outcomes are independent of account existence.
         fail('Please wait before requesting another code', 'resend_cooldown')
+    if channel == 'phone' and not otp.reserve_sms_budget(now):
+        frappe.db.commit()
+        fail('Code sending is temporarily unavailable. Please try again later.', 'sms_budget_exhausted')
     challenge = str(uuid.uuid4())
     code = f'{secrets.randbelow(1000000):06d}'
     frappe.db.sql('''INSERT INTO tt_otp_challenge
@@ -73,18 +76,22 @@ def request_code(channel, contact, request_id):
     frappe.db.sql('UPDATE tt_otp_challenge SET dispatch_state=%s WHERE id=%s', (state, challenge))
     frappe.db.commit()
     # Outcome never depends on whether an account exists. Accepted is not delivered.
+    delivery = 'SMS' if channel == 'phone' else 'email'
     messages = {
-        'Accepted': 'The mail provider accepted the code; delivery to your inbox is not guaranteed.',
-        'Rejected': 'The mail provider could not send to this address. Check the spelling and try again after the cooldown.',
-        'Uncertain': 'We could not confirm delivery. If the code arrives, use it here; wait before requesting another.',
+        'Accepted': f'The {delivery} provider accepted the request. Delivery is not guaranteed.',
+        'Rejected': f'The {delivery} provider rejected the request. Check the contact and try again after the cooldown.',
+        'Uncertain': 'We could not confirm provider acceptance. If the code arrives, use it here; wait before requesting another.',
     }
     return {**_result(challenge), 'delivery_state': state.lower(), 'message': messages[state]}
 
 
 def _identity(channel, contact):
     existing = frappe.db.sql('SELECT user FROM tt_contact_identity WHERE channel=%s AND contact=%s FOR UPDATE', (channel, contact))
-    if not existing and channel == 'phone':
-        existing = frappe.db.sql('SELECT user FROM tt_phone_identity WHERE phone=%s FOR UPDATE', (contact,))
+    if channel == 'phone':
+        legacy = frappe.db.sql('SELECT user FROM tt_phone_identity WHERE phone=%s FOR UPDATE', (contact,))
+        if existing and legacy and existing[0][0] != legacy[0][0]:
+            fail('Contact identity needs administrator review', 'account_unavailable')
+        existing = existing or legacy
     if not existing and channel == 'email':
         # Only reached AFTER contact proof. Never accept a claimed account/user ID.
         name = frappe.db.get_value('User', {'email': contact}, 'name')
@@ -94,6 +101,9 @@ def _identity(channel, contact):
         if not frappe.db.get_value('User', user, 'enabled'):
             fail('This account is unavailable', 'account_unavailable')
     else:
+        from tele_tena.review import registration_enabled
+        if not any(registration_enabled(kind) for kind in ('patient', 'clinician')):
+            fail('New registration is unavailable on this site', 'registration_unavailable')
         user = contact if channel == 'email' else 'contact-' + secrets.token_hex(20) + '@accounts.tele-tena.invalid'
         from tele_tena.account_context import authorized_user_change
         with authorized_user_change():
@@ -112,7 +122,7 @@ def _identity(channel, contact):
 @frappe.whitelist(allow_guest=True, methods=['POST'])
 def verify_code(channel, contact, challenge_id, code):
     from tele_tena.review import guard_contact_access
-    guard_contact_access()
+    guard_contact_access(channel)
     contact = normalize(channel, contact)
     digest = otp._keyed('contact:' + channel, contact)
     purpose = 'contact_' + channel
@@ -141,6 +151,28 @@ def verify_code(channel, contact, challenge_id, code):
 
 
 @frappe.whitelist(allow_guest=True)
+def sign_in_options():
+    """Site capabilities only; never reveal contact/account existence."""
+    from tele_tena.review import enabled, phone_enabled, registration_enabled
+    available_email = False
+    if enabled() or frappe.local.site == 'erp.localhost':
+        try:
+            email_delivery.configuration()
+            available_email = True
+        except email_delivery.DeliveryUnavailable:
+            pass
+    available_phone = phone_enabled()
+    if enabled():
+        try:
+            sms._config()
+        except sms.SMSRejected:
+            available_phone = False
+    return {'phone_otp': available_phone, 'email_otp': available_email,
+            'patient_registration': registration_enabled('patient'),
+            'clinician_registration': registration_enabled('clinician')}
+
+
+@frappe.whitelist(allow_guest=True)
 def session():
     if frappe.session.user == 'Guest':
         return {'authenticated': False}
@@ -162,6 +194,9 @@ def save_onboarding(kind, step, answers, complete=0):
     user = actor()
     if kind not in ('patient', 'clinician') or str(step) not in ('0', '1', '2', '3'):
         fail('Invalid onboarding step')
+    from tele_tena.review import registration_enabled
+    if not registration_enabled(kind):
+        fail('This registration path is unavailable', 'registration_unavailable')
     if not frappe.db.sql('SELECT user FROM tt_contact_identity WHERE user=%s', (user,)):
         fail('Verify a contact before onboarding', 'contact_required')
     rows = frappe.db.sql('SELECT completed FROM tt_onboarding WHERE user=%s FOR UPDATE', (user,))
