@@ -99,6 +99,54 @@ class Presentation(unittest.TestCase):
         self.assertIsNone(scheduling._valid_local(datetime(2026, 3, 8, 2, 30), new_york))
         self.assertIsNone(scheduling._valid_local(datetime(2026, 11, 1, 1, 30), new_york))
 
+    def test_schedule_ui_payload_roundtrips_html_time_values(self):
+        day = day_offset(18)
+        fixtures.login('c1')
+        payload = schedule_payload(fixtures.Integration.offers['c1'], day)
+        payload['intervals'] = [
+            {'weekday': item['weekday'], 'start_local': item['start'], 'end_local': item['end']}
+            for item in payload['intervals']
+        ]
+        result = scheduling.save_schedule(**payload)
+        frappe.db.commit()
+        loaded = next(item for item in scheduling.schedules() if item.id == result['id'])
+        self.assertEqual(
+            [(item.start_local, item.end_local) for item in loaded.intervals],
+            [('09:00', '12:00'), ('14:00', '16:00')],
+        )
+
+    def test_schedule_invalid_intervals_are_specific_and_atomic(self):
+        day = day_offset(19)
+        _, schedule_id, payload = self.make_schedule(day)
+        original = frappe.db.sql('''SELECT weekday,start_local,end_local FROM tt_schedule_rule
+            WHERE schedule_id=%s ORDER BY weekday,start_local''', (schedule_id,))
+        fixtures.login('c1')
+        invalid = {**payload, 'intervals': [
+            {'weekday': day.weekday(), 'start_local': '09:00', 'end_local': '11:00'},
+            {'weekday': day.weekday(), 'start_local': '10:30', 'end_local': '12:00'},
+        ]}
+        with self.assertRaises(frappe.ValidationError):
+            scheduling.save_schedule(**invalid)
+        self.assertEqual(frappe.local.response.get('tele_tena_error'), 'schedule_interval_overlap')
+        after = frappe.db.sql('''SELECT weekday,start_local,end_local FROM tt_schedule_rule
+            WHERE schedule_id=%s ORDER BY weekday,start_local''', (schedule_id,))
+        self.assertEqual(after, original)
+        invalid['intervals'] = [{'weekday': day.weekday(), 'start_local': '12:00', 'end_local': '11:00'}]
+        with self.assertRaises(frappe.ValidationError):
+            scheduling.save_schedule(**invalid)
+        self.assertEqual(frappe.local.response.get('tele_tena_error'), 'schedule_interval_order')
+
+    def test_other_clinician_cannot_change_schedule(self):
+        day, schedule_id, payload = self.make_schedule(day_offset(20))
+        before = frappe.db.sql('''SELECT weekday,start_local,end_local FROM tt_schedule_rule
+            WHERE schedule_id=%s ORDER BY weekday,start_local''', (schedule_id,))
+        fixtures.login('c2')
+        with self.assertRaises(frappe.ValidationError):
+            scheduling.save_schedule(**payload)
+        after = frappe.db.sql('''SELECT weekday,start_local,end_local FROM tt_schedule_rule
+            WHERE schedule_id=%s ORDER BY weekday,start_local''', (schedule_id,))
+        self.assertEqual(after, before)
+
     def test_02_manual_hold_confirm_cancel_and_expiry_release_once(self):
         self.fund_patient(amount=5000)
         day, _, _ = self.make_schedule()

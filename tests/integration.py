@@ -24,7 +24,7 @@ from frappe.utils.password import update_password
 from tele_tena.api import journey as api
 from tele_tena.api import phone_auth
 
-SITE = 'erp.localhost'
+SITE = os.environ.get('TELE_TENA_TEST_SITE', 'erp.localhost')
 PREFIX = 'tt-test-' + secrets.token_hex(5)
 USERS = {kind: PREFIX + '-' + kind + '@example.invalid' for kind in ('p1', 'p2', 'c1', 'c2', 'c3', 'admin')}
 PASSWORD = secrets.token_urlsafe(24)

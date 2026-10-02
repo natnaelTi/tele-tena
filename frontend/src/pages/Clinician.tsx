@@ -107,6 +107,10 @@ export function Availability() {
   const [exceptionEnd, setExceptionEnd] = useState("17:00");
   const [dirty,setDirty]=useState(false);
   const [mobileDay,setMobileDay]=useState((new Date().getDay()+6)%7);
+  const [timeErrors,setTimeErrors]=useState<Record<number,{start?:string;end?:string}>>({});
+  const [serviceError,setServiceError]=useState("");
+  const [nameError,setNameError]=useState("");
+  const [availabilityError,setAvailabilityError]=useState("");
   useEffect(() => {
     const s = current.data?.find(item=>item.offering===offering) || (!offering?current.data?.[0]:undefined);
     if (s) { setName(s.schedule_name); if(s.offering!==offering)setOffering(s.offering); setZone(s.timezone); setFormat(s.consultation_format); setConfirmation(s.confirmation_mode); setNotice(String(s.minimum_notice_minutes)); setHorizon(String(s.horizon_days)); setBefore(String(s.buffer_before)); setAfter(String(s.buffer_after)); setStatus(s.status); setIntervals(s.intervals); setExceptions(s.exceptions); }
@@ -114,9 +118,34 @@ export function Availability() {
     else if(offering){setName("Weekly schedule");setStatus("Draft");setIntervals([]);setExceptions([]);}
   }, [current.data, offerings.data, offering]);
   const dayNames = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-  const addInterval = (weekday:number) => setIntervals([...intervals, {weekday, start_local:"09:00", end_local:"17:00"}]);
-  const editInterval = (i:number, field:"start_local"|"end_local", value:string) => setIntervals(intervals.map((x,n)=>n===i?{...x,[field]:value}:x));
+  const addInterval = (weekday:number) => {setIntervals([...intervals, {weekday, start_local:"09:00", end_local:"17:00"}]);setDirty(true);};
+  const editInterval = (i:number, field:"start_local"|"end_local", value:string) => {setIntervals(intervals.map((x,n)=>n===i?{...x,[field]:value}:x));setTimeErrors(errors=>({...errors,[i]:{...errors[i],[field==="start_local"?"start":"end"]:undefined}}));};
   const selectedSchedule = offerings.data?.offerings.find(x=>x.id===offering);
+  function validateIntervals() {
+    const errors:Record<number,{start?:string;end?:string}>={};
+    const minutes=(value:string)=>/^([01]\d|2[0-3]):[0-5]\d$/.test(value)?Number(value.slice(0,2))*60+Number(value.slice(3)):null;
+    intervals.forEach((item,index)=>{
+      const start=minutes(item.start_local),end=minutes(item.end_local);
+      if(start===null)errors[index]={...errors[index],start:"Enter a valid start time (HH:MM)."};
+      if(end===null)errors[index]={...errors[index],end:"Enter a valid end time (HH:MM)."};
+      if(start!==null&&end!==null&&end<=start)errors[index]={...errors[index],end:"End time must be after start time."};
+    });
+    for(let weekday=0;weekday<7;weekday++){
+      const day=intervals.map((item,index)=>({item,index,start:minutes(item.start_local),end:minutes(item.end_local)})).filter(x=>x.item.weekday===weekday&&x.start!==null&&x.end!==null).sort((a,b)=>(a.start as number)-(b.start as number));
+      day.slice(1).forEach((current,index)=>{const previous=day[index];if((current.start as number)<(previous.end as number)){errors[previous.index]={...errors[previous.index],end:"This time overlaps another interval."};errors[current.index]={...errors[current.index],start:"This time overlaps another interval."};}});
+    }
+    setTimeErrors(errors);
+    return Object.keys(errors).length===0;
+  }
+  function saveSchedule() {
+    setServiceError("");setNameError("");setAvailabilityError("");
+    const validTimes=validateIntervals();
+    if(!offering){setServiceError("Choose an approved service before saving.");return;}
+    if(!name.trim()){setNameError("Enter a name for this schedule.");return;}
+    if(status==="Published"&&!intervals.length&&!exceptions.some(x=>x.kind==="replace")){setAvailabilityError("Add at least one available time before publishing.");return;}
+    if(!validTimes)return;
+    void action.run(async()=>{await journeyApi.saveSchedule({offering,schedule_name:name,timezone_name:zone,consultation_format:format,confirmation_mode:confirmation,minimum_notice_minutes:Number(notice),horizon_days:Number(horizon),buffer_before:Number(before),buffer_after:Number(after),status,intervals,exceptions});setDirty(false);await current.refresh();},"Schedule saved.");
+  }
   return (
     <>
       <PageTitle
@@ -125,8 +154,8 @@ export function Availability() {
       />
       <div className="schedule-editor" data-tour-unsaved={dirty?"true":"false"} onChange={()=>setDirty(true)}>
         <aside className="schedule-config">
-          <TextField label="Schedule name" value={name} onChange={e=>setName(e.target.value)} required />
-          <Select label="Service" value={offering} onChange={e=>setOffering(e.target.value)} required>
+          <TextField label="Schedule name" value={name} error={nameError} onChange={e=>{setName(e.target.value);setNameError("");}} required />
+          <Select label="Service" value={offering} error={serviceError} onChange={e=>{setOffering(e.target.value);setServiceError("");}} required>
             <option value="">Choose a published service</option>{offerings.data?.offerings.map(o=><option key={o.id} value={o.id}>{o.label} · {o.minutes} min</option>)}
           </Select>
           <TextField label="Timezone" value={zone} onChange={e=>setZone(e.target.value)} required placeholder="Africa/Addis_Ababa" />
@@ -135,16 +164,18 @@ export function Availability() {
           <div className="schedule-number-grid"><TextField label="Notice (minutes)" type="number" min="0" value={notice} onChange={e=>setNotice(e.target.value)} /><TextField label="Book ahead (days)" type="number" min="1" value={horizon} onChange={e=>setHorizon(e.target.value)} /><TextField label="Buffer before (min)" type="number" min="0" value={before} onChange={e=>setBefore(e.target.value)} /><TextField label="Buffer after (min)" type="number" min="0" value={after} onChange={e=>setAfter(e.target.value)} /></div>
           <Select label="Patient visibility" value={status} onChange={e=>setStatus(e.target.value as "Draft"|"Published"|"Paused")}><option>Draft</option><option>Published</option><option>Paused</option></Select>
           {selectedSchedule && <p className="supporting">Preview: ETB {money(selectedSchedule.price)} · {selectedSchedule.minutes} minutes · {format}</p>}
-          <Button loading={action.busy} onClick={()=>void action.run(async()=>{if(!offering) throw new Error("Choose a published service first."); await journeyApi.saveSchedule({offering,schedule_name:name,timezone_name:zone,consultation_format:format,confirmation_mode:confirmation,minimum_notice_minutes:Number(notice),horizon_days:Number(horizon),buffer_before:Number(before),buffer_after:Number(after),status,intervals,exceptions}); setDirty(false); await current.refresh();},"Schedule saved.")}>Save schedule</Button>
+          {availabilityError&&<InlineNotice tone="danger">{availabilityError}</InlineNotice>}
+          <Button loading={action.busy} disabled={action.busy||current.error||offerings.error} onClick={saveSchedule}>{action.busy?"Saving schedule…":"Save schedule"}</Button>
+          <p className="supporting" role="status">{action.busy?"Saving changes…":action.success?"Schedule saved.":dirty?"Unsaved changes":current.data?.some(item=>item.offering===offering)?"Saved schedule":"Not saved yet"}</p>
           {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}{action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
         </aside>
         <section className="schedule-week" aria-label="Weekly availability editor">
           <div className="schedule-week-heading"><h2>Weekly availability</h2><span>{zone}</span></div>
           <p className="supporting">Enter local times for this timezone. Ambiguous or skipped daylight-saving times are not offered.</p>
           <nav className="schedule-day-picker" aria-label="Choose day to edit">{dayNames.map((day,weekday)=><button type="button" key={day} aria-pressed={mobileDay===weekday} onClick={()=>setMobileDay(weekday)}>{day.slice(0,3)}</button>)}</nav>
-          {dayNames.map((day,weekday)=>{const items=intervals.map((x,index)=>({...x,index})).filter(x=>x.weekday===weekday);return <div className={`schedule-day${mobileDay===weekday?" mobile-selected":""}`} key={day}><h3>{day}</h3><div className="schedule-intervals">{items.map(x=><div className="schedule-interval" key={x.index}><TextField label={`${day} starts`} type="time" value={x.start_local} onChange={e=>editInterval(x.index,"start_local",e.target.value)} /><span>to</span><TextField label={`${day} ends`} type="time" value={x.end_local} onChange={e=>editInterval(x.index,"end_local",e.target.value)} /><Button variant="quiet" onClick={()=>setIntervals(intervals.filter((_,n)=>n!==x.index))}>Remove</Button></div>)}<Button variant="secondary" onClick={()=>addInterval(weekday)}>Add time</Button></div></div>})}
-          <div className="copy-day"><Select label="Copy Monday intervals to" multiple value={copyDays.map(String)} onChange={e=>setCopyDays(Array.from(e.target.selectedOptions).map(o=>Number(o.value)))}>{dayNames.slice(1).map((d,i)=><option key={d} value={i+1}>{d}</option>)}</Select><Button variant="secondary" onClick={()=>{const monday=intervals.filter(x=>x.weekday===0); setIntervals([...intervals.filter(x=>!copyDays.includes(x.weekday)),...copyDays.flatMap(day=>monday.map(x=>({...x,weekday:day})))]);}}>Copy Monday times</Button></div>
-          <details className="schedule-exceptions"><summary>Date exceptions and breaks</summary><div className="exception-form"><TextField label="Date" type="date" value={exceptionDate} onChange={e=>setExceptionDate(e.target.value)} /><Select label="Change" value={exceptionKind} onChange={e=>setExceptionKind(e.target.value as typeof exceptionKind)}><option value="unavailable">Unavailable all day</option><option value="replace">Replace that day</option><option value="break">Break</option></Select>{exceptionKind!=="unavailable"&&<><TextField label="Starts" type="time" value={exceptionStart} onChange={e=>setExceptionStart(e.target.value)} /><TextField label="Ends" type="time" value={exceptionEnd} onChange={e=>setExceptionEnd(e.target.value)} /></>}<Button variant="secondary" disabled={!exceptionDate} onClick={()=>{setExceptions([...exceptions,{date:exceptionDate,kind:exceptionKind,start_local:exceptionKind==="unavailable"?null:exceptionStart,end_local:exceptionKind==="unavailable"?null:exceptionEnd}]);setExceptionDate("");}}>Add exception</Button></div>{exceptions.map((x,i)=><p key={i}>{x.date} · {x.kind} {x.start_local&&`${x.start_local}–${x.end_local}`} <Button variant="quiet" onClick={()=>setExceptions(exceptions.filter((_,n)=>n!==i))}>Remove</Button></p>)}</details>
+          {dayNames.map((day,weekday)=>{const items=intervals.map((x,index)=>({...x,index})).filter(x=>x.weekday===weekday);return <div className={`schedule-day${mobileDay===weekday?" mobile-selected":""}`} key={day}><h3>{day}</h3><div className="schedule-intervals">{items.map(x=><div className="schedule-interval" key={x.index}><TextField label={`${day} starts`} type="time" value={x.start_local} error={timeErrors[x.index]?.start} onChange={e=>editInterval(x.index,"start_local",e.target.value)} /><span>to</span><TextField label={`${day} ends`} type="time" value={x.end_local} error={timeErrors[x.index]?.end} onChange={e=>editInterval(x.index,"end_local",e.target.value)} /><Button variant="quiet" onClick={()=>{setIntervals(intervals.filter((_,n)=>n!==x.index));setTimeErrors({});setDirty(true);}}>Remove</Button></div>)}<Button variant="secondary" onClick={()=>addInterval(weekday)}>Add time</Button></div></div>})}
+          <div className="copy-day"><Select label="Copy Monday intervals to" multiple value={copyDays.map(String)} onChange={e=>{setCopyDays(Array.from(e.target.selectedOptions).map(o=>Number(o.value)));setDirty(true);}}>{dayNames.slice(1).map((d,i)=><option key={d} value={i+1}>{d}</option>)}</Select><Button variant="secondary" onClick={()=>{const monday=intervals.filter(x=>x.weekday===0); setIntervals([...intervals.filter(x=>!copyDays.includes(x.weekday)),...copyDays.flatMap(day=>monday.map(x=>({...x,weekday:day})))]);setDirty(true);}}>Copy Monday times</Button></div>
+          <details className="schedule-exceptions"><summary>Date exceptions and breaks</summary><div className="exception-form"><TextField label="Date" type="date" value={exceptionDate} onChange={e=>setExceptionDate(e.target.value)} /><Select label="Change" value={exceptionKind} onChange={e=>setExceptionKind(e.target.value as typeof exceptionKind)}><option value="unavailable">Unavailable all day</option><option value="replace">Replace that day</option><option value="break">Break</option></Select>{exceptionKind!=="unavailable"&&<><TextField label="Starts" type="time" value={exceptionStart} onChange={e=>setExceptionStart(e.target.value)} /><TextField label="Ends" type="time" value={exceptionEnd} onChange={e=>setExceptionEnd(e.target.value)} /></>}<Button variant="secondary" disabled={!exceptionDate} onClick={()=>{setExceptions([...exceptions,{date:exceptionDate,kind:exceptionKind,start_local:exceptionKind==="unavailable"?null:exceptionStart,end_local:exceptionKind==="unavailable"?null:exceptionEnd}]);setExceptionDate("");setDirty(true);}}>Add exception</Button></div>{exceptions.map((x,i)=><p key={i}>{x.date} · {x.kind} {x.start_local&&`${x.start_local}–${x.end_local}`} <Button variant="quiet" onClick={()=>{setExceptions(exceptions.filter((_,n)=>n!==i));setDirty(true);}}>Remove</Button></p>)}</details>
         </section>
       </div>
     </>
