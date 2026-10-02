@@ -58,6 +58,14 @@ test in `selfmade-phone-access-update.md`. Provider acceptance is not delivery.
 
 Demonstration funding is not real-money readiness. `tt_ledger` remains the simulation activity log, while v1.7 `tt_journal` is a separate balanced demonstration subledger; neither is ERPNext posting or settlement. Live SMS, SMTP, credential verification, physical-device call testing and production readiness remain outstanding.
 
+Current release-check note: the additive repeat-migration check now snapshots
+the v1.7 account, journal, earning, dispute and payout tables and passed on the
+disposable site. The stronger wallet-to-journal reconciliation check exposed a
+synthetic seeded patient mismatch after an old loopback test worker had written
+legacy events without subledger postings. The records were preserved and no
+release claim is based on reconciling that account; a fresh isolated site is
+needed for clean financial cutover verification.
+
 ## Selfmade review packaging
 
 Deployment packaging and compatible Frappe 16 work were merged through PRs #7–#10.

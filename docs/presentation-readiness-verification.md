@@ -41,6 +41,12 @@ to Selfmade.
   booking/overspend, LiveKit authorization and end/join serialization. This
   was not the full suite: legacy phone-auth cases were excluded because this
   site deliberately disables them.
+- `scripts/check_migration.py` — passed twice through the migration path and
+  verified exact snapshots of old records, nine numbered patches, presentation
+  and financial tables, journals, journal lines and payout/earning/dispute
+  rows. This establishes repeat-migration preservation of the current records,
+  including the mismatch described below; it does not establish that the seeded
+  wallet projection reconciles.
 - `scripts/browser-availability-regression.cjs` passed on the production-built
   Frappe route using a new synthetic patient with a fresh balanced demo wallet.
 - `scripts/browser-availability-calendar.cjs` passed date-only edit and
