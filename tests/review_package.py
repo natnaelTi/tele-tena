@@ -50,7 +50,45 @@ class ReviewPackage(unittest.TestCase):
             review.guard_contact_access()
         self.assertEqual(self.fake.local.response['tele_tena_error'],'review_password_required')
         self.fake.conf.clear()
-        review.guard_contact_access()
+        with self.assertRaises(Permission):
+            review.guard_contact_access()
+
+    def test_contact_flags_are_site_bound_and_independent(self):
+        self.assertFalse(review.phone_enabled())
+        self.assertFalse(review.registration_enabled('patient'))
+        self.assertFalse(review.registration_enabled('clinician'))
+        self.assertEqual(review.sms_cap(), 20)
+        with patch.dict(self.fake.conf, {'tele_tena_phone_otp_enabled': True,
+                                         'tele_tena_patient_registration_enabled': True,
+                                         'tele_tena_sms_24h_cap': 2}):
+            self.assertTrue(review.phone_enabled())
+            self.assertTrue(review.registration_enabled('patient'))
+            self.assertFalse(review.registration_enabled('clinician'))
+            self.assertEqual(review.sms_cap(), 2)
+            review.guard_contact_access('phone')
+        with patch.dict(self.fake.conf, {'tele_tena_phone_otp_enabled': 'true',
+                                         'tele_tena_sms_24h_cap': '100'}):
+            self.assertFalse(review.phone_enabled())
+            self.assertEqual(review.sms_cap(), 0)
+        self.fake.local.site = 'other.test'
+        self.assertFalse(review.phone_enabled())
+        self.assertFalse(review.registration_enabled('clinician'))
+        self.fake.local.site = 'erp.localhost'
+        self.assertTrue(review.phone_enabled())  # Retained local development flow.
+        self.assertTrue(review.registration_enabled('clinician'))
+
+    def test_legacy_phone_route_stays_closed_on_review_site(self):
+        with patch.dict(self.fake.conf, {'tele_tena_phone_otp_enabled': True}):
+            with self.assertRaises(Permission):
+                review.guard_contact_access(legacy=True)
+
+    def test_email_otp_requires_private_delivery_configuration(self):
+        from tele_tena import email_delivery
+        with patch.object(email_delivery, 'configuration', side_effect=email_delivery.DeliveryUnavailable('not configured')):
+            with self.assertRaises(Permission):
+                review.guard_contact_access('email')
+        with patch.object(email_delivery, 'configuration', return_value={'configured': True}):
+            review.guard_contact_access('email')
 
     def test_renderer_is_scoped(self):
         with patch.object(review_web,'enabled',return_value=True):
