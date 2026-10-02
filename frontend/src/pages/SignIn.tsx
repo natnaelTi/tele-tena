@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, LockKeyhole } from "lucide-react";
 import { ApiError, api, phoneAuth, setCsrf, signIn } from "../api";
@@ -11,6 +11,7 @@ import {
 } from "../components/ui";
 import { destination, useSession } from "../hooks/useSession";
 import { useLocale } from "../hooks/useLocale";
+type SignInOptions = { phone_otp: boolean; email_otp: boolean; patient_registration: boolean; clinician_registration: boolean };
 export default function SignIn() {
   const { refresh, session } = useSession();
   const { w } = useLocale();
@@ -26,6 +27,22 @@ export default function SignIn() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [options, setOptions] = useState<SignInOptions | null>(null);
+  const requestKey = useRef("");
+  useEffect(() => {
+    let active = true;
+    void api<SignInOptions>("tele_tena.api.contact_auth.sign_in_options")
+      .then((value) => {
+        if (!active) return;
+        setOptions(value);
+        if (!value.phone_otp) {
+          setChannel("email");
+          setPasswordMode(!value.email_otp);
+        }
+      })
+      .catch(() => { if (active) setError("Sign-in options are unavailable. Reload to try again."); });
+    return () => { active = false; };
+  }, []);
   useEffect(() => {
     if (!cooldown) return;
     const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
@@ -41,7 +58,10 @@ export default function SignIn() {
       await task();
     } catch (error) {
       setError(
-        error instanceof ApiError && error.code === "review_password_required" ? "This review uses invited accounts. Choose Use email instead, then Use password instead." :
+        error instanceof ApiError && error.code === "review_password_required" ? "Phone verification is unavailable here. Use email and password." :
+        error instanceof ApiError && error.code === "sms_budget_exhausted" ? "Code sending is temporarily unavailable. Try again later or use email." :
+        error instanceof ApiError && error.code === "resend_cooldown" ? "Please wait before requesting another code." :
+        error instanceof ApiError && error.code === "registration_unavailable" ? "New registrations are paused here. Existing verified accounts can still sign in." :
         "We couldn’t complete that step. Check your details and try again. Codes expire after five minutes.",
       );
     } finally {
@@ -50,20 +70,27 @@ export default function SignIn() {
   }
   async function request() {
     await run(async () => {
+      if (!requestKey.current) requestKey.current = crypto.randomUUID();
       const result = await api<{
         challenge_id: string;
         delivery_state: string;
         message: string;
       }>(
         "tele_tena.api.contact_auth.request_code",
-        { channel, contact, request_id: crypto.randomUUID() },
+        { channel, contact, request_id: requestKey.current },
         true,
       );
+      requestKey.current = "";
+      if (result.delivery_state === "rejected") {
+        setError("The provider could not send a code. Check your contact or use another sign-in option.");
+        setCooldown(60);
+        return;
+      }
       setChallenge(result.challenge_id);
       setCooldown(60);
-      setNotice(
-        "If delivery is available, a code will arrive shortly. Wait one minute before requesting another.",
-      );
+      setNotice(result.delivery_state === "accepted"
+        ? "The provider accepted the request. Check your messages; delivery is not yet confirmed."
+        : "Delivery could not be confirmed. If a code arrives, enter it here. Wait one minute before resending.");
     });
   }
   async function proceed() {
@@ -100,6 +127,7 @@ export default function SignIn() {
         </p>
       )}
       {error && <InlineNotice tone="danger">{error}</InlineNotice>}
+      {!options && !error ? <p role="status">Checking sign-in options…</p> : null}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -132,23 +160,23 @@ export default function SignIn() {
           <PhoneField
             label={w("Phone number")}
             value={contact}
-            onChange={(e) => setContact(e.target.value)}
+            onChange={(e) => { setContact(e.target.value); requestKey.current = ""; }}
             hint="Ethiopia (+251). You can also enter a number starting with 09 or 07."
             required
           />
         ) : (
           <TextField
-            label="Email"
+            label={w("Email")}
             type="email"
             autoComplete="email"
             value={contact}
-            onChange={(e) => setContact(e.target.value)}
+            onChange={(e) => { setContact(e.target.value); requestKey.current = ""; }}
             required
           />
         )}
         {!challenge && passwordMode && (
           <TextField
-            label="Password"
+            label={w("Password")}
             type="password"
             autoComplete="current-password"
             value={password}
@@ -156,7 +184,7 @@ export default function SignIn() {
             required
           />
         )}
-        <Button type="submit" loading={busy} className="full">
+        <Button type="submit" loading={busy} disabled={!options || (channel === "phone" && !options.phone_otp) || (channel === "email" && !passwordMode && !options.email_otp)} className="full">
           {challenge
             ? w("Verify and continue")
             : passwordMode
@@ -177,6 +205,7 @@ export default function SignIn() {
                 setChallenge("");
                 setCode("");
                 setError("");
+                requestKey.current = "";
               }}
             >
               <ArrowLeft size={18} />
@@ -187,31 +216,32 @@ export default function SignIn() {
               disabled={cooldown > 0 || busy}
               onClick={() => void request()}
             >
-              {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend code"}
+              {cooldown > 0 ? `Resend in ${cooldown}s` : w("Resend code")}
             </Button>
           </div>
         </>
       ) : (
         <div className="auth-secondary vertical">
-          <Button
+          {options?.phone_otp && <Button
             variant="quiet"
             onClick={() => {
               setChannel(channel === "phone" ? "email" : "phone");
-              setPasswordMode(false);
+              setPasswordMode(channel === "phone" && !options.email_otp);
               setContact("");
               setError("");
+              requestKey.current = "";
             }}
           >
-            {channel === "phone" ? w("Use email instead") : "Use phone instead"}
-          </Button>
-          {channel === "email" && (
+            {channel === "phone" ? w("Use email instead") : w("Use phone instead")}
+          </Button>}
+          {channel === "email" && options?.email_otp && (
             <Button
               variant="quiet"
               onClick={() => setPasswordMode(!passwordMode)}
             >
               {passwordMode
-                ? "Use an email code instead"
-                : "Use password instead"}
+                ? w("Use an email code instead")
+                : w("Use password instead")}
             </Button>
           )}
         </div>
