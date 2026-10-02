@@ -54,10 +54,20 @@ Run evidence is itemized in [presentation-readiness-verification.md](presentatio
 - [x] Synthetic screenshot/browser journeys at 320, 390, 768 and 1440 px, plus the 200%-equivalent narrow-layout check, keyboard flows, language samples and offline navigation.
 - [ ] Human translation review, physical-device media and PWA installation review.
 
+## Consolidated baseline and next design coverage
+
+PRs #7–#10 are merged into `main` at `4cc0be9a0a96c3b209d07b47fd5e7c46ab4c31a2`.
+The [route and component inventory](design-update-inventory.md) is the coverage
+checklist for the forthcoming design brief. Each changed row needs responsive
+rendering, connected-flow and three-language review; placeholders remain visibly
+unavailable until their backend capability is implemented. The Selfmade site is
+still pinned to its installed release and was not updated by these merges.
+
 ## Historical merge gate
 PR #6 passed the hosted LiveKit and local checks and merged as `7222836`. Source PRs
-#3/#4 merged through preserved ancestry; #5 was superseded. The new presentation PR
-uses its own acceptance record. No production deployment is authorized.
+#3/#4 merged through preserved ancestry; #5 was superseded. Presentation PR #7
+subsequently merged through preserved ancestry. No production deployment is
+authorized by these merges.
 
 ## Review installation packaging
 
