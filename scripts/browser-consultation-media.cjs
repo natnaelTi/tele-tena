@@ -23,12 +23,22 @@ async function main() {
   async function login(page, kind) {
     checkpoint = 'sign in through explicit password alternative'
     await page.goto(base + '/sign-in')
-    await page.getByRole('button', { name: 'Use email instead', exact: true }).click()
-    await page.getByRole('button', { name: 'Use password instead', exact: true }).click()
+    checkpoint = 'wait for configured sign-in form'
+    await page.locator('.auth-panel button[type="submit"]:not([disabled])').waitFor()
+    const emailChoice = page.getByRole('button', { name: 'Use email instead', exact: true })
+    checkpoint = 'choose email sign-in'
+    if (await emailChoice.count()) await emailChoice.click()
+    const passwordChoice = page.getByRole('button', { name: 'Use password instead', exact: true })
+    checkpoint = 'choose password sign-in'
+    if (await passwordChoice.count()) await passwordChoice.click()
+    checkpoint = 'fill sign-in fields'
     await page.getByLabel('Email', { exact: true }).fill(fixture.users[kind])
     await page.getByLabel('Password', { exact: true }).fill(fixture.password)
+    checkpoint = 'submit password sign-in'
     await page.getByRole('button', { name: 'Sign in', exact: true }).click()
+    checkpoint = 'wait for authenticated workspace'
     await page.getByRole('button', { name: 'Sign out', exact: true }).waitFor({ timeout: 15000 })
+    checkpoint = 'open consultation detail'
     await page.goto(base + (kind.startsWith('p') ? '/patient' : '/clinician') + '/consultations/' + fixture.appointment_id)
     await page.getByRole('link', {name:'Join consultation', exact:true}).click()
     await page.locator(`[data-appointment-id="${fixture.appointment_id}"] .consultation`).waitFor()

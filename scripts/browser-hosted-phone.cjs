@@ -30,6 +30,7 @@ fs.mkdirSync(output, {recursive:true});
   await page.getByRole('button',{name:'Continue',exact:true}).click();
   await page.getByLabel('Verification code',{exact:true}).waitFor();
   assert.equal(await page.locator('main input').count(),1);
+  await page.setViewportSize({width:390,height:850});
   await page.screenshot({path:`${output}/code-entry-390.png`,fullPage:true});
   await page.getByRole('button',{name:'Change number',exact:true}).click();
   await page.getByRole('button',{name:'Use email instead',exact:true}).click();
