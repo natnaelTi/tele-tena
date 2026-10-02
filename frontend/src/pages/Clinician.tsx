@@ -116,10 +116,12 @@ export function Availability() {
   const [weekShift,setWeekShift]=useState(0);
   const [calendarEditMode,setCalendarEditMode]=useState<"weekly"|"date">("weekly");
   const [selectedInterval,setSelectedInterval]=useState<number|null>(null);
+  const [timeEditorOpen,setTimeEditorOpen]=useState(()=>window.matchMedia("(max-width: 800px)").matches);
   const [timeErrors,setTimeErrors]=useState<Record<number,{start?:string;end?:string}>>({});
   const [serviceError,setServiceError]=useState("");
   const [nameError,setNameError]=useState("");
   const [availabilityError,setAvailabilityError]=useState("");
+  useEffect(()=>{const query=window.matchMedia("(max-width: 800px)");const update=()=>setTimeEditorOpen(query.matches);query.addEventListener("change",update);return()=>query.removeEventListener("change",update);},[]);
   useEffect(() => {
     const s = current.data?.find(item=>item.offering===offering) || (!offering?current.data?.[0]:undefined);
     if (s) { setName(s.schedule_name); if(s.offering!==offering)setOffering(s.offering); setZone(s.timezone); setFormat(s.consultation_format); setConfirmation(s.confirmation_mode); setNotice(String(s.minimum_notice_minutes)); setHorizon(String(s.horizon_days)); setBefore(String(s.buffer_before)); setAfter(String(s.buffer_after)); setStatus(s.status); setIntervals(s.intervals); setExceptions(s.exceptions); }
@@ -129,7 +131,7 @@ export function Availability() {
   const dateLocale=locale==="am"?"am-ET":locale==="om"?"om-ET":"en-ET";
   const dayNames = Array.from({length:7},(_,weekday)=>new Intl.DateTimeFormat(dateLocale,{weekday:"long",timeZone:"UTC"}).format(new Date(Date.UTC(2024,0,1+weekday,12))));
   const addInterval = (weekday:number, start="09:00") => {const [hour,minute]=start.split(":").map(Number);const endMinutes=Math.min(23*60+59,hour*60+minute+60);const end=`${String(Math.floor(endMinutes/60)).padStart(2,"0")}:${String(endMinutes%60).padStart(2,"0")}`;setIntervals([...intervals, {weekday, start_local:start, end_local:end}]);setSelectedInterval(intervals.length);setMobileDay(weekday);setDirty(true);};
-  const inspectInterval=(index:number,weekday:number)=>{setSelectedInterval(index);setMobileDay(weekday);window.setTimeout(()=>document.querySelector<HTMLElement>(`[data-selected="true"] input[type="time"]`)?.focus(),0);};
+  const inspectInterval=(index:number,weekday:number)=>{setSelectedInterval(index);setMobileDay(weekday);setTimeEditorOpen(true);window.setTimeout(()=>document.querySelector<HTMLElement>(`[data-selected="true"] input[type="time"]`)?.focus(),0);};
   const editInterval = (i:number, field:"start_local"|"end_local", value:string) => {setIntervals(intervals.map((x,n)=>n===i?{...x,[field]:value}:x));setTimeErrors(errors=>({...errors,[i]:{...errors[i],[field==="start_local"?"start":"end"]:undefined}}));};
   const selectedSchedule = offerings.data?.offerings.find(x=>x.id===offering);
   function validateIntervals() {
@@ -198,6 +200,7 @@ export function Availability() {
           <div className="schedule-week-heading"><h2>{w("Weekly availability")}</h2><Select label={w("Calendar edit mode")} value={calendarEditMode} onChange={e=>setCalendarEditMode(e.target.value as "weekly"|"date")}><option value="weekly">{w("Recurring weekly")}</option><option value="date">{w("This date only")}</option></Select></div>
           <p className="supporting">{calendarEditMode==="weekly"?w("Choose a time to add a weekly interval."):w("Choose a time to prepare a date-specific replacement. Confirm it in Date exceptions before saving. Existing appointments remain unchanged.")}</p>
           <p className="supporting">Times follow {zone}. Ambiguous or skipped daylight-saving times are not offered. Existing appointments stay at their saved times.</p>
+          <div className="availability-workspace">
           <div className="availability-calendar-scroll" aria-label="Weekly appointment calendar">
             <div className={`availability-calendar-grid${calendarEditMode==="date"?" date-edit-mode":""}`} style={{gridTemplateColumns:"56px repeat(7,minmax(90px,1fr))"}}>
               <div className="calendar-corner">Local time</div>{weekDays.map((day,weekday)=><div className="calendar-day-heading" key={dateKey(day)} aria-current={dateKey(day)===dateKey(localToday)?"date":undefined}><strong>{dayNames[weekday]}</strong><span>{displayDay(day)}</span></div>)}
@@ -210,9 +213,17 @@ export function Availability() {
               </div>;})}
             </div>
           </div>
+          {selectedInterval!==null&&intervals[selectedInterval]&&<aside className="availability-interval-editor" aria-label="Edit weekly availability interval">
+            <div className="availability-editor-heading"><h3>{w("Edit weekly interval")}</h3><Button variant="quiet" aria-label={w("Close interval editor")} onClick={()=>setSelectedInterval(null)}>×</Button></div>
+            <p className="supporting">{dayNames[intervals[selectedInterval].weekday]} · {w("Repeats every week")}</p>
+            <TextField label={w("Interval starts")} type="time" value={intervals[selectedInterval].start_local} error={timeErrors[selectedInterval]?.start} onChange={e=>editInterval(selectedInterval,"start_local",e.target.value)} />
+            <TextField label={w("Interval ends")} type="time" value={intervals[selectedInterval].end_local} error={timeErrors[selectedInterval]?.end} onChange={e=>editInterval(selectedInterval,"end_local",e.target.value)} />
+            <Button variant="quiet" onClick={()=>{setIntervals(intervals.filter((_,n)=>n!==selectedInterval));setTimeErrors({});setSelectedInterval(null);setDirty(true);}}>{w("Remove interval")}</Button>
+          </aside>}
+          </div>
           <p className="supporting">Teal blocks repeat weekly. Striped blocks are date exceptions. Dark blocks are already reserved appointments.</p>
           {appointments.error&&<InlineNotice>Existing appointments are temporarily unavailable in this calendar; they remain protected by server-side conflict checks.</InlineNotice>}
-          <details className="schedule-accessible-times" open><summary>{w("Time-field editor and keyboard alternative")}</summary>
+          <details className="schedule-accessible-times" open={timeEditorOpen} onToggle={e=>setTimeEditorOpen(e.currentTarget.open)}><summary>{w("Time-field editor and keyboard alternative")}</summary>
           <nav className="schedule-day-picker" aria-label="Choose day to edit">{dayNames.map((day,weekday)=><button type="button" key={day} aria-pressed={mobileDay===weekday} onClick={()=>setMobileDay(weekday)}>{day.slice(0,3)}</button>)}</nav>
           {dayNames.map((day,weekday)=>{const items=intervals.map((x,index)=>({...x,index})).filter(x=>x.weekday===weekday);return <div className={`schedule-day${mobileDay===weekday?" mobile-selected":""}`} key={day}><h3>{day}</h3><div className="schedule-intervals">{items.map(x=><div className="schedule-interval" key={x.index} data-selected={selectedInterval===x.index}><TextField label={`${day} starts`} type="time" value={x.start_local} error={timeErrors[x.index]?.start} onChange={e=>editInterval(x.index,"start_local",e.target.value)} /><span>to</span><TextField label={`${day} ends`} type="time" value={x.end_local} error={timeErrors[x.index]?.end} onChange={e=>editInterval(x.index,"end_local",e.target.value)} /><Button variant="quiet" onClick={()=>{setIntervals(intervals.filter((_,n)=>n!==x.index));setTimeErrors({});setSelectedInterval(null);setDirty(true);}}>Remove</Button></div>)}<Button variant="secondary" onClick={()=>addInterval(weekday)}>Add time</Button></div></div>})}
           <div className="copy-day"><Select label="Copy intervals from" value={String(copySourceDay)} onChange={e=>{setCopySourceDay(Number(e.target.value));setCopyDays(copyDays.filter(day=>day!==Number(e.target.value)));}}>{dayNames.map((day,index)=><option key={day} value={index}>{day}</option>)}</Select><Select label="Copy to days" multiple value={copyDays.map(String)} onChange={e=>{setCopyDays(Array.from(e.target.selectedOptions).map(o=>Number(o.value)));setDirty(true);}}>{dayNames.map((day,index)=>index!==copySourceDay&&<option key={day} value={index}>{day}</option>)}</Select><Button variant="secondary" disabled={!copyDays.length} onClick={()=>{const source=intervals.filter(x=>x.weekday===copySourceDay); setIntervals([...intervals.filter(x=>!copyDays.includes(x.weekday)),...copyDays.flatMap(day=>source.map(x=>({...x,weekday:day})))]);setDirty(true);}}>Copy {dayNames[copySourceDay]} times</Button></div>

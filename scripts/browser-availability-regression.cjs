@@ -42,8 +42,17 @@ async function signIn(page, user, password) {
     await page.getByLabel('Monday ends', { exact: true }).fill('17:00');
     const tuesday = page.locator('.schedule-day').filter({ has: page.getByRole('heading', { name: 'Tuesday', exact: true }) });
     await tuesday.getByRole('button', { name: 'Add time' }).click();
+    const timeFields = page.locator('details.schedule-accessible-times');
+    if (!(await timeFields.evaluate(element => element.open))) await timeFields.locator('summary').click();
     await page.getByLabel('Tuesday starts', { exact: true }).fill('09:00');
     await page.getByLabel('Tuesday ends', { exact: true }).fill('17:00');
+
+    // Invalid intervals must be explained beside the field and remain editable.
+    await page.getByLabel('Monday ends', { exact: true }).fill('08:00');
+    await page.getByRole('button', { name: 'Save schedule' }).click();
+    await page.getByText('End time must be after start time.', { exact: true }).waitFor();
+    assert.equal(await page.getByLabel('Monday ends', { exact: true }).inputValue(), '08:00');
+    await page.getByLabel('Monday ends', { exact: true }).fill('17:00');
 
     const responseWait = page.waitForResponse(response =>
       response.url().includes('/api/method/tele_tena.api.scheduling.save_schedule'));
