@@ -51,6 +51,14 @@ to Selfmade.
   Frappe route using a new synthetic patient with a fresh balanced demo wallet.
 - `scripts/browser-availability-calendar.cjs` passed date-only edit and
   accessible field focus/copy interactions on the production-built route.
+- `scripts/check_redesign_browser.py` was attempted as a wider browser sweep but
+  stopped during synthetic fixture setup, before Chromium launch: its applicant
+  onboarding fixture called the registration endpoint while the site correctly
+  had public registration disabled. No registration setting was changed and no
+  browser result is claimed from that attempt.
+- `scripts/build_review.py` passed and produced the packaged Frappe assets; the
+  exact source SHA is in the generated `release.json`. The packaged artifact
+  hash/scope/privacy check passed. PR #12's eight frontend/Python CI jobs passed.
 - `git diff --check` passed.
 - `scripts/check_financial_migration.py` currently **fails** on the shared
   disposable review site, so this run does not establish repeat-migration
