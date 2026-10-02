@@ -140,8 +140,17 @@ def clinician_earnings():
                 item[key] = item[key].isoformat() + 'Z'
     account_ids = [account_id('clinician', clinician, bucket) for bucket in buckets]
     activity = _event_rows(account_ids)
+    event_labels = {
+        'ConsultationFinalized': 'Consultation completed',
+        'EarningReleased': 'Earnings released',
+        'PayoutRequested': 'Payout requested',
+        'PayoutCancelled': 'Payout request cancelled',
+        'EarningRefunded': 'Refund recorded',
+    }
     for item in activity:
         item.created = item.created.isoformat() + 'Z'
+        item.kind = event_labels.get(item.event_type, item.event_type)
+        item.source = 'demo_subledger'
     return {'balances': balances, 'earnings': earnings, 'payouts': payouts, 'activity': activity,
             'external_settlement': False}
 

@@ -142,6 +142,12 @@ class Integration(unittest.TestCase):
         frappe.db.sql('DELETE FROM tt_service WHERE id=%s', (PREFIX,))
         for email in USERS.values():
             frappe.delete_doc('User', email)
+        # Fixture cleanup removes its own journals; restore only the cached
+        # account totals from the remaining immutable journal lines.
+        frappe.db.sql('''UPDATE tt_financial_account a SET balance_minor=COALESCE((
+            SELECT SUM(CASE WHEN a.normal_side='D' THEN l.debit_minor-l.credit_minor
+                            ELSE l.credit_minor-l.debit_minor END)
+            FROM tt_journal_line l WHERE l.account_id=a.id),0)''')
         frappe.db.commit()
         frappe.destroy()
 
@@ -247,9 +253,24 @@ class Integration(unittest.TestCase):
         self.assertEqual(api.one('SELECT COUNT(*) AS n FROM tt_appointment WHERE clinician=%s AND start=%s', (USERS['c1'], api.instant(at(4)))).n, 1)
 
     def test_05_concurrent_overspend(self):
+        from tele_tena.accounting import account_id, check_wallet_projection, post
         login('p2')
-        # Reset synthetic test-only balance using SQL; not an application command.
-        frappe.db.sql('UPDATE tt_wallet SET available=600 WHERE patient=%s', (USERS['p2'],))
+        wallet = api.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s FOR UPDATE', (USERS['p2'],))
+        check_wallet_projection(USERS['p2'], wallet)
+        available = int(wallet.available)
+        desired = 600
+        if available > desired:
+            amount = available - desired
+            lines = [(account_id('patient', USERS['p2'], 'available'), amount, 0),
+                     (account_id('', '', 'cash_clearing'), 0, amount)]
+        else:
+            amount = desired - available
+            lines = [(account_id('', '', 'cash_clearing'), amount, 0),
+                     (account_id('patient', USERS['p2'], 'available'), 0, amount)]
+        if amount:
+            reference = 'integration-fixture-balance:' + USERS['p2'] + ':' + secrets.token_hex(8)
+            post(reference, 'TestFixtureBalanceAdjustment', reference, lines, {'synthetic_fixture': True})
+            frappe.db.sql('UPDATE tt_wallet SET available=%s WHERE patient=%s', (desired, USERS['p2']))
         frappe.db.commit()
         result = self.concurrent([('p2', booking(self.offers['c1'], at(6), 'spend-1')),
                                   ('p2', booking(self.offers['c2'], at(7), 'spend-2'))])

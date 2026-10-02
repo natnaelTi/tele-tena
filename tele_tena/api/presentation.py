@@ -471,6 +471,17 @@ def wallet_summary():
     from tele_tena.accounting import _event_rows, account_id
     activity = legacy + _event_rows([
         account_id('patient', patient, 'available'), account_id('patient', patient, 'reserved')])
+    for item in legacy:
+        item.source = 'simulation_log'
+        item.event_ref = item.reference
+        item.kind = {'Deposit': 'Demonstration funds added', 'Reservation': 'Appointment funds reserved',
+                     'Release': 'Appointment reservation released'}.get(item.kind, item.kind)
+    event_labels = {'Deposit': 'Demonstration funds added', 'Reservation': 'Appointment funds reserved',
+                    'ReservationRelease': 'Appointment reservation released',
+                    'ConsultationFinalized': 'Consultation completed', 'EarningRefunded': 'Refund recorded'}
+    for item in activity[len(legacy):]:
+        item.source = 'demo_subledger'
+        item.kind = event_labels.get(item.event_type, item.event_type)
     activity.sort(key=lambda item: (item.created, getattr(item, 'reference', '')), reverse=True)
     activity = activity[:50]
     for item in activity:

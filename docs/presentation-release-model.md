@@ -80,3 +80,34 @@ Replay is always available. No tour executes a mutation. The service worker stor
 the public shell assets and generic offline document only; APIs, authenticated
 responses, private files and financial/clinical data remain network-only. It never
 forces a page reload; updates wait for the client's normal close lifecycle.
+
+## Demonstration earnings ledger (v1.7)
+
+`tt_ledger` remains the prior append-only simulation activity log. The v1.7
+balanced `tt_journal`/`tt_journal_line` subledger separately records opening
+balance snapshots, deposits, reservations, supported releases, finalization,
+earnings release, disputes, refunds and payout reservations. It is not ERPNext
+accounting or an external money movement system. Every posting has an immutable
+event reference/idempotency key; wallet projections are checked before patient
+fund changes.
+
+The demonstration defaults are zero platform fee and a 60-minute dispute window
+after explicit clinician finalization. Each booking stores the configured fee and
+window; later configuration changes do not alter accepted transactions. No
+earnings accrue at call End. Finalization atomically consumes the patient
+reservation and creates clinician pending earnings once. The scheduled process
+runs every five minutes and posts eligible earnings using server time. A dispute
+committed before release blocks it under a shared lock; if release wins first,
+the patient dispute endpoint rejects the request and the case requires separate
+authorized review. Automated refunds after release or while payout is requested
+are unsupported. No negative balances or edits to historical postings are
+allowed. Payout requests reserve only available earnings; cancelling a Requested
+payout releases that reservation once. Current payout states are `Requested`
+and `Cancelled`; no processing or paid claim is exposed because no transfer
+occurs.
+
+On migration, existing wallet values receive one balanced opening snapshot while
+the legacy activity log remains unchanged. Completed appointments with reserved
+funds are marked `LegacyHold`, preserved for review, and never automatically
+settled or released. See `demo-earnings-model.md` for account mappings and the
+acceptance arithmetic.

@@ -24,11 +24,18 @@ cookies and CSRF must follow the installed Frappe version's supported behavior.
 Modules: identity/consent; providers/affiliations; service catalog; marketplace;
 scheduling; consultations/records; financial subledger; trust/operations.
 
-The planned double-entry operational subledger will own spendable/reserved funds
-and clinician earnings; it is not implemented by the simulation event log. ERPNext owns
-financial reporting. Define posting mappings, durable retry references and reconciliation;
-never independently calculate two authoritative spendable balances. Regulatory/provider
-approval of stored funds is still outstanding. Demo money is simulated only.
+The versioned `v1_7_demo_subledger` adds app-owned `tt_financial_account`,
+`tt_journal`, `tt_journal_line`, `tt_earning`, `tt_dispute` and `tt_payout` tables.
+This balanced operational subledger is separate from the legacy `tt_ledger`
+simulation activity log. It is used only for demonstration balances and simulated
+earnings. `tt_wallet` remains the patient-facing projection and each command checks
+it against the subledger before changing funds. Posting references are unique and
+retry-safe; corrections use audited, balanced reversals. ERPNext remains the future
+accounting/reporting boundary: there is no ERPNext posting, bank custody, payment
+provider or external payout integration. Real-money/provider readiness remains
+unapproved. Historical completed appointments with reserved funds become
+review-only `LegacyHold` rows; migration preserves old balances and events and does
+not settle those appointments.
 
 Use explicit command APIs for accept_offer, book_appointment, reserve_funds and
 request_withdrawal. Generic document writes must not bypass these invariants.
