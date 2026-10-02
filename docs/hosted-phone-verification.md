@@ -8,8 +8,9 @@ PR #9, which includes packaging PR #8 and presentation PR #7. It does not
 change real-payment controls, generic Frappe signup, existing records, or the
 deployed Selfmade site. No live SMS was sent.
 
-The exact installation SHA is pinned in
-[the incremental update guide](selfmade-phone-access-update.md). Local testing
+The exact installation SHA is `8f7ab9cd8d5e779d17b632dc9afdae3e700ab3c6`,
+also pinned in [the incremental update guide](selfmade-phone-access-update.md).
+The following documentation-only commit does not alter runtime behavior. Local testing
 used the isolated Frappe 16 Bench; remote HTTPS, proxy identity, provider
 credentials, account-specific SMS header requirements, delivery, and physical
 devices still require the controlled operator checks in that guide.

@@ -4,7 +4,8 @@ This updates the **already installed** TeleTena review site
 `teletena.selfmadecs.com` in `/home/smcs/frappe-bench` from release
 `bba5ed9f15bd0b140967618ed2bd982c31a76c1b`. It does not call the seed,
 create a new site, change Frappe/ERPNext, or enable generic Frappe signup.
-The final verified update SHA is recorded in the verification report. PR dependencies:
+The verified installation SHA is `8f7ab9cd8d5e779d17b632dc9afdae3e700ab3c6`.
+The following documentation-only pin commit does not alter runtime code. PR dependencies:
 this phone-access branch includes open PR #9, #8 and #7; merge is separate.
 
 ## Gate: review the target before modifying it
@@ -28,7 +29,7 @@ more than the returned acceptance state and the recipient's observation.
 ## Pinned code and backup
 
 All commands run as `smcs` in `/home/smcs/frappe-bench` unless they begin with
-`sudo`. The SHA in the report must replace `UPDATE_SHA` below before running.
+`sudo`. The pinned SHA below is the exact artifact build tested locally.
 The staged update includes no new Python package or schema requirement. It still
 runs a site-only migration as a safe hook/patch check and rechecks `pip check`.
 
@@ -36,8 +37,7 @@ runs a site-only migration as a safe hook/patch check and rechecks `pip check`.
 set -euo pipefail
 umask 077
 cd /home/smcs/frappe-bench
-UPDATE_SHA='REPLACE_WITH_FULL_VERIFIED_UPDATE_SHA'
-test "$UPDATE_SHA" != REPLACE_WITH_FULL_VERIFIED_UPDATE_SHA
+UPDATE_SHA='8f7ab9cd8d5e779d17b632dc9afdae3e700ab3c6'
 [[ "$UPDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
 test "$(git -C apps/tele_tena rev-parse HEAD)" = bba5ed9f15bd0b140967618ed2bd982c31a76c1b
 test -z "$(git -C apps/tele_tena status --porcelain)"
