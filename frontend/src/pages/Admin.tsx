@@ -37,8 +37,10 @@ export function Applications() {
         resource.data.map((item) => (
           <Card key={item.user}>
             <StatusBadge>{item.status}</StatusBadge>
-            <h2>{item.user}</h2>
+            <h2>{item.display_name || "Clinician application"}</h2>
+            <p className="supporting">Application reference · {item.user}{item.submitted_at?` · Submitted ${new Date(item.submitted_at).toLocaleDateString()}`:" · Submission date unavailable"}</p>
             <p className="prewrap">{item.statement}</p>
+            <div className="application-evidence"><h3>Requested service scopes</h3><p>{item.requested_service_labels?.length?item.requested_service_labels.join(", "):"No requested scopes recorded"}</p><p>Evidence: {item.evidence_complete?"Complete":"Incomplete"} · Resume: {item.resume_uploaded?"Uploaded":"Not uploaded"}</p>{item.resume_uploaded&&<Button variant="secondary" onClick={async()=>{try{const response=await fetch(`/api/method/tele_tena.api.presentation.download_resume?clinician=${encodeURIComponent(item.user)}`,{credentials:"same-origin",cache:"no-store"});if(!response.ok)throw new Error();const blob=await response.blob();const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="clinician-resume.pdf";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch{window.alert("Resume could not be opened. Check your reviewer access and try again.");}}}>Open resume</Button>}</div>
             <div className="actions">
               <Button
                 disabled={action.busy || item.status === "Approved"}
@@ -113,7 +115,7 @@ export function Scopes() {
             {applications.data
               ?.filter((a) => a.status === "Approved")
               .map((a) => (
-                <option key={a.user}>{a.user}</option>
+                <option key={a.user} value={a.user}>{a.display_name || "Clinician"} · {a.requested_service_labels?.length ? a.requested_service_labels.join(", ") : "No requested scopes"}</option>
               ))}
           </Select>
           <Select
@@ -166,9 +168,9 @@ export function Scopes() {
       <h2>Current scopes</h2>
       {scopes.data?.map((scope) => (
         <Card key={scope.clinician + scope.service}>
-          <h3>{scope.clinician}</h3>
+          <h3>{applications.data?.find(a=>a.user===scope.clinician)?.display_name || "Clinician"}</h3>
           <p>
-            {scope.service} · {scope.status}
+            {scope.service} · {scope.status} <span className="supporting">· {scope.clinician}</span>
           </p>
           <Button
             variant="secondary"

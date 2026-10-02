@@ -1,0 +1,15 @@
+{
+  "id": "/",
+  "name": "TeleTena",
+  "short_name": "TeleTena",
+  "description": "Find a space for a conversation.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FAF9F6",
+  "theme_color": "#126B64",
+  "icons": [
+    { "src": "/brand/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/brand/app-icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

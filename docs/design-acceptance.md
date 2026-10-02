@@ -1,8 +1,8 @@
 # TeleTena redesign acceptance record
 
 Authoritative requirements are in [design-system.md](design-system.md). An
-unchecked item is not a pass. This branch remains under review until its PR checks
-complete. Artifacts use synthetic information only.
+unchecked item is not a pass. This record documents the merged PR #6 baseline. Presentation release acceptance is
+tracked below and in the release verification report. Artifacts use synthetic information only.
 
 - [x] Save the supplied specification and require both frontend design documents in AGENTS.md.
 - [x] Fetch and inspect main and PR #3/#4/#5, verification reports, dependencies and working tree. Preserve source branches and data.
@@ -36,8 +36,24 @@ complete. Artifacts use synthetic information only.
 - [x] Review actual screenshots; artifacts at `/tmp/tele-tena-redesign-review/`.
 - [ ] Required GitHub checks on the pushed consolidation PR.
 
-## Merge gate
-Merge the consolidation only when hosted call checks pass on the final commit, all
-local regressions/build checks pass, and GitHub reports successful required checks.
-Do not deploy to production. Preserve PR #3/#4/#5 branches until this merge accounts
-for their changes; then mark their PRs superseded without deleting source branches.
+## Presentation release
+
+Detailed states and demonstration policies: [presentation-release-model.md](presentation-release-model.md).
+Run evidence is itemized in [presentation-readiness-verification.md](presentation-readiness-verification.md).
+
+- [x] Weekly schedule recurrence, exceptions, timezone conversion, global clinician conflict check, valid-slot booking and manual-confirmation reservation lifecycle.
+- [x] Distinct server-enforced appointment/call/documentation states; explicit completion and authorized cancellation/release.
+- [x] Private notes, separately published summaries, revision and visibility history, follow-up booking.
+- [x] Status-aware consultation detail and focused audio/video room; hosted cached-token End/revocation check passed.
+- [x] Clinician care directory and encounter-scoped disclosure history.
+- [x] Focused account sections and backed wallet summaries; no fabricated earnings.
+- [x] Admin names/status/scopes/resume evidence with permission-checked private upload/download.
+- [x] Public-only static cache, offline page and no forced service-worker reload.
+- [x] Persisted, dismissible and replayable role-specific tours with English, Amharic and Afaan Oromo copy.
+- [x] Synthetic screenshot/browser journeys at 320, 390, 768 and 1440 px, plus the 200%-equivalent narrow-layout check, keyboard flows, language samples and offline navigation.
+- [ ] Human translation review, physical-device media and PWA installation review.
+
+## Historical merge gate
+PR #6 passed the hosted LiveKit and local checks and merged as `7222836`. Source PRs
+#3/#4 merged through preserved ancestry; #5 was superseded. The new presentation PR
+uses its own acceptance record. No production deployment is authorized.

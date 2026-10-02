@@ -23,14 +23,18 @@ class ContactAuth(unittest.TestCase):
         cls.users = []
         cls.contacts = []
         cls.challenges = []
+        cls.services = []
 
     @classmethod
     def tearDownClass(cls):
         frappe.db.rollback()
         frappe.set_user('Administrator')
+        for service in cls.services:
+            frappe.db.sql('DELETE FROM `tabTele Tena Service` WHERE name=%s', (service,))
         for user in cls.users:
             for table, field in [('contact_identity', 'user'), ('onboarding', 'user'), ('profile', 'user'), ('application', 'user'), ('wallet', 'patient')]:
                 frappe.db.sql(f'DELETE FROM tt_{table} WHERE {field}=%s', (user,))
+            frappe.db.sql('DELETE FROM tt_resume_evidence WHERE clinician=%s', (user,))
             if frappe.db.exists('User', user):
                 frappe.delete_doc('User', user)
         for challenge in cls.challenges:
@@ -110,7 +114,21 @@ class ContactAuth(unittest.TestCase):
         frappe.set_user(user)
         with self.assertRaises(frappe.ValidationError):
             auth.save_onboarding('clinician', 2, {'roles': ['System Manager']})
-        auth.save_onboarding('clinician', 3, {'name': 'Synthetic applicant', 'statement': 'Synthetic credentials and scope', 'adult': True, 'consent': True}, 1)
+        service = 'otp-test-' + secrets.token_hex(5)
+        frappe.set_user('Administrator')
+        frappe.get_doc(dict(doctype='Tele Tena Service', service_key=service,
+                            service_label='Synthetic application service', active=1)).insert()
+        self.services.append(service)
+        frappe.db.commit()
+        frappe.set_user(user)
+        answers = {'name': 'Synthetic applicant', 'statement': 'Synthetic credentials and scope',
+                   'adult': True, 'consent': True, 'requested_services': [service]}
+        auth.save_onboarding('clinician', 2, answers)
+        from tele_tena.api import presentation
+        import base64
+        pdf = b'%PDF-1.7\n1 0 obj<</Type/Catalog>>endobj\n%%EOF\n'
+        presentation.upload_resume('synthetic.pdf', base64.b64encode(pdf).decode())
+        auth.save_onboarding('clinician', 3, answers, 1)
         self.assertIn('Tele Tena Applicant', frappe.get_roles(user))
         self.assertNotIn('Tele Tena Clinician', frappe.get_roles(user))
         self.assertEqual(frappe.db.sql('SELECT status FROM tt_application WHERE user=%s', (user,))[0][0], 'Pending')

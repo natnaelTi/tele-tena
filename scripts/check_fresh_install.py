@@ -22,12 +22,14 @@ SITE = 'tele-tena-pr2-test.localhost'
 DB = 'teletenapr2test'
 ADMIN = 'tt_pr2_site_admin'
 CREDENTIALS = Path('/tmp/tele-tena-pr2-db-admin.json')
+LOG = Path('/tmp/tele-tena-pr2-fresh-install.log')
 SITE_PATH = BENCH / 'sites' / SITE
 assert os.geteuid() != 0, 'Run as the normal Linux user, never root'
 assert not SITE_PATH.exists(), 'Disposable site already exists; refusing to overwrite it'
 assert CREDENTIALS.is_file() and not CREDENTIALS.is_symlink()
 assert stat.S_IMODE(CREDENTIALS.stat().st_mode) == 0o600
 assert CREDENTIALS.stat().st_uid == os.getuid()
+assert not LOG.exists() and not LOG.is_symlink(), 'Fresh-install log already exists; refusing to overwrite it'
 credentials = json.loads(CREDENTIALS.read_text())
 assert credentials['db_root_username'] == ADMIN and credentials['db_name'] == DB
 socket = next(path for path in ('/run/mysqld/mysqld.sock', '/var/run/mysqld/mysqld.sock') if Path(path).exists())
@@ -38,10 +40,11 @@ def administration():
 
 def retained_fingerprint():
     from tele_tena.schema import TABLES
+    from tele_tena.patches.v1_6_presentation_release import TABLES as PRESENTATION_TABLES
     frappe.init(site='erp.localhost', sites_path=str(BENCH / 'sites'))
     frappe.connect()
     content = {}
-    for table in TABLES:
+    for table in (*TABLES, *PRESENTATION_TABLES, 'phone_identity','otp_challenge','otp_rate_limit','otp_gate','consultation','contact_identity','onboarding'):
         records = frappe.db.sql(f'SELECT * FROM tt_{table}', as_dict=True)
         content[table] = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in records)
     digest = hashlib.sha256(json.dumps(content, sort_keys=True).encode()).digest()
@@ -77,7 +80,8 @@ try:
                 arguments.insert(0, '--defaults-extra-file=' + str(path))
             assert not any(argument.startswith('--password') for argument in arguments)
             return binary, arguments, name
-        with open('/tmp/tele-tena-pr2-fresh-install.log', 'w') as output:
+        log_fd = os.open(LOG, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+        with os.fdopen(log_fd, 'w') as output:
             with contextlib.redirect_stdout(output), contextlib.redirect_stderr(output):
                 from frappe.commands.site import new_site
                 attempted = True
@@ -94,15 +98,18 @@ try:
     frappe.connect()
     assert {'frappe', 'erpnext', 'tele_tena'} <= set(frappe.get_installed_apps())
     from tele_tena.schema import TABLES
-    assert all('tt_' + table in frappe.db.get_tables(cached=False) for table in TABLES)
+    from tele_tena.patches.v1_6_presentation_release import TABLES as PRESENTATION_TABLES
+    assert all('tt_' + table in frappe.db.get_tables(cached=False) for table in (*TABLES,*PRESENTATION_TABLES))
     assert 'tt_consultation' in frappe.db.get_tables(cached=False)
     assert frappe.db.exists('DocType', 'Tele Tena Service')
     assert frappe.db.exists('DocType', 'Tele Tena Service Scope')
+    assert frappe.db.sql("SHOW COLUMNS FROM tt_appointment LIKE 'policy_snapshot'")
+    assert frappe.db.sql("SHOW COLUMNS FROM tt_application LIKE 'requested_services'")
     assert frappe.db.count('Tele Tena Service Scope') == 0
     assert frappe.db.sql('SELECT COUNT(*) FROM tt_wallet')[0][0] == 0
     for role in ('Tele Tena Patient', 'Tele Tena Clinician', 'Tele Tena Approver'):
         assert frappe.db.exists('Role', role)
-    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_consultations', 'v1_4_consultation_close_state'):
+    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state', 'v1_5_contact_onboarding', 'v1_6_presentation_release'):
         assert frappe.db.exists('Patch Log', {'patch': 'tele_tena.patches.' + version})
     from tele_tena.api import journey
     assert not journey.simulation_enabled(), 'Simulation unexpectedly enabled on disposable site'
@@ -115,7 +122,7 @@ try:
     frappe.destroy()
     assert retained_fingerprint() == retained_before, 'Retained development records changed'
     passed = True
-    print('PASS: fresh Frappe + ERPNext + tele_tena install, native models, roles, consultation and command tables, five recorded migrations, guest denial and disabled simulation; retained development records unchanged')
+    print('PASS: fresh Frappe + ERPNext + tele_tena install, native models, roles, presentation schemas, eight migrations, guest denial and disabled simulation; retained development records unchanged')
 except Exception as error:
     print('Fresh installation failed (' + type(error).__name__ + '); credential contents withheld')
     raise SystemExit(1)
@@ -133,6 +140,8 @@ finally:
         assert SITE_PATH.resolve() == (BENCH / 'sites' / SITE).resolve()
         shutil.rmtree(SITE_PATH)
     CREDENTIALS.unlink()
+    with contextlib.suppress(FileNotFoundError):
+        LOG.unlink()
     denied = False
     try:
         unexpected = administration()

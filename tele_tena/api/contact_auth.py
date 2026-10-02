@@ -163,11 +163,19 @@ def save_onboarding(kind, step, answers, complete=0):
     rows = frappe.db.sql('SELECT completed FROM tt_onboarding WHERE user=%s FOR UPDATE', (user,))
     if not rows or rows[0][0]:
         fail('Onboarding already complete')
-    if not isinstance(answers, dict) or set(answers) - {'name', 'adult', 'consent', 'language', 'share_name', 'share_history', 'statement', 'affiliations'}:
+    if not isinstance(answers, dict) or set(answers) - {'name', 'adult', 'consent', 'language', 'share_name', 'share_history', 'statement', 'affiliations', 'requested_services'}:
         fail('Invalid onboarding answers')
     clean = {k: text(v, 2000 if k == 'statement' else 120, False) for k, v in answers.items() if k in ('name', 'language', 'statement', 'affiliations')}
     for key in ('adult', 'consent', 'share_name', 'share_history'):
         clean[key] = boolean(answers.get(key, False))
+    requested_services = answers.get('requested_services', [])
+    if not isinstance(requested_services, list) or len(requested_services) > 30:
+        fail('Invalid requested service scopes')
+    requested_services = sorted(set(text(item, 80) for item in requested_services))
+    for service in requested_services:
+        if not frappe.db.sql('SELECT name FROM `tabTele Tena Service` WHERE name=%s AND active=1', (service,)):
+            fail('Choose from available services')
+    clean['requested_services'] = requested_services
     if clean.get('language', 'en') not in ('en', 'am', 'om'):
         fail('Unsupported language')
     finish = boolean(complete)
@@ -177,6 +185,10 @@ def save_onboarding(kind, step, answers, complete=0):
             fail('Adult eligibility and consent are required', 'adult_required')
         if kind == 'clinician':
             text(clean.get('statement', ''), 2000)
+            if not requested_services:
+                fail('Choose at least one service for review')
+            if not frappe.db.sql('SELECT clinician FROM tt_resume_evidence WHERE clinician=%s', (user,)):
+                fail('Upload a PDF resume before submitting your application', 'resume_required')
         role = 'Tele Tena Patient' if kind == 'patient' else 'Tele Tena Applicant'
         from tele_tena.account_context import authorized_user_change
         with authorized_user_change():
@@ -186,7 +198,8 @@ def save_onboarding(kind, step, answers, complete=0):
         if kind == 'patient':
             frappe.db.sql('INSERT INTO tt_wallet (patient) VALUES (%s)', (user,))
         else:
-            frappe.db.sql("INSERT INTO tt_application (user,statement,status) VALUES (%s,%s,'Pending')", (user, clean['statement']))
+            frappe.db.sql("INSERT INTO tt_application (user,statement,status,requested_services,submitted_at) VALUES (%s,%s,'Pending',%s,UTC_TIMESTAMP(6))",
+                          (user, clean['statement'], json.dumps(requested_services)))
     frappe.db.sql('''UPDATE tt_onboarding SET kind=%s,step=%s,answers=%s,
         completed=IF(%s,UTC_TIMESTAMP(6),NULL),modified=UTC_TIMESTAMP(6) WHERE user=%s''',
         (kind, int(step), json.dumps(clean), finish, user))

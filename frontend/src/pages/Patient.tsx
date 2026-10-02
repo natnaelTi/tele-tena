@@ -31,6 +31,7 @@ export function PatientHome() {
   const [now] = useState(() => Date.now());
   const { session } = useSession();
   const appointments = useResource(journeyApi.appointments);
+  const wallet = useResource(journeyApi.wallet);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
   return (
@@ -60,6 +61,7 @@ export function PatientHome() {
           </Button>
         </form>
       </section>
+      {wallet.data&&<Link to="/patient/payments" className="balance-summary"><span>Balance</span><strong>ETB {money(wallet.data.available)}</strong><small>Available · ETB {money(wallet.data.reserved)} reserved</small></Link>}
       <div className="section-line">
         <h2>Your next appointment</h2>
         <Link to="/patient/appointments">
@@ -73,11 +75,11 @@ export function PatientHome() {
         </InlineNotice>
       ) : !appointments.data ? (
         <Skeleton />
-      ) : appointments.data.filter((a) => new Date(a.end).getTime() > now)
+      ) : appointments.data.filter((a) => a.state==="Booked" && a.call_state!=="Ended" && new Date(a.end).getTime() > now)
           .length ? (
         <AppointmentCard
           appointment={
-            appointments.data.filter((a) => new Date(a.end).getTime() > now)[0]
+            appointments.data.filter((a) => a.state==="Booked" && a.call_state!=="Ended" && new Date(a.end).getTime() > now)[0]
           }
           base="/patient"
         />
@@ -188,11 +190,12 @@ export function Appointments({ base = "/patient" }: { base?: string }) {
       ) : !resource.data ? (
         <Skeleton />
       ) : resource.data.length ? (
-        <div className="stack">
-          {resource.data.map((a) => (
-            <AppointmentCard key={a.id} appointment={a} base={base} />
-          ))}
-        </div>
+        <div className="appointment-groups">{([
+          ["Needs action", resource.data.filter(a=>a.state==="PendingConfirmation" || (a.call_state==="Ended" && a.documentation_state!=="Finalized"))],
+          ["In progress", resource.data.filter(a=>a.call_state==="Open")],
+          ["Upcoming", resource.data.filter(a=>a.state==="Booked" && a.call_state!=="Open" && new Date(a.start).getTime()>=Date.now())],
+          ["Past", resource.data.filter(a=>["Completed","Cancelled","Expired","NoShow"].includes(a.state) || (a.call_state==="Ended" && a.documentation_state==="Finalized") || (a.state==="Booked" && a.call_state!=="Ended" && new Date(a.start).getTime()<Date.now()))],
+        ] as [string,typeof resource.data][]).filter(([,rows])=>rows.length).map(([title,rows])=><section key={title}><h2>{title}</h2><div className="stack">{rows.map(a=><AppointmentCard key={a.id} appointment={a} base={base} />)}</div></section>)}</div>
       ) : (
         <EmptyState title="No appointments yet.">
           Booked sessions will appear here.
@@ -205,14 +208,17 @@ export function Booking() {
   const { offering } = useParams();
   const { session } = useSession();
   const navigate = useNavigate();
+  const [selectedDate, setSelectedDate] = useState("");
+  const [displayZone, setDisplayZone] = useState("Africa/Addis_Ababa");
   const load = useCallback(async () => {
     const all = await journeyApi.discover();
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: displayZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     return {
       offer: all.find((o) => o.id === offering),
-      times: await journeyApi.windows(offering || ""),
+      calendar: await journeyApi.calendar(offering || "", selectedDate || today, displayZone),
     };
-  }, [offering]);
-  const { data, error } = useResource(load);
+  }, [offering, selectedDate, displayZone]);
+  const { data, error, refresh } = useResource(load);
   const action = useAction();
   const [step, setStep] = useState(0);
   const [start, setStart] = useState("");
@@ -250,46 +256,21 @@ export function Booking() {
         />
         {action.error && (
           <InlineNotice tone="danger">
-            {action.error} Retry with the same details after a connection
-            failure.
+            {action.error} If this time is no longer open, refresh availability and choose another. <Button variant="secondary" onClick={()=>{setStart("");setStep(0);void refresh();}}>Refresh availability</Button>
           </InlineNotice>
         )}
         {step === 0 && (
           <>
-            <p>
-              Available windows in <strong>{timezone}</strong>. Allow{" "}
-              {offer.minutes} minutes for your session.
-            </p>
-            {data.times.windows.length ? (
-              <ul className="availability-list">
-                {data.times.windows.map((window, i) => (
-                  <li key={i}>
-                    {date(window.start)} — {date(window.end)}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <InlineNotice>
-                No available times have been published.
-              </InlineNotice>
-            )}
-            {data.times.busy.length > 0 && (
-              <details>
-                <summary>Already booked times</summary>
-                {data.times.busy.map((window, i) => (
-                  <p key={i}>
-                    {date(window.start)} — {date(window.end)}
-                  </p>
-                ))}
-              </details>
-            )}
-            <TextField
-              label="Session starts"
-              type="datetime-local"
-              value={start}
-              onChange={(e) => setStart(e.target.value)}
-              required
-            />
+            <p>Choose an open appointment time. Session length: <strong>{data.calendar.duration} minutes</strong>. Times use your selected timezone.</p>
+            <Select label="Show times in timezone" value={displayZone} onChange={e=>{setDisplayZone(e.target.value);setStart("");setSelectedDate("");}}><option value="Africa/Addis_Ababa">Addis Ababa (EAT)</option><option value="UTC">UTC</option><option value="Africa/Nairobi">Nairobi (EAT)</option></Select>
+            <div className="booking-dates" aria-label="Available dates">
+              {data.calendar.days.filter(d=>d.slots.length).map(d=><button type="button" key={d.date} className={selectedDate===d.date?"date-chip selected":"date-chip"} onClick={()=>{setSelectedDate(d.date);setStart("");}}><strong>{new Date(d.date+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",timeZone:displayZone})}</strong><span>{d.date}</span></button>)}
+            </div>
+            {data.calendar.days.filter(d=>d.slots.length).length===0&&<InlineNotice>No open times are available in this booking window.</InlineNotice>}
+            <div className="booking-times" role="group" aria-label="Available times">
+              {(data.calendar.days.find(d=>d.date===(selectedDate||data.calendar.days.find(x=>x.slots.length)?.date))?.slots||[]).map(slot=><Button key={slot.start} variant={start===slot.start?"primary":"secondary"} onClick={()=>setStart(slot.start)}>{slot.local_time}</Button>)}
+            </div>
+            {start&&<p className="supporting">Selected: {new Date(start).toLocaleString(undefined,{dateStyle:"full",timeStyle:"short",timeZone:displayZone})} · {displayZone}</p>}
             <Button disabled={!start} onClick={() => setStep(1)}>
               Continue
             </Button>
@@ -352,9 +333,7 @@ export function Booking() {
           <>
             <DisclosurePreview disclosure={preview} />
             <p>
-              ETB {money(offer.price)} will be reserved from your simulated
-              balance. No real payment is taken. Cancellation and refund
-              workflows are not yet available.
+              ETB {money(offer.price)} will be reserved from your balance. Under this demonstration policy, cancelling before the session starts releases the full reservation.
             </p>
             <Button
               loading={action.busy}
@@ -362,7 +341,8 @@ export function Booking() {
                 void action.run(async () => {
                   const payload = {
                     offering: offer.id,
-                    start: new Date(start).toISOString(),
+                    start,
+                    booked_timezone: displayZone,
                     request_text: request,
                     sharing,
                     expected_price: offer.price,
@@ -399,22 +379,19 @@ export function Booking() {
   );
 }
 export function Payments() {
-  const wallet = useResource(journeyApi.wallet);
+  const wallet = useResource(journeyApi.walletActivity);
   const action = useAction();
   const [retryKey, setRetryKey] = useState(() => crypto.randomUUID());
   return (
     <>
       <PageTitle
         title="Payments"
-        description="A clear view of your simulated balance."
+        description="Your available balance, reservations and payment activity."
       />
-      <InlineNotice>
-        This is a demonstration. You cannot add or withdraw real money.
-      </InlineNotice>
       {wallet.data && (
         <div className="balance-grid">
           <Card>
-            <p>Simulated balance · available</p>
+            <p>Available balance</p>
             <h2>ETB {money(wallet.data.available)}</h2>
           </Card>
           <Card>
@@ -446,15 +423,15 @@ export function Payments() {
           }, "ETB 100 added to your simulated balance.")
         }
       >
-        Add simulated ETB 100
+        Add ETB 100
       </Button>
       {action.success && (
         <InlineNotice tone="success">{action.success}</InlineNotice>
       )}
       <p className="supporting">
-        This simulation transaction log is not the planned double-entry
-        accounting subledger or ERPNext integration.
+        Demonstration funds are not real money. Payment activity is a simulation log, not the planned double-entry subledger or ERPNext accounting integration.
       </p>
+      {wallet.data?.activity?.length ? <section><h2>Payment activity</h2><ul className="payment-activity">{wallet.data.activity.map((item,i)=><li key={i}><span>{item.kind}</span><strong>ETB {money(item.amount)}</strong><time>{date(item.created)}</time></li>)}</ul></section>:<EmptyState title="No payment activity yet." />}
     </>
   );
 }

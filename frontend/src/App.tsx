@@ -21,19 +21,20 @@ import {
   Availability,
   CareRecords,
   ClinicianToday,
+  CareRecordDetail,
   PendingFeature,
   Services,
 } from "./pages/Clinician";
 import Account from "./pages/Account";
 import { Applications, Scopes } from "./pages/Admin";
-import ConsultationPage from "./pages/ConsultationPage";
+import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
 import Showcase from "./pages/Showcase";
 import "./App.css";
 export default function App() {
   return (
     <BrowserRouter>
-      <LocaleProvider>
-        <SessionProvider>
+      <SessionProvider>
+        <LocaleProvider>
           <a className="skip-link" href="#main-content">
             Skip to content
           </a>
@@ -59,6 +60,7 @@ export default function App() {
               </Route>
             </Route>
             <Route element={<RequireSession />}>
+              <Route path="/consultation/:id/room" element={<><div className="demo-bar" role="note">Demonstration environment — no real payments or clinical care.</div><ConsultationRoomPage /></>} />
               <Route
                 path="/patient"
                 element={<WorkspaceLayout kind="patient" />}
@@ -100,6 +102,7 @@ export default function App() {
                   }
                 />
                 <Route path="care" element={<CareRecords />} />
+                <Route path="care/:id" element={<CareRecordDetail />} />
                 <Route
                   path="earnings"
                   element={
@@ -126,8 +129,8 @@ export default function App() {
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </SessionProvider>
-      </LocaleProvider>
+        </LocaleProvider>
+      </SessionProvider>
     </BrowserRouter>
   );
 }

@@ -45,3 +45,51 @@ policy windows/caps, dispute operations, production safety/escalation protocol,
 SMS provider, LiveKit credentials, translated clinical copy review, production hosting.
 Labs, diagnostics, diaspora expert access and tourism are future workflows.
 The first demonstration uses synthetic data and is not production clinical readiness.
+
+## Presentation release operational rules (2026-10)
+
+Scheduling and lifecycle are governed by `presentation-release-model.md`. Weekly
+availability uses clinician-selected IANA timezones; appointments store UTC
+instants plus the timezone used at booking. Editing a schedule never changes an
+existing appointment. Pending manual-confirmation bookings hold both slot and
+simulated funds. The demonstration expiry is 24 hours, configurable; expiry and
+decline release funds exactly once. These are demo defaults, not commercial policy.
+
+Completion requires an explicit clinician action after End and documentation.
+Call state, appointment state and note state are separate. Past clock time alone
+does not imply completion or no-show. Clinician notes are private by default;
+patient summaries are separately published and revisioned. Previously published
+content remains in a visible sharing history if later amended.
+
+Cancellation is currently limited to before the scheduled start. The explicit
+demonstration policy returns the full reserved amount for an authorized pre-start
+cancellation, exactly once. This is not a production cancellation/refund promise.
+No time-based or call-duration earnings release is permitted. `tt_ledger` remains
+a simulation transaction log, not a subledger.
+
+The one persistent “Demonstration environment — no real payments or clinical care”
+ribbon communicates the boundary. Ordinary totals use “Balance”; activity detail
+identifies simulated deposits/reservations/releases. This copy choice does not
+enable real payments.
+
+## Presentation behavior now implemented
+
+Clinicians can publish IANA-timezone weekly schedules with date exceptions,
+multiple intervals, buffers and confirmation preference. Patients may choose
+only server-generated, still-open slots; booking serializes conflicts and fund
+reservation. Existing appointments retain their saved instant and policy/disclosure
+snapshots when schedule rules change.
+
+Appointment, call and documentation status are distinct. End closes the call and
+revokes participant identities but does not complete a consultation or release
+earnings. The treating clinician explicitly saves and finalizes versioned private
+notes and may separately publish a patient summary. Patients receive only
+published summary revisions. Reviewers may access private PDF application
+evidence, but neither that role nor a clinic relationship grants patient-record
+access. The PWA provides only public static caching and a generic offline page;
+it never reports that offline changes were saved.
+
+These are demonstration workflows. Mutual rescheduling, no-show decisions,
+notifications, real payments/accounting, clinician earnings, physical-device
+call quality and production clinical readiness remain outside the implemented
+contract; the delivery tracker is authoritative for pending scope.

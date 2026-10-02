@@ -1,10 +1,11 @@
 import { Dialog, Button } from "../../components/ui";
-import { Mic, MicOff, Video, VideoOff, PhoneOff } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, PhoneOff, Maximize2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import type { Room as LiveKitRoom } from "livekit-client";
 import { api } from "../../api";
 import type { Key } from "../../i18n";
-type Appointment = { id: string };
+type Appointment = { id: string; display_identity?:string; call_state?:string };
 type ConsultationInfo = {
   state: "Not started" | "Open" | "Ended";
   role: "patient" | "clinician";
@@ -28,6 +29,9 @@ export default function Consultation({
   const [audioOnly, setAudioOnly] = useState(false);
   const [muted, setMuted] = useState(false);
   const [cameraOn, setCameraOn] = useState(true);
+  const [speaking, setSpeaking] = useState(false);
+  const [level, setLevel] = useState(0);
+  const [expanded, setExpanded] = useState(false);
   const [busy, setBusy] = useState(false);
   const mounted = useRef(false);
   const generation = useRef(0);
@@ -168,6 +172,12 @@ export default function Consultation({
       connectedRoom.on(RoomEvent.Reconnected, () => {
         if (current()) setMediaStatus("callConnected");
       });
+      connectedRoom.on(RoomEvent.ActiveSpeakersChanged, speakers => {
+        if (!current()) return;
+        const remoteSpeaker = speakers.find(participant => participant.identity !== connectedRoom.localParticipant.identity && participant.audioLevel > 0.08);
+        const active = Boolean(remoteSpeaker);
+        setSpeaking(active); setLevel(active ? Math.min(1, remoteSpeaker?.audioLevel || 0) : 0);
+      });
       connectedRoom.on(RoomEvent.Disconnected, () => {
         if (current()) {
           roomRef.current = null;
@@ -275,6 +285,28 @@ export default function Consultation({
       if (mounted.current) setBusy(false);
     }
   }
+  async function toggleAudioOnly(){
+    if(!roomRef.current)return;
+    setBusy(true);
+    try{
+      const next=!audioOnly;
+      if(!next&&audioOnly){
+        // Audio-only tokens deliberately cannot publish camera tracks. Leave
+        // cleanly, then return to preflight to request a camera-capable token.
+        await leave(false);
+        if(mounted.current){setAudioOnly(false);setMediaStatus("callDisconnected");}
+        return;
+      }
+      if(next){await roomRef.current.localParticipant.setCameraEnabled(false);setCameraOn(false);}
+      else {await roomRef.current.localParticipant.setCameraEnabled(true);setCameraOn(true);}
+      if(mounted.current)setAudioOnly(next);
+    }catch{if(mounted.current)setMediaStatus("callToggleError");}
+    finally{if(mounted.current)setBusy(false);}
+  }
+  async function toggleFullscreen(){
+    const node=remote.current?.closest(".consultation");
+    try{if(!document.fullscreenElement&&node?.requestFullscreen)await node.requestFullscreen();else if(document.fullscreenElement)await document.exitFullscreen();else setExpanded(!expanded);}catch{setExpanded(!expanded);}
+  }
   const connected = Boolean(roomRef.current);
   return (
     <section className="consultation" aria-label={t("consultation")}>
@@ -328,25 +360,12 @@ export default function Consultation({
           </button>
         </>
       )}
-      <div className="media-stage" data-connected={connected}>
-        <div
-          ref={remote}
-          className="call-remote"
-          aria-label={t("remoteMedia")}
-        />
-        {connected && (
-          <p className="media-placeholder">Your conversation space</p>
-        )}
-        <video
-          ref={selfPreview}
-          autoPlay
-          muted
-          playsInline
-          className="self-preview"
-          hidden={!connected || !cameraOn}
-          aria-label="Your camera"
-        />
-      </div>
+      {connected&&<div className={`media-stage ${audioOnly?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected}>
+        <div ref={remote} className={audioOnly?"call-audio-hidden":"call-remote"} aria-label={t("remoteMedia")}/>
+        {audioOnly&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={speaking?"Participant speaking":"Participant is quiet"}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><h2>{appointment.display_identity||"Private participant"}</h2><p>{mediaStatus==="callConnected"?"Connected":"Reconnecting"}</p></div>}
+        {!audioOnly&&<video ref={selfPreview} autoPlay muted playsInline className="self-preview" hidden={!cameraOn} aria-label="Your camera"/>}
+        <button className="fullscreen-control" type="button" onClick={()=>void toggleFullscreen()} aria-label="Expand consultation"><Maximize2 size={20}/></button>
+      </div>}
       {connected && (
         <div className="call-controls">
           <button
@@ -367,6 +386,7 @@ export default function Consultation({
               {t(cameraOn ? "cameraOff" : "cameraOn")}
             </button>
           )}
+          <button type="button" disabled={busy} onClick={()=>void toggleAudioOnly()} aria-pressed={audioOnly}>{audioOnly?"Turn video on":"Audio only"}</button>
           <button
             className="leave-call"
             type="button"

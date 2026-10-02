@@ -1,5 +1,6 @@
 """Run with bench env Python. Real isolated-site MariaDB tests; synthetic only."""
 import concurrent.futures
+import base64
 import hashlib
 import hmac
 import json
@@ -82,6 +83,22 @@ class Integration(unittest.TestCase):
     def tearDownClass(cls):
         frappe.db.rollback()
         frappe.set_user('Administrator')
+        appointment_ids = frappe.db.sql('SELECT id FROM tt_appointment WHERE patient IN %s OR clinician IN %s',
+                                       (tuple(USERS.values()), tuple(USERS.values())), pluck=True)
+        for appointment in appointment_ids:
+            frappe.db.sql('DELETE FROM tt_note_revision WHERE appointment=%s', (appointment,))
+            frappe.db.sql('DELETE FROM tt_consultation_note WHERE appointment=%s', (appointment,))
+            frappe.db.sql('DELETE FROM tt_appointment_event WHERE appointment=%s', (appointment,))
+        schedule_ids = frappe.db.sql('SELECT id FROM tt_schedule WHERE clinician IN %s',
+                                     (tuple(USERS.values()),), pluck=True)
+        for schedule_id in schedule_ids:
+            frappe.db.sql('DELETE FROM tt_schedule_rule WHERE schedule_id=%s', (schedule_id,))
+            frappe.db.sql('DELETE FROM tt_schedule_exception WHERE schedule_id=%s', (schedule_id,))
+            frappe.db.sql('DELETE FROM tt_schedule WHERE id=%s', (schedule_id,))
+        for email in USERS.values():
+            frappe.db.sql('DELETE FROM tt_resume_evidence WHERE clinician=%s', (email,))
+            frappe.db.sql('DELETE FROM tt_tour_progress WHERE user=%s', (email,))
+            frappe.db.sql('DELETE FROM tt_preferences WHERE user=%s', (email,))
         scope_names = frappe.db.sql('SELECT name FROM `tabTele Tena Service Scope` WHERE clinician IN %s', (tuple(USERS.values()),), pluck=True)
         for name in scope_names:
             frappe.db.sql('DELETE FROM tabVersion WHERE ref_doctype=%s AND docname=%s', ('Tele Tena Service Scope', name))
@@ -353,6 +370,12 @@ class Integration(unittest.TestCase):
         with self.assertRaises(frappe.ValidationError):
             api.book(**booking(stale, at(8), 'revoked-service'))
         self.assertEqual(dict(api.wallet()), before)
+        login('admin')
+        frappe.db.sql('UPDATE tt_application SET requested_services=%s WHERE user=%s',
+                      (json.dumps([PREFIX]), USERS['c1']))
+        reviewed = next(item for item in api.applications() if item.user == USERS['c1'])
+        self.assertEqual(reviewed.requested_services, [PREFIX])
+        self.assertEqual(reviewed.requested_service_labels, ['Synthetic test consultation'])
 
     def test_12_successful_retry_precedes_mutable_profile_validation(self):
         self.fund('p1', 1200)
@@ -712,7 +735,15 @@ class Integration(unittest.TestCase):
             self.assertFalse(frappe.db.exists('tt_application', phone_user))
             from tele_tena.api import contact_auth
             frappe.set_user(phone_user)
-            contact_auth.save_onboarding('clinician', 3, {'name': 'Synthetic applicant', 'statement': 'Synthetic application', 'adult': True, 'consent': True}, 1)
+            service = api.one('SELECT name AS id FROM `tabTele Tena Service` WHERE active=1 ORDER BY service_label LIMIT 1')
+            contact_auth.save_onboarding('clinician', 1, {'name': 'Synthetic applicant',
+                'adult': True, 'consent': True, 'requested_services': [service.id]}, 0)
+            resume = ('%PDF-1.4\nSynthetic resume fixture\n%%EOF').encode('ascii')
+            from tele_tena.api import presentation
+            presentation.upload_resume('synthetic-resume.pdf', base64.b64encode(resume).decode('ascii'))
+            contact_auth.save_onboarding('clinician', 3, {'name': 'Synthetic applicant',
+                'statement': 'Synthetic application', 'adult': True, 'consent': True,
+                'requested_services': [service.id]}, 1)
             self.assertIn('Tele Tena Applicant', frappe.get_roles(phone_user))
             self.assertEqual(api.one('SELECT status FROM tt_application WHERE user=%s', (phone_user,)).status, 'Pending')
             login('admin')
@@ -824,8 +855,7 @@ class Integration(unittest.TestCase):
             connect()
             try:
                 frappe.set_user('Guest')
-                with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret), \
-                     patch.object(phone_auth, '_establish_login', side_effect=frappe.set_user):
+                with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret):
                     phone_auth.verify_code(phone, response['challenge_id'], code, 'patient_signup',
                                            display_name='Synthetic concurrent patient', adult=1)
                     frappe.db.commit()
@@ -841,8 +871,9 @@ class Integration(unittest.TestCase):
         self.assertEqual(wrong_results, ['rejected', 'rejected'])
         self.assertEqual(api.one('SELECT attempts FROM tt_otp_challenge WHERE id=%s', (response['challenge_id'],)).attempts, 2)
         frappe.db.commit()
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
-            success_results = list(pool.map(verify_worker, [sent[0], sent[0]]))
+        with patch.object(phone_auth, '_establish_login', side_effect=frappe.set_user):
+            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+                success_results = list(pool.map(verify_worker, [sent[0], sent[0]]))
         self.assertEqual(success_results.count('ok'), 1)
         frappe.db.commit()
         identity = frappe.db.sql('SELECT user FROM tt_phone_identity WHERE phone=%s', (phone,), as_dict=True)

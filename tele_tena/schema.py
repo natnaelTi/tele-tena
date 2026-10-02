@@ -73,3 +73,5 @@ def install():
     phone_auth()
     from tele_tena.patches.v1_5_contact_onboarding import execute as contact_onboarding
     contact_onboarding()
+    from tele_tena.patches.v1_6_presentation_release import execute as presentation_release
+    presentation_release()
