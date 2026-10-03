@@ -1,5 +1,94 @@
 # Presentation release verification
 
+## PR #12 local preview checkpoint (2026-10-03)
+
+The currently running review preview is the built Frappe application at
+`http://127.0.0.1:8017/teletena/` (availability:
+`http://127.0.0.1:8017/teletena/clinician/availability`). It is served by
+`/home/frappe/teletena-compat/bench`, site
+`tele-tena-pr2-test.localhost`, from branch `feat/next-design-update`, code
+commit `cc30d7e3622c470a2d4f779ed0bbc04dfa400600`. The packaged bundle reports
+the same source commit. This is a production build behind the local Frappe
+route, not Vite. The original bench at port 8000 and its Vite preview at 5173
+were not stopped or migrated; their checkout is the older deployment branch.
+
+Availability was exercised through this built `/teletena/` route: the approved
+synthetic clinician opened the calendar, an end-before-start interval showed a
+field-level message while preserving the input, a valid weekly schedule saved
+with HTTP 200, survived reload, and generated a patient-bookable slot. A
+separate calendar browser regression covers date-only editing and copying
+intervals. The root cause evidenced by the browser payload and server contract
+was the editor sending `start_local`/`end_local` while the prior API validator
+only read `start`/`end`; the compatibility mapping accepts the documented
+fields without reducing validation or authorization. The server route returned
+200 with `Cache-Control: no-store, private`. The generated bundle was scanned
+for secrets; none were found.
+
+The migration of the retained synthetic compatibility site ran v1.8. It
+imported exactly 15 legacy activity rows posted after opening snapshots (10
+deposits and five reservations), without deleting or rewriting those rows,
+appointments, reservations or wallet projections. Wallet and subledger
+projections now reconcile. This identifies the missing journal rows, but not
+which process originally wrote the legacy events. The cutover runbook requires
+stopping every old writer before activating the new schema/code.
+
+Current-branch reruns: presentation regressions **13 passed**; production build
+**passed**; lint **passed with existing warnings**; Python compile and browser
+script syntax checks **passed**. The first integration rerun was deliberately
+stopped as a meaningful verification result: it targeted the invited-review
+site with phone/registration disabled and the default HTTP fixture at Vite
+port 5173. The auth/HTTP failures reflect that fixture mismatch; they do not
+establish a code regression or a pass. A separate enabled-registration fixture
+and a separate invited-review browser check remain required. The fresh v1.8
+installation check is pending because this environment requires an operator's
+interactive sudo step to create a temporary database credential. The hosted
+LiveKit rerun stopped before connecting because this isolated site has no
+LiveKit project configuration. Prior Cloud evidence is retained above; no new
+Cloud claim is made for this checkpoint.
+
+The calendar has a time-labelled weekly grid, click-to-add interval editor,
+keyboard time fields, a compact editor, weekly/date-only modes, copy-to-days,
+exceptions, and a mobile agenda presentation. A shareable per-offering booking
+link is now implemented as a site-key HMAC token. It is offered only to the
+approved clinician who owns a published offering, resolves only while that
+offering/schedule/scope remain published, and is followed by the authenticated
+patient booking flow. URLs contain no internal offering ID; focused tests cover
+owner, patient/guest roles, revocation, token resolution and private-data
+omissions. A built-browser regression now follows the shared link through
+patient sign-in and booking; it will be rerun after the current bundle is
+repackaged.
+
+The wider route-by-route visual review and screenshot matrix requested for this
+release are not complete. Refreshed availability screenshots cover 320, 390,
+768 and 1440 px. A rendered review exposed clipped labels in compact booked
+blocks; the UI now shows the permitted alias on short blocks and ellipsizes it
+with the complete accessible name available. The browser regression asserts
+that short blocks omit clipped secondary detail. Other inventory entries still
+need current-branch captures and inspection.
+
+The latest disposable installation created Frappe, ERPNext and TeleTena and
+passed its schema/role/patch-log/guest-denial assertions, including v1.8. Its
+combined browser run stopped at a test assertion that expected the Vite root
+manifest path while the built Frappe app correctly used
+`/assets/tele_tena/review/manifest.webmanifest`. The assertion now accepts both
+supported packaging paths; this full fresh install/browser run has not yet been
+repeated. Cleanup succeeded, including removal of the disposable database,
+site, temporary DB administrator and credential file.
+
+One repeated availability browser attempt correctly failed with “Insufficient
+simulated funds”: its mode-600 synthetic patient had already spent ETB 600 from
+its original ETB 1,000 on a previous successful run. The failed retry made no
+booking. A newly generated synthetic patient with its own ETB 1,000 completed
+the built save/reload/booking journey. The regression runner now creates a
+fresh synthetic patient for every run and uses a private, exclusive fixture
+file; no existing balance was altered.
+
+At the start of the next clean build, the packaged app source SHA was
+`c3abaff0aee7ce490b23675a2554466bb620f47f`. Subsequent booking-link source and
+browser-fixture changes have not yet been packaged or served. Do not treat the
+currently running preview as containing those later edits until the process and
+bundle source SHA are checked again.
+
 ## Update for `feat/next-design-update` (2026-10-02)
 
 This section supersedes the earlier PR #7 snapshot where it conflicts with the
