@@ -298,3 +298,31 @@ Compatibility MariaDB now uses its separate socket/data directory, and the
 loopback web process serves the built Frappe route without starting compatibility
 workers. Current package/deep-link and availability save/reload/book browser
 checks pass against that same URL. No old worker is writing to the v1.8 site.
+
+
+## Local authentication repair (2026-10-03)
+
+The invited-review site reports SMS OTP, email OTP and public registration
+disabled. The sign-in UI now remains phone-first and clearly marks phone-code
+access unavailable on this site; the user can choose email/password. When site
+capabilities report OTP delivery available, SMS remains the first route, email
+OTP is available as the alternative, and password is an explicit email option.
+No provider or site authentication setting was enabled for this check.
+
+The local protected review credential file and active User records were checked
+without printing credentials. Patient and clinician password sign-in both passed
+through the built browser UI. A wrong-password browser case now shows a
+non-enumerating email/password message. UI-only mocked capabilities exercised
+phone OTP -> email OTP -> password choice and an invalid/expired-code message;
+no SMS/email was sent and this does not verify delivery.
+
+`Sign in` and fallback states were rendered and visually inspected at 390 and
+1440 px. Captures are `current-review/sign-in-invited-phone-390.png`,
+`sign-in-invited-phone-1440.png`, `sign-in-invited-email-password-390.png` and
+`sign-in-invited-email-password-1440.png`. These show the invited-site fallback,
+not the hosted SMS-enabled configuration.
+
+Checks: `npm run build`, `npm run lint` (existing warnings),
+`python3 scripts/build_review.py`, `python3 scripts/check_review_assets.py`, and
+`node scripts/browser-authentication-flow.cjs` all passed. Packaged frontend
+source SHA: `c9f098814e7aab9e3ab5df7a19a760da6148b33b`.

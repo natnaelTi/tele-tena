@@ -192,3 +192,14 @@ patient and clinician at 320/390/768/1440. They use synthetic records and
 fake-media browser sessions. Inspection identified a remaining status conflict
 on clinician notes: call status is “Call ended” while appointment status says
 “Booked”. A focused built-route regression now verifies “Completion pending” without mutating appointment data; 390/1440 px captures show the corrected display.
+
+
+### Authentication fallback correction (2026-10-03)
+
+The isolated invited-review page now renders phone-first with an explicit
+unavailable notice, then offers email/password because neither SMS nor email OTP
+is configured there. Built browser verification passed for the seeded patient
+and clinician accounts. With mocked enabled capabilities, the UI preserves the
+phone OTP, email OTP and explicit password choice; provider delivery is not
+claimed. Wrong credentials and invalid codes have distinct, non-enumerating
+messages. Current screenshots are in `current-review/sign-in-invited-*`.
