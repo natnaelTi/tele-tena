@@ -5,9 +5,11 @@
 The correct review preview is `http://127.0.0.1:8017/teletena/` (availability:
 `http://127.0.0.1:8017/teletena/clinician/availability`). It is served by
 `/home/frappe/teletena-compat/bench`, site
-`tele-tena-pr2-test.localhost`, branch `feat/next-design-update`, backend
-checkout at branch head `3d806d03bb5a25fcb2bad7ecce3f154d3147f85f`. The built asset
-manifest `tele_tena/public/review/release.json` reports this source SHA. Gunicorn runs
+`tele-tena-pr2-test.localhost`, branch `feat/next-design-update`; the running Gunicorn backend loaded product
+code at `3d806d03bb5a25fcb2bad7ecce3f154d3147f85f`. Current PR head
+`ac7f827995053e8b5605d2896c3712907c25c8d7` adds only screenshots, docs and the
+focused browser regression. The built asset manifest reports the product-code
+SHA `3d806d03bb5a25fcb2bad7ecce3f154d3147f85f`. Gunicorn runs
 from this bench's Python 3.14.2 environment and loads its `./apps/tele_tena`
 checkout. This is the production React build behind Frappe's `/teletena/` route,
 not Vite. The old Vite process at `127.0.0.1:5173` loads
