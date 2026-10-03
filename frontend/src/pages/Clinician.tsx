@@ -121,6 +121,8 @@ export function Availability() {
   const [serviceError,setServiceError]=useState("");
   const [nameError,setNameError]=useState("");
   const [availabilityError,setAvailabilityError]=useState("");
+  const [bookingUrl,setBookingUrl]=useState("");
+  const [bookingLinkStatus,setBookingLinkStatus]=useState("");
   useEffect(()=>{const query=window.matchMedia("(max-width: 800px)");const update=()=>setTimeEditorOpen(query.matches);query.addEventListener("change",update);return()=>query.removeEventListener("change",update);},[]);
   useEffect(() => {
     const s = current.data?.find(item=>item.offering===offering) || (!offering?current.data?.[0]:undefined);
@@ -159,6 +161,16 @@ export function Availability() {
     if(!validTimes)return;
     void action.run(async()=>{await journeyApi.saveSchedule({offering,schedule_name:name,timezone_name:zone,consultation_format:format,confirmation_mode:confirmation,minimum_notice_minutes:Number(notice),horizon_days:Number(horizon),buffer_before:Number(before),buffer_after:Number(after),status,intervals,exceptions});setDirty(false);await current.refresh();},"Schedule saved.");
   }
+  async function createBookingLink() {
+    setBookingLinkStatus("");
+    await action.run(async()=>{
+      const result=await journeyApi.bookingLink(offering);
+      const url=`${window.location.origin}${import.meta.env.PROD?"/teletena":""}/patient/book-link/${result.token}`;
+      setBookingUrl(url);
+      try { await navigator.clipboard.writeText(url); setBookingLinkStatus(w("Booking link copied.")); }
+      catch { setBookingLinkStatus(w("Copy the link from the field below.")); }
+    },"");
+  }
   const localTodayParts = new Intl.DateTimeFormat("en-CA",{timeZone:zone,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
   const localTodayValues = Object.fromEntries(localTodayParts.map(x=>[x.type,x.value]));
   const localToday = new Date(Date.UTC(Number(localTodayValues.year),Number(localTodayValues.month)-1,Number(localTodayValues.day),12));
@@ -194,6 +206,7 @@ export function Availability() {
           <Button loading={action.busy} disabled={action.busy||current.error||offerings.error} onClick={saveSchedule}>{action.busy?"Saving schedule…":"Save schedule"}</Button>
           <p className="supporting" role="status">{action.busy?"Saving changes…":action.success?"Schedule saved.":dirty?"Unsaved changes":current.data?.some(item=>item.offering===offering)?"Saved schedule":"Not saved yet"}</p>
           {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}{action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
+          <div className="schedule-share-link"><Button variant="secondary" disabled={action.busy||dirty||status!=="Published"||!offering} onClick={()=>void createBookingLink()}>{w("Copy patient booking link")}</Button>{bookingLinkStatus&&<p className="supporting" role="status">{bookingLinkStatus}</p>}{bookingUrl&&<TextField label={w("Patient booking link")} value={bookingUrl} readOnly />}</div>
         </aside>
         <section className="schedule-week" aria-label="Weekly availability editor">
           <div className="availability-toolbar"><div className="availability-period-actions"><Button variant="secondary" onClick={()=>setWeekShift(0)}>Today</Button><Button variant="quiet" aria-label="Previous week" onClick={()=>setWeekShift(weekShift-1)}>‹</Button><Button variant="quiet" aria-label="Next week" onClick={()=>setWeekShift(weekShift+1)}>›</Button><strong>{displayDay(weekDays[0])} – {displayDay(weekDays[6])}</strong></div><span className="timezone-label">{zone}</span></div>

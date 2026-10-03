@@ -35,7 +35,8 @@ try:
     journey.simulated_deposit(100000, 'browser-' + uuid.uuid4().hex)
     frappe.db.commit()
     payload = {'clinician': clinician, 'offering': offering, 'patient': email, 'password': password}
-    fd = os.open(OUT, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    fd = os.open(OUT, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+    os.fchmod(fd, 0o600)
     with os.fdopen(fd, 'w') as stream:
         json.dump(payload, stream)
 finally:

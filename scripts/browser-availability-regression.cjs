@@ -73,9 +73,20 @@ async function signIn(page, user, password) {
     assert.equal(await page.getByLabel('Monday starts', { exact: true }).inputValue(), '09:00');
     assert.equal(await page.getByLabel('Monday ends', { exact: true }).inputValue(), '17:00');
 
+    await page.getByRole('button', { name: 'Copy patient booking link', exact: true }).click();
+    const sharedUrl = await page.getByLabel('Patient booking link', { exact: true }).inputValue();
+    const sharedPath = new URL(sharedUrl).pathname;
+    assert.match(sharedPath, /^\/teletena\/patient\/book-link\/[a-f0-9]{64}$/);
+    assert.equal(sharedPath.includes(browserFixture.offering), false,
+      'shareable URLs must not expose the internal offering identifier');
+
     await page.getByRole('button', { name: 'Sign out', exact: true }).click();
-    await signIn(page, browserFixture.patient, browserFixture.password);
-    await page.goto(base + '/teletena/patient/book/' + browserFixture.offering);
+    await page.goto(base + sharedPath);
+    await page.getByLabel('Email', { exact: true }).waitFor();
+    await page.getByLabel('Email', { exact: true }).fill(browserFixture.patient);
+    await page.getByLabel('Password', { exact: true }).fill(browserFixture.password);
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await page.waitForURL('**/teletena/patient/book-link/**');
     await page.getByRole('heading', { name: 'Choose a time' }).waitFor();
     const dates = page.locator('.booking-dates button');
     await dates.first().waitFor();

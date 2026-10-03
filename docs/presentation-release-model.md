@@ -41,6 +41,13 @@ also a conflict. Only server-generated slots can be booked. Existing one-off
 availability rows remain readable for historical compatibility; new schedules do
 not rewrite them. Changing or pausing schedule rules never edits appointments.
 
+Published schedules can provide an opaque HMAC booking link derived from the
+site's private encryption key. The URL contains neither a DocType/offer ID nor
+patient data. It resolves only while the offering, published schedule,
+clinician approval and matching service scope remain active. The receiving
+patient signs in before opening the normal server-generated slot and booking
+flow. Possession of the link is not appointment authorization.
+
 ## Explicit demonstration defaults (configurable)
 
 - Confirmation mode defaults to **automatic**, matching existing direct booking;

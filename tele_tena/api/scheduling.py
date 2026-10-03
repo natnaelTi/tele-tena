@@ -1,5 +1,7 @@
 """Timezone-aware recurring clinician schedules and server-generated slots."""
 import json
+import hashlib
+import hmac
 import uuid
 from datetime import date, datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -9,6 +11,53 @@ import frappe
 from tele_tena.api.journey import actor, approved, approved_service, fail, integer, one, profile, query, rows, text
 
 SLOT_STEP_MINUTES = 15
+
+
+def _booking_link_token(offering, initialize_key=False):
+    key = frappe.conf.get('encryption_key')
+    if not key and initialize_key:
+        # Only the authorized clinician link-creation command may initialize
+        # Frappe's site key. Resolving guessed tokens remains read-only.
+        from frappe.utils.password import get_encryption_key
+        key = get_encryption_key()
+    if not isinstance(key, str) or not key:
+        fail('Booking links are unavailable on this site', 'booking_link_unavailable')
+    message = ('tele-tena:published-booking:v1:' + offering).encode()
+    return hmac.new(key.encode(), message, hashlib.sha256).hexdigest()
+
+
+@frappe.whitelist(methods=['POST'])
+def booking_link(offering):
+    clinician = actor('Tele Tena Clinician')
+    offer = one('''SELECT o.id,o.service FROM tt_offering o
+        JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
+        WHERE o.id=%s AND o.clinician=%s AND o.active=1''', (offering, clinician))
+    approved(clinician)
+    approved_service(clinician, offer.service)
+    return {'token': _booking_link_token(offer.id, initialize_key=True)}
+
+
+@query()
+def resolve_booking_link(token):
+    actor('Tele Tena Patient')
+    if not isinstance(token, str) or len(token) != 64:
+        fail('This booking link is unavailable', 'booking_link_unavailable')
+    candidates = rows('''SELECT o.id,o.clinician,o.service,o.price,o.minutes,sc.service_label,
+        p.display_name,s.consultation_format,s.timezone FROM tt_offering o
+        JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
+        JOIN `tabTele Tena Service` sc ON sc.name=o.service
+        JOIN tt_profile p ON p.user=o.clinician
+        WHERE o.active=1 AND sc.active=1 ORDER BY o.id''')
+    offer = next((item for item in candidates
+                  if hmac.compare_digest(_booking_link_token(item.id), token)), None)
+    if not offer:
+        fail('This booking link is unavailable', 'booking_link_unavailable')
+    approved(offer.clinician)
+    approved_service(offer.clinician, offer.service)
+    return {'offering': offer.id, 'service': offer.service_label,
+            'clinician': offer.display_name, 'price': offer.price,
+            'minutes': offer.minutes, 'format': offer.consultation_format,
+            'timezone': offer.timezone}
 
 
 def _zone(name):

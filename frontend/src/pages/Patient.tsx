@@ -205,8 +205,18 @@ export function Appointments({ base = "/patient" }: { base?: string }) {
     </>
   );
 }
-export function Booking() {
-  const { offering } = useParams();
+export function BookingLink() {
+  const { token = "" } = useParams();
+  const load = useCallback(() => journeyApi.resolveBookingLink(token), [token]);
+  const resource = useResource(load);
+  if (resource.error) return <InlineNotice tone="danger">This booking link is unavailable or no longer active. Find care to choose another clinician.</InlineNotice>;
+  if (!resource.data) return <Skeleton />;
+  return <Booking offeringOverride={resource.data.offering} />;
+}
+
+export function Booking({ offeringOverride }: { offeringOverride?: string }) {
+  const route = useParams();
+  const offering = offeringOverride || route.offering;
   const { session } = useSession();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState("");

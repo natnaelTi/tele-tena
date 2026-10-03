@@ -95,8 +95,10 @@ export default function SignIn() {
   }
   async function proceed() {
     const current = await refresh();
+    const next = params.get("next") || "";
+    const safeBookingReturn = /^\/patient\/book-link\/[a-f0-9]{64}$/.test(next);
     navigate(
-      !current?.profile && params.get("intent") === "clinician"
+      safeBookingReturn ? next : !current?.profile && params.get("intent") === "clinician"
         ? "/onboarding?intent=clinician"
         : destination(current),
       { replace: true },

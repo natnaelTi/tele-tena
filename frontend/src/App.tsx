@@ -16,6 +16,7 @@ import {
   Discovery,
   PatientHome,
   Payments,
+  BookingLink,
 } from "./pages/Patient";
 import {
   Availability,
@@ -69,6 +70,7 @@ export default function App() {
                 <Route index element={<PatientHome />} />
                 <Route path="discovery" element={<Discovery />} />
                 <Route path="book/:offering" element={<Booking />} />
+                <Route path="book-link/:token" element={<BookingLink />} />
                 <Route path="appointments" element={<Appointments />} />
                 <Route path="account" element={<Account />} />
                 <Route path="payments" element={<Payments />} />

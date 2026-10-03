@@ -71,6 +71,37 @@ class Presentation(unittest.TestCase):
         result = scheduling.calendar(offering, day.isoformat(), 1, zone)
         return [slot for item in result['days'] for slot in item['slots']]
 
+    def test_booking_link_is_opaque_owner_scoped_and_revocable(self):
+        offering = fixtures.Integration.offers['c1']
+        self.make_schedule(offering=offering)
+        fixtures.login('c1')
+        token = scheduling.booking_link(offering)['token']
+        self.assertEqual(len(token), 64)
+        self.assertNotIn(offering, token)
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            scheduling.resolve_booking_link(token)
+        fixtures.login('c2')
+        with self.assertRaises(frappe.PermissionError):
+            scheduling.resolve_booking_link(token)
+        fixtures.login('p1')
+        preview = scheduling.resolve_booking_link(token)
+        self.assertEqual(preview['offering'], offering)
+        self.assertNotIn('patient', preview)
+        self.assertNotIn('email', preview)
+        fixtures.login('c2')
+        with self.assertRaises(frappe.ValidationError):
+            scheduling.booking_link(offering)
+        fixtures.login('admin')
+        from tele_tena.api.journey import review_service_scope
+        review_service_scope(fixtures.USERS['c1'], fixtures.PREFIX, 'Revoked')
+        fixtures.login('p1')
+        with self.assertRaises(frappe.ValidationError):
+            scheduling.resolve_booking_link(token)
+        fixtures.login('admin')
+        review_service_scope(fixtures.USERS['c1'], fixtures.PREFIX, 'Approved')
+        frappe.db.commit()
+
     def book_slot(self, offering, slot, key=None, share_name=False, who='p1'):
         fixtures.login(who)
         request = 'A synthetic request for a presentation test'
