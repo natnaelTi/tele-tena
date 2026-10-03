@@ -80,6 +80,7 @@ export function AuthLayout() {
 }
 export function RequireSession() {
   const { session, loading, error, refresh } = useSession();
+  const location = useLocation();
   if (loading)
     return (
       <main className="container">
@@ -97,7 +98,7 @@ export function RequireSession() {
         </InlineNotice>
       </main>
     );
-  return session ? <Outlet /> : <Navigate to="/sign-in" replace />;
+  return session ? <Outlet /> : <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname + location.search)}`} replace />;
 }
 const patientNav = [
   ["/patient", "Home", Home],
@@ -118,6 +119,7 @@ const clinicianNav = [
 const adminNav = [
   ["/admin", "Applications", ClipboardCheck],
   ["/admin/scopes", "Service scopes", Stethoscope],
+  ["/admin/financial-disputes", "Financial disputes", Wallet],
   ["/admin/exceptions", "Exceptions", Settings2],
 ] as const;
 export function WorkspaceLayout({

@@ -3,7 +3,7 @@ const { chromium } = require('playwright')
 const fs = require('node:fs')
 const assert = require('node:assert/strict')
 const fixture = JSON.parse(fs.readFileSync(process.env.TELE_TENA_REDESIGN_FIXTURE, 'utf8'))
-const base = 'http://127.0.0.1:5173'
+const base = process.env.TELE_TENA_TEST_BASE || 'http://127.0.0.1:5173'
 const output = '/tmp/tele-tena-presentation-review'
 fs.mkdirSync(output, { recursive: true })
 let checkpoint = 'launch'
@@ -49,7 +49,8 @@ async function main() {
     await guest.getByRole('heading', { name: 'Find someone you feel comfortable talking to.' }).waitFor()
     await capture(guest, 'homepage', [320, 390, 768, 1440])
     const manifest=await guest.locator('link[rel="manifest"]').getAttribute('href')
-    assert.equal(manifest,'/manifest.webmanifest')
+    assert.ok(['/manifest.webmanifest','/assets/tele_tena/review/manifest.webmanifest'].includes(manifest),
+      `manifest must resolve in the active Vite or built Frappe deployment: ${manifest}`)
     await guest.evaluate(async()=>{await navigator.serviceWorker.ready})
     await guest.reload()
     await guest.waitForFunction(()=>Boolean(navigator.serviceWorker.controller))

@@ -1,5 +1,214 @@
 # Presentation release verification
 
+## PR #12 local preview checkpoint (2026-10-03)
+
+The correct review preview is `http://127.0.0.1:8017/teletena/` (availability:
+`http://127.0.0.1:8017/teletena/clinician/availability`). It is served by
+`/home/frappe/teletena-compat/bench`, site
+`tele-tena-pr2-test.localhost`, branch `feat/next-design-update`; the running Gunicorn backend loaded product
+code at `3d806d03bb5a25fcb2bad7ecce3f154d3147f85f`. Current PR head
+`ac7f827995053e8b5605d2896c3712907c25c8d7` adds only screenshots, docs and the
+focused browser regression. The built asset manifest reports the product-code
+SHA `3d806d03bb5a25fcb2bad7ecce3f154d3147f85f`. Gunicorn runs
+from this bench's Python 3.14.2 environment and loads its `./apps/tele_tena`
+checkout. This is the production React build behind Frappe's `/teletena/` route,
+not Vite. The old Vite process at `127.0.0.1:5173` loads
+`/home/frappe/frappe/frappe-bench/apps/tele_tena/frontend` and belongs to the
+original development bench; it is not the preview URL to use. Its backend is
+the separate original bench on port 8000. Neither original-bench process, site
+nor data was changed. Use the synthetic approved clinician account for
+availability and synthetic patient account for booking; credentials remain in
+the site's mode-600 local review-account file and are not recorded here.
+
+Availability was exercised through the built `/teletena/` route. The approved
+synthetic clinician opened the calendar, an end-before-start interval showed a
+field-level error and retained its value, a valid weekly schedule saved with
+HTTP 200, survived reload, and generated a patient-bookable slot. The regression
+also followed the opaque patient booking link through sign-in and booking. A
+new synthetic patient with ETB 1,000 was created for this run, so previous test
+spending did not alter existing balances. The server route returned
+`Cache-Control: no-store, private`.
+
+Rerun evidence on 2026-10-03: production-built availability save/request/reload/
+booking and booking-link navigation **passed**. Invalid end-before-start input
+showed a field-specific error and remained editable. The browser harness now
+waits for the sign-out response before following the patient link, removing a
+race that could keep the clinician session active. Built-package guest redirect,
+password session, consultation deep-link/reload, sign-out, PWA scope, sensitive-
+cache exclusion and offline-state checks **passed**; invited-review auth policy
+**passed**. Twenty routes rendered at 320, 390, 720, 768 and 1440 CSS px with no
+page-level horizontal overflow. The invited-review email/password entry and the
+enabled phone-entry screen were both captured; patient and clinician onboarding
+step one was captured at 320/390/768/1440 after creating and cleaning up a
+short-lived synthetic verified-contact account. 720 px is a narrow-layout proxy for 200% zoom on
+a 1440 px display, not an actual browser-zoom test. Asset hash/scope/privacy scan
+**passed**. The latest bundled source SHA is `3d806d03bb5a25fcb2bad7ecce3f154d3147f85f`; the earlier route sweep bundles were `0fce298eedaa4ad93243d3f24086f023e068c1d3` and `df845b5b7936a3b696e40c1856f4e48f6148bf75`.
+Presentation regressions passed 14 cases; lint passed with existing warnings.
+
+The first integration rerun stopped on a fixture mismatch: it used the
+invited-review site, where phone OTP and public registration are disabled, and
+an HTTP fixture targeting Vite. This is not a code pass or an app regression.
+An enabled-registration fixture still needs its own browser/API run. A fresh
+v1.8 installation passed schema/role/patch-log/guest-denial checks earlier, but
+its combined browser run stopped on an obsolete root-manifest assertion. That
+assertion is fixed and the browser package passed against the retained site; a
+fresh install plus full browser suite has not yet been repeated. The temporary
+database-admin credential is currently absent, so a new disposable install
+needs the operator setup step. The hosted LiveKit regression **passed against the development LiveKit Cloud
+project** after its mode-600 private configuration was copied only to this
+isolated site and removed in cleanup. Two independent Chromium contexts
+exchanged fake-device audio/video, Leave/rejoin passed, End closed the room,
+and Cloud rejected original/refreshed cached tokens for both identities,
+including a participant who left before End. This is automated fake-media
+evidence, not physical-device testing.
+
+The retained compatibility site ran v1.8 reconciliation: 15 post-opening
+legacy rows (10 deposits and five reservations) were imported into balanced
+journals without rewriting legacy events, appointments, reservations or wallet
+projections. A read-only audit now finds the Review Patient wallet at 120,000
+available / 480,000 reserved minor units (ETB 1,200 / ETB 4,800), exactly equal
+to journal projections; current difference is zero. The earlier mismatch was
+60,000 / 540,000 in the legacy wallet versus opening journals of 260,000 /
+240,000. The 15 missing post-opening rows explain it and v1.8 imported them
+once. This does not identify which process originally wrote the legacy rows.
+The cutover guide requires stopping every old writer before new code is active.
+
+Current route screenshots are under
+`docs/screenshots/next-design-update/current-review/`: 20 public and authenticated
+patient, clinician and reviewer routes at 320/390/720/768/1440 px. The audit
+found patient booking overflow to 984–992 px at 320/390/768; `.booking-layout`
+and its children now shrink, and the production route test plus repeated sweep
+show no page-level overflow. Short booking blocks display the permitted alias
+without clipped secondary text and retain a full accessible name. Visual acceptance remains incomplete: OTP entry/resend, later clinician onboarding and
+pending/rejected application states, open tours, Amharic/Afaan Oromo rendering,
+actual 200% browser zoom and several empty/error states still need visual review.
+Current production-build screenshots now cover video call (390/1440), audio-only,
+clinician end-of-call notes, and completed consultation detail for both roles
+(320/390/768/1440), using fake media and synthetic records. Inspection found a
+remaining clinician detail mismatch: the page can show “Call ended” while its
+appropriate appointment-state field still says “Booked”; lifecycle status
+presentation needs a focused fix and regression before visual acceptance.
+
+## Update for `feat/next-design-update` (2026-10-02)
+
+This section supersedes the earlier PR #7 snapshot where it conflicts with the
+v1.7 earnings work or the availability follow-up. It records checks actually
+run against the current feature branch on the isolated Frappe 16.2.1 / ERPNext
+16.1.0 bench. The site and browser accounts are synthetic. Nothing was deployed
+to Selfmade.
+
+| Requirement | Current branch status | Evidence and remaining work |
+|---|---|---|
+| 1. Availability and patient booking | Implemented; focused browser verification passed | Production-built `/teletena/` clinician schedule save, request values, reload persistence, then a patient booking passed on 2026-10-02. Calendar edit/copy/date-only exception interaction passed. `tests/presentation.py` passed 12 cases for recurrence, DST, exceptions, conflicts, timezone snapshots and invalid-save atomicity. Rendered/inspected at 390, 768 and 1440 px. See [availability hotfix](availability-save-hotfix.md). |
+| 2. Appointment, call and documentation states | Implemented in API; presentation partially updated | 12 presentation and 18 selected integration regressions passed, covering explicit completion, exact-once reservations/releases and call lifecycle authorization. Appointment grouping and status copy changed on this branch. Full status-state screenshot matrix was not rerun. |
+| 3. Post-consultation notes | Implemented in the merged baseline; regression subset passed | The 12 presentation tests include private/shared note access and revisions; the 18 integration tests exercise consultation authorization. This branch did not change note persistence or privacy APIs. No new note-screen screenshot was captured here. |
+| 4. Consultation room | Intentionally unchanged | LiveKit media, Leave/rejoin and Cloud token revocation were verified in the prior hosted report with two fake-media browser contexts. The hosted Cloud run was not repeated on this branch; physical-device testing remains outstanding. |
+| 5. Consultation details | Partial presentation refinement | Changed dominant status and patient/clinician action wording. Backend snapshot and private-note access regressions passed. The full status-specific detail screenshot matrix was not rerun. |
+| 6. Product copy | Partial | Account, activity and payment labels were refined; the add-funds success copy now says “balance.” Some flows still contain repeated demo implementation language and newer copy is not consistently translated. |
+| 7. Care directory and patient record | Intentionally unchanged | Encounter authorization and privacy tests were part of the 12 presentation cases. No current-branch visual browser pass was run for this route. |
+| 8. Account and wallet summaries | Partial | Removed repeated wallet/help/notification placeholder cards from account tabs and limited the patient wallet summary to the account overview. No current-branch browser screenshot pass was run. |
+| 9. Admin review | Partial | Existing application review remains; financial activity now uses readable event labels and does not expose appointment IDs in dispute cards. Full current-branch admin browser verification was not run. |
+| 10. Private resume evidence | Intentionally unchanged | Private evidence authorization is covered by existing presentation tests. No upload/download visual or fresh-install test was repeated on this branch. |
+| 11. Mobile/PWA | Partial | `tests/service_worker.mjs` passed for both development and packaged modes. Calendar screenshots at 390/768/1440 have no horizontal page overflow. Other routes, 320 px and 200% zoom were not rerun. |
+| 12. Role tours | Partial | Invitation is now a compact single row and is hidden while the replay entry is available, reducing duplicated prompts. No post-change visual/accessibility browser pass was run. |
+| Earnings and payout lifecycle | Implemented as demonstration behavior; not real-money readiness | `tests/presentation.py` passed exact arithmetic, fee/window snapshot, dispute/release ordering and concurrent payout regressions. `tt_journal` is a balanced simulated subledger separate from `tt_ledger`; no ERPNext posting or real settlement. |
+
+### Current-branch checks
+
+- `frontend`: `npm run build` passed. Vite reports the LiveKit SDK chunk is
+  above 500 kB.
+- `frontend`: `npm run lint` exited successfully with React hook, Fast Refresh
+  and render-purity warnings; no lint errors.
+- `env/bin/python -m compileall -q tele_tena tests scripts` passed.
+- `node tests/service_worker.mjs` passed for packaged and development worker
+  scope and sensitive-endpoint exclusions.
+- `tests/presentation.py` — **12 passed** against the existing disposable site.
+  The test-process `frappe.enqueue` was a no-op because the local Redis queue
+  was already overloaded; no application code or worker configuration changed.
+- `tests/integration.py` selected cases 01–17 — **18 passed**, including
+  permission/scope, privacy, idempotency, transactional rollback, concurrent
+  booking/overspend, LiveKit authorization and end/join serialization. This
+  was not the full suite: legacy phone-auth cases were excluded because this
+  site deliberately disables them.
+- `scripts/check_migration.py` — passed twice through the migration path and
+  verified exact snapshots of old records, nine numbered patches, presentation
+  and financial tables, journals, journal lines and payout/earning/dispute
+  rows. This establishes repeat-migration preservation of the current records,
+  including the mismatch described below; it does not establish that the seeded
+  wallet projection reconciles.
+- `scripts/browser-availability-regression.cjs` passed on the production-built
+  Frappe route using a new synthetic patient with a fresh balanced demo wallet.
+- `scripts/browser-availability-calendar.cjs` passed date-only edit and
+  accessible field focus/copy interactions on the production-built route.
+- `scripts/check_redesign_browser.py` was attempted as a wider browser sweep but
+  stopped during synthetic fixture setup, before Chromium launch: its applicant
+  onboarding fixture called the registration endpoint while the site correctly
+  had public registration disabled. No registration setting was changed and no
+  browser result is claimed from that attempt.
+- `scripts/build_review.py` passed and produced the packaged Frappe assets; the
+  exact source SHA is in the generated `release.json`. The packaged artifact
+  hash/scope/privacy check passed. PR #12's eight frontend/Python CI jobs passed.
+- `git diff --check` passed.
+- Before the v1.8 reconciliation, the seeded synthetic account had 60,000
+  available / 540,000 reserved in `tt_wallet`, versus 260,000 / 240,000 in its
+  v1.7 opening journals. The append-only log showed 10 post-opening deposits
+  totalling 100,000 and five reservations totalling 300,000 with no matching
+  journals. The records do not identify which process wrote those entries.
+  The new versioned v1.8 patch imported those 15 known events into balanced,
+  idempotent journals. Wallets, legacy event rows and appointments were left
+  unchanged. The mismatch count is now zero.
+- `scripts/check_financial_migration.py` passed after reconciliation and on a
+  second migration, preserving wallet balances, the legacy log, earning rows
+  and balanced journals. `tests/presentation.py` now passes 13 cases, including
+  a savepoint-isolated post-snapshot legacy-event reconciliation/idempotency
+  case. The migration refuses unknown legacy event kinds.
+- A fresh install of v1.7/v1.8 has not yet run: the existing compatibility site
+  contains synthetic records that must be retained. A separate site named
+  `tele-tena-pr12-fresh.localhost` and its narrowly scoped temporary DB admin
+  are prepared in `scripts/prepare_fresh_install_db_admin.py`; operator setup
+  is still required before that one-time check. The existing preview site is
+  not dropped or reseeded.
+- The hosted LiveKit Cloud revocation browser regression, the fresh v1.7/v1.8
+  site installation, configuration-matched invited/enabled-registration
+  browser suites, complete contact-auth suite and all-route visual review are
+  still outstanding for the current source head. Hosted SMS delivery and
+  physical-device results remain unverified.
+
+### Current screenshot evidence
+
+Rendered from the built React bundle served at `/teletena/`, synthetic clinician
+account, on 2026-10-02; screenshots were visually inspected:
+
+- [Availability, 390 px](screenshots/next-design-update/availability-390.png)
+- [Availability, 1440 px](screenshots/next-design-update/availability-1440.png)
+- [Date-specific exception editor, 1440 px](screenshots/next-design-update/date-exception-edit-1440.png)
+
+The 768 px screenshot was rendered and its `scrollWidth` equaled its viewport
+width, but it was not retained. At 390 and 768 px the agenda view is used; at
+1440 px the week grid is shown. The screenshot still includes a synthetic
+appointment and the demonstration ribbon. It is not evidence of a phone/device
+test or a complete visual acceptance pass.
+
+### Availability root cause and exact target state
+
+The previously reported save failure is a frontend/API payload mismatch, not a
+timezone or service-scope failure. The production-built editor sends
+`start_local` and `end_local`, while the original validator read `start` and
+`end`; the API therefore rejected populated time fields as missing. The focused
+compatibility mapping is in PR #11 and is also present in this feature branch.
+Current browser verification confirms save, reload, booking and visible date
+exception editing. Invalid interval saves fail before partial writes and remain
+covered by the presentation API regression.
+
+Selfmade was last operator-reported with app checkout SHA
+`8f7ab9cd8d5e779d17b632dc9afdae3e700ab3c6`; an earlier report named installed
+release SHA `bba5ed9f15bd0b140967618ed2bd982c31a76c1b`. These observations differ
+and no new remote check was performed. Do not prepare a deployment command from
+either value until the operator confirms the active installed commit. This
+branch and PR are not deployed.
+
+## Earlier PR #7 verification snapshot
+
 Verification run on `feat/presentation-ready-release`, based on merged main
 `7222836` (PR #6); review PR: [#7](https://github.com/natnaelTi/tele-tena/pull/7).
 Screenshots use synthetic fixtures and are stored outside Git
@@ -54,13 +263,13 @@ All names below are PNGs in `/tmp/tele-tena-presentation-review/`:
 
 - No human participant or physical iOS/Android device test was performed. Hosted media verification used fake devices; it proves Cloud token revocation and browser media-track exchange, not room quality, clinical suitability or mobile background continuity.
 - SMS and SMTP providers were not live-tested; phone possession OTP does not verify adult age or clinician credentials. Amharic/Afaan Oromo strings remain provisional pending human review.
-- Real payments, double-entry accounting, ERPNext posting/reconciliation, withdrawals, clinician earnings, ratings, rescheduling, no-show actions, couples participation, clinic workspaces, natural-language matching and private requests/offers remain unimplemented per the tracker. The configured cancellation/release rules are demonstration policy only.
+- Real payments and external withdrawal settlement remain disabled. Balanced demonstration subledger postings, clinician earnings, dispute holds and payout reservations are implemented and tested; ERPNext posting remains unimplemented. Ratings, rescheduling, no-show actions, couples participation, clinic workspaces, natural-language matching and private requests/offers remain unimplemented per the tracker. Cancellation/release rules are demonstration policy only.
 - Account notifications and contact-change settings are not implemented. Existing appointments without reliable media timing report it unavailable. The PWA installation checklist has not been validated on physical devices/HTTPS hosting.
 - This branch is not production clinical readiness. Do not activate real payment or credential-verification claims.
 
 ## Presenter walkthrough
 
-1. Open the local development site and sign in through **Use email instead → Use password instead** with a synthetic development patient account. Add demonstration funds from **Payments**.
+1. Open `http://127.0.0.1:8017/teletena/` on the compatibility bench and sign in with a synthetic patient account in invited-review email/password mode. The separate original Vite preview at port 5173 is not this release. Add demonstration funds from **Payments**.
 2. Choose **Find care**, select an approved service, pick one of the returned dates/times in the displayed timezone, review **What you’ll share**, then confirm. Open **Appointments → View consultation** to review the exact snapshot and reservation.
 3. In a separate browser session, sign in as an approved synthetic clinician. Show **Today** and the weekly **Availability** editor; edit intervals or a date exception, save and publish. Show that an already booked appointment remains unchanged.
 4. For a scheduled synthetic consultation, use the explicit pre-call check and Join in both sessions. Show video, mute/camera/audio-only controls, Leave/rejoin, and the clinician’s **End for everyone** confirmation. Hosted End was separately verified in automation.
@@ -69,3 +278,51 @@ All names below are PNGs in `/tmp/tele-tena-presentation-review/`:
 
 Do not present the fake-media screenshots as physical-device evidence, and do not
 describe the simulation transaction log as accounting or a real payment.
+
+
+### Current consultation visuals (2026-10-03)
+
+From the running built app at `http://127.0.0.1:8017/teletena/`, the hosted
+LiveKit browser regression captured video call at 390 and 1440 px, and
+audio-only, clinician end-of-call notes, and completed details for clinician and
+patient at 320/390/768/1440 px. The test exchanges fake audio/video between two
+independent browser contexts; this is not physical-device evidence. Example
+files: `current-review/video-call-390-patient.png`,
+`current-review/audio-only-390.png`,
+`current-review/end-of-call-notes-1440.png`, and
+`current-review/completed-consultation-patient-390.png`. The earlier clinician-notes capture showed “Booked” alongside “Call ended”. A focused UI regression now mocks a synthetic booked appointment with an ended call, verifies the visible “Completion pending” state, and captures 390/1440 px; the stored appointment and accounting state remain unchanged.
+
+
+The local preview was restarted after its isolated MariaDB service had stopped.
+Compatibility MariaDB now uses its separate socket/data directory, and the
+loopback web process serves the built Frappe route without starting compatibility
+workers. Current package/deep-link and availability save/reload/book browser
+checks pass against that same URL. No old worker is writing to the v1.8 site.
+
+
+## Local authentication repair (2026-10-03)
+
+The invited-review site reports SMS OTP, email OTP and public registration
+disabled. The sign-in UI now remains phone-first and clearly marks phone-code
+access unavailable on this site; the user can choose email/password. When site
+capabilities report OTP delivery available, SMS remains the first route, email
+OTP is available as the alternative, and password is an explicit email option.
+No provider or site authentication setting was enabled for this check.
+
+The local protected review credential file and active User records were checked
+without printing credentials. Patient and clinician password sign-in both passed
+through the built browser UI. A wrong-password browser case now shows a
+non-enumerating email/password message. UI-only mocked capabilities exercised
+phone OTP -> email OTP -> password choice and an invalid/expired-code message;
+no SMS/email was sent and this does not verify delivery.
+
+`Sign in` and fallback states were rendered and visually inspected at 390 and
+1440 px. Captures are `current-review/sign-in-invited-phone-390.png`,
+`sign-in-invited-phone-1440.png`, `sign-in-invited-email-password-390.png` and
+`sign-in-invited-email-password-1440.png`. These show the invited-site fallback,
+not the hosted SMS-enabled configuration.
+
+Checks: `npm run build`, `npm run lint` (existing warnings),
+`python3 scripts/build_review.py`, `python3 scripts/check_review_assets.py`, and
+`node scripts/browser-authentication-flow.cjs` all passed. Packaged frontend
+source SHA: `c9f098814e7aab9e3ab5df7a19a760da6148b33b`.

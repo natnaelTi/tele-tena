@@ -1,7 +1,7 @@
 """Disposable fresh install via the installed Bench/Frappe installer, normal user.
 
 DB admin credential file is generated locally, never printed or passed in argv.
-Only tele-tena-pr2-test.localhost / teletenapr2test may be created or removed.
+Only the new tele-tena-pr12-fresh.localhost / teletenapr12fresh may be created or removed.
 """
 import contextlib
 import hashlib
@@ -11,18 +11,24 @@ from pathlib import Path
 import secrets
 import shutil
 import stat
+import subprocess
+import sys
 import tempfile
+import time
+import urllib.request
 from unittest.mock import patch
 
 import frappe
 import pymysql
 
+APP = Path(__file__).resolve().parents[1]
 BENCH = Path(__file__).resolve().parents[3]
-SITE = 'tele-tena-pr2-test.localhost'
-DB = 'teletenapr2test'
-ADMIN = 'tt_pr2_site_admin'
-CREDENTIALS = Path('/tmp/tele-tena-pr2-db-admin.json')
-LOG = Path('/tmp/tele-tena-pr2-fresh-install.log')
+SITE = 'tele-tena-pr12-fresh.localhost'
+DB = 'teletenapr12fresh'
+RETAINED_SITE = 'tele-tena-pr2-test.localhost'
+ADMIN = 'tt_pr12_site_admin'
+CREDENTIALS = Path('/tmp/tele-tena-pr12-db-admin.json')
+LOG = Path('/tmp/tele-tena-pr12-fresh-install.log')
 SITE_PATH = BENCH / 'sites' / SITE
 assert os.geteuid() != 0, 'Run as the normal Linux user, never root'
 assert not SITE_PATH.exists(), 'Disposable site already exists; refusing to overwrite it'
@@ -41,21 +47,87 @@ def administration():
 def retained_fingerprint():
     from tele_tena.schema import TABLES
     from tele_tena.patches.v1_6_presentation_release import TABLES as PRESENTATION_TABLES
-    frappe.init(site='erp.localhost', sites_path=str(BENCH / 'sites'))
+    from tele_tena.patches.v1_7_demo_subledger import TABLES as SUBLEDGER_TABLES
+    frappe.init(site=RETAINED_SITE, sites_path=str(BENCH / 'sites'))
     frappe.connect()
     content = {}
-    for table in (*TABLES, *PRESENTATION_TABLES, 'phone_identity','otp_challenge','otp_rate_limit','otp_gate','consultation','contact_identity','onboarding'):
+    for table in (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'phone_identity','otp_challenge','otp_rate_limit','otp_gate','consultation','contact_identity','onboarding'):
         records = frappe.db.sql(f'SELECT * FROM tt_{table}', as_dict=True)
         content[table] = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in records)
     for table in ('tabTele Tena Service', 'tabTele Tena Service Scope'):
         content[table] = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in frappe.db.sql(f'SELECT * FROM `{table}`', as_dict=True))
     for name in ('site_config.json', 'private/tele_tena_livekit.json', 'private/tele_tena_sms.json', 'private/tele_tena_email.json'):
-        path = BENCH / 'sites/erp.localhost' / name
+        path = BENCH / 'sites' / RETAINED_SITE / name
         if path.is_file():
             content[name] = hashlib.sha256(path.read_bytes()).hexdigest()
     digest = hashlib.sha256(json.dumps(content, sort_keys=True).encode()).digest()
     frappe.destroy()
     return digest
+
+
+def enabled_registration_browser_check():
+    """Exercise signup/onboarding only on this explicitly disposable fresh site."""
+    from frappe.installer import update_site_config
+    for key, value in (
+        ('tele_tena_review_site', SITE),
+        ('tele_tena_review_enabled', True),
+        ('tele_tena_phone_otp_enabled', True),
+        ('tele_tena_patient_registration_enabled', True),
+        ('tele_tena_clinician_registration_enabled', True),
+    ):
+        update_site_config(key, value)
+    frappe.clear_cache()
+    frappe.destroy()
+
+    port = '8021'
+    app_env = dict(os.environ, TELE_TENA_TEST_SITE=SITE, PYTHONUNBUFFERED='1')
+    command = [str(BENCH / 'env/bin/gunicorn'), '--bind', '127.0.0.1:' + port,
+               '--workers', '2', '--pythonpath', './apps/tele_tena', '--chdir', './sites',
+               'scripts.review_test_wsgi:application']
+    server = subprocess.Popen(command, cwd=BENCH, env=app_env,
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        url = 'http://127.0.0.1:' + port + '/teletena/sign-in'
+        for _ in range(80):
+            if server.poll() is not None:
+                raise RuntimeError('Disposable-site browser server exited before readiness')
+            try:
+                with urllib.request.urlopen(url, timeout=1) as response:
+                    if response.status == 200:
+                        break
+            except Exception:
+                time.sleep(0.5)
+        else:
+            raise RuntimeError('Disposable-site browser server did not become ready')
+
+        env = dict(os.environ,
+                   TELE_TENA_TEST_SITE=SITE,
+                   TELE_TENA_TEST_API_ORIGIN='http://127.0.0.1:' + port,
+                   TELE_TENA_TEST_BASE='http://127.0.0.1:' + port + '/teletena',
+                   TELE_TENA_REDIRECTED_BROWSER='1')
+        result = subprocess.run([str(BENCH / 'env/bin/python'),
+                                 str(APP / 'scripts/check_redesign_browser.py')],
+                                cwd=BENCH, env=env, timeout=360,
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        print(result.stdout.strip())
+        if result.returncode:
+            raise RuntimeError('Enabled-registration fresh-site browser journey failed')
+
+        invited_env = dict(os.environ, NODE_PATH='/tmp/tele-tena-browser/node_modules',
+                           TELE_TENA_TEST_BASE='http://127.0.0.1:8017/teletena')
+        invited = subprocess.run(['node', str(APP / 'scripts/browser-invited-review.cjs')],
+                                 cwd=APP, env=invited_env, timeout=90,
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        print(invited.stdout.strip())
+        if invited.returncode:
+            raise RuntimeError('Invited-review browser policy check failed')
+    finally:
+        server.terminate()
+        try:
+            server.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            server.kill()
+            server.wait(timeout=5)
 
 
 os.chdir(BENCH / 'sites')
@@ -105,7 +177,8 @@ try:
     assert {'frappe', 'erpnext', 'tele_tena'} <= set(frappe.get_installed_apps())
     from tele_tena.schema import TABLES
     from tele_tena.patches.v1_6_presentation_release import TABLES as PRESENTATION_TABLES
-    assert all('tt_' + table in frappe.db.get_tables(cached=False) for table in (*TABLES,*PRESENTATION_TABLES))
+    from tele_tena.patches.v1_7_demo_subledger import TABLES as SUBLEDGER_TABLES
+    assert all('tt_' + table in frappe.db.get_tables(cached=False) for table in (*TABLES,*PRESENTATION_TABLES,*SUBLEDGER_TABLES))
     assert 'tt_consultation' in frappe.db.get_tables(cached=False)
     assert frappe.db.exists('DocType', 'Tele Tena Service')
     assert frappe.db.exists('DocType', 'Tele Tena Service Scope')
@@ -115,7 +188,7 @@ try:
     assert frappe.db.sql('SELECT COUNT(*) FROM tt_wallet')[0][0] == 0
     for role in ('Tele Tena Patient', 'Tele Tena Clinician', 'Tele Tena Approver'):
         assert frappe.db.exists('Role', role)
-    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state', 'v1_5_contact_onboarding', 'v1_6_presentation_release'):
+    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state', 'v1_5_contact_onboarding', 'v1_6_presentation_release', 'v1_7_demo_subledger', 'v1_8_legacy_event_reconciliation'):
         assert frappe.db.exists('Patch Log', {'patch': 'tele_tena.patches.' + version})
     from tele_tena.api import journey
     assert not journey.simulation_enabled(), 'Simulation unexpectedly enabled on disposable site'
@@ -125,16 +198,15 @@ try:
         raise AssertionError('Guest app access was allowed')
     except frappe.PermissionError:
         pass
-    if os.environ.get('TELE_TENA_REVIEW_CHECK') == 'hold':
-        print('READY: disposable site retained for separate review verification. Press Enter only after checks finish to clean up.', flush=True)
-        input()
     if os.environ.get('TELE_TENA_REVIEW_CHECK') == '1':
         from check_review_site import verify
         verify()
+    if os.environ.get('TELE_TENA_REVIEW_CHECK') == 'full':
+        enabled_registration_browser_check()
     frappe.destroy()
     assert retained_fingerprint() == retained_before, 'Retained development records changed'
     passed = True
-    print('PASS: fresh Frappe + ERPNext + tele_tena install, native models, roles, presentation schemas, eight migrations, guest denial and simulation disabled before explicit review setup; retained development records unchanged')
+    print('PASS: fresh Frappe + ERPNext + tele_tena install, native models, roles, presentation and subledger schemas, ten migrations, guest denial and simulation disabled before explicit review setup; retained development records unchanged')
 except Exception as error:
     import traceback
     for frame in traceback.extract_tb(error.__traceback__):
@@ -147,9 +219,9 @@ finally:
     admin = administration()
     with admin.cursor() as cursor:
         if attempted:
-            cursor.execute('DROP DATABASE IF EXISTS `teletenapr2test`')
-            cursor.execute("DROP USER IF EXISTS 'teletenapr2test'@'localhost'")
-        cursor.execute("DROP USER 'tt_pr2_site_admin'@'localhost'")
+            cursor.execute(f'DROP DATABASE IF EXISTS `{DB}`')
+            cursor.execute(f"DROP USER IF EXISTS '{DB}'@'localhost'")
+        cursor.execute(f"DROP USER '{ADMIN}'@'localhost'")
     admin.close()
     if attempted and SITE_PATH.exists():
         assert SITE_PATH.resolve() == (BENCH / 'sites' / SITE).resolve()
