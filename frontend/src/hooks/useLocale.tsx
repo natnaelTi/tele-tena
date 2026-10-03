@@ -138,6 +138,7 @@ const words: Record<string, [string, string]> = {
   "Interval starts": ["የሚጀምርበት ሰዓት", "Yeroo jalqabaa"],
   "Interval ends": ["የሚያበቃበት ሰዓት", "Yeroo xumuraa"],
   "Remove interval": ["ይህን ሰዓት አስወግድ", "Yeroo kana haqi"],
+  "Copy availability to other days": ["የስራ ሰዓትን ወደ ሌሎች ቀናት ቅዳ", "Yeroo hojii gara guyyaa biraatti garagalchi"],
   "Choose a time to add a weekly interval.": ["ሳምንታዊ ሰዓት ለመጨመር ጊዜ ይምረጡ።", "Yeroo torbanii dabaluuf sa'aatii filadhu."],
   "Choose a time to prepare a date-specific replacement. Confirm it in Date exceptions before saving. Existing appointments remain unchanged.": ["ለተመረጠው ቀን የሚተካ ሰዓት ይምረጡ። ከማስቀመጥዎ በፊት በቀን ልዩነቶች ውስጥ ያረጋግጡ። ያሉ ቀጠሮዎች አይቀየሩም።", "Guyyaa filatameef yeroo bakka bu'u filadhu. Olkaa'uu dura addaddummaa guyyaa keessatti mirkaneessi. Beellamoonni jiran hin jijjiiraman."],
   "Time-field editor and keyboard alternative": ["የሰዓት መስኮች እና የቁልፍ ሰሌዳ አማራጭ", "Dirree sa'aatii fi filannoo kiiboordii"],

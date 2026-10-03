@@ -32,6 +32,8 @@ async function signIn(page, user, password) {
     await page.getByRole('heading', { name: 'Weekly availability' }).waitFor();
     const mondayStart = page.getByLabel('Monday starts', { exact: true });
     assert.match(await mondayStart.inputValue(), /^\d{2}:\d{2}$/);
+    const timeFields = page.locator('details.schedule-accessible-times');
+    if (!(await timeFields.evaluate(element => element.open))) await timeFields.locator(':scope > summary').click();
 
     for (let n = await page.getByRole('button', { name: 'Remove', exact: true }).count(); n > 0; n--) {
       await page.getByRole('button', { name: 'Remove', exact: true }).first().click();
@@ -42,8 +44,6 @@ async function signIn(page, user, password) {
     await page.getByLabel('Monday ends', { exact: true }).fill('17:00');
     const tuesday = page.locator('.schedule-day').filter({ has: page.getByRole('heading', { name: 'Tuesday', exact: true }) });
     await tuesday.getByRole('button', { name: 'Add time' }).click();
-    const timeFields = page.locator('details.schedule-accessible-times');
-    if (!(await timeFields.evaluate(element => element.open))) await timeFields.locator('summary').click();
     await page.getByLabel('Tuesday starts', { exact: true }).fill('09:00');
     await page.getByLabel('Tuesday ends', { exact: true }).fill('17:00');
 

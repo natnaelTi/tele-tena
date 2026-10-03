@@ -26,6 +26,8 @@ const base = 'http://127.0.0.1:8017/teletena';
     const focusedEditor = page.locator('[data-selected="true"] input[type="time"]').first();
     await focusedEditor.waitFor();
     assert.equal(await focusedEditor.evaluate(element => document.activeElement === element), true);
+    const copyControls = page.locator('details.schedule-copy-controls');
+    if (!(await copyControls.evaluate(element => element.open))) await copyControls.locator(':scope > summary').click();
     await page.getByLabel('Copy intervals from', { exact: true }).selectOption('0');
     await page.getByLabel('Copy to days', { exact: true }).selectOption('2');
     await page.getByRole('button', { name: 'Copy Monday times', exact: true }).click();
