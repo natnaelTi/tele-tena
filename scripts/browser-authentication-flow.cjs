@@ -40,6 +40,18 @@ async function useEmailPassword(page) {
       assert.ok(new URL(page.url()).pathname.startsWith('/teletena' + destination));
     }
 
+    const rejectedPassword = await browser.newPage();
+    await rejectedPassword.route('**/api/method/login', route => route.fulfill({
+      status: 401, contentType: 'application/json', body: JSON.stringify({ message: 'Invalid login' }),
+    }));
+    await rejectedPassword.goto(base + '/sign-in');
+    await useEmailPassword(rejectedPassword);
+    await rejectedPassword.getByLabel('Email', { exact: true }).fill('synthetic@example.invalid');
+    await rejectedPassword.getByLabel('Password', { exact: true }).fill('incorrect-test-password');
+    await rejectedPassword.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await rejectedPassword.getByText('We could not sign you in with those details. Check your email and password, then try again.', { exact: true }).waitFor();
+    assert.equal(await rejectedPassword.getByText(/Codes expire after five minutes/).count(), 0);
+
     const otp = await browser.newPage();
     await otp.route('**/api/method/tele_tena.api.contact_auth.sign_in_options**', route => route.fulfill({
       status: 200, contentType: 'application/json', body: JSON.stringify({ message: {
