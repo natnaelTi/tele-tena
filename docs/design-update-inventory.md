@@ -129,3 +129,39 @@ English is the verified language for this iteration's new calendar and finance
 copy. Amharic and Afaan Oromo strings remain provisional, and the wider product
 contains existing English-only copy. The current design pass is therefore
 partial and is not a whole-product visual acceptance.
+
+## PR #12 rendered-route checkpoint (2026-10-03)
+
+The earlier per-feature status table records whether behavior changed; this
+checkpoint updates only which production-built routes have current screenshots.
+It does not turn a screenshot into proof of permissions or whole-product visual
+acceptance. Source and asset SHA: `df845b5b7936a3b696e40c1856f4e48f6148bf75`.
+Screens are under
+[`docs/screenshots/next-design-update/current-review/`](screenshots/next-design-update/current-review/)
+and use synthetic records only.
+
+| Inventory coverage | Render capture | Remaining visual/functional review |
+|---|---|---|
+| PUB-1, AUTH-1/2 (invited mode) | Homepage and email/password sign-in at 320, 390, 720, 768 and 1440 px | Clinician invitation route; hosted phone entry, OTP, resend and email OTP on an enabled-delivery fixture |
+| ONB-1/2 | Not captured in this run | Patient and clinician resumable steps, pending/rejected application and private resume controls |
+| PAT-1/2/3 | Patient home, discovery and booking at all five widths | Back-navigation state, disclosure preview, price review and confirmation screens need current screenshots; booking regression did complete the flow |
+| PAT-4/5/6/7 | Patient appointments, consultation detail, account and payments at all five widths | Explicit status-state, published summary, privacy-edit, transaction empty/error state review |
+| CLN-1/2/3/4 | Clinician Today, appointments, availability and services/pricing at all five widths | Current availability error/editor interactions at mobile and 200% browser zoom; approval-pending state |
+| CLN-5/6/7/8/10 | Clinician consultation detail, care directory, account and earnings at all five widths | End-of-call notes, private/shared revision states, care-record detail, resume replace/remove and seeded earnings/payout scenario |
+| ADM-1/2/3 | Application queue, service scopes and financial disputes at all five widths | Pending-applicant/resume access and reviewer permission/error states; 200% browser zoom |
+| CALL-1/UI-4 | Not part of the five-width route sweep | Preflight permission failure, real video/audio-only layouts, Leave/rejoin and ended state; hosted Cloud token test passed with fake media, physical devices remain untested |
+| UI-3 tours | Invitation row appears in authenticated captures | Open/step/replay/dismiss/missing-target states at mobile for patient, clinician and reviewer |
+| PWA-1/SYS-1/2/3 | Built sign-in/deep-link/offline flow passed; route screenshots have no page-level overflow | Browser update deferral during an active call and physical HTTPS installation guidance remain unverified |
+
+Twenty direct routes were captured at five CSS viewport widths (320, 390, 720,
+768 and 1440 px). The 720 px viewport is a narrow-layout proxy for the CSS
+viewport width after 200% zoom on a 1440 px display; it is not an actual browser
+zoom/device test. The sweep found patient booking page overflow to 984–992 px at
+320/390/768; `.booking-layout` and its children now allow shrinkage, and the
+built booking regression plus a repeated route sweep passed without page-level
+overflow. Inner date chips remain intentionally horizontally scrollable.
+
+This preview is configured for invited review: the public landing page works,
+phone OTP and public registration are disabled, and email/password reviewer
+access remains available. The enabled-registration visual/browser configuration
+still needs a separate disposable site. No live SMS or SMTP delivery was run.

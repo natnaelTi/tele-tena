@@ -6,7 +6,7 @@ The correct review preview is `http://127.0.0.1:8017/teletena/` (availability:
 `http://127.0.0.1:8017/teletena/clinician/availability`). It is served by
 `/home/frappe/teletena-compat/bench`, site
 `tele-tena-pr2-test.localhost`, branch `feat/next-design-update`, backend
-checkout `4707bfefdde057a8ecf476903e027097c3ca8bf7`. The built asset manifest
+checkout `df845b5b7936a3b696e40c1856f4e48f6148bf75`. The built asset manifest
 `tele_tena/public/review/release.json` reports that same SHA. Gunicorn runs
 from this bench's Python 3.14.2 environment and loads its `./apps/tele_tena`
 checkout. This is the production React build behind Frappe's `/teletena/` route,
@@ -28,11 +28,16 @@ spending did not alter existing balances. The server route returned
 `Cache-Control: no-store, private`.
 
 Rerun evidence on 2026-10-03: production-built availability save/request/reload/
-booking **passed**; built-package browser checks for guest redirect, password
-session, consultation deep-link/reload, sign-out, 390/768/1440 rendering, PWA
-scope, sensitive-cache exclusion and offline state **passed**; invited-review
-auth policy browser check **passed**; packaged asset hash/scope/privacy scan
-**passed**. Bundle source SHA is `4707bfefdde057a8ecf476903e027097c3ca8bf7`.
+booking and booking-link navigation **passed**. Invalid end-before-start input
+showed a field-specific error and remained editable. The browser harness now
+waits for the sign-out response before following the patient link, removing a
+race that could keep the clinician session active. Built-package guest redirect,
+password session, consultation deep-link/reload, sign-out, PWA scope, sensitive-
+cache exclusion and offline-state checks **passed**; invited-review auth policy
+**passed**. Twenty routes rendered at 320, 390, 720, 768 and 1440 CSS px with no
+page-level horizontal overflow. 720 px is a narrow-layout proxy for 200% zoom on
+a 1440 px display, not an actual browser-zoom test. Asset hash/scope/privacy scan
+**passed**. Bundle source SHA: `df845b5b7936a3b696e40c1856f4e48f6148bf75`.
 Presentation regressions passed 14 cases; lint passed with existing warnings.
 
 The first integration rerun stopped on a fixture mismatch: it used the
@@ -44,24 +49,36 @@ its combined browser run stopped on an obsolete root-manifest assertion. That
 assertion is fixed and the browser package passed against the retained site; a
 fresh install plus full browser suite has not yet been repeated. The temporary
 database-admin credential is currently absent, so a new disposable install
-needs the operator setup step. The hosted LiveKit rerun stopped before
-connecting because this isolated site has no LiveKit project configuration.
-Prior hosted Cloud evidence remains in the previous report; no new Cloud claim
-is made here.
+needs the operator setup step. The hosted LiveKit regression **passed against the development LiveKit Cloud
+project** after its mode-600 private configuration was copied only to this
+isolated site and removed in cleanup. Two independent Chromium contexts
+exchanged fake-device audio/video, Leave/rejoin passed, End closed the room,
+and Cloud rejected original/refreshed cached tokens for both identities,
+including a participant who left before End. This is automated fake-media
+evidence, not physical-device testing.
 
 The retained compatibility site ran v1.8 reconciliation: 15 post-opening
-legacy activity rows (10 deposits and five reservations) were imported into
-balanced journals without deleting or rewriting those rows, appointments,
-reservations or wallet projections. Projections reconcile now, but evidence
-does not identify which process originally wrote the legacy events. The cutover
-guide requires stopping every old writer before activating new code.
+legacy rows (10 deposits and five reservations) were imported into balanced
+journals without rewriting legacy events, appointments, reservations or wallet
+projections. A read-only audit now finds the Review Patient wallet at 120,000
+available / 480,000 reserved minor units (ETB 1,200 / ETB 4,800), exactly equal
+to journal projections; current difference is zero. The earlier mismatch was
+60,000 / 540,000 in the legacy wallet versus opening journals of 260,000 /
+240,000. The 15 missing post-opening rows explain it and v1.8 imported them
+once. This does not identify which process originally wrote the legacy rows.
+The cutover guide requires stopping every old writer before new code is active.
 
-The wider route-by-route visual review and screenshot matrix remain incomplete.
-Current availability screenshots cover 320, 390, 768 and 1440 px; other
-inventory entries still need current-branch captures and inspection. A
-rendered review found clipping in short booked blocks; the fix shows the
-permitted alias without clipped secondary text and retains a complete
-accessible name.
+Current route screenshots are under
+`docs/screenshots/next-design-update/current-review/`: 20 public and authenticated
+patient, clinician and reviewer routes at 320/390/720/768/1440 px. The audit
+found patient booking overflow to 984–992 px at 320/390/768; `.booking-layout`
+and its children now shrink, and the production route test plus repeated sweep
+show no page-level overflow. Short booking blocks display the permitted alias
+without clipped secondary text and retain a full accessible name. Visual
+acceptance remains incomplete: phone/OTP and clinician-onboarding states, open
+tours, video/audio/end call states, notes workflow, Amharic/Afaan Oromo
+rendering, actual 200% browser zoom and several empty/error states still need
+visual review.
 
 ## Update for `feat/next-design-update` (2026-10-02)
 
@@ -237,13 +254,13 @@ All names below are PNGs in `/tmp/tele-tena-presentation-review/`:
 
 - No human participant or physical iOS/Android device test was performed. Hosted media verification used fake devices; it proves Cloud token revocation and browser media-track exchange, not room quality, clinical suitability or mobile background continuity.
 - SMS and SMTP providers were not live-tested; phone possession OTP does not verify adult age or clinician credentials. Amharic/Afaan Oromo strings remain provisional pending human review.
-- Real payments, double-entry accounting, ERPNext posting/reconciliation, withdrawals, clinician earnings, ratings, rescheduling, no-show actions, couples participation, clinic workspaces, natural-language matching and private requests/offers remain unimplemented per the tracker. The configured cancellation/release rules are demonstration policy only.
+- Real payments and external withdrawal settlement remain disabled. Balanced demonstration subledger postings, clinician earnings, dispute holds and payout reservations are implemented and tested; ERPNext posting remains unimplemented. Ratings, rescheduling, no-show actions, couples participation, clinic workspaces, natural-language matching and private requests/offers remain unimplemented per the tracker. Cancellation/release rules are demonstration policy only.
 - Account notifications and contact-change settings are not implemented. Existing appointments without reliable media timing report it unavailable. The PWA installation checklist has not been validated on physical devices/HTTPS hosting.
 - This branch is not production clinical readiness. Do not activate real payment or credential-verification claims.
 
 ## Presenter walkthrough
 
-1. Open the local development site and sign in through **Use email instead → Use password instead** with a synthetic development patient account. Add demonstration funds from **Payments**.
+1. Open `http://127.0.0.1:8017/teletena/` on the compatibility bench and sign in with a synthetic patient account in invited-review email/password mode. The separate original Vite preview at port 5173 is not this release. Add demonstration funds from **Payments**.
 2. Choose **Find care**, select an approved service, pick one of the returned dates/times in the displayed timezone, review **What you’ll share**, then confirm. Open **Appointments → View consultation** to review the exact snapshot and reservation.
 3. In a separate browser session, sign in as an approved synthetic clinician. Show **Today** and the weekly **Availability** editor; edit intervals or a date exception, save and publish. Show that an already booked appointment remains unchanged.
 4. For a scheduled synthetic consultation, use the explicit pre-call check and Join in both sessions. Show video, mute/camera/audio-only controls, Leave/rejoin, and the clinician’s **End for everyone** confirmation. Hosted End was separately verified in automation.
