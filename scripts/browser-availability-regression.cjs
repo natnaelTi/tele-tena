@@ -80,7 +80,10 @@ async function signIn(page, user, password) {
     assert.equal(sharedPath.includes(browserFixture.offering), false,
       'shareable URLs must not expose the internal offering identifier');
 
+    const logoutResponse = page.waitForResponse(response =>
+      response.url().includes('/api/method/frappe.handler.logout'));
     await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await logoutResponse;
     await page.goto(base + sharedPath);
     await page.getByLabel('Email', { exact: true }).waitFor();
     await page.getByLabel('Email', { exact: true }).fill(browserFixture.patient);
@@ -88,6 +91,12 @@ async function signIn(page, user, password) {
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     await page.waitForURL('**/teletena/patient/book-link/**');
     await page.getByRole('heading', { name: 'Choose a time' }).waitFor();
+    for (const width of [320, 390, 768, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false,
+        `patient booking must not overflow at ${width}px`);
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
     const dates = page.locator('.booking-dates button');
     await dates.first().waitFor();
     await dates.first().click();
