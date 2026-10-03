@@ -6,8 +6,8 @@ The correct review preview is `http://127.0.0.1:8017/teletena/` (availability:
 `http://127.0.0.1:8017/teletena/clinician/availability`). It is served by
 `/home/frappe/teletena-compat/bench`, site
 `tele-tena-pr2-test.localhost`, branch `feat/next-design-update`, backend
-checkout `df845b5b7936a3b696e40c1856f4e48f6148bf75`. The built asset manifest
-`tele_tena/public/review/release.json` reports that same SHA. Gunicorn runs
+checkout at branch head `0fce298eedaa4ad93243d3f24086f023e068c1d3`. The built asset
+manifest `tele_tena/public/review/release.json` reports this source SHA. Gunicorn runs
 from this bench's Python 3.14.2 environment and loads its `./apps/tele_tena`
 checkout. This is the production React build behind Frappe's `/teletena/` route,
 not Vite. The old Vite process at `127.0.0.1:5173` loads
@@ -35,9 +35,12 @@ race that could keep the clinician session active. Built-package guest redirect,
 password session, consultation deep-link/reload, sign-out, PWA scope, sensitive-
 cache exclusion and offline-state checks **passed**; invited-review auth policy
 **passed**. Twenty routes rendered at 320, 390, 720, 768 and 1440 CSS px with no
-page-level horizontal overflow. 720 px is a narrow-layout proxy for 200% zoom on
+page-level horizontal overflow. The invited-review email/password entry and the
+enabled phone-entry screen were both captured; patient and clinician onboarding
+step one was captured at 320/390/768/1440 after creating and cleaning up a
+short-lived synthetic verified-contact account. 720 px is a narrow-layout proxy for 200% zoom on
 a 1440 px display, not an actual browser-zoom test. Asset hash/scope/privacy scan
-**passed**. Bundle source SHA: `df845b5b7936a3b696e40c1856f4e48f6148bf75`.
+**passed**. The latest bundled source SHA is `0fce298eedaa4ad93243d3f24086f023e068c1d3`; the earlier route sweep bundle was `df845b5b7936a3b696e40c1856f4e48f6148bf75`.
 Presentation regressions passed 14 cases; lint passed with existing warnings.
 
 The first integration rerun stopped on a fixture mismatch: it used the
@@ -74,11 +77,15 @@ patient, clinician and reviewer routes at 320/390/720/768/1440 px. The audit
 found patient booking overflow to 984–992 px at 320/390/768; `.booking-layout`
 and its children now shrink, and the production route test plus repeated sweep
 show no page-level overflow. Short booking blocks display the permitted alias
-without clipped secondary text and retain a full accessible name. Visual
-acceptance remains incomplete: phone/OTP and clinician-onboarding states, open
-tours, video/audio/end call states, notes workflow, Amharic/Afaan Oromo
-rendering, actual 200% browser zoom and several empty/error states still need
-visual review.
+without clipped secondary text and retain a full accessible name. Visual acceptance remains incomplete: OTP entry/resend, later clinician onboarding and
+pending/rejected application states, open tours, Amharic/Afaan Oromo rendering,
+actual 200% browser zoom and several empty/error states still need visual review.
+Current production-build screenshots now cover video call (390/1440), audio-only,
+clinician end-of-call notes, and completed consultation detail for both roles
+(320/390/768/1440), using fake media and synthetic records. Inspection found a
+remaining clinician detail mismatch: the page can show “Call ended” while its
+appropriate appointment-state field still says “Booked”; lifecycle status
+presentation needs a focused fix and regression before visual acceptance.
 
 ## Update for `feat/next-design-update` (2026-10-02)
 
@@ -269,3 +276,19 @@ All names below are PNGs in `/tmp/tele-tena-presentation-review/`:
 
 Do not present the fake-media screenshots as physical-device evidence, and do not
 describe the simulation transaction log as accounting or a real payment.
+
+
+### Current consultation visuals (2026-10-03)
+
+From the running built app at `http://127.0.0.1:8017/teletena/`, the hosted
+LiveKit browser regression captured video call at 390 and 1440 px, and
+audio-only, clinician end-of-call notes, and completed details for clinician and
+patient at 320/390/768/1440 px. The test exchanges fake audio/video between two
+independent browser contexts; this is not physical-device evidence. Example
+files: `current-review/video-call-390-patient.png`,
+`current-review/audio-only-390.png`,
+`current-review/end-of-call-notes-1440.png`, and
+`current-review/completed-consultation-patient-390.png`. The rendered clinician
+notes screen still labels the appointment “Booked” alongside “Call ended”. That
+state-label defect remains open; screenshots are evidence of the observed UI,
+not acceptance of the lifecycle presentation.

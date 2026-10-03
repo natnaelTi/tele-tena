@@ -165,3 +165,30 @@ This preview is configured for invited review: the public landing page works,
 phone OTP and public registration are disabled, and email/password reviewer
 access remains available. The enabled-registration visual/browser configuration
 still needs a separate disposable site. No live SMS or SMTP delivery was run.
+
+### Additional authentication/onboarding captures
+
+The 2026-10-03 route evidence also includes:
+
+- `phone-entry-enabled-{320,390,768,1440}.png`: phone access and registration
+  switches were enabled only on the isolated preview long enough to render the
+  phone-entry UI. No code request was made. The exact invited-review
+  `site_config.json` bytes were restored afterward.
+- `patient-onboarding-{320,390,768,1440}.png` and
+  `clinician-onboarding-{320,390,768,1440}.png`: first step only, using a
+  temporary synthetic Website User with verified synthetic email identity and
+  no clinician role. The account and private password fixture were removed;
+  no onboarding form was submitted.
+
+These captures do not verify SMS delivery, OTP entry, or the later clinician
+application stages. Email OTP remains unavailable without a delivery provider.
+
+
+### Consultation captures from the production-built preview
+
+Current screenshots in `current-review/` cover video call at 390/1440, plus
+audio-only, clinician notes after End, and completed consultation detail for
+patient and clinician at 320/390/768/1440. They use synthetic records and
+fake-media browser sessions. Inspection identified a remaining status conflict
+on clinician notes: call status is “Call ended” while appointment status says
+“Booked”. Lifecycle presentation is not accepted until corrected and retested.
