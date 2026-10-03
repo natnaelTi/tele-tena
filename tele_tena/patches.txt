@@ -10,3 +10,4 @@ tele_tena.patches.v1_3_phone_auth
 tele_tena.patches.v1_5_contact_onboarding
 tele_tena.patches.v1_6_presentation_release
 tele_tena.patches.v1_7_demo_subledger
+tele_tena.patches.v1_8_legacy_event_reconciliation

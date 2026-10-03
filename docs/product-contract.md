@@ -109,3 +109,10 @@ records simulated availability of earnings; it does not transfer money. Mutual
 rescheduling, no-show decisions, notifications, real payments/accounting,
 physical-device call quality and production clinical readiness remain outside
 the implemented contract; the delivery tracker is authoritative for pending scope.
+
+The versioned v1.8 reconciliation imports known legacy deposit, reservation and
+release events created after each v1.7 wallet opening snapshot into balanced,
+idempotent journals. It preserves the wallet projection, original activity log,
+appointments and reserved obligations. Unknown legacy event kinds stop for
+review. A deployment cutover stops all old web and background writers before
+migration, then verifies wallet/subledger equality before starting matching code.

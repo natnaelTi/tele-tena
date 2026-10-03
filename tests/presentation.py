@@ -494,6 +494,39 @@ class Presentation(unittest.TestCase):
         with self.assertRaises(frappe.PermissionError):
             presentation.tour_state('clinician-availability')
 
+    def test_06_legacy_wallet_events_after_opening_snapshot_reconcile_once(self):
+        from tele_tena import accounting
+        from tele_tena.patches.v1_8_legacy_event_reconciliation import reconcile_wallet_events
+        savepoint = 'tt_fin_reconcile_' + uuid.uuid4().hex[:16]
+        frappe.db.sql('SAVEPOINT ' + savepoint)
+        patient = 'legacy-' + uuid.uuid4().hex[:16] + '@example.invalid'
+        try:
+            frappe.db.sql('INSERT INTO tt_wallet (patient,available,reserved) VALUES (%s,60000,540000)',
+                          (patient,))
+            available = accounting.account_id('patient', patient, 'available')
+            reserved = accounting.account_id('patient', patient, 'reserved')
+            accounting.post('opening:' + patient, 'Opening', 'opening:' + patient,
+                            [(available, 0, 260000), (reserved, 0, 240000),
+                             ('demo:opening-control', 500000, 0)], {'source': 'synthetic migration test'})
+            from tele_tena.api.journey import simulation_log
+            simulation_log(patient, 'Deposit', 100000, 'deposit:synthetic-unposted')
+            for index in range(5):
+                simulation_log(patient, 'Reservation', 60000, 'booking:synthetic-unposted-' + str(index))
+            legacy_count = int(journey.one('SELECT COUNT(*) n FROM tt_ledger WHERE patient=%s', (patient,)).n)
+            self.assertEqual(reconcile_wallet_events(patient), 6)
+            self.assertEqual(reconcile_wallet_events(patient), 0)
+            self.assertEqual(accounting.balance('patient', patient, 'available'), 60000)
+            self.assertEqual(accounting.balance('patient', patient, 'reserved'), 540000)
+            wallet = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
+            accounting.check_wallet_projection(patient, wallet)
+            self.assertEqual(int(journey.one('SELECT COUNT(*) n FROM tt_ledger WHERE patient=%s', (patient,)).n), legacy_count)
+            self.assertEqual(int(journey.one('''SELECT COUNT(*) n FROM tt_journal
+                WHERE event_type='LegacyEventImported' AND
+                (event_ref='deposit:synthetic-unposted' OR event_ref LIKE 'booking:synthetic-unposted-%%')''').n), 6)
+        finally:
+            frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
+            frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

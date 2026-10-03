@@ -66,7 +66,29 @@ copy-to-day and date-only exception editing. `tests/presentation.py` passed 12
 cases; selected `tests/integration.py` cases 01–17 passed 18/18. The selected
 suite did not include the legacy phone-auth cases because this invited-review
 site deliberately disables phone access. The synthetic patient was created
-with a new balanced wallet; the old seeded patient was excluded after a stale
-manual test worker wrote wallet/log events without journals. No existing data
-was repaired or discarded. See the current-branch limits in
-`presentation-readiness-verification.md`.
+with a new balanced wallet. A seeded synthetic account had six wallet/log
+events after its v1.7 opening snapshot without matching journal postings. The
+event history identifies the gap; it does not identify which process wrote
+those rows. The v1.8 migration imported those events into the subledger without
+changing wallet, appointment or activity-log rows. Repeat migration now passes.
+See `presentation-readiness-verification.md` for the current verification limits.
+
+## Local preview mismatch (2026-10-03)
+
+The old page at `http://127.0.0.1:5173/` is Vite from the original
+`/home/frappe/frappe/frappe-bench` checkout, branch
+`feat/selfmade-review-deployment`, commit
+`ba674b79bfa493a05689b1cee96d7a0d663766ec`. Vite proxies `/api` to port 8000
+with the default site `erp.localhost`; its web process and workers use that
+same older checkout. There is no production build SHA for that Vite page.
+
+Use `http://127.0.0.1:8017/teletena/` and, for schedule editing,
+`http://127.0.0.1:8017/teletena/clinician/availability`. This production-built
+Frappe route uses `/home/frappe/teletena-compat/bench`, site
+`tele-tena-pr2-test.localhost`, and branch `feat/next-design-update`. The browser
+bundle and API checkout are from this compatibility app; the preview is isolated
+from the original site. Sign in through the invited-review email/password path
+using the synthetic approved-clinician account in the site's private,
+mode-600 `private/tele_tena_review_accounts.json`. Use a synthetic patient
+account there to review generated-slot booking. Neither public registration nor
+SMS access is enabled on this invited-review site.

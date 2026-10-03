@@ -111,3 +111,16 @@ clinical use. Later site-bound switches can explicitly enable phone OTP and
 patient/clinician registration on the designated review site without changing
 demonstration funding or granting clinician approval. These switches remain
 disabled by default; live SMS delivery is unverified.
+
+## v1.8 financial cutover
+
+The `v1_8_legacy_event_reconciliation` patch imports legacy `Deposit`,
+`Reservation` and `Release` events created after a patient's v1.7 opening
+snapshot. It adds one balanced, idempotent `LegacyEventImported` journal per
+known legacy reference and leaves `tt_wallet`, `tt_ledger`, appointments and
+obligations unchanged. Unknown event kinds stop migration for review. Operators
+must stop all old web processes, workers, scheduler processes and queued writers
+before migration, install matching application code, migrate and verify wallet /
+subledger equality before restarting matching processes. If an old writer
+remains after cutover, financial commands fail closed on projection mismatch;
+restarting old code can reintroduce legacy-only writes.

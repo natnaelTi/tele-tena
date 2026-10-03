@@ -77,3 +77,5 @@ def install():
     presentation_release()
     from tele_tena.patches.v1_7_demo_subledger import execute as demo_subledger
     demo_subledger()
+    from tele_tena.patches.v1_8_legacy_event_reconciliation import execute as legacy_event_reconciliation
+    legacy_event_reconciliation()

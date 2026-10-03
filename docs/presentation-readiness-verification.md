@@ -60,20 +60,30 @@ to Selfmade.
   exact source SHA is in the generated `release.json`. The packaged artifact
   hash/scope/privacy check passed. PR #12's eight frontend/Python CI jobs passed.
 - `git diff --check` passed.
-- `scripts/check_financial_migration.py` currently **fails** on the shared
-  disposable review site, so this run does not establish repeat-migration
-  preservation. During the first browser attempt, the already-running manual
-  loopback worker served stale Python code and wrote legacy wallet/log events
-  without v1.7 journal postings. Inspection found one synthetic seeded wallet
-  at 60,000 available / 540,000 reserved while its journal projection is
-  260,000 / 240,000 minor units. Those records were preserved; no repair,
-  reseed or migration was run to disguise the mismatch. The worker was
-  restarted, and the passing browser booking used an isolated fresh synthetic
-  account. A clean second site is needed to repeat fresh-install and migration
-  preservation checks.
-- The hosted LiveKit Cloud revocation browser regression, fresh v1.7 site
-  installation, complete contact-auth suite, all-route visual review, and
-  hosted SMS delivery were not rerun for this branch.
+- Before the v1.8 reconciliation, the seeded synthetic account had 60,000
+  available / 540,000 reserved in `tt_wallet`, versus 260,000 / 240,000 in its
+  v1.7 opening journals. The append-only log showed 10 post-opening deposits
+  totalling 100,000 and five reservations totalling 300,000 with no matching
+  journals. The records do not identify which process wrote those entries.
+  The new versioned v1.8 patch imported those 15 known events into balanced,
+  idempotent journals. Wallets, legacy event rows and appointments were left
+  unchanged. The mismatch count is now zero.
+- `scripts/check_financial_migration.py` passed after reconciliation and on a
+  second migration, preserving wallet balances, the legacy log, earning rows
+  and balanced journals. `tests/presentation.py` now passes 13 cases, including
+  a savepoint-isolated post-snapshot legacy-event reconciliation/idempotency
+  case. The migration refuses unknown legacy event kinds.
+- A fresh install of v1.7/v1.8 has not yet run: the existing compatibility site
+  contains synthetic records that must be retained. A separate site named
+  `tele-tena-pr12-fresh.localhost` and its narrowly scoped temporary DB admin
+  are prepared in `scripts/prepare_fresh_install_db_admin.py`; operator setup
+  is still required before that one-time check. The existing preview site is
+  not dropped or reseeded.
+- The hosted LiveKit Cloud revocation browser regression, the fresh v1.7/v1.8
+  site installation, configuration-matched invited/enabled-registration
+  browser suites, complete contact-auth suite and all-route visual review are
+  still outstanding for the current source head. Hosted SMS delivery and
+  physical-device results remain unverified.
 
 ### Current screenshot evidence
 
