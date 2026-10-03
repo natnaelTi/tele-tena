@@ -32,9 +32,19 @@ export async function api<T>(method: string, data: Record<string, unknown> = {},
   return result.message as T
 }
 export async function signIn(email: string, password: string) {
-  const response = await fetch('/api/method/login', { method: 'POST', credentials: 'same-origin', cache: 'no-store',
-    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usr: email, pwd: password }) })
-  if (!response.ok) throw new Error('Sign in failed')
+  let response: Response
+  try {
+    response = await fetch('/api/method/login', { method: 'POST', credentials: 'same-origin', cache: 'no-store',
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usr: email, pwd: password }) })
+  } catch {
+    throw new ApiError('network_error')
+  }
+  if (!response.ok) {
+    // Do not surface Frappe's raw login response or distinguish unknown users.
+    if (response.status === 401 || response.status === 403 || response.status === 417)
+      throw new ApiError('credentials_invalid', response.status)
+    throw new ApiError(response.status >= 500 ? 'service_unavailable' : 'login_failed', response.status)
+  }
 }
 
 export async function phoneAuth<T>(method: string, data: Record<string, unknown>, csrf?: string): Promise<T> {
