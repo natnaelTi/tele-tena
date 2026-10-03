@@ -11,7 +11,11 @@ from pathlib import Path
 import secrets
 import shutil
 import stat
+import subprocess
+import sys
 import tempfile
+import time
+import urllib.request
 from unittest.mock import patch
 
 import frappe
@@ -58,6 +62,71 @@ def retained_fingerprint():
     digest = hashlib.sha256(json.dumps(content, sort_keys=True).encode()).digest()
     frappe.destroy()
     return digest
+
+
+def enabled_registration_browser_check():
+    """Exercise signup/onboarding only on this explicitly disposable fresh site."""
+    from frappe.installer import update_site_config
+    for key, value in (
+        ('tele_tena_review_site', SITE),
+        ('tele_tena_review_enabled', True),
+        ('tele_tena_phone_otp_enabled', True),
+        ('tele_tena_patient_registration_enabled', True),
+        ('tele_tena_clinician_registration_enabled', True),
+    ):
+        update_site_config(key, value)
+    frappe.clear_cache()
+    frappe.destroy()
+
+    port = '8021'
+    app_env = dict(os.environ, TELE_TENA_TEST_SITE=SITE, PYTHONUNBUFFERED='1')
+    command = [str(BENCH / 'env/bin/gunicorn'), '--bind', '127.0.0.1:' + port,
+               '--workers', '2', '--pythonpath', './apps/tele_tena', '--chdir', './sites',
+               'scripts.review_test_wsgi:application']
+    server = subprocess.Popen(command, cwd=BENCH, env=app_env,
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        url = 'http://127.0.0.1:' + port + '/teletena/sign-in'
+        for _ in range(80):
+            if server.poll() is not None:
+                raise RuntimeError('Disposable-site browser server exited before readiness')
+            try:
+                with urllib.request.urlopen(url, timeout=1) as response:
+                    if response.status == 200:
+                        break
+            except Exception:
+                time.sleep(0.5)
+        else:
+            raise RuntimeError('Disposable-site browser server did not become ready')
+
+        env = dict(os.environ,
+                   TELE_TENA_TEST_SITE=SITE,
+                   TELE_TENA_TEST_API_ORIGIN='http://127.0.0.1:' + port,
+                   TELE_TENA_TEST_BASE='http://127.0.0.1:' + port + '/teletena',
+                   TELE_TENA_REDIRECTED_BROWSER='1')
+        result = subprocess.run([str(BENCH / 'env/bin/python'),
+                                 str(APP / 'scripts/check_redesign_browser.py')],
+                                cwd=BENCH, env=env, timeout=360,
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        print(result.stdout.strip())
+        if result.returncode:
+            raise RuntimeError('Enabled-registration fresh-site browser journey failed')
+
+        invited_env = dict(os.environ, NODE_PATH='/tmp/tele-tena-browser/node_modules',
+                           TELE_TENA_TEST_BASE='http://127.0.0.1:8017/teletena')
+        invited = subprocess.run(['node', str(APP / 'scripts/browser-invited-review.cjs')],
+                                 cwd=APP, env=invited_env, timeout=90,
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        print(invited.stdout.strip())
+        if invited.returncode:
+            raise RuntimeError('Invited-review browser policy check failed')
+    finally:
+        server.terminate()
+        try:
+            server.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            server.kill()
+            server.wait(timeout=5)
 
 
 os.chdir(BENCH / 'sites')
@@ -128,12 +197,11 @@ try:
         raise AssertionError('Guest app access was allowed')
     except frappe.PermissionError:
         pass
-    if os.environ.get('TELE_TENA_REVIEW_CHECK') == 'hold':
-        print('READY: disposable site retained for separate review verification. Press Enter only after checks finish to clean up.', flush=True)
-        input()
     if os.environ.get('TELE_TENA_REVIEW_CHECK') == '1':
         from check_review_site import verify
         verify()
+    if os.environ.get('TELE_TENA_REVIEW_CHECK') == 'full':
+        enabled_registration_browser_check()
     frappe.destroy()
     assert retained_fingerprint() == retained_before, 'Retained development records changed'
     passed = True
