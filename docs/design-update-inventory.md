@@ -191,4 +191,4 @@ audio-only, clinician notes after End, and completed consultation detail for
 patient and clinician at 320/390/768/1440. They use synthetic records and
 fake-media browser sessions. Inspection identified a remaining status conflict
 on clinician notes: call status is “Call ended” while appointment status says
-“Booked”. Lifecycle presentation is not accepted until corrected and retested.
+“Booked”. A focused built-route regression now verifies “Completion pending” without mutating appointment data; 390/1440 px captures show the corrected display.

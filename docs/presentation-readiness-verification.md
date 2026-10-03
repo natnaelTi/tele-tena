@@ -6,7 +6,7 @@ The correct review preview is `http://127.0.0.1:8017/teletena/` (availability:
 `http://127.0.0.1:8017/teletena/clinician/availability`). It is served by
 `/home/frappe/teletena-compat/bench`, site
 `tele-tena-pr2-test.localhost`, branch `feat/next-design-update`, backend
-checkout at branch head `0fce298eedaa4ad93243d3f24086f023e068c1d3`. The built asset
+checkout at branch head `3d806d03bb5a25fcb2bad7ecce3f154d3147f85f`. The built asset
 manifest `tele_tena/public/review/release.json` reports this source SHA. Gunicorn runs
 from this bench's Python 3.14.2 environment and loads its `./apps/tele_tena`
 checkout. This is the production React build behind Frappe's `/teletena/` route,
@@ -40,7 +40,7 @@ enabled phone-entry screen were both captured; patient and clinician onboarding
 step one was captured at 320/390/768/1440 after creating and cleaning up a
 short-lived synthetic verified-contact account. 720 px is a narrow-layout proxy for 200% zoom on
 a 1440 px display, not an actual browser-zoom test. Asset hash/scope/privacy scan
-**passed**. The latest bundled source SHA is `0fce298eedaa4ad93243d3f24086f023e068c1d3`; the earlier route sweep bundle was `df845b5b7936a3b696e40c1856f4e48f6148bf75`.
+**passed**. The latest bundled source SHA is `3d806d03bb5a25fcb2bad7ecce3f154d3147f85f`; the earlier route sweep bundles were `0fce298eedaa4ad93243d3f24086f023e068c1d3` and `df845b5b7936a3b696e40c1856f4e48f6148bf75`.
 Presentation regressions passed 14 cases; lint passed with existing warnings.
 
 The first integration rerun stopped on a fixture mismatch: it used the
@@ -288,7 +288,11 @@ independent browser contexts; this is not physical-device evidence. Example
 files: `current-review/video-call-390-patient.png`,
 `current-review/audio-only-390.png`,
 `current-review/end-of-call-notes-1440.png`, and
-`current-review/completed-consultation-patient-390.png`. The rendered clinician
-notes screen still labels the appointment “Booked” alongside “Call ended”. That
-state-label defect remains open; screenshots are evidence of the observed UI,
-not acceptance of the lifecycle presentation.
+`current-review/completed-consultation-patient-390.png`. The earlier clinician-notes capture showed “Booked” alongside “Call ended”. A focused UI regression now mocks a synthetic booked appointment with an ended call, verifies the visible “Completion pending” state, and captures 390/1440 px; the stored appointment and accounting state remain unchanged.
+
+
+The local preview was restarted after its isolated MariaDB service had stopped.
+Compatibility MariaDB now uses its separate socket/data directory, and the
+loopback web process serves the built Frappe route without starting compatibility
+workers. Current package/deep-link and availability save/reload/book browser
+checks pass against that same URL. No old worker is writing to the v1.8 site.
