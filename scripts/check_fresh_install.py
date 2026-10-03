@@ -21,6 +21,7 @@ from unittest.mock import patch
 import frappe
 import pymysql
 
+APP = Path(__file__).resolve().parents[1]
 BENCH = Path(__file__).resolve().parents[3]
 SITE = 'tele-tena-pr12-fresh.localhost'
 DB = 'teletenapr12fresh'
