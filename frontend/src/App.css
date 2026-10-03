@@ -821,8 +821,9 @@ button:active {
 .availability-block{border:1px solid #126b64;background:#d9ede7;color:#124c47;text-align:left;cursor:pointer;min-height:24px}
 .availability-block[aria-pressed=true]{outline:2px solid #0d5751;outline-offset:1px}
 .calendar-exception{z-index:4;pointer-events:auto;background:repeating-linear-gradient(135deg,#f2bc9740 0,#f2bc9740 6px,#fff4eb 6px,#fff4eb 12px);border:1px dashed #9e6741;color:#613d26;cursor:pointer;text-align:left}
-.calendar-booking{z-index:5;display:flex;flex-direction:column;gap:2px;background:#344c49;color:#fff;border:1px solid #182b2a;font-size:11px}
+.calendar-booking{z-index:5;display:flex;flex-direction:column;gap:2px;overflow:hidden;padding:3px 5px;background:#344c49;color:#fff;border:1px solid #182b2a;font-size:11px;line-height:1.2}
 .calendar-booking span{font-size:10px}
+.calendar-booking strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .schedule-accessible-times{margin-top:16px}
 .schedule-accessible-times>summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
 .schedule-advanced{display:grid;gap:14px;padding:12px 0;border-top:1px solid var(--border-default,#d7e2dc);border-bottom:1px solid var(--border-default,#d7e2dc)}

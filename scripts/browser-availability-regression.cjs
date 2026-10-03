@@ -30,6 +30,11 @@ async function signIn(page, user, password) {
     await signIn(page, fixture.users.clinician, credentials[fixture.users.clinician]);
     await page.goto(base + '/teletena/clinician/availability');
     await page.getByRole('heading', { name: 'Weekly availability' }).waitFor();
+    const compactBooking = page.locator('.calendar-booking').first();
+    if (await compactBooking.count()) {
+      assert.equal(await compactBooking.locator('span').count(), 0,
+        'short appointment blocks must keep the permitted alias readable without clipping secondary details');
+    }
     const mondayStart = page.getByLabel('Monday starts', { exact: true });
     assert.match(await mondayStart.inputValue(), /^\d{2}:\d{2}$/);
     const timeFields = page.locator('details.schedule-accessible-times');
