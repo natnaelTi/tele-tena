@@ -115,7 +115,7 @@ does not mean that the requested whole-product design acceptance is complete.
 | CLN-5 | Partial | Ended-call/documentation action wording was refined; note lifecycle regression tests passed, but no current-branch visual capture. |
 | CLN-6, CLN-7 | Intentionally unchanged | Encounter-scoped care API and presentation retained; privacy tests passed; visual review remains. |
 | CLN-8 | Partial | Professional account section was streamlined; no current-branch visual review. |
-| CLN-9 | Partial on dependent `feat/open-requests` | Connected persisted inbox, expiring explicit presence and own offer; API checks pass. Browser offer acceptance, background expiry and full locale/render review remain outstanding. |
+| CLN-9 | Partial on dependent `feat/open-requests` | Connected persisted inbox, expiring explicit presence and own offer; API checks pass. A built two-session flow reached persisted acceptance and is documented with screenshots; a reusable clean browser test, background expiry and full locale/render review remain outstanding. |
 | CLN-10 | Implemented | Balanced demo journal, earnings lifecycle, holds and payout reservations are server-backed and covered by focused regressions; real settlement and a rendered earnings walkthrough remain out of scope. |
 | ADM-1, ADM-2 | Intentionally unchanged | Manual approval and per-service scope controls were preserved; no current-branch visual review. |
 | ADM-3 | Partial | Financial event labels were clarified and IDs removed from dispute cards; reviewer workflow and separation from private notes passed API tests, but no current-branch visual review. |
