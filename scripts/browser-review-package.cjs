@@ -20,10 +20,11 @@ let checkpoint='launch';
   await page.waitForURL(/\/teletena\/sign-in(?:\?.*)?$/);
   // Invited review sites now show password entry directly when neither OTP
   // delivery provider is enabled. Both account and logout checks remain real.
-  if(await page.getByRole('button',{name:'Use email instead',exact:true}).count())
-    await page.getByRole('button',{name:'Use email instead',exact:true}).click();
-  if(await page.getByRole('button',{name:'Use password instead',exact:true}).count())
-    await page.getByRole('button',{name:'Use password instead',exact:true}).click();
+  // Wait for site policy to settle before interacting; the initial phone UI
+  // may be replaced automatically when the capability response arrives.
+  await page.getByLabel('Email',{exact:true}).waitFor();
+  await page.getByLabel('Password',{exact:true}).waitFor();
+  assert.equal(await page.getByLabel('Phone number',{exact:true}).count(),0);
   checkpoint='invited reviewer account sign-in';await page.getByLabel('Email',{exact:true}).fill(fixture.users.patient);
   await page.getByLabel('Password',{exact:true}).fill(credentials[fixture.users.patient]);
   await page.getByRole('button',{name:'Sign in',exact:true}).click();
