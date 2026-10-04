@@ -31,6 +31,7 @@ import Account from "./pages/Account";
 import { Applications, FinancialDisputes, Scopes } from "./pages/Admin";
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
 import Showcase from "./pages/Showcase";
+import { ClinicianRequestInbox, PatientOpenRequests, PublicClinicianProfile } from "./pages/OpenRequests";
 import "./App.css";
 export default function App() {
   return (
@@ -69,6 +70,8 @@ export default function App() {
               >
                 <Route index element={<PatientHome />} />
                 <Route path="discovery" element={<Discovery />} />
+                <Route path="requests" element={<PatientOpenRequests />} />
+                <Route path="clinicians/:clinicianId" element={<PublicClinicianProfile />} />
                 <Route path="book/:offering" element={<Booking />} />
                 <Route path="book-link/:token" element={<BookingLink />} />
                 <Route path="appointments" element={<Appointments />} />
@@ -95,15 +98,7 @@ export default function App() {
                   path="consultations/:id"
                   element={<ConsultationPage />}
                 />
-                <Route
-                  path="requests"
-                  element={
-                    <PendingFeature
-                      title="Requests"
-                      description="Private open requests and clinician offers are planned. Current bookings are available in Appointments."
-                    />
-                  }
-                />
+                <Route path="requests" element={<ClinicianRequestInbox />} />
                 <Route path="care" element={<CareRecords />} />
                 <Route path="care/:id" element={<CareRecordDetail />} />
                 <Route path="earnings" element={<ClinicianEarnings />} />
