@@ -28,7 +28,9 @@ still English. A build does not satisfy rendered visual acceptance.
 | ONB-1 | `/onboarding` · `Onboarding.tsx` patient | Guided alias, adult/consent, language/privacy, finish | Working | Back/resume, validation, no forced history, first-visit tour invitation |
 | ONB-2 | `/onboarding` clinician | Identity, requested scopes, resume evidence, application submission | Working | Save/resume, pending approval and no implied permission to publish |
 | PAT-1 | `/patient` · `Patient.tsx` | Home, search entry, next appointment and balance | Working | Useful empty state and compact available/reserved summary |
-| PAT-2 | `/patient/discovery` | Approved offerings, clinician cards and filters | Working; matching partial | Price/format/language/category/availability, no invented credentials or ratings |
+| PAT-2 | `/patient/discovery` | Approved offerings, clinician cards and filters | Working; matching partial | Price/format/language/category/availability, no invented credentials or ratings; entry to private request when direct options do not fit |
+| PAT-2A | `/patient/requests` | Private immediate/scheduled requests, offers, disclosure and acceptance | Implemented in progress; backend regression verified | Same-origin persisted API and real two-role API regression pass; built browser journey, concurrency, scheduler expiry and full locale review remain |
+| PAT-2B | `/patient/clinicians/:opaqueId` | Approved clinician public summary and direct-booking entry | Implemented in progress | Opaque ID, approved services only, no account email; backend privacy checks pass |
 | PAT-3 | `/patient/book/:offering` | Calendar/slot, disclosure, review, atomic confirmation | Working | Back without data loss, timezone and price, stale-slot recovery, manual hold status |
 | PAT-4 | `/patient/appointments` | Needs action, in progress, upcoming and past groups | Working | Text/semantic badges; clock time does not fabricate completion |
 | PAT-5 | `/patient/consultations/:id` · `ConsultationPage.tsx` | Scoped details, timeline, snapshot, permitted summary and follow-up | Working | Upcoming/pending/ended/completed/cancelled states and private-text omission |
@@ -42,7 +44,7 @@ still English. A build does not satisfy rendered visual acceptance.
 | CLN-6 | `/clinician/care` | Search/filter/sort/paginate encounter-scoped directory | Working | Table/card parity and masked identities throughout |
 | CLN-7 | `/clinician/care/:id` | Authorized encounter history and notes | Working | Historical disclosure snapshots; no cross-clinician record link |
 | CLN-8 | `/clinician/account` | Professional profile, practice links, resume evidence | Working; settings partial | Approval context, private upload/remove rules, validation |
-| CLN-9 | `/clinician/requests` | Honest pending-feature panel | Placeholder | Private requests/offers require backend implementation before product UI |
+| CLN-9 | `/clinician/requests` | Explicit expiring availability, private matched requests and own offer | Implemented in progress | Scope/language/format/slot server filters; patient-authorized disclosure only; backend competing-offer regression passes; browser/realtime/expiry verification remains |
 | CLN-10 | `/clinician/earnings` | Pending/available/reserved earnings, snapshotted release time, payout request and cancel | Implemented demonstration | Balanced subledger, retry-safe release, payout reserve/release and owner-only tests; no external transfer or Paid status |
 | ADM-1 | `/admin` · `Admin.tsx` | Application queue and authorized resume access | Working | Names first, evidence and requested scopes, approve/reject |
 | ADM-2 | `/admin/scopes` | Service catalog and separate scope decisions | Working | Approval/revocation; general approval never grants a service |
@@ -75,7 +77,8 @@ come from the forthcoming brief and product contract.
 | --- | --- |
 | Clinician pending/available earnings, payout reservations and balanced demo subledger | Implemented for demonstration on this branch; `tt_ledger` remains a separate append-only simulation activity log |
 | ERPNext posting/reconciliation and external payout settlement | Not implemented; real-money operations remain disabled |
-| Private open requests/offers, offer expiry/acceptance, previous clinicians, natural-language matching/relevance/proximity | Not implemented; direct filtered discovery works |
+| Private open requests/offers | In progress on `feat/open-requests`; deterministic private dispatch, offer acceptance and booking integration are implemented; production-browser, concurrency and scheduled-worker acceptance remain |
+| Previous clinicians, natural-language matching/relevance/proximity | Not implemented; direct filtered discovery and editable filters work |
 | Mutual rescheduling, couples' individual consent, ratings/reviews, paid or complimentary extensions | Not implemented |
 | Actor-specific production cancellation/refund policy, post-release disputes and paid extensions | Not implemented; only explicit pre-start demo release and pre-release dispute holds exist |
 | Notification preferences/contact changes and authenticated email summary links | Not implemented |
@@ -112,7 +115,7 @@ does not mean that the requested whole-product design acceptance is complete.
 | CLN-5 | Partial | Ended-call/documentation action wording was refined; note lifecycle regression tests passed, but no current-branch visual capture. |
 | CLN-6, CLN-7 | Intentionally unchanged | Encounter-scoped care API and presentation retained; privacy tests passed; visual review remains. |
 | CLN-8 | Partial | Professional account section was streamlined; no current-branch visual review. |
-| CLN-9 | Intentionally unchanged | Honest unavailable state retained until private request/offer backend exists. |
+| CLN-9 | Partial on dependent `feat/open-requests` | Connected persisted inbox, expiring explicit presence and own offer; API checks pass. Browser offer acceptance, background expiry and full locale/render review remain outstanding. |
 | CLN-10 | Implemented | Balanced demo journal, earnings lifecycle, holds and payout reservations are server-backed and covered by focused regressions; real settlement and a rendered earnings walkthrough remain out of scope. |
 | ADM-1, ADM-2 | Intentionally unchanged | Manual approval and per-service scope controls were preserved; no current-branch visual review. |
 | ADM-3 | Partial | Financial event labels were clarified and IDs removed from dispute cards; reviewer workflow and separation from private notes passed API tests, but no current-branch visual review. |

@@ -326,3 +326,17 @@ Checks: `npm run build`, `npm run lint` (existing warnings),
 `python3 scripts/build_review.py`, `python3 scripts/check_review_assets.py`, and
 `node scripts/browser-authentication-flow.cjs` all passed. Packaged frontend
 source SHA: `c9f098814e7aab9e3ab5df7a19a760da6148b33b`.
+
+## Current continuation checkpoint — local open-request integration (2026-10-04)
+
+This is the current continuation record; earlier SHA-specific sections above are historical. The integrated local branch is `feat/open-requests`, based on the PR #12 draft head and intended as a dependent review change. The request/offer code remains unmerged and has not been deployed to Selfmade.
+
+- Compatibility site: `tele-tena-pr2-test.localhost` on the isolated Frappe 16 bench at `/home/frappe/teletena-compat/bench`; original development bench and Selfmade were not changed.
+- `bench migrate --site tele-tena-pr2-test.localhost --skip-search-index` passed, including `v1_10_request_public_identity`. The migration adds an opaque profile ID and timezone snapshot column; no reseed/reset was run.
+- `tests/presentation.py`: **15 tests passed** on Frappe 16. This includes the persisted private competing-offer scenario, other-patient denial, clinician-to-clinician offer privacy, insufficient-funds then fund/retry acceptance, one appointment/reservation, repeat acceptance, immediate publication retry idempotency, and clinician discovery/profile email exclusion. The local harness replaces `frappe.enqueue` with a no-op because the isolated bench has no compatible request worker; database commands and transaction paths still execute. Thus this does not verify scheduler expiry or queued dispatch.
+- `frontend && npm run build`: **passed** with Vite 8.3.1; the existing LiveKit chunk-size advisory remains. This is a frontend compile/build result only; built-asset deployment and browser request journey have not yet been rerun for this continuation source.
+- Patient open requests poll the authenticated owner-scoped API for reconnect; provider realtime notifications are not implemented. Request/offer expiry is enforced at endpoints and by a one-minute scheduler hook, but the compatibility site's scheduler/worker path is not currently running.
+- Translation strings for several request labels were added to the existing Amharic and Afaan Oromo dictionary and integrated into the patient composer and clinician page title/actions. Most request copy remains English; translation coverage and native-language review are incomplete.
+- Open-request code captures anonymous outcome timestamps, including participant joins through the signed LiveKit webhook. No hosted webhook delivery assertion was rerun during this continuation.
+
+Remaining release gaps include a production-built, two-browser request-to-offer acceptance flow on this same preview; a concurrent two-patient claim of one clinician slot; scheduler-driven expiry/dispatch execution; seeded populated earnings screenshot flow; full inventory screenshots and route-by-route visual checks at 320/390/768/1440 px and actual 200% zoom; enabled-registration backend test on its separate policy fixture; fresh v1.10 installation and representative migration reconciliation; and current hosted LiveKit End/token revocation rerun. Live SMS receipt, native translation sign-off and physical-device calling remain external validation gaps. Keep PR #12 and the dependent request change draft until these substantive acceptance gaps are closed.
