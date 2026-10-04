@@ -176,6 +176,7 @@ export function Discovery() {
 }
 export function Appointments({ base = "/patient" }: { base?: string }) {
   const resource = useResource(journeyApi.appointments);
+  const clinician=base==="/clinician";
   return (
     <>
       <PageTitle
@@ -191,10 +192,10 @@ export function Appointments({ base = "/patient" }: { base?: string }) {
         <Skeleton />
       ) : resource.data.length ? (
         <div className="appointment-groups">{([
-          ["Needs action", resource.data.filter(a=>a.state==="PendingConfirmation" || (a.call_state==="Ended" && a.documentation_state!=="Finalized"))],
+          ["Needs action", resource.data.filter(a=>a.state==="PendingConfirmation" || (clinician && a.call_state==="Ended" && a.documentation_state!=="Finalized"))],
           ["In progress", resource.data.filter(a=>a.call_state==="Open")],
-          ["Upcoming", resource.data.filter(a=>a.state==="Booked" && a.call_state!=="Open" && new Date(a.start).getTime()>=Date.now())],
-          ["Past", resource.data.filter(a=>["Completed","Cancelled","Expired","NoShow"].includes(a.state) || (a.call_state==="Ended" && a.documentation_state==="Finalized") || (a.state==="Booked" && a.call_state!=="Ended" && new Date(a.start).getTime()<Date.now()))],
+          ["Upcoming", resource.data.filter(a=>a.state==="Booked" && a.call_state!=="Open" && a.call_state!=="Ended" && new Date(a.start).getTime()>=Date.now())],
+          ["Past", resource.data.filter(a=>["Completed","Cancelled","Expired","NoShow"].includes(a.state) || a.call_state==="Ended" || (a.state==="Booked" && new Date(a.end).getTime()<Date.now()))],
         ] as [string,typeof resource.data][]).filter(([,rows])=>rows.length).map(([title,rows])=><section key={title}><h2>{title}</h2><div className="stack">{rows.map(a=><AppointmentCard key={a.id} appointment={a} base={base} />)}</div></section>)}</div>
       ) : (
         <EmptyState title="No appointments yet.">
@@ -204,8 +205,18 @@ export function Appointments({ base = "/patient" }: { base?: string }) {
     </>
   );
 }
-export function Booking() {
-  const { offering } = useParams();
+export function BookingLink() {
+  const { token = "" } = useParams();
+  const load = useCallback(() => journeyApi.resolveBookingLink(token), [token]);
+  const resource = useResource(load);
+  if (resource.error) return <InlineNotice tone="danger">This booking link is unavailable or no longer active. Find care to choose another clinician.</InlineNotice>;
+  if (!resource.data) return <Skeleton />;
+  return <Booking offeringOverride={resource.data.offering} />;
+}
+
+export function Booking({ offeringOverride }: { offeringOverride?: string }) {
+  const route = useParams();
+  const offering = offeringOverride || route.offering;
   const { session } = useSession();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState("");
@@ -420,16 +431,16 @@ export function Payments() {
             );
             setRetryKey(crypto.randomUUID());
             await wallet.refresh();
-          }, "ETB 100 added to your simulated balance.")
+          }, "ETB 100 added to your balance.")
         }
       >
-        Add ETB 100
+        Add funds · ETB 100
       </Button>
       {action.success && (
         <InlineNotice tone="success">{action.success}</InlineNotice>
       )}
       <p className="supporting">
-        Demonstration funds are not real money. Payment activity is a simulation log, not the planned double-entry subledger or ERPNext accounting integration.
+        This review environment records demonstration funds and reservations. No external payment or refund is processed.
       </p>
       {wallet.data?.activity?.length ? <section><h2>Payment activity</h2><ul className="payment-activity">{wallet.data.activity.map((item,i)=><li key={i}><span>{item.kind}</span><strong>ETB {money(item.amount)}</strong><time>{date(item.created)}</time></li>)}</ul></section>:<EmptyState title="No payment activity yet." />}
     </>

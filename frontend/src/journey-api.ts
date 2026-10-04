@@ -27,6 +27,8 @@ export const journeyApi = {
     api<{days:{date:string;slots:TimeSlot[]}[];timezone:string;schedule_timezone:string|null;duration:number;format:string;price:number}>('tele_tena.api.scheduling.calendar', { offering, from_date, days: 35, display_timezone }),
   schedules: () => api<Schedule[]>('tele_tena.api.scheduling.schedules'),
   saveSchedule: (data: Record<string, unknown>) => api('tele_tena.api.scheduling.save_schedule', data, true),
+  bookingLink: (offering: string) => api<{token:string}>('tele_tena.api.scheduling.booking_link',{offering},true),
+  resolveBookingLink: (token: string) => api<{offering:string;service:string;clinician:string;price:number;minutes:number;format:'audio'|'video';timezone:string}>('tele_tena.api.scheduling.resolve_booking_link',{token}),
   appointmentDetail: (appointment: string) => api<any>('tele_tena.api.presentation.appointment_detail', { appointment }),
   cancelAppointment: (appointment: string, reason: string) => api('tele_tena.api.presentation.cancel_appointment', { appointment, reason }, true),
   respondToRequest: (appointment: string, decision: 'confirm'|'decline') => api('tele_tena.api.presentation.respond_to_request', { appointment, decision }, true),

@@ -1,5 +1,7 @@
 """Timezone-aware recurring clinician schedules and server-generated slots."""
 import json
+import hashlib
+import hmac
 import uuid
 from datetime import date, datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -11,13 +13,60 @@ from tele_tena.api.journey import actor, approved, approved_service, fail, integ
 SLOT_STEP_MINUTES = 15
 
 
+def _booking_link_token(offering, initialize_key=False):
+    key = frappe.conf.get('encryption_key')
+    if not key and initialize_key:
+        # Only the authorized clinician link-creation command may initialize
+        # Frappe's site key. Resolving guessed tokens remains read-only.
+        from frappe.utils.password import get_encryption_key
+        key = get_encryption_key()
+    if not isinstance(key, str) or not key:
+        fail('Booking links are unavailable on this site', 'booking_link_unavailable')
+    message = ('tele-tena:published-booking:v1:' + offering).encode()
+    return hmac.new(key.encode(), message, hashlib.sha256).hexdigest()
+
+
+@frappe.whitelist(methods=['POST'])
+def booking_link(offering):
+    clinician = actor('Tele Tena Clinician')
+    offer = one('''SELECT o.id,o.service FROM tt_offering o
+        JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
+        WHERE o.id=%s AND o.clinician=%s AND o.active=1''', (offering, clinician))
+    approved(clinician)
+    approved_service(clinician, offer.service)
+    return {'token': _booking_link_token(offer.id, initialize_key=True)}
+
+
+@query()
+def resolve_booking_link(token):
+    actor('Tele Tena Patient')
+    if not isinstance(token, str) or len(token) != 64:
+        fail('This booking link is unavailable', 'booking_link_unavailable')
+    candidates = rows('''SELECT o.id,o.clinician,o.service,o.price,o.minutes,sc.service_label,
+        p.display_name,s.consultation_format,s.timezone FROM tt_offering o
+        JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
+        JOIN `tabTele Tena Service` sc ON sc.name=o.service
+        JOIN tt_profile p ON p.user=o.clinician
+        WHERE o.active=1 AND sc.active=1 ORDER BY o.id''')
+    offer = next((item for item in candidates
+                  if hmac.compare_digest(_booking_link_token(item.id), token)), None)
+    if not offer:
+        fail('This booking link is unavailable', 'booking_link_unavailable')
+    approved(offer.clinician)
+    approved_service(offer.clinician, offer.service)
+    return {'offering': offer.id, 'service': offer.service_label,
+            'clinician': offer.display_name, 'price': offer.price,
+            'minutes': offer.minutes, 'format': offer.consultation_format,
+            'timezone': offer.timezone}
+
+
 def _zone(name):
     if not isinstance(name, str) or len(name) > 80:
-        fail('Choose a valid timezone')
+        fail('Choose a valid timezone', 'schedule_timezone_invalid')
     try:
         return ZoneInfo(name)
     except (ZoneInfoNotFoundError, ValueError):
-        fail('Choose a valid timezone')
+        fail('Choose a valid timezone', 'schedule_timezone_invalid')
 
 
 def _json(value, label):
@@ -25,20 +74,28 @@ def _json(value, label):
         try:
             value = json.loads(value)
         except ValueError:
-            fail('Invalid ' + label)
+            fail('Review the ' + label + ' fields', 'schedule_data_invalid')
     if not isinstance(value, list):
-        fail('Invalid ' + label)
+        fail('Review the ' + label + ' fields', 'schedule_data_invalid')
     return value
 
 
-def _local_time(value):
+def _local_time(value, field='time'):
     try:
         parsed = time.fromisoformat(value)
         if parsed.tzinfo or parsed.second or parsed.microsecond:
-            fail('Times must use whole local minutes')
+            fail('Enter a time in whole minutes', 'schedule_' + field + '_invalid')
         return parsed
     except (TypeError, ValueError):
-        fail('Invalid local time')
+        fail('Enter a valid ' + field.replace('_', ' ') + ' (HH:MM)', 'schedule_' + field + '_invalid')
+
+
+def _interval_time(item, field):
+    """Accept legacy start/end and the documented start_local/end_local API shape."""
+    local = field + '_local'
+    if field in item and local in item and item[field] != item[local]:
+        fail('Conflicting interval times', 'schedule_interval_invalid')
+    return item.get(local, item.get(field))
 
 
 def _db_time(value):
@@ -49,20 +106,21 @@ def _db_time(value):
 
 def _validate_intervals(intervals, allow_weekday=True):
     if len(intervals) > 160:
-        fail('Too many schedule intervals')
+        fail('Remove some intervals; the limit is 160', 'schedule_intervals_limit')
     result = []
     for item in intervals:
         if not isinstance(item, dict):
-            fail('Invalid interval')
+            fail('Review the interval fields', 'schedule_interval_invalid')
         weekday = integer(item.get('weekday'), 0, 6) if allow_weekday else None
-        start, end = _local_time(item.get('start')), _local_time(item.get('end'))
+        start = _local_time(_interval_time(item, 'start'), 'start')
+        end = _local_time(_interval_time(item, 'end'), 'end')
         if end <= start:
-            fail('An interval must end after it starts')
+            fail('End time must be after start time', 'schedule_interval_order')
         result.append({'weekday': weekday, 'start': start, 'end': end})
     ordered = sorted(result, key=lambda i: (i['weekday'] if allow_weekday else 0, i['start']))
     for left, right in zip(ordered, ordered[1:]):
         if (not allow_weekday or left['weekday'] == right['weekday']) and right['start'] < left['end']:
-            fail('Schedule intervals cannot overlap')
+            fail('Times on the same day cannot overlap', 'schedule_interval_overlap')
     return result
 
 
@@ -82,9 +140,10 @@ def _validate_exceptions(value):
         if kind == 'unavailable':
             result.append({'date': local_date, 'kind': kind, 'start': None, 'end': None})
         else:
-            start, end = _local_time(item.get('start')), _local_time(item.get('end'))
+            start = _local_time(_interval_time(item, 'start'), 'exception_start')
+            end = _local_time(_interval_time(item, 'end'), 'exception_end')
             if end <= start:
-                fail('An exception interval must end after it starts')
+                fail('Exception end time must be after its start', 'schedule_exception_order')
             result.append({'date': local_date, 'kind': kind, 'start': start, 'end': end})
     for day in {x['date'] for x in result}:
         daily = [x for x in result if x['date'] == day]
@@ -123,6 +182,8 @@ def save_schedule(offering, schedule_name, timezone_name, consultation_format,
         after = integer(buffer_after, 0, 240)
         weekly = _validate_intervals(_json(intervals, 'weekly availability'))
         dates = _validate_exceptions(exceptions)
+        if status == 'Published' and not weekly and not any(item['kind'] == 'replace' for item in dates):
+            fail('Add at least one available time before publishing', 'schedule_times_required')
         schedule = rows('SELECT id FROM tt_schedule WHERE offering=%s FOR UPDATE', (offering,))
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         schedule_id = schedule[0].id if schedule else str(uuid.uuid4())
@@ -172,6 +233,14 @@ def schedules():
             WHERE schedule_id=%s ORDER BY weekday,start_local''', (schedule.id,))
         schedule.exceptions = rows('''SELECT local_date `date`,kind,start_local,end_local
             FROM tt_schedule_exception WHERE schedule_id=%s ORDER BY local_date,start_local''', (schedule.id,))
+        for interval in schedule.intervals:
+            interval.start_local = _db_time(interval.start_local).strftime('%H:%M')
+            interval.end_local = _db_time(interval.end_local).strftime('%H:%M')
+        for exception in schedule.exceptions:
+            if exception.start_local is not None:
+                exception.start_local = _db_time(exception.start_local).strftime('%H:%M')
+            if exception.end_local is not None:
+                exception.end_local = _db_time(exception.end_local).strftime('%H:%M')
     return result
 
 

@@ -14,7 +14,7 @@ import { useLocale } from "../hooks/useLocale";
 type SignInOptions = { phone_otp: boolean; email_otp: boolean; patient_registration: boolean; clinician_registration: boolean };
 export default function SignIn() {
   const { refresh, session } = useSession();
-  const { w } = useLocale();
+  const { w, t } = useLocale();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [channel, setChannel] = useState<"phone" | "email">("phone");
@@ -28,6 +28,7 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [options, setOptions] = useState<SignInOptions | null>(null);
+  const [optionsError, setOptionsError] = useState(false);
   const requestKey = useRef("");
   useEffect(() => {
     let active = true;
@@ -35,12 +36,8 @@ export default function SignIn() {
       .then((value) => {
         if (!active) return;
         setOptions(value);
-        if (!value.phone_otp) {
-          setChannel("email");
-          setPasswordMode(!value.email_otp);
-        }
       })
-      .catch(() => { if (active) setError("Sign-in options are unavailable. Reload to try again."); });
+      .catch(() => { if (active) setOptionsError(true); });
     return () => { active = false; };
   }, []);
   useEffect(() => {
@@ -57,13 +54,18 @@ export default function SignIn() {
       setCsrf(csrf.csrf_token);
       await task();
     } catch (error) {
-      setError(
-        error instanceof ApiError && error.code === "review_password_required" ? "Phone verification is unavailable here. Use email and password." :
-        error instanceof ApiError && error.code === "sms_budget_exhausted" ? "Code sending is temporarily unavailable. Try again later or use email." :
-        error instanceof ApiError && error.code === "resend_cooldown" ? "Please wait before requesting another code." :
-        error instanceof ApiError && error.code === "registration_unavailable" ? "New registrations are paused here. Existing verified accounts can still sign in." :
-        "We couldn’t complete that step. Check your details and try again. Codes expire after five minutes.",
-      );
+      const code = error instanceof ApiError ? error.code : "";
+      const key = code === "review_password_required" ? "phoneAccessUnavailable"
+        : code === "sms_budget_exhausted" ? "smsTemporarilyUnavailable"
+        : code === "resend_cooldown" ? "resendCooldown"
+        : code === "registration_unavailable" ? "registrationUnavailable"
+        : code === "otp_invalid" ? "otpInvalidExpired"
+        : code === "invalid_contact" ? "contactInvalid"
+        : code === "credentials_invalid" || code === "login_failed" ? "credentialsInvalid"
+        : code === "network_error" ? "networkTryAgain"
+        : code === "service_unavailable" ? "serviceUnavailable"
+        : "stepCouldNotComplete";
+      setError(t(key));
     } finally {
       setBusy(false);
     }
@@ -95,8 +97,10 @@ export default function SignIn() {
   }
   async function proceed() {
     const current = await refresh();
+    const next = params.get("next") || "";
+    const safeBookingReturn = /^\/patient\/book-link\/[a-f0-9]{64}$/.test(next);
     navigate(
-      !current?.profile && params.get("intent") === "clinician"
+      safeBookingReturn ? next : !current?.profile && params.get("intent") === "clinician"
         ? "/onboarding?intent=clinician"
         : destination(current),
       { replace: true },
@@ -117,8 +121,8 @@ export default function SignIn() {
       <p className="auth-description">
         {challenge
           ? "Enter the six-digit code sent to " + masked + "."
-          : passwordMode
-            ? "Use your email and password to continue."
+        : passwordMode
+            ? t("emailPasswordPrompt")
             : "A small step toward the support you’re looking for."}
       </p>
       {session && (
@@ -127,7 +131,11 @@ export default function SignIn() {
         </p>
       )}
       {error && <InlineNotice tone="danger">{error}</InlineNotice>}
-      {!options && !error ? <p role="status">Checking sign-in options…</p> : null}
+      {optionsError && <InlineNotice tone="danger">{t("authOptionsUnavailable")}</InlineNotice>}
+      {!options && !error && !optionsError ? <p role="status">Checking sign-in options…</p> : null}
+      {options && channel === "phone" && !options.phone_otp && !error && (
+        <InlineNotice tone="info">{t("phoneAccessUnavailable")}</InlineNotice>
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -222,17 +230,31 @@ export default function SignIn() {
         </>
       ) : (
         <div className="auth-secondary vertical">
-          {options?.phone_otp && <Button
+          {options?.phone_otp && channel === "email" && <Button
             variant="quiet"
             onClick={() => {
-              setChannel(channel === "phone" ? "email" : "phone");
-              setPasswordMode(channel === "phone" && !options.email_otp);
+              setChannel("phone");
+              setPasswordMode(false);
               setContact("");
+              setPassword("");
               setError("");
               requestKey.current = "";
             }}
           >
-            {channel === "phone" ? w("Use email instead") : w("Use phone instead")}
+            {w("Use phone instead")}
+          </Button>}
+          {channel === "phone" && <Button
+            variant="quiet"
+            onClick={() => {
+              setChannel("email");
+              setPasswordMode(!options?.email_otp);
+              setContact("");
+              setPassword("");
+              setError("");
+              requestKey.current = "";
+            }}
+          >
+            {w("Use email instead")}
           </Button>}
           {channel === "email" && options?.email_otp && (
             <Button

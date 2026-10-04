@@ -15,6 +15,10 @@ spec.loader.exec_module(fixtures)
 import frappe
 from tele_tena.api import journey, contact_auth, phone_auth, scheduling, presentation
 
+# This harness creates disposable synthetic accounts. The local shared Redis
+# may contain unrelated queued jobs, so suppress only test-process enqueues.
+frappe.enqueue = lambda *args, **kwargs: None
+
 
 def main():
     ready = False
@@ -22,6 +26,9 @@ def main():
     try:
         fixtures.Integration.setUpClass()
         ready = True
+        from tele_tena.review import enabled, registration_enabled
+        if not enabled() or not registration_enabled('patient') or not registration_enabled('clinician'):
+            raise RuntimeError('Redesign browser suite requires its explicitly enabled disposable registration fixture')
         fixtures.login('p1')
         journey.simulated_deposit(10000, secrets.token_hex(12))
         appointment = journey.book(**fixtures.booking(fixtures.Integration.offers['c1'], fixtures.at(1), secrets.token_hex(12)))['id']

@@ -80,7 +80,8 @@ export function AppointmentCard({
   base: string;
 }) {
   const elapsed = new Date(appointment.end).getTime() < Date.now();
-  const stateLabel = appointment.state === "Booked" ? elapsed ? "Past · outcome not recorded" : "Upcoming" : appointment.state === "PendingConfirmation" ? "Needs confirmation" : appointment.state;
+  const clinician = base.startsWith("/clinician");
+  const stateLabel = appointment.state === "Completed" ? "Completed" : appointment.call_state === "Open" ? "In progress" : appointment.call_state === "Ended" ? "Call ended" : appointment.state === "Booked" ? elapsed ? "Past · outcome not recorded" : "Upcoming" : appointment.state === "PendingConfirmation" ? "Needs confirmation" : appointment.state;
   return (
     <Card className="appointment-card">
       <div className="appointment-icon">
@@ -88,8 +89,8 @@ export function AppointmentCard({
       </div>
       <div className="appointment-details">
         <StatusBadge tone={appointment.state === "Cancelled" || appointment.state === "Expired" ? "danger" : appointment.state === "PendingConfirmation" ? "warning" : appointment.state === "Completed" ? "success" : "neutral"}>{stateLabel}</StatusBadge>
-        {appointment.call_state === "Ended" && <StatusBadge tone="neutral">Call ended</StatusBadge>}
-        {appointment.call_state === "Ended" && appointment.documentation_state !== "Finalized" && <StatusBadge tone="warning">Notes pending</StatusBadge>}
+        {appointment.call_state === "Ended" && appointment.state === "Completed" && <StatusBadge tone="neutral">Call ended</StatusBadge>}
+        {appointment.call_state === "Ended" && appointment.documentation_state !== "Finalized" && <StatusBadge tone={clinician?"warning":"neutral"}>{clinician?"Notes pending":"Summary being prepared"}</StatusBadge>}
         <h3>{appointment.service_label}</h3>
         <p>
           {date(appointment.start,appointment.timezone)} · {appointment.minutes} booked minutes

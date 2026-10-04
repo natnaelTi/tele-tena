@@ -24,11 +24,18 @@ cookies and CSRF must follow the installed Frappe version's supported behavior.
 Modules: identity/consent; providers/affiliations; service catalog; marketplace;
 scheduling; consultations/records; financial subledger; trust/operations.
 
-The planned double-entry operational subledger will own spendable/reserved funds
-and clinician earnings; it is not implemented by the simulation event log. ERPNext owns
-financial reporting. Define posting mappings, durable retry references and reconciliation;
-never independently calculate two authoritative spendable balances. Regulatory/provider
-approval of stored funds is still outstanding. Demo money is simulated only.
+The versioned `v1_7_demo_subledger` adds app-owned `tt_financial_account`,
+`tt_journal`, `tt_journal_line`, `tt_earning`, `tt_dispute` and `tt_payout` tables.
+This balanced operational subledger is separate from the legacy `tt_ledger`
+simulation activity log. It is used only for demonstration balances and simulated
+earnings. `tt_wallet` remains the patient-facing projection and each command checks
+it against the subledger before changing funds. Posting references are unique and
+retry-safe; corrections use audited, balanced reversals. ERPNext remains the future
+accounting/reporting boundary: there is no ERPNext posting, bank custody, payment
+provider or external payout integration. Real-money/provider readiness remains
+unapproved. Historical completed appointments with reserved funds become
+review-only `LegacyHold` rows; migration preserves old balances and events and does
+not settle those appointments.
 
 Use explicit command APIs for accept_offer, book_appointment, reserve_funds and
 request_withdrawal. Generic document writes must not bypass these invariants.
@@ -90,7 +97,7 @@ ordinary disconnect and leaves the consultation Open for authorized rejoin. No
 clinical notes, recording, transcript, billing action, or
 earnings posting is part of this table or workflow.
 
-## Review packaging (dependent on unmerged PR #7)
+## Review packaging (merged through PRs #7–#10)
 
 The production build lives in the app's public `review` assets, served by Frappe's
 normal `/assets/tele_tena/` mapping. A site-bound renderer owns only `/teletena/*`;
@@ -99,4 +106,21 @@ or catch-all proxy fallback. The service worker's scope is `/teletena/`, with an
 allowlist for this app's public assets only. HTML and authenticated responses are
 not cached. See `selfmade-review-deployment.md` for the dedicated-site/isolation gate,
 private CLI configuration, explicit synthetic seed and code-plus-data rollback.
-The review configuration does not enable public signup, real payments or clinical use.
+The review configuration does not enable generic Frappe signup, real payments or
+clinical use. Later site-bound switches can explicitly enable phone OTP and
+patient/clinician registration on the designated review site without changing
+demonstration funding or granting clinician approval. These switches remain
+disabled by default; live SMS delivery is unverified.
+
+## v1.8 financial cutover
+
+The `v1_8_legacy_event_reconciliation` patch imports legacy `Deposit`,
+`Reservation` and `Release` events created after a patient's v1.7 opening
+snapshot. It adds one balanced, idempotent `LegacyEventImported` journal per
+known legacy reference and leaves `tt_wallet`, `tt_ledger`, appointments and
+obligations unchanged. Unknown event kinds stop migration for review. Operators
+must stop all old web processes, workers, scheduler processes and queued writers
+before migration, install matching application code, migrate and verify wallet /
+subledger equality before restarting matching processes. If an old writer
+remains after cutover, financial commands fail closed on projection mismatch;
+restarting old code can reintroduce legacy-only writes.

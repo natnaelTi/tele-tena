@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import frappe
 
-from tele_tena.api.journey import actor, fail, integer, iso, one, profile, query, rows, text
+from tele_tena.api.journey import actor, command, fail, integer, iso, one, profile, query, rows, text
 
 DEMO_CANCELLATION_POLICY = 'demo-full-release-before-start-v1'
 TOUR_VERSION = 1
@@ -50,10 +50,16 @@ def _wallet_release(item, reference_suffix):
         return False
     if int(wallet.reserved) < int(item.price):
         fail('Reservation is inconsistent; contact support', 'reservation_inconsistent')
+    from tele_tena.accounting import account_id, check_wallet_projection, post
+    check_wallet_projection(item.patient, wallet)
     frappe.db.sql('UPDATE tt_wallet SET available=available+%s,reserved=reserved-%s WHERE patient=%s',
                   (item.price, item.price, item.patient))
     from tele_tena.api.journey import simulation_log
     simulation_log(item.patient, 'Release', item.price, reference)
+    post(reference, 'ReservationRelease', reference, [
+        (account_id('patient', item.patient, 'reserved'), item.price, 0),
+        (account_id('patient', item.patient, 'available'), 0, item.price)],
+        {'appointment': item.id, 'reason': reference_suffix})
     return True
 
 
@@ -185,6 +191,12 @@ def appointment_detail(appointment):
         'can_respond': role == 'clinician' and item.state == 'PendingConfirmation',
         'offering': item.offering,
     }
+    earning = rows('SELECT state,release_at FROM tt_earning WHERE appointment=%s', (item.id,))
+    if earning:
+        selected['financial_state'] = earning[0].state
+        selected['dispute_release_at'] = iso(earning[0].release_at) if earning[0].release_at else None
+        selected['can_open_financial_dispute'] = (role == 'patient' and earning[0].state == 'Pending' and
+            earning[0].release_at and earning[0].release_at > datetime.now(timezone.utc).replace(tzinfo=None))
     if role == 'patient':
         clinician = one('SELECT display_name FROM tt_profile WHERE user=%s AND kind=%s',
                         (item.clinician, 'clinician'))
@@ -261,7 +273,7 @@ def preview_patient_summary(appointment, summary=None):
             'note_status': note.status, 'preview_only': True}
 
 
-@frappe.whitelist(methods=['POST'])
+@command
 def finalize_consultation(appointment, publish_summary=0):
     clinician = actor('Tele Tena Clinician')
     publish = publish_summary in (True, 1, '1')
@@ -273,6 +285,10 @@ def finalize_consultation(appointment, publish_summary=0):
         frappe.throw('Consultation record unavailable', frappe.PermissionError)
     call = rows("SELECT state FROM tt_consultation WHERE appointment=%s", (item.id,))
     note = one('SELECT current_revision,status FROM tt_consultation_note WHERE appointment=%s FOR UPDATE', (item.id,))
+    if item.state == 'Completed' and note.status == 'Finalized':
+        earnings = rows('SELECT state,net_minor,release_at FROM tt_earning WHERE appointment=%s', (item.id,))
+        return {'status': 'Finalized', 'revision': note.current_revision,
+                'idempotent': True, 'earning_state': earnings[0].state if earnings else 'LegacyHold'}
     if not call or call[0].state != 'Ended' or note.status != 'Draft':
         fail('Save a documentation draft after ending the call', 'documentation_not_ready')
     current = one('''SELECT * FROM tt_note_revision WHERE appointment=%s AND revision=%s''',
@@ -289,6 +305,33 @@ def finalize_consultation(appointment, publish_summary=0):
     frappe.db.sql("UPDATE tt_consultation_note SET status='Finalized',current_revision=%s,modified=%s WHERE appointment=%s",
                   (finalized_revision, now, item.id))
     if item.state != 'Completed':
+        import json
+        from tele_tena.accounting import account_id, check_wallet_projection, post
+        wallet = one('SELECT available,reserved FROM tt_wallet WHERE patient=%s FOR UPDATE', (item.patient,))
+        snapshot = json.loads(item.policy_snapshot) if item.policy_snapshot else {}
+        finance = snapshot.get('financial', {})
+        if finance.get('version') != 'demo-earnings-v1' or finance.get('external_settlement') is not False:
+            fail('Accepted earnings policy is unavailable for this appointment', 'financial_policy_missing')
+        fee = (int(item.price) * int(finance.get('fee_bps', 0))) // 10000
+        net = int(item.price) - fee
+        if int(wallet.reserved) < int(item.price):
+            fail('Reservation is inconsistent; consultation remains unfinalized', 'reservation_inconsistent')
+        check_wallet_projection(item.patient, wallet)
+        earning_id = str(uuid.uuid4())
+        release_at = now + timedelta(minutes=int(finance.get('dispute_window_minutes', 60)))
+        frappe.db.sql('''UPDATE tt_wallet SET reserved=reserved-%s WHERE patient=%s''', (item.price, item.patient))
+        entries = [(account_id('patient', item.patient, 'reserved'), item.price, 0),
+                   (account_id('clinician', clinician, 'pending'), 0, net)]
+        if fee:
+            entries.append((account_id('', '', 'platform_fee_revenue'), 0, fee))
+        reference = 'completion:' + item.id
+        post(reference, 'ConsultationFinalized', reference, entries, {'appointment': item.id, 'simulated': True})
+        frappe.db.sql('''INSERT INTO tt_earning
+            (id,appointment,patient,clinician,gross_minor,fee_minor,net_minor,policy_snapshot,
+             state,completed_at,release_at,created,modified)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Pending',%s,%s,%s,%s)''',
+            (earning_id, item.id, item.patient, clinician, item.price, fee, net,
+             json.dumps(finance, separators=(',', ':'), sort_keys=True), now, release_at, now, now))
         frappe.db.sql("UPDATE tt_appointment SET state='Completed' WHERE id=%s", (item.id,))
         _event(item.id, 'Completed', clinician)
     _event(item.id, 'DocumentationFinalized', clinician)
@@ -422,8 +465,25 @@ def wallet_summary():
     patient = actor('Tele Tena Patient')
     profile('patient')
     wallet = one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
-    activity = rows('''SELECT kind,amount,created FROM tt_ledger
-        WHERE patient=%s ORDER BY created DESC,id DESC LIMIT 50''', (patient,))
+    legacy = rows('''SELECT l.kind,l.amount,l.created,l.reference FROM tt_ledger l
+        LEFT JOIN tt_journal j ON j.event_ref=l.reference
+        WHERE l.patient=%s AND j.id IS NULL ORDER BY l.created DESC,l.id DESC LIMIT 50''', (patient,))
+    from tele_tena.accounting import _event_rows, account_id
+    activity = legacy + _event_rows([
+        account_id('patient', patient, 'available'), account_id('patient', patient, 'reserved')])
+    for item in legacy:
+        item.source = 'simulation_log'
+        item.event_ref = item.reference
+        item.kind = {'Deposit': 'Demonstration funds added', 'Reservation': 'Appointment funds reserved',
+                     'Release': 'Appointment reservation released'}.get(item.kind, item.kind)
+    event_labels = {'Deposit': 'Demonstration funds added', 'Reservation': 'Appointment funds reserved',
+                    'ReservationRelease': 'Appointment reservation released',
+                    'ConsultationFinalized': 'Consultation completed', 'EarningRefunded': 'Refund recorded'}
+    for item in activity[len(legacy):]:
+        item.source = 'demo_subledger'
+        item.kind = event_labels.get(item.event_type, item.event_type)
+    activity.sort(key=lambda item: (item.created, getattr(item, 'reference', '')), reverse=True)
+    activity = activity[:50]
     for item in activity:
         item.created = iso(item.created)
     return {'available': wallet.available, 'reserved': wallet.reserved, 'currency': 'ETB',

@@ -109,16 +109,18 @@ export function OTPInput(props: Omit<Parameters<typeof TextField>[0], "type">) {
 }
 export function Select({
   label,
+  error,
   children,
   ...props
-}: SelectHTMLAttributes<HTMLSelectElement> & { label: string }) {
+}: SelectHTMLAttributes<HTMLSelectElement> & { label: string; error?: string }) {
   const id = useId();
   return (
     <div className="field">
       <label htmlFor={id}>{label}</label>
-      <select {...props} id={id}>
+      <select {...props} id={id} aria-invalid={!!error} aria-describedby={error ? id + "-error" : undefined}>
         {children}
       </select>
+      {error&&<p className="field-error" id={id+"-error"}>{error}</p>}
     </div>
   );
 }

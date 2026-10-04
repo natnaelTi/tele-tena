@@ -72,7 +72,10 @@ Cancellation is currently limited to before the scheduled start. The explicit
 demonstration policy returns the full reserved amount for an authorized pre-start
 cancellation, exactly once. This is not a production cancellation/refund promise.
 No time-based or call-duration earnings release is permitted. `tt_ledger` remains
-a simulation transaction log, not a subledger.
+an append-only simulation activity log. The additive `tt_journal` tables implement
+a separate balanced demonstration subledger for deposits, reservations, completion,
+release and payout reservation; this does not constitute ERPNext posting, custody,
+real payment or settlement.
 
 The one persistent “Demonstration environment — no real payments or clinical care”
 ribbon communicates the boundary. Ordinary totals use “Balance”; activity detail
@@ -96,7 +99,20 @@ evidence, but neither that role nor a clinic relationship grants patient-record
 access. The PWA provides only public static caching and a generic offline page;
 it never reports that offline changes were saved.
 
-These are demonstration workflows. Mutual rescheduling, no-show decisions,
-notifications, real payments/accounting, clinician earnings, physical-device
-call quality and production clinical readiness remain outside the implemented
-contract; the delivery tracker is authoritative for pending scope.
+These are demonstration workflows. The clinician earnings workflow uses an
+explicit zero-fee default, a booking-time policy snapshot, a configurable
+dispute hold, audited financial disputes and reserved payout requests. Historical
+completed appointments that still hold funds migrate to review-only `LegacyHold`
+records and are never settled automatically. A dispute/refund after release or an
+open payout is unsupported and must stop for authorized review. The scheduler
+records simulated availability of earnings; it does not transfer money. Mutual
+rescheduling, no-show decisions, notifications, real payments/accounting,
+physical-device call quality and production clinical readiness remain outside
+the implemented contract; the delivery tracker is authoritative for pending scope.
+
+The versioned v1.8 reconciliation imports known legacy deposit, reservation and
+release events created after each v1.7 wallet opening snapshot into balanced,
+idempotent journals. It preserves the wallet projection, original activity log,
+appointments and reserved obligations. Unknown legacy event kinds stop for
+review. A deployment cutover stops all old web and background writers before
+migration, then verifies wallet/subledger equality before starting matching code.
