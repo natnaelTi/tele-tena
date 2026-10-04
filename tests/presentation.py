@@ -166,6 +166,62 @@ class Presentation(unittest.TestCase):
                                      ('open-request:' + req_id,)).n, 1)
         self.assertGreaterEqual(journey.wallet()['reserved'], wallet_before['reserved'] + 1)
 
+    def test_two_patients_cannot_claim_one_offer_slot_concurrently(self):
+        offering = fixtures.Integration.offers['c1']
+        service = fixtures.PREFIX
+        day = day_offset(28)
+        fixtures.login('c1')
+        journey.save_profile('clinician', 'Synthetic slot clinician', 1, languages=['en'])
+        journey.publish(service, 30000, 30)
+        payload = schedule_payload(offering, day, mode='automatic')
+        payload['minimum_notice_minutes'] = 0
+        scheduling.save_schedule(**payload)
+        slot = self.slots(offering, day, who='p1')[0]
+        requests = []
+        for patient in ('p1', 'p2'):
+            fixtures.login(patient)
+            journey.simulated_deposit(100000, 'request-race-' + patient + '-' + secrets.token_hex(6))
+            request = open_requests.publish_request(
+                service=service, request_text='Synthetic concurrent slot request.', urgency='scheduled',
+                language='en', consultation_format='video', sharing={'name': False, 'history': False},
+                retry_key='request-race-' + patient + '-' + secrets.token_hex(6),
+                timezone_name='Africa/Addis_Ababa', earliest_start=slot['start'],
+                latest_start=slot['start'], max_price_minor=100000)
+            requests.append(request['id'])
+            frappe.db.commit()
+        fixtures.login('c1')
+        offers = [open_requests.submit_offer(request_id, offering, slot['start'])['id']
+                  for request_id in requests]
+        frappe.db.commit()
+        barrier = threading.Barrier(2)
+
+        def accept(index):
+            fixtures.connect()
+            try:
+                fixtures.login('p' + str(index + 1))
+                req = next(item for item in open_requests.my_requests() if item.id == requests[index])
+                self.assertTrue(any(item.id == offers[index] for item in req.offers))
+                barrier.wait(timeout=10)
+                result = open_requests.respond_offer(requests[index], offers[index], 'accept',
+                    None, req.disclosure_snapshot)
+                frappe.db.commit()
+                return 'matched', result.get('appointment')
+            except frappe.ValidationError:
+                frappe.db.rollback()
+                return 'conflict', None
+            finally:
+                frappe.destroy()
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(accept, (0, 1)))
+        frappe.db.rollback()
+        self.assertEqual(sum(state == 'matched' for state, _appointment in results), 1)
+        self.assertEqual(sum(state == 'conflict' for state, _appointment in results), 1)
+        self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_appointment WHERE start=%s AND state='Booked'",
+                                     (slot['start'],)).n, 1)
+        self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_request_offer WHERE id IN %s AND state='Accepted'",
+                                     (tuple(offers),)).n, 1)
+
     def test_booking_link_is_opaque_owner_scoped_and_revocable(self):
         offering = fixtures.Integration.offers['c1']
         self.make_schedule(offering=offering)
