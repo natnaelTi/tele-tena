@@ -39,9 +39,18 @@ async function chooseEmailPassword(page) {
   try {
     const context = await browser.newContext();
     const page = await context.newPage();
+    await page.setViewportSize({ width: 1440, height: 1000 });
     await signIn(page, fixture.users.clinician, credentials[fixture.users.clinician]);
     await page.goto(base + '/teletena/clinician/availability');
     await page.getByRole('heading', { name: 'Weekly availability' }).waitFor();
+    const calendar = page.locator('.availability-calendar-scroll');
+    await page.waitForFunction(() => {
+      const grid = document.querySelector('.availability-calendar-scroll');
+      return grid instanceof HTMLElement && grid.scrollTop > 0;
+    });
+    assert.ok(await calendar.locator('.availability-block').first().evaluate(element =>
+      element.getBoundingClientRect().top < innerHeight
+    ), 'the first configured work interval should appear in the initial viewport');
     const compactBooking = page.locator('.calendar-booking').first();
     if (await compactBooking.count()) {
       assert.equal(await compactBooking.locator('span').count(), 0,
