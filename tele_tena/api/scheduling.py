@@ -277,12 +277,13 @@ def _blocked(row, start, end, before, after):
     return start < existing_end and existing_start < end
 
 
-def _slots_for_day(schedule, offer, day, booked, patient_booked=()):
+def _slots_for_day(schedule, offer, day, booked, patient_booked=(), minimum_notice_override=None):
     zone = ZoneInfo(schedule.timezone)
     intervals, breaks = _ranges_for_day(schedule, day)
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     horizon_end = now + timedelta(days=int(schedule.horizon_days))
-    minimum = now + timedelta(minutes=int(schedule.minimum_notice_minutes))
+    notice = schedule.minimum_notice_minutes if minimum_notice_override is None else minimum_notice_override
+    minimum = now + timedelta(minutes=int(notice))
     result = []
     duration = int(offer.minutes)
     for local_start, local_end in intervals:
@@ -311,7 +312,7 @@ def _schedule_for(offering, lock=False):
                (offering,)) if rows('SELECT id FROM tt_schedule WHERE offering=%s', (offering,)) else None
 
 
-def validate_slot(offer, start, patient, lock=True):
+def validate_slot(offer, start, patient, lock=True, immediate_ready=False):
     """Recompute an exact offered slot while the booking gate/clinician are locked."""
     schedule = _schedule_for(offer.id, lock)
     if schedule:
@@ -331,7 +332,8 @@ def validate_slot(offer, start, patient, lock=True):
             AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6))
             AND start<%s AND end>%s''',
             (patient, start + timedelta(days=1), start - timedelta(days=1)))
-        valid = _slots_for_day(schedule, offer, day, booked, patient_booked)
+        valid = _slots_for_day(schedule, offer, day, booked, patient_booked,
+                               minimum_notice_override=0 if immediate_ready else None)
         match = next((slot for slot in valid if slot[0] == start), None)
         if not match:
             fail('That time is no longer available. Choose another slot.', 'slot_unavailable')

@@ -156,23 +156,36 @@ def session():
 
 
 @command
-def save_profile(kind, display_name, adult, history='', share_name=None, share_history=None):
+def save_profile(kind, display_name, adult, history='', share_name=None, share_history=None, languages=None):
     if kind not in ('patient', 'clinician'):
         fail('Unsupported profile type')
     user = actor('Tele Tena ' + kind.title())
     if not boolean(adult):
         fail('Adults 18+ only')
-    existing = rows('SELECT kind,share_name,share_history FROM tt_profile WHERE user=%s FOR UPDATE', (user,))
+    existing = rows('SELECT kind,share_name,share_history,languages,public_id FROM tt_profile WHERE user=%s FOR UPDATE', (user,))
     if existing and existing[0].kind != kind:
         fail('Profile type cannot change')
     share_name = existing[0].share_name if share_name is None and existing else (False if share_name is None else share_name)
     share_history = existing[0].share_history if share_history is None and existing else (False if share_history is None else share_history)
     name = text(display_name, 120)
     history = text(history, 4000, False) if kind == 'patient' else ''
-    frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history)
-        VALUES (%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE display_name=VALUES(display_name),
-        history=VALUES(history),share_name=VALUES(share_name),share_history=VALUES(share_history)''',
-        (user, kind, name, history, boolean(share_name), boolean(share_history)))
+    if languages is None:
+        language_values = json.loads(existing[0].languages or '[]') if existing else []
+    else:
+        if isinstance(languages, str):
+            try:
+                languages = json.loads(languages)
+            except ValueError:
+                fail('Choose the languages you can provide care in')
+        supported = {'en', 'am', 'om'}
+        if not isinstance(languages, list) or len(set(languages)) != len(languages) or not set(languages).issubset(supported):
+            fail('Choose supported care languages')
+        language_values = sorted(set(languages)) if kind == 'clinician' else []
+    public_id = existing[0].public_id if existing else str(uuid.uuid4())
+    frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history,languages,public_id)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE display_name=VALUES(display_name),
+        history=VALUES(history),share_name=VALUES(share_name),share_history=VALUES(share_history),languages=VALUES(languages)''',
+        (user, kind, name, history, boolean(share_name), boolean(share_history), json.dumps(language_values), public_id))
     if kind == 'patient':
         frappe.db.sql('INSERT IGNORE INTO tt_wallet (patient) VALUES (%s)', (user,))
     audit(user, 'ProfileConsent', {'adult_attested': True, 'share_name': boolean(share_name), 'share_history': boolean(share_history)})
@@ -343,7 +356,7 @@ def add_availability(start, end):
 @query()
 def discover(service=None):
     actor('Tele Tena Patient')
-    return rows('''SELECT o.id,o.clinician,p.display_name,o.service,s.service_label AS label,o.price,o.minutes,
+    return rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,o.service,s.service_label AS label,o.price,o.minutes,
         sc.id AS schedule_id,sc.timezone AS schedule_timezone,sc.consultation_format
         FROM tt_offering o JOIN tt_profile p ON p.user=o.clinician
         JOIN tt_application a ON a.user=o.clinician JOIN `tabTele Tena Service` s ON s.name=o.service
@@ -413,7 +426,7 @@ def simulation_log(patient, kind, amount, reference):
 
 @command
 def book(offering, start, request_text, sharing, retry_key, expected_price, expected_minutes,
-         expected_disclosure, booked_timezone='UTC'):
+         expected_disclosure, booked_timezone='UTC', custom_offer_id=None):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     p = profile('patient', True)
     selected = choices(sharing)
@@ -424,8 +437,13 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
             fail('Invalid disclosure preview')
     start = instant(start)
     key = text(retry_key, 80)
-    payload = json.dumps([offering, iso(start), request_text, selected, expected_price,
-                          expected_minutes, expected_disclosure, booked_timezone], sort_keys=True)
+    payload_values = [offering, iso(start), request_text, selected, expected_price,
+                      expected_minutes, expected_disclosure, booked_timezone]
+    if custom_offer_id:
+        if getattr(frappe.local, 'tele_tena_accepting_offer', None) != custom_offer_id:
+            frappe.throw('Offer acceptance must use its authorized request workflow', frappe.PermissionError)
+        payload_values.append({'request_offer': custom_offer_id})
+    payload = json.dumps(payload_values, sort_keys=True)
     digest = hashlib.sha256(payload.encode()).hexdigest()
     wallet = one('SELECT * FROM tt_wallet WHERE patient=%s FOR UPDATE', (p.user,))
     from tele_tena.accounting import account_id, check_wallet_projection, post
@@ -435,22 +453,46 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         if prior[0].payload_hash != digest:
             fail('Retry key payload changed', 'retry_changed')
         return {'id': prior[0].id, 'simulated': True}
-    shared = disclosure(p, request_text, selected)
-    if expected_disclosure != shared:
-        fail('Profile changed; review disclosure again', 'preview_changed')
+    trusted_disclosure = getattr(frappe.local, 'tele_tena_offer_disclosure', None)
+    if custom_offer_id and getattr(frappe.local, 'tele_tena_accepting_offer', None) == custom_offer_id:
+        shared = trusted_disclosure
+        if not isinstance(shared, dict) or expected_disclosure != shared:
+            fail('Review the exact request disclosure before accepting this offer.', 'request_disclosure_changed')
+    else:
+        shared = disclosure(p, request_text, selected)
+        if expected_disclosure != shared:
+            fail('Profile changed; review disclosure again', 'preview_changed')
     o = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (offering,))
     # All scheduling mutations acquire the clinician profile lock, across services.
     one('SELECT user FROM tt_profile WHERE user=%s AND kind=%s FOR UPDATE', (o.clinician, 'clinician'))
     approved(o.clinician, True)
     approved_service(o.clinician, o.service, True)
     o = one('SELECT o.*,s.service_label AS label FROM tt_offering o JOIN `tabTele Tena Service` s ON s.name=o.service WHERE o.id=%s AND o.active=1 AND s.active=1 FOR UPDATE', (offering,))
-    if integer(expected_price, 1, 100000000) != o.price or integer(expected_minutes, 5, 240) != o.minutes:
+    booking_price = int(o.price)
+    immediate_request = False
+    if custom_offer_id:
+        quoted = one("""SELECT ro.price_minor,ro.offering,ro.clinician,r.patient,r.state,r.urgency,
+                ro.state offer_state,ro.valid_until
+            FROM tt_request_offer ro JOIN tt_open_request r ON r.id=ro.request_id
+            WHERE ro.id=%s AND r.patient=%s AND r.state='Open' AND ro.state='Active' FOR UPDATE""",
+            (custom_offer_id, p.user))
+        if quoted.offering != o.id or quoted.valid_until <= datetime.now(timezone.utc).replace(tzinfo=None):
+            fail('This offer is no longer available', 'request_offer_expired')
+        booking_price = int(quoted.price_minor)
+        immediate_request = quoted.urgency == 'immediate'
+        if immediate_request:
+            presence = rows('''SELECT expires_at FROM tt_clinician_request_presence
+                WHERE clinician=%s AND ready=1 AND expires_at>UTC_TIMESTAMP(6) FOR UPDATE''', (o.clinician,))
+            if not presence:
+                fail('Clinician immediate availability has expired', 'request_presence_stale')
+    if integer(expected_price, 1, 100000000) != booking_price or integer(expected_minutes, 5, 240) != o.minutes:
         fail('Offering changed; review price and duration again', 'offering_changed')
     end = start + timedelta(minutes=o.minutes)
     if start <= datetime.now(timezone.utc).replace(tzinfo=None):
         fail('Appointment must be in the future', 'future_required')
     from tele_tena.api import scheduling
-    schedule = scheduling.validate_slot(o, start, p.user, lock=True)
+    schedule = scheduling.validate_slot(o, start, p.user, lock=True,
+                                        immediate_ready=immediate_request)
     schedule_timezone = schedule.timezone if schedule else scheduling._zone(booked_timezone).key
     before = int(schedule.buffer_before) if schedule else 0
     after = int(schedule.buffer_after) if schedule else 0
@@ -464,10 +506,11 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         FOR UPDATE''', (o.clinician, end + timedelta(minutes=after),
                        start - timedelta(minutes=before), p.user, end, start)):
         fail('Appointment conflict', 'appointment_conflict')
-    if wallet.available < o.price:
+    if wallet.available < booking_price:
         fail('Insufficient simulated funds', 'insufficient_funds')
     appointment = str(uuid.uuid4())
-    mode = schedule.confirmation_mode if schedule else 'automatic'
+    # Accepting the clinician's offer is already explicit confirmation.
+    mode = 'automatic' if custom_offer_id else (schedule.confirmation_mode if schedule else 'automatic')
     expires = None
     state = 'Booked'
     confirmed = datetime.now(timezone.utc).replace(tzinfo=None) if mode == 'automatic' else None
@@ -491,18 +534,18 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         service_label,disclosure,choices,retry_key,payload_hash,timezone,schedule_id,confirmation_mode,
         expires_at,confirmed_at,consultation_format,buffer_before,buffer_after,policy_snapshot,created)
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
-        (appointment, p.user, o.clinician, offering, start, end, state, o.price, o.minutes, o.label,
+        (appointment, p.user, o.clinician, offering, start, end, state, booking_price, o.minutes, o.label,
          json.dumps(shared), json.dumps(selected), key, digest, schedule_timezone,
          schedule.id if schedule else None, mode, expires, confirmed,
          schedule.consultation_format if schedule else 'video', before, after, json.dumps(policy), created))
     frappe.db.sql('''INSERT INTO tt_appointment_event (id,appointment,event_type,actor,created)
         VALUES (%s,%s,%s,%s,%s)''', (str(uuid.uuid4()), appointment,
         'Requested' if state == 'PendingConfirmation' else 'Booked', p.user, created))
-    frappe.db.sql('UPDATE tt_wallet SET available=available-%s,reserved=reserved+%s WHERE patient=%s', (o.price, o.price, p.user))
-    simulation_log(p.user, 'Reservation', o.price, 'booking:' + appointment)
+    frappe.db.sql('UPDATE tt_wallet SET available=available-%s,reserved=reserved+%s WHERE patient=%s', (booking_price, booking_price, p.user))
+    simulation_log(p.user, 'Reservation', booking_price, 'booking:' + appointment)
     post('booking:' + appointment, 'Reservation', 'booking:' + appointment, [
-        (account_id('patient', p.user, 'available'), o.price, 0),
-        (account_id('patient', p.user, 'reserved'), 0, o.price)], {'appointment': appointment})
+        (account_id('patient', p.user, 'available'), booking_price, 0),
+        (account_id('patient', p.user, 'reserved'), 0, booking_price)], {'appointment': appointment})
     return {'id': appointment, 'state': state, 'expires_at': iso(expires) if expires else None,
             'simulated': True}
 

@@ -85,6 +85,16 @@ class Integration(unittest.TestCase):
     def tearDownClass(cls):
         frappe.db.rollback()
         frappe.set_user('Administrator')
+        request_ids = frappe.db.sql('''SELECT DISTINCT r.id FROM tt_open_request r
+            LEFT JOIN tt_request_recipient rr ON rr.request_id=r.id
+            WHERE r.patient IN %s OR rr.clinician IN %s''',
+            (tuple(USERS.values()), tuple(USERS.values())), pluck=True)
+        if request_ids:
+            frappe.db.sql('DELETE FROM tt_request_metric WHERE request_id IN %s', (tuple(request_ids),))
+            frappe.db.sql('DELETE FROM tt_request_offer WHERE request_id IN %s', (tuple(request_ids),))
+            frappe.db.sql('DELETE FROM tt_request_recipient WHERE request_id IN %s', (tuple(request_ids),))
+            frappe.db.sql('DELETE FROM tt_open_request WHERE id IN %s', (tuple(request_ids),))
+        frappe.db.sql('DELETE FROM tt_clinician_request_presence WHERE clinician IN %s', (tuple(USERS.values()),))
         appointment_ids = frappe.db.sql('SELECT id FROM tt_appointment WHERE patient IN %s OR clinician IN %s',
                                        (tuple(USERS.values()), tuple(USERS.values())), pluck=True)
         if appointment_ids:
