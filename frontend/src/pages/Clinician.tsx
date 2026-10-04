@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
 import { journeyApi } from "../journey-api";
@@ -123,6 +123,7 @@ export function Availability() {
   const [availabilityError,setAvailabilityError]=useState("");
   const [bookingUrl,setBookingUrl]=useState("");
   const [bookingLinkStatus,setBookingLinkStatus]=useState("");
+  const calendarScrollRef=useRef<HTMLDivElement>(null);
   useEffect(()=>{const query=window.matchMedia("(max-width: 800px)");const update=()=>setTimeEditorOpen(query.matches);query.addEventListener("change",update);return()=>query.removeEventListener("change",update);},[]);
   useEffect(() => {
     const s = current.data?.find(item=>item.offering===offering) || (!offering?current.data?.[0]:undefined);
@@ -180,6 +181,14 @@ export function Availability() {
   const dateKey = (day:Date) => day.toISOString().slice(0,10);
   const displayDay = (day:Date) => new Intl.DateTimeFormat(dateLocale,{weekday:"short",month:"short",day:"numeric",timeZone:"UTC"}).format(day);
   const minutePosition = (value:string) => {const [h,m]=value.slice(0,5).split(":").map(Number);return h*60+m;};
+  const readableZone = (()=>{try{return new Intl.DateTimeFormat(dateLocale,{timeZone:zone,timeZoneName:"long"}).formatToParts(new Date()).find(item=>item.type==="timeZoneName")?.value||zone;}catch{return zone;}})();
+  useEffect(()=>{
+    if(!current.data)return;
+    const saved=current.data.find(item=>item.offering===offering)||current.data[0];
+    const first=saved?.intervals.length?Math.min(...saved.intervals.map(item=>minutePosition(item.start_local))):8*60;
+    const startHour=Math.max(0,Math.floor(first/60)-1);
+    calendarScrollRef.current?.scrollTo({top:startHour*40,behavior:"instant"});
+  },[current.data,offering,weekShift]);
   const visibleException = (date:string) => exceptions.map((item,index)=>({...item,index})).filter(item=>item.date===date);
   const visibleBookings = (date:string) => (appointments.data||[]).filter(item=>["Booked","PendingConfirmation"].includes(item.state)).flatMap(item=>{try{const parts=new Intl.DateTimeFormat("en-CA",{timeZone:zone,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date(item.start));const values=Object.fromEntries(parts.map(x=>[x.type,x.value]));const localDate=`${values.year}-${values.month}-${values.day}`;if(localDate!==date)return[];const startMinute=Number(values.hour)*60+Number(values.minute);const endMinute=startMinute+Number(item.minutes);return endMinute<=0||startMinute>=1440?[]:[{...item,startMinute:Math.max(0,startMinute),endMinute:Math.min(1440,endMinute)}];}catch{return[];}});
   return (
@@ -209,12 +218,12 @@ export function Availability() {
           <div className="schedule-share-link"><Button variant="secondary" disabled={action.busy||dirty||status!=="Published"||!offering} onClick={()=>void createBookingLink()}>{w("Copy patient booking link")}</Button>{bookingLinkStatus&&<p className="supporting" role="status">{bookingLinkStatus}</p>}{bookingUrl&&<TextField label={w("Patient booking link")} value={bookingUrl} readOnly />}</div>
         </aside>
         <section className="schedule-week" aria-label="Weekly availability editor">
-          <div className="availability-toolbar"><div className="availability-period-actions"><Button variant="secondary" onClick={()=>setWeekShift(0)}>Today</Button><Button variant="quiet" aria-label="Previous week" onClick={()=>setWeekShift(weekShift-1)}>‹</Button><Button variant="quiet" aria-label="Next week" onClick={()=>setWeekShift(weekShift+1)}>›</Button><strong>{displayDay(weekDays[0])} – {displayDay(weekDays[6])}</strong></div><span className="timezone-label">{zone}</span></div>
+          <div className="availability-toolbar"><div className="availability-period-actions"><Button variant="secondary" onClick={()=>setWeekShift(0)}>Today</Button><Button variant="quiet" aria-label="Previous week" onClick={()=>setWeekShift(weekShift-1)}>‹</Button><Button variant="quiet" aria-label="Next week" onClick={()=>setWeekShift(weekShift+1)}>›</Button><strong>{displayDay(weekDays[0])} – {displayDay(weekDays[6])}</strong></div><span className="timezone-label">{readableZone} · {zone}</span></div>
           <div className="schedule-week-heading"><h2>{w("Weekly availability")}</h2><Select label={w("Calendar edit mode")} value={calendarEditMode} onChange={e=>setCalendarEditMode(e.target.value as "weekly"|"date")}><option value="weekly">{w("Recurring weekly")}</option><option value="date">{w("This date only")}</option></Select></div>
           <p className="supporting">{calendarEditMode==="weekly"?w("Choose a time to add a weekly interval."):w("Choose a time to prepare a date-specific replacement. Confirm it in Date exceptions before saving. Existing appointments remain unchanged.")}</p>
-          <p className="supporting">Times follow {zone}. Ambiguous or skipped daylight-saving times are not offered. Existing appointments stay at their saved times.</p>
+          <p className="supporting">Daylight-saving gaps are not offered. Existing appointments remain at their saved times.</p>
           <div className="availability-workspace">
-          <div className="availability-calendar-scroll" aria-label="Weekly appointment calendar">
+          <div className="availability-calendar-scroll" aria-label="Weekly appointment calendar" ref={calendarScrollRef}>
             <div className={`availability-calendar-grid${calendarEditMode==="date"?" date-edit-mode":""}`} style={{gridTemplateColumns:"56px repeat(7,minmax(90px,1fr))"}}>
               <div className="calendar-corner">Local time</div>{weekDays.map((day,weekday)=><div className="calendar-day-heading" key={dateKey(day)} aria-current={dateKey(day)===dateKey(localToday)?"date":undefined}><strong>{dayNames[weekday]}</strong><span>{displayDay(day)}</span></div>)}
               <div className="calendar-ruler">{Array.from({length:24},(_,i)=><span key={i} style={{top:i*40-8}}>{String(i).padStart(2,"0")}:00</span>)}</div>
@@ -382,22 +391,33 @@ export function ClinicianEarnings() {
     setRetryKey(crypto.randomUUID());
     await resource.refresh();
   }
+  const history = resource.data ? [
+    ...resource.data.earnings.map(item => ({ kind: "Consultation earnings", id: `earning-${item.id}`, at: item.completed_at, amount: item.net_minor, state: item.state, item })),
+    ...resource.data.payouts.map(item => ({ kind: "Payout request", id: `payout-${item.id}`, at: item.created, amount: item.amount_minor, state: item.state, item })),
+  ].sort((a,b) => String(b.at||"").localeCompare(String(a.at||""))) : [];
   return <>
-    <PageTitle title={w("Earnings")} description={w("Pending earnings become available after the recorded dispute window. No external transfer occurs here.")} />
+    <PageTitle title={w("Earnings")} description={w("See what is pending, available, and reserved for payout requests.")} />
     {resource.error ? <InlineNotice tone="danger">Earnings could not be loaded. <Button onClick={() => void resource.refresh()}>Try again</Button></InlineNotice> : !resource.data ? <Skeleton /> : <>
-      <div className="balance-grid earnings-balances">
-        <Card><p>{w("Pending")}</p><h2>ETB {money(resource.data.balances.pending)}</h2><p className="supporting">{w("Held for the agreed demonstration review window or an open dispute.")}</p></Card>
-        <Card><p>{w("Available")}</p><h2>ETB {money(resource.data.balances.earnings_available)}</h2></Card>
-        <Card><p>{w("Payout requested")}</p><h2>ETB {money(resource.data.balances.payout_reserved)}</h2><p className="supporting">{w("Reserved while a request is open. No external transfer.")}</p></Card>
+      <div className="earnings-overview">
+        <Card className="earnings-available"><p>{w("Available")}</p><h2>ETB {money(resource.data.balances.earnings_available)}</h2><p className="supporting">{w("Available to request")}</p></Card>
+        <dl className="earnings-supporting">
+          <div><dt>{w("Pending")}</dt><dd>ETB {money(resource.data.balances.pending)}</dd><p className="supporting">{w("Held until the saved review window ends or a dispute is resolved.")}</p></div>
+          <div><dt>{w("Payout requested")}</dt><dd>ETB {money(resource.data.balances.payout_reserved)}</dd><p className="supporting">{w("Reserved for open requests")}</p></div>
+        </dl>
       </div>
-      <Card className="payout-request"><h2>{w("Request a payout")}</h2><p>{w("Requested amounts are reserved from available earnings. No external transfer occurs here.")}</p>
-        <TextField label={w("Amount (ETB)")} inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" />
-        <Button loading={action.busy} disabled={action.busy || !amount} onClick={() => void action.run(request, w("Payout request recorded."))}>{w("Request payout")}</Button>
+      <Card className="payout-request"><h2>{w("Request a payout")}</h2>
+        {resource.data.balances.earnings_available > 0 ? <><p>{w("This request reserves the amount. It does not send money outside this demonstration.")}</p>
+          <TextField label={w("Amount (ETB)")} inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" />
+          <Button loading={action.busy} disabled={action.busy || !amount} onClick={() => void action.run(request, w("Payout request saved. No external transfer was made."))}>{w("Request payout")}</Button></>
+          : <p className="supporting">{w("No earnings are available to request yet.")}</p>}
         {action.error && <InlineNotice tone="danger">{action.error}</InlineNotice>}{action.success && <InlineNotice tone="success">{action.success}</InlineNotice>}
       </Card>
-      <section className="earnings-section"><h2>{w("Consultation earnings")}</h2>{resource.data.earnings.length ? <div className="stack">{resource.data.earnings.map(item => <Card key={item.id}><div className="row-between"><h3>{w("Consultation")}</h3><StatusBadge>{w(item.state === "Disputed" ? "On hold" : item.state)}</StatusBadge></div><p>Gross ETB {money(item.gross_minor)} · Fee ETB {money(item.fee_minor)} · Net ETB {money(item.net_minor)}</p>{item.state === "Pending" && item.release_at && <p className="supporting">{w("Expected release")}: {date(item.release_at)} · {w("Subject to the saved dispute window.")}</p>}{item.state === "Disputed" && <p className="supporting">{w("Release is paused while an authorized reviewer resolves the dispute.")}</p>}{item.state === "LegacyHold" && <p className="supporting">{w("Historical balance preserved for authorized review; no automatic settlement.")}</p>}</Card>)}</div> : <EmptyState title={w("No finalized consultations yet.")} />}</section>
-      <section className="earnings-section"><h2>{w("Payout requests")}</h2>{resource.data.payouts.length ? <div className="stack">{resource.data.payouts.map(item => <Card key={item.id}><div className="row-between"><h3>ETB {money(item.amount_minor)}</h3><StatusBadge>{w(item.state)}</StatusBadge></div><p className="supporting">{w("Requested on")} {date(item.created)} · {w("No external transfer occurs here.")}</p>{item.state === "Requested" && <Button variant="secondary" loading={action.busy} onClick={() => void action.run(async () => { await api("tele_tena.accounting.cancel_payout", { payout: item.id, reason: cancelReason }, true); await resource.refresh(); }, w("Payout request cancelled; the reservation was released."))}>{w("Cancel request")}</Button>}</Card>)}</div> : <EmptyState title={w("No payout requests.")} />}</section>
-      <section className="earnings-section"><h2>{w("Earnings activity")}</h2>{resource.data.activity.length?<ul className="payment-activity">{resource.data.activity.map(item=><li key={item.event_ref}><span>{w(item.kind)}</span><strong>ETB {money(item.amount)}</strong><time>{date(item.created)}</time></li>)}</ul>:<EmptyState title={w("No earnings activity yet.")} />}</section>
+      <section className="earnings-history-section"><h2>{w("Activity")}</h2>{history.length ? <ul className="earnings-history">{history.map(entry=><li key={entry.id}><div><strong>{w(entry.kind)}</strong><span className="supporting">{entry.at ? date(entry.at) : w("Date unavailable")}</span></div><div className="earnings-history-value"><strong>ETB {money(entry.amount)}</strong><StatusBadge>{w(entry.state === "Disputed" ? "On hold" : entry.state)}</StatusBadge></div>
+          {"gross_minor" in entry.item && <p className="supporting">{w("Gross")}: ETB {money(entry.item.gross_minor)} · {w("Fee")}: ETB {money(entry.item.fee_minor)} · {w("Net")}: ETB {money(entry.item.net_minor)}{entry.item.release_at&&entry.state==="Pending"?` · ${w("Expected release")}: ${date(entry.item.release_at)}`:""}</p>}
+          {entry.state==="Disputed"&&<p className="supporting">{w("Release is paused while an authorized reviewer resolves the dispute.")}</p>}
+          {entry.state==="LegacyHold"&&<p className="supporting">{w("Historical balance is preserved for authorized review.")}</p>}
+          {"amount_minor" in entry.item&&entry.state==="Requested"&&<Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await api("tele_tena.accounting.cancel_payout",{payout:entry.item.id,reason:cancelReason},true);await resource.refresh();},w("Payout request cancelled; the reservation was released."))}>{w("Cancel request")}</Button>}
+        </li>)}</ul> : <EmptyState title={w("No earnings or payout activity yet.")} />}</section>
     </>}
   </>;
 }

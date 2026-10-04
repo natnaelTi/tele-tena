@@ -837,6 +837,26 @@ button:active {
 .schedule-advanced{display:grid;gap:14px;padding:12px 0;border-top:1px solid var(--border-default,#d7e2dc);border-bottom:1px solid var(--border-default,#d7e2dc)}
 .schedule-advanced>summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
 .schedule-week .schedule-day{display:none}
+.schedule-config{align-self:start;position:sticky;top:16px}
+.earnings-overview{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(250px,1fr);gap:24px;align-items:stretch;max-width:1040px}
+.earnings-available{display:flex;flex-direction:column;justify-content:center;min-height:190px;background:var(--surface-subtle,#eaf2ee)}
+.earnings-available>p:first-child{margin:0;color:var(--text-secondary,#526561);font-weight:600}
+.earnings-available h2{margin:8px 0;font-size:clamp(32px,4vw,48px);font-variant-numeric:tabular-nums}
+.earnings-supporting{margin:0;padding:8px 20px;display:grid;align-content:center;border:1px solid var(--border-default,#d7e2dc);border-radius:20px;background:#fff}
+.earnings-supporting>div{padding:12px 0;border-bottom:1px solid var(--border-default,#d7e2dc)}
+.earnings-supporting>div:last-child{border:0}
+.earnings-supporting dt{color:var(--text-secondary,#526561);font-size:14px}
+.earnings-supporting dd{margin:2px 0;font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.earnings-supporting .supporting{margin:0;font-size:13px}
+.payout-request{max-width:600px;margin:24px 0}
+.earnings-history-section{max-width:1040px;margin-top:32px}
+.earnings-history-section>h2{margin:0 0 12px}
+.earnings-history{list-style:none;margin:0;padding:0;border-top:1px solid var(--border-default,#d7e2dc)}
+.earnings-history>li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 20px;align-items:center;padding:16px 4px;border-bottom:1px solid var(--border-default,#d7e2dc)}
+.earnings-history>li>div:first-child{display:grid;gap:3px}
+.earnings-history-value{display:flex;align-items:center;gap:12px}
+.earnings-history>li>p,.earnings-history>li>.button{grid-column:1/-1;margin:0}
+@media(max-width:800px){.schedule-config{position:static}.earnings-overview{grid-template-columns:1fr;gap:12px}.earnings-available{min-height:150px}.earnings-supporting{padding:4px 16px}.earnings-history>li{gap:8px}.earnings-history-value{align-items:flex-end;flex-direction:column;gap:4px}}
 @media(max-width:800px){.schedule-editor{display:flex;flex-direction:column}.schedule-week{order:1;padding:16px;width:100%}.schedule-config{order:2;position:static;padding:16px;width:100%}.schedule-week-heading{align-items:stretch;flex-direction:column}.schedule-week-heading .field{width:100%}.availability-calendar-scroll{display:none}.availability-workspace{display:block}.availability-interval-editor{position:fixed;left:12px;right:12px;top:auto;bottom:max(12px,env(safe-area-inset-bottom));z-index:75;width:auto;max-height:min(55vh,460px);overflow:auto;box-shadow:0 12px 40px #182b2a35}.schedule-accessible-times{border-top:1px solid var(--border-default,#d7e2dc);padding-top:8px}.schedule-accessible-times:not([open]) .schedule-day-picker{display:none}.schedule-accessible-times[open] .schedule-day-picker{display:grid}.schedule-accessible-times[open] .schedule-day.mobile-selected{display:grid}.schedule-week .schedule-day{display:none}.schedule-week .schedule-day.mobile-selected{display:grid}.schedule-interval{display:flex;align-items:end;gap:8px;flex-wrap:wrap}.schedule-interval .field{flex:1;min-width:130px}.schedule-week-heading select{max-width:100%}.schedule-advanced:not([open])>*:not(summary){display:none}.schedule-advanced[open]{padding-block:8px}}
 @media(min-width:801px) and (max-width:1100px){.schedule-editor{grid-template-columns:250px minmax(0,1fr);gap:12px}.schedule-config,.schedule-week{padding:16px}}
 @media(min-width:801px){.schedule-day-picker{display:none}.schedule-week .schedule-day{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid var(--border-default,#d7e2dc)}.schedule-week .schedule-day h3{margin:0;padding-top:12px}.schedule-week .schedule-intervals{align-items:flex-start}.schedule-week .schedule-interval{display:flex;flex-wrap:wrap}.schedule-week .schedule-interval .field{width:145px;min-width:145px}}

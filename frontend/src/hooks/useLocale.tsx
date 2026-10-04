@@ -6,6 +6,18 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  "Available to request": ["ለመጠየቅ ዝግጁ", "Gaafachuuf qophaaʼe"],
+  "Held until the saved review window ends or a dispute is resolved.": ["የግምገማ ጊዜው እስኪያበቃ ወይም ክርክሩ እስኪፈታ ድረስ ይጠበቃል።", "Yeroon gamaaggamaa hanga xumuramu ykn falmiin furamutti ni tura."],
+  "Reserved for open requests": ["ለክፍት ጥያቄዎች ተይዟል", "Gaaffii banaadhaaf qabame"],
+  "See what is pending, available, and reserved for payout requests.": ["የሚጠበቀውን፣ ያለውን እና ለክፍያ ጥያቄ የተያዘውን ይመልከቱ።", "Waan eeggatu, jiru fi gaaffii kaffaltiif qabame ilaali."],
+  "This request reserves the amount. It does not send money outside this demonstration.": ["ይህ ጥያቄ መጠኑን ይይዛል። ከዚህ ማሳያ ውጭ ገንዘብ አይልክም።", "Gaaffiin kun maallaqa sana ni qabata; agarsiisa kanaan ala hin ergu."],
+  "No earnings are available to request yet.": ["እስካሁን ለመጠየቅ የሚቻል ገቢ የለም።", "Ammaaf galiin gaafachuuf jiru hin jiru."],
+  "Payout request saved. No external transfer was made.": ["የክፍያ ጥያቄው ተመዝግቧል። ውጫዊ ማስተላለፍ አልተደረገም።", "Gaaffiin kaffaltii galmaaʼeera. Dabarsi alaa hin raawwatamne."],
+  Activity: ["እንቅስቃሴ", "Sochii"],
+  "Payout request": ["የክፍያ ጥያቄ", "Gaaffii kaffaltii"],
+  "Date unavailable": ["ቀኑ አልተገኘም", "Guyyaan hin jiru"],
+  "Historical balance is preserved for authorized review.": ["ያለፈው ቀሪ ሂሳብ ለተፈቀደ ግምገማ ተጠብቋል።", "Hafteen durii gamaaggama hayyamameef eegameera."],
+  "No earnings or payout activity yet.": ["እስካሁን የገቢ ወይም የክፍያ እንቅስቃሴ የለም።", "Ammaaf sochiin galii ykn kaffaltii hin jiru."],
   "Find care": ["እንክብካቤ ያግኙ", "Tajaajila barbaadi"],
   Home: ["መነሻ", "Mana"],
   Appointments: ["ቀጠሮዎች", "Beellamoota"],
