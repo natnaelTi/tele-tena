@@ -343,7 +343,7 @@ Remaining release gaps include a production-built, two-browser request-to-offer 
 
 ### Request/offer continuation evidence and current preview source (2026-10-04)
 
-The current source branch is `feat/open-requests` at `0c8900668d...` (see `git rev-parse HEAD` for the full commit). The last clean production asset package was built from `8eb632038f7b6e6c65c4a4688c8ce7af19ce3104`; it includes the policy-aware sign-in change but predates only the browser-test timing correction. A final package rebuild is required after this report commit so `release.json` identifies the exact final source.
+The current source branch is `feat/open-requests`; the final source SHA is the value in `tele_tena/public/review/release.json` after the final clean rebuild. The previous clean package was built from `8eb632038f7b6e6c65c4a4688c8ce7af19ce3104`; it included the policy-aware sign-in change and predates the later browser-test timing correction. The final clean package rebuild follows the current report commit.
 
 The built `/teletena/` preview was restarted with `TELE_TENA_TEST_SITE=tele-tena-pr2-test.localhost` and is running at `http://127.0.0.1:8017/teletena/`. It serves the isolated Frappe 16 compatibility checkout, not Vite. The invited-review policy remains configured: phone OTP and both registration paths are disabled, with email/password reviewer access available. The browser now waits for site policy before rendering the default auth method; both `browser-invited-review.cjs` and `browser-review-package.cjs` passed after this fix. The latter covered guest deep-link redirect, password sign-in, protected detail reload, sign-out, responsive detail capture, `/teletena/` PWA scope, static-only cache and offline page.
 

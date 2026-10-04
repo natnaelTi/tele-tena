@@ -1,6 +1,6 @@
 # Open patient requests and clinician offers
 
-Status: implemented in progress on `feat/open-requests`, dependent on draft PR #12. The persisted APIs and patient/clinician UI are connected. The Frappe 16 backend regression exercises two competing clinician offers, privacy, insufficient funds/retry, atomic reservation and idempotency. Production-built browser acceptance, concurrent distinct-patient slot contention, scheduler execution, live hosted presence/realtime behavior and full translation review remain outstanding. “Implemented” here does not mean release-accepted.
+Status: implemented in progress on `feat/open-requests`, dependent on draft PR #12. The persisted APIs and patient/clinician UI are connected. The Frappe 16 backend regression exercises competing offers, privacy, insufficient-funds retry, atomic reservation, idempotency and two-patient concurrent slot claims. A two-session production-built browser walkthrough reached persisted acceptance; the ad hoc runner’s final assertion was wrong, so a reusable passing browser test remains outstanding. Scheduler execution, provider-backed realtime delivery and full translation review remain outstanding. “Implemented” here does not mean release-accepted.
 
 ## Agreed product rules
 
@@ -26,7 +26,7 @@ The under-three-minute outcome needs enough currently approved, scoped, language
 
 ## Acceptance criteria
 
-- Separate patient and clinician sessions publish, notify, offer and accept a request through authenticated backend APIs and persisted records.
+- Separate patient and clinician sessions publish, notify, offer and accept a request through authenticated backend APIs and persisted records. `tests/presentation.py` passes the real backend acceptance slice; a built two-session walkthrough reached persisted acceptance, with captured states in `docs/screenshots/open-requests/`. The reusable browser assertion remains pending.
 - Patient sees only eligible offers; clinicians see only their own offers and only the authorized request disclosure. Non-selected and unrelated accounts cannot retrieve the request, offer, patient identity, appointment or notes.
 - Two competing clinician offers remain mutually private; a losing offer is superseded on match without exposing the winner's price.
 - Immediate presence expires server-side; pausing, disapproval, scope changes, language/format mismatch, offer expiry and slot conflict prevent acceptance.
