@@ -12,14 +12,26 @@ const base = 'http://127.0.0.1:8017';
 
 async function signIn(page, user, password) {
   await page.goto(base + '/teletena/sign-in');
-  const emailAlternative = page.getByRole('button', { name: 'Use email instead', exact: true });
-  if (await emailAlternative.count()) await emailAlternative.click();
-  const passwordAlternative = page.getByRole('button', { name: 'Use password instead', exact: true });
-  if (await passwordAlternative.count()) await passwordAlternative.click();
+  // Wait for the capability request to select the site's actual login route.
+  // A count() taken while React is still resolving capabilities can be zero
+  // even though invited-review mode will render the phone-first entry next.
+  await page.getByLabel('Phone number', { exact: true }).or(
+    page.getByLabel('Email', { exact: true })
+  ).waitFor();
+  await chooseEmailPassword(page);
   await page.getByLabel('Email', { exact: true }).fill(user);
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await page.getByRole('button', { name: 'Sign out', exact: true }).waitFor();
+}
+
+async function chooseEmailPassword(page) {
+  const emailAlternative = page.getByRole('button', { name: 'Use email instead', exact: true });
+  if (await emailAlternative.count()) await emailAlternative.click();
+  await page.getByLabel('Email', { exact: true }).waitFor();
+  const passwordAlternative = page.getByRole('button', { name: 'Use password instead', exact: true });
+  if (await passwordAlternative.count()) await passwordAlternative.click();
+  await page.getByLabel('Password', { exact: true }).waitFor();
 }
 
 (async () => {
@@ -85,7 +97,10 @@ async function signIn(page, user, password) {
     await page.getByRole('button', { name: 'Sign out', exact: true }).click();
     await logoutResponse;
     await page.goto(base + sharedPath);
-    await page.getByLabel('Email', { exact: true }).waitFor();
+    await page.getByLabel('Phone number', { exact: true }).or(
+      page.getByLabel('Email', { exact: true })
+    ).waitFor();
+    await chooseEmailPassword(page);
     await page.getByLabel('Email', { exact: true }).fill(browserFixture.patient);
     await page.getByLabel('Password', { exact: true }).fill(browserFixture.password);
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
