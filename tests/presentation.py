@@ -166,6 +166,71 @@ class Presentation(unittest.TestCase):
                                      ('open-request:' + req_id,)).n, 1)
         self.assertGreaterEqual(journey.wallet()['reserved'], wallet_before['reserved'] + 1)
 
+    def test_immediate_request_matches_continuous_time_between_booking_grid_points(self):
+        """Fresh presence plus continuous time must not require a 15-minute grid start."""
+        from zoneinfo import ZoneInfo
+        offering = fixtures.Integration.offers['c1']
+        service = fixtures.PREFIX
+        zone = ZoneInfo('Africa/Addis_Ababa')
+        local_day = datetime.now(zone).date() + timedelta(days=2)
+        local_now = datetime.combine(local_day, datetime.min.time().replace(hour=10, minute=5), zone)
+        current = local_now.astimezone(timezone.utc).replace(tzinfo=None)
+        interval_start = '10:00'
+        interval_end = '10:40'
+        today = local_day
+
+        fixtures.login('c1')
+        journey.save_profile('clinician', 'Synthetic immediate clinician', 1, languages=['en'])
+        schedule = dict(offering=offering, schedule_name='Immediate continuous-time regression',
+            timezone_name='Africa/Addis_Ababa', consultation_format='video',
+            confirmation_mode='automatic', minimum_notice_minutes=60, horizon_days=30,
+            buffer_before=0, buffer_after=0,
+            intervals=[{'weekday': today.weekday(), 'start': interval_start,
+                        'end': interval_end}], exceptions=[], status='Published')
+        scheduling.save_schedule(**schedule)
+        with patch.object(open_requests, 'now', return_value=current):
+            ready = open_requests.set_request_presence(True)
+            self.assertTrue(ready['ready'])
+            fixtures.login('p1')
+            immediate = open_requests.publish_request(
+                service=service, request_text='Synthetic immediate request for the grid-boundary regression.',
+                urgency='immediate', language='en', consultation_format='video',
+                sharing={'name': False, 'history': False}, retry_key='immediate-grid-' + secrets.token_hex(8),
+                timezone_name='Africa/Addis_Ababa')
+            self.assertGreaterEqual(immediate['eligible_supply'], 1)
+            self.assertGreaterEqual(immediate['notified'], 1)
+        persisted = journey.one('SELECT * FROM tt_open_request WHERE id=%s', (immediate['id'],))
+        schedule_row = scheduling._schedule_for(offering)
+        offer_row = journey.one('SELECT * FROM tt_offering WHERE id=%s', (offering,))
+        appointment_window = open_requests._has_slot(
+            frappe._dict(offering=offering, clinician=fixtures.USERS['c1']), persisted)
+        self.assertTrue(appointment_window)
+
+        # The old direct-booking grid starts at the interval's opening and advances
+        # in 15-minute increments; none of those generated starts belongs to this
+        # request window even though a full continuous session fits.
+        grid = scheduling._slots_for_day(schedule_row, offer_row, today, [], [],
+                                         minimum_notice_override=0)
+        self.assertFalse(any(persisted.earliest_start <= slot[0] <= persisted.latest_start
+                             for slot in grid))
+        start = scheduling.immediate_start(schedule_row, offer_row, fixtures.USERS['c1'],
+            fixtures.USERS['p1'], persisted.earliest_start, persisted.latest_start)
+        self.assertIsNotNone(start)
+        fixtures.login('c1')
+        self.assertTrue(any(item.id == immediate['id'] for item in open_requests.clinician_requests()))
+        with patch.object(open_requests, 'now', return_value=current):
+            proposed = open_requests.submit_offer(immediate['id'], offering,
+                start.isoformat(timespec='seconds') + 'Z')
+        self.assertEqual(proposed['state'], 'Active')
+        fixtures.login('p1')
+        journey.simulated_deposit(100000, 'immediate-grid-fund-' + secrets.token_hex(8))
+        patient_request = next(item for item in open_requests.my_requests() if item.id == immediate['id'])
+        accepted = open_requests.respond_offer(immediate['id'], proposed['id'], 'accept', None,
+                                               patient_request.disclosure_snapshot)
+        self.assertEqual(accepted['state'], 'Matched')
+        self.assertEqual(journey.one('SELECT state FROM tt_open_request WHERE id=%s',
+                                     (immediate['id'],)).state, 'Matched')
+
     def test_two_patients_cannot_claim_one_offer_slot_concurrently(self):
         offering = fixtures.Integration.offers['c1']
         service = fixtures.PREFIX

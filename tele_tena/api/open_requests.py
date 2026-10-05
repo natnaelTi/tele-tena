@@ -87,13 +87,16 @@ def _eligible(request, exclude_delivered=True, limit=None):
 
 
 def _has_slot(candidate, request):
-    """Check the request range with the same server slot generator as booking."""
+    """Check the request range against generated or continuous immediate time."""
     from tele_tena.api import scheduling
     from zoneinfo import ZoneInfo
     schedule = scheduling._schedule_for(candidate.offering)
     if not schedule or schedule.status != 'Published':
         return False
     offer = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (candidate.offering,))
+    if request.urgency == 'immediate':
+        return scheduling.immediate_start(schedule, offer, candidate.clinician, request.patient,
+                                          request.earliest_start, request.latest_start) is not None
     zone = ZoneInfo(schedule.timezone)
     first_day = request.earliest_start.replace(tzinfo=timezone.utc).astimezone(zone).date()
     last_day = request.latest_start.replace(tzinfo=timezone.utc).astimezone(zone).date()
@@ -111,10 +114,8 @@ def _has_slot(candidate, request):
          request.earliest_start - timedelta(days=1)))
     day = first_day
     while day <= last_day:
-        immediate = request.urgency == 'immediate'
         for start_at, _end_at, _local in scheduling._slots_for_day(
-                schedule, offer, day, booked, patient_booked,
-                minimum_notice_override=0 if immediate else None):
+                schedule, offer, day, booked, patient_booked):
             if request.earliest_start <= start_at <= request.latest_start:
                 return True
         day += timedelta(days=1)
@@ -323,6 +324,25 @@ def clinician_requests():
         ORDER BY r.urgency='immediate' DESC,rr.notified_at LIMIT 30''', (clinician,))
     for req in result:
         req.disclosure_snapshot = json.loads(req.disclosure_snapshot)
+        req.suggested_start = None
+        if req.urgency == 'immediate':
+            offerings = rows('''SELECT o.id FROM tt_offering o
+                JOIN `tabTele Tena Service Scope` sc ON sc.clinician=o.clinician
+                    AND sc.service=o.service AND sc.status='Approved'
+                JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
+                WHERE o.clinician=%s AND o.service=%s AND o.active=1
+                    AND s.consultation_format=%s ORDER BY o.id''',
+                (clinician, req.service, req.consultation_format))
+            from tele_tena.api import scheduling
+            for offering_row in offerings:
+                schedule = scheduling._schedule_for(offering_row.id)
+                offer = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (offering_row.id,))
+                feasible = scheduling.immediate_start(schedule, offer, clinician, req.patient,
+                    req.earliest_start, req.latest_start)
+                if feasible:
+                    req.suggested_start = feasible.isoformat(timespec='seconds') + 'Z'
+                    req.suggested_timezone = schedule.timezone
+                    break
         for field in ('earliest_start','latest_start','expires_at','notified_at','own_offer_start','own_offer_until'):
             if req.get(field):
                 req[field] = req[field].isoformat() + 'Z'
@@ -384,7 +404,9 @@ def submit_offer(request_id, offering, start, price_minor=None):
         fail('This request has reached its response limit.', 'request_offer_limit')
     from tele_tena.api import scheduling
     scheduling.validate_slot(offer, start_at, req.patient, lock=True,
-                             immediate_ready=req.urgency == 'immediate')
+                             immediate_ready=req.urgency == 'immediate',
+                             immediate_window=(req.earliest_start, req.latest_start)
+                             if req.urgency == 'immediate' else None)
     offer_id = str(uuid.uuid4())
     valid_minutes = int(frappe.conf.get('tele_tena_offer_expiry_minutes', DEFAULT_OFFER_MINUTES))
     valid_until = min(req.expires_at, now() + timedelta(minutes=max(2, min(60, valid_minutes))))
@@ -437,7 +459,9 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
     off = one('SELECT * FROM tt_offering WHERE id=%s AND clinician=%s AND active=1 FOR UPDATE',
               (item.offering, item.clinician))
     schedule = scheduling.validate_slot(off, item.start, patient, lock=True,
-                                        immediate_ready=req.urgency == 'immediate')
+                                        immediate_ready=req.urgency == 'immediate',
+                                        immediate_window=(req.earliest_start, req.latest_start)
+                                        if req.urgency == 'immediate' else None)
     if not schedule:
         fail('That time is no longer available. Choose another offer.', 'appointment_conflict')
     if int(off.minutes) != int(item.duration_minutes) or schedule.consultation_format != item.consultation_format:

@@ -312,7 +312,87 @@ def _schedule_for(offering, lock=False):
                (offering,)) if rows('SELECT id FROM tt_schedule WHERE offering=%s', (offering,)) else None
 
 
-def validate_slot(offer, start, patient, lock=True, immediate_ready=False):
+def _minute_ceiling(value):
+    if value.second or value.microsecond:
+        return value.replace(second=0, microsecond=0) + timedelta(minutes=1)
+    return value
+
+
+def immediate_start(schedule, offer, clinician, patient, earliest_start, latest_start,
+                    booked=None, patient_booked=None, preferred_start=None):
+    """Find a feasible continuous start for a fresh immediate request.
+
+    Immediate requests are not constrained to the pre-generated 15-minute
+    direct-booking grid. Their allowed window is supplied by the request; the
+    clinician's explicit fresh presence authorizes bypassing scheduled notice.
+    The entire session and both sides' buffers must fit before a start is returned.
+    """
+    if not schedule or schedule.status != 'Published' or not offer:
+        return None
+    earliest_start = earliest_start.replace(tzinfo=None)
+    latest_start = latest_start.replace(tzinfo=None)
+    if preferred_start is not None:
+        starts = (preferred_start.replace(tzinfo=None),)
+    else:
+        cursor = _minute_ceiling(earliest_start)
+        # The service policy bounds request windows to at most 60 minutes.
+        values = []
+        while cursor <= latest_start:
+            values.append(cursor)
+            cursor += timedelta(minutes=1)
+        starts = values
+    try:
+        zone = ZoneInfo(schedule.timezone)
+    except (ZoneInfoNotFoundError, ValueError):
+        return None
+    if booked is None:
+        booked = rows('''SELECT start,end,buffer_before,buffer_after FROM tt_appointment
+            WHERE clinician=%s AND state IN ('Booked','PendingConfirmation')
+            AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6))
+            AND start<%s AND end>%s''',
+            (clinician, latest_start + timedelta(days=1), earliest_start - timedelta(days=1)))
+    if patient_booked is None:
+        patient_booked = rows('''SELECT start,end FROM tt_appointment WHERE patient=%s
+            AND state IN ('Booked','PendingConfirmation')
+            AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6))
+            AND start<%s AND end>%s''',
+            (patient, latest_start + timedelta(days=1), earliest_start - timedelta(days=1)))
+    duration = timedelta(minutes=int(offer.minutes))
+    horizon_end = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=int(schedule.horizon_days))
+    day_ranges = {}
+    for candidate in starts:
+        if candidate < earliest_start or candidate > latest_start or candidate <= datetime.now(timezone.utc).replace(tzinfo=None):
+            continue
+        end = candidate + duration
+        if candidate > horizon_end:
+            continue
+        local_start = candidate.replace(tzinfo=timezone.utc).astimezone(zone)
+        local_end = end.replace(tzinfo=timezone.utc).astimezone(zone)
+        day = local_start.date()
+        if local_end.date() != day or local_start.utcoffset() != local_end.utcoffset():
+            continue
+        if day not in day_ranges:
+            day_ranges[day] = _ranges_for_day(schedule, day)
+        intervals, breaks = day_ranges[day]
+        start_wall = local_start.replace(tzinfo=None).time()
+        end_wall = local_end.replace(tzinfo=None).time()
+        if _valid_local(local_start.replace(tzinfo=None), zone) is None:
+            continue
+        if not any(start_wall >= interval_start and end_wall <= interval_end
+                   for interval_start, interval_end in intervals):
+            continue
+        if any(start_wall < break_end and break_start < end_wall for break_start, break_end in breaks):
+            continue
+        if any(_blocked(row, candidate, end, int(schedule.buffer_before), int(schedule.buffer_after))
+               for row in booked):
+            continue
+        if any(row.start < end and row.end > candidate for row in patient_booked):
+            continue
+        return candidate
+    return None
+
+
+def validate_slot(offer, start, patient, lock=True, immediate_ready=False, immediate_window=None):
     """Recompute an exact offered slot while the booking gate/clinician are locked."""
     schedule = _schedule_for(offer.id, lock)
     if schedule:
@@ -332,9 +412,13 @@ def validate_slot(offer, start, patient, lock=True, immediate_ready=False):
             AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6))
             AND start<%s AND end>%s''',
             (patient, start + timedelta(days=1), start - timedelta(days=1)))
-        valid = _slots_for_day(schedule, offer, day, booked, patient_booked,
-                               minimum_notice_override=0 if immediate_ready else None)
-        match = next((slot for slot in valid if slot[0] == start), None)
+        if immediate_ready:
+            earliest, latest = immediate_window or (start, start)
+            match = immediate_start(schedule, offer, offer.clinician, patient, earliest, latest,
+                                    booked, patient_booked, preferred_start=start)
+        else:
+            valid = _slots_for_day(schedule, offer, day, booked, patient_booked)
+            match = next((slot[0] for slot in valid if slot[0] == start), None)
         if not match:
             fail('That time is no longer available. Choose another slot.', 'slot_unavailable')
         return schedule

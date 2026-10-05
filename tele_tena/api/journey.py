@@ -472,6 +472,7 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     immediate_request = False
     if custom_offer_id:
         quoted = one("""SELECT ro.price_minor,ro.offering,ro.clinician,r.patient,r.state,r.urgency,
+                r.earliest_start,r.latest_start,
                 ro.state offer_state,ro.valid_until
             FROM tt_request_offer ro JOIN tt_open_request r ON r.id=ro.request_id
             WHERE ro.id=%s AND r.patient=%s AND r.state='Open' AND ro.state='Active' FOR UPDATE""",
@@ -492,7 +493,9 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         fail('Appointment must be in the future', 'future_required')
     from tele_tena.api import scheduling
     schedule = scheduling.validate_slot(o, start, p.user, lock=True,
-                                        immediate_ready=immediate_request)
+                                        immediate_ready=immediate_request,
+                                        immediate_window=(quoted.earliest_start, quoted.latest_start)
+                                        if immediate_request else None)
     schedule_timezone = schedule.timezone if schedule else scheduling._zone(booked_timezone).key
     before = int(schedule.buffer_before) if schedule else 0
     after = int(schedule.buffer_after) if schedule else 0
