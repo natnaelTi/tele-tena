@@ -1,0 +1,106 @@
+{
+  "doctype": "DocType",
+  "name": "Tele Tena Vetting Assessment",
+  "module": "Tele Tena",
+  "fields": [
+    {
+      "fieldname": "scope_application",
+      "label": "Scope application",
+      "fieldtype": "Link",
+      "options": "Tele Tena Vetting Scope Application",
+      "reqd": 1
+    },
+    {
+      "fieldname": "reviewer",
+      "label": "Reviewer",
+      "fieldtype": "Link",
+      "options": "User",
+      "reqd": 1
+    },
+    {
+      "fieldname": "identity_reviewed",
+      "label": "Identity evidence reviewed",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "credential_verified",
+      "label": "Required credential independently verified",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "qualification_relevant",
+      "label": "Qualification relevant to requested scope",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "experience_adequate",
+      "label": "Scope-relevant experience assessed",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "approach_evidence_reviewed",
+      "label": "Approach evidence reviewed",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "adult_scope_appropriate",
+      "label": "Adult population scope appropriate",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "interview_completed",
+      "label": "Structured interview or assessment completed",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "decision",
+      "label": "Decision",
+      "fieldtype": "Select",
+      "options": "Clarification\nApproved\nRejected\nSuspended\nExpired",
+      "reqd": 1
+    },
+    {
+      "fieldname": "findings",
+      "label": "Structured findings and rationale",
+      "fieldtype": "Small Text",
+      "reqd": 1
+    },
+    {
+      "fieldname": "restrictions",
+      "label": "Restrictions",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "evidence_revision",
+      "label": "Evidence revision reviewed",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "rubric_version",
+      "label": "Rubric version",
+      "fieldtype": "Data",
+      "default": "proposed-1.0",
+      "read_only": 1
+    },
+    {
+      "fieldname": "decided_at",
+      "label": "Recorded at",
+      "fieldtype": "Datetime",
+      "read_only": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "Tele Tena Approver",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    }
+  ],
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "allow_rename": 0,
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "autoname": "hash"
+}

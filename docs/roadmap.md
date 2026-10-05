@@ -6,7 +6,7 @@ This roadmap reconciles the agreed product contract with the current delivery tr
 
 1. Establish safe accounts, adult patient onboarding, manually approved clinician applications and individually approved service scopes.
 2. Provide direct discovery and booking, immutable disclosure and policy snapshots, transactional simulated patient reservations, explicit consultation documentation, and the demonstration earnings subledger.
-3. Provide private patient requests and clinician offers. Immediate requests require fresh clinician presence; scheduled requests seek future appointments. Eligibility is deterministic and offers are patient/author scoped. This slice is on `feat/open-requests` and remains under acceptance review; it does not promise a three-minute match.
+3. Provide private patient requests and clinician offers. Immediate requests require fresh clinician presence and an explicitly enabled service policy; scheduled requests seek future appointments. The current dependent implementation passed a packaged scheduled request→offer→acceptance journey and its Frappe 16 regressions on 2026-10-05, but remains under broader acceptance review and does not promise a three-minute match.
 4. Complete route-by-route responsive design and browser acceptance, including recurring availability, account/payment summaries, call states and role tours.
 5. Close remaining demonstration gaps: clinician records/documentation polish, consent-aware couples participation, ratings based on real completed feedback, cancellation/rescheduling/no-show workflows, and authorized extension rules.
 6. Establish pilot operations and safety policies with the clinician/operator before exposing a real pilot. Real payment custody, ERPNext accounting, settlement, credential verification, emergency response, SMS delivery confirmation and native translation approval remain external readiness work.
@@ -24,3 +24,19 @@ This roadmap reconciles the agreed product contract with the current delivery tr
 ## Explicitly outside the current implementation
 
 Clinic membership/workspaces and referral attribution, natural-language clinical matching or relevance feedback, ratings, couples consent, mutual rescheduling, no-show workflows, email summary delivery, real money movement, real credential verification and emergency escalation are not represented as working features. See `mvp-delivery-tracker.md` for current status and evidence.
+
+## Current vetting and routing checkpoint (2026-10)
+
+The dependent `feat/vetting-catalog-routing` work adds native catalog records,
+an explicitly inactive sourced catalog proposal, a human-reviewed per-scope
+application/decision path, readiness reason codes, scope revalidation at offer
+and acceptance, continuous immediate-start selection, and bounded progressive
+private notification waves. Existing legacy review services remain separately
+marked and are never silently promoted into the public catalog. This does not
+complete a clinical taxonomy or credential-verification workflow. The proposed
+rubric is not an agreed rubric and needs medical-lead approval; independent
+credential verification, affiliations, evidence-by-scope, appeals, expiry and
+reverification UI, full jurisdiction/accessibility checks, reliability/experience
+ranking, patient feedback, and native catalog review remain pending. See
+`vetting-routing-verification.md` for local failure evidence and verification
+boundaries.

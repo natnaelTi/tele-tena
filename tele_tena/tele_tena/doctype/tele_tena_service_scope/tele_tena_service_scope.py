@@ -27,6 +27,17 @@ class TeleTenaServiceScope(Document):
             approved(self.clinician, True)
             if not frappe.db.get_value('Tele Tena Service', self.service, 'active'):
                 frappe.throw('Service is inactive')
+            definition = frappe.db.get_value('Tele Tena Service', self.service,
+                ['vetting_required', 'catalog_status', 'clinical_review_status'], as_dict=True)
+            if definition.vetting_required:
+                if not getattr(frappe.local, 'tele_tena_vetting_decision', False):
+                    frappe.throw('This scope must be approved through its structured assessment', frappe.PermissionError)
+                vetted = frappe.db.sql("""SELECT a.name FROM `tabTele Tena Vetting Scope Application` a
+                    JOIN `tabTele Tena Vetting Assessment` v ON v.scope_application=a.name
+                    WHERE a.clinician=%s AND a.service=%s AND a.status='Approved' AND v.decision='Approved'
+                    ORDER BY v.creation DESC LIMIT 1""", (self.clinician, self.service))
+                if definition.catalog_status != 'Active' or definition.clinical_review_status != 'Approved' or not vetted:
+                    frappe.throw('Required clinical catalog and individual scope review is incomplete')
         self.reviewed_by = frappe.session.user
         self.reviewed_at = now_datetime()
 

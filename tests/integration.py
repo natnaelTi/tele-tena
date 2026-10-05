@@ -56,6 +56,11 @@ class Integration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         connect()
+        cls._original_enqueue = frappe.enqueue
+        # Regression fixtures must not fill a retained site queue. Worker
+        # behavior has separate controlled checks; never drain an old queue as
+        # a side effect of an API test run.
+        frappe.enqueue = lambda *args, **kwargs: None
         frappe.set_user('Administrator')
         for kind, email in USERS.items():
             role = 'Tele Tena ' + ('Patient' if kind.startswith('p') else 'Clinician' if kind.startswith('c') else 'Approver')
@@ -129,7 +134,16 @@ class Integration(unittest.TestCase):
         for name in scope_names:
             frappe.db.sql('DELETE FROM tabVersion WHERE ref_doctype=%s AND docname=%s', ('Tele Tena Service Scope', name))
             frappe.db.sql('DELETE FROM `tabTele Tena Service Scope` WHERE name=%s', (name,))
-        for name in (PREFIX, PREFIX + '-other'):
+        vetting_names = frappe.db.sql('SELECT name FROM `tabTele Tena Vetting Scope Application` WHERE clinician IN %s',
+                                     (tuple(USERS.values()),), pluck=True)
+        if vetting_names:
+            frappe.db.sql('DELETE FROM `tabTele Tena Vetting Assessment` WHERE scope_application IN %s',
+                          (tuple(vetting_names),))
+            frappe.db.sql('DELETE FROM tabVersion WHERE ref_doctype=%s AND docname IN %s',
+                          ('Tele Tena Vetting Scope Application', tuple(vetting_names)))
+            frappe.db.sql('DELETE FROM `tabTele Tena Vetting Scope Application` WHERE name IN %s',
+                          (tuple(vetting_names),))
+        for name in (PREFIX, PREFIX + '-other', PREFIX + '-vetting-scope'):
             frappe.db.sql('DELETE FROM tabVersion WHERE ref_doctype=%s AND docname=%s', ('Tele Tena Service', name))
             frappe.db.sql('DELETE FROM `tabTele Tena Service` WHERE name=%s', (name,))
         # Explicit synthetic fixture cleanup; never touch non-test records.
@@ -160,6 +174,7 @@ class Integration(unittest.TestCase):
             FROM tt_journal_line l WHERE l.account_id=a.id),0)''')
         frappe.db.commit()
         frappe.destroy()
+        frappe.enqueue = cls._original_enqueue
 
     def tearDown(self):
         frappe.db.rollback()

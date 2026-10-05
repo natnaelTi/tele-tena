@@ -22,6 +22,7 @@ from tele_tena.api import journey
 from tele_tena.api import presentation
 from tele_tena.api import scheduling
 from tele_tena.api import open_requests
+from tele_tena.api import vetting
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -44,11 +45,25 @@ def schedule_payload(offering, day, mode='manual', zone='Africa/Addis_Ababa', ex
 class Presentation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        cls._original_enqueue = frappe.enqueue
+        # Prevent synthetic fixture setup from filling the retained isolated
+        # bench queue. Scheduler behavior is verified in a separate controlled
+        # test, never by draining pre-existing jobs.
+        frappe.enqueue = lambda *args, **kwargs: None
         fixtures.Integration.setUpClass()
+        cls._previous_immediate_policy = frappe.conf.get('tele_tena_demo_immediate_care_enabled')
+        # This isolated synthetic suite explicitly models a review site whose
+        # operator enabled immediate care for its legacy demo catalog.
+        frappe.conf.update(tele_tena_demo_immediate_care_enabled=True)
 
     @classmethod
     def tearDownClass(cls):
+        if cls._previous_immediate_policy is None:
+            frappe.conf.pop('tele_tena_demo_immediate_care_enabled', None)
+        else:
+            frappe.conf.update(tele_tena_demo_immediate_care_enabled=cls._previous_immediate_policy)
         fixtures.Integration.tearDownClass()
+        frappe.enqueue = cls._original_enqueue
 
     def setUp(self):
         fixtures.login('admin')
@@ -57,6 +72,109 @@ class Presentation(unittest.TestCase):
         fixtures.login(kind)
         journey.simulated_deposit(amount, secrets.token_hex(12))
         frappe.db.commit()
+
+    def test_structured_scope_vetting_blocks_legacy_approval_bypass(self):
+        service = fixtures.PREFIX + '-vetting-scope'
+        fixtures.login('admin')
+        frappe.get_doc({'doctype':'Tele Tena Service','service_key':service,
+            'service_label':'Synthetic vetted service','active':1,'catalog_status':'Active',
+            'category':'psychotherapy','description':'Synthetic test definition',
+            'population_restriction':'Adults only','participant_structure':'individual',
+            'clinical_review_status':'Approved','vetting_required':1,
+            'definition_version':'test-v1'}).insert()
+        fixtures.login('c1')
+        submitted = vetting.save_scope_application(service, {
+            'professional_category':'Synthetic clinician','qualification':'Synthetic qualification',
+            'issuing_institution':'Synthetic institution','registration_number':'TEST-ONLY',
+            'issuing_authority':'Synthetic issuer','jurisdiction':'Synthetic jurisdiction',
+            'experience_years':'4','approach_keys':'','population_adults':True,
+            'independent_practice':True,'relevant_training':'Synthetic training',
+            'applicant_statement':'Synthetic evidence only.'})
+        self.assertEqual(submitted['status'],'Draft')
+        app=frappe.get_doc('Tele Tena Vetting Scope Application',submitted['name'])
+        fixtures.login('c2')
+        self.assertFalse(frappe.has_permission(app.doctype,'read',doc=app,user=fixtures.USERS['c2']))
+        self.assertFalse(any(row.name==submitted['name'] for row in vetting.my_scope_applications()))
+        app.status='Approved'
+        with self.assertRaises(frappe.PermissionError): app.save()
+        fixtures.login('admin')
+        with self.assertRaises(frappe.ValidationError):
+            journey.review_service_scope(fixtures.USERS['c1'],service,'Approved')
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_doc({'doctype':'Tele Tena Vetting Assessment',
+                'scope_application':submitted['name'],'reviewer':fixtures.USERS['admin'],
+                'decision':'Approved','findings':'Synthetic direct-write attempt'}).insert()
+        fixtures.login('c1')
+        with self.assertRaises(frappe.ValidationError): journey.publish(service,50000,30)
+
+    def test_vetting_draft_clarification_resubmission_and_scope_decision(self):
+        service = fixtures.PREFIX + '-reviewed-scope'
+        fixtures.login('admin')
+        frappe.get_doc({'doctype':'Tele Tena Service','service_key':service,
+            'service_label':'Synthetic adult counseling scope','active':1,'catalog_status':'Active',
+            'category':'counseling','description':'Synthetic only; reviewer lifecycle regression.',
+            'population_restriction':'Adults only','participant_structure':'individual',
+            'clinical_review_status':'Approved','vetting_required':1,
+            'definition_version':'synthetic-v1'}).insert()
+        email = 'vetting-' + secrets.token_hex(6) + '@example.invalid'
+        fixtures.USERS['vetting'] = email
+        frappe.set_user('Administrator')
+        user = frappe.get_doc({'doctype':'User','email':email,'first_name':'Synthetic vetting applicant',
+            'user_type':'Website User','send_welcome_email':0})
+        user.insert()
+        user.add_roles('Tele Tena Clinician')
+        fixtures.login('vetting')
+        journey.save_profile('clinician','Synthetic vetting applicant',True,languages=['en'])
+        presentation.upload_resume('synthetic-vetting-evidence.pdf',
+                                   base64.b64encode(b'%PDF-1.4\nSynthetic evidence\n%%EOF').decode())
+        journey.apply('Synthetic application for vetting lifecycle test.', json.dumps([service]))
+        fixtures.login('admin')
+        journey.review(email,'Approved')
+        fixtures.login('vetting')
+        application = vetting.save_scope_application(service, {
+            'professional_category':'Synthetic counselor','qualification':'Synthetic qualification',
+            'issuing_institution':'Synthetic institution','registration_number':'TEST-ONLY',
+            'issuing_authority':'Synthetic issuer','jurisdiction':'Synthetic jurisdiction',
+            'experience_years':'4','approach_keys':'','population_adults':True,
+            'independent_practice':True,'relevant_training':'Synthetic supervised practice',
+            'applicant_statement':'Synthetic evidence; no external credential claim.'})
+        self.assertEqual(application['status'], 'Draft')
+        application = vetting.save_scope_application(service, {
+            'professional_category':'Synthetic counselor','qualification':'Synthetic qualification',
+            'issuing_institution':'Synthetic institution','registration_number':'TEST-ONLY',
+            'issuing_authority':'Synthetic issuer','jurisdiction':'Synthetic jurisdiction',
+            'experience_years':'4','approach_keys':'','population_adults':True,
+            'independent_practice':True,'relevant_training':'Synthetic supervised practice',
+            'applicant_statement':'Synthetic evidence; no external credential claim.'}, submit=True)
+        self.assertEqual(application['status'], 'Submitted')
+        fixtures.login('admin')
+        vetting.assign_scope_reviewer(application['name'], fixtures.USERS['admin'])
+        vetting.review_scope_application(application['name'], 'Clarification', findings='Synthetic missing detail')
+        fixtures.login('vetting')
+        resubmitted = vetting.save_scope_application(service, {
+            'professional_category':'Synthetic counselor','qualification':'Synthetic qualification',
+            'issuing_institution':'Synthetic institution','registration_number':'TEST-ONLY',
+            'issuing_authority':'Synthetic issuer','jurisdiction':'Synthetic jurisdiction',
+            'experience_years':'4','approach_keys':'','population_adults':True,
+            'independent_practice':True,'relevant_training':'Synthetic supervised practice',
+            'applicant_statement':'Synthetic evidence; no external credential claim.',
+            'applicant_response':'Synthetic clarification response.'}, submit=True)
+        self.assertEqual(resubmitted['status'], 'Resubmitted')
+        fixtures.login('admin')
+        result = vetting.review_scope_application(application['name'], 'Approved',
+            identity_reviewed=True, credential_verified=True, qualification_relevant=True,
+            experience_adequate=True, approach_evidence_reviewed=True,
+            adult_scope_appropriate=True, interview_completed=True,
+            findings='Synthetic reviewer assessment; test only.')
+        self.assertEqual(result['status'], 'Approved')
+        self.assertTrue(journey.service_scope_is_current(email, service))
+        assessments = journey.rows('SELECT name FROM `tabTele Tena Vetting Assessment` WHERE scope_application=%s',
+                                   (application['name'],))
+        self.assertEqual(len(assessments), 2)
+        with self.assertRaises(frappe.PermissionError):
+            assessment = frappe.get_doc('Tele Tena Vetting Assessment', result['assessment'])
+            assessment.findings = 'Attempted overwrite'
+            assessment.save()
 
     def make_schedule(self, day=None, mode='manual', exceptions=None, offering=None):
         day = day or day_offset()
@@ -217,7 +335,19 @@ class Presentation(unittest.TestCase):
             fixtures.USERS['p1'], persisted.earliest_start, persisted.latest_start)
         self.assertIsNotNone(start)
         fixtures.login('c1')
-        self.assertTrue(any(item.id == immediate['id'] for item in open_requests.clinician_requests()))
+        with patch.dict(frappe.conf, tele_tena_demo_immediate_care_enabled=False):
+            self.assertFalse(any(item.id == immediate['id'] for item in open_requests.clinician_requests()))
+        inbox_item = next(item for item in open_requests.clinician_requests() if item.id == immediate['id'])
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(inbox_item))
+        self.assertNotIn('_routing_patient', inbox_item)
+        self.assertIsNotNone(inbox_item.suggested_start)
+        open_requests.acknowledge_inbox_fetch([immediate['id']])
+        self.assertTrue(journey.rows("SELECT id FROM tt_request_route_log WHERE request_id=%s AND clinician=%s AND event='InboxFetched'",
+                                    (immediate['id'], fixtures.USERS['c1'])))
+        with patch.dict(frappe.conf, tele_tena_demo_immediate_care_enabled=False):
+            with self.assertRaises(frappe.ValidationError):
+                open_requests.submit_offer(immediate['id'], offering,
+                    start.isoformat(timespec='seconds') + 'Z')
         with patch.object(open_requests, 'now', return_value=current):
             proposed = open_requests.submit_offer(immediate['id'], offering,
                 start.isoformat(timespec='seconds') + 'Z')
@@ -225,11 +355,40 @@ class Presentation(unittest.TestCase):
         fixtures.login('p1')
         journey.simulated_deposit(100000, 'immediate-grid-fund-' + secrets.token_hex(8))
         patient_request = next(item for item in open_requests.my_requests() if item.id == immediate['id'])
+        with patch.dict(frappe.conf, tele_tena_demo_immediate_care_enabled=False):
+            with self.assertRaises(frappe.ValidationError):
+                open_requests.respond_offer(immediate['id'], proposed['id'], 'accept', None,
+                                            patient_request.disclosure_snapshot)
         accepted = open_requests.respond_offer(immediate['id'], proposed['id'], 'accept', None,
                                                patient_request.disclosure_snapshot)
         self.assertEqual(accepted['state'], 'Matched')
         self.assertEqual(journey.one('SELECT state FROM tt_open_request WHERE id=%s',
                                      (immediate['id'],)).state, 'Matched')
+
+    def test_immediate_request_policy_is_explicit_and_site_scoped(self):
+        offering = fixtures.Integration.offers['c1']
+        self.make_schedule(offering=offering)
+        fixtures.login('c1')
+        with patch.dict(frappe.conf, tele_tena_demo_immediate_care_enabled=False):
+            with self.assertRaises(frappe.ValidationError):
+                open_requests.set_request_presence(True)
+            self.assertEqual(frappe.local.response.get('tele_tena_error'), 'immediate_policy_required')
+            fixtures.login('p1')
+            with self.assertRaises(frappe.ValidationError):
+                open_requests.publish_request(service=fixtures.PREFIX,
+                    request_text='Synthetic immediate policy test.', urgency='immediate',
+                    language='en', consultation_format='video',
+                    sharing={'name':False,'history':False}, retry_key='policy-' + secrets.token_hex(8),
+                    timezone_name='Africa/Addis_Ababa')
+            self.assertEqual(frappe.local.response.get('tele_tena_error'), 'immediate_care_unavailable')
+
+        fixtures.login('c1')
+        with patch.dict(frappe.conf, tele_tena_demo_immediate_care_enabled=True), \
+                patch.object(open_requests, '_has_immediate_capacity', return_value=False):
+            with self.assertRaises(frappe.ValidationError):
+                open_requests.set_request_presence(True)
+            self.assertEqual(frappe.local.response.get('tele_tena_error'), 'no_immediate_capacity')
+            self.assertIn('no_immediate_capacity', open_requests.request_presence()['reasons'])
 
     def test_two_patients_cannot_claim_one_offer_slot_concurrently(self):
         offering = fixtures.Integration.offers['c1']

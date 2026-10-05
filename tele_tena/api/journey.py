@@ -282,28 +282,44 @@ def save_service(service, label):
         fail('Invalid service identifier')
     if frappe.db.exists('Tele Tena Service', service):
         doc = frappe.get_doc('Tele Tena Service', service)
-        doc.service_label, doc.active = text(label, 120), 1
+        doc.service_label = text(label, 120)
         doc.save()
     else:
+        from tele_tena.review import enabled as review_enabled
+        legacy_demo = review_enabled() or frappe.local.site == 'erp.localhost'
         frappe.get_doc(dict(doctype='Tele Tena Service', service_key=service,
-                            service_label=text(label, 120), active=1)).insert()
+                            service_label=text(label, 120), active=1 if legacy_demo else 0,
+                            catalog_status='Legacy test' if legacy_demo else 'Draft',
+                            clinical_review_status='Not reviewed', vetting_required=0 if legacy_demo else 1)).insert()
     return {'saved': True}
 
 
 @command
-def review_service_scope(clinician, service, decision):
+def review_service_scope(clinician, service, decision, vetting_action=False):
     actor('Tele Tena Approver')
     if decision not in ('Approved', 'Revoked'):
         fail('Invalid service scope decision')
+    service_doc = one('SELECT vetting_required FROM `tabTele Tena Service` WHERE name=%s', (service,))
+    if decision == 'Approved' and service_doc.vetting_required and not vetting_action:
+        fail('This service requires a completed, recorded scope vetting decision.', 'scope_vetting_required')
+    if decision == 'Approved' and service_doc.vetting_required:
+        approved_application = rows("""SELECT name FROM `tabTele Tena Vetting Scope Application`
+            WHERE clinician=%s AND service=%s AND status='Approved' FOR UPDATE""", (clinician, service))
+        if not approved_application:
+            fail('Complete the human scope assessment before approval.', 'scope_vetting_required')
     from tele_tena.backoffice import scope_name
     name = scope_name(clinician, service)
-    if frappe.db.exists('Tele Tena Service Scope', name):
-        doc = frappe.get_doc('Tele Tena Service Scope', name)
-        doc.status = decision
-        doc.save()
-    else:
-        frappe.get_doc(dict(doctype='Tele Tena Service Scope', clinician=clinician,
-                            service=service, status=decision)).insert()
+    frappe.local.tele_tena_vetting_decision = bool(vetting_action)
+    try:
+        if frappe.db.exists('Tele Tena Service Scope', name):
+            doc = frappe.get_doc('Tele Tena Service Scope', name)
+            doc.status = decision
+            doc.save()
+        else:
+            frappe.get_doc(dict(doctype='Tele Tena Service Scope', clinician=clinician,
+                                service=service, status=decision)).insert()
+    finally:
+        frappe.local.tele_tena_vetting_decision = False
     return {'status': decision}
 
 
@@ -314,15 +330,60 @@ def service_scopes():
 
 
 def approved_service(clinician, service, lock=False):
-    scopes = rows("SELECT name FROM `tabTele Tena Service Scope` WHERE clinician=%s AND service=%s AND status='Approved'" + (' FOR UPDATE' if lock else ''), (clinician, service))
-    if not scopes:
+    if not service_scope_is_current(clinician, service, lock=lock):
+        definitions = rows('''SELECT active,catalog_status,clinical_review_status FROM `tabTele Tena Service`
+            WHERE name=%s''', (service,))
+        if not definitions:
+            fail('This service is not currently available.', 'service_definition_unavailable')
+        definition = definitions[0]
+        if not definition.active or definition.catalog_status not in ('Active', 'Legacy test'):
+            fail('This service is not currently available.', 'service_definition_unavailable')
+        if definition.clinical_review_status != 'Approved' and definition.catalog_status == 'Active':
+            fail('This service definition has not completed clinical review.', 'catalog_not_approved')
         fail('Clinician is not approved for this service', 'service_scope_required')
+
+
+def service_scope_is_current(clinician, service, lock=False):
+    """Fail-closed current service permission used by discovery and commands."""
+    suffix = ' FOR UPDATE' if lock else ''
+    definitions = rows('''SELECT active,catalog_status,vetting_required,clinical_review_status
+        FROM `tabTele Tena Service` WHERE name=%s''', (service,))
+    if not definitions:
+        return False
+    definition = definitions[0]
+    if not definition or not definition.active:
+        return False
+    if definition.catalog_status == 'Legacy test':
+        from tele_tena.review import enabled as review_enabled
+        if not (review_enabled() or frappe.local.site == 'erp.localhost'):
+            return False
+    elif definition.catalog_status != 'Active':
+        return False
+    if definition.vetting_required and definition.clinical_review_status != 'Approved':
+        return False
+    scope = rows("SELECT name FROM `tabTele Tena Service Scope` WHERE clinician=%s AND service=%s AND status='Approved'" + suffix,
+                 (clinician, service))
+    if not scope:
+        return False
+    if not definition.vetting_required:
+        return True
+    current = rows('''SELECT a.name FROM `tabTele Tena Vetting Scope Application` a
+        JOIN `tabTele Tena Vetting Assessment` v ON v.scope_application=a.name
+        WHERE a.clinician=%s AND a.service=%s AND a.status='Approved'
+          AND v.decision='Approved'
+          AND (a.credential_expiry IS NULL OR a.credential_expiry >= CURDATE())
+        ORDER BY v.creation DESC LIMIT 1''', (clinician, service))
+    return bool(current)
 
 
 @query()
 def services():
     actor()
-    return rows('SELECT name AS id,service_label AS label FROM `tabTele Tena Service` WHERE active=1 ORDER BY service_label')
+    from tele_tena.review import enabled as review_enabled
+    legacy_allowed = int(review_enabled() or frappe.local.site == 'erp.localhost')
+    return rows('''SELECT name AS id,service_label AS label FROM `tabTele Tena Service`
+        WHERE active=1 AND (catalog_status='Active' OR (catalog_status='Legacy test' AND %s=1))
+        ORDER BY service_label''', (legacy_allowed,))
 
 
 @command
@@ -356,7 +417,9 @@ def add_availability(start, end):
 @query()
 def discover(service=None):
     actor('Tele Tena Patient')
-    return rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,o.service,s.service_label AS label,o.price,o.minutes,
+    from tele_tena.review import enabled as review_enabled
+    legacy_allowed = int(review_enabled() or frappe.local.site == 'erp.localhost')
+    results = rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,o.clinician,o.service,s.service_label AS label,o.price,o.minutes,
         sc.id AS schedule_id,sc.timezone AS schedule_timezone,sc.consultation_format
         FROM tt_offering o JOIN tt_profile p ON p.user=o.clinician
         JOIN tt_application a ON a.user=o.clinician JOIN `tabTele Tena Service` s ON s.name=o.service
@@ -365,7 +428,18 @@ def discover(service=None):
         WHERE a.status='Approved' AND o.active=1 AND s.active=1 AND u.enabled=1
         AND EXISTS (SELECT 1 FROM `tabTele Tena Service Scope` sc WHERE sc.clinician=o.clinician AND sc.service=o.service AND sc.status='Approved')
         AND EXISTS (SELECT 1 FROM `tabHas Role` r WHERE r.parent=o.clinician AND r.role='Tele Tena Clinician')
-        AND (%s IS NULL OR o.service=%s) ORDER BY s.service_label,p.display_name''', (service or None, service or None))
+        AND (s.catalog_status='Active' OR (s.catalog_status='Legacy test' AND %s=1))
+        AND (%s IS NULL OR o.service=%s) ORDER BY s.service_label,p.display_name''',
+        (legacy_allowed, service or None, service or None))
+    visible = []
+    for item in results:
+        if not service_scope_is_current(item.clinician, item.service):
+            continue
+        # The account key is needed only for the server-side eligibility
+        # filter. Never serialize an account email to patient discovery.
+        item.pop('clinician', None)
+        visible.append(item)
+    return visible
 
 
 @query()

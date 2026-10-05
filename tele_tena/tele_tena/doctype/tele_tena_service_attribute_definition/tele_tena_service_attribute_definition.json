@@ -1,0 +1,117 @@
+{
+  "doctype": "DocType",
+  "name": "Tele Tena Service Attribute Definition",
+  "module": "Tele Tena",
+  "fields": [
+    {
+      "fieldname": "service",
+      "label": "Service definition",
+      "fieldtype": "Link",
+      "options": "Tele Tena Service",
+      "reqd": 1
+    },
+    {
+      "fieldname": "definition_version",
+      "label": "Definition version",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "field_key",
+      "label": "Field key",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "label_en",
+      "label": "English label",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "label_am",
+      "label": "Amharic label",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "label_om",
+      "label": "Afaan Oromo label",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "data_type",
+      "label": "Data type",
+      "fieldtype": "Select",
+      "options": "Text\nInteger\nDate\nBoolean\nChoice",
+      "reqd": 1
+    },
+    {
+      "fieldname": "allowed_values",
+      "label": "Allowed values (one per line)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "required",
+      "label": "Required",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "minimum_value",
+      "label": "Minimum (integer only)",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "maximum_value",
+      "label": "Maximum (integer only)",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "visibility",
+      "label": "Visibility",
+      "fieldtype": "Select",
+      "options": "Public metadata\nClinician only\nPatient private\nReviewer only",
+      "reqd": 1
+    },
+    {
+      "fieldname": "sensitivity",
+      "label": "Sensitivity",
+      "fieldtype": "Select",
+      "options": "Ordinary\nSensitive\nClinical",
+      "reqd": 1
+    },
+    {
+      "fieldname": "applicability",
+      "label": "Applicability condition (controlled key)",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "filterable",
+      "label": "Usable in filters",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "matching_field",
+      "label": "Usable in matching",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "active",
+      "label": "Active",
+      "fieldtype": "Check"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "Tele Tena Approver",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    }
+  ],
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "allow_rename": 0,
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "autoname": "hash"
+}
