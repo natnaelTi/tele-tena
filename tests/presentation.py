@@ -217,7 +217,12 @@ class Presentation(unittest.TestCase):
             fixtures.USERS['p1'], persisted.earliest_start, persisted.latest_start)
         self.assertIsNotNone(start)
         fixtures.login('c1')
-        self.assertTrue(any(item.id == immediate['id'] for item in open_requests.clinician_requests()))
+        inbox_item = next(item for item in open_requests.clinician_requests() if item.id == immediate['id'])
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(inbox_item))
+        self.assertNotIn('_routing_patient', inbox_item)
+        self.assertIsNotNone(inbox_item.suggested_start)
+        self.assertTrue(journey.rows("SELECT id FROM tt_request_route_log WHERE request_id=%s AND clinician=%s AND event='InboxFetched'",
+                                    (immediate['id'], fixtures.USERS['c1'])))
         with patch.object(open_requests, 'now', return_value=current):
             proposed = open_requests.submit_offer(immediate['id'], offering,
                 start.isoformat(timespec='seconds') + 'Z')

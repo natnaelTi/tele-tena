@@ -15,6 +15,7 @@ DEFAULT_REQUEST_MINUTES = 15
 DEFAULT_OFFER_MINUTES = 15
 MAX_RECIPIENTS = 10
 MAX_OFFERS = 10
+ROUTING_WAVES = ((0, 3), (30, 3), (75, 4))
 
 
 def now():
@@ -32,6 +33,25 @@ def metric(request_id, event, eligible_supply=None, external_event_id=None, occu
         (id,request_id,event,occurred_at,eligible_supply,external_event_id)
         VALUES (%s,%s,%s,COALESCE(%s,UTC_TIMESTAMP(6)),%s,%s)''',
         (str(uuid.uuid4()), request_id, event, occurred_at, eligible_supply, external_event_id))
+
+
+def route_event(request_id, clinician, wave, event, reason_code=None):
+    frappe.db.sql('''INSERT INTO tt_request_route_log
+        (id,request_id,clinician,wave,event,reason_code,created_at)
+        VALUES (%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))''',
+        (str(uuid.uuid4()), request_id, clinician, wave, event, reason_code))
+
+
+def wave_policy():
+    """Bound per-site demo tuning; no request can exceed the hard total cap."""
+    delays = (0, int(frappe.conf.get('tele_tena_request_wave_2_seconds', 30)),
+              int(frappe.conf.get('tele_tena_request_wave_3_seconds', 75)))
+    sizes = (int(frappe.conf.get('tele_tena_request_wave_1_size', 3)),
+             int(frappe.conf.get('tele_tena_request_wave_2_size', 3)),
+             int(frappe.conf.get('tele_tena_request_wave_3_size', 4)))
+    delays = (0, max(10, min(180, delays[1])), max(delays[1] + 10, min(240, delays[2])))
+    sizes = tuple(max(1, min(MAX_RECIPIENTS, size)) for size in sizes)
+    return tuple(zip(delays, sizes))
 
 
 def clinician_languages(user):
@@ -62,7 +82,7 @@ def _eligible(request, exclude_delivered=True, limit=None):
         AND (%s=0 OR (pr.ready=1 AND pr.expires_at>UTC_TIMESTAMP(6)))
         AND (%s=0 OR NOT EXISTS (SELECT 1 FROM tt_request_recipient rr
             WHERE rr.request_id=%s AND rr.clinician=o.clinician))
-        ORDER BY presence_until DESC,o.clinician,o.id''',
+        ORDER BY o.clinician,o.id''',
         (request.service, request.consultation_format, 1 if presence else 0,
          1 if exclude_delivered else 0, request.id))
     result = []
@@ -78,25 +98,32 @@ def _eligible(request, exclude_delivered=True, limit=None):
                         (item.clinician,))
             if ready.expires_at <= now():
                 continue
-        if not _has_slot(item, request):
+        feasible = _feasible_start(item, request)
+        if not feasible:
             continue
+        item.feasible_start = feasible
+        item.exposure_count = int(one('''SELECT COUNT(*) n FROM tt_request_recipient rr
+            JOIN tt_open_request prior ON prior.id=rr.request_id
+            WHERE rr.clinician=%s AND rr.enqueued_at>=UTC_TIMESTAMP(6)-INTERVAL 30 DAY''',
+            (item.clinician,)).n)
         result.append(item)
-        if limit is not None and len(result) >= limit:
-            break
+    result.sort(key=lambda item: (item.feasible_start, item.exposure_count, item.clinician, item.offering))
+    if limit is not None:
+        result = result[:limit]
     return result
 
 
-def _has_slot(candidate, request):
+def _feasible_start(candidate, request):
     """Check the request range against generated or continuous immediate time."""
     from tele_tena.api import scheduling
     from zoneinfo import ZoneInfo
     schedule = scheduling._schedule_for(candidate.offering)
     if not schedule or schedule.status != 'Published':
-        return False
+        return None
     offer = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (candidate.offering,))
     if request.urgency == 'immediate':
         return scheduling.immediate_start(schedule, offer, candidate.clinician, request.patient,
-                                          request.earliest_start, request.latest_start) is not None
+                                          request.earliest_start, request.latest_start)
     zone = ZoneInfo(schedule.timezone)
     first_day = request.earliest_start.replace(tzinfo=timezone.utc).astimezone(zone).date()
     last_day = request.latest_start.replace(tzinfo=timezone.utc).astimezone(zone).date()
@@ -117,32 +144,55 @@ def _has_slot(candidate, request):
         for start_at, _end_at, _local in scheduling._slots_for_day(
                 schedule, offer, day, booked, patient_booked):
             if request.earliest_start <= start_at <= request.latest_start:
-                return True
+                return start_at
         day += timedelta(days=1)
-    return False
+    return None
 
 
-def _deliver(request, candidates=None):
+def _has_slot(candidate, request):
+    return _feasible_start(candidate, request) is not None
+
+
+def _deliver(request, candidates=None, wave=None):
     delivered = int(one('SELECT COUNT(*) n FROM tt_request_recipient WHERE request_id=%s',
                         (request.id,)).n)
     remaining = MAX_RECIPIENTS - delivered
     if remaining <= 0:
         return 0, delivered
-    candidates = candidates if candidates is not None else _eligible(request, limit=remaining)
+    wave = int(wave or request.current_wave or 1)
+    if wave not in (1, 2, 3):
+        return 0, delivered
+    wave_size = wave_policy()[wave - 1][1]
+    wave_already = int(one('SELECT COUNT(*) n FROM tt_request_recipient WHERE request_id=%s AND wave=%s',
+                           (request.id, wave)).n)
+    wave_remaining = max(0, wave_size - wave_already)
+    if wave_remaining <= 0:
+        return 0, delivered
+    candidates = candidates if candidates is not None else _eligible(request)
+    frappe.db.sql('''UPDATE tt_open_request SET
+        last_routed_at=IF(last_routed_at IS NULL OR current_wave<>%s,UTC_TIMESTAMP(6),last_routed_at),
+        current_wave=%s WHERE id=%s''', (wave, wave, request.id))
     added = 0
-    for item in candidates[:remaining]:
+    for item in candidates[:min(remaining, wave_remaining)]:
         already = rows('SELECT clinician FROM tt_request_recipient WHERE request_id=%s AND clinician=%s',
                        (request.id, item.clinician))
         if already:
             continue
         frappe.db.sql('''INSERT IGNORE INTO tt_request_recipient
-            (request_id,clinician,notified_at,delivered_round) VALUES (%s,%s,UTC_TIMESTAMP(6),1)''',
-            (request.id, item.clinician))
+            (request_id,clinician,notified_at,delivered_round,wave,enqueued_at)
+            VALUES (%s,%s,UTC_TIMESTAMP(6),%s,%s,UTC_TIMESTAMP(6))''',
+            (request.id, item.clinician, wave, wave))
         added += 1
+        route_event(request.id, item.clinician, wave, 'NotificationEnqueued')
     if added:
-        metric(request.id, 'FirstEligibleNotified' if not delivered else 'EligibleNotified', delivered + added)
+        metric(request.id, 'NoticesEnqueued', delivered + added)
+        if not request.first_notice_at:
+            metric(request.id, 'FirstNoticeEnqueued', delivered + added)
         frappe.db.sql('''UPDATE tt_open_request SET first_notice_at=COALESCE(first_notice_at,UTC_TIMESTAMP(6))
             WHERE id=%s''', (request.id,))
+    elif not delivered:
+        route_event(request.id, None, wave, 'EligibilityEvaluated', 'no_feasible_supply')
+    metric(request.id, 'RoutingWave', len(candidates))
     return added, delivered + added
 
 
@@ -249,16 +299,35 @@ def publish_request(service, request_text, urgency, language, consultation_forma
     # only the bounded first wave and expands later through the scheduler.
     candidates = _eligible(req)
     metric(req_id, 'Published', len(candidates))
-    _deliver(req, candidates)
+    notified, _total = _deliver(req, candidates, wave=1)
     return {'id': req_id, 'state': 'Open', 'expires_at': expiry.isoformat() + 'Z',
-            'eligible_supply': len(candidates), 'notified': min(len(candidates), MAX_RECIPIENTS)}
+            'eligible_supply': len(candidates), 'notified': notified, 'wave': 1}
+
+
+@journey.command
+def find_more_options(request_id):
+    """Patient explicitly expands to the next bounded, unchanged eligibility wave."""
+    patient = profile('patient', lock=True)
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    req = one("SELECT * FROM tt_open_request WHERE id=%s AND patient=%s AND state='Open' FOR UPDATE",
+              (request_id, patient.user))
+    if req.expires_at <= now():
+        fail('This request has expired. Start another request or browse clinicians.', 'request_expired')
+    if int(req.current_wave or 1) >= 3:
+        return {'state': 'Open', 'wave': int(req.current_wave or 1), 'more_available': False, 'notified': 0}
+    wave = int(req.current_wave or 1) + 1
+    candidates = _eligible(req)
+    added, delivered = _deliver(req, candidates, wave=wave)
+    route_event(req.id, None, wave, 'PatientExpandedWave', 'patient_requested_more_options')
+    return {'state': 'Open', 'wave': wave, 'eligible_supply': len(candidates),
+            'notified': added, 'delivered_total': delivered, 'more_available': wave < 3}
 
 
 @query()
 def my_requests():
     patient = profile('patient')
     requests = rows('''SELECT r.id,r.state,r.urgency,r.service,s.service_label AS category,
-        r.language,r.consultation_format,r.request_text,r.disclosure_snapshot,r.max_price_minor,
+        r.language,r.consultation_format,r.request_text,r.disclosure_snapshot,r.max_price_minor,r.current_wave,
         r.earliest_start,r.latest_start,r.timezone,r.published_at,r.expires_at,r.appointment,
         r.first_notice_at,r.first_offer_at,r.matched_at
         FROM tt_open_request r JOIN `tabTele Tena Service` s ON s.name=r.service
@@ -313,9 +382,9 @@ def clinician_profile(clinician_id):
 def clinician_requests():
     clinician = actor('Tele Tena Clinician')
     profile('clinician')
-    result = rows('''SELECT r.id,r.urgency,r.language,r.consultation_format,r.request_text,
+    result = rows('''SELECT r.id,r.service _routing_service,r.urgency,r.language,r.consultation_format,r.request_text,
         r.disclosure_snapshot,r.max_price_minor,r.earliest_start,r.latest_start,r.timezone,
-        r.expires_at,s.service_label category,rr.notified_at,own.id own_offer_id,
+        r.expires_at,r.patient _routing_patient,s.service_label category,rr.notified_at,rr.wave,own.id own_offer_id,
         own.start own_offer_start,own.price_minor own_offer_price,own.valid_until own_offer_until
         FROM tt_request_recipient rr JOIN tt_open_request r ON r.id=rr.request_id
         JOIN `tabTele Tena Service` s ON s.name=r.service
@@ -332,12 +401,12 @@ def clinician_requests():
                 JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
                 WHERE o.clinician=%s AND o.service=%s AND o.active=1
                     AND s.consultation_format=%s ORDER BY o.id''',
-                (clinician, req.service, req.consultation_format))
+                (clinician, req._routing_service, req.consultation_format))
             from tele_tena.api import scheduling
             for offering_row in offerings:
                 schedule = scheduling._schedule_for(offering_row.id)
                 offer = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (offering_row.id,))
-                feasible = scheduling.immediate_start(schedule, offer, clinician, req.patient,
+                feasible = scheduling.immediate_start(schedule, offer, clinician, req._routing_patient,
                     req.earliest_start, req.latest_start)
                 if feasible:
                     req.suggested_start = feasible.isoformat(timespec='seconds') + 'Z'
@@ -346,6 +415,16 @@ def clinician_requests():
         for field in ('earliest_start','latest_start','expires_at','notified_at','own_offer_start','own_offer_until'):
             if req.get(field):
                 req[field] = req[field].isoformat() + 'Z'
+        fetched = one('''SELECT inbox_fetched_at FROM tt_request_recipient
+            WHERE request_id=%s AND clinician=%s FOR UPDATE''', (req.id, clinician))
+        if not fetched.inbox_fetched_at:
+            frappe.db.sql('''UPDATE tt_request_recipient SET inbox_fetched_at=UTC_TIMESTAMP(6)
+                WHERE request_id=%s AND clinician=%s AND inbox_fetched_at IS NULL''', (req.id, clinician))
+            route_event(req.id, clinician, int(req.wave or 1), 'InboxFetched')
+        # The patient id is required only to evaluate schedule conflicts. Never
+        # serialize it to the clinician inbox API.
+        del req['_routing_patient']
+        del req['_routing_service']
     return result
 
 
@@ -354,7 +433,22 @@ def request_presence():
     clinician = actor('Tele Tena Clinician')
     profile('clinician')
     row = rows('SELECT ready,expires_at FROM tt_clinician_request_presence WHERE clinician=%s', (clinician,))
-    return {'ready': bool(row and row[0].ready and row[0].expires_at > now()),
+    reasons = []
+    app = rows("SELECT status FROM tt_application WHERE user=%s", (clinician,))
+    if not app or app[0].status != 'Approved':
+        reasons.append('approval_required')
+    language_set = clinician_languages(clinician)
+    if not language_set.intersection(LANGUAGES):
+        reasons.append('language_required')
+    offerings = rows('''SELECT o.id FROM tt_offering o
+        JOIN `tabTele Tena Service Scope` sc ON sc.clinician=o.clinician
+          AND sc.service=o.service AND sc.status='Approved'
+        JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
+        WHERE o.clinician=%s AND o.active=1 LIMIT 1''', (clinician,))
+    if not offerings:
+        reasons.append('published_schedule_required')
+    live = bool(row and row[0].ready and row[0].expires_at > now())
+    return {'ready': live, 'configured': not reasons, 'reasons': reasons,
             'expires_at': row[0].expires_at.isoformat() + 'Z' if row else None}
 
 
@@ -417,6 +511,7 @@ def submit_offer(request_id, offering, start, price_minor=None):
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'Active',%s,UTC_TIMESTAMP(6),%s)''',
         (offer_id, request_id, clinician, offering, start_at, offer.minutes, offer.consultation_format,
          price, source, valid_until, offer.timezone))
+    route_event(request_id, clinician, int(req.current_wave or 1), 'OfferSubmitted')
     # submit_offer holds the request row lock, so only the first accepted
     # offer submission records this milestone even under concurrent offers.
     if not req.first_offer_at:
@@ -494,6 +589,7 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
     frappe.db.sql("UPDATE tt_open_request SET state='Matched',appointment=%s,matched_at=UTC_TIMESTAMP(6) WHERE id=%s",
                   (appt, request_id))
     metric(request_id, 'AppointmentCreated')
+    route_event(request_id, item.clinician, int(req.current_wave or 1), 'OfferAccepted')
     return {'state': 'Matched', 'appointment': appt, 'simulated': True}
 
 
@@ -530,21 +626,45 @@ def withdraw_offer(offer_id):
 
 
 def dispatch_open_requests():
-    """Bounded minute-level delivery. No request body enters a notification."""
+    """Reconcile due routing waves; a minute scheduler is the retry fallback."""
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     candidates = rows("SELECT id FROM tt_open_request WHERE state='Open' AND expires_at>UTC_TIMESTAMP(6) ORDER BY published_at LIMIT 100")
+    policy = wave_policy()
     for candidate in candidates:
-        req = rows('SELECT * FROM tt_open_request WHERE id=%s', (candidate.id,))
+        req = rows("SELECT * FROM tt_open_request WHERE id=%s AND state='Open' AND expires_at>UTC_TIMESTAMP(6) FOR UPDATE",
+                   (candidate.id,))
         if req:
+            current_wave = max(1, int(req[0].current_wave or 1))
+            if current_wave >= 3:
+                continue
+            active_offer = one("SELECT COUNT(*) n FROM tt_request_offer WHERE request_id=%s AND state='Active' AND valid_until>UTC_TIMESTAMP(6)",
+                               (candidate.id,)).n
+            if active_offer:
+                continue
+            wave_elapsed = (now() - (req[0].last_routed_at or req[0].published_at)).total_seconds()
+            current_size = policy[current_wave - 1][1]
+            current_count = int(one('SELECT COUNT(*) n FROM tt_request_recipient WHERE request_id=%s AND wave=%s',
+                                    (candidate.id, current_wave)).n)
+            next_wave = current_wave
+            next_delay = policy[current_wave][0]
+            if wave_elapsed < next_delay:
+                # Re-check a partially filled wave when a clinician becomes
+                # newly eligible (for example, they just enabled presence).
+                # _deliver is recipient-deduplicated and leaves its clock intact
+                # when no new recipient is found.
+                if current_count >= current_size:
+                    continue
+            else:
+                next_wave = current_wave + 1
             try:
-                _deliver(req[0])
+                _deliver(req[0], wave=next_wave)
             except Exception:
                 frappe.log_error(message='A private request inbox delivery attempt could not be completed.',
                                  title='TeleTena request delivery failed')
 
 
 def expire_requests():
-    """Close stale requests/offers and deliver bounded inbox notifications."""
+    """Close stale requests/offers and reconcile progressive delivery waves."""
     dispatch_open_requests()
     frappe.db.sql("UPDATE tt_request_offer SET state='Expired' WHERE state='Active' AND valid_until<=UTC_TIMESTAMP(6)")
     expired = rows("SELECT id FROM tt_open_request WHERE state='Open' AND expires_at<=UTC_TIMESTAMP(6) ORDER BY expires_at LIMIT 100")

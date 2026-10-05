@@ -13,3 +13,4 @@ tele_tena.patches.v1_7_demo_subledger
 tele_tena.patches.v1_8_legacy_event_reconciliation
 tele_tena.patches.v1_9_open_requests
 tele_tena.patches.v1_10_request_public_identity
+tele_tena.patches.v1_11_progressive_routing

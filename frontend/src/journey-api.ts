@@ -62,6 +62,7 @@ export const journeyApi = {
   book: (data: Record<string, unknown>) => api('book', data, true),
   publishRequest: (data: Record<string, unknown>) => api<any>('tele_tena.api.open_requests.publish_request', data, true),
   myRequests: () => api<any[]>('tele_tena.api.open_requests.my_requests'),
+  findMoreOptions: (request_id: string) => api<any>('tele_tena.api.open_requests.find_more_options', {request_id}, true),
   cancelRequest: (request_id: string) => api<any>('tele_tena.api.open_requests.close_request', {request_id}, true),
   respondOffer: (request_id: string, offer_id: string, decision: 'accept'|'decline', sharing?:Sharing, expected_disclosure?:Disclosure) => api<any>('tele_tena.api.open_requests.respond_offer', {request_id,offer_id,decision,sharing,expected_disclosure}, true),
   requestPresence: () => api<any>('tele_tena.api.open_requests.request_presence'),

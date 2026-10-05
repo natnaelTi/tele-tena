@@ -32,6 +32,7 @@ export function PatientHome() {
   const { session } = useSession();
   const appointments = useResource(journeyApi.appointments);
   const wallet = useResource(journeyApi.wallet);
+  const requests = useResource(journeyApi.myRequests);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
   return (
@@ -61,7 +62,8 @@ export function PatientHome() {
           </Button>
         </form>
       </section>
-      <section className="request-entry"><div><h2>Want clinicians to respond with times?</h2><p>Share what you’re looking for with eligible clinicians and compare private offers.</p></div><Link className="button secondary" to="/patient/requests">Open a care request</Link></section>
+      <section className="request-entry"><div><h2>Let clinicians respond to you</h2><p>Share what support you’re looking for and compare private offers from eligible clinicians.</p></div><Link className="button secondary" to="/patient/requests" state={{requestDraft:{request_text:query}}}>Post a request</Link></section>
+      {!!requests.data?.some((item:any)=>item.state==='Open')&&<section className="active-request-summary"><div className="section-line"><h2>Active care requests</h2><Link to="/patient/requests">Review requests and offers <ArrowRight size={16}/></Link></div>{requests.data.filter((item:any)=>item.state==='Open').slice(0,3).map((item:any)=><Link className="active-request-row" key={item.id} to="/patient/requests"><span>{item.urgency==='immediate'?'As soon as possible':'Schedule for later'} · {item.category}</span><strong>{item.offers.filter((offer:any)=>offer.state==='Active').length} new offers</strong></Link>)}</section>}
       {wallet.data&&<Link to="/patient/payments" className="balance-summary"><span>Balance</span><strong>ETB {money(wallet.data.available)}</strong><small>Available · ETB {money(wallet.data.reserved)} reserved</small></Link>}
       <div className="section-line">
         <h2>Your next appointment</h2>
@@ -145,7 +147,7 @@ export function Discovery() {
           ))}
         </Select>
       </div>
-      <p className="request-entry"><span>Can’t find a suitable time? Ask eligible clinicians to make a private offer.</span> <Link to="/patient/requests">Open a care request</Link></p>
+      <section className="request-entry"><div><h2>Let clinicians respond to you</h2><p>Post for free and compare private offers without changing your filters.</p></div><Link to="/patient/requests" state={{requestDraft:{request_text:query,service_label:category}}}>Post a request</Link></section>
       <p className="supporting">
         Online sessions · Times shown in {timezone}. Language and format filters
         will appear when verified clinician details are available.
@@ -166,7 +168,7 @@ export function Discovery() {
       ) : (
         <EmptyState title="No matching services yet.">
           Try another search or return when more approved offerings are
-          available. <Link to="/patient/requests">You can also open a private request</Link> without relaxing your preferences.
+          available. <Link to="/patient/requests" state={{requestDraft:{request_text:query,service_label:category}}}>Post a private request</Link> without relaxing your preferences.
         </EmptyState>
       )}
       <p className="verification-note">

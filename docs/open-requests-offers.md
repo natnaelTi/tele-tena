@@ -1,6 +1,6 @@
 # Open patient requests and clinician offers
 
-Status: implemented in progress on `feat/open-requests`, dependent on draft PR #12. The persisted APIs and patient/clinician UI are connected. The Frappe 16 backend regression exercises competing offers, privacy, insufficient-funds retry, atomic reservation, idempotency and two-patient concurrent slot claims. A two-session production-built browser walkthrough reached persisted acceptance; the ad hoc runner’s final assertion was wrong, so a reusable passing browser test remains outstanding. Scheduler execution, provider-backed realtime delivery and full translation review remain outstanding. “Implemented” here does not mean release-accepted.
+Status: persisted request and offer APIs are on draft PR #13, dependent on draft PR #12. This continuation adds bounded progressive routing and persistent clinician presence on `feat/vetting-catalog-routing`, dependent on PR #13. Frappe 16 backend regressions cover competing offers, privacy, insufficient-funds retry, atomic reservation, idempotency, concurrent slot claims and the immediate-start grid boundary. Provider-backed realtime delivery and full translation review remain outstanding. “Implemented” here does not mean release-accepted.
 
 ## Agreed product rules
 
@@ -38,6 +38,41 @@ The under-three-minute outcome needs enough currently approved, scoped, language
 ## Unresolved product decisions
 
 The immediate-request service category taxonomy, commercial response SLA, recipient expansion cadence and production request-retention period require pilot/operator agreement. The implementation uses named, configurable demo defaults above; these must not be represented as settled commercial policies. Clinical escalation/safety policies remain outside this matching feature.
+
+## Immediate matching grid-boundary correction (2026-10-05)
+
+The reported empty clinician inbox was reproducible at the eligibility boundary:
+the matcher generated only the direct-booking 15-minute start grid and required
+one of those starts to fall inside the immediate request window. A published
+continuous interval could fit the entire session while every generated grid
+start was just outside the request window. Such a clinician was incorrectly
+excluded before recipient delivery.
+
+Immediate matching now searches minute-resolution UTC starts inside the
+server-generated immediate request window and converts each candidate through
+the schedule's IANA timezone. It requires the full fixed session to fit one
+published interval, avoids date exceptions/breaks, checks clinician and patient
+appointments plus configured pre/post buffers, and enforces the schedule horizon.
+Fresh explicit “Available for requests” presence is still required. Direct and
+scheduled bookings keep the existing 15-minute calendar grid and minimum-notice
+policy. Offer submission and acceptance revalidate the exact immediate start,
+the request window, current presence, authorization, and conflicts under the
+existing booking lock.
+
+The regression constructs an interval from 10:00–10:40, a 30-minute session,
+and an immediate range of 10:05–10:35. The old grid has no valid start inside
+that range, but a continuous 10:05 start fits; the test verifies recipient
+delivery, offer submission, funds reservation, and one matched appointment.
+
+An earlier diagnostic `NoneType.replace` came from a read-only diagnostic query
+that projected the request row without `earliest_start` and `latest_start` before
+passing it to the matcher. The stored records had both columns populated; it was
+not evidence of malformed legacy requests or database corruption.
+
+Current matching still records recipient enqueue time, not proof that a notice
+was seen. Progressive routing waves, service-catalog/vetting dimensions,
+expanded eligibility reason codes, and lifecycle-aware presence remain follow-up
+work rather than claimed complete here.
 
 ## Immediate matching grid-boundary correction (2026-10-05)
 
