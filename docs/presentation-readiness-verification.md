@@ -6,12 +6,13 @@
   not Vite).
 - Bench/site: `/home/frappe/teletena-compat/bench`,
   `tele-tena-pr2-test.localhost`.
-- Source branch and backend checkout: `feat/vetting-catalog-routing`, final
-  checkout commit `464350c60ddeb9bd58b446ecabd994e49cdb378c`; the last functional
-  code commit is `ab5ac52e9f849666a3296d2a5fdfe035428860f0`.
-- Packaged frontend `release.json` source SHA matches the final checkout commit. The
-  current web process was restarted from this compatibility checkout after the
-  asset refresh.
+- Source branch: `feat/vetting-catalog-routing`; latest frontend/product-code
+  commit `4a78f483ff4915e7a9db2744ecc27a5abc73fe46`. The exact source SHA for
+  this packaged React build is recorded in `tele_tena/public/review/release.json`.
+  The documentation changes that follow this build do not change app assets or
+  Python behavior.
+- The current web process is the isolated compatibility WSGI/Gunicorn and serves
+  the packaged React app, not Vite.
 - Isolated `bench worker --queue default,short,long` and `bench schedule` are
   running against this compatibility bench's Redis queue database 15. The old
   Redis DB 0 queue and the original development bench processes were not
@@ -28,6 +29,15 @@
   mocked-time Frappe regressions cover continuous start selection and policy
   enforcement. At this time the clinician shell reports no immediate capacity
   instead of implying ready status.
+- A packaged two-session scheduled request journey on 2026-10-05 delivered one
+  eligible request to the clinician, created a private offer, and accepted it
+  into one appointment with one reservation journal. An intentionally
+  out-of-schedule Wednesday request correctly received no recipient; the actual
+  retained recurrence is Monday/Tuesday only. Full evidence and limitations are
+  in `vetting-routing-verification.md`.
+- Patient request history is keyboard-expandable and collapsed by default. The
+  390px regression retained all 16 previous cards in that section and opened it
+  with Enter. Screenshot: `/tmp/tele-tena-vetting-review/current/patient-request-history-mobile.png`.
 - This does not validate live SMS, hosted LiveKit Cloud in this run, physical
   devices, native translation quality or Selfmade deployment.
 
@@ -361,9 +371,9 @@ Checks: `npm run build`, `npm run lint` (existing warnings),
 `node scripts/browser-authentication-flow.cjs` all passed. Packaged frontend
 source SHA: `c9f098814e7aab9e3ab5df7a19a760da6148b33b`.
 
-## Current continuation checkpoint — local open-request integration (2026-10-04)
+## Historical continuation checkpoint — local open-request integration (2026-10-04)
 
-This is the current continuation record; earlier SHA-specific sections above are historical. The integrated local branch is `feat/open-requests`, based on the PR #12 draft head and intended as a dependent review change. The request/offer code remains unmerged and has not been deployed to Selfmade.
+This records the state on 2026-10-04 and is superseded by the 2026-10-05 local continuation above and in `vetting-routing-verification.md`. The integrated local branch at that time was `feat/open-requests`, based on the PR #12 draft head. The request/offer code remains unmerged and has not been deployed to Selfmade.
 
 - Compatibility site: `tele-tena-pr2-test.localhost` on the isolated Frappe 16 bench at `/home/frappe/teletena-compat/bench`; original development bench and Selfmade were not changed.
 - `bench migrate --site tele-tena-pr2-test.localhost --skip-search-index` passed, including `v1_10_request_public_identity`. The migration adds an opaque profile ID and timezone snapshot column; no reseed/reset was run.
