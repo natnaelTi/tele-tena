@@ -69,10 +69,11 @@ that projected the request row without `earliest_start` and `latest_start` befor
 passing it to the matcher. The stored records had both columns populated; it was
 not evidence of malformed legacy requests or database corruption.
 
-Current matching still records recipient enqueue time, not proof that a notice
-was seen. Progressive routing waves, service-catalog/vetting dimensions,
-expanded eligibility reason codes, and lifecycle-aware presence remain follow-up
-work rather than claimed complete here.
+Current matching records recipient enqueue time, not proof that a notice was
+seen. Dependent PR #14 adds bounded progressive routing, current presence
+readiness reasons, continuous immediate starts, and per-scope vetting checks;
+see `routing-waves.md` and `vetting-routing-verification.md` for its measured
+coverage and remaining catalog, credential, trust-indicator, and pilot gaps.
 
 ## Immediate matching grid-boundary correction (2026-10-05)
 

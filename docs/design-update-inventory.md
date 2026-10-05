@@ -77,7 +77,7 @@ come from the forthcoming brief and product contract.
 | --- | --- |
 | Clinician pending/available earnings, payout reservations and balanced demo subledger | Implemented for demonstration on this branch; `tt_ledger` remains a separate append-only simulation activity log |
 | ERPNext posting/reconciliation and external payout settlement | Not implemented; real-money operations remain disabled |
-| Private open requests/offers | In progress on `feat/open-requests`; deterministic private dispatch, offer acceptance and booking integration are implemented; production-browser, concurrency and scheduled-worker acceptance remain |
+| Private open requests/offers | Partial; packaged Frappe 16 two-session request→eligible inbox→private offer→acceptance→appointment/reservation journey passed on 2026-10-05. Backend tests cover concurrency and privacy; scheduled waves run on isolated Redis DB 15. Not a pilot-performance or call-to-earnings acceptance. See `vetting-routing-verification.md`. |
 | Previous clinicians, natural-language matching/relevance/proximity | Not implemented; direct filtered discovery and editable filters work |
 | Mutual rescheduling, couples' individual consent, ratings/reviews, paid or complimentary extensions | Not implemented |
 | Actor-specific production cancellation/refund policy, post-release disputes and paid extensions | Not implemented; only explicit pre-start demo release and pre-release dispute holds exist |
