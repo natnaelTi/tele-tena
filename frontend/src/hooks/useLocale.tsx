@@ -21,6 +21,7 @@ const words: Record<string, [string, string]> = {
   "Include my saved history": ["ያስቀመጥኩትን ታሪክ አካትት", "Seenaa olkaa’e dabali"],
   "Publish request": ["ጥያቄውን አትም", "Gaaffii maxxansi"],
   "Your requests": ["ጥያቄዎችዎ", "Gaaffiiwwan kee"],
+  "Previous requests": ["ያለፉ ጥያቄዎች", "Gaaffiiwwan darban"],
   "No open requests yet.": ["ገና ክፍት ጥያቄ የለም።", "Ammaaf gaaffiin baname hin jiru."],
   "Review this offer": ["ይህን አቅርቦት ይገምግሙ", "Dhiyeessa kana gamaagami"],
   "Total price": ["ጠቅላላ ዋጋ", "Gatii waliigalaa"],
