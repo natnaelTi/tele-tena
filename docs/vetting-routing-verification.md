@@ -127,3 +127,55 @@ and activation. This does not change scheduled-care rules or production defaults
   continuous starts and capacity gating. The full post-consultation chain, live
   SMS, hosted LiveKit Cloud, physical-device testing and native translation
   review remain unverified in this checkpoint.
+
+## Packaged preview continuation (2026-10-05)
+
+This continuation was run against source `9d239b6d847e7e671fad2026413b92bace5b0ffb`
+at `http://127.0.0.1:8017/teletena/`, on the isolated compatibility site and
+Redis queue DB 15. The page was the packaged Frappe route; no Vite server served
+the preview. The independent compatibility worker and scheduler were running.
+The original development bench processes and Redis queue DB 0 were left alone.
+
+The newest test request that appeared to be missing from the clinician inbox
+was for Wednesday, 2026-10-07 at 15:00 Addis Ababa time. Read-only inspection
+found the retained synthetic clinician's published recurrence on Monday and
+Tuesday only. The Wednesday request therefore had no feasible slot and zero
+eligible recipients; it was not delivered. This is the exact reason for that
+test request's empty inbox. A second packaged UI journey selected Tuesday,
+2026-10-06 at 10:00, which is inside the actual published schedule. It produced
+one eligible clinician notification; the separate clinician session received
+the request, loaded the approved service, and could send an offer only after
+selecting a service and start time. The patient reviewed and accepted that
+offer. Persisted checks found one Matched request, one Booked appointment, one
+legacy reservation event, and one matching reservation journal. These were
+synthetic review records and were preserved.
+
+At the inspected local time, the clinician's “Available for requests” status
+was Paused because no complete session fit within the next 30 minutes. This is
+the intended readiness rule, not evidence that a scheduled request should be
+hidden when a later date has a valid published interval. It also explains why a
+presence toggle cannot make an immediate request eligible outside current
+capacity. The older immediate grid-boundary bug remains separately covered by
+the Frappe regression described above.
+
+Additional checks on this exact source/build:
+
+- `tests/presentation.py` on `tele-tena-pr2-test.localhost`: **20/20 passed**.
+- `scripts/browser-review-package.cjs`: **passed** guest denial, invited
+  password sign-in, protected deep links, consultation reload, sign-out,
+  responsive width assertions, PWA scope, offline state, and no Vite server.
+- Two-context packaged request journey: **passed** scheduled request
+  publication, clinician delivery, offer-input gating, private offer
+  submission, patient acceptance, and persisted appointment/reservation.
+- A separate ad hoc browser attempt used Wednesday despite the Monday/Tuesday
+  recurrence and correctly received no eligible offer. That fixture mismatch
+  was diagnosed from the persisted schedule and request bounds; it was not
+  treated as a product failure or fixed by broadening eligibility.
+- Screenshot evidence is in `/tmp/tele-tena-vetting-review/current/` and the
+  prior synthetic offer screenshots remain under `docs/screenshots/open-requests/`.
+
+This does not close the incomplete requirements above. In particular, the
+clinician operating inbox is demonstrated, but the complete vetting rubric,
+medical catalog approval, multidimensional trust indicators, human response
+performance, full call-to-earnings demonstration, native-language approval,
+fresh-site installation, live SMS, and physical-device testing remain gaps.
