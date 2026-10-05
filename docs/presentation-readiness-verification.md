@@ -6,9 +6,10 @@
   not Vite).
 - Bench/site: `/home/frappe/teletena-compat/bench`,
   `tele-tena-pr2-test.localhost`.
-- Source branch and backend checkout: `feat/vetting-catalog-routing`, commit
-  `ab5ac52e9f849666a3296d2a5fdfe035428860f0`.
-- Packaged frontend `release.json` source SHA matches that exact commit. The
+- Source branch and backend checkout: `feat/vetting-catalog-routing`, final
+  checkout commit `464350c60ddeb9bd58b446ecabd994e49cdb378c`; the last functional
+  code commit is `ab5ac52e9f849666a3296d2a5fdfe035428860f0`.
+- Packaged frontend `release.json` source SHA matches the final checkout commit. The
   current web process was restarted from this compatibility checkout after the
   asset refresh.
 - Isolated `bench worker --queue default,short,long` and `bench schedule` are
