@@ -22,6 +22,257 @@
       "label": "Active",
       "fieldtype": "Check",
       "default": "1"
+    },
+    {
+      "fieldname": "catalog_status",
+      "label": "Catalog status",
+      "fieldtype": "Select",
+      "options": "Draft\nActive\nLegacy test\nRetired",
+      "default": "Legacy test",
+      "reqd": 1
+    },
+    {
+      "fieldname": "category",
+      "label": "Service category",
+      "fieldtype": "Link",
+      "options": "Tele Tena Service Category"
+    },
+    {
+      "fieldname": "description",
+      "label": "Professional description",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "service_label_am",
+      "label": "Amharic label",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "service_label_om",
+      "label": "Afaan Oromo label",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "synonyms",
+      "label": "Search terms (one per line)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "professional_categories",
+      "label": "Eligible professional categories (one per line)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "credential_requirements",
+      "label": "Credential requirements (one per line)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "population_restriction",
+      "label": "Population restriction",
+      "fieldtype": "Select",
+      "options": "Adults only\nAll ages\nNot specified",
+      "default": "Adults only"
+    },
+    {
+      "fieldname": "participant_structure",
+      "label": "Participant structure",
+      "fieldtype": "Link",
+      "options": "Tele Tena Participant Format"
+    },
+    {
+      "fieldname": "supported_formats",
+      "label": "Supported delivery formats",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "booking_rules",
+      "label": "Booking rules (controlled policy keys)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "required_consent_schema",
+      "label": "Required consent schema version",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "location_jurisdiction_policy",
+      "label": "Location/jurisdiction policy key",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "required_workflows",
+      "label": "Required platform workflow capabilities (keys)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "definition_version",
+      "label": "Definition version",
+      "fieldtype": "Data",
+      "default": "tele-tena-adult-catalog-1"
+    },
+    {
+      "fieldname": "catalog_source",
+      "label": "Catalog source reference",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "clinical_review_status",
+      "label": "Clinical terminology review",
+      "fieldtype": "Select",
+      "options": "Not reviewed\nIn review\nApproved",
+      "default": "Not reviewed"
+    },
+    {
+      "fieldname": "effective_from",
+      "label": "Effective from",
+      "fieldtype": "Date"
+    },
+    {
+      "fieldname": "effective_until",
+      "label": "Effective until",
+      "fieldtype": "Date"
+    },
+    {
+      "fieldname": "min_duration_minutes",
+      "label": "Minimum duration",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "max_duration_minutes",
+      "label": "Maximum duration",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "catalog_status",
+      "label": "Catalog status",
+      "fieldtype": "Select",
+      "options": "Draft\nActive\nLegacy test\nRetired",
+      "default": "Legacy test",
+      "reqd": 1
+    },
+    {
+      "fieldname": "category",
+      "label": "Service category",
+      "fieldtype": "Link",
+      "options": "Tele Tena Service Category"
+    },
+    {
+      "fieldname": "description",
+      "label": "Professional description",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "service_label_am",
+      "label": "Amharic label",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "service_label_om",
+      "label": "Afaan Oromo label",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "synonyms",
+      "label": "Search terms (one per line)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "professional_categories",
+      "label": "Eligible professional categories (one per line)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "credential_requirements",
+      "label": "Credential requirements (one per line)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "population_restriction",
+      "label": "Population restriction",
+      "fieldtype": "Select",
+      "options": "Adults only\nAll ages\nNot specified",
+      "default": "Adults only"
+    },
+    {
+      "fieldname": "participant_structure",
+      "label": "Participant structure",
+      "fieldtype": "Link",
+      "options": "Tele Tena Participant Format"
+    },
+    {
+      "fieldname": "supported_formats",
+      "label": "Supported delivery formats",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "booking_rules",
+      "label": "Booking rules (controlled policy keys)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "immediate_care_enabled",
+      "label": "Immediate care enabled",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "required_consent_schema",
+      "label": "Required consent schema version",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "location_jurisdiction_policy",
+      "label": "Location/jurisdiction policy key",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "required_workflows",
+      "label": "Required platform workflow capabilities (keys)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "definition_version",
+      "label": "Definition version",
+      "fieldtype": "Data",
+      "default": "tele-tena-adult-catalog-1"
+    },
+    {
+      "fieldname": "catalog_source",
+      "label": "Catalog source reference",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "clinical_review_status",
+      "label": "Clinical terminology review",
+      "fieldtype": "Select",
+      "options": "Not reviewed\nIn review\nApproved",
+      "default": "Not reviewed"
+    },
+    {
+      "fieldname": "effective_from",
+      "label": "Effective from",
+      "fieldtype": "Date"
+    },
+    {
+      "fieldname": "effective_until",
+      "label": "Effective until",
+      "fieldtype": "Date"
+    },
+    {
+      "fieldname": "min_duration_minutes",
+      "label": "Minimum duration",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "max_duration_minutes",
+      "label": "Maximum duration",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "vetting_required",
+      "label": "Require structured per-scope vetting",
+      "fieldtype": "Check",
+      "default": "0"
     }
   ],
   "permissions": [

@@ -32,6 +32,7 @@ import { Applications, FinancialDisputes, Scopes } from "./pages/Admin";
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
 import Showcase from "./pages/Showcase";
 import { ClinicianRequestInbox, PatientOpenRequests, PublicClinicianProfile } from "./pages/OpenRequests";
+import { ClinicianScopeApplications, VettingQueue } from "./pages/Vetting";
 import "./App.css";
 export default function App() {
   return (
@@ -102,10 +103,12 @@ export default function App() {
                 <Route path="care" element={<CareRecords />} />
                 <Route path="care/:id" element={<CareRecordDetail />} />
                 <Route path="earnings" element={<ClinicianEarnings />} />
+                <Route path="vetting" element={<ClinicianScopeApplications />} />
               </Route>
               <Route path="/admin" element={<WorkspaceLayout kind="admin" />}>
                 <Route index element={<Applications />} />
                 <Route path="scopes" element={<Scopes />} />
+                <Route path="vetting" element={<VettingQueue />} />
                 <Route path="financial-disputes" element={<FinancialDisputes />} />
                 <Route
                   path="exceptions"

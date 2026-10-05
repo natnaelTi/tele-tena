@@ -1,0 +1,171 @@
+{
+  "doctype": "DocType",
+  "name": "Tele Tena Vetting Scope Application",
+  "module": "Tele Tena",
+  "autoname": "hash",
+  "engine": "InnoDB",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "clinician",
+      "label": "Clinician",
+      "fieldtype": "Link",
+      "options": "User",
+      "reqd": 1,
+      "ignore_user_permissions": 1
+    },
+    {
+      "fieldname": "service",
+      "label": "Requested service scope",
+      "fieldtype": "Link",
+      "options": "Tele Tena Service",
+      "reqd": 1
+    },
+    {
+      "fieldname": "status",
+      "label": "Application status",
+      "fieldtype": "Select",
+      "options": "Draft\nSubmitted\nClarification\nResubmitted\nApproved\nRejected\nSuspended\nExpired",
+      "default": "Draft",
+      "reqd": 1
+    },
+    {
+      "fieldname": "professional_category",
+      "label": "Professional category",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "qualification",
+      "label": "Relevant qualification",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "issuing_institution",
+      "label": "Issuing institution",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "registration_number",
+      "label": "Registration or license number",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "issuing_authority",
+      "label": "Issuing authority",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "jurisdiction",
+      "label": "Jurisdiction",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "credential_expiry",
+      "label": "Credential expiry",
+      "fieldtype": "Date"
+    },
+    {
+      "fieldname": "experience_years",
+      "label": "Relevant experience (years)",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "approach_keys",
+      "label": "Treatment approaches (controlled keys, one per line)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "population_adults",
+      "label": "Adult population scope confirmed",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "independent_practice",
+      "label": "Independent practice",
+      "fieldtype": "Check"
+    },
+    {
+      "fieldname": "clinic_affiliations",
+      "label": "Clinic affiliations (one per line; not competence evidence)",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "relevant_training",
+      "label": "Relevant training summary",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "applicant_statement",
+      "label": "Scope statement",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "reviewer",
+      "label": "Assigned reviewer",
+      "fieldtype": "Link",
+      "options": "User"
+    },
+    {
+      "fieldname": "clarification_request",
+      "label": "Clarification requested",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "applicant_response",
+      "label": "Applicant response",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "submitted_at",
+      "label": "Submitted at",
+      "fieldtype": "Datetime",
+      "read_only": 1
+    },
+    {
+      "fieldname": "rubric_version",
+      "label": "Rubric version",
+      "fieldtype": "Data",
+      "default": "proposed-1.0",
+      "read_only": 1
+    },
+    {
+      "fieldname": "decision_reason",
+      "label": "Decision reason",
+      "fieldtype": "Small Text",
+      "read_only": 1
+    },
+    {
+      "fieldname": "restrictions",
+      "label": "Scope restrictions",
+      "fieldtype": "Small Text",
+      "read_only": 1
+    },
+    {
+      "fieldname": "decided_by",
+      "label": "Decided by",
+      "fieldtype": "Link",
+      "options": "User",
+      "read_only": 1
+    },
+    {
+      "fieldname": "decided_at",
+      "label": "Decided at",
+      "fieldtype": "Datetime",
+      "read_only": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "Tele Tena Approver",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    }
+  ],
+  "allow_rename": 0,
+  "sort_field": "modified",
+  "sort_order": "DESC"
+}

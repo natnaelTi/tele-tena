@@ -27,7 +27,9 @@ import {
 import { useResource } from "../hooks/useResource";
 import { useSession } from "../hooks/useSession";
 import { useAction } from "../hooks/useAction";
+import { useLocale } from "../hooks/useLocale";
 export function PatientHome() {
+  const { w } = useLocale();
   const [now] = useState(() => Date.now());
   const { session } = useSession();
   const appointments = useResource(journeyApi.appointments);
@@ -62,7 +64,7 @@ export function PatientHome() {
           </Button>
         </form>
       </section>
-      <section className="request-entry"><div><h2>Let clinicians respond to you</h2><p>Share what support you’re looking for and compare private offers from eligible clinicians.</p></div><Link className="button secondary" to="/patient/requests" state={{requestDraft:{request_text:query}}}>Post a request</Link></section>
+      <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Share what support you’re looking for and compare private offers from eligible clinicians.")}</p></div><Link className="button secondary" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
       {!!requests.data?.some((item:any)=>item.state==='Open')&&<section className="active-request-summary"><div className="section-line"><h2>Active care requests</h2><Link to="/patient/requests">Review requests and offers <ArrowRight size={16}/></Link></div>{requests.data.filter((item:any)=>item.state==='Open').slice(0,3).map((item:any)=><Link className="active-request-row" key={item.id} to="/patient/requests"><span>{item.urgency==='immediate'?'As soon as possible':'Schedule for later'} · {item.category}</span><strong>{item.offers.filter((offer:any)=>offer.state==='Active').length} new offers</strong></Link>)}</section>}
       {wallet.data&&<Link to="/patient/payments" className="balance-summary"><span>Balance</span><strong>ETB {money(wallet.data.available)}</strong><small>Available · ETB {money(wallet.data.reserved)} reserved</small></Link>}
       <div className="section-line">
@@ -109,6 +111,7 @@ export function PatientHome() {
   );
 }
 export function Discovery() {
+  const { w } = useLocale();
   const offers = useResource(journeyApi.discover);
   const services = useResource(journeyApi.services);
   const [category, setCategory] = useState("");
@@ -147,7 +150,7 @@ export function Discovery() {
           ))}
         </Select>
       </div>
-      <section className="request-entry"><div><h2>Let clinicians respond to you</h2><p>Post for free and compare private offers without changing your filters.</p></div><Link to="/patient/requests" state={{requestDraft:{request_text:query,service_label:category}}}>Post a request</Link></section>
+      <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link to="/patient/requests" state={{requestDraft:{request_text:query,service_label:category}}}>{w("Post a request")}</Link></section>
       <p className="supporting">
         Online sessions · Times shown in {timezone}. Language and format filters
         will appear when verified clinician details are available.

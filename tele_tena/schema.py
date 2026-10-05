@@ -85,3 +85,5 @@ def install():
     request_public_identity()
     from tele_tena.patches.v1_11_progressive_routing import execute as progressive_routing
     progressive_routing()
+    from tele_tena.patches.v1_12_catalog_vetting import execute as catalog_vetting
+    catalog_vetting()

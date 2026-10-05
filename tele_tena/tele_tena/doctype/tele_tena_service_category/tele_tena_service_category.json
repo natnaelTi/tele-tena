@@ -1,0 +1,69 @@
+{
+  "doctype": "DocType",
+  "name": "Tele Tena Service Category",
+  "module": "Tele Tena",
+  "fields": [
+    {
+      "fieldname": "catalog_key",
+      "label": "Stable Code",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "unique": 1
+    },
+    {
+      "fieldname": "label_en",
+      "label": "English label",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "label_am",
+      "label": "Amharic label",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "label_om",
+      "label": "Afaan Oromo label",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "definition",
+      "label": "Definition and intended use",
+      "fieldtype": "Small Text",
+      "reqd": 1
+    },
+    {
+      "fieldname": "status",
+      "label": "Lifecycle status",
+      "fieldtype": "Select",
+      "options": "Draft\nActive\nRetired",
+      "default": "Draft",
+      "reqd": 1
+    },
+    {
+      "fieldname": "source_reference",
+      "label": "Source reference",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "terminology_version",
+      "label": "Terminology version",
+      "fieldtype": "Data",
+      "default": "tele-tena-adult-catalog-1"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "Tele Tena Approver",
+      "read": 1,
+      "write": 1,
+      "create": 1
+    }
+  ],
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "allow_rename": 0,
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "autoname": "field:catalog_key"
+}

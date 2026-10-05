@@ -11,12 +11,14 @@ filters and optional relevance feedback. No diagnostic claim. Eligibility preced
 ratings/proximity. Proximity is relevant particularly for in-person care.
 Direct booking uses published price. Private open requests distinguish immediate
 care-seeking from scheduled care; deterministic eligibility requires current
-approval, service scope, language, format and valid availability. A bounded set
+approval, exact active service scope, language, format, an enabled service policy
+for immediate care, fresh presence for immediate care, and feasible full-duration
+availability. A bounded set
 of eligible clinicians receives minimum-necessary disclosure, and each offer is
 visible only to its author and the patient. Acceptance revalidates the offer and
 uses the existing appointment, price snapshot and atomic reservation flow. This
-workflow is under review on `feat/open-requests`; its business outcome target is
-measured, never guaranteed. Offers do not hold slots or funds. Automatic or
+workflow and dependent vetting/routing changes remain under review; its business
+outcome target is measured, never guaranteed. Offers do not hold slots or funds. Automatic or
 manual confirmation, slot holds/expiry, mutual rescheduling.
 
 Global disclosure preferences plus request overrides and exact sharing preview.

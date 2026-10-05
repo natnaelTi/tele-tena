@@ -63,9 +63,22 @@ def clinician_languages(user):
     return set(values) if isinstance(values, list) else set()
 
 
+def immediate_service_enabled(service):
+    if service.immediate_care_enabled:
+        return True
+    from tele_tena.review import enabled as review_enabled
+    return bool(service.catalog_status == 'Legacy test' and
+                (review_enabled() or frappe.local.site == 'erp.localhost') and
+                frappe.conf.get('tele_tena_demo_immediate_care_enabled') is True)
+
+
 def _eligible(request, exclude_delivered=True, limit=None):
     """Deterministic eligibility. Never returns patient identities to clinicians."""
     presence = request.urgency == 'immediate'
+    service = one('''SELECT immediate_care_enabled,catalog_status FROM `tabTele Tena Service`
+        WHERE name=%s AND active=1''', (request.service,))
+    if presence and not immediate_service_enabled(service):
+        return []
     candidates = rows('''SELECT DISTINCT o.clinician,o.id offering,s.id schedule,
         s.timezone,s.consultation_format,p.languages,
         COALESCE(pr.expires_at,'1970-01-01') presence_until
@@ -92,6 +105,8 @@ def _eligible(request, exclude_delivered=True, limit=None):
         except (TypeError, ValueError):
             languages = []
         if request.language not in languages:
+            continue
+        if not journey.service_scope_is_current(item.clinician, request.service):
             continue
         if presence:
             ready = one('SELECT expires_at FROM tt_clinician_request_presence WHERE clinician=%s AND ready=1',
@@ -210,13 +225,25 @@ def set_request_presence(ready):
         if not languages.intersection(LANGUAGES):
             fail('Choose at least one language you can provide care in before becoming available for requests',
                  'request_languages_required')
-        active = rows('''SELECT o.id FROM tt_offering o JOIN `tabTele Tena Service Scope` sc
-            ON sc.clinician=o.clinician AND sc.service=o.service AND sc.status='Approved'
-            JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
-            WHERE o.clinician=%s AND o.active=1 LIMIT 1''', (clinician,))
-        if not active:
-            fail('Publish an approved service schedule before becoming available for requests',
+        offerings = rows('''SELECT o.id,o.service,s.id schedule_id,svc.immediate_care_enabled,svc.catalog_status
+            FROM tt_offering o JOIN `tabTele Tena Service` svc ON svc.name=o.service AND svc.active=1
+            LEFT JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
+            WHERE o.clinician=%s AND o.active=1''', (clinician,))
+        if not offerings:
+            fail('Publish a service offering before becoming available for requests.',
+                 'offering_required')
+        scoped = [item for item in offerings if journey.service_scope_is_current(clinician, item.service, lock=True)]
+        if not scoped:
+            fail('An active service scope must be approved before you can receive requests.',
+                 'scope_approval_required')
+        scheduled = [item for item in scoped if item.schedule_id]
+        if not scheduled:
+            fail('Publish recurring availability for an approved service before receiving requests.',
                  'request_schedule_required')
+        immediate = [item for item in scheduled if immediate_service_enabled(item)]
+        if not immediate:
+            fail('No published service is enabled for immediate requests. Choose scheduled care or ask an administrator to enable the service policy.',
+                 'immediate_policy_required')
     ttl = int(frappe.conf.get('tele_tena_request_presence_ttl_seconds', DEFAULT_PRESENCE_SECONDS))
     ttl = max(30, min(300, ttl))
     expires = now() + timedelta(seconds=ttl)
@@ -237,8 +264,17 @@ def publish_request(service, request_text, urgency, language, consultation_forma
     patient = profile('patient', lock=True)
     if urgency not in ('immediate', 'scheduled') or language not in LANGUAGES or consultation_format not in FORMATS:
         fail('Choose when you need care, a language and a session format')
-    service_row = one('SELECT name FROM `tabTele Tena Service` WHERE name=%s AND active=1', (service,))
-    del service_row
+    service_row = one('SELECT name,catalog_status FROM `tabTele Tena Service` WHERE name=%s AND active=1', (service,))
+    from tele_tena.review import enabled as review_enabled
+    if service_row.catalog_status != 'Active' and not (
+            service_row.catalog_status == 'Legacy test' and
+            (review_enabled() or frappe.local.site == 'erp.localhost')):
+        fail('This service is not currently available for matching.', 'service_definition_unavailable')
+    if urgency == 'immediate':
+        policy = one('SELECT immediate_care_enabled,catalog_status FROM `tabTele Tena Service` WHERE name=%s', (service,))
+        if not immediate_service_enabled(policy):
+            fail('This service is not configured for immediate requests. Choose scheduled care instead.',
+                 'immediate_care_unavailable')
     content = text(request_text, 2000)
     selected = journey.choices(sharing)
     key = text(retry_key, 80)
@@ -391,7 +427,15 @@ def clinician_requests():
         LEFT JOIN tt_request_offer own ON own.request_id=r.id AND own.clinician=rr.clinician AND own.state='Active'
         WHERE rr.clinician=%s AND r.state='Open' AND r.expires_at>UTC_TIMESTAMP(6)
         ORDER BY r.urgency='immediate' DESC,rr.notified_at LIMIT 30''', (clinician,))
+    visible = []
     for req in result:
+        if not journey.service_scope_is_current(clinician, req._routing_service):
+            continue
+        if req.urgency == 'immediate':
+            service = one('''SELECT immediate_care_enabled,catalog_status FROM `tabTele Tena Service`
+                WHERE name=%s AND active=1''', (req._routing_service,))
+            if not immediate_service_enabled(service):
+                continue
         req.disclosure_snapshot = json.loads(req.disclosure_snapshot)
         req.suggested_start = None
         if req.urgency == 'immediate':
@@ -415,17 +459,37 @@ def clinician_requests():
         for field in ('earliest_start','latest_start','expires_at','notified_at','own_offer_start','own_offer_until'):
             if req.get(field):
                 req[field] = req[field].isoformat() + 'Z'
-        fetched = one('''SELECT inbox_fetched_at FROM tt_request_recipient
-            WHERE request_id=%s AND clinician=%s FOR UPDATE''', (req.id, clinician))
-        if not fetched.inbox_fetched_at:
-            frappe.db.sql('''UPDATE tt_request_recipient SET inbox_fetched_at=UTC_TIMESTAMP(6)
-                WHERE request_id=%s AND clinician=%s AND inbox_fetched_at IS NULL''', (req.id, clinician))
-            route_event(req.id, clinician, int(req.wave or 1), 'InboxFetched')
         # The patient id is required only to evaluate schedule conflicts. Never
         # serialize it to the clinician inbox API.
         del req['_routing_patient']
         del req['_routing_service']
-    return result
+        visible.append(req)
+    return visible
+
+
+@journey.command
+def acknowledge_inbox_fetch(request_ids):
+    """Record that request cards were returned to this authenticated inbox client."""
+    clinician = actor('Tele Tena Clinician')
+    if isinstance(request_ids, str):
+        try:
+            request_ids = json.loads(request_ids)
+        except ValueError:
+            fail('Inbox update could not be recorded.')
+    if not isinstance(request_ids, list) or len(request_ids) > 30:
+        fail('Inbox update could not be recorded.')
+    for request_id in set(request_ids):
+        if not isinstance(request_id, str) or len(request_id) != 36:
+            continue
+        recipient = rows('''SELECT rr.wave,rr.inbox_fetched_at FROM tt_request_recipient rr
+            JOIN tt_open_request r ON r.id=rr.request_id
+            WHERE rr.request_id=%s AND rr.clinician=%s AND r.state='Open' AND r.expires_at>UTC_TIMESTAMP(6)
+            FOR UPDATE''', (request_id, clinician))
+        if recipient and not recipient[0].inbox_fetched_at:
+            frappe.db.sql('''UPDATE tt_request_recipient SET inbox_fetched_at=UTC_TIMESTAMP(6)
+                WHERE request_id=%s AND clinician=%s AND inbox_fetched_at IS NULL''', (request_id, clinician))
+            route_event(request_id, clinician, int(recipient[0].wave or 1), 'InboxFetched')
+    return {'recorded': True}
 
 
 @query()
@@ -440,13 +504,21 @@ def request_presence():
     language_set = clinician_languages(clinician)
     if not language_set.intersection(LANGUAGES):
         reasons.append('language_required')
-    offerings = rows('''SELECT o.id FROM tt_offering o
-        JOIN `tabTele Tena Service Scope` sc ON sc.clinician=o.clinician
-          AND sc.service=o.service AND sc.status='Approved'
-        JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
-        WHERE o.clinician=%s AND o.active=1 LIMIT 1''', (clinician,))
-    if not offerings:
+    all_offerings = rows('''SELECT o.id,o.service,s.id schedule_id,svc.immediate_care_enabled,svc.catalog_status
+        FROM tt_offering o JOIN `tabTele Tena Service` svc ON svc.name=o.service AND svc.active=1
+        LEFT JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
+        WHERE o.clinician=%s AND o.active=1''', (clinician,))
+    if not all_offerings:
+        reasons.append('offering_required')
+    scoped = [item for item in all_offerings if journey.service_scope_is_current(clinician, item.service)]
+    if all_offerings and not scoped:
+        reasons.append('scope_approval_required')
+    scheduled = [item for item in scoped if item.schedule_id]
+    if scoped and not scheduled:
         reasons.append('published_schedule_required')
+    immediate_services = [item for item in scheduled if immediate_service_enabled(item)]
+    if not any(immediate_service_enabled(item) for item in immediate_services):
+        reasons.append('immediate_policy_required')
     live = bool(row and row[0].ready and row[0].expires_at > now())
     return {'ready': live, 'configured': not reasons, 'reasons': reasons,
             'expires_at': row[0].expires_at.isoformat() + 'Z' if row else None}
@@ -482,9 +554,16 @@ def submit_offer(request_id, offering, start, price_minor=None):
                       (clinician,))
         if present.expires_at <= now():
             fail('Your available-now status has expired. Turn it on again before offering.', 'request_presence_stale')
-    offer = one('''SELECT o.*,s.consultation_format,s.timezone,s.status FROM tt_offering o
+    offer = one('''SELECT o.*,s.consultation_format,s.timezone,s.status,svc.immediate_care_enabled,
+        svc.catalog_status FROM tt_offering o
+        JOIN `tabTele Tena Service` svc ON svc.name=o.service AND svc.active=1
         JOIN tt_schedule s ON s.offering=o.id WHERE o.id=%s AND o.clinician=%s AND o.active=1 FOR UPDATE''',
         (offering, clinician))
+    if not offer:
+        fail('This offering or schedule is no longer available.', 'offering_unavailable')
+    if req.urgency == 'immediate' and not immediate_service_enabled(offer):
+        fail('This service is no longer configured for immediate requests. Choose scheduled care instead.',
+             'immediate_care_unavailable')
     approved_service(clinician, offer.service, True)
     if offer.service != req.service or offer.consultation_format != req.consultation_format or req.language not in clinician_languages(clinician):
         fail('This request no longer matches your approved service, language or format.', 'request_eligibility_changed')
@@ -541,6 +620,10 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
     # lock shared with direct bookings and all other offer acceptances.
     approved(item.clinician, lock=True)
     approved_service(item.clinician, req.service, True)
+    service_policy = one('''SELECT immediate_care_enabled,catalog_status FROM `tabTele Tena Service`
+        WHERE name=%s AND active=1 FOR UPDATE''', (req.service,))
+    if req.urgency == 'immediate' and not immediate_service_enabled(service_policy):
+        fail('This service is no longer configured for immediate requests.', 'immediate_care_unavailable')
     recipient = rows('SELECT 1 FROM tt_request_recipient WHERE request_id=%s AND clinician=%s',
                      (request_id, item.clinician))
     if not recipient or req.language not in clinician_languages(item.clinician):
