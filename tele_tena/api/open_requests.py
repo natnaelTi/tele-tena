@@ -72,6 +72,21 @@ def immediate_service_enabled(service):
                 frappe.conf.get('tele_tena_demo_immediate_care_enabled') is True)
 
 
+def _has_immediate_capacity(clinician, offerings):
+    """Require a complete, conflict-free session in the current request window."""
+    from tele_tena.api import scheduling
+    earliest = now()
+    latest = earliest + timedelta(minutes=30)
+    for item in offerings:
+        if not item.get('schedule_id') or not immediate_service_enabled(item):
+            continue
+        schedule = scheduling._schedule_for(item.id)
+        offer = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (item.id,))
+        if scheduling.immediate_start(schedule, offer, clinician, None, earliest, latest):
+            return True
+    return False
+
+
 def _eligible(request, exclude_delivered=True, limit=None):
     """Deterministic eligibility. Never returns patient identities to clinicians."""
     presence = request.urgency == 'immediate'
@@ -244,6 +259,9 @@ def set_request_presence(ready):
         if not immediate:
             fail('No published service is enabled for immediate requests. Choose scheduled care or ask an administrator to enable the service policy.',
                  'immediate_policy_required')
+        if not _has_immediate_capacity(clinician, immediate):
+            fail('There is no conflict-free time for a full session in the next 30 minutes. Update availability or pause request presence.',
+                 'no_immediate_capacity')
     ttl = int(frappe.conf.get('tele_tena_request_presence_ttl_seconds', DEFAULT_PRESENCE_SECONDS))
     ttl = max(30, min(300, ttl))
     expires = now() + timedelta(seconds=ttl)
@@ -517,8 +535,10 @@ def request_presence():
     if scoped and not scheduled:
         reasons.append('published_schedule_required')
     immediate_services = [item for item in scheduled if immediate_service_enabled(item)]
-    if not any(immediate_service_enabled(item) for item in immediate_services):
+    if not immediate_services:
         reasons.append('immediate_policy_required')
+    elif not _has_immediate_capacity(clinician, immediate_services):
+        reasons.append('no_immediate_capacity')
     live = bool(row and row[0].ready and row[0].expires_at > now())
     return {'ready': live, 'configured': not reasons, 'reasons': reasons,
             'expires_at': row[0].expires_at.isoformat() + 'Z' if row else None}

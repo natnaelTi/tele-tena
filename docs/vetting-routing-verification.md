@@ -59,6 +59,10 @@ and activation. This does not change scheduled-care rules or production defaults
 
 - Continuous immediate-start selection in a published interval, including
   duration and conflict validation, rechecked at offer and acceptance.
+- Presence now requires a conflict-free full session start inside the next
+  30-minute immediate-request window. A published weekly schedule outside that
+  current window no longer appears as active ready status; the clinician shell
+  gives a `no_immediate_capacity` reason.
 - Explicit immediate-service policy and reason-coded clinician readiness.
 - Current approval/scope and active-offering checks at discovery, delivery,
   offer submission, and acceptance.
@@ -102,7 +106,7 @@ and activation. This does not change scheduled-care rules or production defaults
 ## Verification checkpoint
 
 - Frappe 16 presentation suite: 20 tests passed, covering continuous immediate
-  matching, explicit site-scoped policy, scope approval gates, private offers,
+  matching, no-capacity presence state, explicit site-scoped policy, scope approval gates, private offers,
   booking/funds and slot concurrency, and applicant clarification/resubmission.
 - Frontend TypeScript/Vite production build passed. Oxlint passed with existing
   React hook/purity warnings.

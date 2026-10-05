@@ -65,7 +65,7 @@ function ClinicianRequestAvailability() {
     } finally { setBusy(false); }
   };
   const data = presence.data;
-  const guidance:Record<string,string>={approval_required:"Approval required",language_required:"Add a care language",offering_required:"Publish an offering",scope_approval_required:"Get approval for a service scope",published_schedule_required:"Publish availability",immediate_policy_required:"Ask a reviewer to enable immediate requests for a service"};
+  const guidance:Record<string,string>={approval_required:"Approval required",language_required:"Add a care language",offering_required:"Publish an offering",scope_approval_required:"Get approval for a service scope",published_schedule_required:"Publish availability",immediate_policy_required:"Ask a reviewer to enable immediate requests for a service",no_immediate_capacity:"No complete session fits the next 30 minutes"};
   return <section className="request-presence-shell" aria-label={w("Request availability")}>
     <div><strong>{w(data?.ready ? "Available for requests" : "Requests paused")}</strong>
       <span>{w(connectionFailed ? "Connection lost; availability will expire." : data?.configured ? "Ready status expires if this session disconnects." : "Complete setup before receiving requests.")}</span>

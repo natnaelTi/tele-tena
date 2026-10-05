@@ -382,6 +382,14 @@ class Presentation(unittest.TestCase):
                     timezone_name='Africa/Addis_Ababa')
             self.assertEqual(frappe.local.response.get('tele_tena_error'), 'immediate_care_unavailable')
 
+        fixtures.login('c1')
+        with patch.dict(frappe.conf, tele_tena_demo_immediate_care_enabled=True), \
+                patch.object(open_requests, '_has_immediate_capacity', return_value=False):
+            with self.assertRaises(frappe.ValidationError):
+                open_requests.set_request_presence(True)
+            self.assertEqual(frappe.local.response.get('tele_tena_error'), 'no_immediate_capacity')
+            self.assertIn('no_immediate_capacity', open_requests.request_presence()['reasons'])
+
     def test_two_patients_cannot_claim_one_offer_slot_concurrently(self):
         offering = fixtures.Integration.offers['c1']
         service = fixtures.PREFIX
