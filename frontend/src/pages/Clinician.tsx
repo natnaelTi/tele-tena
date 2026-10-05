@@ -74,6 +74,7 @@ export function ClinicianToday() {
         </EmptyState>
       )}
       <div className="quick-links">
+        <Link to="/clinician/requests"><h3>Requests</h3><p>Choose when you are ready to respond to eligible private requests.</p></Link>
         <Link to="/clinician/services">
           <h3>Services & pricing</h3>
           <p>Manage published sessions and clear prices.</p>

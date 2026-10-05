@@ -9,9 +9,15 @@ belong to the doctor. Guided patient profile and private medical history.
 Natural language request -> suggested service and eligible clinicians, with editable
 filters and optional relevance feedback. No diagnostic claim. Eligibility precedes
 ratings/proximity. Proximity is relevant particularly for in-person care.
-Direct booking uses published price. Private open requests and clinician offers work;
-competing clinicians cannot access offers. Accepted offer specifies fee, time, format,
-expiry. Automatic or manual confirmation, slot holds/expiry, mutual rescheduling.
+Direct booking uses published price. Private open requests distinguish immediate
+care-seeking from scheduled care; deterministic eligibility requires current
+approval, service scope, language, format and valid availability. A bounded set
+of eligible clinicians receives minimum-necessary disclosure, and each offer is
+visible only to its author and the patient. Acceptance revalidates the offer and
+uses the existing appointment, price snapshot and atomic reservation flow. This
+workflow is under review on `feat/open-requests`; its business outcome target is
+measured, never guaranteed. Offers do not hold slots or funds. Automatic or
+manual confirmation, slot holds/expiry, mutual rescheduling.
 
 Global disclosure preferences plus request overrides and exact sharing preview.
 Account identity, consultation disclosure and public review identity are distinct.

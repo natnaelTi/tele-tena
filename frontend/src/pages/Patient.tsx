@@ -61,6 +61,7 @@ export function PatientHome() {
           </Button>
         </form>
       </section>
+      <section className="request-entry"><div><h2>Want clinicians to respond with times?</h2><p>Share what you’re looking for with eligible clinicians and compare private offers.</p></div><Link className="button secondary" to="/patient/requests">Open a care request</Link></section>
       {wallet.data&&<Link to="/patient/payments" className="balance-summary"><span>Balance</span><strong>ETB {money(wallet.data.available)}</strong><small>Available · ETB {money(wallet.data.reserved)} reserved</small></Link>}
       <div className="section-line">
         <h2>Your next appointment</h2>
@@ -144,6 +145,7 @@ export function Discovery() {
           ))}
         </Select>
       </div>
+      <p className="request-entry"><span>Can’t find a suitable time? Ask eligible clinicians to make a private offer.</span> <Link to="/patient/requests">Open a care request</Link></p>
       <p className="supporting">
         Online sessions · Times shown in {timezone}. Language and format filters
         will appear when verified clinician details are available.
@@ -164,7 +166,7 @@ export function Discovery() {
       ) : (
         <EmptyState title="No matching services yet.">
           Try another search or return when more approved offerings are
-          available.
+          available. <Link to="/patient/requests">You can also open a private request</Link> without relaxing your preferences.
         </EmptyState>
       )}
       <p className="verification-note">

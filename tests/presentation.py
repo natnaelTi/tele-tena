@@ -21,6 +21,7 @@ import frappe
 from tele_tena.api import journey
 from tele_tena.api import presentation
 from tele_tena.api import scheduling
+from tele_tena.api import open_requests
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -70,6 +71,221 @@ class Presentation(unittest.TestCase):
         fixtures.login(who)
         result = scheduling.calendar(offering, day.isoformat(), 1, zone)
         return [slot for item in result['days'] for slot in item['slots']]
+
+    def test_private_request_competing_offers_insufficient_funds_and_atomic_match(self):
+        offering1 = fixtures.Integration.offers['c1']
+        offering2 = fixtures.Integration.offers['c2']
+        service = fixtures.PREFIX
+        day = day_offset(21)
+        for who, offering in (('c1', offering1), ('c2', offering2)):
+            fixtures.login(who)
+            journey.save_profile('clinician', 'Synthetic clinician ' + who, 1, languages=['en'])
+            schedule_payload_value = schedule_payload(offering, day, mode='automatic')
+            schedule_payload_value['minimum_notice_minutes'] = 0
+            scheduling.save_schedule(**schedule_payload_value)
+        fixtures.login('p1')
+        discovery = journey.discover(service=service)
+        public = next(item for item in discovery if item.clinician_id)
+        self.assertNotIn(fixtures.USERS['c1'], json.dumps(discovery))
+        profile = open_requests.clinician_profile(public.clinician_id)
+        self.assertNotIn(fixtures.USERS['c1'], json.dumps(profile))
+        self.assertNotIn('email', json.dumps(profile).lower())
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.clinician_profile('00000000-0000-0000-0000-000000000000')
+        wallet_before = journey.wallet()
+        immediate_key = 'immediate-retry-' + secrets.token_hex(6)
+        immediate_payload = dict(service=service, request_text='Synthetic immediate retry payload.',
+            urgency='immediate', language='en', consultation_format='audio',
+            sharing={'name': False, 'history': False}, retry_key=immediate_key,
+            timezone_name='Africa/Addis_Ababa')
+        first_immediate = open_requests.publish_request(**immediate_payload)
+        retried_immediate = open_requests.publish_request(**immediate_payload)
+        self.assertEqual(first_immediate['id'], retried_immediate['id'])
+        self.assertTrue(retried_immediate['idempotent'])
+        self.assertEqual(frappe.db.sql("SELECT COUNT(*) FROM tt_open_request WHERE patient=%s AND retry_key=%s",
+                                      (fixtures.USERS['p1'], immediate_key))[0][0], 1)
+        open_requests.close_request(first_immediate['id'])
+        slot = self.slots(offering1, day)[0]
+        request = open_requests.publish_request(
+            service=service, request_text='Synthetic request for private offer regression.',
+            urgency='scheduled', language='en', consultation_format='video',
+            sharing={'name': False, 'history': False}, retry_key='private-offer-' + secrets.token_hex(6),
+            timezone_name='Africa/Addis_Ababa', earliest_start=slot['start'], latest_start=slot['start'],
+            max_price_minor=wallet_before['available'] + 10000)
+        self.assertEqual(request['state'], 'Open')
+        req_id = request['id']
+        default_c2_price = int(journey.one('SELECT price FROM tt_offering WHERE id=%s', (offering2,)).price)
+        for who, offering, price in (('c1', offering1, wallet_before['available'] + 5000),
+                                     ('c2', offering2, default_c2_price)):
+            fixtures.login(who)
+            inbox = open_requests.clinician_requests()
+            visible = next(item for item in inbox if item.id == req_id)
+            self.assertNotIn(fixtures.USERS['p1'], json.dumps(visible))
+            self.assertNotIn('email', json.dumps(visible).lower())
+            response = open_requests.submit_offer(req_id, offering, slot['start'], price)
+            self.assertEqual(response['state'], 'Active')
+            if who == 'c1':
+                duplicate_offer = open_requests.submit_offer(req_id, offering, slot['start'], price)
+                self.assertTrue(duplicate_offer['idempotent'])
+                self.assertEqual(duplicate_offer['id'], response['id'])
+        fixtures.login('c1')
+        c1_view = next(item for item in open_requests.clinician_requests() if item.id == req_id)
+        self.assertTrue(c1_view.own_offer_id)
+        self.assertEqual(int(c1_view.own_offer_price), wallet_before['available'] + 5000)
+        fixtures.login('c2')
+        c2_view = next(item for item in open_requests.clinician_requests() if item.id == req_id)
+        self.assertTrue(c2_view.own_offer_id)
+        self.assertEqual(int(c2_view.own_offer_price), default_c2_price)
+        self.assertNotEqual(c1_view.own_offer_id, c2_view.own_offer_id)
+        fixtures.login('c1')
+        with self.assertRaises(frappe.PermissionError):
+            open_requests.withdraw_offer(c2_view.own_offer_id)
+        fixtures.login('p1')
+        visible = next(item for item in open_requests.my_requests() if item.id == req_id)
+        self.assertEqual(len([offer for offer in visible.offers if offer.state == 'Active']), 2)
+        losing = next(offer for offer in visible.offers if offer.clinician_name == 'Synthetic clinician c2')
+        fixtures.login('p2')
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.respond_offer(req_id, losing.id, 'accept', None, visible.disclosure_snapshot)
+        fixtures.login('p1')
+        winning = next(offer for offer in visible.offers if offer.clinician_name == 'Synthetic clinician c1')
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.respond_offer(req_id, winning.id, 'accept', None, visible.disclosure_snapshot)
+        self.assertEqual(frappe.local.response.get('tele_tena_error'), 'insufficient_funds')
+        # The request and offer stay active; funding followed by retry succeeds.
+        self.assertEqual(journey.one('SELECT state FROM tt_open_request WHERE id=%s', (req_id,)).state, 'Open')
+        self.assertEqual(journey.one('SELECT state FROM tt_request_offer WHERE id=%s', (winning.id,)).state, 'Active')
+        journey.simulated_deposit(10000, 'request-fund-' + secrets.token_hex(8))
+        match = open_requests.respond_offer(req_id, winning.id, 'accept', None, visible.disclosure_snapshot)
+        self.assertEqual(match['state'], 'Matched')
+        self.assertEqual(journey.one('SELECT state FROM tt_open_request WHERE id=%s', (req_id,)).state, 'Matched')
+        self.assertEqual(journey.one('SELECT state FROM tt_request_offer WHERE id=%s', (losing.id,)).state, 'Superseded')
+        duplicate = open_requests.respond_offer(req_id, winning.id, 'accept', None, visible.disclosure_snapshot)
+        self.assertEqual(duplicate['appointment'], match['appointment'])
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_appointment WHERE retry_key=%s',
+                                     ('open-request:' + req_id,)).n, 1)
+        self.assertGreaterEqual(journey.wallet()['reserved'], wallet_before['reserved'] + 1)
+
+    def test_immediate_request_matches_continuous_time_between_booking_grid_points(self):
+        """Fresh presence plus continuous time must not require a 15-minute grid start."""
+        from zoneinfo import ZoneInfo
+        offering = fixtures.Integration.offers['c1']
+        service = fixtures.PREFIX
+        zone = ZoneInfo('Africa/Addis_Ababa')
+        local_day = datetime.now(zone).date() + timedelta(days=2)
+        local_now = datetime.combine(local_day, datetime.min.time().replace(hour=10, minute=5), zone)
+        current = local_now.astimezone(timezone.utc).replace(tzinfo=None)
+        interval_start = '10:00'
+        interval_end = '10:40'
+        today = local_day
+
+        fixtures.login('c1')
+        journey.save_profile('clinician', 'Synthetic immediate clinician', 1, languages=['en'])
+        schedule = dict(offering=offering, schedule_name='Immediate continuous-time regression',
+            timezone_name='Africa/Addis_Ababa', consultation_format='video',
+            confirmation_mode='automatic', minimum_notice_minutes=60, horizon_days=30,
+            buffer_before=0, buffer_after=0,
+            intervals=[{'weekday': today.weekday(), 'start': interval_start,
+                        'end': interval_end}], exceptions=[], status='Published')
+        scheduling.save_schedule(**schedule)
+        with patch.object(open_requests, 'now', return_value=current):
+            ready = open_requests.set_request_presence(True)
+            self.assertTrue(ready['ready'])
+            fixtures.login('p1')
+            immediate = open_requests.publish_request(
+                service=service, request_text='Synthetic immediate request for the grid-boundary regression.',
+                urgency='immediate', language='en', consultation_format='video',
+                sharing={'name': False, 'history': False}, retry_key='immediate-grid-' + secrets.token_hex(8),
+                timezone_name='Africa/Addis_Ababa')
+            self.assertGreaterEqual(immediate['eligible_supply'], 1)
+            self.assertGreaterEqual(immediate['notified'], 1)
+        persisted = journey.one('SELECT * FROM tt_open_request WHERE id=%s', (immediate['id'],))
+        schedule_row = scheduling._schedule_for(offering)
+        offer_row = journey.one('SELECT * FROM tt_offering WHERE id=%s', (offering,))
+        appointment_window = open_requests._has_slot(
+            frappe._dict(offering=offering, clinician=fixtures.USERS['c1']), persisted)
+        self.assertTrue(appointment_window)
+
+        # The old direct-booking grid starts at the interval's opening and advances
+        # in 15-minute increments; none of those generated starts belongs to this
+        # request window even though a full continuous session fits.
+        grid = scheduling._slots_for_day(schedule_row, offer_row, today, [], [],
+                                         minimum_notice_override=0)
+        self.assertFalse(any(persisted.earliest_start <= slot[0] <= persisted.latest_start
+                             for slot in grid))
+        start = scheduling.immediate_start(schedule_row, offer_row, fixtures.USERS['c1'],
+            fixtures.USERS['p1'], persisted.earliest_start, persisted.latest_start)
+        self.assertIsNotNone(start)
+        fixtures.login('c1')
+        self.assertTrue(any(item.id == immediate['id'] for item in open_requests.clinician_requests()))
+        with patch.object(open_requests, 'now', return_value=current):
+            proposed = open_requests.submit_offer(immediate['id'], offering,
+                start.isoformat(timespec='seconds') + 'Z')
+        self.assertEqual(proposed['state'], 'Active')
+        fixtures.login('p1')
+        journey.simulated_deposit(100000, 'immediate-grid-fund-' + secrets.token_hex(8))
+        patient_request = next(item for item in open_requests.my_requests() if item.id == immediate['id'])
+        accepted = open_requests.respond_offer(immediate['id'], proposed['id'], 'accept', None,
+                                               patient_request.disclosure_snapshot)
+        self.assertEqual(accepted['state'], 'Matched')
+        self.assertEqual(journey.one('SELECT state FROM tt_open_request WHERE id=%s',
+                                     (immediate['id'],)).state, 'Matched')
+
+    def test_two_patients_cannot_claim_one_offer_slot_concurrently(self):
+        offering = fixtures.Integration.offers['c1']
+        service = fixtures.PREFIX
+        day = day_offset(28)
+        fixtures.login('c1')
+        journey.save_profile('clinician', 'Synthetic slot clinician', 1, languages=['en'])
+        journey.publish(service, 30000, 30)
+        payload = schedule_payload(offering, day, mode='automatic')
+        payload['minimum_notice_minutes'] = 0
+        scheduling.save_schedule(**payload)
+        slot = self.slots(offering, day, who='p1')[0]
+        requests = []
+        for patient in ('p1', 'p2'):
+            fixtures.login(patient)
+            journey.simulated_deposit(100000, 'request-race-' + patient + '-' + secrets.token_hex(6))
+            request = open_requests.publish_request(
+                service=service, request_text='Synthetic concurrent slot request.', urgency='scheduled',
+                language='en', consultation_format='video', sharing={'name': False, 'history': False},
+                retry_key='request-race-' + patient + '-' + secrets.token_hex(6),
+                timezone_name='Africa/Addis_Ababa', earliest_start=slot['start'],
+                latest_start=slot['start'], max_price_minor=100000)
+            requests.append(request['id'])
+            frappe.db.commit()
+        fixtures.login('c1')
+        offers = [open_requests.submit_offer(request_id, offering, slot['start'])['id']
+                  for request_id in requests]
+        frappe.db.commit()
+        barrier = threading.Barrier(2)
+
+        def accept(index):
+            fixtures.connect()
+            try:
+                fixtures.login('p' + str(index + 1))
+                req = next(item for item in open_requests.my_requests() if item.id == requests[index])
+                self.assertTrue(any(item.id == offers[index] for item in req.offers))
+                barrier.wait(timeout=10)
+                result = open_requests.respond_offer(requests[index], offers[index], 'accept',
+                    None, req.disclosure_snapshot)
+                frappe.db.commit()
+                return 'matched', result.get('appointment')
+            except frappe.ValidationError:
+                frappe.db.rollback()
+                return 'conflict', None
+            finally:
+                frappe.destroy()
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(accept, (0, 1)))
+        frappe.db.rollback()
+        self.assertEqual(sum(state == 'matched' for state, _appointment in results), 1)
+        self.assertEqual(sum(state == 'conflict' for state, _appointment in results), 1)
+        self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_appointment WHERE start=%s AND state='Booked'",
+                                     (slot['start'],)).n, 1)
+        self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_request_offer WHERE id IN %s AND state='Accepted'",
+                                     (tuple(offers),)).n, 1)
 
     def test_booking_link_is_opaque_owner_scoped_and_revocable(self):
         offering = fixtures.Integration.offers['c1']

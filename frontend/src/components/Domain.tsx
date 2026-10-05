@@ -48,6 +48,7 @@ export function ClinicianCard({ offer }: { offer: Offer }) {
         </div>
         <div>
           <h3>{offer.display_name}</h3>
+          <Link className="text-link" to={'/patient/clinicians/'+offer.clinician_id}>View profile</Link>
           <span className="verified">
             <CheckCircle2 size={16} />
             Approved for this service

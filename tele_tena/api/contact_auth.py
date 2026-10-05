@@ -232,8 +232,9 @@ def save_onboarding(kind, step, answers, complete=0):
         from tele_tena.account_context import authorized_user_change
         with authorized_user_change():
             frappe.get_doc('User', user).add_roles(role)
-        frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history)
-            VALUES (%s,%s,%s,'',%s,%s)''', (user, kind, name, clean['share_name'], clean['share_history']))
+        frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history,public_id)
+            VALUES (%s,%s,%s,'',%s,%s,%s)''',
+            (user, kind, name, clean['share_name'], clean['share_history'], str(uuid.uuid4())))
         if kind == 'patient':
             frappe.db.sql('INSERT INTO tt_wallet (patient) VALUES (%s)', (user,))
         else:

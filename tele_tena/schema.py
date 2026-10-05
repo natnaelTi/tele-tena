@@ -79,3 +79,7 @@ def install():
     demo_subledger()
     from tele_tena.patches.v1_8_legacy_event_reconciliation import execute as legacy_event_reconciliation
     legacy_event_reconciliation()
+    from tele_tena.patches.v1_9_open_requests import execute as open_requests
+    open_requests()
+    from tele_tena.patches.v1_10_request_public_identity import execute as request_public_identity
+    request_public_identity()
