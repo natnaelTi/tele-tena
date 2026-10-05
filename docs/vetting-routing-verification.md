@@ -180,14 +180,18 @@ medical catalog approval, multidimensional trust indicators, human response
 performance, full call-to-earnings demonstration, native-language approval,
 fresh-site installation, live SMS, and physical-device testing remain gaps.
 
-### Patient request-history composition (source `4a78f483ff4915e7a9db2744ecc27a5abc73fe46`)
+### Patient request-history composition (source `3ff4b0245df83809c01bdb29586382d78ef599d2`)
 
 The synthetic review patient's old request list was dominating the same screen
 as the active request composer. Open requests remain directly visible; terminal
 requests now sit under a native keyboard-operable “Previous requests” disclosure.
-No record was deleted or filtered out of the authenticated API. A packaged
-390px browser check confirmed that all 16 historical cards remained inside the
-collapsed disclosure and that Enter expands it. Its EN/AM/OM label was added to
-the dictionary; the Amharic and Afaan Oromo strings are provisional and need
-native-language review. Screenshot captures are in
-`/tmp/tele-tena-vetting-review/current/`.
+Rows still marked Open after their server expiry are treated as history in the
+presentation even if the expiry worker has not reconciled them yet; the server
+continues to enforce expiry. No record was deleted or filtered out of the
+authenticated API. A packaged 390px browser check matched all 16 API records to
+zero unexpired open cards, retained all 16 inside the collapsed disclosure, and
+confirmed Enter expands it. Its EN/AM/OM label was added to the dictionary; the
+Amharic and Afaan Oromo strings are provisional and need native-language review.
+Collapsed and expanded captures are in
+`/tmp/tele-tena-vetting-review/current/patient-requests-collapsed-mobile.png` and
+`/tmp/tele-tena-vetting-review/current/patient-requests-expanded-mobile.png`.
