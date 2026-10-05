@@ -112,6 +112,18 @@ and activation. This does not change scheduled-care rules or production defaults
   React hook/purity warnings.
 - Repeat migration on the retained isolated site completed through after-migrate
   hooks; no reseed or record deletion was performed.
-- Packaged asset refresh, request-inbox browser journey, scheduler execution,
-  full post-consultation chain, live SMS, and physical-device testing remain
-  pending at this checkpoint.
+- Packaged guest/sign-in/deep-link/reload/sign-out/PWA browser check passed on
+  source `ab5ac52e9f849666a3296d2a5fdfe035428860f0`.
+- Production-built availability save, reload and generated patient booking
+  passed with a newly created synthetic patient.
+- Production-built separate patient and clinician sessions published a scheduled
+  request and verified it appeared in the authenticated clinician inbox.
+- The compatibility scheduler and queue worker ran against isolated Redis DB 15;
+  aggregate state inspection confirmed the five stale retained Open requests
+  were transitioned to Expired. One new scheduled synthetic request remains
+  Open for review. No old queue was consumed.
+- A real-time immediate browser dispatch outside the sample clinician's working
+  interval was not claimed. Mocked-time Frappe tests cover immediate eligibility,
+  continuous starts and capacity gating. The full post-consultation chain, live
+  SMS, hosted LiveKit Cloud, physical-device testing and native translation
+  review remain unverified in this checkpoint.

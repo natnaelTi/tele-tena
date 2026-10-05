@@ -1,5 +1,38 @@
 # Presentation release verification
 
+## Current integrated local preview — 2026-10-05
+
+- Review URL: `http://127.0.0.1:8017/teletena/` (built Frappe application,
+  not Vite).
+- Bench/site: `/home/frappe/teletena-compat/bench`,
+  `tele-tena-pr2-test.localhost`.
+- Source branch and backend checkout: `feat/vetting-catalog-routing`, commit
+  `ab5ac52e9f849666a3296d2a5fdfe035428860f0`.
+- Packaged frontend `release.json` source SHA matches that exact commit. The
+  current web process was restarted from this compatibility checkout after the
+  asset refresh.
+- Isolated `bench worker --queue default,short,long` and `bench schedule` are
+  running against this compatibility bench's Redis queue database 15. The old
+  Redis DB 0 queue and the original development bench processes were not
+  processed or restarted. The intended review site has its scheduler enabled.
+- A separate synthetic patient/clinician browser journey against the packaged
+  `/teletena/` build published a scheduled request and showed it in the
+  clinician's authenticated inbox. The packaged availability test saved and
+  reloaded a schedule and booked a generated slot. The package guest/sign-in,
+  deep-link/reload, sign-out, responsive consultation detail, PWA scope and
+  offline checks also passed on this build.
+- Immediate requests are configured for the legacy synthetic review service on
+  this site only. The current wall clock was outside the sample clinician's
+  weekly interval, so an actual immediate browser dispatch was not claimed;
+  mocked-time Frappe regressions cover continuous start selection and policy
+  enforcement. At this time the clinician shell reports no immediate capacity
+  instead of implying ready status.
+- This does not validate live SMS, hosted LiveKit Cloud in this run, physical
+  devices, native translation quality or Selfmade deployment.
+
+Older snapshots below describe their dated branches and commits. They are
+historical evidence, not the current preview source or release manifest.
+
 ## PR #12 local preview checkpoint (2026-10-03)
 
 The correct review preview is `http://127.0.0.1:8017/teletena/` (availability:
