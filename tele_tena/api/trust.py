@@ -38,4 +38,6 @@ def submit_session_feedback(appointment, rating):
         (id,appointment,patient,clinician,rating,metric_version,created_at)
         VALUES (%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))''',
         (str(uuid.uuid4()), item.id, patient, item.clinician, value, SESSION_EXPERIENCE_VERSION))
+    from tele_tena.api.presentation import _event
+    _event(item.id, 'PatientSessionExperienceSubmitted', patient)
     return {'submitted': True, 'idempotent': False}

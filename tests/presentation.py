@@ -873,10 +873,25 @@ class Presentation(unittest.TestCase):
         self.assertNotIn('private_note', shared)
         self.assertEqual(shared['patient_summary_revisions'][0]['summary'], 'Helpful next steps')
         self.assertTrue(shared['can_submit_feedback'])
-        feedback = trust.submit_session_feedback(appointment, 5)
-        self.assertTrue(feedback['submitted'])
-        self.assertFalse(feedback['idempotent'])
+        frappe.db.commit()
+        feedback_barrier = threading.Barrier(2)
+        def submit_feedback():
+            fixtures.connect()
+            try:
+                fixtures.login('p1')
+                feedback_barrier.wait(timeout=10)
+                result = trust.submit_session_feedback(appointment, 5)
+                frappe.db.commit()
+                return result
+            finally:
+                frappe.destroy()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            feedback_results = list(pool.map(lambda _index: submit_feedback(), range(2)))
+        frappe.db.rollback()
+        self.assertEqual(sum(not result['idempotent'] for result in feedback_results), 1)
+        self.assertTrue(all(result['submitted'] for result in feedback_results))
         self.assertTrue(trust.submit_session_feedback(appointment, 5)['idempotent'])
+        self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_appointment_event WHERE appointment=%s AND event_type='PatientSessionExperienceSubmitted'", (appointment,)).n, 1)
         with self.assertRaises(frappe.ValidationError):
             trust.submit_session_feedback(appointment, 4)
         with self.assertRaises(frappe.ValidationError):
