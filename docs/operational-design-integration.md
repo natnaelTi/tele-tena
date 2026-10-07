@@ -1,4 +1,6 @@
-# TeleTena operational design integration
+# Historical TeleTena operational design integration checkpoint
+
+This document captures an initial implementation plan and an earlier source snapshot, not the current release. Current status is maintained in `operational-progress-export.md`; screen acceptance remains in `operational-screen-map.json` and `mvp-delivery-tracker.md`.
 
 7 October 2026. Authorized target: implement the complete approved design inventory and extended modules in the existing React/TypeScript + Frappe/ERPNext architecture. The 142-screen extracted source remains the visual/interaction reference, while the existing product and backend remain authoritative. Do not copy the static prototype as a fake implementation or create a second wallet.
 

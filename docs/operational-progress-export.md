@@ -1,4 +1,15 @@
-# Operational implementation checkpoint — 2026-10-07
+# Current operational checkpoint — 2026-10-07
+
+This current section supersedes the historical checkpoint below. Do not use its old source SHA as the current release.
+
+- Current implementation branch: `feat/teletena-operational-completion`; latest focused feature code commit: `93ca02e` (`feat(trust): add encounter-scoped session feedback`). It is based on PR #15’s integration branch and retains PR #12–#15 ancestry. No branch merge, push, or remote deployment occurred.
+- Added one immutable 1–5 patient session-experience rating after an ended and explicitly finalized encounter. Same-payload retry is idempotent; changed retry, premature feedback, other-patient access, and clinician access are rejected by the command. Public clinician profiles expose a rolling 365-day aggregate only at a sample size of five, with count and metric version; below that threshold only “New to TeleTena” / “More feedback needed” appears. This metric is not clinical competence or outcome evidence. Responsiveness and reliability remain explicitly unmeasured. See `session-experience-metric.md`.
+- Added v1.14 migration/bootstrap, migration-preservation and fresh-install assertions, English/Amharic/Afaan Oromo provisional UI strings, and focused backend regression assertions. The pure metric tests pass (2/2), Python compile, TypeScript/Vite build, and lint pass. Lint retains pre-existing React warnings.
+- The latest source still has no isolated disposable site: `/tmp/tele-tena-pr12-db-admin.json` and `sites/tele-tena-pr12-fresh.localhost` are absent. Frappe migration/integration/browser assertions for this feature have not run. There is no current-source preview URL. The existing port 8017 process is the older Frappe 16 compatibility checkout and is not valid for this branch.
+- `docs/operational-screen-map.json` still covers 142 screens/14 journeys; E12 and F12 moved from Designed to Implemented, verification pending. This is not full acceptance. Clinic, couples, laboratory/diagnostics, subscriptions, second opinions, medical tourism, feedback moderation, and other designed screens remain incomplete or externally gated as recorded in the map/tracker.
+- No live SMS, physical-device, clinical/native translation, provider settlement, remote Selfmade update, or production-care acceptance is claimed.
+
+## Historical checkpoint — superseded source
 
 This is a concise, sanitized progress export for roadmap updates. It is not a release or deployment claim.
 
