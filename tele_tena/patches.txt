@@ -19,3 +19,4 @@ tele_tena.patches.v1_13_financial_reconciliation_audit
 tele_tena.patches.v1_14_session_feedback
 tele_tena.patches.v1_15_mutual_rescheduling
 tele_tena.patches.v1_16_scope_evidence_storage
+tele_tena.patches.v1_17_consultation_extensions
