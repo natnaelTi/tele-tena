@@ -216,3 +216,27 @@ Amharic and Afaan Oromo strings are provisional and need native-language review.
 Collapsed and expanded captures are in
 `/tmp/tele-tena-vetting-review/current/patient-requests-collapsed-mobile.png` and
 `/tmp/tele-tena-vetting-review/current/patient-requests-expanded-mobile.png`.
+
+### Empty immediate-request inbox diagnosis (2026-10-07)
+
+Read-only inspection of the retained synthetic Review Clinician in
+`tele-tena-pr12-fresh.localhost` reproduced the reported “toggle is on but no
+request arrives” setup. The authenticated `request_presence` query returned
+`ready=false`, `configured=false`, with reason codes `language_required` and
+`immediate_policy_required`; no unexpired presence lease existed. The saved
+calendar and published offering do not by themselves make an account eligible
+for immediate requests. The profile must declare the request language, and a
+reviewer must enable immediate care for the exact service; only then can an
+authenticated session create/renew the short-lived ready presence. The matcher
+also excludes a candidate whose language set does not contain the request's
+required language. This explains the empty inbox without relaxing either
+condition. No profile, approval, offering, schedule, appointment or balance
+was changed during this diagnosis.
+
+The clinician workspace now renders each readiness reason as a link to the
+relevant account, service, availability or professional-review screen. This
+does not enable any policy or bypass the human reviewer. A Frappe regression
+asserts that absent languages and disabled immediate-service policy remain
+separate readiness reasons. The running packaged browser confirmed the linked
+reasons for this seeded synthetic account; screenshot:
+`docs/screenshots/mutual-rescheduling/availability-1440.png`.

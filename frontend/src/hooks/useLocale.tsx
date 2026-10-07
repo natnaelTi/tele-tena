@@ -148,6 +148,7 @@ const words: Record<string, [string, string]> = {
   "Post for free and compare private offers without changing your filters.": ["ማጣሪያዎችዎን ሳይቀይሩ በነፃ ጥያቄ ያቅርቡና የግል አቅርቦቶችን ያወዳድሩ።", "Utuu calaltuu kee hin jijjiirin bilisaan gaaffii dhiyeessiitii dhiyeessota dhuunfaa walbira qabi."],
   "Post a request": ["ጥያቄ አቅርብ", "Gaaffii dhiyeessi"],
   "Requests paused": ["የጥያቄ መቀበል ቆሟል", "Gaaffii fudhachuun dhaabbateera"],
+  "Setup needed": ["ማዋቀር ያስፈልጋል", "Qophii barbaachisa"],
   "Ready status expires if this session disconnects.": ["ይህ ክፍለ ጊዜ ከተቋረጠ ዝግጁነቱ ያበቃል።", "Yoo seeshiniin kun cite, qophiin ni dhuma."],
   "Connection lost; availability will expire.": ["ግንኙነት ጠፍቷል፤ ዝግጁነቱ ያበቃል።", "Walqunnamtiin citeera; qophiin ni dhuma."],
   "Complete setup before receiving requests.": ["ጥያቄዎችን ከመቀበልዎ በፊት ማዋቀሩን ያጠናቅቁ።", "Gaaffii fudhachuu dura qophii xumuri."],

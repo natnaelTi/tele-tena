@@ -741,6 +741,11 @@ class Presentation(unittest.TestCase):
         self.make_schedule(offering=offering)
         fixtures.login('c1')
         with patch.dict(frappe.conf, tele_tena_demo_immediate_care_enabled=False):
+            with patch.object(open_requests, 'clinician_languages', return_value=set()):
+                presence = open_requests.request_presence()
+                self.assertFalse(presence['configured'])
+                self.assertIn('language_required', presence['reasons'])
+                self.assertIn('immediate_policy_required', presence['reasons'])
             with self.assertRaises(frappe.ValidationError):
                 open_requests.set_request_presence(True)
             self.assertEqual(frappe.local.response.get('tele_tena_error'), 'immediate_policy_required')

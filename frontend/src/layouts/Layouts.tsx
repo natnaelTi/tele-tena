@@ -66,11 +66,19 @@ function ClinicianRequestAvailability() {
     } finally { setBusy(false); }
   };
   const data = presence.data;
-  const guidance:Record<string,string>={approval_required:"Approval required",language_required:"Add a care language",offering_required:"Publish an offering",scope_approval_required:"Get approval for a service scope",published_schedule_required:"Publish availability",immediate_policy_required:"Ask a reviewer to enable immediate requests for a service",no_immediate_capacity:"No complete session fits the next 30 minutes"};
+  const guidance:Record<string,{label:string;to:string}>={
+    approval_required:{label:"Approval required",to:"/clinician/vetting"},
+    language_required:{label:"Add a care language",to:"/clinician/account"},
+    offering_required:{label:"Publish an offering",to:"/clinician/services"},
+    scope_approval_required:{label:"Get approval for a service scope",to:"/clinician/vetting"},
+    published_schedule_required:{label:"Publish availability",to:"/clinician/availability"},
+    immediate_policy_required:{label:"Ask a reviewer to enable immediate requests for a service",to:"/clinician/vetting"},
+    no_immediate_capacity:{label:"No complete session fits the next 30 minutes",to:"/clinician/availability"},
+  };
   return <section className="request-presence-shell" aria-label={w("Request availability")}>
     <div><strong>{w(data?.ready ? "Available for requests" : "Requests paused")}</strong>
       <span>{w(connectionFailed ? "Connection lost; availability will expire." : data?.configured ? "Ready status expires if this session disconnects." : "Complete setup before receiving requests.")}</span>
-      {!!data?.reasons?.length && <small>{data.reasons.map((reason: string) => w(guidance[reason]||"Complete setup before receiving requests.")).join(" · ")}</small>}
+      {!!data?.reasons?.length && <nav className="request-readiness-actions" aria-label={w("Setup needed")}>{data.reasons.map((reason: string) => {const item=guidance[reason];return item?<Link key={reason} to={item.to}>{w(item.label)}</Link>:<span key={reason}>{w("Complete setup before receiving requests.")}</span>;})}</nav>}
     </div>
     <Button className="compact-button" variant={data?.ready ? "secondary" : "primary"} loading={busy} disabled={!data?.configured && !data?.ready} onClick={() => void toggle()}>{w(data?.ready ? "Pause" : "Go available")}</Button>
   </section>;
