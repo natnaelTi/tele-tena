@@ -1038,6 +1038,11 @@ class Presentation(unittest.TestCase):
         self.assertEqual(int(wallet_reserved.reserved), int(wallet_before.reserved) + 300)
         self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s',
                                      ('extension-reserve:' + proposal['id'],)).n, 1)
+        with self.assertRaises(frappe.ValidationError):
+            presentation.cancel_appointment(appointment, 'Synthetic attempt during open call')
+        self.assertEqual(frappe.local.response.get('tele_tena_error'), 'cancellation_call_active')
+        self.assertEqual(int(journey.one('SELECT reserved FROM tt_wallet WHERE patient=%s', (patient,)).reserved),
+                         int(wallet_reserved.reserved))
         # The clinician explicitly starts the accepted block; elapsed call time
         # alone is not used as consent or billing evidence.
         pending_before = accounting.balance('clinician', clinician, 'pending')

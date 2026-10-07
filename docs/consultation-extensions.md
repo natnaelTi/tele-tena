@@ -43,6 +43,8 @@ accepted block reserves clinician time even before it starts. The server
 revalidates call state, offer expiry, available funds, subledger projection and
 conflicting clinician appointments at acceptance. Existing appointment and
 balance checks use the same global transaction gate and wallet lock order.
+The existing pre-start cancellation path is blocked while a call is open, so it
+cannot release only the base booking amount and strand an extension reservation.
 Unanswered offer expiry is processed by a once-per-minute Frappe scheduler job;
 the authenticated status query also reports an elapsed offer as expired without
 mutating state, and a retry/accept command enforces expiry transactionally.

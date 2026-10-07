@@ -112,6 +112,9 @@ def cancel_appointment(appointment, reason):
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     if item.start <= now:
         fail('Cancellations are available before the scheduled start', 'cancellation_cutoff')
+    active_call = rows("SELECT state FROM tt_consultation WHERE appointment=%s AND state='Open'", (item.id,))
+    if active_call:
+        fail('End the active consultation before cancelling the appointment', 'cancellation_call_active')
     snapshot = json.loads(item.policy_snapshot) if item.policy_snapshot else {}
     if snapshot.get('version') != DEMO_CANCELLATION_POLICY:
         fail('The accepted cancellation policy is unavailable', 'policy_unavailable')

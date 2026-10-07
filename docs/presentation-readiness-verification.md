@@ -15,7 +15,9 @@ were made.
 coverage verifies consent and atomic extension reservation, idempotent retry,
 explicit clinician start, inclusion exactly once in finalized earnings,
 release of an accepted-but-unstarted block when the consultation ends, and
-idempotent scheduler expiry. Python compilation and the frontend TypeScript /
+idempotent scheduler expiry. It also verifies an open consultation cannot be
+cancelled through the older appointment endpoint while extension funds remain
+reserved. Python compilation and the frontend TypeScript /
 Vite production build passed. `npm run lint` exited successfully with the
 existing React warnings; Vite retains its existing LiveKit chunk-size advisory.
 
