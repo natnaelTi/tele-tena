@@ -154,6 +154,12 @@ Frappe 15's tested range; this is not exact Selfmade-stack compatibility
 evidence. Fresh-install schema assertions passed, but full fresh-site browser
 acceptance remains open.
 
+After that run, the browser harness was improved to emit fixed checkpoint
+labels, use bounded Playwright timeouts, and bound service-worker readiness.
+This makes any subsequent isolated rerun fail at a named phase instead of
+waiting for the full outer timeout. It has syntax-checked successfully; the
+changed harness has not yet been rerun on a freshly provisioned site.
+
 `git status` was clean after packaging. The isolated local review preview is
 still available at the URL above. No live SMS, physical-device media, native
 translation approval, or remote deployment is claimed.

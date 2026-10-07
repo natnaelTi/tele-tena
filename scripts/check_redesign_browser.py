@@ -71,11 +71,29 @@ def main():
             with os.fdopen(fd, 'w') as stream:
                 json.dump({'users': fixtures.USERS, 'password': fixtures.PASSWORD, 'appointment_id': appointment,
                            'offering': fixtures.Integration.offers['c1'], 'booking_start': fixtures.at(4)}, stream)
-            result = subprocess.run(['node', str(APP / 'scripts/browser-presentation-release.cjs')],
-                                    env=dict(os.environ, TELE_TENA_REDESIGN_FIXTURE=str(path), NODE_PATH='/tmp/tele-tena-browser/node_modules'),
-                                    cwd=APP, timeout=300)
+            try:
+                result = subprocess.run(
+                    ['node', str(APP / 'scripts/browser-presentation-release.cjs')],
+                    env=dict(os.environ, TELE_TENA_REDESIGN_FIXTURE=str(path),
+                             NODE_PATH='/tmp/tele-tena-browser/node_modules'),
+                    cwd=APP, timeout=300, capture_output=True, text=True)
+            except subprocess.TimeoutExpired as error:
+                # The browser script emits only fixed checkpoint labels. Do not
+                # echo exception diagnostics or fixture values from the child.
+                output = error.stdout or ''
+                if isinstance(output, bytes):
+                    output = output.decode('utf-8', errors='replace')
+                steps = [line for line in output.splitlines()
+                         if line.startswith('STEP: ') and len(line) < 120]
+                print('\n'.join(steps[-12:]))
+                raise RuntimeError('Redesign browser assertions exceeded 300 seconds') from None
             if result.returncode:
+                output = result.stdout or ''
+                steps = [line for line in output.splitlines()
+                         if line.startswith('STEP: ') and len(line) < 120]
+                print('\n'.join(steps[-12:]))
                 raise RuntimeError('Redesign browser assertions failed')
+            print(result.stdout.strip())
     finally:
         if ready:
             frappe.db.rollback()

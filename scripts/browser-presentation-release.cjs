@@ -8,6 +8,7 @@ const output = '/tmp/tele-tena-presentation-review'
 fs.mkdirSync(output, { recursive: true })
 let checkpoint = 'launch'
 let diagnostic = ''
+function mark(step) { checkpoint = step; console.log('STEP: ' + step) }
 async function main() {
   const browser = await chromium.launch({ args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] })
   const contexts = []
@@ -16,6 +17,8 @@ async function main() {
     const context = await browser.newContext({ permissions: ['camera', 'microphone'], timezoneId: 'Africa/Addis_Ababa' })
     contexts.push(context)
     const page = await context.newPage()
+    page.setDefaultTimeout(15000)
+    page.setDefaultNavigationTimeout(20000)
     page.on('pageerror', () => errors.push('page exception'))
     // This visual fixture mocks delivery capabilities along with its OTP send;
     // backend provider readiness is covered separately.
@@ -44,7 +47,7 @@ async function main() {
   }
   try {
     const guest = await pageFor()
-    checkpoint = 'homepage screenshots'
+    mark('homepage screenshots')
     await guest.goto(base)
     await guest.getByRole('heading', { name: 'Find support. Make time for care.' }).waitFor()
     await guest.getByRole('heading', { name: 'Talk to someone who fits your needs.' }).waitFor()
@@ -52,15 +55,21 @@ async function main() {
     const manifest=await guest.locator('link[rel="manifest"]').getAttribute('href')
     assert.ok(['/manifest.webmanifest','/assets/tele_tena/review/manifest.webmanifest'].includes(manifest),
       `manifest must resolve in the active Vite or built Frappe deployment: ${manifest}`)
-    await guest.evaluate(async()=>{await navigator.serviceWorker.ready})
+    mark('service worker installation readiness')
+    await Promise.race([
+      guest.evaluate(async()=>{await navigator.serviceWorker.ready}),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('service worker did not become ready')), 15000))
+    ])
+    mark('service worker controls first page')
     await guest.reload()
-    await guest.waitForFunction(()=>Boolean(navigator.serviceWorker.controller))
+    await guest.waitForFunction(()=>Boolean(navigator.serviceWorker.controller), null, {timeout:15000})
+    mark('offline navigation fallback')
     await guest.context().setOffline(true)
     await guest.goto(base+'/')
     await guest.getByRole('heading',{name:'You’re offline',exact:true}).waitFor()
     await guest.screenshot({path:`${output}/offline-state-390.png`,fullPage:true})
     await guest.context().setOffline(false)
-    checkpoint = 'phone entry is one field and expected guest is signed out'
+    mark('phone entry is one field and expected guest is signed out')
     await guest.goto(base + '/sign-in')
     await guest.getByLabel('Phone number', { exact: true }).waitFor()
     assert.equal(await guest.locator('main input').count(), 1)
@@ -78,7 +87,7 @@ async function main() {
     assert.equal(await guest.getByLabel('Password', { exact: true }).count(), 0)
     await capture(guest, 'email-alternative')
     await guest.unroute('**/api/method/tele_tena.api.contact_auth.request_code')
-    checkpoint = 'patient onboarding save and resume'
+    mark('patient onboarding save and resume')
     const newcomer = await pageFor('newpatient')
     await newcomer.getByLabel('Preferred name or alias', { exact: true }).fill('Synthetic newcomer')
     await newcomer.getByRole('button', { name: 'Save for later', exact: true }).click()
@@ -93,10 +102,10 @@ async function main() {
     await newcomer.getByRole('button', { name: 'Continue', exact: true }).click()
     await newcomer.getByRole('button', { name: 'Find care', exact: true }).click()
     await newcomer.waitForURL('**/patient')
-    checkpoint = 'clinician onboarding'
+    mark('clinician onboarding')
     const applicant = await pageFor('newclinician')
     await capture(applicant, 'clinician-onboarding')
-    checkpoint = 'patient workspace and discovery'
+    mark('patient workspace and discovery')
     const patient = await pageFor('p1')
     await patient.getByRole('heading', { name: 'Your next appointment' }).waitFor()
     await capture(patient, 'patient-home')
@@ -121,13 +130,13 @@ async function main() {
     await patient.getByRole('heading', { name: 'Find the right conversation for you.' }).waitFor()
     await patient.getByLabel('Clinician or service', { exact: true }).fill('Synthetic test consultation')
     await capture(patient, 'discovery')
-    checkpoint = 'persisted booking and privacy choices'
-    checkpoint = 'offering loads persisted availability'
+    mark('persisted booking and privacy choices')
+    mark('offering loads persisted availability')
     await patient.goto(base + '/patient/book/' + fixture.offering)
     try { await patient.getByRole('group', { name: 'Available times' }).waitFor({ timeout: 10000 }) } catch { diagnostic = JSON.stringify(await patient.evaluate(() => ({ path: location.pathname, headings: [...document.querySelectorAll('h1,h2')].map(x => x.innerText), notices: [...document.querySelectorAll('[role=alert],[role=status]')].map(x => x.innerText) }))); throw new Error('booking calendar unavailable') }
     await patient.getByRole('button', { name: /\d{4}-\d{2}-\d{2}/ }).first().click()
     await patient.getByRole('group', { name: 'Available times' }).getByRole('button').first().click()
-    checkpoint = 'choose available time and inspect schedule editor'
+    mark('choose available time and inspect schedule editor')
     const clinician = await pageFor('c1')
     await clinician.goto(base + '/clinician/availability')
     await clinician.getByRole('heading', { name: /Availability/ }).waitFor()
@@ -138,20 +147,20 @@ async function main() {
     await capture(clinician, 'tour-clinician')
     await clinician.getByRole('button', {name: 'Skip', exact: true}).click()
     await clinician.goto(base + '/clinician')
-    checkpoint = 'choose available start time'
+    mark('choose available start time')
     await patient.getByRole('button', { name: 'Continue', exact: true }).click()
-    checkpoint = 'enter request and sharing choices'
+    mark('enter request and sharing choices')
     await patient.getByLabel('What would you like to talk about?', { exact: true }).fill('Synthetic redesign request')
     await patient.getByLabel('Share my preferred name', { exact: true }).check()
-    checkpoint = 'request-specific privacy preview'
+    mark('request-specific privacy preview')
     await patient.getByRole('button', { name: 'Preview and continue', exact: true }).click()
     await patient.getByRole('heading', { name: 'Review your session', exact: true }).waitFor()
     await capture(patient, 'booking-preview')
-    checkpoint = 'confirm appointment and reserve simulated balance'
+    mark('confirm appointment and reserve simulated balance')
     await patient.getByRole('button', { name: /Confirm session/ }).click()
     await patient.waitForURL('**/patient/appointments')
     await capture(patient, 'appointments')
-    checkpoint = 'profile defaults unaffected'
+    mark('profile defaults unaffected')
     await patient.goto(base + '/patient/account')
     await patient.getByRole('button', {name: 'Privacy & sharing', exact: true}).click()
     await patient.getByLabel('Share my preferred name by default', { exact: true }).waitFor()
@@ -160,7 +169,7 @@ async function main() {
     await patient.goto(base + '/patient/payments')
     await patient.getByRole('heading', { name: 'Payments', exact: true }).waitFor()
     await capture(patient, 'payments')
-    checkpoint = 'clinician Today and practice screens'
+    mark('clinician Today and practice screens')
     // Reuse the authenticated clinician context from the schedule screenshot.
     await clinician.getByRole('heading', { name: 'Today', exact: true }).waitFor()
     await capture(clinician, 'clinician-today')
@@ -169,7 +178,7 @@ async function main() {
     await clinician.getByRole('link',{name:'Open consultation',exact:true}).waitFor()
     assert.equal((await clinician.locator('body').innerText()).includes(fixture.users.p1),false,'care record must not expose the patient account identifier')
     await capture(clinician,'care-record')
-    checkpoint = 'consultation preflight'
+    mark('consultation preflight')
     await patient.goto(base + '/patient/consultations/' + fixture.appointment_id)
     await patient.getByRole('heading', {name: 'Synthetic test consultation', exact: true}).waitFor()
     await capture(patient, 'consultation-detail')
@@ -180,14 +189,14 @@ async function main() {
     await checkDevices.click()
     await patient.getByRole('status').filter({ hasText: 'Devices checked' }).waitFor()
     await capture(patient, 'consultation-preflight')
-    checkpoint = 'administrative review'
+    mark('administrative review')
     const admin = await pageFor('admin')
     await admin.getByRole('heading', { name: 'Application review' }).waitFor()
     await capture(admin, 'administrator-review')
     await admin.getByRole('button', {name: 'Take a quick tour', exact: true}).click()
     await admin.getByRole('dialog', {name: /Application queue/}).waitFor()
     await capture(admin, 'tour-administrator')
-    checkpoint = 'showcase scripts keyboard dialogs and zoom'
+    mark('showcase scripts keyboard dialogs and zoom')
     await guest.goto(base + '/showcase')
     await capture(guest, 'showcase', [320, 390, 768, 1440])
     const firstTab = guest.getByRole('tab', { name: 'Overview', exact: true })
