@@ -189,3 +189,64 @@ regressions against the retained disposable integration site.
 `git status` was clean after packaging. The isolated local review preview is
 still available at the URL above. No live SMS, physical-device media, native
 translation approval, or remote deployment is claimed.
+
+## Authoritative fresh-site follow-up — 2026-10-07
+
+This section supersedes earlier statements above that the fresh-site browser
+journey or registration path was still pending. The named disposable site
+`tele-tena-clinic-access-fresh.localhost` was installed with Frappe 15.121.2,
+ERPNext 15.121.6, and this branch's TeleTena app. Fresh schema, app roles,
+expected tables, migration patch records, guest denial, and demonstration-mode
+defaults passed. `bench --site tele-tena-clinic-access-fresh.localhost migrate`
+was run twice successfully. The app was confirmed installed on the site.
+
+The production-built React app, served from the Frappe `/teletena/` route, then
+passed the registration-enabled browser journey on the disposable site. It
+covered the public/PWA entry, phone/email UI (without sending email or SMS),
+patient onboarding draft save/reload/completion and workspace transition,
+clinician application entry, persisted booking/disclosure/reservation, and
+patient/clinician/reviewer workspaces. The separate invited-review browser check
+passed with phone OTP and both public registration switches disabled while the
+email/password alternative remained available. These are separate site policy
+configurations; neither weakens the other. Browser screenshots are under
+`/tmp/tele-tena-presentation-review/`.
+
+The failure traced during this work was in the authorized role-grant context:
+`frappe.set_user("Administrator")` overwrote the authenticated session ID and
+nested session state. The onboarding save returned success, but the subsequent
+session query treated the new user as unauthenticated. Commit `ed7117b` now
+restores the complete session snapshot in a `finally` block after the scoped
+role grant. The regression `test_authorized_user_change_preserves_authenticated_session_state`
+passes, and the browser journey reaches the patient workspace after completion.
+The browser harness also waits for DOM readiness instead of network-idle when
+capturing pages with active Frappe requests, and checks that the development-only
+component showcase is absent from production assets. Error diagnostics emit
+response status and safe structural booleans only; they do not print onboarding
+values, response bodies, cookies, or server messages.
+
+After the fix, `TELE_TENA_TEST_SITE=tele-tena-clinic-access-fresh.localhost
+../../env/bin/python tests/presentation.py` passed **27/27**. Repeat migration
+passed again during this follow-up. The isolated site and database were retained
+by explicit `TELE_TENA_KEEP_FRESH_SITE=1` harness configuration for diagnosis
+and preview; the temporary database administrator and its mode-600 credential
+file were removed. The original `erp.localhost` site and Selfmade were not
+changed. Local MariaDB is 10.11.14, newer than this Frappe 15 environment's
+supported/tested database range; this is not exact Frappe 16/Selfmade
+compatibility evidence.
+
+The live review preview remains `http://127.0.0.1:8017/teletena/`, served by the
+isolated Gunicorn process from
+`/home/frappe/frappe/frappe-bench/apps/tele_tena` on
+`tele-tena-pr12-fresh.localhost`; it returned HTTP 200 after the follow-up.
+Its packaged frontend manifest records source
+`0a6306b4777d5fb4995c2da41e12036efd754f36`; backend branch head is newer and the
+latest backend role/session fix is `ed7117b`. It is the built Frappe app, not
+Vite. The disposable fresh site is separate from the review URL's site. The
+isolated scheduler remains disabled, so this verification does not claim that
+scheduled dispatch or earnings release ran.
+
+Not tested by this follow-up: live SMS delivery, physical-device calling,
+native-language approval, Frappe 16 compatibility, hosted deployment, or
+scheduled job execution. The earlier offline fallback and canonical
+`/teletena/` scope checks are recorded above; automated browser media remains
+fake-device evidence only.
