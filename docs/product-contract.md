@@ -28,9 +28,12 @@ paying or partnership does not grant private record access.
 
 Real voice/video, audio-only option, clinician notes, patient-authorized summaries,
 follow-up booking, and one structured patient session-experience rating per
-completed encounter. Patient experience is distinct from clinical competence and
-outcomes; profile aggregates suppress averages below a minimum sample. Free-text
-reviews/moderation remain unimplemented. Email links to an authenticated summary;
+completed encounter. Clinician profile indicators keep patient experience,
+immediate-inbox offer response, clinician-attributed cancellations, and approved
+credentials/scopes separate. Patient experience is distinct from clinical
+competence and outcomes; aggregates suppress rates/averages below a minimum
+sample. No-show attribution and free-text review moderation remain unimplemented.
+Email links to an authenticated summary;
 no sensitive summary in notification body. No recording/transcription by default.
 
 Simulated deposits; available/reserved patient funds; pending/available clinician earnings;

@@ -4215,13 +4215,18 @@
         "tt_offering",
         "tt_schedule",
         "tt_open_request",
+        "tt_request_recipient",
         "tt_request_offer",
         "tt_clinician_request_presence",
         "tt_appointment",
+        "tt_appointment_event",
         "tt_session_feedback"
       ],
       "queries": [
-        "tele_tena.api.open_requests.clinician_profile"
+        "tele_tena.api.open_requests.clinician_profile",
+        "trust_metrics.summarize_response_behavior",
+        "trust_metrics.summarize_clinician_cancellations",
+        "trust_metrics.summarize_session_experience"
       ],
       "commands": [
         "tele_tena.api.journey.publish",
@@ -4257,7 +4262,7 @@
         "calendar/worker readiness",
         "trust metrics based on real events"
       ],
-      "verification_evidence": "Profile query exposes separate credential/scope, responsiveness, reliability and patient session-experience dimensions; only the session-experience metric has measured data. See docs/session-experience-metric.md. Browser/API verification pending."
+      "verification_evidence": "Public profile now exposes separate approved-scope, immediate-inbox offer-response (90-day), clinician-attributed cancellation (365-day), and patient session-experience (365-day) indicators. All hide rates/means below five observations and include counts/version metadata. No-show attribution and ranking remain unsupported. Migration, direct authorization, and browser verification pending; see docs/session-experience-metric.md."
     },
     {
       "id": "F13",

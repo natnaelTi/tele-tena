@@ -910,6 +910,12 @@ class Presentation(unittest.TestCase):
         self.assertEqual(metric['sample_count'], 1)
         self.assertIsNone(metric['average'])
         self.assertEqual(metric['status'], 'more_feedback_needed')
+        response_metric = public_profile['trust_indicators']['responsiveness']
+        self.assertEqual(response_metric['sample_count'], 0)
+        self.assertIsNone(response_metric['rate_percent'])
+        reliability_metric = public_profile['trust_indicators']['reliability']
+        self.assertEqual(reliability_metric['sample_count'], 1)
+        self.assertIsNone(reliability_metric['rate_percent'])
         fixtures.login('c1')
         presentation.save_note_draft(appointment, 'Amended private observation', 'New next steps')
         presentation.finalize_consultation(appointment, 0)

@@ -136,8 +136,12 @@ export function PublicClinicianProfile(){
     <InlineNotice>{resource.data.approval_meaning}</InlineNotice>
     <section className="trust-indicators" aria-labelledby="trust-indicators-title"><h2 id="trust-indicators-title">{w("trustIndicators")}</h2><dl>
       <div><dt>{w("professionalReview")}</dt><dd>{w("manuallyReviewedScopes")}</dd></div>
-      <div><dt>{w("responseBehavior")}</dt><dd>{w("sessionExperienceNotMeasured")}</dd></div>
-      <div><dt>{w("reliability")}</dt><dd>{w("sessionExperienceNotMeasured")}</dd></div>
+      <div><dt>{w("responseBehavior")}</dt><dd>{resource.data.trust_indicators.responsiveness.rate_percent===null
+        ? resource.data.trust_indicators.responsiveness.status==="new"?w("noRequestHistory"): <>{w("trustInsufficientData")} · {resource.data.trust_indicators.responsiveness.sample_count} {w("immediateRequestsPresented")}</>
+        : <>{resource.data.trust_indicators.responsiveness.rate_percent}% {w("offerResponseRate")} · {resource.data.trust_indicators.responsiveness.response_count}/{resource.data.trust_indicators.responsiveness.sample_count} {w("immediateRequestsPresented")}</>}</dd></div>
+      <div><dt>{w("reliability")}</dt><dd>{resource.data.trust_indicators.reliability.rate_percent===null
+        ? resource.data.trust_indicators.reliability.status==="new"?w("noAppointmentHistory"): <>{w("trustInsufficientData")} · {resource.data.trust_indicators.reliability.sample_count} {w("completedAndCancelledSessions")}</>
+        : <>{resource.data.trust_indicators.reliability.rate_percent}% · {resource.data.trust_indicators.reliability.clinician_cancelled_count}/{resource.data.trust_indicators.reliability.sample_count} {w("clinicianCancellations")}</>}</dd></div>
       <div><dt>{w("sessionExperienceMetric")}</dt><dd>{resource.data.trust_indicators.session_experience.average===null
         ? <>{w(resource.data.trust_indicators.session_experience.status==="new"?"sessionExperienceNew":"sessionExperienceMore")} · {resource.data.trust_indicators.session_experience.sample_count} {w("evidenceCount")}</>
         : <>{resource.data.trust_indicators.session_experience.average} / 5 · {resource.data.trust_indicators.session_experience.sample_count} {w("evidenceCount")}</>}</dd></div>

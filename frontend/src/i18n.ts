@@ -60,6 +60,9 @@ export const en = {
   sessionExperience:'How was your session?', sessionExperienceExplainer:'Share your experience of this session. This is not a rating of clinical outcomes.', sessionExperienceScale:'Rate your experience from 1 (not positive) to 5 (very positive).', submitSessionFeedback:'Send feedback', feedbackSubmitted:'Thank you. Your session feedback was recorded.',
   sessionExperienceNew:'New to TeleTena', sessionExperienceMore:'More feedback needed', sessionExperienceMetric:'Session experience', sessionExperienceNotMeasured:'Not yet measured',
   trustIndicators:'Trust indicators', professionalReview:'Professional review', manuallyReviewedScopes:'Application and each listed service scope are manually reviewed.', approvedScope:'Approved for this service', responseBehavior:'Response behavior', reliability:'Appointment reliability', evidenceCount:'sessions',
+  trustInsufficientData:'More data needed', immediateRequestsPresented:'immediate requests returned to the inbox', offersMade:'offers made', clinicianCancellations:'clinician-initiated cancellations',
+  completedAndCancelledSessions:'completed or clinician-cancelled sessions', offerResponseRate:'received an offer',
+  noRequestHistory:'No eligible requests presented yet', noAppointmentHistory:'No completed or clinician-cancelled sessions yet',
 } as const
 export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
@@ -112,6 +115,9 @@ export const am: Record<Key, string> = {
   sessionExperience:'የክፍለ ጊዜዎ ተሞክሮ እንዴት ነበር?', sessionExperienceExplainer:'የዚህን ክፍለ ጊዜ ተሞክሮ ያጋሩ። ይህ የሕክምና ውጤት ደረጃ አይደለም።', sessionExperienceScale:'ተሞክሮዎን ከ1 (ጥሩ አይደለም) እስከ 5 (በጣም ጥሩ) ይምረጡ።', submitSessionFeedback:'አስተያየት ላክ', feedbackSubmitted:'እናመሰግናለን። የክፍለ ጊዜ አስተያየትዎ ተመዝግቧል።',
   sessionExperienceNew:'በTeleTena አዲስ', sessionExperienceMore:'ተጨማሪ አስተያየት ያስፈልጋል', sessionExperienceMetric:'የክፍለ ጊዜ ተሞክሮ', sessionExperienceNotMeasured:'ገና አልተለካም',
   trustIndicators:'የእምነት መለኪያዎች', professionalReview:'የሙያ ግምገማ', manuallyReviewedScopes:'ማመልከቻውና የተዘረዘሩ የሙያ ፈቃዶች በተናጠል በሰው ይገመገማሉ።', approvedScope:'ለዚህ አገልግሎት ተፈቅዷል', responseBehavior:'ምላሽ መስጠት', reliability:'የቀጠሮ ታማኝነት', evidenceCount:'ክፍለ ጊዜዎች',
+  trustInsufficientData:'ተጨማሪ መረጃ ያስፈልጋል', immediateRequestsPresented:'ወደ መጠባበቂያ ሳጥኑ የተመለሱ ፈጣን ጥያቄዎች', offersMade:'የቀረቡ ጥቆማዎች', clinicianCancellations:'በሐኪም የተጀመሩ ስረዛዎች',
+  completedAndCancelledSessions:'የተጠናቀቁ ወይም በሐኪም የተሰረዙ ክፍለ ጊዜዎች', offerResponseRate:'ጥቆማ የተቀረበላቸው',
+  noRequestHistory:'ገና ብቁ የሆኑ ጥያቄዎች አልቀረቡም', noAppointmentHistory:'ገና የተጠናቀቁ ወይም በሐኪም የተሰረዙ ክፍለ ጊዜዎች የሉም',
 }
 export const om: Record<Key, string> = {
   sessionLifecycle:'Haala marii', mediaStatus:'Walqunnamtii miidiyaa', callNotConnected:'Hin wal qabamne', callToggleError:'Mikirofoonii ykn kaameraa jijjiiruun hin milkoofne. Hayyama meeshaalee ilaalii irra deebiʼi yaali.',
@@ -160,5 +166,8 @@ export const om: Record<Key, string> = {
   sessionExperience:'Muuxannoon marii kee akkam ture?', sessionExperienceExplainer:'Muuxannoo marii kanaa qoodi. Kun madaallii buʼaa yaalaa miti.', sessionExperienceScale:'Muuxannoo kee 1 (gaarii miti) irraa hanga 5 (baayʼee gaarii)tti filadhu.', submitSessionFeedback:'Yaada ergi', feedbackSubmitted:'Galatoomi. Yaadni muuxannoo marii kee galmaaʼeera.',
   sessionExperienceNew:'TeleTena irratti haaraa', sessionExperienceMore:'Yaadni dabalataa barbaachisa', sessionExperienceMetric:'Muuxannoo marii', sessionExperienceNotMeasured:'Hanga ammaatti hin safaramne',
   trustIndicators:'Agarsiistota amanamummaa', professionalReview:'Gamaaggama ogummaa', manuallyReviewedScopes:'Iyyannoon fi tajaajiloonni tarreeffaman tokkoon tokkoon isaanii namaan gamaaggamamu.', approvedScope:'Tajaajila kanaaf hayyamame', responseBehavior:'Amala deebii kennuu', reliability:'Amanamummaa beellamaa', evidenceCount:'marii',
+  trustInsufficientData:'Odeeffannoo dabalataa barbaachisa', immediateRequestsPresented:'gaaffii ariifachiisaa sanduuqa keessatti agarsiifaman', offersMade:'dhiyeessiiwwan godhaman', clinicianCancellations:'haquu ogeessi jalqabe',
+  completedAndCancelledSessions:'marii xumurame ykn ogeessi haqe', offerResponseRate:'dhiyeessii argatan',
+  noRequestHistory:'Hanga ammaatti gaaffiin ulaagaa guute hin dhiyaanne', noAppointmentHistory:'Hanga ammaatti mariin hin xumuramne ykn ogeessi hin haqne',
 }
 export const locales = { en, am, om }

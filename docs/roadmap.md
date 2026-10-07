@@ -44,7 +44,7 @@ product scope, not shipped capability:
 
 ## Explicitly outside the current implementation
 
-Clinic membership/workspaces and referral attribution, natural-language clinical matching or relevance feedback, public free-text reviews/moderation, couples consent, mutual rescheduling, no-show workflows, email summary delivery, real money movement, real credential verification and emergency escalation are not represented as working features. Structured session-experience feedback is being added in the current branch, with database/browser verification still pending. See `mvp-delivery-tracker.md` for current status and evidence.
+Clinic membership/workspaces and referral attribution, natural-language clinical matching or relevance feedback, public free-text reviews/moderation, couples consent, mutual rescheduling, no-show workflows, email summary delivery, real money movement, real credential verification and emergency escalation are not represented as working features. Separate session-experience, eligible-inbox response, and clinician-attributed cancellation indicators are being added in the current branch; database/browser verification remains pending. See `mvp-delivery-tracker.md` for current status and evidence.
 
 ## Current vetting and routing checkpoint (2026-10)
 
