@@ -105,8 +105,12 @@ alone is not persisted evidence that presence is still fresh.
 
 - The catalog is a sourced proposal, not a reviewed or exhaustive taxonomy.
   Medical-lead approval is required before activation.
-- Applicant evidence-by-scope, clinic-affiliation verification, structured
-  interview scoring, independent license verification, appeals, reverification,
+- Applicant scope-specific PDF upload/revision is now implemented on the
+  dependent `feat/scope-evidence` branch with private storage and assessment
+  references; API permission/state regression tests pass on the retained
+  Frappe 15 site. Rendered browser verification for this new workflow is still
+  pending. Clinic-affiliation verification, structured interview scoring,
+  independent license verification, appeals, reverification,
   expiry automation, and operational review of existing appointments after
   revocation are incomplete.
 - The rubric records gating findings but does not implement the requested

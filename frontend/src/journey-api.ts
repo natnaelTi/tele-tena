@@ -83,6 +83,7 @@ export const journeyApi = {
   vettingServices: () => api<any[]>('tele_tena.api.vetting.vetting_services'),
   myScopeApplications: () => api<any[]>('tele_tena.api.vetting.my_scope_applications'),
   saveScopeApplication: (service:string, values:Record<string,unknown>, submit=false) => api<any>('tele_tena.api.vetting.save_scope_application',{service,values,submit:submit?1:0},true),
+  uploadScopeEvidence: (application:string,evidence_type:string,filename:string,content_base64:string) => api<any>('tele_tena.api.vetting.upload_scope_evidence',{application,evidence_type,filename,content_base64},true),
   reviewScopeApplication: (data:Record<string,unknown>) => api<any>('tele_tena.api.vetting.review_scope_application',data,true),
   assignScopeReviewer: (application:string,reviewer:string) => api<any>('tele_tena.api.vetting.assign_scope_reviewer',{application,reviewer},true),
   myClinicApplications: () => api<any[]>('tele_tena.api.clinics.my_clinic_applications'),

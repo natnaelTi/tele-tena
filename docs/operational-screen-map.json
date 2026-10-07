@@ -1036,18 +1036,20 @@
       "module": "Profiles/vetting",
       "backend_reference": "journey, vetting, private evidence",
       "required_contract": "Guided profiles, scoped review decisions, protected evidence",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Applicant browser flow locally verified on isolated Frappe 15; clean fresh install remains pending",
       "prototype_route": "b09",
       "route": "/clinician/vetting",
       "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_profile",
         "tt_onboarding",
         "tt_application",
         "tt_resume_evidence",
         "Tele Tena Service Scope",
-        "Tele Tena Vetting Scope Application"
+        "Tele Tena Vetting Scope Application",
+        "Tele Tena Scope Evidence",
+        "tt_scope_evidence_content"
       ],
       "queries": [
         "tele_tena.api.journey.practice",
@@ -1060,10 +1062,12 @@
         "tele_tena.api.journey.apply",
         "tele_tena.api.vetting.save_scope_application",
         "tele_tena.api.vetting.review_scope_application",
-        "tele_tena.api.presentation.upload_resume"
+        "tele_tena.api.presentation.upload_resume",
+        "tele_tena.api.vetting.upload_scope_evidence",
+        "tele_tena.api.vetting.download_scope_evidence"
       ],
-      "server_permissions": "Applicant may edit only own draft and uploads; reviewer access is role-scoped; clinic membership does not grant clinical access. Final scope action requires an authorized human reviewer.",
-      "workflow_transitions": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+      "server_permissions": "Per-scope PDF metadata and bytes are available only to the authenticated applicant owner or Tele Tena Approver. Uploads are restricted to the owner while the application is Draft or Clarification; generic writes/deletes are denied. Financial or clinic roles do not confer evidence access.",
+      "workflow_transitions": "Draft/Clarification → append immutable evidence revision → submission/resubmission → reviewer sees evidence → decision snapshot records evidence IDs/revisions/digests; no applicant mutation after submission.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -1091,8 +1095,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B09) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
+        "current_local": "Frappe 15 isolated presentation regressions passed 27/27; built-browser applicant sign-in, two PDF revisions, submission, persistence on revisit, and reviewer-visible submitted evidence passed on tele-tena-pr12-fresh.localhost. Frappe 16.2.1/ERPNext 16.1.0/Python 3.14.2 disposable site was backed up, migrated v1.8→v1.16, repeat-migrated, and passed the 27-test backend suite. Evidence screenshots: /tmp/tele-tena-presentation-review/scope-evidence/applicant-revisions.png. Fresh-empty-site check and Frappe 16 browser journey remain pending; no external credential validation or malware scanning is claimed."
       }
     },
     {
@@ -1102,18 +1106,20 @@
       "module": "Profiles/vetting",
       "backend_reference": "journey, vetting, private evidence",
       "required_contract": "Guided profiles, scoped review decisions, protected evidence",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Reviewer browser flow locally verified on isolated Frappe 15; clean fresh install remains pending",
       "prototype_route": "b10",
       "route": "/clinician/vetting",
       "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_profile",
         "tt_onboarding",
         "tt_application",
         "tt_resume_evidence",
         "Tele Tena Service Scope",
-        "Tele Tena Vetting Scope Application"
+        "Tele Tena Vetting Scope Application",
+        "Tele Tena Scope Evidence",
+        "tt_scope_evidence_content"
       ],
       "queries": [
         "tele_tena.api.journey.practice",
@@ -1126,10 +1132,12 @@
         "tele_tena.api.journey.apply",
         "tele_tena.api.vetting.save_scope_application",
         "tele_tena.api.vetting.review_scope_application",
-        "tele_tena.api.presentation.upload_resume"
+        "tele_tena.api.presentation.upload_resume",
+        "tele_tena.api.vetting.upload_scope_evidence",
+        "tele_tena.api.vetting.download_scope_evidence"
       ],
-      "server_permissions": "Applicant may edit only own draft and uploads; reviewer access is role-scoped; clinic membership does not grant clinical access. Final scope action requires an authorized human reviewer.",
-      "workflow_transitions": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+      "server_permissions": "Per-scope PDF metadata and bytes are available only to the authenticated applicant owner or Tele Tena Approver. Uploads are restricted to the owner while the application is Draft or Clarification; generic writes/deletes are denied. Financial or clinic roles do not confer evidence access.",
+      "workflow_transitions": "Draft/Clarification → append immutable evidence revision → submission/resubmission → reviewer sees evidence → decision snapshot records evidence IDs/revisions/digests; no applicant mutation after submission.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -1157,8 +1165,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B10) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
+        "current_local": "Frappe 15 isolated presentation regressions passed 27/27, including owner/reviewer authorization and assessment evidence snapshot. Built-browser reviewer queue displayed submitted applicant and evidence; authorized reviewer downloaded the newest private PDF revision successfully. Frappe 16.2.1/ERPNext 16.1.0/Python 3.14.2 disposable site was backed up, migrated v1.8→v1.16, repeat-migrated, and passed the 27-test backend suite. Screenshot: /tmp/tele-tena-presentation-review/scope-evidence/reviewer-evidence.png. Fresh-empty-site check and Frappe 16 browser journey remain pending; no external credential validation or malware scanning is claimed."
       }
     },
     {
@@ -5863,7 +5871,9 @@
         "Tele Tena Vetting Assessment",
         "tt_audit",
         "tt_dispute",
-        "tt_financial_reconciliation"
+        "tt_financial_reconciliation",
+        "Tele Tena Scope Evidence",
+        "tt_scope_evidence_content"
       ],
       "queries": [
         "tele_tena.api.journey.applications",
@@ -5874,10 +5884,12 @@
         "tele_tena.api.journey.review",
         "tele_tena.api.vetting.assign_scope_reviewer",
         "tele_tena.api.vetting.review_scope_application",
-        "tele_tena.accounting.resolve_earning_dispute"
+        "tele_tena.accounting.resolve_earning_dispute",
+        "tele_tena.api.vetting.upload_scope_evidence",
+        "tele_tena.api.vetting.download_scope_evidence"
       ],
-      "server_permissions": "Approver may inspect authorized application evidence and decide individual scopes. Vetting, financial review and patient-record access are separate grants.",
-      "workflow_transitions": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+      "server_permissions": "Per-scope PDF metadata and bytes are available only to the authenticated applicant owner or Tele Tena Approver. Uploads are restricted to the owner while the application is Draft or Clarification; generic writes/deletes are denied. Financial or clinic roles do not confer evidence access.",
+      "workflow_transitions": "Draft/Clarification → append immutable evidence revision → submission/resubmission → reviewer sees evidence → decision snapshot records evidence IDs/revisions/digests; no applicant mutation after submission.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -5906,7 +5918,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I05) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Backend/API regression on Frappe 15 retained isolated site passed in tests/presentation.py (27/27), including PDF validation, revision history, submitted-state lock, owner/reviewer download, patient/unrelated-clinician denial, and assessment evidence snapshot. Patch v1.16 repeat migration passed after a site/database/private-files backup. Rendered browser and fresh-empty-site checks for this screen are pending; no external credential validation or malware scanning is claimed."
       }
     },
     {

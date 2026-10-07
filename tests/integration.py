@@ -16,7 +16,7 @@ from unittest.mock import Mock, patch
 
 import requests
 
-BENCH = Path(__file__).resolve().parents[3]
+BENCH = Path(os.environ.get('TELE_TENA_TEST_BENCH', Path(__file__).resolve().parents[3])).resolve()
 os.chdir(BENCH / 'sites')
 sys.path.insert(0, str(BENCH / 'apps/frappe'))
 import frappe
@@ -38,6 +38,10 @@ assert urlsplit(BASE).hostname in ('127.0.0.1', 'localhost'), 'Integration tests
 def connect():
     frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
     frappe.connect()
+    # Frappe 16's version diff formatter assumes a resolved session language.
+    # API-only test contexts have no HTTP language negotiation, so make the
+    # fixture locale explicit instead of reaching into the system user's prefs.
+    frappe.local.lang = 'en'
 
 
 def login(kind):

@@ -76,6 +76,12 @@
       "fieldtype": "Int"
     },
     {
+      "fieldname": "scope_evidence_snapshot",
+      "label": "Scope evidence reviewed (immutable IDs and revisions)",
+      "fieldtype": "Long Text",
+      "read_only": 1
+    },
+    {
       "fieldname": "rubric_version",
       "label": "Rubric version",
       "fieldtype": "Data",
