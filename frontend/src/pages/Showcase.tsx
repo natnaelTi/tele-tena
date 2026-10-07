@@ -73,20 +73,20 @@ export default function Showcase() {
         <h1>Space for a real conversation.</h1>
         <h2>እንክብካቤ ያግኙ። ለውይይት ቦታ ይስጡ።</h2>
         <p>Nama itti dubbachuun sitti tolu argadhu.</p>
-        <p>Manrope / Noto Sans Ethiopic · 400, 500, 600, 700 · body 16/1.6</p>
+        <p>Inter / Noto Sans Ethiopic · 400, 500, 600, 700 · body 16/1.6</p>
       </section>
       <section>
         <h2>Colors & spacing</h2>
         <div className="swatches">
           {[
-            "#126B64",
-            "#0D5751",
-            "#182B2A",
-            "#526561",
-            "#FAF9F6",
+            "#145D7A",
+            "#104A62",
+            "#102A33",
+            "#52636A",
+            "#F5F7F8",
             "#FFFFFF",
-            "#EAF2EE",
-            "#D7E2DC",
+            "#EAF5F5",
+            "#DFE7E9",
             "#F2BC97",
           ].map((color) => (
             <div key={color}>

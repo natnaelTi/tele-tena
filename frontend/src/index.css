@@ -1,7 +1,3 @@
-@import "@fontsource/manrope/latin-400.css";
-@import "@fontsource/manrope/latin-500.css";
-@import "@fontsource/manrope/latin-600.css";
-@import "@fontsource/manrope/latin-700.css";
 @import "@fontsource/noto-sans-ethiopic/latin-400.css";
 @import "@fontsource/noto-sans-ethiopic/latin-500.css";
 @import "@fontsource/noto-sans-ethiopic/latin-600.css";
@@ -10,20 +6,25 @@
 @import "@fontsource/noto-sans-ethiopic/ethiopic-500.css";
 @import "@fontsource/noto-sans-ethiopic/ethiopic-600.css";
 @import "@fontsource/noto-sans-ethiopic/ethiopic-700.css";
+@font-face { font-family: Inter; src: url('./assets/fonts/inter/inter-400.ttf') format('truetype'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: Inter; src: url('./assets/fonts/inter/inter-500.ttf') format('truetype'); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: Inter; src: url('./assets/fonts/inter/inter-600.ttf') format('truetype'); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: Inter; src: url('./assets/fonts/inter/inter-700.ttf') format('truetype'); font-style: normal; font-weight: 700; font-display: swap; }
 :root {
-  font-family: Manrope, "Noto Sans Ethiopic", sans-serif;
-  color: #182b2a;
-  background: #faf9f6;
+  font-family: Inter, "Noto Sans Ethiopic", sans-serif;
+  color: #102a33;
+  background: #f5f7f8;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --brand: #126b64;
-  --brand-hover: #0d5751;
-  --ink: #182b2a;
-  --muted: #526561;
-  --canvas: #faf9f6;
+  --brand: #145d7a;
+  --brand-hover: #104a62;
+  --teal: #087f8c;
+  --ink: #102a33;
+  --muted: #52636a;
+  --canvas: #f5f7f8;
   --card: #fff;
-  --subtle: #eaf2ee;
-  --border: #d7e2dc;
+  --subtle: #eaf5f5;
+  --border: #dfe7e9;
   --apricot: #f2bc97;
   --success: #216141;
   --warning: #79500e;
@@ -166,10 +167,10 @@ video {
   max-width: 100%;
 }
 ::selection {
-  background: #d3e7de;
+  background: #d4eef0;
 }
 html[lang="am"] {
-  font-family: "Noto Sans Ethiopic", Manrope, sans-serif;
+  font-family: "Noto Sans Ethiopic", Inter, sans-serif;
   line-height: 1.7;
 }
 html[lang="am"] h1,

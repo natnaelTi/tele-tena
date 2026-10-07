@@ -15,10 +15,10 @@ export function ConversationArt() {
       role="img"
       aria-label="Two conversation shapes making space for one another"
     >
-      <ellipse cx="250" cy="396" rx="168" ry="16" fill="#D7E2DC" />
+      <ellipse cx="250" cy="396" rx="168" ry="16" fill="#DFE7E9" />
       <path
         d="M54 183C54 101 110 51 192 51h51c55 0 84 33 84 85v81c0 48-32 78-80 78h-73l-64 42 11-62c-45-13-67-45-67-92Z"
-        fill="#126B64"
+        fill="#145D7A"
       />
       <path
         d="M253 172h55c84 0 139 48 139 113 0 42-22 72-58 88l9 43-49-29h-96c-49 0-78-30-78-80v-55c0-49 29-80 78-80Z"
@@ -40,7 +40,7 @@ export function ConversationArt() {
       />
       <path
         d="m359 70 13-25m18 46 28-8"
-        stroke="#126B64"
+        stroke="#145D7A"
         strokeWidth="6"
         strokeLinecap="round"
       />
