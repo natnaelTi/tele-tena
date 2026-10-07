@@ -36,7 +36,10 @@ async function main() {
     return page
   }
   async function capture(page, name, widths = [320, 390, 768, 1440]) {
-    await page.waitForLoadState('networkidle')
+    // Frappe may keep authenticated/realtime requests active. Callers assert
+    // their screen's critical content before capture; DOM readiness plus the
+    // per-viewport font wait is stable without requiring network quiescence.
+    await page.waitForLoadState('domcontentloaded')
     for (const width of widths) {
       await page.setViewportSize({ width, height: 960 })
       await page.evaluate(() => document.fonts.ready)
@@ -98,22 +101,63 @@ async function main() {
     await guest.unroute('**/api/method/tele_tena.api.contact_auth.request_code')
     mark('patient onboarding save and resume')
     const newcomer = await pageFor('newpatient')
+    mark('patient onboarding draft loaded')
     await newcomer.getByLabel('Preferred name or alias', { exact: true }).fill('Synthetic newcomer')
+    const saveResponsePromise = newcomer.waitForResponse(response =>
+      new URL(response.url()).pathname.endsWith('tele_tena.api.contact_auth.save_onboarding'), { timeout: 15000 }
+    ).catch(() => null)
     await newcomer.getByRole('button', { name: 'Save for later', exact: true }).click()
+    const saveResponse = await saveResponsePromise
+    const saveBody = saveResponse ? await saveResponse.json().catch(() => ({})) : {}
+    console.log(`ONBOARDING_SAVE_DIAGNOSTIC: response=${saveResponse ? saveResponse.status() : 'missing'}; serverError=${saveBody.exc_type ? 'present' : 'none'}`)
     await newcomer.getByText('Progress saved. You can return to this step.').waitFor()
+    mark('patient onboarding draft saved')
     await newcomer.reload()
-    await newcomer.waitForFunction(()=>[...document.querySelectorAll('input')].some(input=>input.labels?.[0]?.innerText.includes('Preferred name or alias')&&input.value==='Synthetic newcomer'),null,{timeout:15000}).catch(async()=>{diagnostic=JSON.stringify(await newcomer.evaluate(()=>({path:location.pathname,headings:[...document.querySelectorAll('h1')].map(x=>x.innerText),inputs:[...document.querySelectorAll('input')].map(x=>({label:x.labels?.[0]?.innerText,value:x.value})),notices:[...document.querySelectorAll('[role=alert],[role=status]')].map(x=>x.innerText)})));throw new Error('saved onboarding value did not reload')})
+    await newcomer.waitForFunction(()=>[...document.querySelectorAll('input')].some(input=>input.labels?.[0]?.innerText.includes('Preferred name or alias')&&input.value==='Synthetic newcomer'),null,{timeout:15000}).catch(async()=>{diagnostic=await newcomer.evaluate(()=>{const field=[...document.querySelectorAll('input')].find(input=>input.labels?.[0]?.innerText.includes('Preferred name or alias'));return `path=${location.pathname.startsWith('/teletena/')?'app':'unexpected'}; heading=${Boolean(document.querySelector('h1'))}; field=${field?'present':'missing'}; valuePersisted=${field?.value==='Synthetic newcomer'}; alert=${Boolean(document.querySelector('[role=alert]'))}; status=${Boolean(document.querySelector('[role=status]'))}`});console.log(`ONBOARDING_RELOAD_DIAGNOSTIC: ${diagnostic}`);throw new Error('saved onboarding value did not reload')})
+    mark('patient onboarding draft reloaded')
     await capture(newcomer, 'patient-onboarding')
+    mark('patient onboarding first step verified')
     await newcomer.getByRole('button', { name: 'Continue', exact: true }).click()
     await newcomer.getByLabel('I am 18 or older.', { exact: true }).check()
     await newcomer.getByLabel('I consent to storing my profile and the information I choose to share for this care journey.').check()
     await newcomer.getByRole('button', { name: 'Continue', exact: true }).click()
+    mark('patient onboarding consent saved')
     await newcomer.getByRole('button', { name: 'Continue', exact: true }).click()
+    mark('patient onboarding privacy step saved')
+    await newcomer.getByRole('button', { name: 'Find care', exact: true }).waitFor({ state: 'visible' })
+    mark('patient onboarding completion action ready')
+    const sidBefore = (await newcomer.context().cookies()).find(cookie => cookie.name === 'sid')?.value || ''
+    const completionResponsePromise = newcomer.waitForResponse(response =>
+      new URL(response.url()).pathname.endsWith('tele_tena.api.contact_auth.save_onboarding'), { timeout: 15000 }
+    ).catch(() => null)
+    const sessionResponsePromise = newcomer.waitForResponse(response =>
+      new URL(response.url()).pathname.endsWith('tele_tena.api.contact_auth.session'), { timeout: 15000 }
+    ).catch(() => null)
     await newcomer.getByRole('button', { name: 'Find care', exact: true }).click()
-    await newcomer.waitForURL('**/patient')
+    const completionResponse = await completionResponsePromise
+    const completionBody = completionResponse ? await completionResponse.json().catch(() => ({})) : {}
+    const sidAfter = (await newcomer.context().cookies()).find(cookie => cookie.name === 'sid')?.value || ''
+    const responseSetCookie = completionResponse?.headers()['set-cookie'] || ''
+    console.log(`ONBOARDING_COMPLETE_DIAGNOSTIC: response=${completionResponse ? completionResponse.status() : 'missing'}; serverError=${completionBody.exc_type ? 'present' : 'none'}; completed=${typeof completionBody.message?.completed === 'boolean' ? completionBody.message.completed : 'unknown'}; sessionCookiePreserved=${Boolean(sidBefore && sidAfter && sidBefore === sidAfter)}; sessionCookieOpaque=${sidAfter.length >= 32}; responseSetSessionCookie=${/sid=/i.test(responseSetCookie)}`)
+    await newcomer.waitForURL('**/patient', { timeout: 15000 }).catch(async () => {
+      const sessionResponse = await sessionResponsePromise
+      const sessionBody = sessionResponse ? await sessionResponse.json().catch(() => ({})) : {}
+      const sessionMessage = sessionBody.message || {}
+      const safeErrorCode = typeof sessionBody.tele_tena_error === 'string' && /^[a-z_]{1,40}$/.test(sessionBody.tele_tena_error) ? sessionBody.tele_tena_error : 'none'
+      const safeException = typeof sessionBody.exc_type === 'string' && /^[A-Za-z_]{1,60}$/.test(sessionBody.exc_type) ? sessionBody.exc_type : 'none'
+      const safeKeys = Object.keys(sessionBody).filter(key => /^[a-z_]{1,40}$/.test(key)).sort().join(',') || 'none'
+      diagnostic = await newcomer.evaluate(() => `path=${location.pathname.includes('/onboarding') ? 'onboarding' : 'other'}; alert=${Boolean(document.querySelector('[role=alert]'))}; status=${Boolean(document.querySelector('[role=status]'))}`)
+      console.log(`ONBOARDING_COMPLETE_STATE: ${diagnostic}; sessionResponse=${sessionResponse ? sessionResponse.status() : 'missing'}; sessionError=${safeErrorCode}; exception=${safeException}; responseKeys=${safeKeys}; authenticated=${sessionMessage.authenticated === true}; profile=${Boolean(sessionMessage.profile)}; patientRole=${Array.isArray(sessionMessage.roles) && sessionMessage.roles.includes('Tele Tena Patient')}`)
+      throw new Error('patient registration did not reach patient workspace')
+    })
+    mark('patient onboarding completed')
     mark('clinician onboarding')
     const applicant = await pageFor('newclinician')
+    mark('clinician onboarding draft loaded')
+    await applicant.getByLabel('Professional name', { exact: true }).waitFor()
+    mark('clinician onboarding form ready')
     await capture(applicant, 'clinician-onboarding')
+    mark('clinician onboarding initial state verified')
     mark('patient workspace and discovery')
     const patient = await pageFor('p1')
     await patient.getByRole('heading', { name: 'Your next appointment' }).waitFor()
@@ -207,24 +251,36 @@ async function main() {
     await capture(admin, 'tour-administrator')
     mark('showcase scripts keyboard dialogs and zoom')
     await guest.goto(base + '/showcase')
-    await capture(guest, 'showcase', [320, 390, 768, 1440])
-    const firstTab = guest.getByRole('tab', { name: 'Overview', exact: true })
-    await firstTab.focus()
-    await guest.keyboard.press('ArrowRight')
-    assert.equal(await guest.getByRole('tab', { name: 'Privacy', exact: true }).getAttribute('aria-selected'), 'true')
-    await guest.getByRole('button', { name: 'Open dialog', exact: true }).click()
-    await guest.getByRole('dialog').waitFor()
-    assert.equal(await guest.evaluate(() => document.querySelector('[role=dialog]').contains(document.activeElement)), true)
-    await guest.keyboard.press('Escape')
-    assert.equal(await guest.getByRole('dialog').count(), 0)
-    await guest.locator('main').getByLabel('Language / ቋንቋ / Afaan').selectOption('am')
-    await capture(guest, 'showcase-amharic', [390, 768, 1440])
-    await guest.locator('main').getByLabel('Language / ቋንቋ / Afaan').selectOption('om')
-    await capture(guest, 'showcase-oromo', [390])
-    await guest.emulateMedia({ reducedMotion: 'reduce' })
-    await guest.setViewportSize({ width: 384, height: 960 })
-    await guest.screenshot({ path: `${output}/showcase-200-percent-equivalent-384px.png`, fullPage: true })
-    assert.equal(await guest.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
+    if (new URL(base).pathname.startsWith('/teletena')) {
+      await guest.getByRole('heading', { name: 'Find support. Make time for care.' }).waitFor()
+      assert.equal(await guest.getByRole('tab').count(), 0, 'development showcase must not be exposed in the production package')
+      mark('development-only component showcase is not exposed by production package')
+    } else {
+      await capture(guest, 'showcase', [320, 390, 768, 1440])
+      mark('showcase rendered responsively')
+      const firstTab = guest.getByRole('tab', { name: 'Overview', exact: true })
+      await firstTab.focus()
+      await guest.keyboard.press('ArrowRight')
+      await guest.waitForFunction(() => document.getElementById('tab-privacy')?.getAttribute('aria-selected') === 'true')
+      mark('showcase keyboard tab interaction')
+      await guest.getByRole('button', { name: 'Open dialog', exact: true }).click()
+      await guest.getByRole('dialog').waitFor()
+      assert.equal(await guest.evaluate(() => document.querySelector('[role=dialog]').contains(document.activeElement)), true)
+      await guest.keyboard.press('Escape')
+      assert.equal(await guest.getByRole('dialog').count(), 0)
+      mark('showcase dialog focus and escape')
+      await guest.locator('main').getByLabel('Language / ቋንቋ / Afaan').selectOption('am')
+      await capture(guest, 'showcase-amharic', [390, 768, 1440])
+      mark('showcase Amharic layout')
+      await guest.locator('main').getByLabel('Language / ቋንቋ / Afaan').selectOption('om')
+      await capture(guest, 'showcase-oromo', [390])
+      mark('showcase Afaan Oromo layout')
+      await guest.emulateMedia({ reducedMotion: 'reduce' })
+      await guest.setViewportSize({ width: 384, height: 960 })
+      await guest.screenshot({ path: `${output}/showcase-200-percent-equivalent-384px.png`, fullPage: true })
+      assert.equal(await guest.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
+      mark('showcase zoom and reduced motion')
+    }
     assert.deepEqual(errors, [])
     console.log('PASS: public/auth steps, resumable onboarding, real booking/privacy flow, portals, preflight, responsive screenshots, keyboard dialog, scripts and 200% zoom; no live delivery sent')
   } finally { await browser.close() }

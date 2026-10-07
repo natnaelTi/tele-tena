@@ -90,7 +90,12 @@ def main():
             if result.returncode:
                 output = result.stdout or ''
                 steps = [line for line in output.splitlines()
-                         if line.startswith('STEP: ') and len(line) < 120]
+                         if (line.startswith('STEP: ') and len(line) < 120) or
+                         line.startswith('OFFLINE_FALLBACK_DIAGNOSTIC: ') or
+                         line.startswith('ONBOARDING_SAVE_DIAGNOSTIC: ') or
+                         line.startswith('ONBOARDING_RELOAD_DIAGNOSTIC: ') or
+                         line.startswith('ONBOARDING_COMPLETE_DIAGNOSTIC: ') or
+                         line.startswith('ONBOARDING_COMPLETE_STATE: ')]
                 print('\n'.join(steps[-12:]))
                 raise RuntimeError('Redesign browser assertions failed')
             print(result.stdout.strip())
