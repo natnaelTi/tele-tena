@@ -5919,15 +5919,15 @@
     {
       "id": "I06",
       "family": "I",
-      "title": "Credentials & renewals",
+      "title": "Reconsideration and reverification",
       "module": "Back office",
       "backend_reference": "vetting, catalog and scoped reviewer APIs",
       "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
       "integration_status": "Pending screen-level operational acceptance",
       "prototype_route": "i06",
-      "route": "No renewal/independent verification route",
+      "route": "/clinician/vetting; /admin/vetting",
       "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
-      "status": "Designed",
+      "status": "Implemented, verification pending",
       "persistent_models": [
         "Tele Tena Service",
         "Tele Tena Service Scope",
@@ -5936,21 +5936,25 @@
         "Tele Tena Vetting Assessment",
         "tt_audit",
         "tt_dispute",
-        "tt_financial_reconciliation"
+        "tt_financial_reconciliation",
+        "Tele Tena Vetting Appeal"
       ],
       "queries": [
         "tele_tena.api.journey.applications",
         "tele_tena.api.vetting.my_scope_applications",
-        "tele_tena.accounting.open_disputes"
+        "tele_tena.accounting.open_disputes",
+        "tele_tena.api.vetting.scope_appeals"
       ],
       "commands": [
         "tele_tena.api.journey.review",
         "tele_tena.api.vetting.assign_scope_reviewer",
         "tele_tena.api.vetting.review_scope_application",
-        "tele_tena.accounting.resolve_earning_dispute"
+        "tele_tena.accounting.resolve_earning_dispute",
+        "tele_tena.api.vetting.submit_scope_appeal",
+        "tele_tena.api.vetting.review_scope_appeal"
       ],
-      "server_permissions": "Approver may inspect authorized application evidence and decide individual scopes. Vetting, financial review and patient-record access are separate grants.",
-      "workflow_transitions": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+      "server_permissions": "Applicants can submit one reconsideration against their own latest rejected, suspended, or expired assessment and read only their appeals. Approvers can read/review appeals. Reopening returns the scope to clarification; approval requires a fresh ordinary human assessment. Financial review and clinical records remain separate.",
+      "workflow_transitions": "Assessment Rejected/Suspended/Expired → Appeal Submitted → Upheld (decision preserved) or Reopened → Clarification → Resubmitted → new full scope assessment; appeals are immutable and never grant practice.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -5973,13 +5977,12 @@
         "ethiopic_layout": "Verify font coverage, wrapping, line height and control labels on this screen."
       },
       "dependencies": [
-        "approved rubric",
-        "independent primary-source verification and appeal policy"
+        "proposed appeal policy awaits medical-lead approval; no deadline or second-reviewer policy is assumed"
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I06) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "feat/vetting-reconsideration: native append-only appeal DocType, authenticated commands, reviewer and applicant UI; focused integration test pending.",
+        "current_local": "Verification pending; previous vetting/evidence checks cover v1.16 only."
       }
     },
     {
