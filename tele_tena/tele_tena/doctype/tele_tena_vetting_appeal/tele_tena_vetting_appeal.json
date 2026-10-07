@@ -1,0 +1,28 @@
+{
+  "doctype": "DocType",
+  "name": "Tele Tena Vetting Appeal",
+  "module": "Tele Tena",
+  "autoname": "hash",
+  "engine": "InnoDB",
+  "track_changes": 0,
+  "allow_rename": 0,
+  "sort_field": "creation",
+  "sort_order": "DESC",
+  "fields": [
+    {"fieldname":"scope_application","label":"Scope application","fieldtype":"Link","options":"Tele Tena Vetting Scope Application","reqd":1,"read_only":1},
+    {"fieldname":"clinician","label":"Applicant","fieldtype":"Link","options":"User","reqd":1,"read_only":1,"ignore_user_permissions":1},
+    {"fieldname":"basis_assessment","label":"Decision under reconsideration","fieldtype":"Link","options":"Tele Tena Vetting Assessment","reqd":1,"read_only":1},
+    {"fieldname":"sequence","label":"Appeal sequence","fieldtype":"Int","reqd":1,"read_only":1},
+    {"fieldname":"applicant_statement","label":"Reason for reconsideration","fieldtype":"Small Text","reqd":1,"read_only":1},
+    {"fieldname":"submitted_at","label":"Submitted at","fieldtype":"Datetime","reqd":1,"read_only":1},
+    {"fieldname":"status","label":"Status","fieldtype":"Select","options":"Submitted\nUpheld\nReopened","default":"Submitted","reqd":1,"read_only":1},
+    {"fieldname":"reviewer","label":"Reviewer","fieldtype":"Link","options":"User","read_only":1},
+    {"fieldname":"reviewer_reason","label":"Reviewer rationale","fieldtype":"Small Text","read_only":1},
+    {"fieldname":"decided_at","label":"Decision recorded at","fieldtype":"Datetime","read_only":1}
+  ],
+  "permissions": [
+    {"role":"Tele Tena Applicant","read":1,"create":1},
+    {"role":"Tele Tena Clinician","read":1,"create":1},
+    {"role":"Tele Tena Approver","read":1}
+  ]
+}

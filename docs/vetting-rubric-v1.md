@@ -19,7 +19,7 @@ Any Fail or unresolved mandatory item blocks approval regardless of scored items
 
 For reviewer organization only, each dimension may be rated 0–3 with evidence references and notes: scope-relevant education; supervised clinical experience; training in selected approach; adult population experience; ethical/privacy and safeguarding understanding; consultation/assessment interview. A weighted sum may help compare missing evidence, but it cannot override mandatory gates and cannot automatically decide approval. Reviewer notes and ratings remain private.
 
-Reviewer outcomes per scope: `Approved`, `Request information`, `Rejected`, `Suspended`, or `Expired`. Each action records actor, time, rubric version, reason codes, free-text private notes, restrictions, evidence references, and prior decision. Clarification permits applicant resubmission and creates a new immutable review event. Appeals/reconsideration create a separate review event; history is never overwritten.
+Reviewer outcomes per scope: `Approved`, `Request information`, `Rejected`, `Suspended`, or `Expired`. Each action records actor, time, rubric version, reason codes, free-text private notes, restrictions, evidence references, and prior decision. Clarification permits applicant resubmission and creates a new immutable review event. Reconsideration uses a separate appeal record tied to one immutable assessment. `Upheld` preserves the decision; `Reopened` returns the application to clarification and requires a new complete human assessment. An appeal never grants practice. The proposed process and its remaining policy decisions are in `vetting-appeals.md`.
 
 ## Credential wording
 

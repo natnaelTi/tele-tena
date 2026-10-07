@@ -77,24 +77,142 @@ def _validated_form(values):
 def my_scope_applications():
     user = actor()
     if 'Tele Tena Approver' in frappe.get_roles(user):
-        result = rows('''SELECT a.*,p.display_name,s.service_label FROM `tabTele Tena Vetting Scope Application` a
+        result = rows('''SELECT a.*,p.display_name,s.service_label,
+            (SELECT d.name FROM `tabTele Tena Vetting Assessment` d WHERE d.scope_application=a.name
+             ORDER BY d.decided_at DESC,d.creation DESC LIMIT 1) AS latest_assessment
+            FROM `tabTele Tena Vetting Scope Application` a
             JOIN tt_profile p ON p.user=a.clinician JOIN `tabTele Tena Service` s ON s.name=a.service
             ORDER BY FIELD(a.status,'Submitted','Resubmitted','Clarification','Draft'),a.submitted_at''')
         for item in result:
             item.resume_uploaded = bool(rows('SELECT 1 FROM tt_resume_evidence WHERE clinician=%s', (item.clinician,)))
             item.scope_evidence = _scope_evidence_rows(item.name)
+            item.appeals = _appeal_history(item.name)
         return result
     user = _applicant(user)
     result = rows('''SELECT a.name,a.service,s.service_label,a.status,a.professional_category,a.qualification,
         a.issuing_institution,a.registration_number,a.issuing_authority,a.jurisdiction,a.credential_expiry,
         a.experience_years,a.approach_keys,a.population_adults,a.independent_practice,a.clinic_affiliations,
         a.relevant_training,a.applicant_statement,a.applicant_response,a.clarification_request,
-        a.decision_reason,a.restrictions,a.submitted_at,a.decided_at,a.rubric_version
+        a.decision_reason,a.restrictions,a.submitted_at,a.decided_at,a.rubric_version,
+        (SELECT d.name FROM `tabTele Tena Vetting Assessment` d WHERE d.scope_application=a.name
+         ORDER BY d.decided_at DESC,d.creation DESC LIMIT 1) AS latest_assessment
         FROM `tabTele Tena Vetting Scope Application` a JOIN `tabTele Tena Service` s ON s.name=a.service
         WHERE a.clinician=%s ORDER BY a.modified DESC''', (user,))
     for item in result:
         item.scope_evidence = _scope_evidence_rows(item.name)
+        item.appeals = _appeal_history(item.name)
     return result
+
+
+def _appeal_history(application):
+    return rows('''SELECT name,basis_assessment,status,applicant_statement,submitted_at,reviewer_reason,decided_at
+        FROM `tabTele Tena Vetting Appeal` WHERE scope_application=%s ORDER BY sequence''',
+        (application,))
+
+
+@journey.query()
+def scope_appeals():
+    reviewer = actor('Tele Tena Approver')
+    return rows('''SELECT a.name,a.scope_application,a.clinician,p.display_name,
+        s.service_label,a.basis_assessment,a.sequence,a.applicant_statement,a.submitted_at,
+        d.decision AS basis_decision,d.findings AS basis_reason
+        FROM `tabTele Tena Vetting Appeal` a
+        JOIN `tabTele Tena Vetting Scope Application` app ON app.name=a.scope_application
+        JOIN tt_profile p ON p.user=a.clinician
+        JOIN `tabTele Tena Service` s ON s.name=app.service
+        JOIN `tabTele Tena Vetting Assessment` d ON d.name=a.basis_assessment
+        WHERE a.status='Submitted' ORDER BY a.submitted_at,a.name''')
+
+
+@journey.command
+def submit_scope_appeal(application, statement):
+    user = _applicant()
+    statement = text(statement, 1600)
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    item = rows('''SELECT name,clinician,status FROM `tabTele Tena Vetting Scope Application`
+        WHERE name=%s FOR UPDATE''', (application,))
+    if not item or item[0].clinician != user:
+        frappe.throw('Scope application unavailable', frappe.PermissionError)
+    current = item[0]
+    decisions = rows('''SELECT name,decision FROM `tabTele Tena Vetting Assessment`
+        WHERE scope_application=%s ORDER BY decided_at DESC,creation DESC LIMIT 1 FOR UPDATE''',
+        (current.name,))
+    if not decisions:
+        fail('The latest recorded decision is not eligible for reconsideration.',
+             'appeal_decision_mismatch')
+    prior = rows('''SELECT name,status,applicant_statement FROM `tabTele Tena Vetting Appeal`
+        WHERE basis_assessment=%s''', (decisions[0].name,))
+    if prior:
+        # Safe retries return the original appeal; the unique assessment link
+        # ensures only one applicant statement can be recorded for this basis.
+        if prior[0].applicant_statement != statement:
+            fail('This decision already has a reconsideration request; its original statement is preserved.',
+                 'appeal_payload_mismatch')
+        return {'id': prior[0].name, 'status': prior[0].status, 'idempotent': True}
+    if current.status not in ('Rejected', 'Suspended', 'Expired') or decisions[0].decision != current.status:
+        fail('Only the latest rejected, suspended, or expired scope decision can be reconsidered.',
+             'appeal_decision_mismatch')
+    count = rows('''SELECT COALESCE(MAX(sequence),0) AS sequence
+        FROM `tabTele Tena Vetting Appeal` WHERE scope_application=%s''', (current.name,))
+    now = frappe.utils.now_datetime()
+    appeal = frappe.get_doc({'doctype':'Tele Tena Vetting Appeal',
+        'scope_application':current.name,'clinician':user,
+        'basis_assessment':decisions[0].name,'sequence':int(count[0].sequence or 0)+1,
+        'applicant_statement':statement,'submitted_at':now,'status':'Submitted'})
+    frappe.local.tele_tena_vetting_appeal_action = True
+    try:
+        appeal.insert()
+    finally:
+        frappe.local.tele_tena_vetting_appeal_action = False
+    journey.audit(user, 'ScopeAppealSubmitted', {'application':current.name,
+        'appeal':appeal.name,'basis_assessment':decisions[0].name})
+    return {'id':appeal.name,'status':'Submitted','idempotent':False}
+
+
+@journey.command
+def review_scope_appeal(appeal, decision, reason):
+    reviewer = actor('Tele Tena Approver')
+    if decision not in ('Upheld', 'Reopen'):
+        fail('Choose whether to uphold the decision or reopen the application.')
+    reason = text(reason, 1600)
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    locked = rows('''SELECT name,scope_application,clinician,basis_assessment,status
+        FROM `tabTele Tena Vetting Appeal` WHERE name=%s FOR UPDATE''', (appeal,))
+    if not locked:
+        frappe.throw('Appeal unavailable', frappe.PermissionError)
+    item = locked[0]
+    if item.status != 'Submitted':
+        final_status = 'Reopened' if decision == 'Reopen' else decision
+        if item.status == final_status and rows('''SELECT name FROM `tabTele Tena Vetting Appeal`
+                WHERE name=%s AND reviewer=%s AND reviewer_reason=%s''',
+                (item.name, reviewer, reason)):
+            return {'status':item.status,'idempotent':True}
+        fail('This appeal already has a recorded outcome.', 'appeal_already_reviewed')
+    application = rows('''SELECT name,status,clinician FROM `tabTele Tena Vetting Scope Application`
+        WHERE name=%s FOR UPDATE''', (item.scope_application,))
+    assessment = rows('''SELECT decision FROM `tabTele Tena Vetting Assessment`
+        WHERE name=%s AND scope_application=%s''', (item.basis_assessment,item.scope_application))
+    if (not application or application[0].clinician != item.clinician or not assessment
+            or application[0].status != assessment[0].decision
+            or application[0].status not in ('Rejected','Suspended','Expired')):
+        fail('The underlying scope decision changed; this appeal needs a fresh reviewer assessment.',
+             'appeal_basis_changed')
+    now = frappe.utils.now_datetime()
+    frappe.local.tele_tena_vetting_appeal_action = True
+    try:
+        frappe.db.set_value('Tele Tena Vetting Appeal', item.name, {
+            'status':'Upheld' if decision == 'Upheld' else 'Reopened',
+            'reviewer':reviewer,'reviewer_reason':reason,'decided_at':now}, update_modified=False)
+    finally:
+        frappe.local.tele_tena_vetting_appeal_action = False
+    if decision == 'Reopen':
+        frappe.db.sql('''UPDATE `tabTele Tena Vetting Scope Application`
+            SET status='Clarification',clarification_request=%s,reviewer=%s,
+                modified=%s,modified_by=%s WHERE name=%s''',
+            ('Reconsideration reopened: ' + reason, reviewer, now, reviewer, item.scope_application))
+    journey.audit(reviewer, 'ScopeAppealReviewed', {'application':item.scope_application,
+        'appeal':item.name,'decision':decision,'basis_assessment':item.basis_assessment})
+    return {'status':'Upheld' if decision == 'Upheld' else 'Reopened','idempotent':False}
 
 
 def _scope_evidence_rows(application):

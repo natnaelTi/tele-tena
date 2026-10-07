@@ -494,6 +494,82 @@ class Presentation(unittest.TestCase):
             assessment.findings = 'Attempted overwrite'
             assessment.save()
 
+        # A later suspension is appealable, but the appeal itself does not
+        # grant practice. Reopening requires resubmission and a fresh decision.
+        vetting.review_scope_application(application['name'], 'Suspended',
+            findings='Synthetic suspension for reconsideration regression.')
+        suspended_assessment = journey.one('''SELECT name FROM `tabTele Tena Vetting Assessment`
+            WHERE scope_application=%s ORDER BY decided_at DESC,creation DESC LIMIT 1''',
+            (application['name'],)).name
+        fixtures.login('vetting')
+        appeal = vetting.submit_scope_appeal(application['name'],
+            'Synthetic request to reconsider this scope decision.')
+        self.assertEqual(appeal['status'], 'Submitted')
+        with self.assertRaises(frappe.ValidationError):
+            vetting.submit_scope_appeal(application['name'],
+                'A retry cannot replace the original reconsideration statement.')
+        retry = vetting.submit_scope_appeal(application['name'],
+            'Synthetic request to reconsider this scope decision.')
+        self.assertTrue(retry['idempotent'])
+        self.assertEqual(retry['id'], appeal['id'])
+        self.assertEqual(journey.one('''SELECT applicant_statement FROM `tabTele Tena Vetting Appeal`
+            WHERE name=%s''', (appeal['id'],)).applicant_statement,
+            'Synthetic request to reconsider this scope decision.')
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_doc({'doctype':'Tele Tena Vetting Appeal',
+                'scope_application':application['name'],'clinician':email,
+                'basis_assessment':suspended_assessment,'sequence':99,
+                'applicant_statement':'Direct API insertion attempt.',
+                'submitted_at':frappe.utils.now_datetime(),'status':'Submitted'}).insert()
+        own_appeal = next(item for item in vetting.my_scope_applications()
+                          if item.name == application['name']).appeals[0]
+        self.assertEqual(own_appeal.basis_assessment, suspended_assessment)
+        appeal_doc = frappe.get_doc('Tele Tena Vetting Appeal', appeal['id'])
+        appeal_doc.applicant_statement = 'tamper'
+        with self.assertRaises(frappe.PermissionError):
+            appeal_doc.save()
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            vetting.scope_appeals()
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_list('Tele Tena Vetting Appeal', fields=['name'])
+        fixtures.login('admin')
+        self.assertEqual(vetting.scope_appeals()[0].name, appeal['id'])
+        vetting.review_scope_appeal(appeal['id'], 'Reopen',
+            'Synthetic reviewer found a process issue; provide updated evidence.')
+        reopened = frappe.get_doc('Tele Tena Vetting Scope Application', application['name'])
+        self.assertEqual(reopened.status, 'Clarification')
+        self.assertFalse(journey.service_scope_is_current(email, service))
+        fixtures.login('vetting')
+        self.assertTrue(vetting.submit_scope_appeal(application['name'],
+            'Synthetic request to reconsider this scope decision.')['idempotent'])
+        resubmitted = vetting.save_scope_application(service, {
+            'professional_category':'Synthetic counselor','qualification':'Synthetic qualification',
+            'issuing_institution':'Synthetic institution','registration_number':'TEST-ONLY',
+            'issuing_authority':'Synthetic issuer','jurisdiction':'Synthetic jurisdiction',
+            'experience_years':'4','approach_keys':'','population_adults':True,
+            'independent_practice':True,'relevant_training':'Updated synthetic training',
+            'applicant_statement':'Synthetic appeal resubmission.',
+            'applicant_response':'Synthetic new evidence submitted after reopening.'}, submit=True)
+        self.assertEqual(resubmitted['status'], 'Resubmitted')
+        fixtures.login('admin')
+        rejected = vetting.review_scope_application(application['name'], 'Rejected',
+            findings='Synthetic rejection following full reconsideration review.')
+        fixtures.login('vetting')
+        second_appeal = vetting.submit_scope_appeal(application['name'],
+            'Synthetic reconsideration after the new review decision.')
+        fixtures.login('admin')
+        upheld = vetting.review_scope_appeal(second_appeal['id'], 'Upheld',
+            'Synthetic rationale supports the documented outcome.')
+        self.assertEqual(upheld['status'], 'Upheld')
+        self.assertEqual(frappe.db.get_value('Tele Tena Vetting Scope Application',
+            application['name'], 'status'), 'Rejected')
+        self.assertFalse(journey.service_scope_is_current(email, service))
+        self.assertEqual(journey.one('''SELECT COUNT(*) n FROM `tabTele Tena Vetting Assessment`
+            WHERE scope_application=%s''', (application['name'],)).n, 4)
+        self.assertEqual(journey.one('''SELECT COUNT(*) n FROM `tabTele Tena Vetting Appeal`
+            WHERE scope_application=%s''', (application['name'],)).n, 2)
+
     def make_schedule(self, day=None, mode='manual', exceptions=None, offering=None):
         day = day or day_offset()
         fixtures.login('c1')

@@ -60,6 +60,7 @@ export function ClinicianScopeApplications() {
   const [statement, setStatement] = useState('');
   const [adults, setAdults] = useState(false);
   const [independent, setIndependent] = useState(false);
+  const [appealStatements,setAppealStatements]=useState<Record<string,string>>({});
 
   const save = (submit:boolean) => void action.run(async()=>{
     if(!service) throw new Error('Choose an active reviewed service scope.');
@@ -71,6 +72,16 @@ export function ClinicianScopeApplications() {
     await journeyApi.saveScopeApplication(service,values,submit);
     await applications.refresh();
   });
+  const continueApplication=(item:any)=>{
+    setService(item.service);setCategory(item.professional_category||'');
+    setQualification(item.qualification||'');setInstitution(item.issuing_institution||'');
+    setLicense(item.registration_number||'');setAuthority(item.issuing_authority||'');
+    setJurisdiction(item.jurisdiction||'');setExpiry(item.credential_expiry||'');
+    setExperience(String(item.experience_years??''));setApproaches(item.approach_keys||'');
+    setTraining(item.relevant_training||'');setStatement(item.applicant_statement||'');
+    setAdults(!!item.population_adults);setIndependent(!!item.independent_practice);
+    document.querySelector('.scope-application-form')?.scrollIntoView({behavior:'smooth',block:'start'});
+  };
   return <>
     <PageTitle title={w("Professional profile and scope review")} description={w("Apply for each service separately. Clinic affiliations do not establish competence, and approval is always decided by a human reviewer.")} />
     <InlineNotice>{w("TeleTena’s proposed vetting rubric is versioned for medical-lead review. Credential verification is manual. Upload your PDF CV in Account and attach supporting evidence to each service application.")}</InlineNotice>
@@ -97,7 +108,7 @@ export function ClinicianScopeApplications() {
         </>}
         {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
       </div>
-      <section className="scope-application-list"><h2>{w("Your applications")}</h2>{!applications.data?<Skeleton/>:applications.data.length?applications.data.map((item:any)=><article className="scope-application-row" key={item.name}><strong>{item.service_label}</strong><span>{w(item.status)}</span>{item.clarification_request&&<InlineNotice>{item.clarification_request}</InlineNotice>}{item.decision_reason&&<p>{item.decision_reason}</p>}{item.restrictions&&<p>{w("Restrictions:")} {item.restrictions}</p>}<ScopeEvidencePanel item={item} canUpload={['Draft','Clarification'].includes(item.status)} refresh={applications.refresh}/>{item.status==='Approved'&&<p>{w("This specific scope is approved. Offerings still require the matching service configuration and published availability.")}</p>}</article>):<EmptyState title={w("No scope applications yet.")} />}</section>
+      <section className="scope-application-list"><h2>{w("Your applications")}</h2>{!applications.data?<Skeleton/>:applications.data.length?applications.data.map((item:any)=><article className="scope-application-row" key={item.name}><strong>{item.service_label}</strong><span>{w(item.status)}</span>{item.clarification_request&&<InlineNotice>{item.clarification_request}</InlineNotice>}{item.decision_reason&&<p>{item.decision_reason}</p>}{item.restrictions&&<p>{w("Restrictions:")} {item.restrictions}</p>}{item.appeals?.map((appeal:any)=><InlineNotice key={appeal.name}>{w('Reconsideration')}: {w(appeal.status)}{appeal.reviewer_reason?` — ${appeal.reviewer_reason}`:''}</InlineNotice>)}{['Rejected','Suspended','Expired'].includes(item.status)&&!item.appeals?.some((appeal:any)=>appeal.basis_assessment===item.latest_assessment)&&<div className="scope-appeal-form"><label className="field">{w('Request reconsideration')}<textarea rows={3} maxLength={1600} value={appealStatements[item.name]||''} onChange={e=>setAppealStatements({...appealStatements,[item.name]:e.target.value})} /></label><Button loading={action.busy} onClick={()=>void action.run(async()=>{const statement=(appealStatements[item.name]||'').trim();if(!statement)throw new Error(w('Explain why this decision should be reconsidered.'));await journeyApi.submitScopeAppeal(item.name,statement);await applications.refresh();})}>{w('Submit reconsideration')}</Button></div>}{['Draft','Clarification'].includes(item.status)&&<Button variant="secondary" onClick={()=>continueApplication(item)}>{w('Continue this application')}</Button>}<ScopeEvidencePanel item={item} canUpload={['Draft','Clarification'].includes(item.status)} refresh={applications.refresh}/>{item.status==='Approved'&&<p>{w("This specific scope is approved. Offerings still require the matching service configuration and published availability.")}</p>}</article>):<EmptyState title={w("No scope applications yet.")} />}</section>
     </section>
   </>;
 }
@@ -106,11 +117,15 @@ const checks=[['identity_reviewed','Identity evidence reviewed'],['credential_ve
 export function VettingQueue() {
   const { w } = useLocale();
   const queue=useResource(journeyApi.myScopeApplications);const action=useAction();
+  const appeals=useResource(journeyApi.scopeAppeals);
+  const [appealDecisions,setAppealDecisions]=useState<Record<string,string>>({});
+  const [appealReasons,setAppealReasons]=useState<Record<string,string>>({});
   const [values,setValues]=useState<Record<string,Record<string,boolean>>>({});
   const [findings,setFindings]=useState<Record<string,string>>({});
   const [restrictions,setRestrictions]=useState<Record<string,string>>({});
   const [decision,setDecision]=useState<Record<string,string>>({});
   return <><PageTitle title={w("Service-scope vetting")} description={w("Review each professional scope separately. A missing mandatory criterion cannot be offset by other evidence.")} />
+    <section className="scope-review-appeals"><h2>{w('Reconsideration requests')}</h2>{appeals.error&&<InlineNotice tone="danger">{w('Reconsideration requests could not be loaded.')} <Button onClick={()=>void appeals.refresh()}>{w('Retry')}</Button></InlineNotice>}{!appeals.data?<Skeleton/>:appeals.data.length?appeals.data.map((item:any)=><article className="scope-review-card" key={item.name}><header><div><h3>{item.display_name||w('Clinician application')}</h3><p className="supporting">{item.service_label} · {w('Previously')} {w(item.basis_decision)}</p></div><span>{item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w('date unavailable')}</span></header><p><strong>{w('Applicant statement')}</strong></p><p>{item.applicant_statement}</p><details><summary>{w('Prior reviewer rationale')}</summary><p>{item.basis_reason}</p></details><TextField label={w('Reviewer rationale')} value={appealReasons[item.name]||''} onChange={e=>setAppealReasons({...appealReasons,[item.name]:e.target.value})} /><Select label={w('Reconsideration outcome')} value={appealDecisions[item.name]||''} onChange={e=>setAppealDecisions({...appealDecisions,[item.name]:e.target.value})}><option value="">{w('Choose decision')}</option><option value="Upheld">{w('Uphold previous decision')}</option><option value="Reopen">{w('Reopen for new evidence and full review')}</option></Select><Button loading={action.busy} onClick={()=>void action.run(async()=>{const reason=(appealReasons[item.name]||'').trim();if(!reason||!appealDecisions[item.name])throw new Error(w('Choose an outcome and record the reviewer rationale.'));await journeyApi.reviewScopeAppeal(item.name,appealDecisions[item.name] as 'Upheld'|'Reopen',reason);await Promise.all([appeals.refresh(),queue.refresh()]);})}>{w('Record reconsideration outcome')}</Button></article>):<EmptyState title={w('No reconsideration requests are waiting.')} />}</section>
     {queue.error&&<InlineNotice tone="danger">{w("The vetting queue could not be loaded.")} <Button onClick={()=>void queue.refresh()}>{w("Retry")}</Button></InlineNotice>}
     {!queue.data?<Skeleton/>:queue.data.length?queue.data.map((item:any)=><article className="scope-review-card" key={item.name}>
       <header><div><h2>{item.display_name||w('Clinician application')}</h2><p className="supporting">{item.service_label} · {w(item.status)} · {w('Submitted')} {item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w('date unavailable')}</p></div><span>{w('Rubric proposed-1.0')}</span></header>
