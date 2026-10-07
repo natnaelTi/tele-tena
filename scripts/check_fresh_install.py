@@ -200,7 +200,10 @@ try:
     from tele_tena.schema import TABLES
     from tele_tena.patches.v1_6_presentation_release import TABLES as PRESENTATION_TABLES
     from tele_tena.patches.v1_7_demo_subledger import TABLES as SUBLEDGER_TABLES
-    assert all('tt_' + table in frappe.db.get_tables(cached=False) for table in (*TABLES,*PRESENTATION_TABLES,*SUBLEDGER_TABLES,'financial_reconciliation'))
+    expected_tables = (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'financial_reconciliation')
+    missing_tables = sorted('tt_' + table for table in expected_tables
+                            if 'tt_' + table not in frappe.db.get_tables(cached=False))
+    assert not missing_tables, 'Missing app tables: ' + ', '.join(missing_tables)
     assert 'tt_consultation' in frappe.db.get_tables(cached=False)
     assert frappe.db.exists('DocType', 'Tele Tena Service')
     assert frappe.db.exists('DocType', 'Tele Tena Service Scope')
@@ -233,6 +236,8 @@ except Exception as error:
     import traceback
     for frame in traceback.extract_tb(error.__traceback__):
         print('Failure location:', Path(frame.filename).name, frame.lineno, frame.name)
+    if isinstance(error, AssertionError) and str(error).startswith('Missing app tables: '):
+        print('Failure detail:', str(error))
     print('Fresh installation failed (' + type(error).__name__ + '); credential contents withheld')
     raise SystemExit(1)
 finally:
