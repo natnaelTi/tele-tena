@@ -2,8 +2,9 @@
 
 ## Active integrated checkout — 2026-10-07
 
-The active local checkout is `feat/mutual-rescheduling`, currently at
-`69e0e0b7ad0970e5912205928808424d3a2db25f`. Draft PR #22
+The active local checkout is `feat/mutual-rescheduling`; the exact source SHA
+is exposed by the current production asset manifest and the Git branch head.
+Draft PR #22
 ([review](https://github.com/natnaelTi/tele-tena/pull/22)) depends on draft
 PR #21 and remains unmerged. The local production-built preview is
 `http://127.0.0.1:8017/teletena/`, site
