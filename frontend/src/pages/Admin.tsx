@@ -90,6 +90,7 @@ export function Scopes() {
   const action = useAction();
   const { w } = useLocale();
   const [policyService, setPolicyService] = useState("");
+  const [policySearch, setPolicySearch] = useState("");
   const [policyReason, setPolicyReason] = useState("");
   const policy = immediateServices.data?.find((item) => item.id === policyService);
   const loadPolicyHistory = useCallback(() => policyService ? journeyApi.immediatePolicyHistory(policyService) : Promise.resolve([]), [policyService]);
@@ -178,9 +179,10 @@ export function Scopes() {
         <h2>{w("Immediate requests")}</h2>
         <p>{w("A reviewer controls this service setting. It does not replace clinician approval, approved scope, language, presence, or available time.")}</p>
         {immediateServices.error ? <InlineNotice tone="danger">{w("Service policies could not be loaded.")}</InlineNotice> : !immediateServices.data ? <Skeleton /> : <>
+          <TextField label={w("Find a service")} value={policySearch} onChange={(e)=>{setPolicySearch(e.target.value);setPolicyService("");setPolicyReason("");}} />
           <Select label={w("Service") } value={policyService} onChange={(e)=>{setPolicyService(e.target.value);setPolicyReason("");}}>
             <option value="">{w("Choose a service")}</option>
-            {immediateServices.data.map(item=><option value={item.id} key={item.id}>{item.label} · {item.catalog_status} · {item.id}</option>)}
+            {immediateServices.data.filter(item=>`${item.label} ${item.catalog_status} ${item.id}`.toLocaleLowerCase().includes(policySearch.trim().toLocaleLowerCase())).map(item=><option value={item.id} key={item.id}>{item.label} · {item.catalog_status} · {item.id}</option>)}
           </Select>
           {policy && <>
             <p className="supporting">{policy.immediate_care_enabled ? w("Immediate requests enabled") : w("Immediate requests paused")} · {w("Definition")}: {policy.definition_version || "—"}</p>
