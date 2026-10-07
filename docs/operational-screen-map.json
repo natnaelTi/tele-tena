@@ -953,7 +953,7 @@
       "module": "Profiles/vetting",
       "backend_reference": "journey, vetting, private evidence",
       "required_contract": "Guided profiles, scoped review decisions, protected evidence",
-      "integration_status": "Implemented, verification pending",
+      "integration_status": "Backend and built-browser flow passed; responsive overflow checked at 320/390/768/1440. Actual 200% zoom and native language review remain pending.",
       "prototype_route": "b08",
       "route": "/clinician/affiliations; /clinician/clinic-access; /patient/clinic-access",
       "actor": "Clinician/clinic submitter or active Clinic Manager; invited account with exact verified email; authorized clinic reviewer for registration and affiliation decisions",
@@ -1014,7 +1014,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B08) and design-handoff.md",
         "implementation": "Native clinic membership DocType, transactional API, verified-email gate, workspace routes, localized invitation/team UI; no email delivery or clinical-record grants.",
-        "current_local": "Frappe 15.121.2 disposable site; 23 tests/presentation run includes membership security and idempotency; built browser journey, exact current source commit and screenshots pending."
+        "current_local": "Source/build 05115ca5c8027baf99a5049c7e6f5c7250d58466; Frappe 15.121.2/ERPNext 15.121.6 migration; tests/presentation.py 23/23; built /teletena/ clinic registration → reviewer approval → invite → verified invitee acceptance → revocation passed. Playwright checked 320/390/768/1440 CSS px for page overflow; screenshots at 390/1440: docs/screenshots/clinic-membership/. Temporary synthetic verified-email fixture removed. Actual 200% zoom, fresh-site install for this DocType, Frappe 16, and native translation review remain pending."
       },
       "related_operational_routes": [
         "/clinician/clinic-access",

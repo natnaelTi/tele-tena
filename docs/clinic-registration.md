@@ -70,11 +70,24 @@ The actual built `/teletena/` browser journey also passed clinic submission,
 separate reviewer decision, affiliation submission and affiliation review.
 Screenshots are checked in under `docs/screenshots/clinic-review/`.
 
+On source commit `05115ca5c8027baf99a5049c7e6f5c7250d58466`, the additive
+`Tele Tena Clinic Membership` model migrated on the same disposable Frappe 15
+site and passed the built-browser path: clinician submits clinic, reviewer
+verifies, clinician invites a staff contact, the account with a temporary
+synthetic already-verified email fixture accepts, and the manager revokes with
+a reason. The fixture row was removed after the browser run. Focused screenshots
+are in `docs/screenshots/clinic-membership/`. The screenshots use only a
+synthetic `example.invalid` account. The browser checked 320/390/768/1440 CSS
+px with no page horizontal overflow and captured the 390/1440 states. Actual
+200% zoom, human Amharic/Afaan Oromo review, fresh-site install, and Frappe 16
+schema compatibility remain pending.
+
 This was an additive migration onto a site created earlier in the same
 checkpoint, followed by Frappe model synchronization; it is not yet a clean
 fresh-install proof for the final DocType package. Frappe 16 schema/API
-compatibility, responsive review at narrow widths and human Amharic/Afaan Oromo
-review remain unverified. The separate membership feature is additive and now
+compatibility, actual 200% zoom, and human Amharic/Afaan Oromo review remain
+unverified. Responsive overflow checks for the membership route passed at the
+four CSS widths above. The separate membership feature is additive and now
 has focused database coverage for verified-email visibility/acceptance,
 unverified denial, immutable invite identity, non-manager restrictions,
 idempotent invite/accept/revoke retries, retained membership history, and the
