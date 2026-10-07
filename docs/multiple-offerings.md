@@ -39,10 +39,18 @@ verify retry safety; and confirm existing appointment snapshots do not change.
   after the migration; source data was not seeded or reset. A pre-migration
   digest was not recorded, so this count is preservation evidence, not a
   cryptographic before/after comparison.
-- Frontend lint/build passed; lint reports existing warnings. Browser acceptance
-  of the new offering form is pending the packaged preview reload. No Frappe 16
-  migration, fresh-empty-site install, live clinician publication or patient
-  booking with a newly created second offering is claimed in this slice.
+- The packaged `/teletena/` app on `http://127.0.0.1:8017/teletena/` was rebuilt
+  from source SHA `44694b4364e466b1aec3308d01521b9739641ab9`. An existing synthetic
+  clinician created the second offering through the browser; it persisted after
+  reload. A separate patient browser session found it in discovery, and the
+  account email was absent from rendered content. Screenshots:
+  `docs/screenshots/multiple-offerings/clinician-services-1440.png` and
+  `docs/screenshots/multiple-offerings/patient-discovery-390.png`.
+- Frontend lint/build passed; lint reports existing warnings and the build has
+  the existing large-chunk advisory. No booking was made against the new
+  offering. The synthetic clinician profile is paused for immediate requests
+  because its language setup is incomplete. No Frappe 16 migration or fresh
+  empty-site installation for v1.23 is claimed in this slice.
 
 This schema does not implement general service-specific intake or authorize
 couple, family, group, diagnostic or laboratory workflows.
