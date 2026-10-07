@@ -20,6 +20,11 @@ class TeleTenaVettingScopeApplication(Document):
         if self.clinician != user or not roles.intersection({'Tele Tena Clinician', 'Tele Tena Applicant'}):
             frappe.throw('You may edit only your own scope application', frappe.PermissionError)
         previous = self.get_doc_before_save()
+        if self.reverification_of and not getattr(frappe.local, 'tele_tena_reverification_action', False):
+            frappe.throw('Use the audited credential re-verification action.', frappe.PermissionError)
+        if previous and (self.reverification_of != previous.reverification_of or
+                         self.reverification_payload_hash != previous.reverification_payload_hash):
+            frappe.throw('Credential re-verification references are immutable.', frappe.PermissionError)
         allowed = {'Draft', 'Clarification', 'Submitted', 'Resubmitted'}
         if self.status not in allowed:
             frappe.throw('Applicants cannot set a vetting decision', frappe.PermissionError)

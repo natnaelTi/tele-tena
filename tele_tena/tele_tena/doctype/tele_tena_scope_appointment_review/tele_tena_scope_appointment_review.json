@@ -1,0 +1,26 @@
+{
+  "doctype": "DocType",
+  "name": "Tele Tena Scope Appointment Review",
+  "module": "Tele Tena",
+  "autoname": "hash",
+  "engine": "InnoDB",
+  "track_changes": 0,
+  "allow_rename": 0,
+  "sort_field": "flagged_at",
+  "sort_order": "DESC",
+  "fields": [
+    {"fieldname":"appointment","label":"Appointment reference","fieldtype":"Data","reqd":1,"read_only":1},
+    {"fieldname":"scope_application","label":"Affected service-scope application","fieldtype":"Data","read_only":1},
+    {"fieldname":"eligibility_event","label":"Eligibility event reference","fieldtype":"Data","reqd":1,"read_only":1},
+    {"fieldname":"clinician","label":"Clinician","fieldtype":"Link","options":"User","reqd":1,"read_only":1,"ignore_user_permissions":1},
+    {"fieldname":"service","label":"Service scope","fieldtype":"Link","options":"Tele Tena Service","reqd":1,"read_only":1},
+    {"fieldname":"scheduled_start","label":"Scheduled start","fieldtype":"Datetime","reqd":1,"read_only":1},
+    {"fieldname":"reason_code","label":"Reason","fieldtype":"Select","options":"Credential expired\nScope approval withdrawn\nScope approval unavailable","reqd":1,"read_only":1},
+    {"fieldname":"status","label":"Review status","fieldtype":"Select","options":"Open\nAcknowledged\nCleared","default":"Open","reqd":1,"read_only":1},
+    {"fieldname":"flagged_at","label":"Flagged at","fieldtype":"Datetime","reqd":1,"read_only":1},
+    {"fieldname":"reviewer","label":"Reviewer","fieldtype":"Link","options":"User","read_only":1},
+    {"fieldname":"reviewer_rationale","label":"Reviewer rationale","fieldtype":"Small Text","read_only":1},
+    {"fieldname":"resolved_at","label":"Resolved at","fieldtype":"Datetime","read_only":1}
+  ],
+  "permissions": [{"role":"Tele Tena Approver","read":1,"create":1,"write":1}]
+}

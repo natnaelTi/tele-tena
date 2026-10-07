@@ -21,3 +21,6 @@ tele_tena.patches.v1_15_mutual_rescheduling
 tele_tena.patches.v1_16_scope_evidence_storage
 tele_tena.patches.v1_17_consultation_extensions
 tele_tena.patches.v1_18_vetting_appeals
+tele_tena.patches.v1_19_scope_reverification
+tele_tena.patches.v1_20_scope_appointment_review
+tele_tena.patches.v1_21_scope_review_history

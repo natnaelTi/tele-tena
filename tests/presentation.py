@@ -570,6 +570,193 @@ class Presentation(unittest.TestCase):
         self.assertEqual(journey.one('''SELECT COUNT(*) n FROM `tabTele Tena Vetting Appeal`
             WHERE scope_application=%s''', (application['name'],)).n, 2)
 
+    def test_scope_credential_reverification_is_separate_and_expiry_fails_closed(self):
+        service = fixtures.PREFIX + '-credential-renewal'
+        fixtures.login('admin')
+        frappe.get_doc({'doctype':'Tele Tena Service','service_key':service,
+            'service_label':'Synthetic credential renewal scope','active':1,'catalog_status':'Active',
+            'category':'counseling','description':'Synthetic renewal behavior only.',
+            'population_restriction':'Adults only','participant_structure':'individual',
+            'clinical_review_status':'Approved','vetting_required':1,
+            'definition_version':'synthetic-v1'}).insert()
+        email = 'renewal-' + secrets.token_hex(6) + '@example.invalid'
+        fixtures.USERS['renewal'] = email
+        frappe.set_user('Administrator')
+        user = frappe.get_doc({'doctype':'User','email':email,'first_name':'Synthetic renewal applicant',
+            'user_type':'Website User','send_welcome_email':0})
+        user.insert(); user.add_roles('Tele Tena Clinician')
+        fixtures.login('renewal')
+        journey.save_profile('clinician','Synthetic renewal applicant',True,languages=['en'])
+        presentation.upload_resume('synthetic-renewal-cv.pdf',
+                                   base64.b64encode(b'%PDF-1.4\nSynthetic CV\n%%EOF').decode())
+        journey.apply('Synthetic renewal test profile.',json.dumps([service]))
+        fixtures.login('admin'); journey.review(email,'Approved')
+        values = {'professional_category':'Synthetic counselor','qualification':'Synthetic qualification',
+            'issuing_institution':'Synthetic institution','registration_number':'TEST-RENEWAL',
+            'issuing_authority':'Synthetic authority','jurisdiction':'Synthetic test jurisdiction',
+            'credential_expiry':frappe.utils.add_days(frappe.utils.today(),90),
+            'experience_years':'4','approach_keys':'','population_adults':True,
+            'independent_practice':True,'relevant_training':'Synthetic continuing training',
+            'applicant_statement':'Synthetic application; no external credential claim.'}
+        fixtures.login('renewal')
+        base = vetting.save_scope_application(service, values)
+        pdf = base64.b64encode(b'%PDF-1.4\nSynthetic license evidence\n%%EOF').decode()
+        vetting.upload_scope_evidence(base['name'],'License or registration','license-current.pdf',pdf)
+        base = vetting.save_scope_application(service,values,submit=True)
+        fixtures.login('admin')
+        vetting.review_scope_application(base['name'],'Approved',identity_reviewed=True,
+            credential_verified=True,qualification_relevant=True,experience_adequate=True,
+            adult_scope_appropriate=True,interview_completed=True,findings='Synthetic approval for renewal test.')
+        self.assertTrue(journey.service_scope_is_current(email,service))
+
+        renewed_values = {**values, 'credential_expiry':frappe.utils.add_days(frappe.utils.today(),365),
+            'applicant_statement':'Synthetic renewal statement; no new credential claim.'}
+        fixtures.login('renewal')
+        draft = vetting.save_scope_application(service,renewed_values,reverification_of=base['name'])
+        self.assertNotEqual(draft['name'],base['name'])
+        fixtures.login('c1')
+        with self.assertRaises(frappe.PermissionError):
+            vetting.save_scope_application(service,renewed_values,reverification_of=base['name'])
+        fixtures.login('renewal')
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_doc({'doctype':'Tele Tena Vetting Scope Application',
+                'clinician':email,'service':service,'status':'Draft',
+                'professional_category':'Synthetic counselor','qualification':'Synthetic qualification',
+                'issuing_institution':'Synthetic institution','reverification_of':base['name']}).insert()
+        with self.assertRaises(frappe.ValidationError):
+            vetting.save_scope_application(service,renewed_values,submit=True,reverification_of=base['name'])
+        new_evidence = vetting.upload_scope_evidence(draft['name'],'License or registration',
+            'license-renewal.pdf',pdf)
+        self.assertEqual(new_evidence['revision'],1)
+        renewal = vetting.save_scope_application(service,renewed_values,submit=True,
+            reverification_of=base['name'])
+        retry = vetting.save_scope_application(service,renewed_values,submit=True,
+            reverification_of=base['name'])
+        self.assertEqual(renewal['name'],retry['name'])
+        self.assertTrue(retry['idempotent'])
+        changed = {**renewed_values,'applicant_statement':'Different changed payload.'}
+        with self.assertRaises(frappe.ValidationError):
+            vetting.save_scope_application(service,changed,submit=True,reverification_of=base['name'])
+        self.assertTrue(journey.service_scope_is_current(email,service),
+            'a pending renewal must not shorten still-valid prior credentials')
+        self.assertEqual(str(frappe.db.get_value('Tele Tena Vetting Scope Application',base['name'],
+            'credential_expiry')),str(values['credential_expiry']))
+        journey.publish(service,600,30)
+        offering = journey.one('SELECT id FROM tt_offering WHERE clinician=%s AND service=%s',
+                               (email,service)).id
+        fixtures.login('renewal')
+        journey.add_availability(fixtures.at(0),fixtures.at(12))
+        fixtures.login('p1')
+        reserved_before = journey.one('SELECT reserved FROM tt_wallet WHERE patient=%s',
+            (fixtures.USERS['p1'],)).reserved
+        journey.simulated_deposit(600,'scope-review-' + secrets.token_hex(5))
+        existing_booking = journey.book(**fixtures.booking(offering,fixtures.at(4),
+            'scope-review-' + secrets.token_hex(5)))
+        self.assertEqual(existing_booking['state'],'Booked')
+
+        # Move only this synthetic test record across the expiry boundary. The
+        # application workflow itself never edits the old approved snapshot.
+        frappe.db.set_value('Tele Tena Vetting Scope Application',base['name'],
+            'credential_expiry',frappe.utils.add_days(frappe.utils.today(),-1),update_modified=False)
+        fixtures.login('admin')
+        vetting.review_scope_application(base['name'],'Expired',
+            findings='Synthetic renewal regression: old credential expired.')
+        self.assertFalse(journey.service_scope_is_current(email,service))
+        fixtures.login('renewal')
+        fixtures.login('admin')
+        self.assertEqual(vetting.flag_scope_appointments_for_review(email,service)['flagged'],0)
+        self.assertEqual(vetting.flag_scope_appointments_for_review(email,service)['flagged'],0)
+        review = journey.one('''SELECT * FROM `tabTele Tena Scope Appointment Review`
+            WHERE appointment=%s''',(existing_booking['id'],))
+        self.assertEqual(review.reason_code,'Credential expired')
+        self.assertNotIn('patient',review.keys())
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_doc({'doctype':'Tele Tena Scope Appointment Review',
+                'appointment':'forged-review-' + secrets.token_hex(5),
+                'scope_application':base['name'],'eligibility_event':'forged',
+                'clinician':email,'service':service,'scheduled_start':fixtures.at(4),
+                'reason_code':'Credential expired','status':'Open',
+                'flagged_at':frappe.utils.now_datetime()}).insert()
+        review_payload = vetting.scope_appointment_reviews()
+        self.assertNotIn('patient',review_payload[0].keys())
+        self.assertNotIn('disclosure',review_payload[0].keys())
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            vetting.scope_appointment_reviews()
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_list('Tele Tena Scope Appointment Review')
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_doc('Tele Tena Scope Appointment Review',review.name).check_permission('read')
+        fixtures.login('admin')
+        with self.assertRaises(frappe.ValidationError):
+            vetting.resolve_scope_appointment_review(review.name,'Clear','Scope remains expired.')
+        self.assertEqual(journey.one('SELECT state FROM tt_appointment WHERE id=%s',
+            (existing_booking['id'],)).state,'Booked')
+        self.assertEqual(journey.one('SELECT reserved FROM tt_wallet WHERE patient=%s',
+            (fixtures.USERS['p1'],)).reserved,reserved_before + 600)
+        fixtures.login('renewal')
+        with self.assertRaises(frappe.ValidationError):
+            journey.publish(service,10000,50)
+        fixtures.login('p1')
+        stale_booking = fixtures.booking(offering,fixtures.at(),
+            'expired-scope-' + secrets.token_hex(5))
+        with self.assertRaises(frappe.ValidationError):
+            journey.book(**stale_booking)
+        self.assertNotIn(offering,[item.id for item in journey.discover(service)])
+        self.assertFalse(journey.rows('SELECT id FROM tt_appointment WHERE retry_key=%s',
+                                      (stale_booking['retry_key'],)))
+
+        fixtures.login('admin')
+        frappe.db.set_value('Tele Tena Vetting Scope Application',renewal['name'],
+            'credential_expiry',frappe.utils.add_days(frappe.utils.today(),-1),update_modified=False)
+        with self.assertRaises(frappe.ValidationError):
+            vetting.review_scope_application(renewal['name'],'Approved',identity_reviewed=True,
+                credential_verified=True,qualification_relevant=True,experience_adequate=True,
+                adult_scope_appropriate=True,interview_completed=True,
+                findings='Expired credential must not be accepted.')
+        self.assertEqual(frappe.db.get_value('Tele Tena Vetting Scope Application',renewal['name'],
+            'status'),'Submitted')
+        frappe.db.set_value('Tele Tena Vetting Scope Application',renewal['name'],
+            'credential_expiry',renewed_values['credential_expiry'],update_modified=False)
+        vetting.review_scope_application(renewal['name'],'Approved',identity_reviewed=True,
+            credential_verified=True,qualification_relevant=True,experience_adequate=True,
+            adult_scope_appropriate=True,interview_completed=True,findings='Synthetic re-verification approved.')
+        self.assertTrue(journey.service_scope_is_current(email,service))
+        self.assertEqual(vetting.resolve_scope_appointment_review(review.name,'Clear',
+            'Renewed synthetic credential was approved.'),{'status':'Cleared','idempotent':False})
+        frappe.db.set_value('Tele Tena Vetting Scope Application',renewal['name'],
+            'credential_expiry',frappe.utils.add_days(frappe.utils.today(),-1),update_modified=False)
+        self.assertFalse(journey.service_scope_is_current(email,service))
+        self.assertEqual(vetting.flag_scope_appointments_for_review(email,service)['flagged'],1,
+            'a distinct later expiry event must be reviewable for the same appointment')
+        self.assertEqual(journey.one('''SELECT COUNT(*) AS n FROM `tabTele Tena Scope Appointment Review`
+            WHERE appointment=%s''',(existing_booking['id'],)).n,2)
+        frappe.db.set_value('Tele Tena Vetting Scope Application',renewal['name'],
+            'credential_expiry',renewed_values['credential_expiry'],update_modified=False)
+        self.assertEqual(frappe.db.get_value('Tele Tena Vetting Scope Application',renewal['name'],
+            'reverification_of'),base['name'])
+        self.assertEqual(frappe.db.get_value('Tele Tena Vetting Scope Application',base['name'],
+            'status'),'Expired')
+
+        # Rejecting a later renewal must not revoke a still-current previous
+        # credential; the failed renewal remains an auditable separate record.
+        second_values = {**renewed_values,
+            'credential_expiry':frappe.utils.add_days(frappe.utils.today(),730),
+            'applicant_statement':'Synthetic next renewal for rejection test.'}
+        fixtures.login('renewal')
+        second_draft = vetting.save_scope_application(service,second_values,
+            reverification_of=renewal['name'])
+        vetting.upload_scope_evidence(second_draft['name'],'License or registration',
+            'license-next-renewal.pdf',pdf)
+        second_renewal = vetting.save_scope_application(service,second_values,submit=True,
+            reverification_of=renewal['name'])
+        fixtures.login('admin')
+        vetting.review_scope_application(second_renewal['name'],'Rejected',
+            findings='Synthetic renewal evidence rejected; previous approval is still current.')
+        self.assertTrue(journey.service_scope_is_current(email,service))
+        self.assertEqual(frappe.db.get_value('Tele Tena Service Scope',
+            {'clinician':email,'service':service},'status'),'Approved')
+
     def make_schedule(self, day=None, mode='manual', exceptions=None, offering=None):
         day = day or day_offset()
         fixtures.login('c1')

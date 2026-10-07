@@ -96,5 +96,15 @@ def install():
     session_feedback()
     from tele_tena.patches.v1_15_mutual_rescheduling import execute as mutual_rescheduling
     mutual_rescheduling()
+    from tele_tena.patches.v1_16_scope_evidence_storage import execute as scope_evidence_storage
+    scope_evidence_storage()
     from tele_tena.patches.v1_17_consultation_extensions import execute as consultation_extensions
     consultation_extensions()
+    from tele_tena.patches.v1_18_vetting_appeals import execute as vetting_appeals
+    vetting_appeals()
+    from tele_tena.patches.v1_19_scope_reverification import execute as scope_reverification
+    scope_reverification()
+    from tele_tena.patches.v1_20_scope_appointment_review import execute as scope_appointment_review
+    scope_appointment_review()
+    from tele_tena.patches.v1_21_scope_review_history import execute as scope_review_history
+    scope_review_history()

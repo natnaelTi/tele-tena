@@ -1,5 +1,11 @@
 # Agreed product contract
 
+Credential lifecycle update (2026-10-08): future booked or pending-confirmation
+appointments affected by expired or revoked scopes receive a logistics-only
+operational review flag. It does not change appointment or financial state and
+does not expose patient records to vetting reviewers. Human operational
+continuity policy remains required.
+
 ## First internal demonstration
 Adults 18+. English, Amharic and Afaan Oromo with native review before pilot.
 Patient and clinician portals; administrator approval; independent and multi-clinic
@@ -95,6 +101,20 @@ policy windows/caps, dispute operations, production safety/escalation protocol,
 SMS provider, LiveKit credentials, translated clinical copy review, production hosting.
 Labs, diagnostics, diaspora expert access and tourism are future workflows.
 The first demonstration uses synthetic data and is not production clinical readiness.
+
+### Credential expiry and re-verification (demonstration)
+
+Credential expiry is evaluated against the site's Frappe date. An expired
+credential immediately disqualifies its service scope from new discovery,
+offering publication, matching and bookings, while existing appointments and
+their accepted snapshots remain unchanged. An applicant can create a separate
+scope re-verification application, submit fresh private license/registration
+evidence, and receive a new human decision. Pending renewal does not extend an
+expired scope; a still-valid old credential remains in effect until its date.
+Rejecting renewal evidence does not revoke that still-valid prior credential,
+while explicit suspension or expiry does. Jurisdiction-specific timezone/date
+rules, reminders, grace periods and operations for appointments after expiry
+remain policy decisions. See `scope-reverification.md`.
 
 Hosted review contact access is an explicit site-scoped option. Phone OTP sign-in,
 new adult patient registration and new clinician applications may be enabled

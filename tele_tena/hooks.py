@@ -11,7 +11,8 @@ after_request = ["tele_tena.privacy.no_store"]
 scheduler_events = {
     "all": ["tele_tena.api.presentation.expire_pending_appointments"],
     "cron": {"*/5 * * * *": ["tele_tena.accounting.release_eligible_earnings"],
-        "* * * * *": ["tele_tena.api.open_requests.expire_requests", "tele_tena.api.extensions.expire_extensions"],
+        "* * * * *": ["tele_tena.api.open_requests.expire_requests", "tele_tena.api.extensions.expire_extensions",
+                       "tele_tena.api.vetting.flag_scope_appointments_for_review"],
         "0 * * * *": ["tele_tena.api.presentation.expire_reschedule_proposals"]},
 }
 
@@ -28,6 +29,7 @@ permission_query_conditions = {
     "Tele Tena Vetting Scope Application": "tele_tena.tele_tena.doctype.tele_tena_vetting_scope_application.tele_tena_vetting_scope_application.get_permission_query_conditions",
     "Tele Tena Scope Evidence": "tele_tena.tele_tena.doctype.tele_tena_scope_evidence.tele_tena_scope_evidence.get_permission_query_conditions",
     "Tele Tena Vetting Appeal": "tele_tena.tele_tena.doctype.tele_tena_vetting_appeal.tele_tena_vetting_appeal.get_permission_query_conditions",
+    "Tele Tena Scope Appointment Review": "tele_tena.tele_tena.doctype.tele_tena_scope_appointment_review.tele_tena_scope_appointment_review.get_permission_query_conditions",
 }
 
 has_permission = {
@@ -37,4 +39,5 @@ has_permission = {
     "Tele Tena Clinic Encounter Access": "tele_tena.tele_tena.doctype.tele_tena_clinic_encounter_access.tele_tena_clinic_encounter_access.has_document_permission",
     "Tele Tena Scope Evidence": "tele_tena.tele_tena.doctype.tele_tena_scope_evidence.tele_tena_scope_evidence.has_document_permission",
     "Tele Tena Vetting Appeal": "tele_tena.tele_tena.doctype.tele_tena_vetting_appeal.tele_tena_vetting_appeal.has_document_permission",
+    "Tele Tena Scope Appointment Review": "tele_tena.tele_tena.doctype.tele_tena_scope_appointment_review.tele_tena_scope_appointment_review.has_document_permission",
 }

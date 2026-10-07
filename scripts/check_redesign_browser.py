@@ -95,7 +95,8 @@ def main():
                          line.startswith('ONBOARDING_SAVE_DIAGNOSTIC: ') or
                          line.startswith('ONBOARDING_RELOAD_DIAGNOSTIC: ') or
                          line.startswith('ONBOARDING_COMPLETE_DIAGNOSTIC: ') or
-                         line.startswith('ONBOARDING_COMPLETE_STATE: ')]
+                         line.startswith('ONBOARDING_COMPLETE_STATE: ') or
+                         line.startswith('TOUR_TARGET_DIAGNOSTIC: ')]
                 print('\n'.join(steps[-12:]))
                 raise RuntimeError('Redesign browser assertions failed')
             print(result.stdout.strip())
