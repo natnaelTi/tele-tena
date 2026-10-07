@@ -31,6 +31,17 @@ let checkpoint = 'launch'
     await actualPage.getByRole('link', { name: 'Ask a reviewer to enable immediate requests for a service', exact: true }).waitFor()
     assert.equal(await actualPage.getByRole('button', { name: 'Go available', exact: true }).isDisabled(), true)
     assert.equal(await actualPage.getByText('Requests paused', { exact: true }).count(), 1)
+    await actualPage.setViewportSize({ width: 320, height: 900 })
+    const mobileNav = actualPage.getByRole('navigation', { name: 'Mobile workspace', exact: true })
+    await mobileNav.waitFor({ state: 'visible' })
+    await mobileNav.getByRole('link', { name: 'Availability', exact: true }).waitFor()
+    const moreButton = mobileNav.getByRole('button', { name: 'More', exact: true })
+    await moreButton.click()
+    const moreDialog = actualPage.getByRole('dialog', { name: 'More workspace links', exact: true })
+    await moreDialog.getByRole('link', { name: 'Care records', exact: true }).waitFor()
+    await actualPage.keyboard.press('Escape')
+    await moreDialog.waitFor({ state: 'detached' })
+    assert.equal(await moreButton.evaluate(element => element === document.activeElement), true)
     const screenshots = '/tmp/tele-tena-presentation-review/request-readiness'
     fs.mkdirSync(screenshots, { recursive: true })
     const translations = {
