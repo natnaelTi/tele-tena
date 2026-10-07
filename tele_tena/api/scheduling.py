@@ -346,13 +346,13 @@ def immediate_start(schedule, offer, clinician, patient, earliest_start, latest_
     except (ZoneInfoNotFoundError, ValueError):
         return None
     if booked is None:
-        booked = rows('''SELECT start,end,buffer_before,buffer_after FROM tt_appointment
+        booked = rows('''SELECT id,start,end,buffer_before,buffer_after FROM tt_appointment
             WHERE clinician=%s AND state IN ('Booked','PendingConfirmation')
             AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6))
             AND start<%s AND end>%s''',
             (clinician, latest_start + timedelta(days=1), earliest_start - timedelta(days=1)))
     if patient_booked is None:
-        patient_booked = rows('''SELECT start,end FROM tt_appointment WHERE patient=%s
+        patient_booked = rows('''SELECT id,start,end FROM tt_appointment WHERE patient=%s
             AND state IN ('Booked','PendingConfirmation')
             AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6))
             AND start<%s AND end>%s''',
@@ -392,7 +392,8 @@ def immediate_start(schedule, offer, clinician, patient, earliest_start, latest_
     return None
 
 
-def validate_slot(offer, start, patient, lock=True, immediate_ready=False, immediate_window=None):
+def validate_slot(offer, start, patient, lock=True, immediate_ready=False, immediate_window=None,
+                  exclude_appointment=None):
     """Recompute an exact offered slot while the booking gate/clinician are locked."""
     schedule = _schedule_for(offer.id, lock)
     if schedule:
@@ -402,16 +403,22 @@ def validate_slot(offer, start, patient, lock=True, immediate_ready=False, immed
             fail('Schedule is unavailable')
         zone = ZoneInfo(schedule.timezone)
         day = start.replace(tzinfo=timezone.utc).astimezone(zone).date()
-        booked = rows('''SELECT start,end,buffer_before,buffer_after FROM tt_appointment
+        booked = rows('''SELECT id,start,end,buffer_before,buffer_after FROM tt_appointment
             WHERE clinician=%s AND state IN ('Booked','PendingConfirmation')
             AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6))
             AND start<%s AND end>%s''',
             (offer.clinician, start + timedelta(days=1), start - timedelta(days=1)))
-        patient_booked = rows('''SELECT start,end FROM tt_appointment WHERE patient=%s
+        # Mutual rescheduling retains the existing booking until consent. Its own
+        # occupied interval must not conflict with its proposed replacement.
+        if exclude_appointment:
+            booked = [item for item in booked if item.id != exclude_appointment]
+        patient_booked = rows('''SELECT id,start,end FROM tt_appointment WHERE patient=%s
             AND state IN ('Booked','PendingConfirmation')
             AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6))
             AND start<%s AND end>%s''',
             (patient, start + timedelta(days=1), start - timedelta(days=1)))
+        if exclude_appointment:
+            patient_booked = [item for item in patient_booked if item.id != exclude_appointment]
         if immediate_ready:
             earliest, latest = immediate_window or (start, start)
             match = immediate_start(schedule, offer, offer.clinician, patient, earliest, latest,

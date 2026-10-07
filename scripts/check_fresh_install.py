@@ -1,7 +1,9 @@
 """Disposable fresh install via the installed Bench/Frappe installer, normal user.
 
 DB admin credential file is generated locally, never printed or passed in argv.
-Only the new tele-tena-pr12-fresh.localhost / teletenapr12fresh may be created or removed.
+Only the explicitly named disposable site/database may be created or removed.
+Set TELE_TENA_KEEP_FRESH_SITE=1 to retain that site/database for diagnosis while
+still removing the temporary database administrator and credential file.
 """
 import contextlib
 import hashlib
@@ -252,12 +254,13 @@ finally:
         frappe.destroy()
     admin = administration()
     with admin.cursor() as cursor:
-        if attempted and not (KEEP_SITE and passed):
+        preserve_site = KEEP_SITE and attempted
+        if attempted and not preserve_site:
             cursor.execute(f'DROP DATABASE IF EXISTS `{DB}`')
             cursor.execute(f"DROP USER IF EXISTS '{DB}'@'localhost'")
         cursor.execute(f"DROP USER '{ADMIN}'@'localhost'")
     admin.close()
-    if attempted and not (KEEP_SITE and passed) and SITE_PATH.exists():
+    if attempted and not KEEP_SITE and SITE_PATH.exists():
         assert SITE_PATH.resolve() == (BENCH / 'sites' / SITE).resolve()
         shutil.rmtree(SITE_PATH)
     CREDENTIALS.unlink()
@@ -270,9 +273,9 @@ finally:
     except pymysql.err.OperationalError as error:
         denied = error.args[0] in (1045, 1698)
     assert denied and not CREDENTIALS.exists(), 'Temporary database-administrator cleanup verification failed'
-    if KEEP_SITE and passed:
+    if KEEP_SITE and attempted:
         assert SITE_PATH.exists(), 'Requested fresh preview site was not retained'
-        print('CLEANUP PASS: temporary localhost administrator and credential file removed; disposable verification site retained by explicit request')
+        print('CLEANUP PASS: temporary localhost administrator and credential file removed; disposable verification site/database retained by explicit request')
     else:
         assert not SITE_PATH.exists(), 'Disposable site cleanup verification failed'
         print('CLEANUP PASS: disposable site/database/site user and temporary localhost administrator removed; credential file removed; administrator re-authentication denied')

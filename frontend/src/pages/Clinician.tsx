@@ -213,8 +213,8 @@ export function Availability() {
           </details>
           {selectedSchedule && <p className="supporting">Preview: ETB {money(selectedSchedule.price)} · {selectedSchedule.minutes} minutes · {format}</p>}
           {availabilityError&&<InlineNotice tone="danger">{availabilityError}</InlineNotice>}
-          <Button loading={action.busy} disabled={action.busy||current.error||offerings.error} onClick={saveSchedule}>{action.busy?"Saving schedule…":"Save schedule"}</Button>
-          <p className="supporting" role="status">{action.busy?"Saving changes…":action.success?"Schedule saved.":dirty?"Unsaved changes":current.data?.some(item=>item.offering===offering)?"Saved schedule":"Not saved yet"}</p>
+          <Button className="schedule-config-save" loading={action.busy} disabled={action.busy||current.error||offerings.error} onClick={saveSchedule}>{w(action.busy?"Saving schedule…":"Save schedule")}</Button>
+          <p className="supporting" role="status">{w(action.busy?"Saving changes…":action.success?"Schedule saved.":dirty?"Unsaved changes":current.data?.some(item=>item.offering===offering)?"Saved schedule":"Not saved yet")}</p>
           {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}{action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
           <div className="schedule-share-link"><Button variant="secondary" disabled={action.busy||dirty||status!=="Published"||!offering} onClick={()=>void createBookingLink()}>{w("Copy patient booking link")}</Button>{bookingLinkStatus&&<p className="supporting" role="status">{bookingLinkStatus}</p>}{bookingUrl&&<TextField label={w("Patient booking link")} value={bookingUrl} readOnly />}</div>
         </aside>
@@ -244,6 +244,7 @@ export function Availability() {
             <Button variant="quiet" onClick={()=>{setIntervals(intervals.filter((_,n)=>n!==selectedInterval));setTimeErrors({});setSelectedInterval(null);setDirty(true);}}>{w("Remove interval")}</Button>
           </aside>}
           </div>
+          <div className="schedule-mobile-save"><Button loading={action.busy} disabled={action.busy||current.error||offerings.error} onClick={saveSchedule}>{w(action.busy?"Saving schedule…":"Save schedule")}</Button><span role="status">{w(action.busy?"Saving changes…":action.success?"Schedule saved.":dirty?"Unsaved changes":current.data?.some(item=>item.offering===offering)?"Saved schedule":"Not saved yet")}</span></div>
           <p className="supporting">Teal blocks repeat weekly. Striped blocks are date exceptions. Dark blocks are already reserved appointments.</p>
           {appointments.error&&<InlineNotice>Existing appointments are temporarily unavailable in this calendar; they remain protected by server-side conflict checks.</InlineNotice>}
           <details className="schedule-accessible-times" open={timeEditorOpen} onToggle={e=>setTimeEditorOpen(e.currentTarget.open)}><summary>{w("Time-field editor and keyboard alternative")}</summary>

@@ -12,6 +12,15 @@ class ReviewPage(BaseRenderer):
 
     def render(self):
         root = Path(frappe.get_app_path('tele_tena', 'public', 'review'))
+        request = frappe.local.request
+        if self.path == 'teletena' and request.path == '/teletena':
+            query = getattr(request, 'query_string', b'')
+            suffix = ('?' + query.decode('latin1')) if query else ''
+            return Response(status=308, headers={
+                'Location': '/teletena/' + suffix,
+                'Cache-Control': 'no-store, private',
+                'X-Content-Type-Options': 'nosniff',
+            })
         worker = self.path == 'teletena/sw.js'
         path = root / ('sw.js' if worker else 'index.html')
         if not path.is_file():

@@ -42,6 +42,11 @@ const messages: Record<string, string> = {
   request_disclosure_changed: "Review the exact information that will be shared before accepting.",
   request_matched: "This request has already been matched.",
   request_retry_changed: "This retry differs from the request already sent. Start a new request to change it.",
+  reschedule_unavailable: "This appointment can no longer be changed. Contact support if you need help.",
+  reschedule_pending: "A time-change request is already waiting for a response.",
+  reschedule_resolved: "This time-change request is no longer active.",
+  reschedule_service_changed: "The booked service has changed and needs support review before rescheduling.",
+  slot_unavailable: "That time is no longer available. Choose another time.",
 };
 export function useAction() {
   const [busy, setBusy] = useState(false);

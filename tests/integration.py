@@ -105,6 +105,8 @@ class Integration(unittest.TestCase):
         appointment_ids = frappe.db.sql('SELECT id FROM tt_appointment WHERE patient IN %s OR clinician IN %s',
                                        (tuple(USERS.values()), tuple(USERS.values())), pluck=True)
         if appointment_ids:
+            frappe.db.sql('DELETE FROM tt_reschedule_proposal WHERE appointment IN %s',
+                          (tuple(appointment_ids),))
             frappe.db.sql('DELETE FROM tt_dispute WHERE earning IN (SELECT id FROM tt_earning WHERE appointment IN %s)',
                           (tuple(appointment_ids),))
             frappe.db.sql('DELETE FROM tt_earning WHERE appointment IN %s', (tuple(appointment_ids),))

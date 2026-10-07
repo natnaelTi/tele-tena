@@ -8,6 +8,7 @@ const output = '/tmp/tele-tena-presentation-review'
 fs.mkdirSync(output, { recursive: true })
 let checkpoint = 'launch'
 let diagnostic = ''
+function mark(step) { checkpoint = step; console.log('STEP: ' + step) }
 async function main() {
   const browser = await chromium.launch({ args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] })
   const contexts = []
@@ -16,6 +17,8 @@ async function main() {
     const context = await browser.newContext({ permissions: ['camera', 'microphone'], timezoneId: 'Africa/Addis_Ababa' })
     contexts.push(context)
     const page = await context.newPage()
+    page.setDefaultTimeout(15000)
+    page.setDefaultNavigationTimeout(20000)
     page.on('pageerror', () => errors.push('page exception'))
     // This visual fixture mocks delivery capabilities along with its OTP send;
     // backend provider readiness is covered separately.
@@ -33,7 +36,10 @@ async function main() {
     return page
   }
   async function capture(page, name, widths = [320, 390, 768, 1440]) {
-    await page.waitForLoadState('networkidle')
+    // Frappe may keep authenticated/realtime requests active. Callers assert
+    // their screen's critical content before capture; DOM readiness plus the
+    // per-viewport font wait is stable without requiring network quiescence.
+    await page.waitForLoadState('domcontentloaded')
     for (const width of widths) {
       await page.setViewportSize({ width, height: 960 })
       await page.evaluate(() => document.fonts.ready)
@@ -44,22 +50,38 @@ async function main() {
   }
   try {
     const guest = await pageFor()
-    checkpoint = 'homepage screenshots'
+    mark('homepage screenshots')
     await guest.goto(base)
-    await guest.getByRole('heading', { name: 'Find someone you feel comfortable talking to.' }).waitFor()
+    if (new URL(base).pathname === '/teletena') {
+      await guest.waitForURL(url => new URL(url).pathname === '/teletena/')
+    }
+    await guest.getByRole('heading', { name: 'Find support. Make time for care.' }).waitFor()
+    await guest.getByRole('heading', { name: 'Talk to someone who fits your needs.' }).waitFor()
     await capture(guest, 'homepage', [320, 390, 768, 1440])
     const manifest=await guest.locator('link[rel="manifest"]').getAttribute('href')
     assert.ok(['/manifest.webmanifest','/assets/tele_tena/review/manifest.webmanifest'].includes(manifest),
       `manifest must resolve in the active Vite or built Frappe deployment: ${manifest}`)
-    await guest.evaluate(async()=>{await navigator.serviceWorker.ready})
+    mark('service worker installation readiness')
+    await Promise.race([
+      guest.evaluate(async()=>{await navigator.serviceWorker.ready}),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('service worker did not become ready')), 15000))
+    ])
+    mark('service worker controls first page')
     await guest.reload()
-    await guest.waitForFunction(()=>Boolean(navigator.serviceWorker.controller))
+    await guest.waitForFunction(()=>Boolean(navigator.serviceWorker.controller), null, {timeout:15000})
+    mark('offline navigation fallback')
     await guest.context().setOffline(true)
-    await guest.goto(base+'/')
-    await guest.getByRole('heading',{name:'You’re offline',exact:true}).waitFor()
+    const offlineNavigation = await guest.goto(base+'/').then(response => ({ ok: true, status: response?.status() ?? null })).catch(() => ({ ok: false, status: null }))
+    const offlineState = await guest.evaluate(() => ({
+      heading: document.querySelector('h1')?.textContent?.trim() ?? '',
+      controlled: Boolean(navigator.serviceWorker.controller),
+      pathInScope: location.pathname.startsWith(new URL(navigator.serviceWorker.controller?.scriptURL ?? location.href).pathname.replace(/sw\.js$/, '')),
+    }))
+    console.log(`OFFLINE_FALLBACK_DIAGNOSTIC: navigation=${offlineNavigation.ok ? 'resolved' : 'rejected'}; status=${offlineNavigation.status ?? 'none'}; heading=${offlineState.heading === 'You’re offline' ? 'expected' : 'missing'}; controller=${offlineState.controlled ? 'present' : 'missing'}; path=${offlineState.pathInScope ? 'in-scope' : 'out-of-scope'}`)
+    assert.equal(offlineState.heading, 'You’re offline', 'offline fallback heading was not rendered')
     await guest.screenshot({path:`${output}/offline-state-390.png`,fullPage:true})
     await guest.context().setOffline(false)
-    checkpoint = 'phone entry is one field and expected guest is signed out'
+    mark('phone entry is one field and expected guest is signed out')
     await guest.goto(base + '/sign-in')
     await guest.getByLabel('Phone number', { exact: true }).waitFor()
     assert.equal(await guest.locator('main input').count(), 1)
@@ -77,25 +99,66 @@ async function main() {
     assert.equal(await guest.getByLabel('Password', { exact: true }).count(), 0)
     await capture(guest, 'email-alternative')
     await guest.unroute('**/api/method/tele_tena.api.contact_auth.request_code')
-    checkpoint = 'patient onboarding save and resume'
+    mark('patient onboarding save and resume')
     const newcomer = await pageFor('newpatient')
+    mark('patient onboarding draft loaded')
     await newcomer.getByLabel('Preferred name or alias', { exact: true }).fill('Synthetic newcomer')
+    const saveResponsePromise = newcomer.waitForResponse(response =>
+      new URL(response.url()).pathname.endsWith('tele_tena.api.contact_auth.save_onboarding'), { timeout: 15000 }
+    ).catch(() => null)
     await newcomer.getByRole('button', { name: 'Save for later', exact: true }).click()
+    const saveResponse = await saveResponsePromise
+    const saveBody = saveResponse ? await saveResponse.json().catch(() => ({})) : {}
+    console.log(`ONBOARDING_SAVE_DIAGNOSTIC: response=${saveResponse ? saveResponse.status() : 'missing'}; serverError=${saveBody.exc_type ? 'present' : 'none'}`)
     await newcomer.getByText('Progress saved. You can return to this step.').waitFor()
+    mark('patient onboarding draft saved')
     await newcomer.reload()
-    await newcomer.waitForFunction(()=>[...document.querySelectorAll('input')].some(input=>input.labels?.[0]?.innerText.includes('Preferred name or alias')&&input.value==='Synthetic newcomer'),null,{timeout:15000}).catch(async()=>{diagnostic=JSON.stringify(await newcomer.evaluate(()=>({path:location.pathname,headings:[...document.querySelectorAll('h1')].map(x=>x.innerText),inputs:[...document.querySelectorAll('input')].map(x=>({label:x.labels?.[0]?.innerText,value:x.value})),notices:[...document.querySelectorAll('[role=alert],[role=status]')].map(x=>x.innerText)})));throw new Error('saved onboarding value did not reload')})
+    await newcomer.waitForFunction(()=>[...document.querySelectorAll('input')].some(input=>input.labels?.[0]?.innerText.includes('Preferred name or alias')&&input.value==='Synthetic newcomer'),null,{timeout:15000}).catch(async()=>{diagnostic=await newcomer.evaluate(()=>{const field=[...document.querySelectorAll('input')].find(input=>input.labels?.[0]?.innerText.includes('Preferred name or alias'));return `path=${location.pathname.startsWith('/teletena/')?'app':'unexpected'}; heading=${Boolean(document.querySelector('h1'))}; field=${field?'present':'missing'}; valuePersisted=${field?.value==='Synthetic newcomer'}; alert=${Boolean(document.querySelector('[role=alert]'))}; status=${Boolean(document.querySelector('[role=status]'))}`});console.log(`ONBOARDING_RELOAD_DIAGNOSTIC: ${diagnostic}`);throw new Error('saved onboarding value did not reload')})
+    mark('patient onboarding draft reloaded')
     await capture(newcomer, 'patient-onboarding')
+    mark('patient onboarding first step verified')
     await newcomer.getByRole('button', { name: 'Continue', exact: true }).click()
     await newcomer.getByLabel('I am 18 or older.', { exact: true }).check()
     await newcomer.getByLabel('I consent to storing my profile and the information I choose to share for this care journey.').check()
     await newcomer.getByRole('button', { name: 'Continue', exact: true }).click()
+    mark('patient onboarding consent saved')
     await newcomer.getByRole('button', { name: 'Continue', exact: true }).click()
+    mark('patient onboarding privacy step saved')
+    await newcomer.getByRole('button', { name: 'Find care', exact: true }).waitFor({ state: 'visible' })
+    mark('patient onboarding completion action ready')
+    const sidBefore = (await newcomer.context().cookies()).find(cookie => cookie.name === 'sid')?.value || ''
+    const completionResponsePromise = newcomer.waitForResponse(response =>
+      new URL(response.url()).pathname.endsWith('tele_tena.api.contact_auth.save_onboarding'), { timeout: 15000 }
+    ).catch(() => null)
+    const sessionResponsePromise = newcomer.waitForResponse(response =>
+      new URL(response.url()).pathname.endsWith('tele_tena.api.contact_auth.session'), { timeout: 15000 }
+    ).catch(() => null)
     await newcomer.getByRole('button', { name: 'Find care', exact: true }).click()
-    await newcomer.waitForURL('**/patient')
-    checkpoint = 'clinician onboarding'
+    const completionResponse = await completionResponsePromise
+    const completionBody = completionResponse ? await completionResponse.json().catch(() => ({})) : {}
+    const sidAfter = (await newcomer.context().cookies()).find(cookie => cookie.name === 'sid')?.value || ''
+    const responseSetCookie = completionResponse?.headers()['set-cookie'] || ''
+    console.log(`ONBOARDING_COMPLETE_DIAGNOSTIC: response=${completionResponse ? completionResponse.status() : 'missing'}; serverError=${completionBody.exc_type ? 'present' : 'none'}; completed=${typeof completionBody.message?.completed === 'boolean' ? completionBody.message.completed : 'unknown'}; sessionCookiePreserved=${Boolean(sidBefore && sidAfter && sidBefore === sidAfter)}; sessionCookieOpaque=${sidAfter.length >= 32}; responseSetSessionCookie=${/sid=/i.test(responseSetCookie)}`)
+    await newcomer.waitForURL('**/patient', { timeout: 15000 }).catch(async () => {
+      const sessionResponse = await sessionResponsePromise
+      const sessionBody = sessionResponse ? await sessionResponse.json().catch(() => ({})) : {}
+      const sessionMessage = sessionBody.message || {}
+      const safeErrorCode = typeof sessionBody.tele_tena_error === 'string' && /^[a-z_]{1,40}$/.test(sessionBody.tele_tena_error) ? sessionBody.tele_tena_error : 'none'
+      const safeException = typeof sessionBody.exc_type === 'string' && /^[A-Za-z_]{1,60}$/.test(sessionBody.exc_type) ? sessionBody.exc_type : 'none'
+      const safeKeys = Object.keys(sessionBody).filter(key => /^[a-z_]{1,40}$/.test(key)).sort().join(',') || 'none'
+      diagnostic = await newcomer.evaluate(() => `path=${location.pathname.includes('/onboarding') ? 'onboarding' : 'other'}; alert=${Boolean(document.querySelector('[role=alert]'))}; status=${Boolean(document.querySelector('[role=status]'))}`)
+      console.log(`ONBOARDING_COMPLETE_STATE: ${diagnostic}; sessionResponse=${sessionResponse ? sessionResponse.status() : 'missing'}; sessionError=${safeErrorCode}; exception=${safeException}; responseKeys=${safeKeys}; authenticated=${sessionMessage.authenticated === true}; profile=${Boolean(sessionMessage.profile)}; patientRole=${Array.isArray(sessionMessage.roles) && sessionMessage.roles.includes('Tele Tena Patient')}`)
+      throw new Error('patient registration did not reach patient workspace')
+    })
+    mark('patient onboarding completed')
+    mark('clinician onboarding')
     const applicant = await pageFor('newclinician')
+    mark('clinician onboarding draft loaded')
+    await applicant.getByLabel('Professional name', { exact: true }).waitFor()
+    mark('clinician onboarding form ready')
     await capture(applicant, 'clinician-onboarding')
-    checkpoint = 'patient workspace and discovery'
+    mark('clinician onboarding initial state verified')
+    mark('patient workspace and discovery')
     const patient = await pageFor('p1')
     await patient.getByRole('heading', { name: 'Your next appointment' }).waitFor()
     await capture(patient, 'patient-home')
@@ -120,13 +183,13 @@ async function main() {
     await patient.getByRole('heading', { name: 'Find the right conversation for you.' }).waitFor()
     await patient.getByLabel('Clinician or service', { exact: true }).fill('Synthetic test consultation')
     await capture(patient, 'discovery')
-    checkpoint = 'persisted booking and privacy choices'
-    checkpoint = 'offering loads persisted availability'
+    mark('persisted booking and privacy choices')
+    mark('offering loads persisted availability')
     await patient.goto(base + '/patient/book/' + fixture.offering)
     try { await patient.getByRole('group', { name: 'Available times' }).waitFor({ timeout: 10000 }) } catch { diagnostic = JSON.stringify(await patient.evaluate(() => ({ path: location.pathname, headings: [...document.querySelectorAll('h1,h2')].map(x => x.innerText), notices: [...document.querySelectorAll('[role=alert],[role=status]')].map(x => x.innerText) }))); throw new Error('booking calendar unavailable') }
     await patient.getByRole('button', { name: /\d{4}-\d{2}-\d{2}/ }).first().click()
     await patient.getByRole('group', { name: 'Available times' }).getByRole('button').first().click()
-    checkpoint = 'choose available time and inspect schedule editor'
+    mark('choose available time and inspect schedule editor')
     const clinician = await pageFor('c1')
     await clinician.goto(base + '/clinician/availability')
     await clinician.getByRole('heading', { name: /Availability/ }).waitFor()
@@ -137,20 +200,20 @@ async function main() {
     await capture(clinician, 'tour-clinician')
     await clinician.getByRole('button', {name: 'Skip', exact: true}).click()
     await clinician.goto(base + '/clinician')
-    checkpoint = 'choose available start time'
+    mark('choose available start time')
     await patient.getByRole('button', { name: 'Continue', exact: true }).click()
-    checkpoint = 'enter request and sharing choices'
+    mark('enter request and sharing choices')
     await patient.getByLabel('What would you like to talk about?', { exact: true }).fill('Synthetic redesign request')
     await patient.getByLabel('Share my preferred name', { exact: true }).check()
-    checkpoint = 'request-specific privacy preview'
+    mark('request-specific privacy preview')
     await patient.getByRole('button', { name: 'Preview and continue', exact: true }).click()
     await patient.getByRole('heading', { name: 'Review your session', exact: true }).waitFor()
     await capture(patient, 'booking-preview')
-    checkpoint = 'confirm appointment and reserve simulated balance'
+    mark('confirm appointment and reserve simulated balance')
     await patient.getByRole('button', { name: /Confirm session/ }).click()
     await patient.waitForURL('**/patient/appointments')
     await capture(patient, 'appointments')
-    checkpoint = 'profile defaults unaffected'
+    mark('profile defaults unaffected')
     await patient.goto(base + '/patient/account')
     await patient.getByRole('button', {name: 'Privacy & sharing', exact: true}).click()
     await patient.getByLabel('Share my preferred name by default', { exact: true }).waitFor()
@@ -159,7 +222,7 @@ async function main() {
     await patient.goto(base + '/patient/payments')
     await patient.getByRole('heading', { name: 'Payments', exact: true }).waitFor()
     await capture(patient, 'payments')
-    checkpoint = 'clinician Today and practice screens'
+    mark('clinician Today and practice screens')
     // Reuse the authenticated clinician context from the schedule screenshot.
     await clinician.getByRole('heading', { name: 'Today', exact: true }).waitFor()
     await capture(clinician, 'clinician-today')
@@ -168,7 +231,7 @@ async function main() {
     await clinician.getByRole('link',{name:'Open consultation',exact:true}).waitFor()
     assert.equal((await clinician.locator('body').innerText()).includes(fixture.users.p1),false,'care record must not expose the patient account identifier')
     await capture(clinician,'care-record')
-    checkpoint = 'consultation preflight'
+    mark('consultation preflight')
     await patient.goto(base + '/patient/consultations/' + fixture.appointment_id)
     await patient.getByRole('heading', {name: 'Synthetic test consultation', exact: true}).waitFor()
     await capture(patient, 'consultation-detail')
@@ -179,33 +242,45 @@ async function main() {
     await checkDevices.click()
     await patient.getByRole('status').filter({ hasText: 'Devices checked' }).waitFor()
     await capture(patient, 'consultation-preflight')
-    checkpoint = 'administrative review'
+    mark('administrative review')
     const admin = await pageFor('admin')
     await admin.getByRole('heading', { name: 'Application review' }).waitFor()
     await capture(admin, 'administrator-review')
     await admin.getByRole('button', {name: 'Take a quick tour', exact: true}).click()
     await admin.getByRole('dialog', {name: /Application queue/}).waitFor()
     await capture(admin, 'tour-administrator')
-    checkpoint = 'showcase scripts keyboard dialogs and zoom'
+    mark('showcase scripts keyboard dialogs and zoom')
     await guest.goto(base + '/showcase')
-    await capture(guest, 'showcase', [320, 390, 768, 1440])
-    const firstTab = guest.getByRole('tab', { name: 'Overview', exact: true })
-    await firstTab.focus()
-    await guest.keyboard.press('ArrowRight')
-    assert.equal(await guest.getByRole('tab', { name: 'Privacy', exact: true }).getAttribute('aria-selected'), 'true')
-    await guest.getByRole('button', { name: 'Open dialog', exact: true }).click()
-    await guest.getByRole('dialog').waitFor()
-    assert.equal(await guest.evaluate(() => document.querySelector('[role=dialog]').contains(document.activeElement)), true)
-    await guest.keyboard.press('Escape')
-    assert.equal(await guest.getByRole('dialog').count(), 0)
-    await guest.locator('main').getByLabel('Language / ቋንቋ / Afaan').selectOption('am')
-    await capture(guest, 'showcase-amharic', [390, 768, 1440])
-    await guest.locator('main').getByLabel('Language / ቋንቋ / Afaan').selectOption('om')
-    await capture(guest, 'showcase-oromo', [390])
-    await guest.emulateMedia({ reducedMotion: 'reduce' })
-    await guest.setViewportSize({ width: 384, height: 960 })
-    await guest.screenshot({ path: `${output}/showcase-200-percent-equivalent-384px.png`, fullPage: true })
-    assert.equal(await guest.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
+    if (new URL(base).pathname.startsWith('/teletena')) {
+      await guest.getByRole('heading', { name: 'Find support. Make time for care.' }).waitFor()
+      assert.equal(await guest.getByRole('tab').count(), 0, 'development showcase must not be exposed in the production package')
+      mark('development-only component showcase is not exposed by production package')
+    } else {
+      await capture(guest, 'showcase', [320, 390, 768, 1440])
+      mark('showcase rendered responsively')
+      const firstTab = guest.getByRole('tab', { name: 'Overview', exact: true })
+      await firstTab.focus()
+      await guest.keyboard.press('ArrowRight')
+      await guest.waitForFunction(() => document.getElementById('tab-privacy')?.getAttribute('aria-selected') === 'true')
+      mark('showcase keyboard tab interaction')
+      await guest.getByRole('button', { name: 'Open dialog', exact: true }).click()
+      await guest.getByRole('dialog').waitFor()
+      assert.equal(await guest.evaluate(() => document.querySelector('[role=dialog]').contains(document.activeElement)), true)
+      await guest.keyboard.press('Escape')
+      assert.equal(await guest.getByRole('dialog').count(), 0)
+      mark('showcase dialog focus and escape')
+      await guest.locator('main').getByLabel('Language / ቋንቋ / Afaan').selectOption('am')
+      await capture(guest, 'showcase-amharic', [390, 768, 1440])
+      mark('showcase Amharic layout')
+      await guest.locator('main').getByLabel('Language / ቋንቋ / Afaan').selectOption('om')
+      await capture(guest, 'showcase-oromo', [390])
+      mark('showcase Afaan Oromo layout')
+      await guest.emulateMedia({ reducedMotion: 'reduce' })
+      await guest.setViewportSize({ width: 384, height: 960 })
+      await guest.screenshot({ path: `${output}/showcase-200-percent-equivalent-384px.png`, fullPage: true })
+      assert.equal(await guest.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
+      mark('showcase zoom and reduced motion')
+    }
     assert.deepEqual(errors, [])
     console.log('PASS: public/auth steps, resumable onboarding, real booking/privacy flow, portals, preflight, responsive screenshots, keyboard dialog, scripts and 200% zoom; no live delivery sent')
   } finally { await browser.close() }

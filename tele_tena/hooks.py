@@ -11,7 +11,8 @@ after_request = ["tele_tena.privacy.no_store"]
 scheduler_events = {
     "all": ["tele_tena.api.presentation.expire_pending_appointments"],
     "cron": {"*/5 * * * *": ["tele_tena.accounting.release_eligible_earnings"],
-        "* * * * *": ["tele_tena.api.open_requests.expire_requests"]},
+        "* * * * *": ["tele_tena.api.open_requests.expire_requests"],
+        "0 * * * *": ["tele_tena.api.presentation.expire_reschedule_proposals"]},
 }
 
 # A dedicated namespace only; no catch-all routing or changes to other sites.

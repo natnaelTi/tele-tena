@@ -155,10 +155,10 @@ dispute hold, audited financial disputes and reserved payout requests. Historica
 completed appointments that still hold funds migrate to review-only `LegacyHold`
 records and are never settled automatically. A dispute/refund after release or an
 open payout is unsupported and must stop for authorized review. The scheduler
-records simulated availability of earnings; it does not transfer money. Mutual
-rescheduling, no-show decisions, notifications, real payments/accounting,
-physical-device call quality and production clinical readiness remain outside
-the implemented contract; the delivery tracker is authoritative for pending scope.
+records simulated availability of earnings; it does not transfer money. No-show
+decisions, notifications, real payments/accounting, physical-device call quality
+and production clinical readiness remain outside the implemented contract; the
+delivery tracker is authoritative for pending scope.
 
 The versioned v1.8 reconciliation imports known legacy deposit, reservation and
 release events created after each v1.7 wallet opening snapshot into balanced,
@@ -251,3 +251,21 @@ when the appointment is cancelled/completed or the membership is revoked. It
 does not allow joining, confirmation, cancellation, rescheduling, notes, shared
 summary, contact details, request text, profile history, balances, or access to
 other encounters. This is not a clinic-wide record grant or shared calendar.
+
+## Mutual appointment rescheduling (demonstration)
+
+Either booked participant may propose a new time before the appointment begins
+and before a consultation room has been created. The proposal must match a
+server-generated slot for the same active offering, currently approved service
+scope, duration and consultation format. The existing appointment continues to
+occupy its original slot until the other participant explicitly accepts. At
+acceptance, a global scheduling lock rechecks approval, schedule and conflicts
+while excluding only the appointment being moved. If the proposed time became
+unavailable, the proposal closes as unavailable and the original booking remains
+unchanged. Decline, withdrawal, expiry or supersession never changes the booking
+or moves money. Acceptance updates the existing appointment and writes an audit
+event; price, policy and disclosure snapshots, appointment identity and the
+single existing reservation are preserved. The demonstration proposal expiry is
+48 hours by default and configurable per site; it is not a production policy.
+See `mutual-rescheduling-verification.md` for the current implementation and
+verification state.

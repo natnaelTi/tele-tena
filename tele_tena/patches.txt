@@ -17,3 +17,4 @@ tele_tena.patches.v1_11_progressive_routing
 tele_tena.patches.v1_12_catalog_vetting
 tele_tena.patches.v1_13_financial_reconciliation_audit
 tele_tena.patches.v1_14_session_feedback
+tele_tena.patches.v1_15_mutual_rescheduling

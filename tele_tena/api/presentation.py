@@ -9,7 +9,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import frappe
 
-from tele_tena.api.journey import actor, command, fail, integer, iso, one, profile, query, rows, text
+from tele_tena.api.journey import (actor, approved, approved_service, command, fail, integer, iso,
+                                   one, profile, query, rows, text)
 
 DEMO_CANCELLATION_POLICY = 'demo-full-release-before-start-v1'
 TOUR_VERSION = 1
@@ -115,10 +116,208 @@ def cancel_appointment(appointment, reason):
     if snapshot.get('version') != DEMO_CANCELLATION_POLICY:
         fail('The accepted cancellation policy is unavailable', 'policy_unavailable')
     _wallet_release(item, 'cancel')
+    frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Superseded',responded_at=UTC_TIMESTAMP(6) WHERE appointment=%s AND state='Pending'",
+                  (item.id,))
     frappe.db.sql("UPDATE tt_appointment SET state='Cancelled',cancelled_by=%s,cancelled_at=%s,cancel_reason=%s WHERE id=%s",
                   (user, now, reason, item.id))
     _event(item.id, 'Cancelled', user, reason)
     return {'state': 'Cancelled', 'released': True}
+
+
+def _reschedule_expiry():
+    # 48 hours is a demonstration default, not an agreed commercial policy.
+    try:
+        hours = int(frappe.conf.get('tele_tena_reschedule_expiry_hours', 48))
+    except (TypeError, ValueError):
+        hours = 48
+    return max(1, min(hours, 168))
+
+
+def _can_change_time(item):
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    return (item.state == 'Booked' and item.start > now and
+            not rows('SELECT appointment FROM tt_consultation WHERE appointment=%s', (item.id,)) and
+            not rows('SELECT appointment FROM tt_consultation_note WHERE appointment=%s AND status=%s',
+                     (item.id, 'Finalized')))
+
+
+@command
+def propose_reschedule(appointment, start, retry_key):
+    """Propose a generated replacement time; the current slot remains held."""
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    item, user, role = _authorized(appointment, True)
+    if not _can_change_time(item):
+        fail('This appointment can no longer be rescheduled', 'reschedule_unavailable')
+    start = journey_instant(start)
+    key = text(retry_key, 80)
+    payload_hash = hashlib.sha256(json.dumps(
+        [appointment, iso(start)], separators=(',', ':')).encode()).hexdigest()
+    prior = rows('''SELECT id,payload_hash,state FROM tt_reschedule_proposal
+        WHERE appointment=%s AND proposer=%s AND retry_key=%s FOR UPDATE''', (item.id, user, key))
+    if prior:
+        if prior[0].payload_hash != payload_hash:
+            fail('Retry key payload changed', 'retry_changed')
+        return {'id': prior[0].id, 'state': prior[0].state, 'idempotent': True}
+    active = rows('''SELECT id FROM tt_reschedule_proposal WHERE appointment=%s AND state='Pending'
+        AND expires_at>UTC_TIMESTAMP(6) FOR UPDATE''', (item.id,))
+    if active:
+        fail('Another time-change request is awaiting a response', 'reschedule_pending')
+    from tele_tena.api import scheduling
+    offer = one('''SELECT o.*,s.service_label FROM tt_offering o
+        JOIN `tabTele Tena Service` s ON s.name=o.service
+        WHERE o.id=%s AND o.clinician=%s AND o.active=1 AND s.active=1 FOR UPDATE''',
+        (item.offering, item.clinician))
+    approved(item.clinician, True)
+    approved_service(item.clinician, offer.service, True)
+    if int(offer.minutes) != int(item.minutes):
+        fail('The booked service duration has changed; support must review this appointment',
+             'reschedule_service_changed')
+    schedule = scheduling.validate_slot(offer, start, item.patient, lock=True,
+                                        exclude_appointment=item.id)
+    if schedule and schedule.consultation_format != item.consultation_format:
+        fail('Choose an available time in the same consultation format', 'slot_unavailable')
+    proposal_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    expires = now + timedelta(hours=_reschedule_expiry())
+    frappe.db.sql('''INSERT INTO tt_reschedule_proposal
+        (id,appointment,proposer,start,end,timezone,retry_key,payload_hash,state,created_at,expires_at)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Pending',%s,%s)''',
+        (proposal_id, item.id, user, start, start + timedelta(minutes=int(item.minutes)),
+         schedule.timezone if schedule else item.timezone, key, payload_hash, now, expires))
+    _event(item.id, 'RescheduleProposed', user, 'A new appointment time was proposed')
+    return {'id': proposal_id, 'state': 'Pending', 'expires_at': iso(expires),
+            'start': iso(start), 'timezone': schedule.timezone if schedule else item.timezone}
+
+
+def journey_instant(value):
+    from tele_tena.api.journey import instant
+    return instant(value)
+
+
+@command
+def respond_to_reschedule(appointment, proposal, decision):
+    if decision not in ('accept', 'decline'):
+        fail('Choose whether to accept or decline the proposed time')
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    item, user, role = _authorized(appointment, True)
+    record = rows('''SELECT * FROM tt_reschedule_proposal WHERE id=%s AND appointment=%s FOR UPDATE''',
+                  (proposal, item.id))
+    if not record:
+        frappe.throw('Appointment unavailable', frappe.PermissionError)
+    record = record[0]
+    if record.state in ('Accepted', 'Declined'):
+        if decision == 'accept' and record.state == 'Accepted':
+            return {'state': 'Accepted', 'start': iso(record.start), 'idempotent': True}
+        if decision == 'decline' and record.state == 'Declined' and record.responded_by == user:
+            return {'state': 'Declined', 'idempotent': True}
+        fail('This time-change request is already resolved', 'reschedule_resolved')
+    if record.proposer == user:
+        frappe.throw('Only the other appointment participant may respond', frappe.PermissionError)
+    if record.state != 'Pending':
+        fail('This time-change request is no longer available', 'reschedule_resolved')
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    if record.expires_at <= now:
+        frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Expired',responded_at=%s WHERE id=%s",
+                      (now, record.id))
+        _event(item.id, 'RescheduleExpired', 'System')
+        return {'state': 'Expired'}
+    if decision == 'decline':
+        frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Declined',responded_by=%s,responded_at=%s WHERE id=%s",
+                      (user, now, record.id))
+        _event(item.id, 'RescheduleDeclined', user)
+        return {'state': 'Declined'}
+    if not _can_change_time(item):
+        frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Superseded',responded_by=%s,responded_at=%s WHERE id=%s",
+                      (user, now, record.id))
+        _event(item.id, 'RescheduleUnavailable', 'System')
+        return {'state': 'Unavailable', 'message': 'This appointment can no longer be rescheduled.'}
+    from tele_tena.api import scheduling
+    offer = rows('''SELECT o.*,s.service_label FROM tt_offering o
+        JOIN `tabTele Tena Service` s ON s.name=o.service
+        WHERE o.id=%s AND o.clinician=%s AND o.active=1 AND s.active=1 FOR UPDATE''',
+        (item.offering, item.clinician))
+    if not offer:
+        fail('The booked service is no longer available for a time change', 'reschedule_service_changed')
+    offer = offer[0]
+    approved(item.clinician, True)
+    approved_service(item.clinician, offer.service, True)
+    if int(offer.minutes) != int(item.minutes):
+        fail('The booked service duration has changed; support must review this appointment',
+             'reschedule_service_changed')
+    try:
+        schedule = scheduling.validate_slot(offer, record.start, item.patient, lock=True,
+                                            exclude_appointment=item.id)
+    except frappe.ValidationError:
+        frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Unavailable',responded_by=%s,responded_at=%s WHERE id=%s",
+                      (user, now, record.id))
+        _event(item.id, 'RescheduleSlotUnavailable', 'System')
+        return {'state': 'Unavailable', 'message': 'That time is no longer available. Ask for another time.'}
+    if schedule and (schedule.timezone != record.timezone or
+                     schedule.consultation_format != item.consultation_format):
+        frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Unavailable',responded_by=%s,responded_at=%s WHERE id=%s",
+                      (user, now, record.id))
+        _event(item.id, 'RescheduleSlotUnavailable', 'System')
+        return {'state': 'Unavailable', 'message': 'That time is no longer available. Ask for another time.'}
+    end = record.start + timedelta(minutes=int(item.minutes))
+    # The original reservation and immutable price/disclosure/policy remain on
+    # this same appointment. No financial posting is created by rescheduling.
+    frappe.db.sql('''UPDATE tt_appointment SET start=%s,end=%s,timezone=%s,schedule_id=%s,
+        buffer_before=%s,buffer_after=%s WHERE id=%s''',
+        (record.start, end, schedule.timezone if schedule else record.timezone,
+         schedule.id if schedule else item.schedule_id,
+         schedule.buffer_before if schedule else item.buffer_before,
+         schedule.buffer_after if schedule else item.buffer_after, item.id))
+    frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Accepted',responded_by=%s,responded_at=%s WHERE id=%s",
+                  (user, now, record.id))
+    frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Superseded',responded_at=%s WHERE appointment=%s AND id<>%s AND state='Pending'",
+                  (now, item.id, record.id))
+    _event(item.id, 'RescheduleAccepted', user)
+    return {'state': 'Accepted', 'start': iso(record.start), 'end': iso(end),
+            'timezone': schedule.timezone if schedule else record.timezone}
+
+
+@command
+def withdraw_reschedule(appointment, proposal):
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    item, user, _ = _authorized(appointment, True)
+    record = rows('''SELECT id,proposer,state FROM tt_reschedule_proposal
+        WHERE id=%s AND appointment=%s FOR UPDATE''', (proposal, item.id))
+    if not record:
+        frappe.throw('Appointment unavailable', frappe.PermissionError)
+    if record[0].proposer != user:
+        frappe.throw('Only the proposer may withdraw this request', frappe.PermissionError)
+    if record[0].state == 'Withdrawn':
+        return {'state': 'Withdrawn', 'idempotent': True}
+    if record[0].state != 'Pending':
+        fail('This time-change request is already resolved', 'reschedule_resolved')
+    frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Withdrawn',responded_by=%s,responded_at=UTC_TIMESTAMP(6) WHERE id=%s",
+                  (user, record[0].id))
+    _event(item.id, 'RescheduleWithdrawn', user)
+    return {'state': 'Withdrawn'}
+
+
+def expire_reschedule_proposals():
+    """Expire pending mutual-time proposals without changing appointments."""
+    candidates = rows("SELECT id,appointment FROM tt_reschedule_proposal WHERE state='Pending' "
+                      "AND expires_at<=UTC_TIMESTAMP(6) ORDER BY expires_at LIMIT 100")
+    for candidate in candidates:
+        savepoint = 'tt_reschedule_expire_' + uuid.uuid4().hex
+        frappe.db.savepoint(savepoint)
+        try:
+            one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+            record = rows("SELECT id,appointment FROM tt_reschedule_proposal WHERE id=%s "
+                          "AND state='Pending' AND expires_at<=UTC_TIMESTAMP(6) FOR UPDATE",
+                          (candidate.id,))
+            if not record:
+                frappe.db.rollback(save_point=savepoint)
+                continue
+            frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Expired',responded_at=UTC_TIMESTAMP(6) WHERE id=%s",
+                          (candidate.id,))
+            _event(candidate.appointment, 'RescheduleExpired', 'System')
+            frappe.db.commit()
+        except Exception:
+            frappe.db.rollback(save_point=savepoint)
+            raise
 
 
 def expire_pending_appointments():
@@ -153,6 +352,23 @@ def appointment_detail(appointment):
     note = rows('SELECT status,current_revision FROM tt_consultation_note WHERE appointment=%s', (item.id,))
     events = rows('''SELECT event_type,actor,reason,created FROM tt_appointment_event
         WHERE appointment=%s ORDER BY created,id''', (item.id,))
+    event_labels = {
+        'Booked': 'Appointment booked', 'Requested': 'Confirmation requested',
+        'Confirmed': 'Appointment confirmed', 'Declined': 'Appointment declined',
+        'Cancelled': 'Appointment cancelled', 'Expired': 'Appointment expired',
+        'Completed': 'Consultation finalized', 'DocumentationDraftSaved': 'Notes draft saved',
+        'DocumentationFinalized': 'Consultation finalized',
+        'RescheduleProposed': 'New time proposed', 'RescheduleAccepted': 'New time accepted',
+        'RescheduleDeclined': 'New time declined', 'RescheduleWithdrawn': 'Time request withdrawn',
+        'RescheduleExpired': 'Time request expired', 'RescheduleUnavailable': 'Time change unavailable',
+        'RescheduleSlotUnavailable': 'Proposed time unavailable',
+        'ClinicScheduleAccessGranted': 'Clinic scheduling access shared',
+        'ClinicScheduleAccessRevoked': 'Clinic scheduling access stopped',
+        'SessionFeedbackSubmitted': 'Session feedback submitted',
+    }
+    reschedule = rows('''SELECT id,proposer,start,timezone,state,expires_at FROM tt_reschedule_proposal
+        WHERE appointment=%s AND state='Pending' AND expires_at>UTC_TIMESTAMP(6)
+        ORDER BY created_at DESC LIMIT 1''', (item.id,))
     disclosure = json.loads(item.disclosure)
     selected = {
         'id': item.id,
@@ -182,7 +398,8 @@ def appointment_detail(appointment):
             'reason': item.cancel_reason,
             'policy': json.loads(item.policy_snapshot) if item.policy_snapshot else None,
         },
-        'timeline': [{'event': e.event_type, 'actor': 'You' if e.actor == user else
+        'timeline': [{'event': event_labels.get(e.event_type,
+                      re.sub(r'(?<!^)(?=[A-Z])', ' ', e.event_type)), 'actor': 'You' if e.actor == user else
                       ('System' if e.actor == 'System' else
                        'Care team' if role == 'patient' else 'Patient'),
                       'reason': e.reason, 'at': iso(e.created)} for e in events],
@@ -190,6 +407,10 @@ def appointment_detail(appointment):
                       item.start > datetime.now(timezone.utc).replace(tzinfo=None),
         'can_respond': role == 'clinician' and item.state == 'PendingConfirmation',
         'offering': item.offering,
+        'reschedule': ({'id': reschedule[0].id, 'proposed_by_you': reschedule[0].proposer == user,
+                        'start': iso(reschedule[0].start), 'timezone': reschedule[0].timezone,
+                        'expires_at': iso(reschedule[0].expires_at)} if reschedule else None),
+        'can_propose_reschedule': _can_change_time(item) and not bool(reschedule),
     }
     earning = rows('SELECT state,release_at FROM tt_earning WHERE appointment=%s', (item.id,))
     if earning:

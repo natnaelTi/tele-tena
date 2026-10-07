@@ -176,3 +176,16 @@ The staff projection omits account IDs, contact information, request narrative,
 saved history, notes, summaries, feedback, balances, and other encounters. It
 ends on patient revocation, membership removal, expiry, appointment cancellation,
 or completion. It provides logistics only and no clinical-record access.
+
+## Mutual appointment rescheduling
+
+Patch v1.15 adds the private app-owned `tt_reschedule_proposal` table. Proposals
+are append-preserved state records keyed to an existing appointment and
+idempotency key. They are not holds: the original appointment remains the only
+reservation while waiting. Propose and accept commands take the same global
+scheduling gate as direct booking, and revalidate the same offering, approval,
+scope, duration, timezone schedule and current conflicts. Acceptance excludes
+only the appointment being moved from the conflict set, updates it in place and
+adds an appointment event. Price, financial policy, disclosure and identity stay
+unchanged. Fresh installation bootstraps this additive patch and site upgrades
+run it through Patch Log.

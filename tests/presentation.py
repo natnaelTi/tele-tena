@@ -1,6 +1,7 @@
 """State, recurring calendar and private-record regressions on isolated synthetic fixtures."""
 import base64
 import concurrent.futures
+from copy import deepcopy
 import importlib.util
 import json
 import secrets
@@ -70,6 +71,27 @@ class Presentation(unittest.TestCase):
 
     def setUp(self):
         fixtures.login('admin')
+
+    def test_authorized_user_change_preserves_authenticated_session_state(self):
+        from tele_tena.account_context import authorized_user_change
+        fixtures.login('p1')
+        session = frappe.local.session
+        original = deepcopy(session)
+        try:
+            session.sid = 'synthetic-active-session-id'
+            session.csrf_token = 'synthetic-csrf-token'
+            session.data = frappe._dict({'user': fixtures.USERS['p1'], 'session_marker': 'preserve'})
+            before = deepcopy(session)
+            with authorized_user_change():
+                self.assertEqual(frappe.session.user, 'Administrator')
+            self.assertIs(frappe.local.session, session)
+            self.assertEqual(frappe.session.user, fixtures.USERS['p1'])
+            self.assertEqual(session.sid, before.sid)
+            self.assertEqual(session.csrf_token, before.csrf_token)
+            self.assertEqual(dict(session.data), dict(before.data))
+        finally:
+            session.clear()
+            session.update(original)
 
     def fund_patient(self, kind='p1', amount=10000):
         fixtures.login(kind)
@@ -448,6 +470,99 @@ class Presentation(unittest.TestCase):
         result = scheduling.calendar(offering, day.isoformat(), 1, zone)
         return [slot for item in result['days'] for slot in item['slots']]
 
+    def test_mutual_reschedule_keeps_original_hold_until_counterparty_accepts(self):
+        savepoint = 'tt_reschedule_' + uuid.uuid4().hex[:16]
+        frappe.db.sql('SAVEPOINT ' + savepoint)
+        try:
+            offering = fixtures.Integration.offers['c1']
+            day = day_offset(18)
+            fixtures.login('c1')
+            payload = schedule_payload(offering, day, mode='automatic')
+            payload['minimum_notice_minutes'] = 0
+            scheduling.save_schedule(**payload)
+            fixtures.login('p1')
+            journey.simulated_deposit(10000, 'reschedule-test-' + secrets.token_hex(10))
+            available = self.slots(offering, day)
+            self.assertGreaterEqual(len(available), 6)
+            original = self.book_slot(offering, available[0])
+            before = journey.one('SELECT start,price,state FROM tt_appointment WHERE id=%s', (original['id'],))
+            wallet_before = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s',
+                                        (fixtures.USERS['p1'],))
+            replacement = available[4]
+            retry_key = 'reschedule-' + secrets.token_hex(8)
+            proposed = presentation.propose_reschedule(original['id'], replacement['start'], retry_key)
+            retried = presentation.propose_reschedule(original['id'], replacement['start'], retry_key)
+            self.assertEqual(proposed['id'], retried['id'])
+            self.assertTrue(retried['idempotent'])
+            self.assertEqual(journey.one('SELECT start FROM tt_appointment WHERE id=%s',
+                                         (original['id'],)).start, before.start)
+            self.assertEqual(journey.one('SELECT reserved FROM tt_wallet WHERE patient=%s',
+                                         (fixtures.USERS['p1'],)).reserved, wallet_before.reserved)
+            with self.assertRaises(frappe.ValidationError):
+                presentation.propose_reschedule(original['id'], available[5]['start'], retry_key)
+            with self.assertRaises(frappe.PermissionError):
+                presentation.respond_to_reschedule(original['id'], proposed['id'], 'accept')
+            fixtures.login('c2')
+            with self.assertRaises(frappe.PermissionError):
+                presentation.appointment_detail(original['id'])
+            fixtures.login('c1')
+            result = presentation.respond_to_reschedule(original['id'], proposed['id'], 'accept')
+            self.assertEqual(result['state'], 'Accepted')
+            self.assertEqual(result['start'], replacement['start'])
+            repeated = presentation.respond_to_reschedule(original['id'], proposed['id'], 'accept')
+            self.assertTrue(repeated['idempotent'])
+            fixtures.login('p1')
+            timeline = presentation.appointment_detail(original['id'])['timeline']
+            self.assertIn('New time accepted', [event['event'] for event in timeline])
+            self.assertNotIn('RescheduleAccepted', str(timeline))
+            after = journey.one('SELECT start,end,price,state FROM tt_appointment WHERE id=%s',
+                                (original['id'],))
+            moved_start = datetime.fromisoformat(replacement['start'].replace('Z', '+00:00')).replace(tzinfo=None)
+            self.assertEqual((after.start, after.price, after.state),
+                             (moved_start, before.price, before.state))
+            wallet_after = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s',
+                                       (fixtures.USERS['p1'],))
+            self.assertEqual((wallet_after.available, wallet_after.reserved),
+                             (wallet_before.available, wallet_before.reserved))
+            self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s',
+                                         ('booking:' + original['id'],)).n, 1)
+        finally:
+            frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
+            frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
+
+    def test_mutual_reschedule_revalidates_target_slot_at_acceptance(self):
+        savepoint = 'tt_reschedule_conflict_' + uuid.uuid4().hex[:12]
+        frappe.db.sql('SAVEPOINT ' + savepoint)
+        try:
+            offering = fixtures.Integration.offers['c1']
+            day = day_offset(20)
+            fixtures.login('c1')
+            payload = schedule_payload(offering, day, mode='automatic')
+            payload['minimum_notice_minutes'] = 0
+            scheduling.save_schedule(**payload)
+            fixtures.login('p1')
+            journey.simulated_deposit(10000, 'reschedule-conflict-p1-' + secrets.token_hex(8))
+            slots = self.slots(offering, day)
+            original = self.book_slot(offering, slots[0])
+            alternate = slots[8]
+            proposal = presentation.propose_reschedule(original['id'], alternate['start'],
+                                                        'reschedule-conflict-' + secrets.token_hex(8))
+            fixtures.login('p2')
+            journey.simulated_deposit(10000, 'reschedule-conflict-p2-' + secrets.token_hex(8))
+            competing = self.book_slot(offering, alternate, who='p2')
+            self.assertNotEqual(competing['id'], original['id'])
+            fixtures.login('c1')
+            result = presentation.respond_to_reschedule(original['id'], proposal['id'], 'accept')
+            self.assertEqual(result['state'], 'Unavailable')
+            persisted = journey.one('SELECT start,state FROM tt_appointment WHERE id=%s', (original['id'],))
+            self.assertEqual(persisted.start, datetime.fromisoformat(slots[0]['start'].replace('Z','+00:00')).replace(tzinfo=None))
+            self.assertEqual(persisted.state, 'Booked')
+            proposal_state = journey.one('SELECT state FROM tt_reschedule_proposal WHERE id=%s', (proposal['id'],))
+            self.assertEqual(proposal_state.state, 'Unavailable')
+        finally:
+            frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
+            frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
+
     def test_private_request_competing_offers_insufficient_funds_and_atomic_match(self):
         offering1 = fixtures.Integration.offers['c1']
         offering2 = fixtures.Integration.offers['c2']
@@ -648,6 +763,11 @@ class Presentation(unittest.TestCase):
         self.make_schedule(offering=offering)
         fixtures.login('c1')
         with patch.dict(frappe.conf, tele_tena_demo_immediate_care_enabled=False):
+            with patch.object(open_requests, 'clinician_languages', return_value=set()):
+                presence = open_requests.request_presence()
+                self.assertFalse(presence['configured'])
+                self.assertIn('language_required', presence['reasons'])
+                self.assertIn('immediate_policy_required', presence['reasons'])
             with self.assertRaises(frappe.ValidationError):
                 open_requests.set_request_presence(True)
             self.assertEqual(frappe.local.response.get('tele_tena_error'), 'immediate_policy_required')

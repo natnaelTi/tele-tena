@@ -1,5 +1,5 @@
 import { Link, Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
   ClipboardCheck,
@@ -12,14 +12,16 @@ import {
   Clock3,
   FileHeart,
   Building2,
+  MoreHorizontal,
 } from "lucide-react";
 import { Brand } from "../components/Brand";
-import { Button, InlineNotice, Skeleton } from "../components/ui";
+import { Button, Dialog, InlineNotice, Skeleton } from "../components/ui";
 import { LanguageSelect, useLocale } from "../hooks/useLocale";
 import { useSession } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
 import WorkspaceTour from "../components/WorkspaceTour";
 import { useResource } from "../hooks/useResource";
+import { ApiError } from "../api";
 export function DemoBar() {
   return (
     <div className="demo-bar" role="note" aria-label="Demonstration environment">
@@ -45,34 +47,59 @@ function ClinicianRequestAvailability() {
   const refresh = presence.refresh;
   const ready = !!presence.data?.ready;
   const [busy, setBusy] = useState(false);
-  const [connectionFailed, setConnectionFailed] = useState(false);
+  const [failure, setFailure] = useState<"network" | "session" | "permission" | "update" | null>(null);
+  const failureMessage = failure === "network"
+    ? "Connection interrupted; request availability may expire."
+    : failure === "session"
+      ? "Your session expired. Sign in again to update request availability."
+      : failure === "permission"
+        ? "You don’t have permission to change request availability."
+        : failure === "update"
+          ? "Could not update request availability. Review the setup items and try again."
+          : null;
+  const recordFailure = useCallback((error: unknown) => {
+    if (error instanceof ApiError && error.code === "session_required") setFailure("session");
+    else if (error instanceof ApiError && error.code === "permission_denied") setFailure("permission");
+    else if (error instanceof TypeError) setFailure("network");
+    else setFailure("update");
+    void refresh().catch(() => undefined);
+  }, [refresh]);
   useEffect(() => {
     const timer = window.setInterval(() => {
       if (!ready) { void refresh(); return; }
       void journeyApi.setRequestPresence(true)
-        .then(() => { setConnectionFailed(false); void refresh(); })
-        .catch(() => setConnectionFailed(true));
+        .then(() => { setFailure(null); void refresh(); })
+        .catch(recordFailure);
     }, 30000);
     return () => window.clearInterval(timer);
-  }, [ready, refresh]);
+  }, [ready, refresh, recordFailure]);
   const toggle = async () => {
     setBusy(true);
     try {
       await journeyApi.setRequestPresence(!presence.data?.ready);
-      setConnectionFailed(false);
+      setFailure(null);
       await presence.refresh();
-    } catch {
-      setConnectionFailed(true);
+    } catch (error) {
+      recordFailure(error);
     } finally { setBusy(false); }
   };
   const data = presence.data;
-  const guidance:Record<string,string>={approval_required:"Approval required",language_required:"Add a care language",offering_required:"Publish an offering",scope_approval_required:"Get approval for a service scope",published_schedule_required:"Publish availability",immediate_policy_required:"Ask a reviewer to enable immediate requests for a service",no_immediate_capacity:"No complete session fits the next 30 minutes"};
+  const guidance:Record<string,{label:string;to:string}>={
+    approval_required:{label:"Approval required",to:"/clinician/vetting"},
+    language_required:{label:"Add a care language",to:"/clinician/account"},
+    offering_required:{label:"Publish an offering",to:"/clinician/services"},
+    scope_approval_required:{label:"Get approval for a service scope",to:"/clinician/vetting"},
+    published_schedule_required:{label:"Publish availability",to:"/clinician/availability"},
+    immediate_policy_required:{label:"Ask a reviewer to enable immediate requests for a service",to:"/clinician/vetting"},
+    no_immediate_capacity:{label:"No complete session fits the next 30 minutes",to:"/clinician/availability"},
+  };
   return <section className="request-presence-shell" aria-label={w("Request availability")}>
     <div><strong>{w(data?.ready ? "Available for requests" : "Requests paused")}</strong>
-      <span>{w(connectionFailed ? "Connection lost; availability will expire." : data?.configured ? "Ready status expires if this session disconnects." : "Complete setup before receiving requests.")}</span>
-      {!!data?.reasons?.length && <small>{data.reasons.map((reason: string) => w(guidance[reason]||"Complete setup before receiving requests.")).join(" · ")}</small>}
+      <span>{w(failureMessage || (data?.ready ? "Ready status expires if this session disconnects." : "Complete setup before receiving requests."))}</span>
+      {!!data?.reasons?.length && <nav className="request-readiness-actions" aria-label={w("Setup needed")}>{data.reasons.map((reason: string) => {const item=guidance[reason];return item?<Link key={reason} to={item.to}>{w(item.label)}</Link>:<span key={reason}>{w("Complete setup before receiving requests.")}</span>;})}</nav>}
     </div>
     <Button className="compact-button" variant={data?.ready ? "secondary" : "primary"} loading={busy} disabled={!data?.configured && !data?.ready} onClick={() => void toggle()}>{w(data?.ready ? "Pause" : "Go available")}</Button>
+    {failureMessage && <InlineNotice tone="danger">{w(failureMessage)}</InlineNotice>}
   </section>;
 }
 export function PublicLayout() {
@@ -176,7 +203,8 @@ export function WorkspaceLayout({
 }) {
   const { session, refresh } = useSession();
   const { w } = useLocale();
-  const location = useLocation();
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreTrigger = useRef<HTMLButtonElement | null>(null);
   const roleItems =
     kind === "patient"
       ? patientNav
@@ -186,7 +214,28 @@ export function WorkspaceLayout({
   const items = kind !== "clinic" && session?.clinic_workspace
     ? [...roleItems, ["/clinic", "Clinic workspace", Building2] as const]
     : roleItems;
-  useEffect(()=>{const revealActive=()=>{if(window.matchMedia("(max-width: 800px)").matches){document.querySelector<HTMLElement>(".workspace-nav a.active")?.scrollIntoView({block:"nearest",inline:"center"});}};revealActive();window.addEventListener("resize",revealActive);return()=>window.removeEventListener("resize",revealActive);},[location.pathname]);
+  const mobilePrimaryRoutes = kind === "clinician"
+    ? ["/clinician", "/clinician/requests", "/clinician/availability"]
+    : kind === "patient"
+      ? ["/patient", "/patient/discovery", "/patient/appointments"]
+      : kind === "admin"
+        ? ["/admin", "/admin/scopes", "/admin/exceptions"]
+        : ["/clinic"];
+  const mobilePrimary = items.filter(([to]) => mobilePrimaryRoutes.includes(to));
+  const mobileMore = items.filter(([to]) => !mobilePrimaryRoutes.includes(to));
+  const tourTargets: Record<string, string> = {
+    "/patient": "patient-home", "/patient/discovery": "patient-discovery",
+    "/patient/appointments": "patient-appointments", "/patient/account": "patient-account",
+    "/clinician": "clinician-today", "/clinician/availability": "clinician-availability",
+    "/clinician/appointments": "clinician-appointments", "/clinician/care": "clinician-care",
+    "/admin": "reviewer-applications", "/admin/scopes": "reviewer-scopes",
+  };
+  const renderNavLink = (item: (typeof items)[number], closeMore = false) => {
+    const [to, label, Icon] = item;
+    return <NavLink key={to} to={to} end data-tour={tourTargets[to]} onClick={closeMore ? () => setMoreOpen(false) : undefined}>
+      <Icon size={20} /><span>{w(label)}</span>
+    </NavLink>;
+  };
   if (kind === "admin" && !session?.roles.includes("Tele Tena Approver"))
     return (
       <main className="container">
@@ -219,12 +268,13 @@ export function WorkspaceLayout({
               : "Your space for care"}
         </div>
         <nav className={`workspace-nav workspace-nav-${kind}`} aria-label="Workspace">
-          {items.map(([to, label, Icon]) => (
-            <NavLink key={to} to={to} end data-tour={to==="/patient"?"patient-home":to==="/patient/discovery"?"patient-discovery":to==="/patient/appointments"?"patient-appointments":to==="/patient/account"?"patient-account":to==="/clinician"?"clinician-today":to==="/clinician/availability"?"clinician-availability":to==="/clinician/appointments"?"clinician-appointments":to==="/clinician/care"?"clinician-care":to==="/admin"?"reviewer-applications":to==="/admin/scopes"?"reviewer-scopes":undefined}>
-              <Icon size={20} />
-              <span>{w(label)}</span>
-            </NavLink>
-          ))}
+          {items.map((item) => renderNavLink(item))}
+        </nav>
+        <nav className="workspace-mobile-nav" aria-label={w("Mobile workspace")}>
+          {mobilePrimary.map((item) => renderNavLink(item))}
+          {mobileMore.length > 0 && <Button variant="quiet" className="mobile-nav-more" onClick={(event) => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}>
+            <MoreHorizontal size={20} /><span>{w("More")}</span>
+          </Button>}
         </nav>
         <div className="sidebar-bottom">
           <TranslationNote />
@@ -260,6 +310,14 @@ export function WorkspaceLayout({
           <Outlet />
         </main>
       </div>
+      {mobileMore.length > 0 && <Dialog open={moreOpen} onOpenChange={(open) => {
+        setMoreOpen(open);
+        if (!open) window.requestAnimationFrame(() => moreTrigger.current?.focus());
+      }} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer>
+        <nav className="workspace-more-links" aria-label={w("Additional workspace links")}>
+          {mobileMore.map((item) => renderNavLink(item, true))}
+        </nav>
+      </Dialog>}
     </div>
   );
 }
