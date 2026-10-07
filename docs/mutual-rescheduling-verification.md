@@ -57,7 +57,7 @@ patient's authorized timeline.
 
 ## Current integrated local checkpoint
 
-The current branch source is `9eb66d9db6b96367fb17f7f8c53b491735e2dc59`;
+The current branch source is `0660c0ae779e97c374c33553f226a3fbf3359b0f`;
 the running production-built `/teletena/` asset manifest reports that exact
 source SHA. The 390px patient-home screenshot is
 `docs/screenshots/mutual-rescheduling/patient-home-390.png`. A fresh browser
@@ -90,3 +90,20 @@ work interval were visible, there was no horizontal overflow, and no page
 exception occurred. This was a read-only inspection; the existing schedule
 was left unchanged. Screenshot:
 `docs/screenshots/mutual-rescheduling/availability-1440.png`.
+
+The production-route calendar regression also passed against the same URL:
+field-level end-before-start error preserved the entered value; valid Monday
+and Tuesday intervals were posted as `start_local`/`end_local`, saved (HTTP
+200), and retained after reload; the patient booking page returned a
+server-generated slot and completed one booking (HTTP 200). Before the test,
+the clinician's schedule was saved to a private local snapshot and restored
+afterward; the original appointment and balance records were not changed. The
+test's new synthetic patient, deposit and booking were retained as additional
+demonstration records. See `docs/screenshots/availability-regression/` for the
+earlier full journey evidence.
+
+At 390px, the clinician route uses the weekday agenda and time-field editor,
+keeps the calendar grid hidden, and has no horizontal overflow. The editor now
+keeps a sticky Save action reachable on mobile and translates its saving and
+saved states. Screenshot:
+`docs/screenshots/mutual-rescheduling/availability-390.png`.
