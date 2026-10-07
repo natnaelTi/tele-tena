@@ -212,7 +212,24 @@ export function WorkspaceLayout({
   const items = kind !== "clinic" && session?.clinic_workspace
     ? [...roleItems, ["/clinic", "Clinic workspace", Building2] as const]
     : roleItems;
-  useEffect(()=>{const revealActive=()=>{if(window.matchMedia("(max-width: 800px)").matches){document.querySelector<HTMLElement>(".workspace-nav a.active")?.scrollIntoView({block:"nearest",inline:"center"});}};revealActive();window.addEventListener("resize",revealActive);return()=>window.removeEventListener("resize",revealActive);},[location.pathname]);
+  useEffect(() => {
+    const revealActive = () => {
+      if (!window.matchMedia("(max-width: 800px)").matches) return;
+      const nav = document.querySelector<HTMLElement>(".workspace-nav");
+      const active = nav?.querySelector<HTMLElement>("a.active");
+      if (!nav || !active) return;
+      const navRect = nav.getBoundingClientRect();
+      const itemRect = active.getBoundingClientRect();
+      const left = nav.scrollLeft + itemRect.left - navRect.left - (nav.clientWidth - itemRect.width) / 2;
+      nav.scrollTo({
+        left,
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      });
+    };
+    revealActive();
+    window.addEventListener("resize", revealActive);
+    return () => window.removeEventListener("resize", revealActive);
+  }, [location.pathname]);
   if (kind === "admin" && !session?.roles.includes("Tele Tena Approver"))
     return (
       <main className="container">
