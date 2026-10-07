@@ -54,3 +54,32 @@ Appointment timeline events are presented as human-readable, localized labels;
 internal event codes remain private to persistence and are not rendered to
 participants. The regression suite checks the accepted-time label in the
 patient's authorized timeline.
+
+## Current integrated local checkpoint
+
+The current branch source is `9eb66d9db6b96367fb17f7f8c53b491735e2dc59`;
+the running production-built `/teletena/` asset manifest reports that exact
+source SHA. The 390px patient-home screenshot is
+`docs/screenshots/mutual-rescheduling/patient-home-390.png`. A fresh browser
+context signed into the seeded patient, reached `/teletena/patient`, received
+the service worker at `/teletena/sw.js`, and reported no page exceptions.
+
+The correct credentials for this preview are stored privately at
+`sites/tele-tena-pr12-fresh.localhost/private/tele_tena_review_accounts.json`.
+The similarly named `/tmp/tele-tena-demo-credentials.json` belongs to
+`erp.localhost` and does not authenticate against the isolated review site.
+No account credentials are included here.
+
+The invited-review browser check passes: the API reports phone OTP and public
+registration disabled, the phone Continue action is disabled, and the email /
+password alternative remains available. The real backend contact-auth suite
+passes 7/7 with registration policy enabled inside its isolated test setup.
+
+A disposable fresh install reached and passed app installation, schema, role,
+guest-denial, and simulation-disabled assertions; its optional browser journey
+then stopped at an obsolete homepage-heading expectation before auth testing.
+That browser assertion has been updated to the current two-audience hero. The
+fresh-install/browser harness has not yet been rerun after the correction.
+Its cleanup removed the disposable database/site and temporary database admin
+and credential file. The retained preview database and records were
+fingerprinted unchanged.

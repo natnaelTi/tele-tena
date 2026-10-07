@@ -15,17 +15,20 @@ async function main() {
     assert.equal(options.phone_otp, false)
     assert.equal(options.patient_registration, false)
     assert.equal(options.clinician_registration, false)
+    await page.getByLabel('Phone number', { exact: true }).waitFor()
+    assert.equal(await page.getByRole('button', { name: 'Continue', exact: true }).isDisabled(), true)
+    await page.getByRole('button', { name: 'Use email instead', exact: true }).click()
     await page.getByLabel('Email', { exact: true }).waitFor()
     await page.getByLabel('Password', { exact: true }).waitFor()
-    assert.equal(await page.getByLabel('Phone number', { exact: true }).count(), 0)
     assert.equal(await page.getByLabel('Verification code', { exact: true }).count(), 0)
-    console.log('PASS: invited-review site exposes email/password access only; phone OTP and public registration remain disabled')
+    assert.equal(await page.getByRole('button', { name: 'Sign in', exact: true }).isDisabled(), false)
+    console.log('PASS: invited-review site blocks phone OTP, keeps email/password access, and disables both public registration paths')
   } finally {
     await browser.close()
   }
 }
 
-main().catch(() => {
-  console.error('FAIL: invited-review authentication policy did not match the disabled-access fixture')
+main().catch(error => {
+  console.error('FAIL: invited-review authentication policy did not match the disabled-access fixture:', error.message)
   process.exitCode = 1
 })
