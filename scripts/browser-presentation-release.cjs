@@ -68,8 +68,14 @@ async function main() {
     await guest.waitForFunction(()=>Boolean(navigator.serviceWorker.controller), null, {timeout:15000})
     mark('offline navigation fallback')
     await guest.context().setOffline(true)
-    await guest.goto(base+'/')
-    await guest.getByRole('heading',{name:'You’re offline',exact:true}).waitFor()
+    const offlineNavigation = await guest.goto(base+'/').then(response => ({ ok: true, status: response?.status() ?? null })).catch(() => ({ ok: false, status: null }))
+    const offlineState = await guest.evaluate(() => ({
+      heading: document.querySelector('h1')?.textContent?.trim() ?? '',
+      controlled: Boolean(navigator.serviceWorker.controller),
+      pathInScope: location.pathname.startsWith(new URL(navigator.serviceWorker.controller?.scriptURL ?? location.href).pathname.replace(/sw\.js$/, '')),
+    }))
+    console.log(`OFFLINE_FALLBACK_DIAGNOSTIC: navigation=${offlineNavigation.ok ? 'resolved' : 'rejected'}; status=${offlineNavigation.status ?? 'none'}; heading=${offlineState.heading === 'You’re offline' ? 'expected' : 'missing'}; controller=${offlineState.controlled ? 'present' : 'missing'}; path=${offlineState.pathInScope ? 'in-scope' : 'out-of-scope'}`)
+    assert.equal(offlineState.heading, 'You’re offline', 'offline fallback heading was not rendered')
     await guest.screenshot({path:`${output}/offline-state-390.png`,fullPage:true})
     await guest.context().setOffline(false)
     mark('phone entry is one field and expected guest is signed out')

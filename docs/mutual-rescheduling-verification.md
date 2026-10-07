@@ -166,6 +166,20 @@ checkpoint labels, applies bounded Playwright timeouts, and bounds worker
 readiness. A complete fresh-site rerun is still pending; this probe does not
 substitute for its registration and authentication journeys.
 
+The next full fresh-site run installed the schema and completed the earlier
+homepage and service-worker readiness checkpoints, but failed at the offline
+navigation fallback assertion. The harness cleaned the disposable site,
+temporary database administrator, credential file and install log, and verified
+that re-authentication for the temporary administrator was denied. It did not
+reach either registration/login journey, so those remain unverified on the
+fresh site. The failure occurred even though an independent Chromium run on the
+current packaged preview returned the offline page (`200`, expected heading,
+active in-scope controller). The fresh-site browser harness now emits a
+privacy-safe diagnostic for navigation resolution, status, expected heading,
+controller presence and scope; that diagnostic has passed on the packaged
+preview but has not yet been rerun on a fresh site. Do not treat this as a
+fresh-site browser pass.
+
 After this correction, `TELE_TENA_TEST_SITE=tele-tena-pr12-fresh.localhost
 ../../env/bin/python tests/presentation.py` passed 26/26; Python and Node syntax
 checks and `git diff --check` also passed. This suite reruns the existing
