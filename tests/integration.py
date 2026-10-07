@@ -129,6 +129,10 @@ class Integration(unittest.TestCase):
             frappe.db.sql('DELETE FROM tt_schedule_exception WHERE schedule_id=%s', (schedule_id,))
             frappe.db.sql('DELETE FROM tt_schedule WHERE id=%s', (schedule_id,))
         for email in USERS.values():
+            # Clinic applications retain their submitter Link as audit history;
+            # remove only rows created by this synthetic fixture before users.
+            frappe.db.sql('DELETE FROM `tabTele Tena Clinic Affiliation` WHERE clinician=%s', (email,))
+            frappe.db.sql('DELETE FROM `tabTele Tena Clinic` WHERE submitted_by=%s', (email,))
             frappe.db.sql('DELETE FROM tt_resume_evidence WHERE clinician=%s', (email,))
             frappe.db.sql('DELETE FROM tt_tour_progress WHERE user=%s', (email,))
             frappe.db.sql('DELETE FROM tt_preferences WHERE user=%s', (email,))

@@ -955,32 +955,26 @@
       "required_contract": "Guided profiles, scoped review decisions, protected evidence",
       "integration_status": "Pending screen-level operational acceptance",
       "prototype_route": "b08",
-      "route": "/clinician/vetting (affiliation workflow absent)",
+      "route": "/clinician/affiliations",
       "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
-      "status": "Designed",
+      "status": "Implemented, verification pending",
       "persistent_models": [
+        "Tele Tena Clinic",
+        "Tele Tena Clinic Affiliation",
         "tt_profile",
-        "tt_onboarding",
-        "tt_application",
-        "tt_resume_evidence",
-        "Tele Tena Service Scope",
-        "Tele Tena Vetting Scope Application"
+        "tt_audit"
       ],
       "queries": [
-        "tele_tena.api.journey.practice",
-        "tele_tena.api.journey.applications",
-        "tele_tena.api.vetting.my_scope_applications",
-        "tele_tena.api.presentation.resume_status"
+        "tele_tena.api.clinics.my_clinic_applications",
+        "tele_tena.api.clinics.my_affiliations",
+        "tele_tena.api.clinics.verified_clinics"
       ],
       "commands": [
-        "tele_tena.api.journey.save_profile",
-        "tele_tena.api.journey.apply",
-        "tele_tena.api.vetting.save_scope_application",
-        "tele_tena.api.vetting.review_scope_application",
-        "tele_tena.api.presentation.upload_resume"
+        "tele_tena.api.clinics.submit_clinic_application",
+        "tele_tena.api.clinics.submit_affiliation"
       ],
-      "server_permissions": "Applicant may edit only own draft and uploads; reviewer access is role-scoped; clinic membership does not grant clinical access. Final scope action requires an authorized human reviewer.",
-      "workflow_transitions": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+      "server_permissions": "Clinician/applicant sees only own submissions and verified public clinic name/jurisdiction. Legal names and registration references are private to applicant and Tele Tena Approver. Affiliation never creates a service scope or patient-record access.",
+      "workflow_transitions": "Clinic: Draft → Submitted → Verified/Rejected; Verified → Suspended. Affiliation: Submitted → Verified/Clarification/Rejected; Clarification → Submitted; Verified → Revoked. Reviewer decisions require reason and are audited.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -1003,13 +997,14 @@
         "ethiopic_layout": "Verify font coverage, wrapping, line height and control labels on this screen."
       },
       "dependencies": [
-        "verified credential sources and clinical lead review",
-        "private file storage"
+        "human clinic registry verification",
+        "verified clinic profile",
+        "clinician/applicant role"
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B08) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "PR #18 adds native additive clinic and affiliation DocTypes, controller permissions, audited decisions, clinician/applicant workflows, and a verified-clinic public-field query. Existing free-text affiliations are not migrated or assumed verified.",
+        "current_local": "Frontend production build/lint and Python/JSON syntax checks pass. Frappe migration, permission, state, browser and responsive checks are pending on the disposable site."
       }
     },
     {
@@ -5560,7 +5555,7 @@
       "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
       "integration_status": "Pending screen-level operational acceptance",
       "prototype_route": "i01",
-      "route": "/admin",
+      "route": "/admin (review workspace); /admin/clinics (clinic and affiliation review)",
       "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
       "status": "Implemented, verification pending",
       "persistent_models": [
@@ -5576,13 +5571,16 @@
       "queries": [
         "tele_tena.api.journey.applications",
         "tele_tena.api.vetting.my_scope_applications",
-        "tele_tena.accounting.open_disputes"
+        "tele_tena.accounting.open_disputes",
+        "tele_tena.api.clinics.review_queue"
       ],
       "commands": [
         "tele_tena.api.journey.review",
         "tele_tena.api.vetting.assign_scope_reviewer",
         "tele_tena.api.vetting.review_scope_application",
-        "tele_tena.accounting.resolve_earning_dispute"
+        "tele_tena.accounting.resolve_earning_dispute",
+        "tele_tena.api.clinics.review_clinic",
+        "tele_tena.api.clinics.review_affiliation"
       ],
       "server_permissions": "Approver may inspect authorized application evidence and decide individual scopes. Vetting, financial review and patient-record access are separate grants.",
       "workflow_transitions": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
@@ -5613,7 +5611,7 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I01) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific Clinic identity and clinician affiliation review now have a separate focused admin route with reasoned decisions; neither workflow grants clinical-record access.",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
       }
     },
@@ -6952,21 +6950,19 @@
       "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
       "integration_status": "Pending screen-level operational acceptance",
       "prototype_route": "j11",
-      "route": "/j11 (not implemented)",
+      "route": "/clinician/affiliations (initial clinic registration; broader clinic setup pending)",
       "actor": "Clinic owner/admin and explicitly invited staff",
-      "status": "Designed",
+      "status": "Implemented, verification pending",
       "persistent_models": [
-        "Proposed Clinic",
-        "Proposed Clinic Membership",
-        "Proposed Clinic Location",
-        "Proposed Clinic Resource",
-        "Proposed Encounter Access Grant"
+        "Tele Tena Clinic",
+        "Tele Tena Clinic Affiliation"
       ],
       "queries": [
-        "No clinic workspace API implemented"
+        "tele_tena.api.clinics.my_clinic_applications",
+        "tele_tena.api.clinics.verified_clinics"
       ],
       "commands": [
-        "No clinic workspace commands implemented"
+        "tele_tena.api.clinics.submit_clinic_application"
       ],
       "server_permissions": "Membership grants only the named operational permissions; no blanket patient or clinician record access.",
       "workflow_transitions": "Draft clinic → verification pending → verified/suspended; invitation pending → accepted/revoked; encounter grant requested → granted/revoked.",
@@ -6999,8 +6995,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J11) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Initial clinician-submitted clinic registration is connected to private persistent records and human review. Clinic team, calendar, resource, billing and patient-access workflows remain absent.",
+        "current_local": "Pending disposable Frappe migration, permissions and browser checks."
       }
     },
     {

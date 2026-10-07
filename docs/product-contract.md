@@ -186,3 +186,28 @@ available in the patient's appointment history.
 The current slice is implemented in the patient dashboard and backend query.
 Fresh-site Frappe permission/database and browser verification are pending; it
 must not be represented as locally verified until those checks pass.
+
+## Clinic registration and affiliation (initial slice)
+
+Clinic registration and clinician affiliation are separate human-reviewed
+records. A clinician or applicant may submit a clinic profile with legal name,
+registration reference, jurisdiction and a non-sensitive public description.
+An authorized reviewer records Verified, Rejected or Suspended with an audited
+reason. Registration references and legal names are visible only to the
+applicant and authorized reviewers; the clinician-facing directory returns
+verified public clinic name and jurisdiction only.
+
+A clinician or applicant may request an affiliation with a verified clinic and
+submit a role and evidence summary. A reviewer may verify, request clarification,
+reject or revoke that affiliation. Re-submission after clarification keeps the
+same record and review history; repeat identical submissions are idempotent.
+The affiliation never grants service-scope approval, request eligibility,
+appointment access or patient-record access. A clinic verification or
+affiliation cannot be used to create or approve a `Tele Tena Service Scope`.
+
+This is an initial registry/affiliation workflow only. Evidence files, clinic
+staff invitations and memberships, clinic calendars/resources, clinic billing,
+explicit encounter access grants and clinic-wide patient records are not
+implemented. Existing narrative affiliation fields are preserved and are not
+automatically converted into verified affiliations. Native DocType schema is
+additive and synchronized by normal Frappe migration.
