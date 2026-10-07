@@ -485,6 +485,42 @@ def clinician_requests():
     return visible
 
 
+@query()
+def clinician_offers(page=0):
+    """Own quotes and outcomes, including closed requests, with bounded paging.
+
+    No request narrative, patient account identity, competitor quote, or new
+    profile disclosure is returned. A matched appointment belongs to this actor.
+    Read-time expiry keeps the view correct even while the scheduler is delayed.
+    """
+    from tele_tena.offer_status import effective_offer_state, offer_patient_label
+    clinician = actor('Tele Tena Clinician')
+    profile('clinician')
+    page_number = integer(page, 0, 10000)
+    offers = rows('''SELECT o.id,o.start,o.duration_minutes,o.consultation_format,
+        o.price_minor,o.price_source,o.state,o.valid_until,o.created_at,o.timezone,
+        r.state AS request_state,r.disclosure_snapshot,s.service_label AS category,
+        a.id AS appointment
+        FROM tt_request_offer o JOIN tt_open_request r ON r.id=o.request_id
+        JOIN tt_offering off ON off.id=o.offering
+        JOIN `tabTele Tena Service` s ON s.name=off.service
+        LEFT JOIN tt_appointment a ON a.id=o.appointment AND a.clinician=%s
+        WHERE o.clinician=%s ORDER BY o.created_at DESC,o.id DESC
+        LIMIT 51 OFFSET %s''', (clinician, clinician, page_number * 50))
+    has_more = len(offers) > 50
+    result = []
+    current_time = now()
+    for offer in offers[:50]:
+        offer.state = effective_offer_state(offer.state, offer.request_state,
+                                             offer.valid_until, current_time)
+        offer.patient_label = offer_patient_label(json.loads(offer.disclosure_snapshot))
+        del offer['disclosure_snapshot']
+        for field in ('start', 'valid_until', 'created_at'):
+            offer[field] = offer[field].isoformat() + 'Z'
+        result.append(offer)
+    return {'items': result, 'page': page_number, 'has_more': has_more}
+
+
 @journey.command
 def acknowledge_inbox_fetch(request_ids):
     """Record that request cards were returned to this authenticated inbox client."""

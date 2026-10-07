@@ -1,0 +1,1422 @@
+[
+  {
+    "id": "A01",
+    "family": "A",
+    "title": "Welcome to TeleTena",
+    "route": "welcome",
+    "module": "Identity/public",
+    "backend_reference": "contact_auth, onboarding",
+    "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "A02",
+    "family": "A",
+    "title": "How TeleTena works",
+    "route": "a02",
+    "module": "Identity/public",
+    "backend_reference": "contact_auth, onboarding",
+    "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "A03",
+    "family": "A",
+    "title": "For clinicians",
+    "route": "a03",
+    "module": "Identity/public",
+    "backend_reference": "contact_auth, onboarding",
+    "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "A04",
+    "family": "A",
+    "title": "Phone sign-in",
+    "route": "a04",
+    "module": "Identity/public",
+    "backend_reference": "contact_auth, onboarding",
+    "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "A05",
+    "family": "A",
+    "title": "Enter your code",
+    "route": "a05",
+    "module": "Identity/public",
+    "backend_reference": "contact_auth, onboarding",
+    "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "A06",
+    "family": "A",
+    "title": "Email sign-in",
+    "route": "a06",
+    "module": "Identity/public",
+    "backend_reference": "contact_auth, onboarding",
+    "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "A07",
+    "family": "A",
+    "title": "Choose your account",
+    "route": "a07",
+    "module": "Identity/public",
+    "backend_reference": "contact_auth, onboarding",
+    "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B01",
+    "family": "B",
+    "title": "Adult eligibility",
+    "route": "b01",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B02",
+    "family": "B",
+    "title": "A little about you",
+    "route": "b02",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B03",
+    "family": "B",
+    "title": "Your privacy defaults",
+    "route": "b03",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B04",
+    "family": "B",
+    "title": "Care background",
+    "route": "b04",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B05",
+    "family": "B",
+    "title": "You\u2019re ready",
+    "route": "b05",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B06",
+    "family": "B",
+    "title": "Your professional profile",
+    "route": "b06",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B07",
+    "family": "B",
+    "title": "Qualifications & r\u00e9sum\u00e9",
+    "route": "b07",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B08",
+    "family": "B",
+    "title": "Clinic affiliations",
+    "route": "b08",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B09",
+    "family": "B",
+    "title": "Choose your service scopes",
+    "route": "b09",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B10",
+    "family": "B",
+    "title": "Review your application",
+    "route": "b10",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B11",
+    "family": "B",
+    "title": "Application progress",
+    "route": "b11",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "B12",
+    "family": "B",
+    "title": "Set up your practice",
+    "route": "b12",
+    "module": "Profiles/vetting",
+    "backend_reference": "journey, vetting, private evidence",
+    "required_contract": "Guided profiles, scoped review decisions, protected evidence",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "C01",
+    "family": "C",
+    "title": "Your care, in one place",
+    "route": "c01",
+    "module": "Discovery/scheduling",
+    "backend_reference": "journey.discover, scheduling, journey.book",
+    "required_contract": "Eligibility, timezone, conflicts, immutable disclosure and price",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "C02",
+    "family": "C",
+    "title": "Find your care",
+    "route": "care",
+    "module": "Discovery/scheduling",
+    "backend_reference": "journey.discover, scheduling, journey.book",
+    "required_contract": "Eligibility, timezone, conflicts, immutable disclosure and price",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "C03",
+    "family": "C",
+    "title": "Your matching clinicians",
+    "route": "c03",
+    "module": "Discovery/scheduling",
+    "backend_reference": "journey.discover, scheduling, journey.book",
+    "required_contract": "Eligibility, timezone, conflicts, immutable disclosure and price",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "C04",
+    "family": "C",
+    "title": "Meet your clinician",
+    "route": "c04",
+    "module": "Discovery/scheduling",
+    "backend_reference": "journey.discover, scheduling, journey.book",
+    "required_contract": "Eligibility, timezone, conflicts, immutable disclosure and price",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "C05",
+    "family": "C",
+    "title": "About this consultation",
+    "route": "c05",
+    "module": "Discovery/scheduling",
+    "backend_reference": "journey.discover, scheduling, journey.book",
+    "required_contract": "Eligibility, timezone, conflicts, immutable disclosure and price",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "C06",
+    "family": "C",
+    "title": "Choose a time",
+    "route": "c06",
+    "module": "Discovery/scheduling",
+    "backend_reference": "journey.discover, scheduling, journey.book",
+    "required_contract": "Eligibility, timezone, conflicts, immutable disclosure and price",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "C07",
+    "family": "C",
+    "title": "Preview what you share",
+    "route": "c07",
+    "module": "Discovery/scheduling",
+    "backend_reference": "journey.discover, scheduling, journey.book",
+    "required_contract": "Eligibility, timezone, conflicts, immutable disclosure and price",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "C08",
+    "family": "C",
+    "title": "Review your booking",
+    "route": "c08",
+    "module": "Discovery/scheduling",
+    "backend_reference": "journey.discover, scheduling, journey.book",
+    "required_contract": "Eligibility, timezone, conflicts, immutable disclosure and price",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "C09",
+    "family": "C",
+    "title": "Your appointment is confirmed",
+    "route": "c09",
+    "module": "Discovery/scheduling",
+    "backend_reference": "journey.discover, scheduling, journey.book",
+    "required_contract": "Eligibility, timezone, conflicts, immutable disclosure and price",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "D01",
+    "family": "D",
+    "title": "What support do you need?",
+    "route": "d01",
+    "module": "Marketplace",
+    "backend_reference": "open_requests",
+    "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "D02",
+    "family": "D",
+    "title": "When and how?",
+    "route": "d02",
+    "module": "Marketplace",
+    "backend_reference": "open_requests",
+    "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "D03",
+    "family": "D",
+    "title": "Review your open request",
+    "route": "d03",
+    "module": "Marketplace",
+    "backend_reference": "open_requests",
+    "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "D04",
+    "family": "D",
+    "title": "Finding your clinician",
+    "route": "d04",
+    "module": "Marketplace",
+    "backend_reference": "open_requests",
+    "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "D05",
+    "family": "D",
+    "title": "Compare private offers",
+    "route": "requests",
+    "module": "Marketplace",
+    "backend_reference": "open_requests",
+    "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "D06",
+    "family": "D",
+    "title": "Review your offer",
+    "route": "d06",
+    "module": "Marketplace",
+    "backend_reference": "open_requests",
+    "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "D07",
+    "family": "D",
+    "title": "More ways to find care",
+    "route": "d07",
+    "module": "Marketplace",
+    "backend_reference": "open_requests",
+    "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "D08",
+    "family": "D",
+    "title": "Your requests",
+    "route": "d08",
+    "module": "Marketplace",
+    "backend_reference": "open_requests",
+    "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "D09",
+    "family": "D",
+    "title": "Live request progress",
+    "route": "d09",
+    "module": "Marketplace",
+    "backend_reference": "open_requests",
+    "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E01",
+    "family": "E",
+    "title": "Your appointments",
+    "route": "e01",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E02",
+    "family": "E",
+    "title": "Appointment details",
+    "route": "e02",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E03",
+    "family": "E",
+    "title": "Choose a new time",
+    "route": "e03",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E04",
+    "family": "E",
+    "title": "Cancel your appointment",
+    "route": "e04",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E05",
+    "family": "E",
+    "title": "Check your devices",
+    "route": "e05",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E06",
+    "family": "E",
+    "title": "Your waiting room",
+    "route": "e06",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E07",
+    "family": "E",
+    "title": "A space to talk",
+    "route": "room",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E08",
+    "family": "E",
+    "title": "Audio consultation",
+    "route": "e08",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E09",
+    "family": "E",
+    "title": "Let\u2019s reconnect",
+    "route": "e09",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E10",
+    "family": "E",
+    "title": "Extend your session",
+    "route": "e10",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E11",
+    "family": "E",
+    "title": "Finish the consultation",
+    "route": "e11",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E12",
+    "family": "E",
+    "title": "How was your session?",
+    "route": "e12",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E13",
+    "family": "E",
+    "title": "Your consultation record",
+    "route": "e13",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "E14",
+    "family": "E",
+    "title": "Plan your follow-up",
+    "route": "e14",
+    "module": "Consultations/records",
+    "backend_reference": "consultations, presentation",
+    "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F01",
+    "family": "F",
+    "title": "Your day at a glance",
+    "route": "f01",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F02",
+    "family": "F",
+    "title": "Open requests inbox",
+    "route": "f02",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F03",
+    "family": "F",
+    "title": "Send a private offer",
+    "route": "f03",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F04",
+    "family": "F",
+    "title": "Your offers",
+    "route": "f04",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F05",
+    "family": "F",
+    "title": "Make time for care",
+    "route": "availability",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F06",
+    "family": "F",
+    "title": "Edit your booking schedule",
+    "route": "f06",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F07",
+    "family": "F",
+    "title": "Date-specific hours",
+    "route": "f07",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F08",
+    "family": "F",
+    "title": "Your services",
+    "route": "f08",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F09",
+    "family": "F",
+    "title": "Create an offering",
+    "route": "f09",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F10",
+    "family": "F",
+    "title": "Your patients",
+    "route": "f10",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F11",
+    "family": "F",
+    "title": "Patient care timeline",
+    "route": "f11",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F12",
+    "family": "F",
+    "title": "Your practice indicators",
+    "route": "f12",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F13",
+    "family": "F",
+    "title": "Offer detail",
+    "route": "f13",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F14",
+    "family": "F",
+    "title": "Offers history",
+    "route": "f14",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "F15",
+    "family": "F",
+    "title": "Accepted offer",
+    "route": "f15",
+    "module": "Practice",
+    "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
+    "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "G01",
+    "family": "G",
+    "title": "Your balance",
+    "route": "g01",
+    "module": "Finance",
+    "backend_reference": "demo financial subledger; real provider work pending",
+    "required_contract": "Exact balanced postings, holds, disputes, release, refunds, payouts and reconciliation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "G02",
+    "family": "G",
+    "title": "Add funds",
+    "route": "g02",
+    "module": "Finance",
+    "backend_reference": "demo financial subledger; real provider work pending",
+    "required_contract": "Exact balanced postings, holds, disputes, release, refunds, payouts and reconciliation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "G03",
+    "family": "G",
+    "title": "Transaction details",
+    "route": "g03",
+    "module": "Finance",
+    "backend_reference": "demo financial subledger; real provider work pending",
+    "required_contract": "Exact balanced postings, holds, disputes, release, refunds, payouts and reconciliation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "G04",
+    "family": "G",
+    "title": "Request a refund",
+    "route": "g04",
+    "module": "Finance",
+    "backend_reference": "demo financial subledger; real provider work pending",
+    "required_contract": "Exact balanced postings, holds, disputes, release, refunds, payouts and reconciliation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "G05",
+    "family": "G",
+    "title": "See your earnings",
+    "route": "earnings",
+    "module": "Finance",
+    "backend_reference": "demo financial subledger; real provider work pending",
+    "required_contract": "Exact balanced postings, holds, disputes, release, refunds, payouts and reconciliation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "G06",
+    "family": "G",
+    "title": "Earnings breakdown",
+    "route": "g06",
+    "module": "Finance",
+    "backend_reference": "demo financial subledger; real provider work pending",
+    "required_contract": "Exact balanced postings, holds, disputes, release, refunds, payouts and reconciliation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "G07",
+    "family": "G",
+    "title": "Request a payout",
+    "route": "g07",
+    "module": "Finance",
+    "backend_reference": "demo financial subledger; real provider work pending",
+    "required_contract": "Exact balanced postings, holds, disputes, release, refunds, payouts and reconciliation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "G08",
+    "family": "G",
+    "title": "Resolve a payment concern",
+    "route": "g08",
+    "module": "Finance",
+    "backend_reference": "demo financial subledger; real provider work pending",
+    "required_contract": "Exact balanced postings, holds, disputes, release, refunds, payouts and reconciliation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "H01",
+    "family": "H",
+    "title": "Your account",
+    "route": "h01",
+    "module": "Account/support",
+    "backend_reference": "profiles, privacy defaults; preferences/support gaps",
+    "required_contract": "Role-appropriate fields, secure notification links and scoped access",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "H02",
+    "family": "H",
+    "title": "Professional account",
+    "route": "h02",
+    "module": "Account/support",
+    "backend_reference": "profiles, privacy defaults; preferences/support gaps",
+    "required_contract": "Role-appropriate fields, secure notification links and scoped access",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "H03",
+    "family": "H",
+    "title": "Privacy & sharing",
+    "route": "h03",
+    "module": "Account/support",
+    "backend_reference": "profiles, privacy defaults; preferences/support gaps",
+    "required_contract": "Role-appropriate fields, secure notification links and scoped access",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "H04",
+    "family": "H",
+    "title": "Your preferences",
+    "route": "h04",
+    "module": "Account/support",
+    "backend_reference": "profiles, privacy defaults; preferences/support gaps",
+    "required_contract": "Role-appropriate fields, secure notification links and scoped access",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "H05",
+    "family": "H",
+    "title": "Account security",
+    "route": "h05",
+    "module": "Account/support",
+    "backend_reference": "profiles, privacy defaults; preferences/support gaps",
+    "required_contract": "Role-appropriate fields, secure notification links and scoped access",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "H06",
+    "family": "H",
+    "title": "Notifications",
+    "route": "h06",
+    "module": "Account/support",
+    "backend_reference": "profiles, privacy defaults; preferences/support gaps",
+    "required_contract": "Role-appropriate fields, secure notification links and scoped access",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "H07",
+    "family": "H",
+    "title": "How can we help?",
+    "route": "h07",
+    "module": "Account/support",
+    "backend_reference": "profiles, privacy defaults; preferences/support gaps",
+    "required_contract": "Role-appropriate fields, secure notification links and scoped access",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "H08",
+    "family": "H",
+    "title": "Take a quick tour",
+    "route": "h08",
+    "module": "Account/support",
+    "backend_reference": "profiles, privacy defaults; preferences/support gaps",
+    "required_contract": "Role-appropriate fields, secure notification links and scoped access",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I01",
+    "family": "I",
+    "title": "Review workspace",
+    "route": "i01",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I02",
+    "family": "I",
+    "title": "Clinician applications",
+    "route": "i02",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I03",
+    "family": "I",
+    "title": "Application review",
+    "route": "i03",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I04",
+    "family": "I",
+    "title": "Clinical vetting rubric",
+    "route": "i04",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I05",
+    "family": "I",
+    "title": "Service scope decisions",
+    "route": "i05",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I06",
+    "family": "I",
+    "title": "Credentials & renewals",
+    "route": "i06",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I07",
+    "family": "I",
+    "title": "Service catalog",
+    "route": "i07",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I08",
+    "family": "I",
+    "title": "Service definition",
+    "route": "i08",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I09",
+    "family": "I",
+    "title": "Rubric versions",
+    "route": "i09",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I10",
+    "family": "I",
+    "title": "Matching operations",
+    "route": "i10",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I11",
+    "family": "I",
+    "title": "Financial operations",
+    "route": "i11",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "I12",
+    "family": "I",
+    "title": "Feedback moderation",
+    "route": "i12",
+    "module": "Back office",
+    "backend_reference": "vetting, catalog and scoped reviewer APIs",
+    "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J01",
+    "family": "J",
+    "title": "Clinic overview",
+    "route": "j01",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J02",
+    "family": "J",
+    "title": "Clinic calendar",
+    "route": "j02",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J03",
+    "family": "J",
+    "title": "Your clinical team",
+    "route": "j03",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J04",
+    "family": "J",
+    "title": "Invite a team member",
+    "route": "j04",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J05",
+    "family": "J",
+    "title": "Clinic patients",
+    "route": "j05",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J06",
+    "family": "J",
+    "title": "Clinic encounter record",
+    "route": "j06",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J07",
+    "family": "J",
+    "title": "Clinic services",
+    "route": "j07",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J08",
+    "family": "J",
+    "title": "Locations & resources",
+    "route": "j08",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J09",
+    "family": "J",
+    "title": "Clinic billing",
+    "route": "j09",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J10",
+    "family": "J",
+    "title": "Permissions & audit",
+    "route": "j10",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J11",
+    "family": "J",
+    "title": "Set up your clinic",
+    "route": "j11",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "J12",
+    "family": "J",
+    "title": "Practice insights",
+    "route": "j12",
+    "module": "Clinic operations",
+    "backend_reference": "Full backend pending",
+    "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K01",
+    "family": "K",
+    "title": "Find a test",
+    "route": "k01",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K02",
+    "family": "K",
+    "title": "Choose a diagnostic center",
+    "route": "k02",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K03",
+    "family": "K",
+    "title": "About this test",
+    "route": "k03",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K04",
+    "family": "K",
+    "title": "Referral & sharing",
+    "route": "k04",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K05",
+    "family": "K",
+    "title": "Book sample collection",
+    "route": "k05",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K06",
+    "family": "K",
+    "title": "Track your test",
+    "route": "k06",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K07",
+    "family": "K",
+    "title": "Your laboratory report",
+    "route": "k07",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K08",
+    "family": "K",
+    "title": "Laboratory overview",
+    "route": "k08",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K09",
+    "family": "K",
+    "title": "Collection worklist",
+    "route": "k09",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K10",
+    "family": "K",
+    "title": "Review & release results",
+    "route": "k10",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K11",
+    "family": "K",
+    "title": "Laboratory catalog",
+    "route": "k11",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "K12",
+    "family": "K",
+    "title": "Quality & corrections",
+    "route": "k12",
+    "module": "Labs/diagnostics",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Orders, identity, collection, results validation/release, corrections and patient grants",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "L01",
+    "family": "L",
+    "title": "Care beyond borders",
+    "route": "l01",
+    "module": "Medical travel",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Case consent, second opinion, conditional estimate, coordinator authorization and itinerary",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "L02",
+    "family": "L",
+    "title": "Tell us about your care need",
+    "route": "l02",
+    "module": "Medical travel",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Case consent, second opinion, conditional estimate, coordinator authorization and itinerary",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "L03",
+    "family": "L",
+    "title": "Second-opinion specialists",
+    "route": "l03",
+    "module": "Medical travel",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Case consent, second opinion, conditional estimate, coordinator authorization and itinerary",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "L04",
+    "family": "L",
+    "title": "Compare care plans",
+    "route": "l04",
+    "module": "Medical travel",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Case consent, second opinion, conditional estimate, coordinator authorization and itinerary",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "L05",
+    "family": "L",
+    "title": "Understand your estimate",
+    "route": "l05",
+    "module": "Medical travel",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Case consent, second opinion, conditional estimate, coordinator authorization and itinerary",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "L06",
+    "family": "L",
+    "title": "Prepare for your journey",
+    "route": "l06",
+    "module": "Medical travel",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Case consent, second opinion, conditional estimate, coordinator authorization and itinerary",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "L07",
+    "family": "L",
+    "title": "Your care itinerary",
+    "route": "l07",
+    "module": "Medical travel",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Case consent, second opinion, conditional estimate, coordinator authorization and itinerary",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "L08",
+    "family": "L",
+    "title": "Care coordinator workspace",
+    "route": "l08",
+    "module": "Medical travel",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Case consent, second opinion, conditional estimate, coordinator authorization and itinerary",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "L09",
+    "family": "L",
+    "title": "Review a travel provider",
+    "route": "l09",
+    "module": "Medical travel",
+    "backend_reference": "Backend and partner integrations pending",
+    "required_contract": "Case consent, second opinion, conditional estimate, coordinator authorization and itinerary",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "M01",
+    "family": "M",
+    "title": "Care that stays connected",
+    "route": "m01",
+    "module": "Membership",
+    "backend_reference": "Backend and payment contracts pending",
+    "required_contract": "Versioned plans, entitlements, limits, credits, renewal, provider events and cancellation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "M02",
+    "family": "M",
+    "title": "Compare memberships",
+    "route": "m02",
+    "module": "Membership",
+    "backend_reference": "Backend and payment contracts pending",
+    "required_contract": "Versioned plans, entitlements, limits, credits, renewal, provider events and cancellation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "M03",
+    "family": "M",
+    "title": "Review your membership",
+    "route": "m03",
+    "module": "Membership",
+    "backend_reference": "Backend and payment contracts pending",
+    "required_contract": "Versioned plans, entitlements, limits, credits, renewal, provider events and cancellation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "M04",
+    "family": "M",
+    "title": "Your membership",
+    "route": "m04",
+    "module": "Membership",
+    "backend_reference": "Backend and payment contracts pending",
+    "required_contract": "Versioned plans, entitlements, limits, credits, renewal, provider events and cancellation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "M05",
+    "family": "M",
+    "title": "Benefits & credits",
+    "route": "m05",
+    "module": "Membership",
+    "backend_reference": "Backend and payment contracts pending",
+    "required_contract": "Versioned plans, entitlements, limits, credits, renewal, provider events and cancellation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "M06",
+    "family": "M",
+    "title": "Manage renewal",
+    "route": "m06",
+    "module": "Membership",
+    "backend_reference": "Backend and payment contracts pending",
+    "required_contract": "Versioned plans, entitlements, limits, credits, renewal, provider events and cancellation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "M07",
+    "family": "M",
+    "title": "Membership administration",
+    "route": "m07",
+    "module": "Membership",
+    "backend_reference": "Backend and payment contracts pending",
+    "required_contract": "Versioned plans, entitlements, limits, credits, renewal, provider events and cancellation",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "N01",
+    "family": "N",
+    "title": "Care, together",
+    "route": "n01",
+    "module": "Shared adult care",
+    "backend_reference": "Backend pending",
+    "required_contract": "Independent adult consent, participant tokens, private intake and recipient-specific notes",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "N02",
+    "family": "N",
+    "title": "Invite your partner",
+    "route": "n02",
+    "module": "Shared adult care",
+    "backend_reference": "Backend pending",
+    "required_contract": "Independent adult consent, participant tokens, private intake and recipient-specific notes",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "N03",
+    "family": "N",
+    "title": "Your invitation",
+    "route": "n03",
+    "module": "Shared adult care",
+    "backend_reference": "Backend pending",
+    "required_contract": "Independent adult consent, participant tokens, private intake and recipient-specific notes",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "N04",
+    "family": "N",
+    "title": "Your private intake",
+    "route": "n04",
+    "module": "Shared adult care",
+    "backend_reference": "Backend pending",
+    "required_contract": "Independent adult consent, participant tokens, private intake and recipient-specific notes",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "N05",
+    "family": "N",
+    "title": "Ready for your shared session",
+    "route": "n05",
+    "module": "Shared adult care",
+    "backend_reference": "Backend pending",
+    "required_contract": "Independent adult consent, participant tokens, private intake and recipient-specific notes",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "N06",
+    "family": "N",
+    "title": "Together in consultation",
+    "route": "n06",
+    "module": "Shared adult care",
+    "backend_reference": "Backend pending",
+    "required_contract": "Independent adult consent, participant tokens, private intake and recipient-specific notes",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "N07",
+    "family": "N",
+    "title": "Notes & recipients",
+    "route": "n07",
+    "module": "Shared adult care",
+    "backend_reference": "Backend pending",
+    "required_contract": "Independent adult consent, participant tokens, private intake and recipient-specific notes",
+    "integration_status": "Pending screen-level operational acceptance"
+  },
+  {
+    "id": "N08",
+    "family": "N",
+    "title": "Your shared care record",
+    "route": "n08",
+    "module": "Shared adult care",
+    "backend_reference": "Backend pending",
+    "required_contract": "Independent adult consent, participant tokens, private intake and recipient-specific notes",
+    "integration_status": "Pending screen-level operational acceptance"
+  }
+]

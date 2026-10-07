@@ -137,7 +137,7 @@ export function RequireSession() {
         </InlineNotice>
       </main>
     );
-  return session ? <Outlet /> : <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname + location.search)}`} replace />;
+  return session ? <Outlet /> : <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname + location.search)}`} state={location.state} replace />;
 }
 const patientNav = [
   ["/patient", "Home", Home],
