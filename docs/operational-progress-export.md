@@ -1,5 +1,15 @@
 # Current operational checkpoint — 2026-10-07
 
+## Later dependent branch checkpoint
+
+Current source is `fb58ab13815bd3cc16b9e12675c6f6e2474967a1` on
+`feat/previous-clinicians`; draft PR #17 depends on PR #16 at
+`503a39df2993cbced46ea067cef97917bac8bcf8`. The browser code and patient-only
+query for returning clinicians are implemented. PR #17 CI passed. The
+Frappe-backed regression and matching local `/teletena/` preview remain pending.
+The original Frappe 15 site was preserved and not migrated. Port 8017 is still
+the separate Frappe 16 compatibility WSGI app and does not serve this checkout.
+
 This current section supersedes the historical checkpoint below. Do not use its old source SHA as the current release.
 
 - Current implementation branch: `feat/teletena-operational-completion`; draft PR #16 targets PR #15’s integration branch and retains PR #12–#15 ancestry. It is pushed for review but remains unmerged; no remote deployment occurred.

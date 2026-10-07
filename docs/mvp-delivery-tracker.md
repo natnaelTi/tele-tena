@@ -1,5 +1,22 @@
 # TeleTena delivery tracker
 
+## Returning-care checkpoint — 2026-10-07
+
+The current dependent branch is `feat/previous-clinicians` at
+`fb58ab13815bd3cc16b9e12675c6f6e2474967a1`. Draft PR #17 targets the open
+PR #16 branch `feat/teletena-operational-completion` at `503a39df2993cbced46ea067cef97917bac8bcf8`;
+neither PR is merged. The patient-home returning-clinician slice is implemented
+but Frappe integration and browser verification are pending. PR #17 CI passed
+frontend builds on Node 22/24 and Python syntax jobs on Python 3.12/3.14.2.
+
+No valid `/teletena/` preview for this source currently runs. Port 8000 is the
+retained Frappe 15 `erp.localhost` bench using its pre-existing checkout; port
+8017 is the separate Frappe 16 compatibility test WSGI process at
+`/home/frappe/teletena-compat/bench` and is not this branch's matching preview.
+Neither service was restarted or migrated. The disposable integration site and
+its temporary DB credential are absent. Do not review either URL as this
+branch's built application.
+
 ## Current implementation checkpoint — 2026-10-07
 
 The active local branch is `feat/teletena-operational-completion` at the PR #15
