@@ -3,14 +3,14 @@
 ## Current clinic and authentication verification — 2026-10-07
 
 Current branch `feat/clinic-affiliation-review` is at
-`57c4a4842a1a26d1b6cd4e10b6701a8ace3d9324`, based on
+`c5c2bf2c532e2b3c50d3416291ae63e32484569b`, based on
 `feat/previous-clinicians`; it is a focused dependent slice, not the complete
 approved A–I product scope. The matching built preview is
 `http://127.0.0.1:8017/teletena/`, served from
 `/home/frappe/frappe/frappe-bench`, site
 `tele-tena-pr12-fresh.localhost`, Frappe 15.121.2 / ERPNext 15.121.6 / Python
 3.12.3 / Node 22.23.3. Backend checkout and packaged frontend source are both
-this branch at `57c4a484`; assets are production-built, not served by Vite.
+this branch at `c5c2bf2`; assets are production-built, not served by Vite.
 The retained `erp.localhost` site has not been migrated or reseeded. The review
 site remains invited-review configuration; phone OTP and public registration
 are disabled there.
@@ -40,6 +40,12 @@ grants remain pending. Responsive clinic/admin review, real SMTP/SMS, mobile
 devices, native-language review, and Frappe 16 compatibility for this added
 schema are not verified. Other A–I scope remains at the per-screen status in
 `operational-screen-map.json`; the map is not an implementation claim.
+
+Scheduler status on this disposable site is disabled and no worker is running.
+The integration suite covers scheduling/dispatch command behavior but does not
+prove queued earnings release or routing executes. Do not demonstrate those
+scheduled transitions until an isolated queue and worker are configured; the
+shared bench queue must not be drained accidentally.
 
 ## Returning-care checkpoint — 2026-10-07
 

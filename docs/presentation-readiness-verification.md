@@ -6,7 +6,7 @@
   not Vite). Bench `/home/frappe/frappe/frappe-bench`; site
   `tele-tena-pr12-fresh.localhost`; branch `feat/clinic-affiliation-review`;
   backend checkout and packaged source SHA
-  `57c4a4842a1a26d1b6cd4e10b6701a8ace3d9324`.
+  `c5c2bf2c532e2b3c50d3416291ae63e32484569b`.
 - Environment: Frappe 15.121.2 / ERPNext 15.121.6, Python 3.12.3, Node
   22.23.3. The review WSGI process is Gunicorn on loopback 8017. This site is
   configured for invited password review; its public phone and registration
@@ -25,6 +25,8 @@
   SMS transport and OTP-key access were mocked in tests; no SMS was sent. The
   HTTP regressions used `http://127.0.0.1:8017`, not the obsolete Vite default
   on port 5173. After the run the preview is back in invited-review mode.
+- The test site's scheduler reports disabled and no worker is running for it.
+  Scheduler-backed release and routing execution are therefore unverified.
 - `scripts/browser-clinic-registration.cjs`: passed a real browser journey
   through the built React package and Frappe APIs: applicant submission →
   reviewer verification → affiliation request → separate reviewer decision.
