@@ -58,9 +58,16 @@ verify retry safety; and confirm existing appointment snapshots do not change.
   offering bubbled a change event to the editor and displayed “Unsaved changes”
   although its values were loaded from the server. Commit `d82c5e7` stops that
   selector event from marking the form dirty and asks before switching away
-  from genuine unsaved edits. A rebuilt browser verification is pending; do
-  not treat the earlier screenshot as visual proof of the fix.
-- Frontend lint/build passed before the status fix; lint reports existing
+  from genuine unsaved edits. On the rebuilt source/build SHA
+  `f7795b85d780ad2804cc0718195f4d51162af6a4`, a fresh browser context selected
+  the saved offering and verified the “Saved schedule” state and the persisted
+  09:00–10:00 interval. Screenshot:
+  `docs/screenshots/multiple-offerings/availability-saved-1440.png`.
+- `TELE_TENA_TEST_SITE=tele-tena-clinic-access-fresh.localhost ../../env/bin/python
+  tests/presentation.py` passed **33/33** after the status fix. This includes
+  schedule validation, recurrence/conflicts, booking, privacy, finance, vetting,
+  immediate-request matching, and multiple-offering regressions.
+- Frontend lint/build passed; lint reports existing
   warnings and the build has the existing large-chunk advisory. The synthetic
   clinician profile is paused for immediate requests
   because its language setup is incomplete. No Frappe 16 migration or fresh
