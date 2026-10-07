@@ -83,3 +83,10 @@ fresh-install/browser harness has not yet been rerun after the correction.
 Its cleanup removed the disposable database/site and temporary database admin
 and credential file. The retained preview database and records were
 fingerprinted unchanged.
+
+A separate seeded clinician browser session opened
+`/teletena/clinician/availability`; the weekly calendar and first configured
+work interval were visible, there was no horizontal overflow, and no page
+exception occurred. This was a read-only inspection; the existing schedule
+was left unchanged. Screenshot:
+`docs/screenshots/mutual-rescheduling/availability-1440.png`.
