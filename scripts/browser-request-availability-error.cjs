@@ -54,6 +54,7 @@ let checkpoint = 'launch'
     const moreDialog = actualPage.getByRole('dialog', { name: 'More workspace links', exact: true })
     checkpoint = 'inspect mobile more menu'
     await moreDialog.getByRole('link', { name: 'Care records', exact: true }).waitFor()
+    await moreDialog.screenshot({ path: '/tmp/tele-tena-presentation-review/request-readiness/mobile-more-menu.png' })
     checkpoint = 'close mobile more menu'
     await actualPage.keyboard.press('Escape')
     await moreDialog.waitFor({ state: 'detached' })
