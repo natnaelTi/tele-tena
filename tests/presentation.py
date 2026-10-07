@@ -958,24 +958,20 @@ class Presentation(unittest.TestCase):
         from tele_tena.patches.v1_13_financial_reconciliation_audit import audit_wallet
         savepoint = 'tt_fin_audit_' + uuid.uuid4().hex[:16]
         frappe.db.sql('SAVEPOINT ' + savepoint)
-        patient = 'mismatch-' + uuid.uuid4().hex[:16] + '@example.invalid'
+        patient = fixtures.USERS['p1']
         try:
-            frappe.db.sql('INSERT INTO tt_wallet (patient,available,reserved) VALUES (%s,500,0)',
-                          (patient,))
-            account = accounting.account_id('patient', patient, 'available')
-            accounting.post('opening:' + patient, 'Opening', 'opening:' + patient,
-                            [(account, 0, 500), ('demo:opening-control', 500, 0)],
-                            {'source': 'synthetic reconciliation test'})
-            journey.simulation_log(patient, 'Deposit', 1000, 'deposit:mismatch-test')
+            wallet = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
+            journey.simulation_log(patient, 'Deposit', 1000, 'deposit:mismatch-test-' + uuid.uuid4().hex)
             result = audit_wallet(patient)
             self.assertFalse(result['matches'])
-            self.assertEqual(result['legacy']['available'], 1000)
-            self.assertEqual(result['wallet']['available'], 500)
-            self.assertEqual(accounting.balance('patient', patient, 'available'), 500)
-            wallet = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
-            with self.assertRaises(frappe.ValidationError):
-                accounting.check_wallet_projection(patient, wallet)
+            self.assertEqual(result['legacy']['available'], int(wallet.available) + 1000)
+            self.assertEqual(result['wallet']['available'], int(wallet.available))
+            self.assertEqual(accounting.balance('patient', patient, 'available'), int(wallet.available))
             fixtures.login('p1')
+            with self.assertRaises(frappe.ValidationError):
+                journey.simulated_deposit(250, 'held-wallet-test-' + uuid.uuid4().hex)
+            after = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
+            self.assertEqual((after.available, after.reserved), (wallet.available, wallet.reserved))
             with self.assertRaises(frappe.PermissionError):
                 accounting.financial_reconciliation_queue()
             fixtures.login('admin')
@@ -983,11 +979,29 @@ class Presentation(unittest.TestCase):
             self.assertIn(patient, [row.patient for row in queue])
             accepted = accounting.accept_wallet_snapshot(patient, 'Synthetic review accepted current opening snapshot')
             self.assertTrue(accepted['historical_difference_preserved'])
-            accounting.check_wallet_projection(patient, wallet)
+            accounting.check_wallet_projection(patient, after)
             audit = journey.one('''SELECT status,decision,reason FROM tt_financial_reconciliation
                 WHERE patient=%s''', (patient,))
             self.assertEqual(audit.status, 'SnapshotAccepted')
             self.assertIn('legacy_diff', audit.reason)
+
+            boundary_owner = 'boundary-' + uuid.uuid4().hex[:16] + '@example.invalid'
+            frappe.db.sql('INSERT INTO tt_wallet (patient,available,reserved) VALUES (%s,100,0)',
+                          (boundary_owner,))
+            account = accounting.account_id('patient', boundary_owner, 'available')
+            opening_ref = 'opening:' + boundary_owner
+            accounting.post(opening_ref, 'Opening', opening_ref,
+                            [(account, 0, 100), ('demo:opening-control', 100, 0)],
+                            {'source': 'synthetic exact-boundary test'})
+            journey.simulation_log(boundary_owner, 'Deposit', 100, 'deposit:boundary-test-' + uuid.uuid4().hex)
+            frappe.db.sql('''UPDATE tt_ledger SET created=(SELECT created FROM tt_journal WHERE event_ref=%s)
+                WHERE patient=%s ORDER BY id DESC LIMIT 1''', (opening_ref, boundary_owner))
+            boundary_result = audit_wallet(boundary_owner)
+            self.assertFalse(boundary_result['matches'])
+            boundary_case = journey.one('''SELECT status,boundary_event_count FROM tt_financial_reconciliation
+                WHERE patient=%s''', (boundary_owner,))
+            self.assertEqual(boundary_case.status, 'ReviewRequired')
+            self.assertEqual(int(boundary_case.boundary_event_count), 1)
         finally:
             frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
