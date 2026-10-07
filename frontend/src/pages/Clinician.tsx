@@ -201,7 +201,7 @@ export function Availability() {
       <div className="schedule-editor" data-tour-unsaved={dirty?"true":"false"} onChange={()=>setDirty(true)}>
         <aside className="schedule-config">
           <TextField label="Schedule name" value={name} error={nameError} onChange={e=>{setName(e.target.value);setNameError("");}} required />
-          <Select label="Service" value={offering} error={serviceError} onChange={e=>{setOffering(e.target.value);setServiceError("");}} required>
+          <Select label="Service" value={offering} error={serviceError} onChange={e=>{e.stopPropagation();if(dirty&&!window.confirm(w("Discard unsaved schedule changes?")))return;setDirty(false);setOffering(e.target.value);setServiceError("");}} required>
             <option value="">Choose a published service</option>{offerings.data?.offerings.map(o=><option key={o.id} value={o.id}>{o.label} · {o.minutes} min</option>)}
           </Select>
           <TextField label="Timezone" value={zone} onChange={e=>setZone(e.target.value)} required placeholder="Africa/Addis_Ababa" />
