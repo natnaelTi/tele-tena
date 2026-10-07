@@ -278,3 +278,17 @@ packaged `/teletena/admin/scopes` page was then opened in Chromium using the
 existing synthetic reviewer; its service selector and immediate-policy panel
 rendered with the explanatory copy. No service was toggled in this browser
 check. Capture: `docs/screenshots/immediate-policy/reviewer-services-1440.png`.
+
+## Current packaged preview (2026-10-08)
+
+- URL: `http://127.0.0.1:8017/teletena/`
+- Bench/site: `/home/frappe/frappe/frappe-bench` /
+  `tele-tena-pr12-fresh.localhost`
+- Backend checkout: branch `feat/immediate-service-policy-review`, source
+  `00a5f0245fcd2b78e93fcea9b65821e5071977af`; the dedicated loopback Gunicorn
+  was gracefully reloaded after migration and build.
+- Frontend: production-built Frappe assets, `release.json` source SHA matches
+  `00a5f0245fcd2b78e93fcea9b65821e5071977af`; no Vite server serves this URL.
+- Scheduler: enabled for this review site; `bench doctor` reports one worker
+  online and `show-pending-jobs` reported no pending jobs at this check. This
+  does not prove a future request or earnings job has executed.
