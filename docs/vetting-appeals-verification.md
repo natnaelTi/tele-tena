@@ -32,14 +32,18 @@ resubmission and a new ordinary assessment are required.
   during this slice was removed. Amharic and Afaan Oromo copy is provisional.
 - `npm run build`: passed. The LiveKit client chunk-size advisory remains.
 - `scripts/build_review.py` and `scripts/check_review_assets.py`: production
-  asset integration passed for source `888e40138a07336c9aa93ef2b6b8130bf20089ba`;
-  the private credential scan found zero matches. A subsequent applicant form
-  resume affordance is included in source commit `9ef9838` and requires a fresh
-  packaged build before its review.
+  asset integration passed for source `0884174039e6dc0ed068c42887d25c542648af24`;
+  the private credential scan found zero matches.
 - Browser inspection on the built `/teletena/` route at
   `http://127.0.0.1:8017/teletena/`: authenticated clinician application page
   at 1440px and reviewer queue at 390px rendered without browser exceptions or
   horizontal overflow. Captures are `docs/screenshots/vetting-appeals/`.
+- The runtime manifest and service-worker cache key identify source
+  `0884174039e6dc0ed068c42887d25c542648af24`; port 8017 was gracefully
+  reloaded. Browser inspection confirmed the packaged asset URL and `/teletena/`
+  service-worker scope/cache. A fresh Playwright context verified the new
+  versioned public cache installs. Update notification in a pre-existing
+  physical browser profile has not been independently tested.
 
 ## Not verified in browser
 
