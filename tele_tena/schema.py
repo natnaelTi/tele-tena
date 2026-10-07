@@ -94,3 +94,5 @@ def install():
     financial_reconciliation()
     from tele_tena.patches.v1_14_session_feedback import execute as session_feedback
     session_feedback()
+    from tele_tena.patches.v1_15_mutual_rescheduling import execute as mutual_rescheduling
+    mutual_rescheduling()
