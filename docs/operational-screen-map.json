@@ -5981,8 +5981,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I06) and design-handoff.md",
-        "implementation": "feat/vetting-reconsideration: native append-only appeal DocType, authenticated commands, reviewer and applicant UI; focused integration test pending.",
-        "current_local": "Verification pending; previous vetting/evidence checks cover v1.16 only."
+        "implementation": "PR feature branch feat/vetting-reconsideration: native append-only appeal DocType, authenticated commands, reviewer/applicant UI, and focused tests.",
+        "current_local": "29/29 presentation tests passed on Frappe 15.121.2 and Frappe 16.2.1; migration and repeat migration passed on retained isolated sites. Built browser verified applicant normal page and reviewer empty queue at 1440/390px; populated appeal actions remain unverified in browser. See docs/vetting-appeals-verification.md."
       }
     },
     {
