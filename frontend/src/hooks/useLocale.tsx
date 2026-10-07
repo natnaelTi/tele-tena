@@ -238,6 +238,7 @@ const words: Record<string, [string, string]> = {
   "Reopen for new evidence and full review": ["ለአዲስ ማስረጃና ሙሉ ግምገማ እንደገና ይክፈቱ", "Ragaa haaraafi gamaaggama guutuuf irra deebi'ii bani"],
   "Choose an outcome and record the reviewer rationale.": ["ውጤት ይምረጡና የገምጋሚውን ምክንያት ይመዝግቡ።", "Bu'aa filadhu, sababa madaalaa galmeessi."],
   "Record reconsideration outcome": ["የዳግም ግምገማ ውጤት ይመዝግቡ", "Bu'aa madaallii irra deebi'uu galmeessi"],
+  "Continue this application": ["ይህን ማመልከቻ ይቀጥሉ", "Iyyannoo kana itti fufi"],
   "Service-scope vetting": ["Vetting daangaa tajaajilaa", "Vetting daangaa tajaajilaa"],
   "Review each professional scope separately. A missing mandatory criterion cannot be offset by other evidence.": ["Daangaa ogeummaa tokkoon tokkoon isaa addaan gamaaggami. Ragaan biraa ulaagaa dirqamaa dhabame bakka hin bu'u.", "Daangaa ogummaa tokkoon tokkoon isaa addaan gamaaggami. Ragaan biraa ulaagaa dirqamaa dhabame bakka hin bu'u."],
   "The vetting queue could not be loaded.": ["Tarreen vetting fe'uun hin danda'amne.", "Tarreen vetting fe'uun hin danda'amne."],
