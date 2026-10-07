@@ -12,11 +12,13 @@ const passwords = JSON.parse(fs.readFileSync(path.join(site, 'private/tele_tena_
 const app = (process.env.TELE_TENA_BROWSER_ORIGIN || 'http://127.0.0.1:8017') + '/teletena';
 const screenshots = path.resolve('docs/screenshots/clinic-membership');
 const clinicName = 'Synthetic membership clinic ' + Date.now();
-const inviteEmail = marker.users.patient;
+const inviteEmail = marker.users.calendarpatient || marker.users.patient;
 let checkpoint = 'launch';
 
 async function signIn(page, user) {
   await page.goto(app + '/sign-in');
+  const emailAlternative = page.getByRole('button', { name: 'Use email instead', exact: true });
+  if (await emailAlternative.count()) await emailAlternative.click();
   await page.getByLabel('Email', { exact: true }).waitFor();
   await page.getByLabel('Email', { exact: true }).fill(user);
   await page.getByLabel('Password', { exact: true }).fill(passwords[user]);

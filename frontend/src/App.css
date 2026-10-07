@@ -596,6 +596,8 @@ button:active {
 .clinic-record-row p {
   margin: 4px 0 0;
 }
+.clinic-record-row > div { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.clinic-record-row strong { overflow-wrap: anywhere; word-break: break-word; }
 .clinic-review-card {
   margin: 12px 0;
   padding: 20px;
