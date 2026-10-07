@@ -215,9 +215,9 @@ export function WorkspaceLayout({
     ? [...roleItems, ["/clinic", "Clinic workspace", Building2] as const]
     : roleItems;
   const mobilePrimaryRoutes = kind === "clinician"
-    ? ["/clinician", "/clinician/appointments", "/clinician/requests", "/clinician/availability"]
+    ? ["/clinician", "/clinician/requests", "/clinician/availability"]
     : kind === "patient"
-      ? ["/patient", "/patient/discovery", "/patient/appointments", "/patient/account"]
+      ? ["/patient", "/patient/discovery", "/patient/appointments"]
       : kind === "admin"
         ? ["/admin", "/admin/scopes", "/admin/exceptions"]
         : ["/clinic"];

@@ -462,7 +462,7 @@ button:active {
   flex-direction: column;
   gap: 4px;
 }
-.workspace-mobile-nav {
+.sidebar nav.workspace-mobile-nav {
   display: none;
 }
 .sidebar nav a {
