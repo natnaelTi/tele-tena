@@ -256,6 +256,15 @@ for this snapshot. Neither cause is inferred from the original screenshot; both
 were read from this later server state. No synthetic account or service was
 changed to make the diagnosis pass.
 
+The saved schedule is published daily from 08:00 to 20:00 in
+`Africa/Addis_Ababa`, for 30-minute sessions. The host clock at this read was
+02:24 EAT. That interval supports later scheduled bookings, but no complete
+start can fit the immediate request's next-30-minute window at that time. Once
+the saved-language and service-policy blockers are addressed, clinician
+readiness will still require a current interval with continuous capacity.
+“Available for requests” is a presence lease, not a claim that daytime hours
+make the clinician immediately ready overnight.
+
 The current dependent branch adds v1.22's audited policy command and a scoped
 reviewer control under Administration → Service scopes. Enable/pause requires
 an approver role, rationale, eligible catalog lifecycle, and a stable retry key.
