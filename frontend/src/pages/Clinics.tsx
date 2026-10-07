@@ -36,7 +36,7 @@ export function ClinicianAffiliations() {
           <TextField label={w("Registration reference")} required value={registration} onChange={e=>setRegistration(e.target.value)} />
           <TextField label={w("Jurisdiction")} required value={jurisdiction} onChange={e=>setJurisdiction(e.target.value)} />
           <TextField label={w("Public description (optional)")} value={description} onChange={e=>setDescription(e.target.value)} />
-          <Button loading={action.busy}><Building2 size={18}/>{w("Submit for verification")}</Button>
+          <Button type="submit" loading={action.busy}><Building2 size={18}/>{w("Submit for verification")}</Button>
         </form>
       </Card>
       <Card>
@@ -49,7 +49,7 @@ export function ClinicianAffiliations() {
           </Select>
           <TextField label={w("Professional role at this clinic")} required value={role} onChange={e=>setRole(e.target.value)} />
           <TextField label={w("Affiliation evidence summary")} required value={evidence} onChange={e=>setEvidence(e.target.value)} />
-          <Button loading={action.busy}><CheckCircle2 size={18}/>{w("Submit affiliation")}</Button>
+          <Button type="submit" loading={action.busy}><CheckCircle2 size={18}/>{w("Submit affiliation")}</Button>
         </form>
       </Card>
     </section>
