@@ -14,6 +14,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('%MODE%' === 'production' ? '/teletena/sw.js' : '/sw.js', {scope: '%MODE%' === 'production' ? '/teletena/' : '/'}).catch(() => {}));</script>
   </body>
 </html>

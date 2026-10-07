@@ -1576,3 +1576,27 @@ button:active {
 
 .offer-facts{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0}.offer-facts dt{font-size:14px;color:var(--text-secondary)}.offer-facts dd{margin:5px 0;font-weight:600}.clinician-offer-workspace{margin:32px 0}.clinician-offer-workspace .segmented{display:flex;gap:8px;flex-wrap:wrap}.request-progress.settled .request-progress-words>span{animation:none;opacity:1}.request-progress .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}@media(max-width:760px){.care-entry-columns{grid-template-columns:1fr}.care-entry-columns>section{padding:24px}.dual-care-hero{padding-top:32px}.offer-facts{grid-template-columns:1fr}}
 .care-entry-columns{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.care-entry-columns>section{min-width:0}.care-entry-columns .text-link{white-space:normal;overflow-wrap:anywhere}.care-entry-chips{max-width:100%}@media(max-width:760px){.care-entry-columns{grid-template-columns:minmax(0,1fr)}}
+/* Non-modal, user-controlled release refresh. Hidden during OTP and consultations. */
+.pwa-update-notice {
+  position: fixed;
+  z-index: 120;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(640px, calc(100vw - 32px));
+  padding: 12px 14px;
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  background: var(--surface-card);
+  color: var(--text-primary);
+  box-shadow: 0 8px 28px rgb(16 42 51 / 16%);
+}
+.pwa-update-notice p { margin: 0; flex: 1; font-size: 14px; line-height: 1.45; }
+.pwa-update-notice .button { min-height: 44px; white-space: nowrap; }
+@media (max-width: 560px) {
+  .pwa-update-notice { right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100vw - 16px); gap: 6px; padding: 10px; }
+  .pwa-update-notice p { font-size: 13px; }
+  .pwa-update-notice .button { padding-inline: 10px; }
+}
