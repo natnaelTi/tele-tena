@@ -20,6 +20,7 @@ import { useSession } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
 import WorkspaceTour from "../components/WorkspaceTour";
 import { useResource } from "../hooks/useResource";
+import { ApiError } from "../api";
 export function DemoBar() {
   return (
     <div className="demo-bar" role="note" aria-label="Demonstration environment">
@@ -45,24 +46,40 @@ function ClinicianRequestAvailability() {
   const refresh = presence.refresh;
   const ready = !!presence.data?.ready;
   const [busy, setBusy] = useState(false);
-  const [connectionFailed, setConnectionFailed] = useState(false);
+  const [failure, setFailure] = useState<"network" | "session" | "permission" | "update" | null>(null);
+  const failureMessage = failure === "network"
+    ? "Connection interrupted; request availability may expire."
+    : failure === "session"
+      ? "Your session expired. Sign in again to update request availability."
+      : failure === "permission"
+        ? "You don’t have permission to change request availability."
+        : failure === "update"
+          ? "Could not update request availability. Review the setup items and try again."
+          : null;
+  const recordFailure = useCallback((error: unknown) => {
+    if (error instanceof ApiError && error.code === "session_required") setFailure("session");
+    else if (error instanceof ApiError && error.code === "permission_denied") setFailure("permission");
+    else if (error instanceof TypeError) setFailure("network");
+    else setFailure("update");
+    void refresh().catch(() => undefined);
+  }, [refresh]);
   useEffect(() => {
     const timer = window.setInterval(() => {
       if (!ready) { void refresh(); return; }
       void journeyApi.setRequestPresence(true)
-        .then(() => { setConnectionFailed(false); void refresh(); })
-        .catch(() => setConnectionFailed(true));
+        .then(() => { setFailure(null); void refresh(); })
+        .catch(recordFailure);
     }, 30000);
     return () => window.clearInterval(timer);
-  }, [ready, refresh]);
+  }, [ready, refresh, recordFailure]);
   const toggle = async () => {
     setBusy(true);
     try {
       await journeyApi.setRequestPresence(!presence.data?.ready);
-      setConnectionFailed(false);
+      setFailure(null);
       await presence.refresh();
-    } catch {
-      setConnectionFailed(true);
+    } catch (error) {
+      recordFailure(error);
     } finally { setBusy(false); }
   };
   const data = presence.data;
@@ -77,10 +94,11 @@ function ClinicianRequestAvailability() {
   };
   return <section className="request-presence-shell" aria-label={w("Request availability")}>
     <div><strong>{w(data?.ready ? "Available for requests" : "Requests paused")}</strong>
-      <span>{w(connectionFailed ? "Connection lost; availability will expire." : data?.configured ? "Ready status expires if this session disconnects." : "Complete setup before receiving requests.")}</span>
+      <span>{w(failureMessage || (data?.ready ? "Ready status expires if this session disconnects." : "Complete setup before receiving requests."))}</span>
       {!!data?.reasons?.length && <nav className="request-readiness-actions" aria-label={w("Setup needed")}>{data.reasons.map((reason: string) => {const item=guidance[reason];return item?<Link key={reason} to={item.to}>{w(item.label)}</Link>:<span key={reason}>{w("Complete setup before receiving requests.")}</span>;})}</nav>}
     </div>
     <Button className="compact-button" variant={data?.ready ? "secondary" : "primary"} loading={busy} disabled={!data?.configured && !data?.ready} onClick={() => void toggle()}>{w(data?.ready ? "Pause" : "Go available")}</Button>
+    {failureMessage && <InlineNotice tone="danger">{w(failureMessage)}</InlineNotice>}
   </section>;
 }
 export function PublicLayout() {
