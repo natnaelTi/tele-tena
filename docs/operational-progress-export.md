@@ -3,7 +3,7 @@
 This is a concise, sanitized progress export for roadmap updates. It is not a release or deployment claim.
 
 - Repository: `natnaelTi/tele-tena`.
-- Local branch: `feat/teletena-operational-completion`, based on open draft PR #15 head `3e0965c5fdf6485d945756b382c0a3c008450058`; ancestry includes open PR #14 → #13 → #12. PR #11 is separately open. No merge/deploy occurred.
+- Local branch: `feat/teletena-operational-completion`, current source commit `c621b2fa63b33b09e7febfd3fb0785f49cb5d520`, based on open draft PR #15 head `3e0965c5fdf6485d945756b382c0a3c008450058`; ancestry includes open PR #14 → #13 → #12. PR #11 is separately open. No merge/deploy occurred.
 - Active original WSL Bench: `/home/frappe/frappe/frappe-bench`; site `erp.localhost`; Frappe 15.121.2 / ERPNext 15.121.6 / Python 3.12.3 / Node 22.23.3. The site was backed up before changes and has not been migrated. Existing web/worker processes remain untouched.
 - Extracted design: `/home/frappe/teletena-design-reference`; inventory contains 142 screens/14 journeys. It is a visual source, not an operational product.
 - PR #15 adds the two-sided hero, real request progress, clinician-owned paginated offer history, disclosure-safe patient labels, accepted appointment handoff and offer withdrawal. Current local Frappe integration assertions are pending.

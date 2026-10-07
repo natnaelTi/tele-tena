@@ -3,10 +3,10 @@ const { chromium } = require('playwright');
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
 const root = process.env.TELE_TENA_REVIEW_SITE_PATH;
-assert.ok(root?.endsWith('/tele-tena-pr2-test.localhost'));
+assert.ok(root && /^tele-tena-[a-z0-9-]+\.localhost$/.test(require('node:path').basename(root)));
 const credentials = JSON.parse(fs.readFileSync(root + '/private/tele_tena_review_accounts.json', 'utf8'));
 const user = Object.keys(credentials).find(value => value.includes('clinician'));
-const base = 'http://127.0.0.1:8017/teletena';
+const base = process.env.TELE_TENA_BROWSER_BASE || 'http://127.0.0.1:8017/teletena';
 (async () => {
   const browser = await chromium.launch({ headless: true });
   try {

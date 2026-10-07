@@ -4,7 +4,7 @@
 
 ## Current slice
 
-Current branch `feat/teletena-operational-completion` starts at PR #15 head `3e0965c5fdf6485d945756b382c0a3c008450058`, based on PR #14 and preserving PR #12–14 ancestry. Current committed head is `475c7c6` plus the pending design/documentation work. PR #15 adds a two-sided homepage, server-state request motion, clinician-owned paginated offer history, a masked patient label from the original disclosure snapshot, accepted-appointment handoff and offer withdrawal. Those backend assertions have not yet run in this local Frappe 15 Bench.
+Current branch `feat/teletena-operational-completion` starts at PR #15 head `3e0965c5fdf6485d945756b382c0a3c008450058`, based on PR #14 and preserving PR #12–14 ancestry. Current committed head is `c621b2fa63b33b09e7febfd3fb0785f49cb5d520`. PR #15 adds a two-sided homepage, server-state request motion, clinician-owned paginated offer history, a masked patient label from the original disclosure snapshot, accepted-appointment handoff and offer withdrawal. Those backend assertions have not yet run in this local Frappe 15 Bench.
 
 Motion never fabricates an ETA, receipt, offer or booking. Changing prompts describe current facts. Reduced-motion users receive static text. No request narrative or competitor quote is copied into the new history response. The clinician must authenticate with the clinician role and matching profile. The appointment join is actor-scoped. Limits use bounded paging; read-time expiry does not require a scheduler write.
 

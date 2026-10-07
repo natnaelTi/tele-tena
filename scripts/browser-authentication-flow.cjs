@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const assert = require('node:assert/strict');
 
 const root = process.env.TELE_TENA_REVIEW_SITE_PATH;
-assert.ok(root?.endsWith('/tele-tena-pr2-test.localhost'));
+assert.ok(root && /^tele-tena-[a-z0-9-]+\.localhost$/.test(require('node:path').basename(root)));
 const seed = JSON.parse(fs.readFileSync(root + '/private/tele_tena_review_seed.json', 'utf8'));
 const credentials = JSON.parse(fs.readFileSync(root + '/private/tele_tena_review_accounts.json', 'utf8'));
 const base = process.env.TELE_TENA_BROWSER_BASE || 'http://127.0.0.1:8017/teletena';

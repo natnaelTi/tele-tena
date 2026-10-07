@@ -7,7 +7,9 @@ import uuid
 
 APP = Path(__file__).resolve().parents[1]
 BENCH = APP.parents[1]
-SITE = os.environ.get('TELE_TENA_TEST_SITE', 'tele-tena-pr2-test.localhost')
+SITE = os.environ.get('TELE_TENA_TEST_SITE')
+if not SITE or not SITE.startswith('tele-tena-') or not SITE.endswith('.localhost'):
+    raise SystemExit('Set TELE_TENA_TEST_SITE to a disposable TeleTena .localhost site')
 OUT = Path(os.environ.get('TELE_TENA_AVAILABILITY_FIXTURE', '/tmp/tele-tena-availability-browser.json'))
 os.chdir(BENCH / 'sites')
 import sys
