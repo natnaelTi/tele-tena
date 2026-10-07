@@ -1,5 +1,38 @@
 # Presentation release verification
 
+## Current local checkpoint — clinic scheduling access — 2026-10-07
+
+- Review URL: `http://127.0.0.1:8017/teletena/`. It is served by the dedicated
+  Gunicorn process bound to `127.0.0.1:8017`, with
+  `TELE_TENA_TEST_SITE=tele-tena-pr12-fresh.localhost`, from
+  `/home/frappe/frappe/frappe-bench/sites`. The production frontend package
+  under `tele_tena/public/review/` records source commit
+  `4758539387ceae5bc363461c7d59760d0bd51438`, matching branch
+  `feat/clinic-encounter-access`. This is Frappe-served static content, not
+  Vite. Direct route refresh and hashed asset serving returned HTTP 200 after
+  a graceful reload of this preview process only.
+- In the built browser app, the synthetic Review Patient explicitly shared a
+  future booked appointment's scheduling details with a verified clinic,
+  reloaded and confirmed the grant persisted, then revoked access. No existing
+  appointments or balances were changed. At 390px, document width matched the
+  viewport; the 1440px screenshot was visually inspected. Screenshots are in
+  `docs/screenshots/clinic-encounter-access/`.
+- `TELE_TENA_TEST_SITE=tele-tena-pr12-fresh.localhost ./env/bin/python
+  apps/tele_tena/tests/presentation.py` passed **24/24**, including the new
+  authorization regression: grants are idempotent and revocable; generic
+  DocType access, non-member/Billing access, and another patient's access are
+  denied; the clinic query returns only the permitted booking projection;
+  Scheduling membership works and membership revocation closes access.
+- The site's scheduler remains disabled; shared workers were not restarted or
+  drained. Fresh-site installation is still pending. The corrected helper now
+  targets the separate `tele-tena-clinic-access-fresh.localhost` site, but has
+  not been run. The earlier helper targeted the existing review-site database;
+  its temporary scoped administrator account and credential file were removed
+  without changing review-site records. The correct local command is
+  `python3 /home/frappe/frappe/frappe-bench/apps/tele_tena/scripts/prepare_fresh_install_db_admin.py`.
+  Native Amharic/Afaan Oromo review, 200% zoom, physical-device behavior,
+  Frappe 16, live SMS, and hosted LiveKit remain separate validation gates.
+
 ## Current local checkpoint — session feedback UI — 2026-10-07
 
 - Review URL: `http://127.0.0.1:8017/teletena/`, production-built Frappe

@@ -953,11 +953,11 @@
       "module": "Profiles/vetting",
       "backend_reference": "journey, vetting, private evidence",
       "required_contract": "Guided profiles, scoped review decisions, protected evidence",
-      "integration_status": "Clinic registry, affiliation, membership, and patient-controlled scheduling-only encounter grants are implemented. Existing-site Frappe migration and 24-case presentation suite passed; grant authorization, expiry, patient revocation, manager/scheduler membership and Billing denial have backend coverage. The new patient/clinic browser journey, visual inspection, and fresh-site installation remain pending.",
+      "integration_status": "Clinic registry, affiliation, membership, and patient-controlled scheduling-only encounter grants are implemented. Existing-site Frappe migration and 24-case presentation suite passed; grant authorization, expiry, patient revocation, manager/scheduler membership and Billing denial have backend coverage. The patient grant/revoke journey is verified in the production-built local browser app; fresh-site installation remains pending.",
       "prototype_route": "b08",
       "route": "/clinician/affiliations; /clinician/clinic-access; /patient/clinic-access",
       "actor": "Clinician/clinic submitter or active Clinic Manager; invited account with exact verified email; authorized clinic reviewer for registration and affiliation decisions",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "Tele Tena Clinic",
         "Tele Tena Clinic Affiliation",
