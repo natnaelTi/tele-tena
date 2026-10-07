@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useResource } from "../hooks/useResource";
 import { useSession } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
@@ -17,6 +17,11 @@ export default function ConsultationPage() {
   const base = session?.profile?.kind === "clinician" ? "/clinician" : "/patient";
   const loadDetail = useCallback(() => journeyApi.appointmentDetail(id), [id]);
   const detail = useResource(loadDetail);
+  useEffect(()=>{
+    if(detail.data?.status!=='Booked'||detail.data?.call_state!=='NotStarted')return;
+    const timer=window.setInterval(()=>void detail.refresh(),15000);
+    return()=>window.clearInterval(timer);
+  },[detail.data?.status,detail.data?.call_state,detail.refresh]);
   const [privateNote, setPrivateNote] = useState<string|null>(null);
   const [summary, setSummary] = useState<string|null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -44,6 +49,7 @@ export default function ConsultationPage() {
       {canOpenRoom&&!callEnded&&<Card className="join-card"><h2>{item.call_state==="Open"?"Your consultation is ready":"Join your consultation"}</h2><p>Use the pre-call device check before joining. Booked duration is {item.booked_minutes} minutes.</p><Link className="button primary" to={`/consultation/${item.id}/room`}>Join consultation</Link></Card>}
       {clinician&&item.can_respond&&<div className="actions"><Button loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondToRequest(id,"confirm");await detail.refresh();},"Appointment confirmed.")}>Confirm request</Button><Button variant="danger" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondToRequest(id,"decline");await detail.refresh();},"Request declined and reservation released.")}>Decline request</Button></div>}
       {item.can_cancel&&<Button variant="secondary" onClick={()=>{const reason=window.prompt("Reason for cancellation (optional)");if(reason!==null)void action.run(async()=>{await journeyApi.cancelAppointment(id,reason);await detail.refresh();},"Appointment cancelled. Reservation release recorded.");}}>Cancel appointment</Button>}
+      {item.status === "Booked" && <ReschedulePanel appointment={item} refresh={detail.refresh} />}
       {item.status==="Cancelled"&&<Card><h2>Cancellation</h2><p>Cancelled by {item.cancellation.actor} · {item.cancellation.at?date(item.cancellation.at):"time unavailable"}</p>{item.cancellation.reason&&<p>Reason: {item.cancellation.reason}</p>}<p>Reserved balance released under the accepted demonstration policy.</p></Card>}
       {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}{action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
       {clinician&&callEnded&&item.documentation_state!=="Finalized"&&<section className="note-editor" data-tour-unsaved={privateNote!==null||summary!==null?"true":"false"}><h2>Consultation notes</h2><label className="field">Private consultation note <span className="visibility-label">Only you can see this</span><textarea rows={7} maxLength={12000} value={privateNote??item.private_note?.text??""} onChange={e=>setPrivateNote(e.target.value)} /></label><label className="field">Patient summary / next steps <span className="visibility-label">For patient sharing, with your approval</span><textarea rows={5} maxLength={6000} value={summary??item.private_note?.patient_summary??""} onChange={e=>setSummary(e.target.value)} /></label><div className="actions"><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.saveNoteDraft(id,privateNote??item.private_note?.text??"",summary??item.private_note?.patient_summary??"");await detail.refresh();},"Draft saved.")}>Save draft</Button><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{const result=await journeyApi.previewSummary(id,summary??item.private_note?.patient_summary??"");setPreview(result.summary);},"")}>Preview patient summary</Button><Button loading={action.busy} onClick={()=>{if(window.confirm("Finalize this consultation and publish the current patient summary?"))void action.run(async()=>{await journeyApi.saveNoteDraft(id,privateNote??item.private_note?.text??"",summary??item.private_note?.patient_summary??"");await journeyApi.finalizeConsultation(id,!!(summary??item.private_note?.patient_summary));await detail.refresh();},"Consultation finalized.");}}>Finalize consultation</Button></div>{preview!==null&&<Card><h3>Patient-visible preview</h3><p className="prewrap">{preview||"No patient summary has been entered."}</p><p className="supporting">Previously shared material may already have been seen and cannot be recalled.</p></Card>}</section>}
@@ -58,6 +64,43 @@ export default function ConsultationPage() {
       {!clinician&&item.financial_state==="Disputed"&&<InlineNotice>A payment review is open. Related simulated earnings remain on hold.</InlineNotice>}
     </main><aside><Card><h2>Session details</h2><dl className="summary-list"><dt>Appointment state</dt><dd>{appointmentStateLabel}</dd><dt>Service</dt><dd>{item.service}</dd><dt>Scheduled</dt><dd>{date(item.start,item.timezone)}<br/>{item.timezone||"Timezone unavailable"}</dd><dt>Format</dt><dd>{item.format}</dd><dt>Booked duration</dt><dd>{item.booked_minutes} minutes</dd><dt>Call state</dt><dd>{item.call_state==="Ended"?"Call ended":item.call_state}</dd><dt>Call ended</dt><dd>{item.call_ended_at?date(item.call_ended_at,item.timezone):"Unavailable"}</dd><dt>Connected time</dt><dd>{item.actual_connected_time_available?"Available":"Unavailable"}</dd><dt>Price</dt><dd>ETB {money(item.price)}</dd><dt>Reservation</dt><dd>{item.status==="Cancelled"||item.status==="Expired"?"Released":item.financial_state==="Pending"||item.financial_state==="Released"?"Consumed":item.status==="Completed"?"Consumed":"Reserved"}</dd></dl></Card><Card><h2>What you’ll share</h2><p>{item.disclosure.request}</p><dl className="summary-list"><dt>Preferred name</dt><dd>{item.disclosure.name||"Not shared"}</dd><dt>Saved history</dt><dd>{item.disclosure.history||"Not shared"}</dd></dl></Card><Card><h2>Timeline</h2><ol className="consultation-timeline">{item.timeline.map((event:any,index:number)=><li key={index}><strong>{event.event}</strong><span>{date(event.at,item.timezone)} · {event.actor}</span>{event.reason&&<p>{event.reason}</p>}</li>)}</ol></Card></aside></div>
   </div>;
+}
+
+function ReschedulePanel({appointment,refresh}:{appointment:any;refresh:()=>Promise<void>}) {
+  const {w}=useLocale();
+  const [expanded,setExpanded]=useState(false);
+  const [selected,setSelected]=useState("");
+  const [retryKey,setRetryKey]=useState("");
+  const [outcome,setOutcome]=useState("");
+  const action=useAction();
+  const today=new Intl.DateTimeFormat('en-CA',{timeZone:appointment.timezone||'UTC',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const load=useCallback(()=>journeyApi.calendar(appointment.offering,today,appointment.timezone||'UTC'),[appointment.offering,appointment.timezone,today]);
+  const calendar=useResource(load);
+  const slots=(calendar.data?.days||[]).flatMap(day=>day.slots.map(slot=>({slot,label:`${day.date} · ${slot.local_time} (${slot.timezone})`})));
+  const current=appointment.reschedule;
+  const propose=async()=>{
+    if(!selected||!retryKey)return;
+    await action.run(async()=>{await journeyApi.proposeReschedule(appointment.id,selected,retryKey);setSelected("");setRetryKey("");await refresh();},w('A new time is waiting for your response.'));
+  };
+  return <Card className="reschedule-panel">
+    <h2>{w('Request a new time')}</h2>
+    <p>{w('The original appointment stays reserved until both of you agree.')}</p>
+    {current&&<InlineNotice tone="info"><strong>{w('A new time is waiting for your response.')}</strong><br/>
+      {w('Your proposed time')}: {date(current.start,current.timezone)} · {current.timezone}
+      {current.proposed_by_you?<Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.withdrawReschedule(appointment.id,current.id);await refresh();},w('Withdraw request'))}>{w('Withdraw request')}</Button>:<div className="actions"><Button loading={action.busy} onClick={()=>void action.run(async()=>{const result=await journeyApi.respondToReschedule(appointment.id,current.id,'accept');if(result.state==='Unavailable')setOutcome(result.message);await refresh();},w('Accept new time'))}>{w('Accept new time')}</Button><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondToReschedule(appointment.id,current.id,'decline');await refresh();},w('Decline new time'))}>{w('Decline new time')}</Button></div>}
+    </InlineNotice>}
+    {!current&&appointment.can_propose_reschedule&&<>
+      {!expanded?<Button variant="secondary" onClick={()=>{setExpanded(true);void calendar.refresh();}}>{w('Request a new time')}</Button>:<>
+        {calendar.error&&<InlineNotice tone="danger">Available times could not be loaded. <Button variant="secondary" onClick={()=>void calendar.refresh()}>{w('Try again')}</Button></InlineNotice>}
+        {!calendar.error&&!calendar.data?<Skeleton/>:null}
+        {calendar.data&&slots.length>0&&<><Select label={w('Choose an available time')} value={selected} onChange={event=>{setSelected(event.target.value);setRetryKey(crypto.randomUUID());}}><option value="">{w('Choose an available time')}</option>{slots.map(({slot,label})=><option key={slot.start} value={slot.start}>{label}</option>)}</Select><div className="actions"><Button loading={action.busy} disabled={!selected||!retryKey} onClick={()=>void propose()}>{w('Send time request')}</Button><Button variant="secondary" onClick={()=>setExpanded(false)}>{w('Cancel')}</Button></div></>}
+        {calendar.data&&!slots.length&&<InlineNotice>{w('No available times to propose in the current booking window.')}</InlineNotice>}
+      </>}
+    </>}
+    {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
+    {outcome&&<InlineNotice tone="info">{outcome}</InlineNotice>}
+    {action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
+  </Card>;
 }
 
 function PatientClinicScheduleSharing({appointment}:{appointment:string}) {
