@@ -170,3 +170,19 @@ future demo operations; the historical mismatch remains visible. Unknown legacy
 event kinds stop for review. A deployment cutover stops all old web and
 background writers before migration, then verifies owner-by-owner wallet and
 subledger equality or records an explicit hold before starting matching code.
+# Returning care and previous clinicians
+
+The patient workspace may offer a returning-care shortcut only for clinicians
+with whom that signed-in patient has a completed appointment. The query is
+patient-authorized and returns an opaque public profile key, the clinician's
+public display name, the latest booked session instant, and that patient's
+completed-session count. It does not join or infer relationships from another
+patient's encounters. A clinician appears only while enabled, manually approved,
+and holding a current approved scope with a published active offering and
+schedule. Historical appointments remain unchanged when an offering is no
+longer eligible; the clinician is then omitted from this shortcut and remains
+available in the patient's appointment history.
+
+The current slice is implemented in the patient dashboard and backend query.
+Fresh-site Frappe permission/database and browser verification are pending; it
+must not be represented as locally verified until those checks pass.
