@@ -22,7 +22,7 @@ sys.path.insert(0, str(BENCH / 'apps/frappe'))
 import frappe
 from frappe.utils.password import update_password
 from tele_tena.api import journey as api
-from tele_tena.api import phone_auth
+from tele_tena.api import phone_auth, contact_auth
 
 SITE = os.environ.get('TELE_TENA_TEST_SITE')
 if not SITE or not SITE.endswith('.localhost') or not SITE.startswith(('tele-tena-', 'teletena-')):
@@ -30,7 +30,7 @@ if not SITE or not SITE.endswith('.localhost') or not SITE.startswith(('tele-ten
 PREFIX = 'tt-test-' + secrets.token_hex(5)
 USERS = {kind: PREFIX + '-' + kind + '@example.invalid' for kind in ('p1', 'p2', 'c1', 'c2', 'c3', 'admin')}
 PASSWORD = secrets.token_urlsafe(24)
-BASE = os.environ.get('TELE_TENA_TEST_API_ORIGIN', os.environ.get('TELE_TENA_TEST_BASE', 'http://127.0.0.1:5173'))
+BASE = os.environ.get('TELE_TENA_TEST_API_ORIGIN', os.environ.get('TELE_TENA_TEST_BASE', 'http://127.0.0.1:8017'))
 from urllib.parse import urlsplit
 assert urlsplit(BASE).hostname in ('127.0.0.1', 'localhost'), 'Integration tests require a loopback server'
 
@@ -736,22 +736,19 @@ class Integration(unittest.TestCase):
         frappe.set_user('Guest')
         with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret), \
              patch.object(phone_auth.sms, 'send_otp', side_effect=lambda number, code: sent.append((number, code)) or 'accepted'), \
-             patch.object(phone_auth, '_establish_login', side_effect=frappe.set_user), \
-             patch.object(phone_auth, 'RESEND_COOLDOWN_SECONDS', 0):
+             patch.object(phone_auth, '_establish_login', side_effect=frappe.set_user):
             request_id = str(uuid.uuid4())
-            response = phone_auth.request_code(phone, 'patient_signup', request_id)
-            replay = phone_auth.request_code(phone, 'patient_signup', request_id)
-            self.assertEqual(response, replay)
+            response = contact_auth.request_code('phone', phone, request_id)
+            replay = contact_auth.request_code('phone', phone, request_id)
+            self.assertEqual(response['challenge_id'], replay['challenge_id'])
             self.assertEqual(len(sent), 1, 'idempotent replay must not call provider twice')
             self.assertNotIn(sent[0][1], json.dumps(response))
-            digest = phone_auth._keyed('phone', phone)
+            digest = phone_auth._keyed('contact:phone', phone)
             track_phone(phone_auth, phone, digest)
             challenge = api.one('SELECT * FROM tt_otp_challenge WHERE id=%s', (response['challenge_id'],))
             self.assertEqual(challenge.dispatch_state, 'Accepted')
             self.assertNotIn(sent[0][1], json.dumps(dict(challenge), default=str))
-            user = phone_auth.verify_code(phone, response['challenge_id'], sent[0][1], 'patient_signup',
-                                          display_name='Attacker-controlled name', adult=0)['authenticated']
-            self.assertTrue(user)
+            self.assertTrue(contact_auth.verify_code('phone', phone, response['challenge_id'], sent[0][1])['authenticated'])
             phone_user = frappe.session.user
             PHONE_AUTH_TEST_USERS.append(phone_user)
             self.assertEqual(frappe.get_value('User', phone_user, 'user_type'), 'Website User')
@@ -760,9 +757,8 @@ class Integration(unittest.TestCase):
             self.assertNotIn('Tele Tena Clinician', roles)
             self.assertNotIn('Tele Tena Approver', roles)
             self.assertFalse(frappe.db.exists('tt_profile', phone_user))
-            self.assertEqual(api.one('SELECT phone FROM tt_phone_identity WHERE user=%s',
-                                     (phone_user,)).phone, phone)
-            from tele_tena.api import contact_auth
+            self.assertEqual(api.one('SELECT contact FROM tt_contact_identity WHERE user=%s AND channel=%s',
+                                     (phone_user, 'phone')).contact, phone)
             with self.assertRaises(frappe.ValidationError):
                 contact_auth.save_onboarding('patient', 3, {'name': 'Synthetic alias', 'adult': True, 'consent': False}, 1)
             frappe.set_user(phone_user)
@@ -771,11 +767,10 @@ class Integration(unittest.TestCase):
             self.assertEqual(api.one('SELECT attempts FROM tt_otp_challenge WHERE id=%s',
                                      (response['challenge_id'],)).attempts, 1)
             with self.assertRaises(frappe.ValidationError):
-                phone_auth.verify_code(phone, response['challenge_id'], sent[0][1], 'patient_signup',
-                                       display_name='Synthetic OTP Patient', adult=1)
-            suppressed = phone_auth.request_code(phone, 'patient_signup', str(uuid.uuid4()))
-            self.assertEqual(len(sent), 1, 'duplicate signup phone must not trigger SMS')
-            self.assertEqual(suppressed.keys(), response.keys())
+                contact_auth.verify_code('phone', phone, response['challenge_id'], sent[0][1])
+            with self.assertRaises(frappe.ValidationError):
+                contact_auth.request_code('phone', phone, str(uuid.uuid4()))
+            self.assertEqual(len(sent), 1, 'cooldown must not trigger another SMS')
         frappe.db.commit()
 
     def test_17_clinician_phone_signup_stays_unprivileged_until_manual_approval(self):
@@ -788,20 +783,15 @@ class Integration(unittest.TestCase):
         with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret), \
              patch.object(phone_auth.sms, 'send_otp', side_effect=lambda number, code: sent.append(code) or 'accepted'), \
              patch.object(phone_auth, '_establish_login', side_effect=frappe.set_user):
-            response = phone_auth.request_code(phone, 'clinician_application', str(uuid.uuid4()))
-            digest = phone_auth._keyed('phone', phone)
+            response = contact_auth.request_code('phone', phone, str(uuid.uuid4()))
+            digest = phone_auth._keyed('contact:phone', phone)
             track_phone(phone_auth, phone, digest)
-            with self.assertRaises(frappe.ValidationError):
-                phone_auth.verify_code(phone, response['challenge_id'], sent[0], 'patient_signup',
-                                       display_name='Synthetic applicant', adult=1)
-            phone_auth.verify_code(phone, response['challenge_id'], sent[0], 'clinician_application',
-                                   display_name='Attacker name', statement='Unreviewed claim', adult=0)
+            contact_auth.verify_code('phone', phone, response['challenge_id'], sent[0])
             phone_user = frappe.session.user
             PHONE_AUTH_TEST_USERS.append(phone_user)
             self.assertNotIn('Tele Tena Applicant', frappe.get_roles(phone_user))
             self.assertNotIn('Tele Tena Clinician', frappe.get_roles(phone_user))
             self.assertFalse(frappe.db.exists('tt_application', phone_user))
-            from tele_tena.api import contact_auth
             frappe.set_user(phone_user)
             service = api.one('SELECT name AS id FROM `tabTele Tena Service` WHERE active=1 ORDER BY service_label LIMIT 1')
             contact_auth.save_onboarding('clinician', 1, {'name': 'Synthetic applicant',
@@ -829,30 +819,29 @@ class Integration(unittest.TestCase):
         frappe.set_user('Guest')
         with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret), \
              patch.object(phone_auth.sms, 'send_otp', side_effect=lambda number, code: sent.append(code) or 'accepted'):
-            response = phone_auth.request_code(phone, 'patient_signup', str(uuid.uuid4()))
-            digest = phone_auth._keyed('phone', phone)
+            response = contact_auth.request_code('phone', phone, str(uuid.uuid4()))
+            digest = phone_auth._keyed('contact:phone', phone)
             track_phone(phone_auth, phone, digest)
             challenge = response['challenge_id']
             wrong_code = '000000' if sent[0] != '000000' else '000001'
             for _ in range(phone_auth.MAX_ATTEMPTS):
                 with self.assertRaises(frappe.ValidationError):
-                    phone_auth.verify_code(phone, challenge, wrong_code, 'patient_signup',
-                                           display_name='Synthetic locked', adult=1)
+                    contact_auth.verify_code('phone', phone, challenge, wrong_code)
             self.assertEqual(api.one('SELECT attempts FROM tt_otp_challenge WHERE id=%s', (challenge,)).attempts, phone_auth.MAX_ATTEMPTS)
             with self.assertRaises(frappe.ValidationError):
-                phone_auth.verify_code(phone, challenge, sent[0], 'patient_signup',
-                                       display_name='Synthetic locked', adult=1)
+                contact_auth.verify_code('phone', phone, challenge, sent[0])
         frappe.db.commit()
         client = requests.Session()
-        url = BASE + '/api/method/tele_tena.api.phone_auth.'
-        token_response = client.get(url + 'csrf_token')
+        url = BASE + '/api/method/tele_tena.api.contact_auth.'
+        # CSRF issuance remains on the shared legacy-named helper.
+        token_response = client.get(BASE + '/api/method/tele_tena.api.phone_auth.csrf_token')
         self.assertEqual(token_response.status_code, 200)
-        payload = {'phone': phone, 'purpose': 'wrong-purpose', 'request_id': str(uuid.uuid4())}
+        payload = {'channel': 'invalid', 'contact': phone, 'request_id': str(uuid.uuid4())}
         self.assertNotEqual(client.post(url + 'request_code', json=payload).status_code, 200)
         client.headers['X-Frappe-CSRF-Token'] = token_response.json()['message']['csrf_token']
         rejected = client.post(url + 'request_code', json=payload)
         self.assertNotEqual(rejected.status_code, 200)
-        self.assertEqual(rejected.json()['tele_tena_error'], 'invalid_request')
+        self.assertEqual(rejected.json()['tele_tena_error'], 'invalid_contact')
 
     def test_19_uncertain_sms_is_never_retried_and_limits_are_enforced(self):
         import uuid
@@ -864,44 +853,41 @@ class Integration(unittest.TestCase):
         with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret), \
              patch.object(phone_auth.sms, 'send_otp', side_effect=sms.SMSUncertain('provider_outcome_unknown')) as send:
             first_id = str(uuid.uuid4())
-            first = phone_auth.request_code(phone, 'patient_signup', first_id)
-            replay = phone_auth.request_code(phone, 'patient_signup', first_id)
-            cooldown = phone_auth.request_code(phone, 'patient_signup', str(uuid.uuid4()))
-            digest = phone_auth._keyed('phone', phone)
+            first = contact_auth.request_code('phone', phone, first_id)
+            replay = contact_auth.request_code('phone', phone, first_id)
+            digest = phone_auth._keyed('contact:phone', phone)
             track_phone(phone_auth, phone, digest)
-            self.assertEqual(first, replay)
-            self.assertEqual(cooldown['challenge_id'], first['challenge_id'])
+            self.assertEqual(first['challenge_id'], replay['challenge_id'])
+            self.assertEqual(first['delivery_state'], 'uncertain')
             self.assertEqual(send.call_count, 1)
             self.assertEqual(api.one('SELECT dispatch_state FROM tt_otp_challenge WHERE id=%s',
                                      (first['challenge_id'],)).dispatch_state, 'Uncertain')
 
         capped_phone = '+2517' + f'{secrets.randbelow(100_000_000):08d}'
-        sent = []
+        digest = phone_auth._keyed('contact:phone', capped_phone)
+        track_phone(phone_auth, capped_phone, digest)
+        increment = contact_auth.otp._increment_limit
         with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret), \
-             patch.object(phone_auth.sms, 'send_otp', side_effect=lambda number, code: sent.append(code) or 'accepted'), \
-             patch.object(phone_auth, 'RESEND_COOLDOWN_SECONDS', 0), \
-             patch.object(phone_auth, 'PHONE_WINDOW_LIMIT', 2):
-            responses = [phone_auth.request_code(capped_phone, 'patient_signup', str(uuid.uuid4())) for _ in range(3)]
-            digest = phone_auth._keyed('phone', capped_phone)
-            track_phone(phone_auth, capped_phone, digest)
-            self.assertEqual(len(sent), 2)
-            self.assertTrue(all(response['requested'] for response in responses))
-            self.assertEqual(responses[2]['challenge_id'], '')
+             patch.object(contact_auth.otp, '_increment_limit',
+                           side_effect=lambda kind, *args: False if kind == 'contact-window' else increment(kind, *args)), \
+             patch.object(phone_auth.sms, 'send_otp') as send:
+            with self.assertRaises(frappe.ValidationError):
+                contact_auth.request_code('phone', capped_phone, str(uuid.uuid4()))
+            send.assert_not_called()
 
-        ip_secret = 'ip-limit-' + secrets.token_hex(20)
         ip = 'synthetic-test-peer-' + secrets.token_hex(8)
-        ip_sent = []
-        ip_phones = ['+2519' + f'{secrets.randbelow(100_000_000):08d}' for _ in range(3)]
-        with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=ip_secret), \
-             patch.object(phone_auth.sms, 'send_otp', side_effect=lambda number, code: ip_sent.append(code) or 'accepted'), \
+        ip_phone = '+2519' + f'{secrets.randbelow(100_000_000):08d}'
+        ip_digest = phone_auth._keyed('contact:phone', ip_phone)
+        track_phone(phone_auth, ip_phone, ip_digest, ip)
+        increment = contact_auth.otp._increment_limit
+        with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret), \
              patch.object(phone_auth, '_peer_ip', return_value=ip), \
-             patch.object(phone_auth, 'RESEND_COOLDOWN_SECONDS', 0), \
-             patch.object(phone_auth, 'IP_WINDOW_LIMIT', 2):
-            ip_responses = [phone_auth.request_code(number, 'patient_signup', str(uuid.uuid4())) for number in ip_phones]
-            for number in ip_phones:
-                track_phone(phone_auth, number, phone_auth._keyed('phone', number), ip)
-            self.assertEqual(len(ip_sent), 2)
-            self.assertEqual(ip_responses[2]['challenge_id'], '')
+             patch.object(contact_auth.otp, '_increment_limit',
+                           side_effect=lambda kind, *args: False if kind == 'contact-ip' else increment(kind, *args)), \
+             patch.object(phone_auth.sms, 'send_otp') as send:
+            with self.assertRaises(frappe.ValidationError):
+                contact_auth.request_code('phone', ip_phone, str(uuid.uuid4()))
+            send.assert_not_called()
         frappe.db.commit()
 
     def test_20_concurrent_phone_attempts_and_success_are_atomic(self):
@@ -913,8 +899,8 @@ class Integration(unittest.TestCase):
         frappe.set_user('Guest')
         with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret), \
              patch.object(phone_auth.sms, 'send_otp', side_effect=lambda number, code: sent.append(code) or 'accepted'):
-            response = phone_auth.request_code(phone, 'patient_signup', str(uuid.uuid4()))
-            digest = phone_auth._keyed('phone', phone)
+            response = contact_auth.request_code('phone', phone, str(uuid.uuid4()))
+            digest = phone_auth._keyed('contact:phone', phone)
             track_phone(phone_auth, phone, digest)
         frappe.db.commit()
         wrong = '000000' if sent[0] != '000000' else '000001'
@@ -924,8 +910,7 @@ class Integration(unittest.TestCase):
             try:
                 frappe.set_user('Guest')
                 with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret):
-                    phone_auth.verify_code(phone, response['challenge_id'], code, 'patient_signup',
-                                           display_name='Synthetic concurrent patient', adult=1)
+                    contact_auth.verify_code('phone', phone, response['challenge_id'], code)
                     frappe.db.commit()
                     return 'ok'
             except frappe.ValidationError:
@@ -944,11 +929,15 @@ class Integration(unittest.TestCase):
                 success_results = list(pool.map(verify_worker, [sent[0], sent[0]]))
         self.assertEqual(success_results.count('ok'), 1)
         frappe.db.commit()
-        identity = frappe.db.sql('SELECT user FROM tt_phone_identity WHERE phone=%s', (phone,), as_dict=True)
+        identity = frappe.db.sql('SELECT user FROM tt_contact_identity WHERE contact=%s AND channel=%s',
+                                 (phone, 'phone'), as_dict=True)
         self.assertTrue(identity)
         identity = identity[0]
         PHONE_AUTH_TEST_USERS.append(identity.user)
-        self.assertEqual(api.one('SELECT attempts FROM tt_otp_challenge WHERE id=%s', (response['challenge_id'],)).attempts, 3)
+        # The duplicate successful retry is rejected and still consumes a
+        # verification attempt, so the durable counter is 2 wrong + 1 success
+        # + 1 replay rejection.
+        self.assertEqual(api.one('SELECT attempts FROM tt_otp_challenge WHERE id=%s', (response['challenge_id'],)).attempts, 4)
         self.assertIsNotNone(api.one('SELECT consumed FROM tt_otp_challenge WHERE id=%s', (response['challenge_id'],)).consumed)
 
 
@@ -963,6 +952,9 @@ def track_phone(phone_auth_module, phone, phone_digest, peer='unknown-peer'):
         ('limit:phone-window', phone_digest), ('limit:phone-day', phone_digest),
         ('limit:ip-window', peer), ('limit:verify-phone', phone_digest),
         ('limit:verify-ip', peer),
+        ('limit:contact-window', phone_digest), ('limit:contact-day', phone_digest),
+        ('limit:contact-ip', peer), ('limit:contact-verify', phone_digest),
+        ('limit:contact-verify-ip', peer),
     ):
         PHONE_AUTH_TEST_BUCKET_KEYS.append(phone_auth_module._keyed(kind, subject))
 

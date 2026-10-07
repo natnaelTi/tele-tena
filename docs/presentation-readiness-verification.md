@@ -18,6 +18,13 @@
 - `tests/contact_auth.py`: 7/7 passed. These tests exercise enabled-registration
   OTP state using a mocked email provider and a test-only enabled policy; they
   did not change the invited site's configuration and did not send email.
+- `tests/integration.py`: 24/24 passed against the same built Frappe preview.
+  The run used a scoped, temporary setting change on this disposable site to
+  exercise enabled phone/patient/clinician registration, restored the original
+  site config in a `finally` cleanup, and reloaded only this isolated Gunicorn.
+  SMS transport and OTP-key access were mocked in tests; no SMS was sent. The
+  HTTP regressions used `http://127.0.0.1:8017`, not the obsolete Vite default
+  on port 5173. After the run the preview is back in invited-review mode.
 - `scripts/browser-clinic-registration.cjs`: passed a real browser journey
   through the built React package and Frappe APIs: applicant submission →
   reviewer verification → affiliation request → separate reviewer decision.

@@ -27,6 +27,13 @@ only for that enabled-registration state-machine suite; no mail was sent and
 the site's flags were not changed. Screenshots are in
 `docs/screenshots/clinic-review/`.
 
+The Frappe integration suite also passed 24/24 after aligning its HTTP origin
+with the built port 8017 and replacing stale calls to the retired guest-phone
+API with the current `contact_auth` API. The disposable site's phone and public
+registration flags were temporarily enabled for that run and restored in
+cleanup; the preview is again invited-only. SMS transport was mocked and no
+live message was sent.
+
 This is partial clinic onboarding/review, not clinic operations. Memberships,
 staff invitations, shared calendars/resources, clinic billing and encounter
 grants remain pending. Responsive clinic/admin review, real SMTP/SMS, mobile
