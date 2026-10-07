@@ -57,6 +57,29 @@ Date: 2026-10-08
 - GitHub CI for PR #26 passed frontend builds on Node 22.23.3 and Node 24.13.0,
   plus Python syntax jobs on 3.12 and 3.14.2. The local Bench has Node
   22.23.3; Node 24.13.0 was not installed locally.
+- The retained disposable site `tele-tena-clinic-access-fresh.localhost` is
+  installed with Frappe 15, ERPNext and `tele_tena`; direct read-only schema
+  inspection found all checked core, subledger, reconciliation, feedback and
+  appointment-review tables plus all 23 `tele_tena` patch-log entries. The
+  latest three lifecycle patches are present. Its first-install setup predates
+  this checkpoint; a database-and-files backup was taken and `bench migrate`
+  was repeated successfully on 2026-10-08. Existing records were not reset.
+- The built Frappe browser suite passed against that site on a temporary,
+  loopback-only Gunicorn port (8021), with real backend login, onboarding,
+  availability load, booking, privacy snapshot, and simulated reservation.
+  It also passed offline navigation fallback, tour navigation/replay/missing
+  target recovery, patient/clinician/admin layouts, preflight, and responsive
+  320/390/768/1440 captures plus the suite's 200%-zoom-equivalent viewport.
+  The calendar assertion measured `scrollTop=320px` before responsive captures
+  for the synthetic 09:00 opening interval; the rendered 1440px image begins at
+  09:00 while later hours remain accessible. Browser-only OTP delivery was
+  mocked; pre-created synthetic accounts were used, so this is not live SMS or
+  complete new-account phone verification.
+  Captures are retained under `docs/screenshots/scope-lifecycle-current/`.
+- Tour target lookup now selects a visible target among responsive duplicates
+  and observes DOM changes, so hidden mobile/desktop navigation duplicates do
+  not mask a genuinely missing target. The browser regression removes duplicate
+  tour targets and verifies the accessible recovery notice.
 - Read-only site status reports scheduler active
   (`System Settings.enable_scheduler=true`, `pause_scheduler=false`); `bench
   doctor` reports one worker online. These processes are shared across the
@@ -73,11 +96,11 @@ Date: 2026-10-08
 - The populated operational review card has backend coverage but has not yet
   been exercised in the rendered browser. Only the reviewer empty state was
   captured.
-- Fresh empty-site installation is pending because this WSL session has no
-  non-interactive MariaDB administrator access. The latest harness change
-  retains only the named disposable site/database on a failed browser run; no
-  current temporary credential file is present. The existing Frappe 16 test
-  site was preserved.
+- A clean empty-site install was not repeated at this final frontend-only
+  commit. The earlier disposable install is retained and its schema/repeat
+  migration checks are documented above. No temporary database administrator
+  or credential file is present; the separate Frappe 16 compatibility site was
+  preserved.
 - Isolated scheduler/worker execution has not been completed. Because scheduler and worker services are
   shared, automatic date-expiry scanning is not claimed until the new hook is
   verified without disturbing other sites. Explicit reviewer suspension/expiry
@@ -86,9 +109,8 @@ Date: 2026-10-08
   semantics, reminders, malware scanning and patient-care continuity policy
   remain human/external decisions.
 
-The production asset manifest identifies source
-`03435bd3a4ae31c263c0bc753222763f90c2b536` in
-`tele_tena/public/review/release.json`; the preview is an isolated Frappe 15
-site at `http://127.0.0.1:8017/teletena/` and does not use Vite. Frappe 16
-compatibility was verified through migrations and backend tests on the
-separate compatibility bench, not by replacing this review preview.
+The current source/build commit is `2f62775` (full SHA recorded by Git and the
+asset manifest in `tele_tena/public/review/release.json`). The preview is an
+isolated Frappe 15 site at `http://127.0.0.1:8017/teletena/` and does not use
+Vite. Frappe 16 compatibility was verified through migrations and backend
+tests on the separate compatibility bench, not by replacing this preview.

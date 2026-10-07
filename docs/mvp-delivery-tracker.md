@@ -11,12 +11,16 @@ booking/financial state. Frappe 15 and the separate Frappe 16.2.1 / ERPNext
 suite and repeat migration through v1.21; Frappe 16 `pip check` is clean. CI
 passed frontend on Node 22 and 24 and Python syntax on 3.12 and 3.14.2. The
 packaged `/teletena/admin/vetting` reviewer empty-state rendered without browser
-errors; see the screenshot in the verification report. Fresh empty-site install,
-Frappe 16 browser verification, populated queue browser verification and
-isolated scheduler execution remain pending. The shared review-site scheduler
-is enabled and one shared-bench worker is online, but execution of the new hook
-is unverified. Automatic date-expiry discovery is not claimed until an isolated
-worker check passes. See
+errors; see the screenshot in the verification report. The disposable Frappe 15
+site's installed schema and repeat migration were checked, and the production
+browser journey passed for registration/onboarding, booking, tours and responsive
+screens. A clean-site creation at the final frontend-only commit, Frappe 16
+browser verification, populated reviewer queue and isolated scheduler execution
+remain pending. The shared review-site scheduler is enabled and one shared-bench
+worker is online, but execution of the new hook is unverified. Automatic
+date-expiry discovery is not claimed until an isolated worker check passes. This
+is still a narrow vetting lifecycle slice; the approved A–I scope and screen
+inventory are not complete. See
 [`scope-lifecycle-verification.md`](scope-lifecycle-verification.md).
 
 ## Current active continuation — consultation extensions — 2026-10-08

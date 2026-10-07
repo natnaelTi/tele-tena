@@ -5541,7 +5541,7 @@
       "prototype_route": "h08",
       "route": "Help & tours entry in workspace",
       "actor": "Signed-in account owner; account type controls editable fields",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_profile",
         "tt_preferences",
@@ -5589,8 +5589,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H08) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Versioned server-side tour state, role-scoped route steps, dismissal, replay, missing-target recovery and reduced-motion behavior; current source 2f6277519174490374cb395ac4b96d6c92fa3866",
+        "current_local": "Production-built Frappe 15 browser suite on tele-tena-clinic-access-fresh.localhost verified patient/clinician/admin tours, route transitions, dismissal/replay and missing-target recovery at 320/390/768/1440 CSS px plus 200%-equivalent viewport; see docs/screenshots/scope-lifecycle-current/tour-*.png and docs/scope-lifecycle-verification.md. Provisional Amharic/Afaan Oromo remain unreviewed by native speakers."
       }
     },
     {
