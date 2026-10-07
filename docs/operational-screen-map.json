@@ -2661,7 +2661,7 @@
       "module": "Consultations/records",
       "backend_reference": "consultations, presentation",
       "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Mutual reschedule proposal, response and persistence passed in the built local browser; broader consultation-detail acceptance remains pending.",
       "prototype_route": "e03",
       "route": "/patient/consultations/:id and /clinician/consultations/:id (appointment detail; reschedule proposal panel)",
       "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
@@ -2722,8 +2722,9 @@
       "verification_evidence": {
         "implementation": "Mutual rescheduling backend, UI panel and v1.15 persistence added on feat/mutual-rescheduling.",
         "backend": "Frappe presentation regression covers participant permissions, changed-payload retry rejection, idempotent submission/acceptance, unchanged reservation and successful in-place move.",
-        "browser": "Pending built-browser interaction run.",
-        "migration": "v1.15 applied and repeated successfully on isolated tele-tena-pr12-fresh.localhost after a site backup."
+        "browser": "Passed against http://127.0.0.1:8017/teletena/ using independent synthetic patient/clinician sessions: generate/select slot → propose → clinician accepts → persisted appointment remains Booked with proposal Accepted. Desktop screenshots: docs/screenshots/mutual-rescheduling/patient-proposal-1440.png and clinician-response-1440.png.",
+        "migration": "v1.15 applied and repeated successfully on isolated tele-tena-pr12-fresh.localhost after a site backup.",
+        "responsive": "Desktop 1280px functional screenshots inspected. 320/390/768/1440, 200% zoom, keyboard-only and Amharic/Afaan Oromo visual acceptance remain pending."
       }
     },
     {

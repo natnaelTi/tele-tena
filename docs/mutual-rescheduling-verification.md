@@ -41,6 +41,11 @@ suite passed 26 tests on the migrated site. Focused regressions also passed for
 idempotent propose/accept, unauthorized participant and third-party access,
 unchanged reservation and successful in-place movement, and a competing booking
 making the proposed slot unavailable. The frontend production build and lint
-completed; lint retains existing warnings and Vite reports the existing large
-LiveKit bundle warning. Packaged-browser journey and screen-level visual review
-remain pending. No fresh install or physical-device test is claimed.
+completed; lint retains pre-existing warnings and Vite reports the existing
+large LiveKit bundle warning. The packaged `/teletena/` browser journey passed
+with independent synthetic patient and clinician sessions: patient selected a
+server-generated slot and proposed it, clinician saw and accepted it, and the
+appointment/proposal were confirmed persisted as `Booked`/`Accepted`. The
+captured desktop screens are `docs/screenshots/mutual-rescheduling/`. This is
+functional desktop evidence, not full responsive/accessibility acceptance. No
+fresh install, physical-device, or native-language approval is claimed.

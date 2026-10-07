@@ -80,7 +80,7 @@ function ReschedulePanel({appointment,refresh}:{appointment:any;refresh:()=>Prom
   const current=appointment.reschedule;
   const propose=async()=>{
     if(!selected||!retryKey)return;
-    await action.run(async()=>{await journeyApi.proposeReschedule(appointment.id,selected,retryKey);setSelected("");setRetryKey("");await refresh();},w('A new time is waiting for your response.'));
+    await action.run(async()=>{await journeyApi.proposeReschedule(appointment.id,selected,retryKey);setSelected("");setRetryKey("");await refresh();},"");
   };
   return <Card className="reschedule-panel">
     <h2>{w('Request a new time')}</h2>
