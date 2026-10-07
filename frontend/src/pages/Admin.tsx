@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { api } from "../api";
 import { journeyApi } from "../journey-api";
 import { PageTitle, date, money } from "../components/Domain";
@@ -92,6 +92,8 @@ export function Scopes() {
   const [policyService, setPolicyService] = useState("");
   const [policyReason, setPolicyReason] = useState("");
   const policy = immediateServices.data?.find((item) => item.id === policyService);
+  const loadPolicyHistory = useCallback(() => policyService ? journeyApi.immediatePolicyHistory(policyService) : Promise.resolve([]), [policyService]);
+  const policyHistory = useResource(loadPolicyHistory);
   return (
     <>
       <PageTitle
@@ -178,15 +180,17 @@ export function Scopes() {
         {immediateServices.error ? <InlineNotice tone="danger">{w("Service policies could not be loaded.")}</InlineNotice> : !immediateServices.data ? <Skeleton /> : <>
           <Select label={w("Service") } value={policyService} onChange={(e)=>{setPolicyService(e.target.value);setPolicyReason("");}}>
             <option value="">{w("Choose a service")}</option>
-            {immediateServices.data.map(item=><option value={item.id} key={item.id}>{item.label} · {item.catalog_status}</option>)}
+            {immediateServices.data.map(item=><option value={item.id} key={item.id}>{item.label} · {item.catalog_status} · {item.id}</option>)}
           </Select>
           {policy && <>
             <p className="supporting">{policy.immediate_care_enabled ? w("Immediate requests enabled") : w("Immediate requests paused")} · {w("Definition")}: {policy.definition_version || "—"}</p>
-            <TextField label={w("Review reason") } value={policyReason} onChange={e=>setPolicyReason(e.target.value)} maxLength={1000} hint={w("At least 20 characters. This is retained in the review history.")} />
+            <TextField label={w("Review reason") } value={policyReason} onChange={e=>setPolicyReason(e.target.value)} maxLength={1000} hint={w("At least 20 characters. Record service-level reasoning; do not include patient data. This is retained in the review history.")} />
             <div className="actions">
               <Button disabled={action.busy || !policyReason.trim() || !!policy.immediate_care_enabled} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.setImmediatePolicy(policy.id,true,policyReason,crypto.randomUUID());setPolicyReason("");await immediateServices.refresh();},w("Immediate requests enabled for this service."))}>{w("Enable immediate requests")}</Button>
               <Button variant="secondary" disabled={action.busy || !policyReason.trim() || !policy.immediate_care_enabled} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.setImmediatePolicy(policy.id,false,policyReason,crypto.randomUUID());setPolicyReason("");await immediateServices.refresh();},w("Immediate requests paused for this service."))}>{w("Pause immediate requests")}</Button>
             </div>
+            <h3>{w("Recent policy decisions")}</h3>
+            {policyHistory.error ? <InlineNotice tone="danger">{w("Policy history could not be loaded.")}</InlineNotice> : policyHistory.data?.length ? <ul className="policy-history">{policyHistory.data.map((event:any)=><li key={event.id}><strong>{event.enabled ? w("Immediate requests enabled") : w("Immediate requests paused")}</strong><span className="supporting"> · {date(event.created)} · {event.reviewer}</span><p>{event.reason}</p></li>)}</ul> : <p className="supporting">{w("No policy decisions recorded yet.")}</p>}
           </>}
         </>}
       </Card>
