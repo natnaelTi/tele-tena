@@ -28,6 +28,7 @@ from tele_tena.api import trust
 from tele_tena.api import clinics
 from tele_tena.api import clinic_access
 from tele_tena.api import extensions
+from tele_tena.api import service_policy
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -1088,6 +1089,65 @@ class Presentation(unittest.TestCase):
                 open_requests.set_request_presence(True)
             self.assertEqual(frappe.local.response.get('tele_tena_error'), 'no_immediate_capacity')
             self.assertIn('no_immediate_capacity', open_requests.request_presence()['reasons'])
+
+    def test_immediate_service_policy_requires_reviewer_and_is_audited_idempotently(self):
+        service = fixtures.PREFIX + '-immediate-policy-' + secrets.token_hex(3)
+        fixtures.login('admin')
+        journey.save_service(service, 'Synthetic immediate policy')
+        reason = 'Synthetic reviewer approved the bounded immediate-care workflow.'
+        key = 'policy-' + secrets.token_hex(12)
+        try:
+            with patch('tele_tena.review.enabled', return_value=True):
+                self.assertTrue(any(row.id == service for row in service_policy.immediate_services()))
+                changed = service_policy.set_immediate_policy(service, True, reason, key)
+                self.assertTrue(changed['changed'])
+                replay = service_policy.set_immediate_policy(service, True, reason, key)
+                self.assertTrue(replay['replayed'])
+                self.assertEqual(changed['event'], replay['event'])
+                with self.assertRaises(frappe.ValidationError):
+                    service_policy.set_immediate_policy(service, False, reason, key)
+                self.assertTrue(frappe.db.get_value('Tele Tena Service', service,
+                                                    'immediate_care_enabled'))
+                events = service_policy.immediate_policy_history(service)
+                self.assertEqual(len(events), 1)
+                self.assertEqual(events[0].reviewer, fixtures.USERS['admin'])
+                self.assertEqual(events[0].reason, reason)
+                request_id = str(uuid.uuid4())
+                frappe.db.sql('''INSERT INTO tt_open_request
+                    (id,patient,state,urgency,service,language,consultation_format,request_text,
+                     disclosure_snapshot,max_price_minor,earliest_start,latest_start,timezone,
+                     retry_key,payload_hash,sharing_choices,published_at,expires_at)
+                    VALUES (%s,%s,'Open','immediate',%s,'en','video','Synthetic active request',
+                     '{}',NULL,NULL,DATE_ADD(UTC_TIMESTAMP(6),INTERVAL 20 MINUTE),
+                     'Africa/Addis_Ababa',%s,REPEAT('a',64),'{}',UTC_TIMESTAMP(6),
+                     DATE_ADD(UTC_TIMESTAMP(6),INTERVAL 15 MINUTE))''',
+                    (request_id, fixtures.USERS['p1'], service, 'policy-request-' + secrets.token_hex(6)))
+                with self.assertRaises(frappe.ValidationError):
+                    service_policy.set_immediate_policy(service, False, reason,
+                                                        'policy-disable-' + secrets.token_hex(12))
+                frappe.db.sql('DELETE FROM tt_open_request WHERE id=%s', (request_id,))
+                with self.assertRaises(frappe.PermissionError):
+                    fixtures.login('c1')
+                    service_policy.immediate_services()
+                fixtures.login('admin')
+                frappe.local.tele_tena_service_policy_action = False
+                doc = frappe.get_doc('Tele Tena Service', service)
+                doc.immediate_care_enabled = 0
+                with self.assertRaises(frappe.PermissionError):
+                    doc.save()
+                disabled = service_policy.set_immediate_policy(
+                    service, False, reason, 'policy-disable-' + secrets.token_hex(12))
+                self.assertTrue(disabled['changed'])
+                doc = frappe.get_doc('Tele Tena Service', service)
+                doc.immediate_care_enabled = 1
+                with self.assertRaises(frappe.PermissionError):
+                    doc.save()
+        finally:
+            fixtures.login('admin')
+            if 'request_id' in locals():
+                frappe.db.sql('DELETE FROM tt_open_request WHERE id=%s', (request_id,))
+            frappe.db.sql('DELETE FROM tt_immediate_service_policy_event WHERE service=%s', (service,))
+            frappe.db.sql('DELETE FROM `tabTele Tena Service` WHERE name=%s', (service,))
 
     def test_two_patients_cannot_claim_one_offer_slot_concurrently(self):
         offering = fixtures.Integration.offers['c1']

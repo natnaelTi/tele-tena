@@ -289,3 +289,14 @@ single existing reservation are preserved. The demonstration proposal expiry is
 48 hours by default and configurable per site; it is not a production policy.
 See `mutual-rescheduling-verification.md` for the current implementation and
 verification state.
+
+## Immediate-care service policy
+
+Immediate-care routing has a separate manually reviewed service-level policy.
+General clinician approval, individual scope approval, offering publication,
+calendar availability, and the clinician's short-lived request-presence lease
+are independent requirements. Changing the service policy requires an
+authorized approver, a reason, and an append-only audit event. Legacy test
+services are eligible only on a site explicitly bound to review mode; migration
+does not enable immediate care. The three-minute target is measured, not
+promised.

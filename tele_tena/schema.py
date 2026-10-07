@@ -108,3 +108,5 @@ def install():
     scope_appointment_review()
     from tele_tena.patches.v1_21_scope_review_history import execute as scope_review_history
     scope_review_history()
+    from tele_tena.patches.v1_22_immediate_service_policy import execute as immediate_service_policy
+    immediate_service_policy()
