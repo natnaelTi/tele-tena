@@ -1096,7 +1096,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B09) and design-handoff.md",
         "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
-        "current_local": "Frappe 15 isolated presentation regressions passed 27/27; built-browser applicant sign-in, two PDF revisions, submission, persistence on revisit, and reviewer-visible submitted evidence passed on tele-tena-pr12-fresh.localhost. Evidence screenshots: /tmp/tele-tena-presentation-review/scope-evidence/applicant-revisions.png. Patch v1.16 repeat migration passed after backup. Fresh-empty-site check remains pending; no external credential validation or malware scanning is claimed."
+        "current_local": "Frappe 15 isolated presentation regressions passed 27/27; built-browser applicant sign-in, two PDF revisions, submission, persistence on revisit, and reviewer-visible submitted evidence passed on tele-tena-pr12-fresh.localhost. Frappe 16.2.1/ERPNext 16.1.0/Python 3.14.2 disposable site was backed up, migrated v1.8→v1.16, repeat-migrated, and passed the 27-test backend suite. Evidence screenshots: /tmp/tele-tena-presentation-review/scope-evidence/applicant-revisions.png. Fresh-empty-site check and Frappe 16 browser journey remain pending; no external credential validation or malware scanning is claimed."
       }
     },
     {
@@ -1166,7 +1166,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B10) and design-handoff.md",
         "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
-        "current_local": "Frappe 15 isolated presentation regressions passed 27/27, including owner/reviewer authorization and assessment evidence snapshot. Built-browser reviewer queue displayed submitted applicant and evidence; authorized reviewer downloaded the newest private PDF revision successfully. Screenshot: /tmp/tele-tena-presentation-review/scope-evidence/reviewer-evidence.png. Patch v1.16 repeat migration passed after backup. Fresh-empty-site check remains pending; no external credential validation or malware scanning is claimed."
+        "current_local": "Frappe 15 isolated presentation regressions passed 27/27, including owner/reviewer authorization and assessment evidence snapshot. Built-browser reviewer queue displayed submitted applicant and evidence; authorized reviewer downloaded the newest private PDF revision successfully. Frappe 16.2.1/ERPNext 16.1.0/Python 3.14.2 disposable site was backed up, migrated v1.8→v1.16, repeat-migrated, and passed the 27-test backend suite. Screenshot: /tmp/tele-tena-presentation-review/scope-evidence/reviewer-evidence.png. Fresh-empty-site check and Frappe 16 browser journey remain pending; no external credential validation or malware scanning is claimed."
       }
     },
     {

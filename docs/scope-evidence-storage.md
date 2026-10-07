@@ -49,6 +49,16 @@ authorized download of the newest revision. The screenshot evidence is in
 200 and uses the packaged Frappe app, not Vite. This browser run exercised the
 retained migrated site; it is not a fresh-empty-database install check.
 
+The Frappe 16.2.1 / ERPNext 16.1.0 / Python 3.14.2 compatibility bench was
+backed up before upgrading its disposable `tele-tena-pr2-test.localhost` site
+from v1.8 through v1.16. The v1.16 patch and repeat migration both completed;
+the current branch's `tests/presentation.py` then passed 27/27 on that site.
+The suite uses the configured compatibility Bench root and an explicit English
+test locale so it does not depend on the source checkout's path or an HTTP
+language negotiation context. This is an existing-site migration check, not a
+fresh-empty-database install. The Frappe 16 browser journey has not been run;
+the rendered applicant/reviewer browser flow above is on Frappe 15.
+
 Fresh-empty-site installation for this patch remains pending. Human credential
 checks, medical-lead approval of the proposed rubric and external malware
 scanning are separate gates.
