@@ -124,3 +124,17 @@ before migration, install matching application code, migrate and verify wallet /
 subledger equality before restarting matching processes. If an old writer
 remains after cutover, financial commands fail closed on projection mismatch;
 restarting old code can reintroduce legacy-only writes.
+
+## v1.13 owner-level reconciliation audit
+
+`tt_financial_reconciliation` is a private app-owned operational table because it
+contains per-owner balances and legacy integrity findings and must not be
+available through Desk, generic DocType APIs, or reports. Migration compares
+the existing event projection, immutable v1.7 wallet snapshot and new subledger
+for each patient; it records exact opening-boundary and unknown-event cases but
+never adjusts any source. A `ReviewRequired` owner is blocked from further
+patient-fund mutations. Only an explicitly authorized reviewer can accept the
+unchanged current snapshot with a reason, and only if wallet and subledger agree.
+That audited choice preserves the unresolved historical difference; it does not
+claim to reconstruct missing history or create a balancing entry. All future
+financial records remain on the existing subledger path.

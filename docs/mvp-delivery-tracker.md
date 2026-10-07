@@ -1,4 +1,20 @@
-# Tele-tena MVP delivery tracker
+# TeleTena delivery tracker
+
+## Current implementation checkpoint — 2026-10-07
+
+The active local branch is `feat/teletena-operational-completion` at the PR #15
+base commit `3e0965c5fdf6485d945756b382c0a3c008450058`; it preserves PR #14 →
+#13 → #12 ancestry. PR #15 is open/draft and has passing frontend/syntax CI but
+no executed Frappe integration suite. PR #11 remains open separately. PRs #7–#10
+are merged; Selfmade remains unchanged. The WSL Frappe 15 `erp.localhost` site was
+backed up before schema work and has not been migrated by this branch.
+
+The expanded approved scope is tracked across A–I in `operational-design-integration.md`.
+The 142-screen acceptance map is `operational-screen-map.json`; its status values
+are evidence states and are not inferred from a rendered page alone. Current
+financial work adds a versioned reconciliation audit/hold; it is not yet run on
+a disposable site. The production-built review route has not yet been established
+for this source SHA.
 
 Consolidated 2026-10-02: PRs #7, #8, #9 and #10 are merged into `main` at `4cc0be9a0a96c3b209d07b47fd5e7c46ab4c31a2`. The Selfmade site remains pinned to its separately installed commit; merging did not deploy or enable hosted phone access. Earlier PRs #3/#4 are merged through preserved ancestry; PR #5 was superseded. The hosted LiveKit Cloud End/rejoin/cached-token assertions passed with automated two-browser fake-media. Status describes demonstration evidence, not production readiness. Presentation release implementation and verification are tracked in `docs/presentation-readiness-verification.md`; [the next design inventory](design-update-inventory.md) maps every current route and component.
 
@@ -66,6 +82,26 @@ synthetic seeded patient mismatch after an old loopback test worker had written
 legacy events without subledger postings. The records were preserved and no
 release claim is based on reconciling that account; a fresh isolated site is
 needed for clean financial cutover verification.
+
+### Expanded product scope status (2026-10-07)
+
+| Approved area | Current status | Evidence / remaining work |
+|---|---|---|
+| Extracted design, React design system, all 142 screens | partial | Existing React flows remain authoritative and the visual tokens now begin moving toward the extracted Inter/blue–teal reference. Screen-level map covers 142 concepts. Most routes still need direct visual and connected interaction review; prototype-only states are not accepted. |
+| Clinician vetting and service catalog | partial | Native per-scope application, reviewer decision and draft catalog exist; proposed rubric v1.0 remains subject to medical-lead approval. Evidence-by-scope, affiliation verification, license renewal/suspension/appeal operations and approved clinical terminology review remain. |
+| Open requests, private offers and progressive routing | partial | PR #13/#14 implement persisted request/offer state, eligibility, presence and bounded waves. PR #15 adds owned paginated history, awaiting Frappe 15 integration/browser verification. Three-minute results require pilot coverage and are not guaranteed. |
+| Owner-level legacy financial reconciliation | implementation in progress | New v1.13 migration records legacy-event, wallet-snapshot, subledger and exact opening-boundary differences without changing existing records. Mismatched owners are held until an authorized reasoned snapshot decision. Fresh/upgrade/repeat tests on a disposable site remain pending. |
+| Extensions and dispute/refund policy | pending | No prefunded explicit extension workflow. Refunds/disputes after release or payout state remain gated for authorized operations; no negative balance or history edits are allowed. |
+| Clinic operations and record grants | pending | Membership, staff roles, verified affiliations, calendars/resources and explicit encounter grants are not implemented. |
+| Adult couples/family care | pending | Separate participant identity, invitations, per-person consent/disclosure, multi-party call permissions and recipient-specific documentation are absent. |
+| Laboratory and diagnostics | pending | The v1.12 inactive typed-attribute example is a schema illustration only. Partners, orders, specimen custody, processing, result review/correction/release and integration are absent. |
+| Subscriptions | pending | No durable plan entitlements or provider event workflow. Basic records must remain outside any subscription gate. |
+| Second opinions and medical travel | pending | No case-sharing, jurisdiction workflow, conditional estimate/proposal or coordination records. |
+| Administration and operations | partial | Clinician/scope review, financial disputes and request administration exist in slices. Clinic/lab/metrics/support and scoped financial operations remain. |
+
+Status distinction: “implemented” describes behavior covered by code and listed
+checks; “verified” requires the named current-environment run; “external” means
+live provider, clinical, legal or partner acceptance is still needed.
 
 ## Selfmade review packaging
 
