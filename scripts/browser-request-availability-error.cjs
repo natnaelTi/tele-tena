@@ -20,27 +20,44 @@ let checkpoint = 'launch'
   try {
     const actualContext = await browser.newContext()
     const actualPage = await actualContext.newPage()
-    checkpoint = 'real clinician sign-in'
+    checkpoint = 'real clinician sign-in page'
     await actualPage.goto(app + '/sign-in')
+    checkpoint = 'select email sign-in'
     await actualPage.getByRole('button', { name: 'Use email instead' }).click()
+    checkpoint = 'enter clinician credentials'
     await actualPage.getByLabel('Email', { exact: true }).fill(account)
     await actualPage.getByLabel('Password', { exact: true }).fill(credentials[account])
+    checkpoint = 'submit clinician credentials'
     await actualPage.getByRole('button', { name: 'Sign in', exact: true }).click()
+    checkpoint = 'wait for clinician workspace'
     await actualPage.waitForURL(/\/teletena\/clinician(?:\/|$)/)
+    checkpoint = 'set review language for assertions'
+    await actualPage.getByLabel('Language / ቋንቋ / Afaan').selectOption('en')
+    checkpoint = 'wait for live readiness reasons'
+    await actualPage.screenshot({ path: '/tmp/tele-tena-presentation-review/request-readiness/live-state.png', fullPage: true })
+    console.log(`READINESS_DIAGNOSTIC: languageLink=${await actualPage.getByRole('link', { name: 'Add a care language', exact: true }).count()}; immediatePolicyLink=${await actualPage.getByRole('link', { name: 'Ask a reviewer to enable immediate requests for a service', exact: true }).count()}; goAvailableDisabled=${await actualPage.getByRole('button', { name: 'Go available', exact: true }).isDisabled().catch(()=>false)}`)
     await actualPage.getByRole('link', { name: 'Add a care language', exact: true }).waitFor()
+    checkpoint = 'wait for immediate policy setup link'
     await actualPage.getByRole('link', { name: 'Ask a reviewer to enable immediate requests for a service', exact: true }).waitFor()
+    console.log(`READINESS_ASSERTIONS: goAvailableDisabled=${await actualPage.getByRole('button', { name: 'Go available', exact: true }).isDisabled()}; pausedLabelCount=${await actualPage.getByText('Requests paused', { exact: true }).count()}`)
     assert.equal(await actualPage.getByRole('button', { name: 'Go available', exact: true }).isDisabled(), true)
     assert.equal(await actualPage.getByText('Requests paused', { exact: true }).count(), 1)
     await actualPage.setViewportSize({ width: 320, height: 900 })
     const mobileNav = actualPage.getByRole('navigation', { name: 'Mobile workspace', exact: true })
+    checkpoint = 'show mobile workspace navigation'
     await mobileNav.waitFor({ state: 'visible' })
+    checkpoint = 'find mobile availability shortcut'
     await mobileNav.getByRole('link', { name: 'Availability', exact: true }).waitFor()
     const moreButton = mobileNav.getByRole('button', { name: 'More', exact: true })
+    checkpoint = 'open mobile more menu'
     await moreButton.click()
     const moreDialog = actualPage.getByRole('dialog', { name: 'More workspace links', exact: true })
+    checkpoint = 'inspect mobile more menu'
     await moreDialog.getByRole('link', { name: 'Care records', exact: true }).waitFor()
+    checkpoint = 'close mobile more menu'
     await actualPage.keyboard.press('Escape')
     await moreDialog.waitFor({ state: 'detached' })
+    checkpoint = 'restore mobile menu focus'
     assert.equal(await moreButton.evaluate(element => element === document.activeElement), true)
     const screenshots = '/tmp/tele-tena-presentation-review/request-readiness'
     fs.mkdirSync(screenshots, { recursive: true })
