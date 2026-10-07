@@ -49,6 +49,9 @@ async function main() {
     const guest = await pageFor()
     mark('homepage screenshots')
     await guest.goto(base)
+    if (new URL(base).pathname === '/teletena') {
+      await guest.waitForURL(url => new URL(url).pathname === '/teletena/')
+    }
     await guest.getByRole('heading', { name: 'Find support. Make time for care.' }).waitFor()
     await guest.getByRole('heading', { name: 'Talk to someone who fits your needs.' }).waitFor()
     await capture(guest, 'homepage', [320, 390, 768, 1440])
