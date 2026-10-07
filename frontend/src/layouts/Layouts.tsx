@@ -145,6 +145,7 @@ const patientNav = [
   ["/patient/discovery", "Find care", Search],
   ["/patient/appointments", "Appointments", CalendarDays],
   ["/patient/account", "Account", Settings2],
+  ["/patient/clinic-access", "Clinic access", Building2],
 ] as const;
 const clinicianNav = [
   ["/clinician", "Today", Home],
@@ -154,6 +155,7 @@ const clinicianNav = [
   ["/clinician/services", "Services & pricing", Stethoscope],
   ["/clinician/vetting", "Professional review", ClipboardCheck],
   ["/clinician/affiliations", "Clinics & affiliations", Building2],
+  ["/clinician/clinic-access", "Clinic access", Building2],
   ["/clinician/care", "Care records", FileHeart],
   ["/clinician/earnings", "Earnings", Wallet],
   ["/clinician/account", "Account", Settings2],

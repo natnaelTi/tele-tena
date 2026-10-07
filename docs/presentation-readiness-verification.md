@@ -1,50 +1,77 @@
 # Presentation release verification
 
-## Latest local clinic/auth checkpoint — 2026-10-07
+## Current local checkpoint — 2026-10-07
 
-- Review URL: `http://127.0.0.1:8017/teletena/` (production-built Frappe app,
-  not Vite). Bench `/home/frappe/frappe/frappe-bench`; site
-  `tele-tena-pr12-fresh.localhost`; branch `feat/clinic-affiliation-review`;
-  packaged asset source SHA
-  `8e3a298bdc3f2624cdf0fb5d256fc469177fea36`.
-  The pushed branch head includes later test/documentation-only commits; the
-  app source and production assets did not change after this package build.
+- Review URL: `http://127.0.0.1:8017/teletena/`, production-built Frappe app,
+  not Vite. Bench `/home/frappe/frappe/frappe-bench`; site
+  `tele-tena-pr12-fresh.localhost`; branch `feat/clinic-membership`.
+  Authentication UI source commit is `0b3d1bdecfede8180ebdbdf9e7bdfedc0f4cd60d`;
+  current package manifest source SHA is
+  `0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee`.
 - Environment: Frappe 15.121.2 / ERPNext 15.121.6, Python 3.12.3, Node
-  22.23.3. The review WSGI process is Gunicorn on loopback 8017. This site is
-  configured for invited password review; its public phone and registration
-  flags remain off. Its synthetic account file is private under that site's
-  `private` directory; credentials are intentionally omitted here.
-- `tests/presentation.py`: 22/22 passed, including clinic registration and
-  affiliation state, ownership, generic DocType permissions and no implied
-  scope/record access.
-- `tests/contact_auth.py`: 7/7 passed. These tests exercise enabled-registration
-  OTP state using a mocked email provider and a test-only enabled policy; they
-  did not change the invited site's configuration and did not send email.
-- `tests/integration.py`: 24/24 passed against the same built Frappe preview.
-  The run used a scoped, temporary setting change on this disposable site to
-  exercise enabled phone/patient/clinician registration, restored the original
-  site config in a `finally` cleanup, and reloaded only this isolated Gunicorn.
-  SMS transport and OTP-key access were mocked in tests; no SMS was sent. The
-  HTTP regressions used `http://127.0.0.1:8017`, not the obsolete Vite default
-  on port 5173. After the run the preview is back in invited-review mode.
-- The test site's scheduler reports disabled and no worker is running for it.
-  Scheduler-backed release and routing execution are therefore unverified.
-- `scripts/browser-clinic-registration.cjs`: passed a real browser journey
-  through the built React package and Frappe APIs: applicant submission →
-  reviewer verification → affiliation request → separate reviewer decision.
-  Synthetic screenshots: `docs/screenshots/clinic-review/`.
-- The earlier frontend build, lint and packaged review/auth/PWA checks passed
-  at this source checkpoint. Existing lint warnings and large LiveKit bundle
-  warning remain.
-- The fresh schema path was synchronized on a disposable site that had been
-  created before the final DocType directory correction. This is not claimed as
-  a clean fresh-install test of the final package. Frappe 16 compatibility for
-  the new clinic DocTypes, clinic/admin responsive visual review, actual
-  browser zoom, live email/SMS, physical-device calling, and native language
-  approval remain unverified.
-- This checkpoint does not complete the 142-screen/product scope. The accurate
-  per-screen status remains in `operational-screen-map.json`; clinics still
-  lack staff membership, calendars/resources, billing and encounter grants.
+  22.23.3. The loopback Gunicorn preview is scoped to port 8017. Site review
+  mode is enabled; phone OTP and patient/clinician public registration are
+  explicitly disabled. Account files remain private and credentials are not
+  included here.
+- `tests/presentation.py`: **23/23 passed** after syncing the additive Clinic
+  Membership DocType on this disposable site. It includes availability,
+  booking, privacy, financial, vetting, and clinic membership permission
+  regressions.
+- `tests/integration.py`: **24/24 passed** on the built API origin. First, the
+  five enabled-phone tests correctly rejected the invited-review policy. The
+  suite then passed with phone and registration flags temporarily enabled only
+  on this isolated site; the SMS transport and OTP key were mocked. A `finally`
+  cleanup restored all three flags to false. No SMS was sent. The previous
+  HTTP/browser run verifies invited mode separately; this is not two separate
+  site databases.
+- `scripts/check_clinic_membership_browser.py` exercised the built UI/API journey:
+  clinic submission → reviewer verification → manager invite → exact verified
+  email acceptance → reasoned revocation. Synthetic screenshots are in
+  `docs/screenshots/clinic-membership/`.
+- A focused correction keeps phone-first sign-in visible when phone OTP is
+  disabled, shows the explicit disabled explanation, and leaves the email
+  alternative available. The built-browser journey passed for the invited
+  patient/clinician accounts and the explicit email/password switch. A
+  controlled code-entry path exercised invalid-code feedback. Screenshots at
+  390/1440 px are under `docs/screenshots/auth-invited/`.
+- The enabled-policy run of `tests/integration.py` passed **24/24**, including
+  patient/clinician registration, manual approval, CSRF, one-use code,
+  attempt/rate controls, uncertain provider result and concurrent verification.
+  All provider sends and OTP-key reads were mocked. The failed first run in
+  invited mode is expected policy enforcement, not an OTP regression.
+- `scripts/browser-availability-regression.cjs` passed against this same
+  production `/teletena/` package and Frappe API: it read the initial weekly
+  grid, entered keyboard times, confirmed the field-specific end-before-start
+  message while preserving the entered value, saved the documented
+  `start_local`/`end_local` payload (HTTP 200), reloaded persisted hours,
+  generated a patient slot, and completed booking (HTTP 200). The seeded
+  clinician schedule was restored afterward to its documented seven-day
+  08:00–20:00 Addis Ababa configuration with manual confirmation. One new
+  synthetic patient and one `PendingConfirmation` appointment remain; the
+  patient account has a generated password in the mode-600 review account file.
+  The resulting balance is ETB 400 available / ETB 600 reserved from the
+  synthetic ETB 1,000 opening balance. Screenshots are under
+  `docs/screenshots/availability-regression/`.
+  The repeat sign-in confirms the generated patient can access the persisted
+  appointment. The demonstration clinician can review its pending-confirmation
+  request from Appointments; no approval was fabricated by the browser test.
+- `npm run build`, `scripts/build_review.py`, and `scripts/check_review_assets.py`
+  passed. The package asset scan found no credentials or public site config;
+  Vite reports the existing LiveKit chunk-size advisory. A controlled service
+  worker waiting-update test passed; it verifies explicit refresh after a
+  waiting worker, not browser-profile cache eviction on every installed device.
+- Site scheduler is disabled. Shared bench worker and scheduler processes are
+  online for other sites and were not changed; this site's queued routing and
+  financial release jobs have not been processed.
+- Phone OTP and both public-registration site flags were checked after the
+  integration run and are explicitly false. The existing email/password
+  reviewer path remains available. Sign-in options from the running API report
+  all contact-code and registration capabilities as false for this site.
+- This remains a focused clinic membership/auth UI checkpoint, not completion
+  of the approved product scope. Frappe 16 compatibility, clean fresh install,
+  actual 200% browser zoom, live SMS/email delivery, physical-device calling,
+  native-language review, clinic calendars/resources/billing, and encounter
+  grants remain unverified or unimplemented.
 
 ## Current integrated local preview — 2026-10-05
 
@@ -444,3 +471,50 @@ A two-context Playwright session against this same built preview exercised the r
 Frontend production build passed (`npm run build`, Vite 8.3.1); `npm run lint` completed with existing React-hook/purity warnings and no lint errors. `build_review.py` passed; `check_review_assets.py` passed with no embedded secrets/config. `bench migrate --skip-search-index` passed through v1.10, and the repeat financial migration checker passed. The financial checker remains a limited aggregate verifier: fresh v1.10 installation and per-owner legacy reconciliation (including opening timestamp equality and all historical account projections) are not proven. The compatibility preview has no scheduler or background worker active; request expiry/dispatch scheduling and scheduled earnings release were not run by workers.
 
 Still outstanding for presentation release acceptance: clean automated enabled-registration/contact-auth suite on a separate site fixture; a reusable passing Playwright request/offer script; live concurrent web requests (database concurrency is covered); scheduler/worker execution; fresh v1.10 installation and per-patient/per-clinician migration reconciliation; hosted LiveKit Cloud revocation rerun; complete earnings lifecycle screenshots; and route-by-route visual inspection at all requested widths, 200% browser zoom and all languages. Current language strings in new request screens are only partially localized and remain provisional. SMS delivery, native-language approval, physical-device call quality, remote installation and deployment are untested.
+
+## Clinic operational membership checkpoint (2026-10-07)
+
+This dependent slice is on `feat/clinic-membership`, based on the open draft
+PR #18 head `8a451e22a0727de24ee096328516b419c4ae1cdc`. Source commit and
+frontend asset source are both
+`05115ca5c8027baf99a5049c7e6f5c7250d58466`. It does not alter the Selfmade
+installation. The current local preview remains the production-built Frappe app
+at `http://127.0.0.1:8017/teletena/`, isolated site
+`tele-tena-pr12-fresh.localhost` on `/home/frappe/frappe/frappe-bench`; it is
+not a Vite server. The identified Gunicorn master was gracefully reloaded and
+replaced only its two preview workers. The built manifest reports the exact
+source SHA above. The user-initiated service-worker update browser check passed
+against the current homepage and built production application.
+
+An additive migration synchronized the new native `Tele Tena Clinic Membership`
+DocType on this disposable Frappe 15.121.2 / ERPNext 15.121.6 site. A private,
+mode-600 site backup was created before migration. `tests/presentation.py`
+passed **23/23**, covering verified-contact visibility and acceptance, unverified
+denial, generic DocType filtering, reviewer and non-manager denial, no patient
+record access, direct insert/edit/delete denial, and idempotent invite/accept/
+revoke retries. It also reran the broader availability, booking, notes,
+financial and vetting presentation checks. One first concurrency assertion
+counted a different clinician's legitimate same-time booking; it now checks the
+conflicting clinician only, and the complete suite passed on rerun.
+
+`scripts/check_clinic_membership_browser.py` passed the built two-account
+journey: clinician submits clinic → reviewer verifies → manager invites →
+invitee with a temporary synthetic verified-email fixture accepts → manager
+revokes with reason. The temporary `tt_contact_identity` fixture was removed
+afterwards. Screenshots are in `docs/screenshots/clinic-membership/`; visual
+inspection confirmed the invitation, accepted-member and revoked-member states.
+The browser checked 320, 390, 768, and 1440 CSS px with no page horizontal
+overflow; screenshots at 390 and 1440 are included. Actual 200% zoom remains
+untested. Amharic and Afaan Oromo copy is present but remains provisional and
+was not natively reviewed. Invitations are in-app only; no email was sent.
+
+Frontend `npm run build` and `python3 apps/tele_tena/scripts/build_review.py`
+passed. `npm run lint` exited successfully with existing React hook/purity
+warnings, and Vite still reports its existing LiveKit chunk-size advisory.
+`scripts/check_fresh_install.py` now asserts the membership DocType, but a clean
+fresh-site install for this addition was not run. Frappe 16, mobile layouts,
+200% browser zoom, email delivery, clinic calendars/resources, clinic billing,
+encounter grants, and membership-driven access to clinical workflows remain
+unverified or unimplemented. The review-site scheduler switch is off. Shared
+bench worker and scheduler processes remain online for other sites but were
+left untouched; no queued work was drained or scheduled processing claimed.

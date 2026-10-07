@@ -197,6 +197,80 @@ class Presentation(unittest.TestCase):
         with self.assertRaises(frappe.PermissionError):
             clinics.review_queue()
 
+    def test_clinic_membership_requires_verified_contact_and_never_grants_clinical_access(self):
+        fixtures.login('c1')
+        submitted = clinics.submit_clinic_application(
+            clinic_name='Synthetic Membership Clinic', legal_name='Synthetic Membership Care Ltd',
+            registration_reference='TEST-MEMBER-' + secrets.token_hex(4),
+            jurisdiction='Synthetic jurisdiction', public_description='Synthetic membership test')
+        fixtures.login('admin')
+        clinics.review_clinic(submitted['application'], 'Verified', 'Synthetic review fixture.')
+
+        invite_email = fixtures.USERS['p2'].lower()
+        self.assertFalse(frappe.db.exists('tt_contact_identity', {
+            'channel': 'email', 'contact': invite_email}))
+        fixtures.login('c1')
+        invitation = clinics.invite_clinic_member(
+            submitted['application'], invite_email, 'Scheduling')
+        self.assertEqual(invitation['status'], 'Invited')
+        self.assertTrue(clinics.invite_clinic_member(
+            submitted['application'], invite_email, 'Scheduling')['idempotent'])
+        self.assertEqual(clinics.clinic_team(submitted['application'])[0].invite_email,
+                         invite_email)
+
+        fixtures.login('admin')
+        self.assertEqual(frappe.get_list('Tele Tena Clinic Membership', fields=['name']), [])
+        self.assertFalse(frappe.has_permission('Tele Tena Clinic Membership', 'read',
+            doc=frappe.get_doc('Tele Tena Clinic Membership', invitation['membership']),
+            user=fixtures.USERS['admin']))
+        fixtures.login('p2')
+        self.assertEqual(frappe.get_list('Tele Tena Clinic Membership', fields=['name']), [])
+        self.assertEqual(clinics.my_clinic_memberships()['invitations'], [])
+        with self.assertRaises(frappe.PermissionError):
+            clinics.respond_to_clinic_invitation(invitation['membership'], 'accept')
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_doc({'doctype': 'Tele Tena Clinic Membership',
+                'clinic': submitted['application'], 'invite_email': invite_email,
+                'membership_role': 'Clinic Manager', 'status': 'Invited',
+                'invited_by': fixtures.USERS['p2']}).insert()
+        self.assertFalse(frappe.has_permission('Tele Tena Clinic', 'read',
+            doc=frappe.get_doc('Tele Tena Clinic', submitted['application']),
+            user=fixtures.USERS['p2']))
+
+        frappe.db.sql('''INSERT INTO tt_contact_identity(channel,contact,user,verified_at)
+            VALUES ('email',%s,%s,NOW(6))''', (invite_email, fixtures.USERS['p2']))
+        self.assertEqual(len(clinics.my_clinic_memberships()['invitations']), 1)
+        accepted = clinics.respond_to_clinic_invitation(invitation['membership'], 'accept')
+        self.assertEqual(accepted['status'], 'Active')
+        self.assertTrue(clinics.respond_to_clinic_invitation(
+            invitation['membership'], 'accept')['idempotent'])
+        self.assertIn('Tele Tena Patient', frappe.get_roles(fixtures.USERS['p2']))
+        self.assertNotIn('Tele Tena Clinician', frappe.get_roles(fixtures.USERS['p2']))
+        self.assertFalse(frappe.has_permission('Tele Tena Clinic', 'read',
+            doc=frappe.get_doc('Tele Tena Clinic', submitted['application']),
+            user=fixtures.USERS['p2']))
+        membership_doc = frappe.get_doc('Tele Tena Clinic Membership', invitation['membership'])
+        self.assertTrue(frappe.has_permission('Tele Tena Clinic Membership', 'read',
+            doc=membership_doc, user=fixtures.USERS['p2']))
+        with self.assertRaises(frappe.PermissionError):
+            membership_doc.delete()
+        membership_doc.status = 'Revoked'
+        with self.assertRaises(frappe.PermissionError):
+            membership_doc.save()
+        with self.assertRaises(frappe.PermissionError):
+            clinics.clinic_team(submitted['application'])
+        fixtures.login('c1')
+        revoked = clinics.revoke_clinic_membership(invitation['membership'],
+                                                    'Synthetic test revocation.')
+        self.assertEqual(revoked['status'], 'Revoked')
+        self.assertTrue(clinics.revoke_clinic_membership(invitation['membership'],
+            'Synthetic test revocation.')['idempotent'])
+        fixtures.login('p2')
+        self.assertEqual(clinics.my_clinic_memberships()['memberships'][0].status, 'Revoked')
+        self.assertTrue(frappe.has_permission('Tele Tena Clinic Membership', 'read',
+            doc=frappe.get_doc('Tele Tena Clinic Membership', invitation['membership']),
+            user=fixtures.USERS['p2']))
+
     def test_vetting_draft_clarification_resubmission_and_scope_decision(self):
         service = fixtures.PREFIX + '-reviewed-scope'
         fixtures.login('admin')
@@ -553,8 +627,11 @@ class Presentation(unittest.TestCase):
         frappe.db.rollback()
         self.assertEqual(sum(state == 'matched' for state, _appointment in results), 1)
         self.assertEqual(sum(state == 'conflict' for state, _appointment in results), 1)
-        booked_rows = journey.rows("SELECT start,end,state FROM tt_appointment WHERE start=%s AND state='Booked'",
-                                   (slot['start'],))
+        # Another clinician may legitimately have a different appointment at
+        # the same instant; the conflict invariant is global across offerings
+        # owned by this clinician, not global across the entire service.
+        booked_rows = journey.rows("SELECT start,end,state FROM tt_appointment WHERE clinician=%s AND start=%s AND state='Booked'",
+                                   (fixtures.USERS['c1'], slot['start']))
         self.assertEqual(len(booked_rows), 1,
                          msg='Expected one globally reserved start; found ' + repr([(str(r.start), str(r.end), r.state) for r in booked_rows]))
         self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_request_offer WHERE id IN %s AND state='Accepted'",

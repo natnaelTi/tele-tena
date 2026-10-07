@@ -231,11 +231,11 @@
       "module": "Identity/public",
       "backend_reference": "contact_auth, onboarding",
       "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Built /teletena/ invited-review browser check passed at 390/1440: phone-first screen remains visible, Continue is disabled by site policy, email/password remains available, and existing patient/clinician accounts sign in. Auth source commit 0b3d1bd; packaged manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee. Phone OTP/public registration flags restored false. No live provider call.",
       "prototype_route": "a04",
       "route": "/sign-in",
       "actor": "Guest; authenticated account after contact verification",
-      "status": "External integration blocked",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_contact_identity",
         "tt_otp_challenge",
@@ -286,7 +286,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A04) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Built /teletena/ invited-review browser check passed at 390/1440: phone-first screen remains visible, Continue is disabled by site policy, email/password remains available, and existing patient/clinician accounts sign in. Auth source commit 0b3d1bd; packaged manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee. Phone OTP/public registration flags restored false. No live provider call."
       }
     },
     {
@@ -296,7 +296,7 @@
       "module": "Identity/public",
       "backend_reference": "contact_auth, onboarding",
       "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Built browser exercised code-step navigation and safe invalid/expired-code feedback; integration suite verified HMAC/single-use/attempt/race paths with mocked SMS. Live SMS delivery and native Amharic/Afaan Oromo review not tested. Auth source commit 0b3d1bd; package manifest 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee.",
       "prototype_route": "a05",
       "route": "/sign-in (OTP step)",
       "actor": "Guest; authenticated account after contact verification",
@@ -351,7 +351,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A05) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Built browser exercised code-step navigation and safe invalid/expired-code feedback; integration suite verified HMAC/single-use/attempt/race paths with mocked SMS. Live SMS delivery and native Amharic/Afaan Oromo review not tested. Auth source commit 0b3d1bd; package manifest 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee."
       }
     },
     {
@@ -361,11 +361,11 @@
       "module": "Identity/public",
       "backend_reference": "contact_auth, onboarding",
       "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Invited-review email/password path and explicit switch from phone were verified in Chromium; email OTP UI/error path exercised with controlled responses, backend enabled-policy OTP tests use mocked delivery. SMTP is not configured, so delivery is blocked. Screenshots: docs/screenshots/auth-invited/. Package manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee.",
       "prototype_route": "a06",
       "route": "/sign-in (email method)",
       "actor": "Guest; authenticated account after contact verification",
-      "status": "External integration blocked",
+      "status": "Implemented, verification pending",
       "persistent_models": [
         "tt_contact_identity",
         "tt_otp_challenge",
@@ -416,7 +416,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A06) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Invited-review email/password path and explicit switch from phone were verified in Chromium; email OTP UI/error path exercised with controlled responses, backend enabled-policy OTP tests use mocked delivery. SMTP is not configured, so delivery is blocked. Screenshots: docs/screenshots/auth-invited/. Package manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee."
       }
     },
     {
@@ -953,33 +953,40 @@
       "module": "Profiles/vetting",
       "backend_reference": "journey, vetting, private evidence",
       "required_contract": "Guided profiles, scoped review decisions, protected evidence",
-      "integration_status": "Functional route and decision flow verified; responsive, language and reviewer evidence checks remain.",
+      "integration_status": "Backend and built-browser flow passed; responsive overflow checked at 320/390/768/1440. Actual 200% zoom and native language review remain pending.",
       "prototype_route": "b08",
-      "route": "/clinician/affiliations",
-      "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
+      "route": "/clinician/affiliations; /clinician/clinic-access; /patient/clinic-access",
+      "actor": "Clinician/clinic submitter or active Clinic Manager; invited account with exact verified email; authorized clinic reviewer for registration and affiliation decisions",
       "status": "Implementation in progress",
       "persistent_models": [
         "Tele Tena Clinic",
         "Tele Tena Clinic Affiliation",
         "tt_profile",
-        "tt_audit"
+        "tt_audit",
+        "Tele Tena Clinic Membership"
       ],
       "queries": [
         "tele_tena.api.clinics.my_clinic_applications",
         "tele_tena.api.clinics.my_affiliations",
-        "tele_tena.api.clinics.verified_clinics"
+        "tele_tena.api.clinics.verified_clinics",
+        "managed_clinics: submitting manager and active Clinic Manager only",
+        "clinic_team: clinic-scoped invitation and membership history for managers only",
+        "my_clinic_memberships: invitations only for an exact verified contact identity; own accepted/revoked memberships"
       ],
       "commands": [
         "tele_tena.api.clinics.submit_clinic_application",
-        "tele_tena.api.clinics.submit_affiliation"
+        "tele_tena.api.clinics.submit_affiliation",
+        "invite_clinic_member: create or return the manager-owned idempotent invite",
+        "respond_to_clinic_invitation: accept/decline after exact verified-email check",
+        "revoke_clinic_membership: audited reasoned revocation; idempotent retry"
       ],
-      "server_permissions": "Clinician/applicant sees only own submissions and verified public clinic name/jurisdiction. Legal names and registration references are private to applicant and Tele Tena Approver. Affiliation never creates a service scope or patient-record access.",
-      "workflow_transitions": "Clinic: Draft → Submitted → Verified/Rejected; Verified → Suspended. Same applicant may create a linked correction after Rejected. Affiliation: Submitted → Verified/Clarification/Rejected; Clarification → Submitted; Verified → Revoked. Reviewer decisions require reason and are audited.",
+      "server_permissions": "Clinic membership never grants patient-record, appointment, note, resume, or service-scope access. Generic list/document hooks are owner, manager, or accepted-member scoped. Invitee sees an invitation only after authenticating an exact verified email. Direct writes/deletes are rejected by controller validation.",
+      "workflow_transitions": "Invited → Active | Declined | Revoked; Active → Revoked. Terminal states cannot be reopened. Owner/active Clinic Manager invites and revokes; verified invitee accepts/declines. Retry of same invitation, acceptance, or revocation is idempotent.",
       "states": {
-        "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
-        "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
-        "error": "Preserve safe user input; distinguish session expiry, permission, validation, service and retryable network failures.",
-        "success": "Confirm only the persisted server result; include the resulting status and next permitted action."
+        "loading": "Show skeletons for clinic, invitation and membership data; never fabricate invitations.",
+        "empty": "Separate no invitations, no memberships, and no managed clinics; explain that in-app invites require prior contact verification.",
+        "error": "Show safe endpoint error and retry action; do not expose email or internal identifiers in notification previews.",
+        "success": "Show persisted invitation, acceptance, decline or revocation status. Role labels Scheduling and Billing do not claim unavailable operations."
       },
       "responsive_accessibility": {
         "breakpoints": "Acceptance at 320, 390, 768 and 1440 CSS px and browser zoom 200%; no page-level horizontal overflow.",
@@ -999,13 +1006,20 @@
       "dependencies": [
         "human clinic registry verification",
         "verified clinic profile",
-        "clinician/applicant role"
+        "clinician/applicant role",
+        "verified contact identity",
+        "verified clinic registration",
+        "clinic owner or active Clinic Manager"
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B08) and design-handoff.md",
-        "implementation": "Native clinic and affiliation DocTypes, site-safe API commands and React forms. Rejected clinic details create a linked new record; reviewer state changes are constrained. Affiliation never changes service scope or patient-record access.",
-        "current_local": "Frappe 15 disposable site `tele-tena-pr12-fresh.localhost`, `tests/presentation.py` 22/22, actual built `/teletena/` Playwright clinician submission → reviewer verification → affiliation submission → separate reviewer decision. Screenshots: docs/screenshots/clinic-review/. Functional desktop journey verified; responsive widths, 200% zoom and Amharic/Afaan Oromo review are pending."
-      }
+        "implementation": "Native clinic membership DocType, transactional API, verified-email gate, workspace routes, localized invitation/team UI; no email delivery or clinical-record grants.",
+        "current_local": "Source/build 05115ca5c8027baf99a5049c7e6f5c7250d58466; Frappe 15.121.2/ERPNext 15.121.6 migration; tests/presentation.py 23/23; built /teletena/ clinic registration → reviewer approval → invite → verified invitee acceptance → revocation passed. Playwright checked 320/390/768/1440 CSS px for page overflow; screenshots at 390/1440: docs/screenshots/clinic-membership/. Temporary synthetic verified-email fixture removed. Actual 200% zoom, fresh-site install for this DocType, Frappe 16, and native translation review remain pending."
+      },
+      "related_operational_routes": [
+        "/clinician/clinic-access",
+        "/patient/clinic-access"
+      ]
     },
     {
       "id": "B09",
@@ -3773,11 +3787,11 @@
       "module": "Practice",
       "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
       "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Built weekly schedule save/reload and generated-slot booking locally verified; surrounding clinician workspace, date-only edit, scheduler and external-language acceptance remain in progress.",
       "prototype_route": "f06",
       "route": "/clinician/availability",
       "actor": "Clinician; patients see approved public profile and offering data",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_profile",
         "tt_application",
@@ -3835,7 +3849,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F06) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Built Frappe /teletena/ Frappe 15 browser journey passed keyboard time entry, specific reversed-time error with input preserved, POST save of start_local/end_local (HTTP 200), reload persistence, patient generated slot and booking (HTTP 200). The weekly editor was restored afterward to the site's documented synthetic baseline. New synthetic patient/appointment retained. Screenshots: docs/screenshots/availability-regression/. Frappe 16, scheduler, actual 200% zoom and native-language review pending."
       }
     },
     {

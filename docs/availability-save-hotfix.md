@@ -43,6 +43,33 @@ phone access enabled, while this review site intentionally disables it. Those
 failures do not demonstrate an availability defect. A configuration-matched
 full-suite run remains outstanding.
 
+## Current integrated-preview regression — 2026-10-07
+
+The review site and source have since moved to the main Bench at
+`/home/frappe/frappe/frappe-bench`, site `tele-tena-pr12-fresh.localhost`, with
+the production build at `http://127.0.0.1:8017/teletena/`. On this exact built
+route, the browser again submitted weekly `start_local`/`end_local` values,
+received HTTP 200 from `scheduling.save_schedule`, reloaded the persisted
+09:00–17:00 interval, and booked a generated patient slot. A reversed interval
+was rejected with the field-specific end-after-start message while the entered
+value remained present. This verifies the UI-to-API payload contract on the
+integrated Frappe 15 preview; the original screenshot did not contain its
+submitted payload or traceback, so those exact original inputs cannot be
+reconstructed from the image alone. The API accepts both `start`/`end` and
+`start_local`/`end_local` payloads.
+
+The runner temporarily changed the seeded clinician's synthetic weekly hours.
+They were restored to the documented seven-day 08:00–20:00 Africa/Addis_Ababa
+review schedule, with manual confirmation and the same booking settings. One
+new synthetic patient and one pending-confirmation appointment were retained;
+the generated password is stored in the site's mode-600 private review account
+file. No existing appointment or balance was removed or rewritten.
+
+The enabled-policy integration run passed 24/24 with SMS mocked. The invited
+browser check passed with phone OTP and signup disabled; after verification,
+those flags remained false. See `presentation-readiness-verification.md` for
+the current package SHA and remaining limits.
+
 The hosted Selfmade site is still pinned to the operator-reported commit
 `8f7ab9cd8d5e779d17b632dc9afdae3e700ab3c6`. No remote installation or data was
 changed. The hotfix PR is independently based on merged `main` and is safe to

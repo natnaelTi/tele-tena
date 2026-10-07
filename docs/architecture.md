@@ -138,3 +138,20 @@ unchanged current snapshot with a reason, and only if wallet and subledger agree
 That audited choice preserves the unresolved historical difference; it does not
 claim to reconstruct missing history or create a balancing entry. All future
 financial records remain on the existing subledger path.
+
+## Clinic operational memberships
+
+`Tele Tena Clinic Membership` is an additive native DocType. Its state machine
+is `Invited → Active | Declined | Revoked` and `Active → Revoked`; terminal
+states cannot be reopened. The inviting clinic owner or active Clinic Manager
+may issue/revoke an invitation. Acceptance or decline is available only to the
+authenticated account with a verified `tt_contact_identity` email equal to the
+invited address. Generic DocType list/document permissions use the same clinic
+manager and accepted-member boundary; controller validation rejects direct
+writes and deletes. Membership roles are limited to `Clinic Manager`,
+`Scheduling`, and `Billing`. Only Clinic Manager currently authorizes further
+membership administration; the other labels do not imply enabled calendar or
+billing operations. No membership role grants clinical-record, appointment,
+consultation-note, resume, or service-scope access. Invite delivery is not
+implemented, so an invitee must already know to sign in and verify their
+address. Audit events record invitation, acceptance/decline, and revocation.

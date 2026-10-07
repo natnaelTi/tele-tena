@@ -33,7 +33,7 @@ import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage
 import Showcase from "./pages/Showcase";
 import { ClinicianRequestInbox, PatientOpenRequests, PublicClinicianProfile } from "./pages/OpenRequests";
 import { ClinicianScopeApplications, VettingQueue } from "./pages/Vetting";
-import { ClinicianAffiliations, ClinicReview } from "./pages/Clinics";
+import { ClinicianAffiliations, ClinicMembershipPortal, ClinicReview } from "./pages/Clinics";
 import PWAUpdateNotice from "./components/PWAUpdateNotice";
 import "./App.css";
 export default function App() {
@@ -62,9 +62,9 @@ export default function App() {
             </Route>
             <Route element={<AuthLayout />}>
               <Route path="/sign-in" element={<SignIn />} />
-              <Route element={<RequireSession />}>
-                <Route path="/onboarding" element={<Onboarding />} />
-              </Route>
+            <Route element={<RequireSession />}>
+              <Route path="/onboarding" element={<Onboarding />} />
+            </Route>
             </Route>
             <Route element={<RequireSession />}>
               <Route path="/consultation/:id/room" element={<><div className="demo-bar" role="note">Demonstration environment — no real payments or clinical care.</div><ConsultationRoomPage /></>} />
@@ -80,6 +80,7 @@ export default function App() {
                 <Route path="book-link/:token" element={<BookingLink />} />
                 <Route path="appointments" element={<Appointments />} />
                 <Route path="account" element={<Account />} />
+                <Route path="clinic-access" element={<ClinicMembershipPortal />} />
                 <Route path="payments" element={<Payments />} />
                 <Route
                   path="consultations/:id"
@@ -98,6 +99,7 @@ export default function App() {
                 <Route path="availability" element={<Availability />} />
                 <Route path="services" element={<Services />} />
                 <Route path="account" element={<Account />} />
+                <Route path="clinic-access" element={<ClinicMembershipPortal />} />
                 <Route
                   path="consultations/:id"
                   element={<ConsultationPage />}

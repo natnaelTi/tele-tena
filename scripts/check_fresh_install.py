@@ -209,6 +209,7 @@ try:
     assert frappe.db.exists('DocType', 'Tele Tena Service Scope')
     assert frappe.db.exists('DocType', 'Tele Tena Clinic')
     assert frappe.db.exists('DocType', 'Tele Tena Clinic Affiliation')
+    assert frappe.db.exists('DocType', 'Tele Tena Clinic Membership')
     assert frappe.db.sql("SHOW COLUMNS FROM tt_appointment LIKE 'policy_snapshot'")
     assert frappe.db.sql("SHOW COLUMNS FROM tt_application LIKE 'requested_services'")
     assert frappe.db.count('Tele Tena Service Scope') == 0
@@ -233,7 +234,7 @@ try:
     frappe.destroy()
     assert retained_fingerprint() == retained_before, 'Retained development records changed'
     passed = True
-    print('PASS: fresh Frappe + ERPNext + tele_tena install, native models, roles, presentation, subledger and reconciliation schemas, migrations, guest denial and simulation disabled before explicit review setup; retained development records unchanged')
+    print('PASS: fresh Frappe + ERPNext + tele_tena install, native clinic membership and other models, roles, presentation, subledger and reconciliation schemas, migrations, guest denial and simulation disabled before explicit review setup; retained development records unchanged')
 except Exception as error:
     import traceback
     for frame in traceback.extract_tb(error.__traceback__):

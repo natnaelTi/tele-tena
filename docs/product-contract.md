@@ -205,9 +205,18 @@ The affiliation never grants service-scope approval, request eligibility,
 appointment access or patient-record access. A clinic verification or
 affiliation cannot be used to create or approve a `Tele Tena Service Scope`.
 
-This is an initial registry/affiliation workflow only. Evidence files, clinic
-staff invitations and memberships, clinic calendars/resources, clinic billing,
-explicit encounter access grants and clinic-wide patient records are not
-implemented. Existing narrative affiliation fields are preserved and are not
-automatically converted into verified affiliations. Native DocType schema is
-additive and synchronized by normal Frappe migration.
+This is an initial registry/affiliation workflow. A separate operational
+membership workflow lets a verified clinic's submitting manager invite a
+staff email into one of three limited roles: Clinic Manager, Scheduling, or
+Billing. The invitee must sign in and prove possession of the exact invited
+email before accepting. Invitations are not emailed by this local slice; they
+are visible only after the invited contact is verified. Managers can revoke
+active memberships with a recorded reason. Membership grants no clinical
+service authority and no patient, appointment, note, or evidence access. The
+Scheduling and Billing roles are currently descriptive and do not expose
+calendar, resource, or billing capabilities. Clinic Manager may manage clinic
+memberships only. Clinic verification and affiliation never enable clinic
+calendars/resources, clinic billing, explicit encounter grants, or clinic-wide
+patient records. Existing narrative affiliation fields are preserved and are
+not automatically converted into verified affiliations. Native DocType schema
+is additive and synchronized by normal Frappe migration.

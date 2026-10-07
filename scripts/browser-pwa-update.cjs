@@ -2,6 +2,7 @@
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const base=process.env.TELE_TENA_BROWSER_BASE||'http://127.0.0.1:8024/teletena';
+let checkpoint='launch';
 (async()=>{
  const browser=await chromium.launch({headless:true});
  try{
@@ -25,13 +26,19 @@ const base=process.env.TELE_TENA_BROWSER_BASE||'http://127.0.0.1:8024/teletena';
    const loads=Number(sessionStorage.getItem('teletena-test-load-count')||'0')+1;
    sessionStorage.setItem('teletena-test-load-count',String(loads));
   });
+  checkpoint='homepage load';
   await page.goto(base+'/',{waitUntil:'domcontentloaded'});
   const notice=page.getByRole('status').filter({hasText:'A TeleTena update is ready'});
+  checkpoint='update notice';
   await notice.waitFor();
+  checkpoint='user initiated update';
   await page.getByRole('button',{name:'Refresh to update'}).click();
+  checkpoint='controlled reload';
   await page.waitForFunction(()=>sessionStorage.getItem('teletena-test-load-count')==='2');
+  checkpoint='activation message';
   assert.equal(await page.evaluate(()=>sessionStorage.getItem('teletena-test-update-message')),'SKIP_WAITING');
-  assert.equal(await page.getByRole('heading',{name:'Find someone you feel comfortable talking to.'}).count(),1);
+  checkpoint='post update home';
+  assert.equal(await page.getByRole('heading',{name:'Find support. Make time for care.'}).count(),1);
   console.log('PASS: built app detects a waiting worker, waits for explicit refresh, and reloads after activation');
  }finally{await browser.close()}
-})().catch(error=>{console.error('FAIL: PWA update interaction ('+(error?.name||'Error')+'); details withheld');process.exitCode=1});
+})().catch(error=>{console.error('FAIL: PWA update interaction at '+checkpoint+' ('+(error?.name||'Error')+'); details withheld');process.exitCode=1});

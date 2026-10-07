@@ -603,6 +603,59 @@ button:active {
 .clinic-review-card .supporting {
   overflow-wrap: anywhere;
 }
+.clinic-access-page {
+  padding-bottom: 48px;
+}
+.clinic-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+  gap: 20px;
+  align-items: start;
+}
+.clinic-team-card {
+  min-width: 0;
+  padding: 22px;
+}
+.clinic-team-card .clinic-review-heading {
+  flex-direction: row;
+  align-items: center;
+}
+.clinic-team-invite {
+  grid-template-columns: minmax(0, 1.3fr) minmax(150px, .8fr);
+  align-items: end;
+}
+.clinic-team-invite > button {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+.clinic-team-list {
+  margin-top: 12px;
+}
+.clinic-team-revoke {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  width: min(100%, 520px);
+}
+.clinic-team-revoke > :first-child {
+  flex: 1 1 220px;
+}
+@media (max-width: 600px) {
+  .clinic-team-card {
+    padding: 16px;
+  }
+  .clinic-team-invite {
+    grid-template-columns: 1fr;
+  }
+  .clinic-team-invite > button {
+    grid-column: auto;
+    width: 100%;
+  }
+  .clinic-team-revoke > button {
+    width: 100%;
+  }
+}
 @media (max-width: 800px) {
   .clinic-settings-grid {
     grid-template-columns: 1fr;
