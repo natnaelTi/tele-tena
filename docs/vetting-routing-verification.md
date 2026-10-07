@@ -244,3 +244,51 @@ asserts that absent languages and disabled immediate-service policy remain
 separate readiness reasons. The running packaged browser confirmed the linked
 reasons for this seeded synthetic account; screenshot:
 `docs/screenshots/mutual-rescheduling/availability-1440.png`.
+
+### Reviewer service-policy workflow (2026-10-08)
+
+The fresh read-only check on the retained `tele-tena-pr12-fresh.localhost`
+synthetic account returned `language_required` and `immediate_policy_required`.
+The persisted care-language list was empty and the exact service policy was
+false; the schedule and approved offering existed. Thus the user's statement
+about a matching language in the interface did not match the persisted profile
+for this snapshot. Neither cause is inferred from the original screenshot; both
+were read from this later server state. No synthetic account or service was
+changed to make the diagnosis pass.
+
+The saved schedule is published daily from 08:00 to 20:00 in
+`Africa/Addis_Ababa`, for 30-minute sessions. The host clock at this read was
+02:24 EAT. That interval supports later scheduled bookings, but no complete
+start can fit the immediate request's next-30-minute window at that time. Once
+the saved-language and service-policy blockers are addressed, clinician
+readiness will still require a current interval with continuous capacity.
+“Available for requests” is a presence lease, not a claim that daytime hours
+make the clinician immediately ready overnight.
+
+The current dependent branch adds v1.22's audited policy command and a scoped
+reviewer control under Administration → Service scopes. Enable/pause requires
+an approver role, rationale, eligible catalog lifecycle, and a stable retry key.
+Generic DocType saves cannot change the switch. The event and service update
+share a transaction; disable is refused while live immediate requests remain.
+This controls service policy only: it does not declare the clinician ready.
+The clinician must still save supported languages, exact scope approval,
+published offering/schedule, and fresh presence with full-session capacity.
+Automated backend verification passed on the Frappe 15 isolated site. The
+packaged `/teletena/admin/scopes` page was then opened in Chromium using the
+existing synthetic reviewer; its service selector and immediate-policy panel
+rendered with the explanatory copy. No service was toggled in this browser
+check. Capture: `docs/screenshots/immediate-policy/reviewer-services-1440.png`.
+
+## Current packaged preview (2026-10-08)
+
+- URL: `http://127.0.0.1:8017/teletena/`
+- Bench/site: `/home/frappe/frappe/frappe-bench` /
+  `tele-tena-pr12-fresh.localhost`
+- Backend checkout: branch `feat/immediate-service-policy-review`, source
+  `00a5f0245fcd2b78e93fcea9b65821e5071977af`; the dedicated loopback Gunicorn
+  was gracefully reloaded after migration and build.
+- Frontend: production-built Frappe assets, `release.json` source SHA matches
+  `00a5f0245fcd2b78e93fcea9b65821e5071977af`; no Vite server serves this URL.
+- Scheduler: enabled for this review site; `bench doctor` reports one worker
+  online and `show-pending-jobs` reported no pending jobs at this check. This
+  does not prove a future request or earnings job has executed.

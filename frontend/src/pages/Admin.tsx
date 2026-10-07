@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { api } from "../api";
 import { journeyApi } from "../journey-api";
 import { PageTitle, date, money } from "../components/Domain";
@@ -82,11 +82,19 @@ export function Scopes() {
   const applications = useResource(journeyApi.applications);
   const services = useResource(journeyApi.services);
   const scopes = useResource(journeyApi.serviceScopes);
+  const immediateServices = useResource(journeyApi.immediateServices);
   const [clinician, setClinician] = useState("");
   const [service, setService] = useState("");
   const [id, setId] = useState("");
   const [label, setLabel] = useState("");
   const action = useAction();
+  const { w } = useLocale();
+  const [policyService, setPolicyService] = useState("");
+  const [policySearch, setPolicySearch] = useState("");
+  const [policyReason, setPolicyReason] = useState("");
+  const policy = immediateServices.data?.find((item) => item.id === policyService);
+  const loadPolicyHistory = useCallback(() => policyService ? journeyApi.immediatePolicyHistory(policyService) : Promise.resolve([]), [policyService]);
+  const policyHistory = useResource(loadPolicyHistory);
   return (
     <>
       <PageTitle
@@ -167,6 +175,28 @@ export function Scopes() {
       {action.error && (
         <InlineNotice tone="danger">{action.error}</InlineNotice>
       )}
+      <Card className="immediate-policy-review">
+        <h2>{w("Immediate requests")}</h2>
+        <p>{w("A reviewer controls this service setting. It does not replace clinician approval, approved scope, language, presence, or available time.")}</p>
+        {immediateServices.error ? <InlineNotice tone="danger">{w("Service policies could not be loaded.")}</InlineNotice> : !immediateServices.data ? <Skeleton /> : <>
+          <TextField label={w("Find a service")} value={policySearch} onChange={(e)=>{setPolicySearch(e.target.value);setPolicyService("");setPolicyReason("");}} />
+          <Select label={w("Service") } value={policyService} onChange={(e)=>{setPolicyService(e.target.value);setPolicyReason("");}}>
+            <option value="">{w("Choose a service")}</option>
+            {immediateServices.data.filter(item=>`${item.label} ${item.catalog_status} ${item.id}`.toLocaleLowerCase().includes(policySearch.trim().toLocaleLowerCase())).map(item=><option value={item.id} key={item.id}>{item.label} · {item.catalog_status} · {item.id}</option>)}
+          </Select>
+          {policy && <>
+            <p className="supporting">{policy.immediate_care_enabled ? w("Immediate requests enabled") : w("Immediate requests paused")} · {w("Definition")}: {policy.definition_version || "—"}</p>
+            <TextField label={w("Review reason") } value={policyReason} onChange={e=>setPolicyReason(e.target.value)} maxLength={1000} hint={w("At least 20 characters. Record service-level reasoning; do not include patient data. This is retained in the review history.")} />
+            <div className="actions">
+              <Button disabled={action.busy || !policyReason.trim() || !!policy.immediate_care_enabled} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.setImmediatePolicy(policy.id,true,policyReason,crypto.randomUUID());setPolicyReason("");await immediateServices.refresh();},w("Immediate requests enabled for this service."))}>{w("Enable immediate requests")}</Button>
+              <Button variant="secondary" disabled={action.busy || !policyReason.trim() || !policy.immediate_care_enabled} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.setImmediatePolicy(policy.id,false,policyReason,crypto.randomUUID());setPolicyReason("");await immediateServices.refresh();},w("Immediate requests paused for this service."))}>{w("Pause immediate requests")}</Button>
+            </div>
+            <h3>{w("Recent policy decisions")}</h3>
+            {policyHistory.error ? <InlineNotice tone="danger">{w("Policy history could not be loaded.")}</InlineNotice> : policyHistory.data?.length ? <ul className="policy-history">{policyHistory.data.map((event:any)=><li key={event.id}><strong>{event.enabled ? w("Immediate requests enabled") : w("Immediate requests paused")}</strong><span className="supporting"> · {date(event.created)} · {event.reviewer}</span><p>{event.reason}</p></li>)}</ul> : <p className="supporting">{w("No policy decisions recorded yet.")}</p>}
+          </>}
+        </>}
+      </Card>
+      {action.success && <InlineNotice tone="success">{action.success}</InlineNotice>}
       <h2>Current scopes</h2>
       {scopes.data?.map((scope) => (
         <Card key={scope.clinician + scope.service}>

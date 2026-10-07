@@ -22,6 +22,11 @@ class TeleTenaService(Document):
         if self.vetting_required and self.catalog_status == 'Legacy test':
             frappe.throw('New vetting-required services cannot use the legacy test catalog state')
         previous = self.get_doc_before_save()
+        immediate_changed = (bool(self.immediate_care_enabled) != bool(
+            previous.immediate_care_enabled if previous else 0))
+        if immediate_changed and not getattr(frappe.local, 'tele_tena_service_policy_action', False):
+            frappe.throw('Immediate request policy must be changed through the reviewed policy workflow',
+                         frappe.PermissionError)
         if previous and previous.service_key != self.service_key:
             frappe.throw('Service identifier is immutable')
 
