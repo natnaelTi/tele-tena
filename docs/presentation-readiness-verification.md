@@ -1,5 +1,40 @@
 # Presentation release verification
 
+## Latest local clinic/auth checkpoint — 2026-10-07
+
+- Review URL: `http://127.0.0.1:8017/teletena/` (production-built Frappe app,
+  not Vite). Bench `/home/frappe/frappe/frappe-bench`; site
+  `tele-tena-pr12-fresh.localhost`; branch `feat/clinic-affiliation-review`;
+  backend checkout and packaged source SHA
+  `57c4a4842a1a26d1b6cd4e10b6701a8ace3d9324`.
+- Environment: Frappe 15.121.2 / ERPNext 15.121.6, Python 3.12.3, Node
+  22.23.3. The review WSGI process is Gunicorn on loopback 8017. This site is
+  configured for invited password review; its public phone and registration
+  flags remain off. Its synthetic account file is private under that site's
+  `private` directory; credentials are intentionally omitted here.
+- `tests/presentation.py`: 22/22 passed, including clinic registration and
+  affiliation state, ownership, generic DocType permissions and no implied
+  scope/record access.
+- `tests/contact_auth.py`: 7/7 passed. These tests exercise enabled-registration
+  OTP state using a mocked email provider and a test-only enabled policy; they
+  did not change the invited site's configuration and did not send email.
+- `scripts/browser-clinic-registration.cjs`: passed a real browser journey
+  through the built React package and Frappe APIs: applicant submission →
+  reviewer verification → affiliation request → separate reviewer decision.
+  Synthetic screenshots: `docs/screenshots/clinic-review/`.
+- The earlier frontend build, lint and packaged review/auth/PWA checks passed
+  at this source checkpoint. Existing lint warnings and large LiveKit bundle
+  warning remain.
+- The fresh schema path was synchronized on a disposable site that had been
+  created before the final DocType directory correction. This is not claimed as
+  a clean fresh-install test of the final package. Frappe 16 compatibility for
+  the new clinic DocTypes, clinic/admin responsive visual review, actual
+  browser zoom, live email/SMS, physical-device calling, and native language
+  approval remain unverified.
+- This checkpoint does not complete the 142-screen/product scope. The accurate
+  per-screen status remains in `operational-screen-map.json`; clinics still
+  lack staff membership, calendars/resources, billing and encounter grants.
+
 ## Current integrated local preview — 2026-10-05
 
 - Review URL: `http://127.0.0.1:8017/teletena/` (built Frappe application,

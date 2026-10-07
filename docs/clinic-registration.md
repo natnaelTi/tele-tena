@@ -50,6 +50,18 @@ covers idempotent submission, uniqueness within jurisdiction, corrected
 resubmission with history, approved clinic and affiliation review, self-review
 denial, generic DocType list/document permission checks, cross-clinician denial,
 clarification/resubmission, and the invariant that clinic approval creates no
-service scope. Fresh-install sync and Frappe integration results are tracked in
-the current verification report. Frontend build/lint alone does not establish
-workflow or visual acceptance.
+service scope. It passed 22/22 presentation regressions on the disposable
+Frappe 15 site after the DocType module paths and permission hooks were fixed.
+The actual built `/teletena/` browser journey also passed clinic submission,
+separate reviewer decision, affiliation submission and affiliation review.
+Screenshots are checked in under `docs/screenshots/clinic-review/`.
+
+This was an additive migration onto a site created earlier in the same
+checkpoint, followed by Frappe model synchronization; it is not yet a clean
+fresh-install proof for the final DocType package. Frappe 16 schema/API
+compatibility, responsive review at narrow widths and human Amharic/Afaan Oromo
+review remain unverified. Generic API permissions are covered; private uploads,
+staff membership, clinic workspaces and explicit encounter grants do not exist
+in this slice.
+
+Frontend build/lint alone does not establish workflow or visual acceptance.
