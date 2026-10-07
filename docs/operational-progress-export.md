@@ -13,9 +13,12 @@ real-patient-readiness, real-money, or market-performance claim.
   `tele-tena-pr12-fresh.localhost`, Bench
   `/home/frappe/frappe/frappe-bench`. Frappe 15.121.2 / ERPNext 15.121.6 /
   Python 3.12.3 / Node 22.23.3. This is the built Frappe application, not Vite.
-- The isolated review scheduler is disabled. Do not claim scheduled request
-  routing or earnings release ran through workers. The original development
-  site and Selfmade installation were not modified.
+- The isolated review site has its scheduler enabled. The bench scheduler and
+  its shared worker processes serve the bench; only this site's scheduler
+  flag was changed. Scheduled request expiry ran through the Frappe scheduler
+  and worker. There were no due earnings to release, so scheduled earnings
+  release remains unverified. No unrelated bench service was restarted.
+  The original development site and Selfmade installation were not modified.
 - The named disposable fresh site `tele-tena-clinic-access-fresh.localhost`
   remains available; its temporary scoped database administrator and
   credential file were removed after use.
@@ -49,6 +52,16 @@ real-patient-readiness, real-money, or market-performance claim.
   approved.
 - The packaged Frappe browser check returned HTTP 200 at `/teletena/`, and its
   service worker controlled the canonical `/teletena/` scope after reload.
+- After confirming there were no due pending earnings or pending-confirmation
+  holds, the scheduler was enabled only for `tele-tena-pr12-fresh.localhost`.
+  The site-specific `Scheduled Job Type` rows for request expiry, pending
+  appointment expiry, earnings release and reschedule expiry recorded a run;
+  two overdue open synthetic requests transitioned to `Expired`, and no due
+  earning or appointment hold remained. `bench doctor` showed an online worker
+  processing queues. The default queue also contains an old global failed-job
+  registry; failures were not attributed to TeleTena. The short check did not
+  create an eligible request or a due earning, so it does not prove a successful
+  routing wave or financial release.
 - Frontend TypeScript/Vite production build passed; lint exited 0 with existing
   React warnings. Asset hash/scope/secrets validation passed. PR CI passed on
   Node 22.23.3/24.13.0 and Python 3.12/3.14.2.

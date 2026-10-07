@@ -324,6 +324,13 @@ is not a real request-service rejection. Screenshots are in
 The focused authenticated browser check passed against the built Frappe route.
 Frontend build and focused lint passed before these documentation-only edits.
 The last backend presentation run passed 27/27 before this frontend-only change.
-The preview scheduler remains disabled; this checkpoint does not claim a
-successful offer route, routing wave, or earnings release. Amharic and Afaan
-Oromo remain provisional and have not had native-language approval.
+After the browser run, I checked the preview site's due-work counts: no due
+pending earnings and no expired pending-confirmation bookings existed. I then
+enabled the scheduler only for `tele-tena-pr12-fresh.localhost`; the scheduler
+and workers are bench-wide services, and no service was restarted. Frappe
+recorded execution for the site's TeleTena scheduled entries. Two overdue open
+synthetic requests transitioned to `Expired`; there were no due earnings to
+release. This verifies the scheduled expiry path, not earnings release or a
+successful routing wave. The preview scheduler is now enabled. Other sites'
+scheduler flags were not changed. Amharic and Afaan Oromo remain provisional
+and have not had native-language approval.
