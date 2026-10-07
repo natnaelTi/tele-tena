@@ -23,6 +23,7 @@ permission_query_conditions = {
     "Tele Tena Clinic": "tele_tena.tele_tena.doctype.tele_tena_clinic.tele_tena_clinic.get_permission_query_conditions",
     "Tele Tena Clinic Affiliation": "tele_tena.tele_tena.doctype.tele_tena_clinic_affiliation.tele_tena_clinic_affiliation.get_permission_query_conditions",
     "Tele Tena Clinic Membership": "tele_tena.tele_tena.doctype.tele_tena_clinic_membership.tele_tena_clinic_membership.get_permission_query_conditions",
+    "Tele Tena Clinic Encounter Access": "tele_tena.tele_tena.doctype.tele_tena_clinic_encounter_access.tele_tena_clinic_encounter_access.get_permission_query_conditions",
     "Tele Tena Vetting Scope Application": "tele_tena.tele_tena.doctype.tele_tena_vetting_scope_application.tele_tena_vetting_scope_application.get_permission_query_conditions",
 }
 
@@ -30,4 +31,5 @@ has_permission = {
     "Tele Tena Clinic": "tele_tena.tele_tena.doctype.tele_tena_clinic.tele_tena_clinic.has_document_permission",
     "Tele Tena Clinic Affiliation": "tele_tena.tele_tena.doctype.tele_tena_clinic_affiliation.tele_tena_clinic_affiliation.has_document_permission",
     "Tele Tena Clinic Membership": "tele_tena.tele_tena.doctype.tele_tena_clinic_membership.tele_tena_clinic_membership.has_document_permission",
+    "Tele Tena Clinic Encounter Access": "tele_tena.tele_tena.doctype.tele_tena_clinic_encounter_access.tele_tena_clinic_encounter_access.has_document_permission",
 }

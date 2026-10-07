@@ -953,17 +953,20 @@
       "module": "Profiles/vetting",
       "backend_reference": "journey, vetting, private evidence",
       "required_contract": "Guided profiles, scoped review decisions, protected evidence",
-      "integration_status": "Backend and built-browser flow passed; responsive overflow checked at 320/390/768/1440. Actual 200% zoom and native language review remain pending.",
+      "integration_status": "Clinic registry, affiliation, membership, and patient-controlled scheduling-only encounter grants are implemented. Existing-site Frappe migration and 24-case presentation suite passed; grant authorization, expiry, patient revocation, manager/scheduler membership and Billing denial have backend coverage. The new patient/clinic browser journey, visual inspection, and fresh-site installation remain pending.",
       "prototype_route": "b08",
       "route": "/clinician/affiliations; /clinician/clinic-access; /patient/clinic-access",
       "actor": "Clinician/clinic submitter or active Clinic Manager; invited account with exact verified email; authorized clinic reviewer for registration and affiliation decisions",
-      "status": "Implementation in progress",
+      "status": "Implemented, verification pending",
       "persistent_models": [
         "Tele Tena Clinic",
         "Tele Tena Clinic Affiliation",
+        "Tele Tena Clinic Membership",
+        "Tele Tena Clinic Encounter Access",
         "tt_profile",
-        "tt_audit",
-        "Tele Tena Clinic Membership"
+        "tt_appointment",
+        "tt_appointment_event",
+        "tt_audit"
       ],
       "queries": [
         "tele_tena.api.clinics.my_clinic_applications",
@@ -971,17 +974,22 @@
         "tele_tena.api.clinics.verified_clinics",
         "managed_clinics: submitting manager and active Clinic Manager only",
         "clinic_team: clinic-scoped invitation and membership history for managers only",
-        "my_clinic_memberships: invitations only for an exact verified contact identity; own accepted/revoked memberships"
+        "my_clinic_memberships: invitations only for an exact verified contact identity; own accepted/revoked memberships",
+        "tele_tena.api.clinic_access.eligible_clinics_for_appointment",
+        "tele_tena.api.clinic_access.my_schedule_access",
+        "tele_tena.api.clinic_access.clinic_schedule_access"
       ],
       "commands": [
         "tele_tena.api.clinics.submit_clinic_application",
         "tele_tena.api.clinics.submit_affiliation",
         "invite_clinic_member: create or return the manager-owned idempotent invite",
         "respond_to_clinic_invitation: accept/decline after exact verified-email check",
-        "revoke_clinic_membership: audited reasoned revocation; idempotent retry"
+        "revoke_clinic_membership: audited reasoned revocation; idempotent retry",
+        "tele_tena.api.clinic_access.grant_schedule_access",
+        "tele_tena.api.clinic_access.revoke_schedule_access"
       ],
-      "server_permissions": "Clinic membership never grants patient-record, appointment, note, resume, or service-scope access. Generic list/document hooks are owner, manager, or accepted-member scoped. Invitee sees an invitation only after authenticating an exact verified email. Direct writes/deletes are rejected by controller validation.",
-      "workflow_transitions": "Invited → Active | Declined | Revoked; Active → Revoked. Terminal states cannot be reopened. Owner/active Clinic Manager invites and revokes; verified invitee accepts/declines. Retry of same invitation, acceptance, or revocation is idempotent.",
+      "server_permissions": "Membership alone grants no appointment or clinical-record access. Only the patient on a future confirmed appointment may grant a linked, verified clinic. Custom clinic scheduling query checks verified clinic and active owner/Manager/Scheduling membership; Billing and generic DocType API access are denied. Projection contains only booking-approved identity label and scheduling fields, never notes, contact data, narrative, balances or other appointments.",
+      "workflow_transitions": "Invited → Active | Declined | Revoked; Active → Revoked. Terminal states cannot be reopened. Owner/active Clinic Manager invites and revokes; verified invitee accepts/declines. Retry of same invitation, acceptance, or revocation is idempotent. Patient may grant one scheduling-only share to a verified affiliated clinic; grant → Revoked by patient or access closes on membership removal, expiry, cancellation or completion. Repeated grant/revoke is idempotent.",
       "states": {
         "loading": "Show skeletons for clinic, invitation and membership data; never fabricate invitations.",
         "empty": "Separate no invitations, no memberships, and no managed clinics; explain that in-app invites require prior contact verification.",
@@ -1012,9 +1020,9 @@
         "clinic owner or active Clinic Manager"
       ],
       "verification_evidence": {
-        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B08) and design-handoff.md",
-        "implementation": "Native clinic membership DocType, transactional API, verified-email gate, workspace routes, localized invitation/team UI; no email delivery or clinical-record grants.",
-        "current_local": "Source/build 05115ca5c8027baf99a5049c7e6f5c7250d58466; Frappe 15.121.2/ERPNext 15.121.6 migration; tests/presentation.py 23/23; built /teletena/ clinic registration → reviewer approval → invite → verified invitee acceptance → revocation passed. Playwright checked 320/390/768/1440 CSS px for page overflow; screenshots at 390/1440: docs/screenshots/clinic-membership/. Temporary synthetic verified-email fixture removed. Actual 200% zoom, fresh-site install for this DocType, Frappe 16, and native translation review remain pending."
+        "backend": "Existing Frappe 15 site migrated after a private backup. tests/presentation.py passed 24/24, including patient ownership, generic API denial, exact minimized fields, Billing exclusion, Manager/Scheduling allow, membership revocation, and idempotent patient revoke.",
+        "browser": "Pending: use production-built /teletena/ on the same isolated site.",
+        "fresh_install": "Not run. The existing preview already occupies tele-tena-pr12-fresh.localhost and database teletenapr12fresh; the earlier temporary admin credential was removed without changing this site."
       },
       "related_operational_routes": [
         "/clinician/clinic-access",

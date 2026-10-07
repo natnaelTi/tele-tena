@@ -212,7 +212,14 @@ Billing. The invitee must sign in and prove possession of the exact invited
 email before accepting. Invitations are not emailed by this local slice; they
 are visible only after the invited contact is verified. Managers can revoke
 active memberships with a recorded reason. Membership grants no clinical
-service authority and no patient, appointment, note, or evidence access. The
+service authority and no patient or appointment access by itself. A patient may
+separately grant one verified clinic scheduling-only access to a single future
+confirmed encounter when the treating clinician has a verified affiliation. The
+projection contains only the booking-approved identity label and appointment
+logistics; it excludes notes, contact details, request text, history, balances,
+and other encounters. The patient may revoke at any time; membership revocation,
+expiry, cancellation, or completion also closes access. This does not grant
+clinical-record access. The
 Scheduling and Billing roles are currently descriptive and do not expose
 calendar, resource, or billing capabilities. Clinic Manager may manage clinic
 memberships only. Clinic verification and affiliation never enable clinic
@@ -220,3 +227,18 @@ calendars/resources, clinic billing, explicit encounter grants, or clinic-wide
 patient records. Existing narrative affiliation fields are preserved and are
 not automatically converted into verified affiliations. Native DocType schema
 is additive and synchronized by normal Frappe migration.
+
+
+## Clinic encounter access (scheduling-only initial slice)
+
+A patient may grant one verified clinic scheduling-only access to a single
+future confirmed appointment when the treating clinician has a separately
+verified affiliation with that clinic. Active Clinic Manager and Scheduling
+members can view only service, appointment time/timezone, format, duration,
+status and the identity label already permitted by that encounter's accepted
+disclosure. Billing membership grants no appointment access. The grant expires
+seven days after the scheduled end, can be revoked by the patient, and closes
+when the appointment is cancelled/completed or the membership is revoked. It
+does not allow joining, confirmation, cancellation, rescheduling, notes, shared
+summary, contact details, request text, profile history, balances, or access to
+other encounters. This is not a clinic-wide record grant or shared calendar.

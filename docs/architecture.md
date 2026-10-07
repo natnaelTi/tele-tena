@@ -155,3 +155,17 @@ billing operations. No membership role grants clinical-record, appointment,
 consultation-note, resume, or service-scope access. Invite delivery is not
 implemented, so an invitee must already know to sign in and verify their
 address. Audit events record invitation, acceptance/decline, and revocation.
+
+
+## Patient-controlled clinic scheduling disclosure
+
+`Tele Tena Clinic Encounter Access` is a native, append-history DocType. Generic
+DocType list/read/write APIs deny application access; custom commands create or
+revoke patient-owned grants, and a minimized query authorizes only verified
+clinic owners plus active Clinic Manager/Scheduling members. Billing memberships
+receive no schedule. A grant binds exactly one patient, one confirmed appointment,
+one verified clinic, and the treating clinician's current verified affiliation.
+The staff projection omits account IDs, contact information, request narrative,
+saved history, notes, summaries, feedback, balances, and other encounters. It
+ends on patient revocation, membership removal, expiry, appointment cancellation,
+or completion. It provides logistics only and no clinical-record access.

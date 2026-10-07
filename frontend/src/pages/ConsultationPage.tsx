@@ -5,7 +5,7 @@ import { useSession } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
 import { api } from "../api";
 import { date, money } from "../components/Domain";
-import { Button, Card, InlineNotice, Skeleton } from "../components/ui";
+import { Button, Card, Checkbox, InlineNotice, Select, Skeleton } from "../components/ui";
 import { useAction } from "../hooks/useAction";
 import Consultation from "../features/consultations/Consultation";
 import { useLocale } from "../hooks/useLocale";
@@ -49,6 +49,7 @@ export default function ConsultationPage() {
       {clinician&&callEnded&&item.documentation_state!=="Finalized"&&<section className="note-editor" data-tour-unsaved={privateNote!==null||summary!==null?"true":"false"}><h2>Consultation notes</h2><label className="field">Private consultation note <span className="visibility-label">Only you can see this</span><textarea rows={7} maxLength={12000} value={privateNote??item.private_note?.text??""} onChange={e=>setPrivateNote(e.target.value)} /></label><label className="field">Patient summary / next steps <span className="visibility-label">For patient sharing, with your approval</span><textarea rows={5} maxLength={6000} value={summary??item.private_note?.patient_summary??""} onChange={e=>setSummary(e.target.value)} /></label><div className="actions"><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.saveNoteDraft(id,privateNote??item.private_note?.text??"",summary??item.private_note?.patient_summary??"");await detail.refresh();},"Draft saved.")}>Save draft</Button><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{const result=await journeyApi.previewSummary(id,summary??item.private_note?.patient_summary??"");setPreview(result.summary);},"")}>Preview patient summary</Button><Button loading={action.busy} onClick={()=>{if(window.confirm("Finalize this consultation and publish the current patient summary?"))void action.run(async()=>{await journeyApi.saveNoteDraft(id,privateNote??item.private_note?.text??"",summary??item.private_note?.patient_summary??"");await journeyApi.finalizeConsultation(id,!!(summary??item.private_note?.patient_summary));await detail.refresh();},"Consultation finalized.");}}>Finalize consultation</Button></div>{preview!==null&&<Card><h3>Patient-visible preview</h3><p className="prewrap">{preview||"No patient summary has been entered."}</p><p className="supporting">Previously shared material may already have been seen and cannot be recalled.</p></Card>}</section>}
       {!clinician&&item.patient_summary_revisions?.map((revision:any)=><Card key={revision.revision}><h2>Shared summary · revision {revision.revision}</h2><p className="prewrap">{revision.summary}</p><p className="supporting">Shared {date(revision.published_at)}</p></Card>)}
       {!clinician&&item.status==="Completed"&&<Link className="button secondary" to={`/patient/book/${item.offering}`}>Book a follow-up</Link>}
+      {!clinician&&item.status==="Booked"&&!callEnded&&<PatientClinicScheduleSharing appointment={id}/>}
       {!clinician&&item.can_submit_feedback&&<Card className="session-feedback"><h2>{t("sessionExperience")}</h2><p>{t("sessionExperienceExplainer")}</p><fieldset><legend>{t("sessionExperienceScale")}</legend><div className="feedback-rating" role="radiogroup" aria-label={t("sessionExperience")}>
         {[1,2,3,4,5].map(value=><label key={value}><input type="radio" name="session-experience" value={value} aria-label={`${value} / 5`} checked={feedbackRating===value} onChange={()=>setFeedbackRating(value)}/><span>{value}</span></label>)}
       </div></fieldset><Button loading={action.busy} disabled={feedbackRating===null} onClick={()=>void action.run(async()=>{await journeyApi.submitSessionFeedback(id,feedbackRating!);setFeedbackRating(null);await detail.refresh();},t("feedbackSubmitted"))}>{t("submitSessionFeedback")}</Button></Card>}
@@ -57,6 +58,29 @@ export default function ConsultationPage() {
       {!clinician&&item.financial_state==="Disputed"&&<InlineNotice>A payment review is open. Related simulated earnings remain on hold.</InlineNotice>}
     </main><aside><Card><h2>Session details</h2><dl className="summary-list"><dt>Appointment state</dt><dd>{appointmentStateLabel}</dd><dt>Service</dt><dd>{item.service}</dd><dt>Scheduled</dt><dd>{date(item.start,item.timezone)}<br/>{item.timezone||"Timezone unavailable"}</dd><dt>Format</dt><dd>{item.format}</dd><dt>Booked duration</dt><dd>{item.booked_minutes} minutes</dd><dt>Call state</dt><dd>{item.call_state==="Ended"?"Call ended":item.call_state}</dd><dt>Call ended</dt><dd>{item.call_ended_at?date(item.call_ended_at,item.timezone):"Unavailable"}</dd><dt>Connected time</dt><dd>{item.actual_connected_time_available?"Available":"Unavailable"}</dd><dt>Price</dt><dd>ETB {money(item.price)}</dd><dt>Reservation</dt><dd>{item.status==="Cancelled"||item.status==="Expired"?"Released":item.financial_state==="Pending"||item.financial_state==="Released"?"Consumed":item.status==="Completed"?"Consumed":"Reserved"}</dd></dl></Card><Card><h2>What you’ll share</h2><p>{item.disclosure.request}</p><dl className="summary-list"><dt>Preferred name</dt><dd>{item.disclosure.name||"Not shared"}</dd><dt>Saved history</dt><dd>{item.disclosure.history||"Not shared"}</dd></dl></Card><Card><h2>Timeline</h2><ol className="consultation-timeline">{item.timeline.map((event:any,index:number)=><li key={index}><strong>{event.event}</strong><span>{date(event.at,item.timezone)} · {event.actor}</span>{event.reason&&<p>{event.reason}</p>}</li>)}</ol></Card></aside></div>
   </div>;
+}
+
+function PatientClinicScheduleSharing({appointment}:{appointment:string}) {
+  const {t}=useLocale();
+  const eligible=useResource(useCallback(()=>journeyApi.eligibleClinicsForAppointment(appointment),[appointment]));
+  const grants=useResource(useCallback(()=>journeyApi.myClinicScheduleAccess(appointment),[appointment]));
+  const action=useAction();
+  const [clinic,setClinic]=useState('');
+  const [consented,setConsented]=useState(false);
+  const choices=eligible.data||[];
+  const active=(grants.data||[]).filter((grant:any)=>grant.status==='Active');
+  const visible=choices.length>0||(grants.data||[]).length>0||eligible.error||grants.error;
+  if(!visible)return null;
+  const refresh=async()=>{await Promise.all([eligible.refresh(),grants.refresh()]);};
+  return <Card className="clinic-schedule-sharing"><h2>{t('shareScheduleTitle')}</h2><p>{t('shareScheduleExplainer')}</p>
+    {eligible.error||grants.error?<InlineNotice tone="danger">{t('clinicShareLoadError')} <Button variant="secondary" onClick={()=>void refresh()}>{t('tryAgain')}</Button></InlineNotice>:null}
+    {active.map((grant:any)=><div className="clinic-shared-row" key={grant.grant}><p><strong>{grant.clinic_name}</strong> · {t('sharedSchedule')}</p><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.revokeClinicScheduleAccess(grant.grant);await refresh();})}>{t('stopSharing')}</Button></div>)}
+    {choices.filter(item=>!item.already_shared).length>0&&<><Select label={t('chooseClinic')} value={clinic} onChange={event=>{setClinic(event.target.value);setConsented(false);}}><option value="">{t('chooseClinic')}</option>{choices.filter(item=>!item.already_shared).map(item=><option key={item.clinic} value={item.clinic}>{item.clinic_name} · {item.jurisdiction}</option>)}</Select>
+      {clinic&&<><Checkbox label={t('clinicScheduleConsent')} checked={consented} onChange={event=>setConsented(event.target.checked)}/><Button disabled={!consented||action.busy} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.grantClinicScheduleAccess(appointment,clinic);setClinic('');setConsented(false);await refresh();},t('sharedSchedule'))}>{t('shareAppointment')}</Button></>}
+    </>}
+    {!choices.length&&!active.length&&!eligible.error&&<p className="supporting">{t('noEligibleClinic')}</p>}
+    {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}{action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
+  </Card>;
 }
 
 export function ConsultationRoomPage() {

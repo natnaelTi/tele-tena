@@ -25,6 +25,7 @@ from tele_tena.api import open_requests
 from tele_tena.api import vetting
 from tele_tena.api import trust
 from tele_tena.api import clinics
+from tele_tena.api import clinic_access
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -270,6 +271,93 @@ class Presentation(unittest.TestCase):
         self.assertTrue(frappe.has_permission('Tele Tena Clinic Membership', 'read',
             doc=frappe.get_doc('Tele Tena Clinic Membership', invitation['membership']),
             user=fixtures.USERS['p2']))
+
+    def test_patient_clinic_grant_is_scheduling_only_revocable_and_membership_scoped(self):
+        fixtures.login('c1')
+        registration = clinics.submit_clinic_application(
+            clinic_name='Synthetic Access Clinic', legal_name='Synthetic Access Clinic Ltd',
+            registration_reference='TEST-ACCESS-' + secrets.token_hex(4),
+            jurisdiction='Synthetic jurisdiction', public_description='Synthetic test clinic')
+        clinic = registration['application']
+        fixtures.login('admin')
+        clinics.review_clinic(clinic, 'Verified', 'Synthetic reviewer fixture only.')
+        fixtures.login('c1')
+        affiliation = clinics.submit_affiliation(clinic, 'Synthetic clinician',
+                                                   'Synthetic affiliation evidence only.')
+        fixtures.login('admin')
+        clinics.review_affiliation(affiliation['application'], 'Verified',
+                                    'Synthetic affiliation review only.')
+
+        self.fund_patient('p1', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        booked = self.book_slot(offering, self.slots(offering, day)[0],
+                                'clinic-access-' + secrets.token_hex(6), share_name=False)
+        appointment = booked['id']
+        fixtures.login('p1')
+        eligible = clinic_access.eligible_clinics_for_appointment(appointment)
+        self.assertIn(clinic, [item['clinic'] for item in eligible])
+        granted = clinic_access.grant_schedule_access(appointment, clinic)
+        self.assertEqual(granted['status'], 'Active')
+        self.assertFalse(granted['idempotent'])
+        self.assertTrue(clinic_access.grant_schedule_access(appointment, clinic)['idempotent'])
+        self.assertFalse(frappe.has_permission('Tele Tena Clinic Encounter Access', 'read',
+            doc=frappe.get_doc('Tele Tena Clinic Encounter Access', granted['grant']),
+            user=fixtures.USERS['p1']))
+        self.assertEqual(frappe.get_list('Tele Tena Clinic Encounter Access', fields=['name']), [])
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_doc({'doctype':'Tele Tena Clinic Encounter Access', 'clinic':clinic,
+                'appointment':appointment, 'patient':fixtures.USERS['p1'],
+                'clinician':fixtures.USERS['c1'], 'purpose':'Scheduling coordination',
+                'status':'Active', 'granted_by':fixtures.USERS['p1']}).insert()
+
+        fixtures.login('c1')  # verified clinic owner
+        schedule = clinic_access.clinic_schedule_access()
+        self.assertEqual(len(schedule), 1)
+        self.assertEqual(schedule[0]['patient_label'], 'Private patient')
+        self.assertNotIn('appointment', schedule[0])
+        self.assertNotIn('patient', schedule[0])
+        self.assertNotIn('disclosure', schedule[0])
+        self.assertNotIn('price', schedule[0])
+        self.assertEqual(set(schedule[0]), {'access','clinic','patient_label','service',
+            'start','end','timezone','format','minutes','status'})
+        fixtures.login('c2')
+        self.assertEqual(clinic_access.clinic_schedule_access(), [])
+        with self.assertRaises(frappe.PermissionError):
+            clinic_access.eligible_clinics_for_appointment(appointment)
+
+        fixtures.login('c1')
+        billing = clinics.invite_clinic_member(clinic, fixtures.USERS['c2'], 'Billing')
+        frappe.db.sql('''INSERT INTO tt_contact_identity(channel,contact,user,verified_at)
+            VALUES ('email',%s,%s,NOW(6))''', (fixtures.USERS['c2'], fixtures.USERS['c2']))
+        fixtures.login('c2')
+        clinics.respond_to_clinic_invitation(billing['membership'], 'accept')
+        self.assertEqual(clinic_access.clinic_schedule_access(), [])
+
+        fixtures.login('c1')
+        scheduling = clinics.invite_clinic_member(clinic, fixtures.USERS['c3'], 'Scheduling')
+        frappe.db.sql('''INSERT INTO tt_contact_identity(channel,contact,user,verified_at)
+            VALUES ('email',%s,%s,NOW(6))''', (fixtures.USERS['c3'], fixtures.USERS['c3']))
+        fixtures.login('c3')
+        clinics.respond_to_clinic_invitation(scheduling['membership'], 'accept')
+        self.assertEqual(len(clinic_access.clinic_schedule_access()), 1)
+        fixtures.login('c1')
+        clinics.revoke_clinic_membership(scheduling['membership'], 'Synthetic revocation test.')
+        fixtures.login('c3')
+        self.assertEqual(clinic_access.clinic_schedule_access(), [])
+
+        fixtures.login('p2')
+        with self.assertRaises(frappe.PermissionError):
+            clinic_access.revoke_schedule_access(granted['grant'], 'Not the granting patient.')
+        self.assertEqual(clinic_access.my_schedule_access(appointment), [])
+        fixtures.login('p1')
+        revoked = clinic_access.revoke_schedule_access(granted['grant'], 'Synthetic revoke test.')
+        self.assertEqual(revoked['status'], 'Revoked')
+        self.assertTrue(clinic_access.revoke_schedule_access(
+            granted['grant'], 'Synthetic revoke test.')['idempotent'])
+        self.assertEqual(clinic_access.my_schedule_access(appointment)[0]['status'], 'Revoked')
+        fixtures.login('c1')
+        self.assertEqual(clinic_access.clinic_schedule_access(), [])
 
     def test_vetting_draft_clarification_resubmission_and_scope_decision(self):
         service = fixtures.PREFIX + '-reviewed-scope'

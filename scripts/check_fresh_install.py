@@ -23,15 +23,15 @@ import pymysql
 
 APP = Path(__file__).resolve().parents[1]
 BENCH = Path(__file__).resolve().parents[3]
-SITE = 'tele-tena-pr12-fresh.localhost'
-DB = 'teletenapr12fresh'
-RETAINED_SITE = os.environ.get('TELE_TENA_RETAINED_SITE', 'erp.localhost')
-ADMIN = 'tt_pr12_site_admin'
-CREDENTIALS = Path('/tmp/tele-tena-pr12-db-admin.json')
-LOG = Path('/tmp/tele-tena-pr12-fresh-install.log')
+SITE = os.environ.get('TELE_TENA_FRESH_SITE', 'tele-tena-clinic-access-fresh.localhost')
+DB = os.environ.get('TELE_TENA_FRESH_DB', 'teletenaclinicaccessfresh')
+RETAINED_SITES = tuple(dict.fromkeys((os.environ.get('TELE_TENA_RETAINED_SITES', 'erp.localhost,tele-tena-pr12-fresh.localhost')).split(',')))
+ADMIN = os.environ.get('TELE_TENA_DB_ADMIN_USER', 'tt_clinic_access_admin')
+CREDENTIALS = Path(os.environ.get('TELE_TENA_DB_CREDENTIALS', '/tmp/tele-tena-clinic-access-db-admin.json'))
+LOG = Path('/tmp/tele-tena-clinic-access-fresh-install.log')
 SITE_PATH = BENCH / 'sites' / SITE
 KEEP_SITE = os.environ.get('TELE_TENA_KEEP_FRESH_SITE') == '1'
-assert RETAINED_SITE != SITE, 'The retained site and disposable site must be different'
+assert SITE not in RETAINED_SITES, 'The disposable site must differ from every retained site'
 assert os.geteuid() != 0, 'Run as the normal Linux user, never root'
 assert not SITE_PATH.exists(), 'Disposable site already exists; refusing to overwrite it'
 assert CREDENTIALS.is_file() and not CREDENTIALS.is_symlink()
@@ -50,25 +50,28 @@ def retained_fingerprint():
     from tele_tena.schema import TABLES
     from tele_tena.patches.v1_6_presentation_release import TABLES as PRESENTATION_TABLES
     from tele_tena.patches.v1_7_demo_subledger import TABLES as SUBLEDGER_TABLES
-    frappe.init(site=RETAINED_SITE, sites_path=str(BENCH / 'sites'))
-    frappe.connect()
-    content = {}
-    existing_tables = set(frappe.db.get_tables(cached=False))
-    for table in (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'financial_reconciliation', 'session_feedback', 'phone_identity','otp_challenge','otp_rate_limit','otp_gate','consultation','contact_identity','onboarding'):
-        # A retained pre-v1.7 site legitimately has none of the new subledger
-        # tables yet. Fingerprint only records that existed before this check.
-        if f'tt_{table}' not in existing_tables:
-            continue
-        records = frappe.db.sql(f'SELECT * FROM tt_{table}', as_dict=True)
-        content[table] = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in records)
-    for table in ('tabTele Tena Service', 'tabTele Tena Service Scope'):
-        content[table] = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in frappe.db.sql(f'SELECT * FROM `{table}`', as_dict=True))
-    for name in ('site_config.json', 'private/tele_tena_livekit.json', 'private/tele_tena_sms.json', 'private/tele_tena_email.json'):
-        path = BENCH / 'sites' / RETAINED_SITE / name
-        if path.is_file():
-            content[name] = hashlib.sha256(path.read_bytes()).hexdigest()
-    digest = hashlib.sha256(json.dumps(content, sort_keys=True).encode()).digest()
-    frappe.destroy()
+    all_content = {}
+    for retained_site in RETAINED_SITES:
+        frappe.init(site=retained_site, sites_path=str(BENCH / 'sites'))
+        frappe.connect()
+        content = {}
+        existing_tables = set(frappe.db.get_tables(cached=False))
+        for table in (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'financial_reconciliation', 'session_feedback', 'phone_identity','otp_challenge','otp_rate_limit','otp_gate','consultation','contact_identity','onboarding'):
+            # A retained pre-v1.7 site legitimately has none of the new subledger
+            # tables yet. Fingerprint only records that existed before this check.
+            if f'tt_{table}' not in existing_tables:
+                continue
+            records = frappe.db.sql(f'SELECT * FROM tt_{table}', as_dict=True)
+            content[table] = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in records)
+        for table in ('tabTele Tena Service', 'tabTele Tena Service Scope'):
+            content[table] = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in frappe.db.sql(f'SELECT * FROM `{table}`', as_dict=True))
+        for name in ('site_config.json', 'private/tele_tena_livekit.json', 'private/tele_tena_sms.json', 'private/tele_tena_email.json'):
+            path = BENCH / 'sites' / retained_site / name
+            if path.is_file():
+                content[name] = hashlib.sha256(path.read_bytes()).hexdigest()
+        all_content[retained_site] = content
+        frappe.destroy()
+    digest = hashlib.sha256(json.dumps(all_content, sort_keys=True).encode()).digest()
     return digest
 
 
@@ -210,6 +213,7 @@ try:
     assert frappe.db.exists('DocType', 'Tele Tena Clinic')
     assert frappe.db.exists('DocType', 'Tele Tena Clinic Affiliation')
     assert frappe.db.exists('DocType', 'Tele Tena Clinic Membership')
+    assert frappe.db.exists('DocType', 'Tele Tena Clinic Encounter Access')
     assert frappe.db.sql("SHOW COLUMNS FROM tt_appointment LIKE 'policy_snapshot'")
     assert frappe.db.sql("SHOW COLUMNS FROM tt_application LIKE 'requested_services'")
     assert frappe.db.count('Tele Tena Service Scope') == 0

@@ -96,4 +96,9 @@ export const journeyApi = {
   myClinicMemberships: () => api<{invitations:any[];memberships:any[]}>('tele_tena.api.clinics.my_clinic_memberships'),
   respondToClinicInvitation: (membership:string,decision:'accept'|'decline') => api<any>('tele_tena.api.clinics.respond_to_clinic_invitation',{membership,decision},true),
   revokeClinicMembership: (membership:string,reason:string) => api<any>('tele_tena.api.clinics.revoke_clinic_membership',{membership,reason},true),
+  eligibleClinicsForAppointment: (appointment:string) => api<{clinic:string;clinic_name:string;jurisdiction:string;already_shared:boolean}[]>('tele_tena.api.clinic_access.eligible_clinics_for_appointment',{appointment}),
+  grantClinicScheduleAccess: (appointment:string,clinic:string) => api<any>('tele_tena.api.clinic_access.grant_schedule_access',{appointment,clinic},true),
+  revokeClinicScheduleAccess: (grant:string,reason='') => api<any>('tele_tena.api.clinic_access.revoke_schedule_access',{grant,reason},true),
+  myClinicScheduleAccess: (appointment:string) => api<any[]>('tele_tena.api.clinic_access.my_schedule_access',{appointment}),
+  clinicScheduleAccess: () => api<any[]>('tele_tena.api.clinic_access.clinic_schedule_access'),
 }
