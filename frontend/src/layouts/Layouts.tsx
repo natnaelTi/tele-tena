@@ -12,9 +12,10 @@ import {
   Clock3,
   FileHeart,
   Building2,
+  MoreHorizontal,
 } from "lucide-react";
 import { Brand } from "../components/Brand";
-import { Button, InlineNotice, Skeleton } from "../components/ui";
+import { Button, Dialog, InlineNotice, Skeleton } from "../components/ui";
 import { LanguageSelect, useLocale } from "../hooks/useLocale";
 import { useSession } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
@@ -202,7 +203,7 @@ export function WorkspaceLayout({
 }) {
   const { session, refresh } = useSession();
   const { w } = useLocale();
-  const location = useLocation();
+  const [moreOpen, setMoreOpen] = useState(false);
   const roleItems =
     kind === "patient"
       ? patientNav
@@ -212,24 +213,28 @@ export function WorkspaceLayout({
   const items = kind !== "clinic" && session?.clinic_workspace
     ? [...roleItems, ["/clinic", "Clinic workspace", Building2] as const]
     : roleItems;
-  useEffect(() => {
-    const revealActive = () => {
-      if (!window.matchMedia("(max-width: 800px)").matches) return;
-      const nav = document.querySelector<HTMLElement>(".workspace-nav");
-      const active = nav?.querySelector<HTMLElement>("a.active");
-      if (!nav || !active) return;
-      const navRect = nav.getBoundingClientRect();
-      const itemRect = active.getBoundingClientRect();
-      const left = nav.scrollLeft + itemRect.left - navRect.left - (nav.clientWidth - itemRect.width) / 2;
-      nav.scrollTo({
-        left,
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
-      });
-    };
-    revealActive();
-    window.addEventListener("resize", revealActive);
-    return () => window.removeEventListener("resize", revealActive);
-  }, [location.pathname]);
+  const mobilePrimaryRoutes = kind === "clinician"
+    ? ["/clinician", "/clinician/appointments", "/clinician/requests", "/clinician/availability"]
+    : kind === "patient"
+      ? ["/patient", "/patient/discovery", "/patient/appointments", "/patient/account"]
+      : kind === "admin"
+        ? ["/admin", "/admin/scopes", "/admin/exceptions"]
+        : ["/clinic"];
+  const mobilePrimary = items.filter(([to]) => mobilePrimaryRoutes.includes(to));
+  const mobileMore = items.filter(([to]) => !mobilePrimaryRoutes.includes(to));
+  const tourTargets: Record<string, string> = {
+    "/patient": "patient-home", "/patient/discovery": "patient-discovery",
+    "/patient/appointments": "patient-appointments", "/patient/account": "patient-account",
+    "/clinician": "clinician-today", "/clinician/availability": "clinician-availability",
+    "/clinician/appointments": "clinician-appointments", "/clinician/care": "clinician-care",
+    "/admin": "reviewer-applications", "/admin/scopes": "reviewer-scopes",
+  };
+  const renderNavLink = (item: (typeof items)[number], closeMore = false) => {
+    const [to, label, Icon] = item;
+    return <NavLink key={to} to={to} end data-tour={tourTargets[to]} onClick={closeMore ? () => setMoreOpen(false) : undefined}>
+      <Icon size={20} /><span>{w(label)}</span>
+    </NavLink>;
+  };
   if (kind === "admin" && !session?.roles.includes("Tele Tena Approver"))
     return (
       <main className="container">
@@ -262,12 +267,13 @@ export function WorkspaceLayout({
               : "Your space for care"}
         </div>
         <nav className={`workspace-nav workspace-nav-${kind}`} aria-label="Workspace">
-          {items.map(([to, label, Icon]) => (
-            <NavLink key={to} to={to} end data-tour={to==="/patient"?"patient-home":to==="/patient/discovery"?"patient-discovery":to==="/patient/appointments"?"patient-appointments":to==="/patient/account"?"patient-account":to==="/clinician"?"clinician-today":to==="/clinician/availability"?"clinician-availability":to==="/clinician/appointments"?"clinician-appointments":to==="/clinician/care"?"clinician-care":to==="/admin"?"reviewer-applications":to==="/admin/scopes"?"reviewer-scopes":undefined}>
-              <Icon size={20} />
-              <span>{w(label)}</span>
-            </NavLink>
-          ))}
+          {items.map((item) => renderNavLink(item))}
+        </nav>
+        <nav className="workspace-mobile-nav" aria-label={w("Mobile workspace")}>
+          {mobilePrimary.map((item) => renderNavLink(item))}
+          {mobileMore.length > 0 && <Button variant="quiet" className="mobile-nav-more" onClick={() => setMoreOpen(true)}>
+            <MoreHorizontal size={20} /><span>{w("More")}</span>
+          </Button>}
         </nav>
         <div className="sidebar-bottom">
           <TranslationNote />
@@ -303,6 +309,11 @@ export function WorkspaceLayout({
           <Outlet />
         </main>
       </div>
+      {mobileMore.length > 0 && <Dialog open={moreOpen} onOpenChange={setMoreOpen} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer>
+        <nav className="workspace-more-links" aria-label={w("Additional workspace links")}>
+          {mobileMore.map((item) => renderNavLink(item, true))}
+        </nav>
+      </Dialog>}
     </div>
   );
 }

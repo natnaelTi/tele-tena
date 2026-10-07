@@ -462,6 +462,9 @@ button:active {
   flex-direction: column;
   gap: 4px;
 }
+.workspace-mobile-nav {
+  display: none;
+}
 .sidebar nav a {
   display: flex;
   align-items: center;
@@ -1355,6 +1358,65 @@ button:active {
   .sidebar nav.workspace-nav-patient a { flex: 1 1 0; min-width: 0; white-space: normal; text-align: center; }
   .sidebar nav.workspace-nav-patient a { font-size: 13px; }
   .sidebar nav.workspace-nav-patient a span { max-width: none; overflow-wrap: normal; word-break: normal; white-space: normal; text-align: center; }
+  .sidebar nav.workspace-nav { display: none; }
+  .sidebar nav.workspace-mobile-nav {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 2px;
+    width: 100%;
+    min-width: 0;
+    overflow: visible;
+    padding: 0;
+  }
+  .workspace-mobile-nav a,
+  .workspace-mobile-nav button {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 60px;
+    padding: 6px 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-align: center;
+    white-space: normal;
+    font-size: 12px;
+    line-height: 1.2;
+    border-radius: 12px;
+  }
+  .workspace-mobile-nav a span,
+  .workspace-mobile-nav button span {
+    display: block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  .workspace-mobile-nav button.mobile-nav-more {
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted);
+  }
+  .workspace-mobile-nav button.mobile-nav-more:hover,
+  .workspace-mobile-nav button.mobile-nav-more:focus-visible { background: var(--subtle); color: var(--brand); }
+  .workspace-more-links {
+    display: grid;
+    gap: 8px;
+    margin: 20px 0 4px;
+  }
+  .workspace-more-links a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .workspace-more-links a.active { background: var(--subtle); color: var(--brand); }
   .sidebar-bottom {
     position: absolute;
     right: 24px;
@@ -1712,6 +1774,12 @@ button:active {
   }
   .sidebar nav {
     gap: 8px;
+  }
+  .sidebar nav.workspace-mobile-nav a,
+  .sidebar nav.workspace-mobile-nav button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-inline: 3px;
   }
 }
 
