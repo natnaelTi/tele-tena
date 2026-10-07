@@ -24,6 +24,9 @@ export const journeyApi = {
   wallet: () => api<{ available: number; reserved: number }>('wallet'),
   applications: () => api<Application[]>('applications'),
   serviceScopes: () => api<{ clinician: string; service: string; status: string }[]>('service_scopes'),
+  immediateServices: () => api<{id:string;label:string;catalog_status:string;clinical_review_status:string;immediate_care_enabled:number;definition_version:string}[]>('tele_tena.api.service_policy.immediate_services'),
+  setImmediatePolicy: (service:string,enabled:boolean,reason:string,idempotency_key:string) => api<any>('tele_tena.api.service_policy.set_immediate_policy',{service,enabled,reason,idempotency_key},true),
+  immediatePolicyHistory: (service:string) => api<any[]>('tele_tena.api.service_policy.immediate_policy_history',{service}),
   appointments: () => api<Appointment[]>('appointments'),
   calendar: (offering: string, from_date: string, display_timezone: string) =>
     api<{days:{date:string;slots:TimeSlot[]}[];timezone:string;schedule_timezone:string|null;duration:number;format:string;price:number}>('tele_tena.api.scheduling.calendar', { offering, from_date, days: 35, display_timezone }),

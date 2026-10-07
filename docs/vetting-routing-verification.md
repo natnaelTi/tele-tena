@@ -244,3 +244,25 @@ asserts that absent languages and disabled immediate-service policy remain
 separate readiness reasons. The running packaged browser confirmed the linked
 reasons for this seeded synthetic account; screenshot:
 `docs/screenshots/mutual-rescheduling/availability-1440.png`.
+
+### Reviewer service-policy workflow (2026-10-08)
+
+The fresh read-only check on the retained `tele-tena-pr12-fresh.localhost`
+synthetic account returned `language_required` and `immediate_policy_required`.
+The persisted care-language list was empty and the exact service policy was
+false; the schedule and approved offering existed. Thus the user's statement
+about a matching language in the interface did not match the persisted profile
+for this snapshot. Neither cause is inferred from the original screenshot; both
+were read from this later server state. No synthetic account or service was
+changed to make the diagnosis pass.
+
+The current dependent branch adds v1.22's audited policy command and a scoped
+reviewer control under Administration → Service scopes. Enable/pause requires
+an approver role, rationale, eligible catalog lifecycle, and a stable retry key.
+Generic DocType saves cannot change the switch. The event and service update
+share a transaction; disable is refused while live immediate requests remain.
+This controls service policy only: it does not declare the clinician ready.
+The clinician must still save supported languages, exact scope approval,
+published offering/schedule, and fresh presence with full-session capacity.
+Automated backend verification passed on the Frappe 15 isolated site; rendered
+admin-browser interaction for this new control remains pending.

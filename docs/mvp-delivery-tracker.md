@@ -250,3 +250,16 @@ Selfmade was separately reported installed at `bba5ed9f15bd0b140967618ed2bd982c3
 the operator later reported actual app SHA `8f7ab9cd8d5e779d17b632dc9afdae3e700ab3c6`.
 No update is implied by local feature work. The current availability hotfix PR #11 is
 open and independent of the wider presentation improvement branch.
+
+### Immediate service policy follow-up (2026-10-08)
+
+The dependent `feat/immediate-service-policy-review` branch adds an approver-
+only audit command for enabling or pausing service-level immediate-care policy,
+with lifecycle checks, idempotency, rationale, and generic DocType write
+protection. On the backed-up Frappe 15 isolated site, v1.22 migration and repeat
+migration passed; `tests/presentation.py` passed 31/31. Frontend lint/build
+passed (existing lint warnings and bundle-size notice remain). The new reviewer
+control has not yet had a dedicated connected browser click-through or Frappe 16
+migration run. Existing Review Clinician data remains unchanged and is still
+blocked by missing saved language and the service policy being off. No claim of
+successful routed offer is made.

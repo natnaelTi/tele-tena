@@ -82,11 +82,16 @@ export function Scopes() {
   const applications = useResource(journeyApi.applications);
   const services = useResource(journeyApi.services);
   const scopes = useResource(journeyApi.serviceScopes);
+  const immediateServices = useResource(journeyApi.immediateServices);
   const [clinician, setClinician] = useState("");
   const [service, setService] = useState("");
   const [id, setId] = useState("");
   const [label, setLabel] = useState("");
   const action = useAction();
+  const { w } = useLocale();
+  const [policyService, setPolicyService] = useState("");
+  const [policyReason, setPolicyReason] = useState("");
+  const policy = immediateServices.data?.find((item) => item.id === policyService);
   return (
     <>
       <PageTitle
@@ -167,6 +172,25 @@ export function Scopes() {
       {action.error && (
         <InlineNotice tone="danger">{action.error}</InlineNotice>
       )}
+      <Card className="immediate-policy-review">
+        <h2>{w("Immediate requests")}</h2>
+        <p>{w("A reviewer controls this service setting. It does not replace clinician approval, approved scope, language, presence, or available time.")}</p>
+        {immediateServices.error ? <InlineNotice tone="danger">{w("Service policies could not be loaded.")}</InlineNotice> : !immediateServices.data ? <Skeleton /> : <>
+          <Select label={w("Service") } value={policyService} onChange={(e)=>{setPolicyService(e.target.value);setPolicyReason("");}}>
+            <option value="">{w("Choose a service")}</option>
+            {immediateServices.data.map(item=><option value={item.id} key={item.id}>{item.label} · {item.catalog_status}</option>)}
+          </Select>
+          {policy && <>
+            <p className="supporting">{policy.immediate_care_enabled ? w("Immediate requests enabled") : w("Immediate requests paused")} · {w("Definition")}: {policy.definition_version || "—"}</p>
+            <TextField label={w("Review reason") } value={policyReason} onChange={e=>setPolicyReason(e.target.value)} maxLength={1000} hint={w("At least 20 characters. This is retained in the review history.")} />
+            <div className="actions">
+              <Button disabled={action.busy || !policyReason.trim() || !!policy.immediate_care_enabled} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.setImmediatePolicy(policy.id,true,policyReason,crypto.randomUUID());setPolicyReason("");await immediateServices.refresh();},w("Immediate requests enabled for this service."))}>{w("Enable immediate requests")}</Button>
+              <Button variant="secondary" disabled={action.busy || !policyReason.trim() || !policy.immediate_care_enabled} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.setImmediatePolicy(policy.id,false,policyReason,crypto.randomUUID());setPolicyReason("");await immediateServices.refresh();},w("Immediate requests paused for this service."))}>{w("Pause immediate requests")}</Button>
+            </div>
+          </>}
+        </>}
+      </Card>
+      {action.success && <InlineNotice tone="success">{action.success}</InlineNotice>}
       <h2>Current scopes</h2>
       {scopes.data?.map((scope) => (
         <Card key={scope.clinician + scope.service}>

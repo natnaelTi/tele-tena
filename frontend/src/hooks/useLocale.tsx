@@ -6,6 +6,20 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  "Immediate requests": ["ፈጣን ጥያቄዎች", "Gaaffiiwwan ariifachiisoo"],
+  "A reviewer controls this service setting. It does not replace clinician approval, approved scope, language, presence, or available time.": ["ይህን የአገልግሎት ቅንብር ገምጋሚ ይቆጣጠራል። የሐኪም ማጽደቅን፣ የተፈቀደ ወሰንን፣ ቋንቋን፣ ዝግጁነትን ወይም ነፃ ጊዜን አይተካም።", "Gamaaggamaan qindaa'ina tajaajila kana to'ata. Mirkaneessa ogeessaa, daangaa hayyamame, afaan, qophii ykn yeroo bilisaa hin bakka bu'u."],
+  "Service policies could not be loaded.": ["የአገልግሎት ፖሊሲዎችን መጫን አልተቻለም።", "Imaammata tajaajilaa fe'uun hin danda'amne."],
+  "Immediate requests enabled": ["ፈጣን ጥያቄዎች ተከፍተዋል", "Gaaffiiwwan ariifachiisoo banamaniiru"],
+  "Immediate requests paused": ["ፈጣን ጥያቄዎች ቆመዋል", "Gaaffiiwwan ariifachiisoo dhaabbataniiru"],
+  "Definition": ["ትርጓሜ", "Hiika"],
+  "Review reason": ["የግምገማ ምክንያት", "Sababa gamaaggamaa"],
+  "At least 20 characters. This is retained in the review history.": ["ቢያንስ 20 ቁምፊዎች። ይህ በግምገማ ታሪክ ውስጥ ይቀመጣል።", "Yoo xiqqaate arfama 20. Kun seenaa gamaaggamaa keessatti ni turu."],
+  "Enable immediate requests": ["ፈጣን ጥያቄዎችን ክፈት", "Gaaffiiwwan ariifachiisoo bani"],
+  "Pause immediate requests": ["ፈጣን ጥያቄዎችን አቁም", "Gaaffiiwwan ariifachiisoo dhaabi"],
+  "Immediate requests enabled for this service.": ["ለዚህ አገልግሎት ፈጣን ጥያቄዎች ተከፍተዋል።", "Gaaffiiwwan ariifachiisoo tajaajila kanaaf banamaniiru."],
+  "Immediate requests paused for this service.": ["ለዚህ አገልግሎት ፈጣን ጥያቄዎች ቆመዋል።", "Gaaffiiwwan ariifachiisoo tajaajila kanaaf dhaabbataniiru."],
+  "Review your service application": ["የአገልግሎት ማመልከቻዎን ይመልከቱ", "Iyyannoo tajaajilaa kee ilaali"],
+  "A reviewer must enable immediate requests for this service. This does not guarantee a request or match.": ["ለዚህ አገልግሎት ፈጣን ጥያቄዎችን ገምጋሚ ማንቃት አለበት። ይህ ጥያቄ ወይም ግጥሚያ እንደሚመጣ ዋስትና አይሰጥም።", "Gamaaggamaan tajaajila kanaaf gaaffiiwwan ariifachiisoo banuu qaba. Kun gaaffii ykn walitti dhufeenya mirkaneessu miti."],
   "Open a care request": ["የእንክብካቤ ጥያቄ ይክፈቱ", "Gaaffii kunuunsaa bani"],
   "Open requests are not an emergency response service.": ["ክፍት ጥያቄዎች የአደጋ ጊዜ ምላሽ አገልግሎት አይደሉም።", "Gaaffiin banaan tajaajila deebii balaa ariifachiisaa miti."],
   "What would you like help with?": ["በምን እንርዳዎ?", "Maal irratti gargaarsa barbaadda?"],
