@@ -6,15 +6,17 @@ Active branch `feat/scope-reverification` is a dependent follow-up to the
 vetting reconsideration work. It adds separate, evidence-backed credential
 renewal and reviewer-only operational flags for future appointments when a
 scope is no longer eligible. The flag cannot reveal patient records or mutate
-booking/financial state. Frappe 15 presentation verification passed 30/30;
-repeat migration, hosted-phone unit tests, service-worker tests, frontend
-build/lint, and compile checks passed. The packaged `/teletena/admin/vetting`
-reviewer empty-state rendered without browser errors; see the screenshot in
-the verification report. Frappe 16, fresh-site install, and populated queue
-browser verification remain pending. The review-site scheduler is enabled and
-one shared-bench worker is online, but execution of the new hook is unverified.
-Automatic date-expiry discovery is not claimed until an isolated worker check
-passes. See
+booking/financial state. Frappe 15 and the separate Frappe 16.2.1 / ERPNext
+16.1.0 / Python 3.14.2 compatibility site each passed the 30-case presentation
+suite and repeat migration through v1.21; Frappe 16 `pip check` is clean. CI
+passed frontend on Node 22 and 24 and Python syntax on 3.12 and 3.14.2. The
+packaged `/teletena/admin/vetting` reviewer empty-state rendered without browser
+errors; see the screenshot in the verification report. Fresh empty-site install,
+Frappe 16 browser verification, populated queue browser verification and
+isolated scheduler execution remain pending. The shared review-site scheduler
+is enabled and one shared-bench worker is online, but execution of the new hook
+is unverified. Automatic date-expiry discovery is not claimed until an isolated
+worker check passes. See
 [`scope-lifecycle-verification.md`](scope-lifecycle-verification.md).
 
 ## Current active continuation — consultation extensions — 2026-10-08

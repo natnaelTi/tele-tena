@@ -46,6 +46,17 @@ Date: 2026-10-08
 - Backed up the isolated review site with database and files before schema
   migration. Frappe migration applied v1.20/v1.21 and a repeat migration
   succeeded.
+- A separate Frappe 16.2.1 / ERPNext 16.1.0 / Python 3.14.2 compatibility
+  bench site (`tele-tena-pr2-test.localhost`) was backed up before migration.
+  Both the initial and repeat migration through v1.21 succeeded, and
+  `tests/presentation.py` passed 30/30 on that stack. `pip check` reported no
+  broken requirements. The full suite exercises renewal evidence, eligibility,
+  preservation, idempotency, privacy and appointment-review permissions. This
+  is Frappe integration evidence; it does not establish fresh-empty-site
+  installation or Frappe 16 browser behavior.
+- GitHub CI for PR #26 passed frontend builds on Node 22.23.3 and Node 24.13.0,
+  plus Python syntax jobs on 3.12 and 3.14.2. The local Bench has Node
+  22.23.3; Node 24.13.0 was not installed locally.
 - Read-only site status reports scheduler active
   (`System Settings.enable_scheduler=true`, `pause_scheduler=false`); `bench
   doctor` reports one worker online. These processes are shared across the
@@ -62,8 +73,12 @@ Date: 2026-10-08
 - The populated operational review card has backend coverage but has not yet
   been exercised in the rendered browser. Only the reviewer empty state was
   captured.
-- Frappe 16 migration/tests for v1.19–v1.21 and isolated scheduler/worker
-  execution have not been completed. Because scheduler and worker services are
+- Fresh empty-site installation is pending because this WSL session has no
+  non-interactive MariaDB administrator access. The latest harness change
+  retains only the named disposable site/database on a failed browser run; no
+  current temporary credential file is present. The existing Frappe 16 test
+  site was preserved.
+- Isolated scheduler/worker execution has not been completed. Because scheduler and worker services are
   shared, automatic date-expiry scanning is not claimed until the new hook is
   verified without disturbing other sites. Explicit reviewer suspension/expiry
   creates flags synchronously.
@@ -71,6 +86,9 @@ Date: 2026-10-08
   semantics, reminders, malware scanning and patient-care continuity policy
   remain human/external decisions.
 
-The production asset manifest identifies the source commit shown in
+The production asset manifest identifies source
+`03435bd3a4ae31c263c0bc753222763f90c2b536` in
 `tele_tena/public/review/release.json`; the preview is an isolated Frappe 15
-site and does not use Vite.
+site at `http://127.0.0.1:8017/teletena/` and does not use Vite. Frappe 16
+compatibility was verified through migrations and backend tests on the
+separate compatibility bench, not by replacing this review preview.
