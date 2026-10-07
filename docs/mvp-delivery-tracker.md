@@ -11,9 +11,10 @@ repeat migration, hosted-phone unit tests, service-worker tests, frontend
 build/lint, and compile checks passed. The packaged `/teletena/admin/vetting`
 reviewer empty-state rendered without browser errors; see the screenshot in
 the verification report. Frappe 16, fresh-site install, and populated queue
-browser verification remain pending. The review-site scheduler is disabled,
-so automatic date-expiry discovery is not claimed until an isolated worker
-check passes. See
+browser verification remain pending. The review-site scheduler is enabled and
+one shared-bench worker is online, but execution of the new hook is unverified.
+Automatic date-expiry discovery is not claimed until an isolated worker check
+passes. See
 [`scope-lifecycle-verification.md`](scope-lifecycle-verification.md).
 
 ## Current active continuation — consultation extensions — 2026-10-08

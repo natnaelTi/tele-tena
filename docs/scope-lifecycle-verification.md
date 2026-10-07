@@ -44,8 +44,13 @@ Date: 2026-10-08
   displayed existing synthetic vetting fixtures; it did not expose real
   personal or clinical data.
 - Backed up the isolated review site with database and files before schema
-migration. Frappe migration applied v1.20/v1.21 and a repeat migration
-succeeded.
+  migration. Frappe migration applied v1.20/v1.21 and a repeat migration
+  succeeded.
+- Read-only site status reports scheduler active
+  (`System Settings.enable_scheduler=true`, `pause_scheduler=false`); `bench
+  doctor` reports one worker online. These processes are shared across the
+  Bench, so this does not prove the new hook was loaded or executed. No
+  bench-wide service was restarted for this feature.
 
 ## Not yet verified
 
@@ -57,15 +62,15 @@ succeeded.
 - The populated operational review card has backend coverage but has not yet
   been exercised in the rendered browser. Only the reviewer empty state was
   captured.
-- Frappe 16 migration/tests for v1.19–v1.21 and a running isolated scheduler
-  have not been completed. The current review-site scheduler remains disabled;
-  automatic date-expiry scanning must not be claimed until an isolated worker
-  check passes. Explicit reviewer suspension/expiry still creates flags
-  synchronously.
+- Frappe 16 migration/tests for v1.19–v1.21 and isolated scheduler/worker
+  execution have not been completed. Because scheduler and worker services are
+  shared, automatic date-expiry scanning is not claimed until the new hook is
+  verified without disturbing other sites. Explicit reviewer suspension/expiry
+  creates flags synchronously.
 - Credential issuer/registry verification, jurisdiction-specific expiry-date
   semantics, reminders, malware scanning and patient-care continuity policy
   remain human/external decisions.
 
-The production asset manifest currently identifies `fbbf5c1414a5a5cc0856a46755cbcf24e07d8833`.
-The preview is an isolated Frappe 15 review site, not Vite. A later
-documentation-only commit may cause the source SHA to be repackaged.
+The production asset manifest identifies the source commit shown in
+`tele_tena/public/review/release.json`; the preview is an isolated Frappe 15
+site and does not use Vite.
