@@ -25,11 +25,13 @@ APP = Path(__file__).resolve().parents[1]
 BENCH = Path(__file__).resolve().parents[3]
 SITE = 'tele-tena-pr12-fresh.localhost'
 DB = 'teletenapr12fresh'
-RETAINED_SITE = 'tele-tena-pr2-test.localhost'
+RETAINED_SITE = os.environ.get('TELE_TENA_RETAINED_SITE', 'erp.localhost')
 ADMIN = 'tt_pr12_site_admin'
 CREDENTIALS = Path('/tmp/tele-tena-pr12-db-admin.json')
 LOG = Path('/tmp/tele-tena-pr12-fresh-install.log')
 SITE_PATH = BENCH / 'sites' / SITE
+KEEP_SITE = os.environ.get('TELE_TENA_KEEP_FRESH_SITE') == '1'
+assert RETAINED_SITE != SITE, 'The retained site and disposable site must be different'
 assert os.geteuid() != 0, 'Run as the normal Linux user, never root'
 assert not SITE_PATH.exists(), 'Disposable site already exists; refusing to overwrite it'
 assert CREDENTIALS.is_file() and not CREDENTIALS.is_symlink()
@@ -51,7 +53,12 @@ def retained_fingerprint():
     frappe.init(site=RETAINED_SITE, sites_path=str(BENCH / 'sites'))
     frappe.connect()
     content = {}
-    for table in (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'phone_identity','otp_challenge','otp_rate_limit','otp_gate','consultation','contact_identity','onboarding'):
+    existing_tables = set(frappe.db.get_tables(cached=False))
+    for table in (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'financial_reconciliation', 'phone_identity','otp_challenge','otp_rate_limit','otp_gate','consultation','contact_identity','onboarding'):
+        # A retained pre-v1.7 site legitimately has none of the new subledger
+        # tables yet. Fingerprint only records that existed before this check.
+        if f'tt_{table}' not in existing_tables:
+            continue
         records = frappe.db.sql(f'SELECT * FROM tt_{table}', as_dict=True)
         content[table] = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in records)
     for table in ('tabTele Tena Service', 'tabTele Tena Service Scope'):
@@ -113,14 +120,29 @@ def enabled_registration_browser_check():
         if result.returncode:
             raise RuntimeError('Enabled-registration fresh-site browser journey failed')
 
+        # Verify the invited-review policy against this same isolated site and
+        # backend, not whichever older branch happens to own port 8017.
+        for key in ('tele_tena_phone_otp_enabled',
+                    'tele_tena_patient_registration_enabled',
+                    'tele_tena_clinician_registration_enabled'):
+            update_site_config(key, False)
         invited_env = dict(os.environ, NODE_PATH='/tmp/tele-tena-browser/node_modules',
-                           TELE_TENA_TEST_BASE='http://127.0.0.1:8017/teletena')
+                           TELE_TENA_TEST_BASE='http://127.0.0.1:' + port + '/teletena')
         invited = subprocess.run(['node', str(APP / 'scripts/browser-invited-review.cjs')],
                                  cwd=APP, env=invited_env, timeout=90,
                                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         print(invited.stdout.strip())
         if invited.returncode:
             raise RuntimeError('Invited-review browser policy check failed')
+        # The retained preview site is left with the enabled-review policy used
+        # for the main integration journey; the invoked browser fixture itself
+        # saw all three switches disabled above.
+        for key, value in (
+            ('tele_tena_phone_otp_enabled', True),
+            ('tele_tena_patient_registration_enabled', True),
+            ('tele_tena_clinician_registration_enabled', True),
+        ):
+            update_site_config(key, value)
     finally:
         server.terminate()
         try:
@@ -178,7 +200,7 @@ try:
     from tele_tena.schema import TABLES
     from tele_tena.patches.v1_6_presentation_release import TABLES as PRESENTATION_TABLES
     from tele_tena.patches.v1_7_demo_subledger import TABLES as SUBLEDGER_TABLES
-    assert all('tt_' + table in frappe.db.get_tables(cached=False) for table in (*TABLES,*PRESENTATION_TABLES,*SUBLEDGER_TABLES))
+    assert all('tt_' + table in frappe.db.get_tables(cached=False) for table in (*TABLES,*PRESENTATION_TABLES,*SUBLEDGER_TABLES,'financial_reconciliation'))
     assert 'tt_consultation' in frappe.db.get_tables(cached=False)
     assert frappe.db.exists('DocType', 'Tele Tena Service')
     assert frappe.db.exists('DocType', 'Tele Tena Service Scope')
@@ -188,7 +210,7 @@ try:
     assert frappe.db.sql('SELECT COUNT(*) FROM tt_wallet')[0][0] == 0
     for role in ('Tele Tena Patient', 'Tele Tena Clinician', 'Tele Tena Approver'):
         assert frappe.db.exists('Role', role)
-    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state', 'v1_5_contact_onboarding', 'v1_6_presentation_release', 'v1_7_demo_subledger', 'v1_8_legacy_event_reconciliation'):
+    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state', 'v1_5_contact_onboarding', 'v1_6_presentation_release', 'v1_7_demo_subledger', 'v1_8_legacy_event_reconciliation', 'v1_13_financial_reconciliation_audit'):
         assert frappe.db.exists('Patch Log', {'patch': 'tele_tena.patches.' + version})
     from tele_tena.api import journey
     assert not journey.simulation_enabled(), 'Simulation unexpectedly enabled on disposable site'
@@ -206,7 +228,7 @@ try:
     frappe.destroy()
     assert retained_fingerprint() == retained_before, 'Retained development records changed'
     passed = True
-    print('PASS: fresh Frappe + ERPNext + tele_tena install, native models, roles, presentation and subledger schemas, ten migrations, guest denial and simulation disabled before explicit review setup; retained development records unchanged')
+    print('PASS: fresh Frappe + ERPNext + tele_tena install, native models, roles, presentation, subledger and reconciliation schemas, migrations, guest denial and simulation disabled before explicit review setup; retained development records unchanged')
 except Exception as error:
     import traceback
     for frame in traceback.extract_tb(error.__traceback__):
@@ -218,12 +240,12 @@ finally:
         frappe.destroy()
     admin = administration()
     with admin.cursor() as cursor:
-        if attempted:
+        if attempted and not (KEEP_SITE and passed):
             cursor.execute(f'DROP DATABASE IF EXISTS `{DB}`')
             cursor.execute(f"DROP USER IF EXISTS '{DB}'@'localhost'")
         cursor.execute(f"DROP USER '{ADMIN}'@'localhost'")
     admin.close()
-    if attempted and SITE_PATH.exists():
+    if attempted and not (KEEP_SITE and passed) and SITE_PATH.exists():
         assert SITE_PATH.resolve() == (BENCH / 'sites' / SITE).resolve()
         shutil.rmtree(SITE_PATH)
     CREDENTIALS.unlink()
@@ -235,5 +257,10 @@ finally:
         unexpected.close()
     except pymysql.err.OperationalError as error:
         denied = error.args[0] in (1045, 1698)
-    assert denied and not CREDENTIALS.exists() and not SITE_PATH.exists(), 'Cleanup verification failed'
-    print('CLEANUP PASS: disposable site/database/site user and temporary localhost administrator removed; credential file removed; administrator re-authentication denied')
+    assert denied and not CREDENTIALS.exists(), 'Temporary database-administrator cleanup verification failed'
+    if KEEP_SITE and passed:
+        assert SITE_PATH.exists(), 'Requested fresh preview site was not retained'
+        print('CLEANUP PASS: temporary localhost administrator and credential file removed; disposable verification site retained by explicit request')
+    else:
+        assert not SITE_PATH.exists(), 'Disposable site cleanup verification failed'
+        print('CLEANUP PASS: disposable site/database/site user and temporary localhost administrator removed; credential file removed; administrator re-authentication denied')

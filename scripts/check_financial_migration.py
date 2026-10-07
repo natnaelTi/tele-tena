@@ -8,7 +8,9 @@ import subprocess
 import sys
 
 BENCH = Path(__file__).resolve().parents[3]
-SITE = os.environ.get('TELE_TENA_TEST_SITE', 'tele-tena-pr2-test.localhost')
+SITE = os.environ.get('TELE_TENA_TEST_SITE')
+assert SITE and SITE.endswith('.localhost') and SITE.startswith(('tele-tena-', 'teletena-')), \
+    'Set TELE_TENA_TEST_SITE to a disposable TeleTena site; development sites are refused'
 os.chdir(BENCH / 'sites')
 sys.path.insert(0, str(BENCH / 'apps/frappe'))
 import frappe
@@ -18,6 +20,10 @@ def snapshot():
     wallets = frappe.db.sql('SELECT patient,available,reserved FROM tt_wallet ORDER BY patient', as_dict=True)
     legacy = frappe.db.sql('SELECT COUNT(*) n,COALESCE(SUM(amount),0) total FROM tt_ledger', as_dict=True)[0]
     earnings = frappe.db.sql('SELECT appointment,state,gross_minor,fee_minor,net_minor FROM tt_earning ORDER BY appointment', as_dict=True)
+    reconciliations = frappe.db.sql('''SELECT patient,status,legacy_available,legacy_reserved,
+        wallet_available,wallet_reserved,subledger_available,subledger_reserved,event_count,
+        unknown_event_count,boundary_event_count,decision,decision_reason
+        FROM tt_financial_reconciliation ORDER BY patient''', as_dict=True)
     balances = []
     for wallet in wallets:
         accounts = frappe.db.sql('''SELECT bucket,balance_minor FROM tt_financial_account
@@ -35,7 +41,8 @@ def snapshot():
     payload = {'wallets': balances, 'legacy_count': int(legacy.n), 'legacy_total': int(legacy.total),
                'earnings': [[r.appointment,r.state,int(r.gross_minor),int(r.fee_minor),int(r.net_minor)] for r in earnings],
                'journals': int(frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0]),
-               'journal_lines': int(frappe.db.sql('SELECT COUNT(*) FROM tt_journal_line')[0][0])}
+               'journal_lines': int(frappe.db.sql('SELECT COUNT(*) FROM tt_journal_line')[0][0]),
+               'reconciliations': [list(row) for row in reconciliations]}
     return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 

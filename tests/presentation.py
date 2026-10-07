@@ -953,6 +953,45 @@ class Presentation(unittest.TestCase):
             frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
 
+    def test_07_legacy_wallet_mismatch_is_held_until_audited_decision(self):
+        from tele_tena import accounting
+        from tele_tena.patches.v1_13_financial_reconciliation_audit import audit_wallet
+        savepoint = 'tt_fin_audit_' + uuid.uuid4().hex[:16]
+        frappe.db.sql('SAVEPOINT ' + savepoint)
+        patient = 'mismatch-' + uuid.uuid4().hex[:16] + '@example.invalid'
+        try:
+            frappe.db.sql('INSERT INTO tt_wallet (patient,available,reserved) VALUES (%s,500,0)',
+                          (patient,))
+            account = accounting.account_id('patient', patient, 'available')
+            accounting.post('opening:' + patient, 'Opening', 'opening:' + patient,
+                            [(account, 0, 500), ('demo:opening-control', 500, 0)],
+                            {'source': 'synthetic reconciliation test'})
+            journey.simulation_log(patient, 'Deposit', 1000, 'deposit:mismatch-test')
+            result = audit_wallet(patient)
+            self.assertFalse(result['matches'])
+            self.assertEqual(result['legacy']['available'], 1000)
+            self.assertEqual(result['wallet']['available'], 500)
+            self.assertEqual(accounting.balance('patient', patient, 'available'), 500)
+            wallet = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
+            with self.assertRaises(frappe.ValidationError):
+                accounting.check_wallet_projection(patient, wallet)
+            fixtures.login('p1')
+            with self.assertRaises(frappe.PermissionError):
+                accounting.financial_reconciliation_queue()
+            fixtures.login('admin')
+            queue = accounting.financial_reconciliation_queue()
+            self.assertIn(patient, [row.patient for row in queue])
+            accepted = accounting.accept_wallet_snapshot(patient, 'Synthetic review accepted current opening snapshot')
+            self.assertTrue(accepted['historical_difference_preserved'])
+            accounting.check_wallet_projection(patient, wallet)
+            audit = journey.one('''SELECT status,decision,reason FROM tt_financial_reconciliation
+                WHERE patient=%s''', (patient,))
+            self.assertEqual(audit.status, 'SnapshotAccepted')
+            self.assertIn('legacy_diff', audit.reason)
+        finally:
+            frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
+            frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
