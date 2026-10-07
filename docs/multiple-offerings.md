@@ -43,12 +43,26 @@ verify retry safety; and confirm existing appointment snapshots do not change.
   from source SHA `44694b4364e466b1aec3308d01521b9739641ab9`. An existing synthetic
   clinician created the second offering through the browser; it persisted after
   reload. A separate patient browser session found it in discovery, and the
-  account email was absent from rendered content. Screenshots:
-  `docs/screenshots/multiple-offerings/clinician-services-1440.png` and
-  `docs/screenshots/multiple-offerings/patient-discovery-390.png`.
-- Frontend lint/build passed; lint reports existing warnings and the build has
-  the existing large-chunk advisory. No booking was made against the new
-  offering. The synthetic clinician profile is paused for immediate requests
+  account email was absent from rendered content. The clinician created a
+  published Monday schedule (09:00–10:00 Africa/Addis_Ababa); it persisted after
+  reload and generated a patient booking slot. The patient booked the
+  30-minute, ETB 649 offering. It first appeared as pending confirmation; the
+  clinician confirmed it, and it moved to Upcoming. Existing appointments and
+  balances were not reset. Screenshots:
+  `docs/screenshots/multiple-offerings/clinician-services-1440.png`,
+  `docs/screenshots/multiple-offerings/patient-discovery-390.png`,
+  `docs/screenshots/multiple-offerings/availability-1440.png`,
+  `docs/screenshots/multiple-offerings/patient-booking-390.png`, and
+  `docs/screenshots/multiple-offerings/clinician-confirmation-1440.png`.
+- The availability screenshot exposed a frontend status bug: selecting a saved
+  offering bubbled a change event to the editor and displayed “Unsaved changes”
+  although its values were loaded from the server. Commit `d82c5e7` stops that
+  selector event from marking the form dirty and asks before switching away
+  from genuine unsaved edits. A rebuilt browser verification is pending; do
+  not treat the earlier screenshot as visual proof of the fix.
+- Frontend lint/build passed before the status fix; lint reports existing
+  warnings and the build has the existing large-chunk advisory. The synthetic
+  clinician profile is paused for immediate requests
   because its language setup is incomplete. No Frappe 16 migration or fresh
   empty-site installation for v1.23 is claimed in this slice.
 
