@@ -1,5 +1,5 @@
 import { Link, Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
   ClipboardCheck,
@@ -204,6 +204,7 @@ export function WorkspaceLayout({
   const { session, refresh } = useSession();
   const { w } = useLocale();
   const [moreOpen, setMoreOpen] = useState(false);
+  const moreTrigger = useRef<HTMLButtonElement | null>(null);
   const roleItems =
     kind === "patient"
       ? patientNav
@@ -271,7 +272,7 @@ export function WorkspaceLayout({
         </nav>
         <nav className="workspace-mobile-nav" aria-label={w("Mobile workspace")}>
           {mobilePrimary.map((item) => renderNavLink(item))}
-          {mobileMore.length > 0 && <Button variant="quiet" className="mobile-nav-more" onClick={() => setMoreOpen(true)}>
+          {mobileMore.length > 0 && <Button variant="quiet" className="mobile-nav-more" onClick={(event) => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}>
             <MoreHorizontal size={20} /><span>{w("More")}</span>
           </Button>}
         </nav>
@@ -309,7 +310,10 @@ export function WorkspaceLayout({
           <Outlet />
         </main>
       </div>
-      {mobileMore.length > 0 && <Dialog open={moreOpen} onOpenChange={setMoreOpen} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer>
+      {mobileMore.length > 0 && <Dialog open={moreOpen} onOpenChange={(open) => {
+        setMoreOpen(open);
+        if (!open) window.requestAnimationFrame(() => moreTrigger.current?.focus());
+      }} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer>
         <nav className="workspace-more-links" aria-label={w("Additional workspace links")}>
           {mobileMore.map((item) => renderNavLink(item, true))}
         </nav>
