@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowRight, Search } from "lucide-react";
 import { api } from "../api";
 import { journeyApi } from "../journey-api";
@@ -111,12 +111,13 @@ export function PatientHome() {
   );
 }
 export function Discovery() {
+  const routeLocation=useLocation();
   const { w } = useLocale();
   const offers = useResource(journeyApi.discover);
   const services = useResource(journeyApi.services);
   const [category, setCategory] = useState("");
   const [query, setQuery] = useState(
-    new URLSearchParams(location.search).get("q") || "",
+    (routeLocation.state as {careQuery?:string}|null)?.careQuery || new URLSearchParams(location.search).get("q") || "",
   );
   const shown = offers.data?.filter(
     (offer) =>

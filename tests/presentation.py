@@ -283,6 +283,26 @@ class Presentation(unittest.TestCase):
         self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_appointment WHERE retry_key=%s',
                                      ('open-request:' + req_id,)).n, 1)
         self.assertGreaterEqual(journey.wallet()['reserved'], wallet_before['reserved'] + 1)
+        # Own offer history remains available after matching, without competitor
+        # quotes, account identifiers or copied clinical narrative.
+        with self.assertRaises(frappe.PermissionError):
+            open_requests.clinician_offers()
+        fixtures.login('c1')
+        history = open_requests.clinician_offers()
+        own = next(item for item in history['items'] if item.id == winning.id)
+        self.assertEqual(own.state, 'Accepted')
+        self.assertEqual(own.appointment, match['appointment'])
+        self.assertEqual(own.patient_label, 'Patient · alias')
+        self.assertNotIn(losing.id, json.dumps(history))
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(history))
+        self.assertNotIn('Synthetic request for private offer regression.', json.dumps(history))
+        self.assertNotIn('disclosure_snapshot', json.dumps(history))
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.clinician_offers(-1)
+        fixtures.login('c2')
+        own_loser = next(item for item in open_requests.clinician_offers()['items'] if item.id == losing.id)
+        self.assertEqual(own_loser.state, 'Superseded')
+        self.assertIsNone(own_loser.appointment)
 
     def test_immediate_request_matches_continuous_time_between_booking_grid_points(self):
         """Fresh presence plus continuous time must not require a 15-minute grid start."""

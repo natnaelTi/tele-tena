@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, LockKeyhole } from "lucide-react";
 import { ApiError, api, phoneAuth, setCsrf, signIn } from "../api";
 import {
@@ -16,6 +16,7 @@ export default function SignIn() {
   const { refresh, session } = useSession();
   const { w, t } = useLocale();
   const navigate = useNavigate();
+  const routeLocation=useLocation();
   const [params] = useSearchParams();
   const [channel, setChannel] = useState<"phone" | "email">("phone");
   const [contact, setContact] = useState("");
@@ -107,10 +108,10 @@ export default function SignIn() {
     const next = params.get("next") || "";
     const safeBookingReturn = /^\/patient\/book-link\/[a-f0-9]{64}$/.test(next);
     navigate(
-      safeBookingReturn ? next : !current?.profile && params.get("intent") === "clinician"
+      (safeBookingReturn || (next === "/patient/discovery" && current?.profile?.kind === "patient")) ? next : !current?.profile && params.get("intent") === "clinician"
         ? "/onboarding?intent=clinician"
         : destination(current),
-      { replace: true },
+      { replace: true, state: routeLocation.state },
     );
   }
   const masked =

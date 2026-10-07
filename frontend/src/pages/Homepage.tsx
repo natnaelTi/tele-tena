@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   HeartHandshake,
@@ -6,35 +7,29 @@ import {
   ShieldCheck,
   Sprout,
 } from "lucide-react";
-import { ConversationArt } from "../components/Brand";
+
 import { useLocale } from "../hooks/useLocale";
 export default function Homepage() {
   const { w } = useLocale();
+  const navigate=useNavigate();
+  const [query,setQuery]=useState("");
+  const [tool,setTool]=useState("Schedule");
   return (
     <main>
-      <section className="hero container">
-        <div className="hero-copy">
-          <p className="eyebrow">ROOM FOR A REAL CONVERSATION</p>
-          <h1>Find someone you feel comfortable talking to.</h1>
-          <p className="hero-intro">
-            Explore mental health and relationship support. Choose your
-            clinician, your time, and what you share.
-          </p>
-          <div className="actions">
-            <Link className="button primary" to="/sign-in">
-              {w("Find care")}
-              <ArrowRight size={20} />
-            </Link>
-            <a className="text-link" href="#how-it-works">
-              Explore how it works <ArrowRight size={18} />
-            </a>
-          </div>
-          <p className="hero-footnote">
-            <ShieldCheck size={18} />
-            Your sharing choices stay in your hands.
-          </p>
+      <section className="dual-care-hero container">
+        <header><p className="eyebrow">MENTAL HEALTH & RELATIONSHIP CARE · ETHIOPIA</p><h1>Find support.<br/>Make time for care.</h1><p className="hero-intro">Private voice and video consultations with approved mental health and counseling professionals.</p></header>
+        <div className="care-entry-columns">
+          <section className="patient-care-entry"><p className="eyebrow">FOR PATIENTS</p><h2>Talk to someone who fits your needs.</h2><p>Choose your clinician, see the fee, and decide what you share. Browse directly or ask eligible clinicians for a private offer.</p>
+            <form onSubmit={e=>{e.preventDefault();navigate('/patient/discovery',{state:{careQuery:query}});}}><label htmlFor="landing-care-query">What would you like support with?</label><input id="landing-care-query" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Stress, relationships, feeling low…" required/><button className="button primary" type="submit">{w('Find care')}</button></form>
+            <div className="care-entry-chips">{['Work stress','Relationships','Anxiety'].map(text=><button type="button" key={text} onClick={()=>setQuery(text)}>{text}</button>)}</div>
+            <Link className="text-link" to="/patient/requests">Post a private request</Link><p className="supporting">Free to browse · Pay the agreed session fee · Adults 18+</p>
+          </section>
+          <section className="clinician-care-entry"><p className="eyebrow">FOR CLINICIANS</p><h2>Your practice. One connected workspace.</h2><p>Bring your patients, publish approved services, manage bookings, and respond to people looking for your expertise.</p>
+            <div className="care-tool-preview"><div className="care-entry-chips" aria-label="Explore clinician tools">{['Schedule','Requests','Earnings'].map(value=><button key={value} type="button" aria-pressed={tool===value} onClick={()=>setTool(value)}>{value}</button>)}</div>
+            <h3>{tool==='Schedule'?'Set hours that work for you.':tool==='Requests'?'Respond with a private offer.':'Understand every balance.'}</h3><p>{tool==='Schedule'?'Recurring availability and date exceptions help patients book usable times.':tool==='Requests'?'Review eligible requests, propose a fee and time, and track the patient’s response.':'Track pending earnings, available funds and payout requests. Funds release follows completion and dispute rules.'}</p></div>
+            <Link className="button primary" to="/sign-in?intent=clinician">Apply as a clinician</Link><Link className="text-link" to="/clinician">Open your workspace</Link><p className="supporting">Credentials and each service scope are reviewed before publication.</p>
+          </section>
         </div>
-        <ConversationArt />
       </section>
       <section className="services-section container">
         <div className="section-heading">

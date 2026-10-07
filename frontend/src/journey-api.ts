@@ -68,6 +68,7 @@ export const journeyApi = {
   requestPresence: () => api<any>('tele_tena.api.open_requests.request_presence'),
   setRequestPresence: (ready: boolean) => api<any>('tele_tena.api.open_requests.set_request_presence', {ready}, true),
   clinicianRequests: () => api<any[]>('tele_tena.api.open_requests.clinician_requests'),
+  clinicianOffers: (page=0) => api<{items:any[];page:number;has_more:boolean}>('tele_tena.api.open_requests.clinician_offers', {page}),
   acknowledgeInboxFetch: (request_ids:string[]) => api<any>('tele_tena.api.open_requests.acknowledge_inbox_fetch',{request_ids},true),
   submitOffer: (data: Record<string, unknown>) => api<any>('tele_tena.api.open_requests.submit_offer', data, true),
   withdrawOffer: (offer_id: string) => api<any>('tele_tena.api.open_requests.withdraw_offer', {offer_id}, true),
