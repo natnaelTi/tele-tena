@@ -109,6 +109,8 @@ class Integration(unittest.TestCase):
         appointment_ids = frappe.db.sql('SELECT id FROM tt_appointment WHERE patient IN %s OR clinician IN %s',
                                        (tuple(USERS.values()), tuple(USERS.values())), pluck=True)
         if appointment_ids:
+            frappe.db.sql('DELETE FROM `tabTele Tena Scope Appointment Review` WHERE appointment IN %s',
+                          (tuple(appointment_ids),))
             frappe.db.sql('DELETE FROM tt_reschedule_proposal WHERE appointment IN %s',
                           (tuple(appointment_ids),))
             frappe.db.sql('DELETE FROM tt_dispute WHERE earning IN (SELECT id FROM tt_earning WHERE appointment IN %s)',
@@ -156,6 +158,15 @@ class Integration(unittest.TestCase):
         vetting_names = frappe.db.sql('SELECT name FROM `tabTele Tena Vetting Scope Application` WHERE clinician IN %s',
                                      (tuple(USERS.values()),), pluck=True)
         if vetting_names:
+            frappe.db.sql('DELETE FROM `tabTele Tena Vetting Appeal` WHERE scope_application IN %s',
+                          (tuple(vetting_names),))
+            evidence_ids = frappe.db.sql('''SELECT name FROM `tabTele Tena Scope Evidence`
+                WHERE scope_application IN %s''', (tuple(vetting_names),), pluck=True)
+            if evidence_ids:
+                frappe.db.sql('DELETE FROM tt_scope_evidence_content WHERE evidence IN %s',
+                              (tuple(evidence_ids),))
+                frappe.db.sql('DELETE FROM `tabTele Tena Scope Evidence` WHERE name IN %s',
+                              (tuple(evidence_ids),))
             frappe.db.sql('DELETE FROM `tabTele Tena Vetting Assessment` WHERE scope_application IN %s',
                           (tuple(vetting_names),))
             frappe.db.sql('DELETE FROM tabVersion WHERE ref_doctype=%s AND docname IN %s',

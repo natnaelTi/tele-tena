@@ -393,8 +393,8 @@ def service_scope_is_current(clinician, service, lock=False):
         JOIN `tabTele Tena Vetting Assessment` v ON v.scope_application=a.name
         WHERE a.clinician=%s AND a.service=%s AND a.status='Approved'
           AND v.decision='Approved'
-          AND (a.credential_expiry IS NULL OR a.credential_expiry >= CURDATE())
-        ORDER BY v.creation DESC LIMIT 1''', (clinician, service))
+          AND (a.credential_expiry IS NULL OR a.credential_expiry >= %s)
+        ORDER BY v.creation DESC LIMIT 1''', (clinician, service, frappe.utils.today()))
     return bool(current)
 
 
