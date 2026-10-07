@@ -39,6 +39,22 @@
   attempt/rate controls, uncertain provider result and concurrent verification.
   All provider sends and OTP-key reads were mocked. The failed first run in
   invited mode is expected policy enforcement, not an OTP regression.
+- `scripts/browser-availability-regression.cjs` passed against this same
+  production `/teletena/` package and Frappe API: it read the initial weekly
+  grid, entered keyboard times, confirmed the field-specific end-before-start
+  message while preserving the entered value, saved the documented
+  `start_local`/`end_local` payload (HTTP 200), reloaded persisted hours,
+  generated a patient slot, and completed booking (HTTP 200). The seeded
+  clinician schedule was restored afterward to its documented seven-day
+  08:00–20:00 Addis Ababa configuration with manual confirmation. One new
+  synthetic patient and one `PendingConfirmation` appointment remain; the
+  patient account has a generated password in the mode-600 review account file.
+  The resulting balance is ETB 400 available / ETB 600 reserved from the
+  synthetic ETB 1,000 opening balance. Screenshots are under
+  `docs/screenshots/availability-regression/`.
+  The repeat sign-in confirms the generated patient can access the persisted
+  appointment. The demonstration clinician can review its pending-confirmation
+  request from Appointments; no approval was fabricated by the browser test.
 - `npm run build`, `scripts/build_review.py`, and `scripts/check_review_assets.py`
   passed. The package asset scan found no credentials or public site config;
   Vite reports the existing LiveKit chunk-size advisory. A controlled service

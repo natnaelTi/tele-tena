@@ -3787,11 +3787,11 @@
       "module": "Practice",
       "backend_reference": "scheduling, vetting, open_requests.clinician_offers",
       "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Built weekly schedule save/reload and generated-slot booking locally verified; surrounding clinician workspace, date-only edit, scheduler and external-language acceptance remain in progress.",
       "prototype_route": "f06",
       "route": "/clinician/availability",
       "actor": "Clinician; patients see approved public profile and offering data",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_profile",
         "tt_application",
@@ -3849,7 +3849,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F06) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Built Frappe /teletena/ Frappe 15 browser journey passed keyboard time entry, specific reversed-time error with input preserved, POST save of start_local/end_local (HTTP 200), reload persistence, patient generated slot and booking (HTTP 200). The weekly editor was restored afterward to the site's documented synthetic baseline. New synthetic patient/appointment retained. Screenshots: docs/screenshots/availability-regression/. Frappe 16, scheduler, actual 200% zoom and native-language review pending."
       }
     },
     {
