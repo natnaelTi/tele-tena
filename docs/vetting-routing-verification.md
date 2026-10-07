@@ -264,5 +264,8 @@ share a transaction; disable is refused while live immediate requests remain.
 This controls service policy only: it does not declare the clinician ready.
 The clinician must still save supported languages, exact scope approval,
 published offering/schedule, and fresh presence with full-session capacity.
-Automated backend verification passed on the Frappe 15 isolated site; rendered
-admin-browser interaction for this new control remains pending.
+Automated backend verification passed on the Frappe 15 isolated site. The
+packaged `/teletena/admin/scopes` page was then opened in Chromium using the
+existing synthetic reviewer; its service selector and immediate-policy panel
+rendered with the explanatory copy. No service was toggled in this browser
+check. Capture: `docs/screenshots/immediate-policy/reviewer-services-1440.png`.

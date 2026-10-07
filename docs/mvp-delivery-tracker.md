@@ -258,8 +258,9 @@ only audit command for enabling or pausing service-level immediate-care policy,
 with lifecycle checks, idempotency, rationale, and generic DocType write
 protection. On the backed-up Frappe 15 isolated site, v1.22 migration and repeat
 migration passed; `tests/presentation.py` passed 31/31. Frontend lint/build
-passed (existing lint warnings and bundle-size notice remain). The new reviewer
-control has not yet had a dedicated connected browser click-through or Frappe 16
-migration run. Existing Review Clinician data remains unchanged and is still
-blocked by missing saved language and the service policy being off. No claim of
-successful routed offer is made.
+passed (existing lint warnings and bundle-size notice remain). The rendered
+packaged reviewer page is captured at
+`docs/screenshots/immediate-policy/reviewer-services-1440.png`. The preview's
+synthetic Review Clinician data remains unchanged and still has no persisted
+care language; its service policy remains off. No successful routed offer is
+claimed.
