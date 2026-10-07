@@ -6,7 +6,7 @@
   not Vite). Bench `/home/frappe/frappe/frappe-bench`; site
   `tele-tena-pr12-fresh.localhost`; branch `feat/clinic-affiliation-review`;
   backend checkout and packaged source SHA
-  `c5c2bf2c532e2b3c50d3416291ae63e32484569b`.
+  `8e3a298bdc3f2624cdf0fb5d256fc469177fea36`.
 - Environment: Frappe 15.121.2 / ERPNext 15.121.6, Python 3.12.3, Node
   22.23.3. The review WSGI process is Gunicorn on loopback 8017. This site is
   configured for invited password review; its public phone and registration

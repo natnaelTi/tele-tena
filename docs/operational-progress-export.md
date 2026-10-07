@@ -3,7 +3,7 @@
 ## Clinic affiliation subflow — 2026-10-07
 
 The focused branch `feat/clinic-affiliation-review` is at
-`c5c2bf2c532e2b3c50d3416291ae63e32484569b`, based on
+`8e3a298bdc3f2624cdf0fb5d256fc469177fea36`, based on
 `feat/previous-clinicians`. On disposable Frappe 15, presentation API tests
 passed 22/22, OTP state-machine tests passed 7/7 with a mocked mail provider
 and enabled-registration test fixture, and a built `/teletena/` browser journey
