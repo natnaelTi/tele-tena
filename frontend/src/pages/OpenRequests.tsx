@@ -134,6 +134,14 @@ export function PublicClinicianProfile(){
   return <>
     <PageTitle eyebrow="CLINICIAN PROFILE" title={resource.data.display_name} description="Approved services and published appointment options." />
     <InlineNotice>{resource.data.approval_meaning}</InlineNotice>
-    {resource.data.services.length?resource.data.services.map((service:any)=><article className="request-card" key={service.offering}><header><strong>{service.label}</strong><span>Approved for this service</span></header><p>{service.minutes} minutes · {service.consultation_format} · ETB {money(service.price)} · {service.timezone}</p><Link className="button secondary" to={'/patient/book/'+service.offering}>{w('Choose a time')}</Link></article>):<EmptyState title="No published service times are available yet." />}
+    <section className="trust-indicators" aria-labelledby="trust-indicators-title"><h2 id="trust-indicators-title">{w("trustIndicators")}</h2><dl>
+      <div><dt>{w("professionalReview")}</dt><dd>{w("manuallyReviewedScopes")}</dd></div>
+      <div><dt>{w("responseBehavior")}</dt><dd>{w("sessionExperienceNotMeasured")}</dd></div>
+      <div><dt>{w("reliability")}</dt><dd>{w("sessionExperienceNotMeasured")}</dd></div>
+      <div><dt>{w("sessionExperienceMetric")}</dt><dd>{resource.data.trust_indicators.session_experience.average===null
+        ? w(resource.data.trust_indicators.session_experience.status==="new"?"sessionExperienceNew":"sessionExperienceMore")
+        : <>{resource.data.trust_indicators.session_experience.average} / 5 · {resource.data.trust_indicators.session_experience.sample_count} {w("evidenceCount")}</>}</dd></div>
+    </dl><p className="supporting">{w("sessionExperienceExplainer")}</p></section>
+    {resource.data.services.length?resource.data.services.map((service:any)=><article className="request-card" key={service.offering}><header><strong>{service.label}</strong><span>{w("approvedScope")}</span></header><p>{service.minutes} minutes · {service.consultation_format} · ETB {money(service.price)} · {service.timezone}</p><Link className="button secondary" to={'/patient/book/'+service.offering}>{w('Choose a time')}</Link></article>):<EmptyState title="No published service times are available yet." />}
   </>;
 }

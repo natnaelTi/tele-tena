@@ -23,6 +23,7 @@ from tele_tena.api import presentation
 from tele_tena.api import scheduling
 from tele_tena.api import open_requests
 from tele_tena.api import vetting
+from tele_tena.api import trust
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -857,6 +858,9 @@ class Presentation(unittest.TestCase):
         patient_detail = presentation.appointment_detail(appointment)
         self.assertNotIn('private_note', patient_detail)
         self.assertNotIn('Private synthetic observation', str(patient_detail))
+        self.assertFalse(patient_detail['can_submit_feedback'])
+        with self.assertRaises(frappe.ValidationError):
+            trust.submit_session_feedback(appointment, 5)
         fixtures.login('admin')
         with self.assertRaises(frappe.PermissionError):
             presentation.appointment_detail(appointment)
@@ -868,6 +872,29 @@ class Presentation(unittest.TestCase):
         shared = presentation.appointment_detail(appointment)
         self.assertNotIn('private_note', shared)
         self.assertEqual(shared['patient_summary_revisions'][0]['summary'], 'Helpful next steps')
+        self.assertTrue(shared['can_submit_feedback'])
+        feedback = trust.submit_session_feedback(appointment, 5)
+        self.assertTrue(feedback['submitted'])
+        self.assertFalse(feedback['idempotent'])
+        self.assertTrue(trust.submit_session_feedback(appointment, 5)['idempotent'])
+        with self.assertRaises(frappe.ValidationError):
+            trust.submit_session_feedback(appointment, 4)
+        with self.assertRaises(frappe.ValidationError):
+            trust.submit_session_feedback(appointment, 6)
+        fixtures.login('p2')
+        with self.assertRaises(frappe.PermissionError):
+            trust.submit_session_feedback(appointment, 5)
+        fixtures.login('c1')
+        with self.assertRaises(frappe.PermissionError):
+            trust.submit_session_feedback(appointment, 5)
+        fixtures.login('p1')
+        clinician_id = journey.one('SELECT public_id FROM tt_profile WHERE user=%s',
+                                   (fixtures.USERS['c1'],)).public_id
+        public_profile = open_requests.clinician_profile(clinician_id)
+        metric = public_profile['trust_indicators']['session_experience']
+        self.assertEqual(metric['sample_count'], 1)
+        self.assertIsNone(metric['average'])
+        self.assertEqual(metric['status'], 'more_feedback_needed')
         fixtures.login('c1')
         presentation.save_note_draft(appointment, 'Amended private observation', 'New next steps')
         presentation.finalize_consultation(appointment, 0)

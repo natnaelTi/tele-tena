@@ -44,7 +44,7 @@ product scope, not shipped capability:
 
 ## Explicitly outside the current implementation
 
-Clinic membership/workspaces and referral attribution, natural-language clinical matching or relevance feedback, ratings, couples consent, mutual rescheduling, no-show workflows, email summary delivery, real money movement, real credential verification and emergency escalation are not represented as working features. See `mvp-delivery-tracker.md` for current status and evidence.
+Clinic membership/workspaces and referral attribution, natural-language clinical matching or relevance feedback, public free-text reviews/moderation, couples consent, mutual rescheduling, no-show workflows, email summary delivery, real money movement, real credential verification and emergency escalation are not represented as working features. Structured session-experience feedback is being added in the current branch, with database/browser verification still pending. See `mvp-delivery-tracker.md` for current status and evidence.
 
 ## Current vetting and routing checkpoint (2026-10)
 
@@ -58,6 +58,6 @@ complete a clinical taxonomy or credential-verification workflow. The proposed
 rubric is not an agreed rubric and needs medical-lead approval; independent
 credential verification, affiliations, evidence-by-scope, appeals, expiry and
 reverification UI, full jurisdiction/accessibility checks, reliability/experience
-ranking, patient feedback, and native catalog review remain pending. See
+reliability/response ranking, native catalog review, and feedback moderation remain pending. Structured sample-aware session-experience ratings are now implemented in source but not yet integration-verified. See
 `vetting-routing-verification.md` for local failure evidence and verification
 boundaries.

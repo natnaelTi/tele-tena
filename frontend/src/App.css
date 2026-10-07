@@ -1503,6 +1503,21 @@ button:active {
     max-width: calc(100vw - 32px);
   }
 }
+.trust-indicators { margin: 24px 0; padding: 20px 24px; border: 1px solid var(--border-default); border-radius: 20px; background: var(--surface-subtle); }
+.trust-indicators h2 { margin: 0 0 14px; font-size: 20px; }
+.trust-indicators dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px 24px; margin: 0; }
+.trust-indicators dl>div { min-width: 0; }
+.trust-indicators dt { color: var(--text-secondary); font-size: 14px; }
+.trust-indicators dd { margin: 3px 0 0; font-weight: 600; overflow-wrap: anywhere; }
+.session-feedback fieldset { border: 0; padding: 0; margin: 12px 0 18px; }
+.session-feedback legend { margin-bottom: 8px; font-weight: 600; }
+.feedback-rating { display: flex; gap: 8px; }
+.feedback-rating label { position: relative; cursor: pointer; }
+.feedback-rating input { position: absolute; opacity: 0; inset: 0; }
+.feedback-rating span { display: grid; place-items: center; width: 48px; min-height: 48px; border: 1px solid var(--border-default); border-radius: 12px; background: var(--surface-card); font-weight: 650; }
+.feedback-rating input:checked+span { border-color: var(--brand-primary); background: var(--surface-subtle); box-shadow: 0 0 0 2px var(--focus-ring); }
+.feedback-rating input:focus-visible+span { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+@media (max-width: 560px) { .trust-indicators { padding: 16px; } .trust-indicators dl { grid-template-columns: 1fr; gap: 10px; } .feedback-rating { gap: 6px; } .feedback-rating span { width: 44px; } }
 
 /* First-visit invitations stay in document flow and never cover controls. */
 .tour-invite{position:static;margin:12px 32px 0 auto;width:max-content;box-shadow:0 2px 12px #102a3312}

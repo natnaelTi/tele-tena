@@ -23,9 +23,11 @@ def snapshot():
     frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
     frappe.connect()
     result = {}
+    existing_tables = set(frappe.db.get_tables(cached=False))
     for table in (*TABLES, *PHONE_AUTH_TABLES, *PRESENTATION_TABLES, *FINANCIAL_TABLES,
-                  'financial_reconciliation', 'consultation', 'contact_identity', 'onboarding'):
-        records = frappe.db.sql(f'SELECT * FROM tt_{table}', as_dict=True)
+                  'financial_reconciliation', 'session_feedback', 'consultation', 'contact_identity', 'onboarding'):
+        records = (frappe.db.sql(f'SELECT * FROM tt_{table}', as_dict=True)
+                   if f'tt_{table}' in existing_tables else [])
         encoded = sorted(json.dumps(dict(row), sort_keys=True, default=str) for row in records)
         result[table] = hashlib.sha256(json.dumps(encoded).encode()).digest()
     frappe.destroy()
@@ -48,11 +50,13 @@ frappe.connect()
 for patch in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check',
               'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state',
               'v1_5_contact_onboarding', 'v1_6_presentation_release', 'v1_7_demo_subledger',
-              'v1_8_legacy_event_reconciliation', 'v1_13_financial_reconciliation_audit'):
+              'v1_8_legacy_event_reconciliation', 'v1_13_financial_reconciliation_audit',
+              'v1_14_session_feedback'):
     assert frappe.db.exists('Patch Log', {'patch': 'tele_tena.patches.' + patch})
 for table in ('tt_phone_identity', 'tt_otp_challenge', 'tt_otp_rate_limit', 'tt_otp_gate',
               *(f'tt_{name}' for name in PRESENTATION_TABLES),
-              *(f'tt_{name}' for name in FINANCIAL_TABLES), 'tt_financial_reconciliation'):
+              *(f'tt_{name}' for name in FINANCIAL_TABLES), 'tt_financial_reconciliation',
+              'tt_session_feedback'):
     assert table in frappe.db.get_tables(cached=False), 'Missing phone-auth table'
 key_path = Path(frappe.get_site_path('private', 'tele_tena_otp.key'))
 assert key_path.is_file() and not key_path.is_symlink()

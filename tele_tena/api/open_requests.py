@@ -428,8 +428,20 @@ def clinician_profile(clinician_id):
         JOIN `tabTele Tena Service` s ON s.name=o.service AND s.active=1
         JOIN tt_schedule schedule ON schedule.offering=o.id AND schedule.status='Published'
         WHERE o.clinician=%s AND o.active=1 ORDER BY s.service_label''', (clinician.user,))
+    from tele_tena.trust_metrics import summarize_session_experience
+    experience = one('''SELECT COUNT(*) sample_count,AVG(rating) mean_rating
+        FROM tt_session_feedback WHERE clinician=%s
+        AND created_at>=UTC_TIMESTAMP(6)-INTERVAL 365 DAY''', (clinician.user,))
     return {'display_name': clinician.display_name, 'services': services,
-            'approval_meaning': 'Application and listed service scopes are manually approved.'}
+            'approval_meaning': 'Application and listed service scopes are manually approved.',
+            'trust_indicators': {
+                'credential_status': 'Manually reviewed application and listed scopes',
+                'relevant_expertise': 'See the approved service scopes above',
+                'responsiveness': {'label': 'Not yet measured', 'sample_count': None},
+                'reliability': {'label': 'Not yet measured', 'sample_count': None},
+                'session_experience': summarize_session_experience(
+                    experience.sample_count, experience.mean_rating),
+            }}
 
 
 @query()

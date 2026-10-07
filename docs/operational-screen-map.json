@@ -3224,31 +3224,29 @@
       "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
       "integration_status": "Pending screen-level operational acceptance",
       "prototype_route": "e12",
-      "route": "No feedback route",
+      "route": "/patient/consultations/:appointment (feedback section)",
       "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
-      "status": "Designed",
+      "status": "Implemented, verification pending",
       "persistent_models": [
         "tt_appointment",
         "tt_consultation",
         "tt_consultation_note",
         "tt_note_revision",
         "tt_appointment_event",
-        "tt_earning"
+        "tt_earning",
+        "tt_session_feedback"
       ],
       "queries": [
         "tele_tena.api.presentation.appointment_detail",
-        "tele_tena.api.presentation.care_directory",
-        "tele_tena.api.consultations.join (token response only)"
+        "tele_tena.api.open_requests.clinician_profile"
       ],
       "commands": [
-        "tele_tena.api.consultations.join",
-        "tele_tena.api.consultations.end",
+        "tele_tena.api.trust.submit_session_feedback",
         "tele_tena.api.presentation.save_note_draft",
-        "tele_tena.api.presentation.preview_patient_summary",
         "tele_tena.api.presentation.finalize_consultation"
       ],
-      "server_permissions": "Only authenticated booked participants may view details/join; only treating clinician may read private notes/end/finalize. Patient API returns published summary revisions only. No call-duration billing.",
-      "workflow_transitions": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+      "server_permissions": "Only the patient attached to an explicitly completed, ended, finalized encounter may submit one rating. The patient may read their own rating. Clinicians/admins cannot read individual feedback; public clinicians receive only a sample-suppressed 365-day aggregate.",
+      "workflow_transitions": "Completed + ended + finalized encounter → one immutable patient experience rating (1–5); same-value retries are idempotent and changed resubmissions are rejected.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -3274,11 +3272,7 @@
         "LiveKit Cloud revocation project for hosted token guarantees",
         "human/device and clinical sign-off"
       ],
-      "verification_evidence": {
-        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E12) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
-      }
+      "verification_evidence": "tests/trust_metrics.py; tests/presentation.py feedback authorization/idempotency assertions (database-backed portion pending isolated-site execution)."
     },
     {
       "id": "E13",
@@ -4211,9 +4205,9 @@
       "required_contract": "Scope-first offerings, calendar, own offers, masked care and trust signals",
       "integration_status": "Pending screen-level operational acceptance",
       "prototype_route": "f12",
-      "route": "No multidimensional trust dashboard",
+      "route": "/patient/clinicians/:opaque_clinician_id (public trust summary)",
       "actor": "Clinician; patients see approved public profile and offering data",
-      "status": "Designed",
+      "status": "Implemented, verification pending",
       "persistent_models": [
         "tt_profile",
         "tt_application",
@@ -4221,18 +4215,13 @@
         "tt_offering",
         "tt_schedule",
         "tt_open_request",
-        "tt_offer",
-        "tt_presence",
+        "tt_request_offer",
+        "tt_clinician_request_presence",
         "tt_appointment",
-        "tt_consultation_note"
+        "tt_session_feedback"
       ],
       "queries": [
-        "tele_tena.api.journey.practice",
-        "tele_tena.api.open_requests.clinician_requests",
-        "tele_tena.api.open_requests.clinician_offers",
-        "tele_tena.api.open_requests.request_presence",
-        "tele_tena.api.presentation.care_directory",
-        "tele_tena.accounting.clinician_earnings"
+        "tele_tena.api.open_requests.clinician_profile"
       ],
       "commands": [
         "tele_tena.api.journey.publish",
@@ -4268,11 +4257,7 @@
         "calendar/worker readiness",
         "trust metrics based on real events"
       ],
-      "verification_evidence": {
-        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F12) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
-      }
+      "verification_evidence": "Profile query exposes separate credential/scope, responsiveness, reliability and patient session-experience dimensions; only the session-experience metric has measured data. See docs/session-experience-metric.md. Browser/API verification pending."
     },
     {
       "id": "F13",

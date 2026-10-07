@@ -35,6 +35,7 @@ export const journeyApi = {
   saveNoteDraft: (appointment: string, private_note: string, patient_summary: string) => api('tele_tena.api.presentation.save_note_draft', { appointment, private_note, patient_summary }, true),
   previewSummary: (appointment: string, summary?:string) => api<{revision:number;summary:string}>('tele_tena.api.presentation.preview_patient_summary', { appointment, summary }, true),
   finalizeConsultation: (appointment: string, publish_summary: boolean) => api('tele_tena.api.presentation.finalize_consultation', { appointment, publish_summary }, true),
+  submitSessionFeedback: (appointment:string,rating:number) => api('tele_tena.api.trust.submit_session_feedback',{appointment,rating},true),
   careDirectory: (data: Record<string, unknown>) => api<{rows:any[];total:number;page:number;page_size:number;pages:number}>('tele_tena.api.presentation.care_directory', data),
   careDetail: (appointment: string) => api<any>('tele_tena.api.presentation.care_detail', { appointment }),
   carePatientRecord: (appointment: string) => api<{patient_label:string;encounters:any[]}>('tele_tena.api.presentation.care_patient_record', { appointment }),

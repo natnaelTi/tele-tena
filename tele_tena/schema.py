@@ -92,3 +92,5 @@ def install():
     # expose the same fail-closed financial reconciliation boundary.
     from tele_tena.patches.v1_13_financial_reconciliation_audit import execute as financial_reconciliation
     financial_reconciliation()
+    from tele_tena.patches.v1_14_session_feedback import execute as session_feedback
+    session_feedback()
