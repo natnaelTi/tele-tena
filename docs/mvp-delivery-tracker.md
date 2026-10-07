@@ -1,5 +1,35 @@
 # TeleTena delivery tracker
 
+## Active integrated checkout — 2026-10-07
+
+The active local checkout is `feat/mutual-rescheduling`, currently at
+`69e0e0b7ad0970e5912205928808424d3a2db25f`. Draft PR #22
+([review](https://github.com/natnaelTi/tele-tena/pull/22)) depends on draft
+PR #21 and remains unmerged. The local production-built preview is
+`http://127.0.0.1:8017/teletena/`, site
+`tele-tena-pr12-fresh.localhost`, from
+`/home/frappe/frappe/frappe-bench/apps/tele_tena`; the asset manifest is the
+authority for the currently served frontend source SHA. The preview is Frappe
+15.121.2 / ERPNext 15.121.6 / Python 3.12.3 and does not use Vite. The original
+`erp.localhost` and Selfmade installation were not migrated or changed.
+
+The mutual-rescheduling and availability slice, account composition correction,
+and browser-harness diagnostic improvements are in this branch. Focused
+Frappe 15 presentation regressions passed 26/26; production frontend build,
+lint (existing warnings), artifact-scope/secret check, and the built-route PWA
+update/offline checks passed. A separate fresh-site install passed schema,
+migration, guest-denial, and default-safeguard assertions, but its enabled-
+registration browser run timed out before authentication; cleanup and retained
+site fingerprints passed. See `mutual-rescheduling-verification.md` for exact
+evidence and limits.
+
+This is an incremental implementation checkpoint, not completion of batches
+A–I or the 142-screen acceptance map. Clinic resources, couples consent, labs,
+subscriptions, second opinions, medical tourism, extensions, and several other
+contracted workflows remain pending or partial in the per-screen map. The
+isolated preview scheduler is disabled; no scheduled routing or earnings
+release is claimed from this checkout.
+
 ## Current clinic and authentication verification — 2026-10-07
 
 Current branch `feat/clinic-affiliation-review` is a focused dependent slice
