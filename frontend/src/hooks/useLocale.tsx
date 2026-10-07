@@ -6,6 +6,11 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  "Offering title": ["የአገልግሎት ስም", "Maqaa tajaajilaa"],
+  "Offering description": ["የአገልግሎት መግለጫ", "Ibsa tajaajilaa"],
+  "Edit offering": ["አገልግሎት አርትዕ", "Tajaajila gulaali"],
+  "Save offering": ["አገልግሎት አስቀምጥ", "Tajaajila ol kaa'i"],
+  "Cancel edit": ["አርትዖት ሰርዝ", "Gulaallii haqi"],
   "Immediate requests": ["ፈጣን ጥያቄዎች", "Gaaffiiwwan ariifachiisoo"],
   "Find a service": ["አገልግሎት ይፈልጉ", "Tajaajila barbaadi"],
   "A reviewer controls this service setting. It does not replace clinician approval, approved scope, language, presence, or available time.": ["ይህን የአገልግሎት ቅንብር ገምጋሚ ይቆጣጠራል። የሐኪም ማጽደቅን፣ የተፈቀደ ወሰንን፣ ቋንቋን፣ ዝግጁነትን ወይም ነፃ ጊዜን አይተካም።", "Gamaaggamaan qindaa'ina tajaajila kana to'ata. Mirkaneessa ogeessaa, daangaa hayyamame, afaan, qophii ykn yeroo bilisaa hin bakka bu'u."],

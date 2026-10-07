@@ -10,6 +10,12 @@ Status: structurally implemented in this branch; all newly curated definitions r
 - **Concern/support topic** is a patient-facing search phrase such as stress, grief or relationship difficulty. It is not a diagnosis and does not authorize clinical interpretation.
 - **Participant format** is individual, couple, family or group. Only individual services are bookable in this pilot; the other formats remain catalog-only pending consent workflows.
 - **Clinician offering** is a clinician-owned title/description/price/duration and booking format within one approved service. It cannot expand authorization; multiple offerings can share a scope.
+
+Storage note (2026-10): v1.0's legacy unique key limited a clinician to one
+offering per service. The additive v1.23 migration removes only that key and
+preserves offering identifiers and dependent records. See
+[`multiple-offerings.md`](multiple-offerings.md) for retry and compatibility
+semantics and verification evidence.
 - **Service attribute definition** has versioned fixed-type metadata (text, integer, date, boolean, controlled choice), allowed values, required flag, validation bounds, public/private/sensitive visibility, applicability and filter/matching flags. It cannot contain executable expressions. The schema records are present, but service-specific dynamic intake values and matching validation are not yet implemented; no arbitrary JSON currently drives matching.
 
 The core service fields are typed Frappe fields. Localized labels/descriptions and synonyms are represented as separate fields/controlled terms where present; catalog search synonym support is incomplete. Dynamic attribute values are not yet collected or validated by runtime APIs. A future inactive diagnostics schema demonstrates `specimen_type`, `preparation_requirements`, and `expected_turnaround`; it is not an operational or advertised laboratory service.

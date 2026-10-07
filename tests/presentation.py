@@ -29,6 +29,7 @@ from tele_tena.api import clinics
 from tele_tena.api import clinic_access
 from tele_tena.api import extensions
 from tele_tena.api import service_policy
+from tele_tena.patches import v1_23_multiple_offerings
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -73,6 +74,73 @@ class Presentation(unittest.TestCase):
 
     def setUp(self):
         fixtures.login('admin')
+
+    def test_clinician_can_publish_multiple_retry_safe_offerings_within_one_scope(self):
+        service = fixtures.PREFIX
+        keys = ['offering-multi-' + secrets.token_hex(10), 'offering-multi-' + secrets.token_hex(10)]
+        created = []
+        try:
+            fixtures.login('c1')
+            first = journey.publish(service, 5500, 30, 'Synthetic brief session',
+                'Synthetic description for repeat-offering verification.', retry_key=keys[0])
+            created.append(first['offering'])
+            self.assertFalse(first['replayed'])
+            self.assertEqual(journey.publish(service, 5500, 30, 'Synthetic brief session',
+                'Synthetic description for repeat-offering verification.', retry_key=keys[0]),
+                {'saved': True, 'offering': first['offering'], 'replayed': True})
+            second = journey.publish(service, 8200, 45, 'Synthetic longer session',
+                'A second offer under the same approved scope.', retry_key=keys[1])
+            created.append(second['offering'])
+            self.assertNotEqual(first['offering'], second['offering'])
+            with self.assertRaises(frappe.ValidationError):
+                journey.publish(service, 5600, 30, 'Changed title',
+                    'Changed payload must not reuse a completed key.', retry_key=keys[0])
+
+            own = journey.practice()['offerings']
+            by_id = {item.id: item for item in own if item.id in created}
+            self.assertEqual(set(by_id), set(created))
+            self.assertEqual(int(by_id[first['offering']].price), 5500)
+            self.assertEqual(by_id[second['offering']].title, 'Synthetic longer session')
+
+            fixtures.login('p1')
+            visible = {item.id: item for item in journey.discover(service)}
+            self.assertTrue(set(created).issubset(visible))
+            self.assertEqual(int(visible[first['offering']].price), 5500)
+            self.assertEqual(int(visible[second['offering']].price), 8200)
+
+            fixtures.login('c2')
+            with self.assertRaises(frappe.PermissionError):
+                journey.publish(service, 9900, 30, 'Unauthorized edit', '',
+                    offering_id=first['offering'])
+        finally:
+            fixtures.login('admin')
+            if created:
+                frappe.db.sql('DELETE FROM tt_offering WHERE id IN %s', (tuple(created),))
+            frappe.db.commit()
+
+    def test_multiple_offerings_migration_is_repeatable_and_preserves_legacy_row(self):
+        offering_id = str(uuid.uuid4())
+        clinician = fixtures.USERS['c1']
+        service = fixtures.PREFIX
+        fixtures.login('admin')
+        frappe.db.sql('''INSERT INTO tt_offering
+            (id,clinician,service,title,description,price,minutes,active,retry_key,payload_hash)
+            VALUES (%s,%s,%s,'','',4321,35,1,NULL,NULL)''', (offering_id, clinician, service))
+        frappe.db.commit()
+        try:
+            v1_23_multiple_offerings.execute()
+            v1_23_multiple_offerings.execute()
+            preserved = journey.one('''SELECT id,clinician,service,title,description,price,minutes,active
+                FROM tt_offering WHERE id=%s''', (offering_id,))
+            self.assertEqual((preserved.id, preserved.clinician, preserved.service,
+                preserved.title, preserved.description, int(preserved.price), int(preserved.minutes),
+                int(preserved.active)), (offering_id, clinician, service, 'Synthetic test consultation', '', 4321, 35, 1))
+            indexes = {row[2] for row in frappe.db.sql('SHOW INDEX FROM tt_offering')}
+            self.assertNotIn('clinician_service', indexes)
+            self.assertIn('clinician_retry', indexes)
+        finally:
+            frappe.db.sql('DELETE FROM tt_offering WHERE id=%s', (offering_id,))
+            frappe.db.commit()
 
     def test_authorized_user_change_preserves_authenticated_session_state(self):
         from tele_tena.account_context import authorized_user_change
