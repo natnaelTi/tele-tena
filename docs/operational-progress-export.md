@@ -1,3 +1,24 @@
+## Current local checkpoint — 2026-10-07
+
+- Source branch `fix/session-feedback-translations`, commit
+  `1e2f8c00f6d354e27f99ac1d924e5476abc4cbe4`, is a dependent review branch
+  based on the open PR #19 head `8d4e70606c5785dcb0dabb94f445aca4290dec8a`.
+  No merge or remote deployment occurred.
+- The isolated built preview is `http://127.0.0.1:8017/teletena/` on site
+  `tele-tena-pr12-fresh.localhost`. Frappe serves the packaged React app; the
+  asset manifest's frontend source SHA is the feature commit above. Scheduler
+  remains disabled for this site; shared bench worker services were untouched.
+- Fixed translation-key rendering on finalized patient-session feedback and
+  public clinician trust indicators. `npm run build`, `build_review.py`,
+  `check_review_assets.py`, `tests/presentation.py` (23/23), and
+  `tests/trust_metrics.py` (4/4) passed. Built-browser feedback persisted one
+  synthetic 5/5 response through reload without exposing the private note.
+- Screenshots are in `docs/screenshots/session-feedback/`. This is one
+  localized acceptance correction, not completion of the full 142-screen/
+  14-journey design inventory. Live SMS, device media, native-language review,
+  scheduler execution, fresh install/migration preservation, and multiple
+  planned clinical and partner workflows remain unverified or unimplemented.
+
 # Current operational checkpoint — 2026-10-07
 
 ## Clinic affiliation subflow — 2026-10-07

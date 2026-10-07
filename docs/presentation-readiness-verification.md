@@ -1,6 +1,42 @@
 # Presentation release verification
 
-## Current local checkpoint — 2026-10-07
+## Current local checkpoint — session feedback UI — 2026-10-07
+
+- Review URL: `http://127.0.0.1:8017/teletena/`, production-built Frappe
+  app on `/home/frappe/frappe/frappe-bench`, site
+  `tele-tena-pr12-fresh.localhost`. Current feature branch is
+  `fix/session-feedback-translations`, commit
+  `1e2f8c00f6d354e27f99ac1d924e5476abc4cbe4`, based on `feat/clinic-membership`
+  (PR #19 head `8d4e70606c5785dcb0dabb94f445aca4290dec8a`). It is unmerged and
+  has not been deployed remotely. The packaged `release.json` reports the same
+  app/frontend source commit. The app is served by Frappe; no Vite server is
+  involved. `/teletena/` and a nested consultation route both returned HTTP 200.
+- Fixed feedback and clinician trust labels that had passed localization keys
+  through the literal-English helper. The patient feedback title, scale,
+  explanatory copy, submit/success copy and public-profile trust labels now use
+  translated keys in English, Amharic and Afaan Oromo.
+- Verification: `npm run build`; `python3 scripts/build_review.py`;
+  `python3 scripts/check_review_assets.py`; `tests/presentation.py` **23/23**;
+  `tests/trust_metrics.py` **4/4**. Browser sign-in and feedback submission on
+  the built `/teletena/` route produced HTTP 200, stored one 5/5 row for the
+  synthetic encounter, and displayed the result after reload. Patient detail
+  omitted the private clinician note. No browser page errors occurred. A second
+  session confirmed the submitted rating remains one row; the UI does not offer
+  repeat submission. Rendered English/Amharic/Afaan Oromo headings were checked;
+  translation remains provisional and is not native-language approval.
+- Screenshots: `docs/screenshots/session-feedback/` (patient consultation at
+  mobile and desktop widths, Amharic patient view, clinician finalized detail).
+  The feedback fixture represents a synthetic ended/finalized record; it does
+  not represent actual call media exchange.
+- Environment: Frappe 15.121.2 / ERPNext 15.121.6, Python 3.12.3, Node
+  22.23.3. Site policy remains invited-review: public phone OTP and registration
+  are disabled; existing email/password reviewer access remains. The isolated
+  site's scheduler is disabled. Shared bench web/workers/scheduler were not
+  changed; no site-specific background processing was claimed. SMS delivery,
+  physical-device media, native translation review, fresh-site installation of
+  later features, and the broader approved product scope remain outstanding.
+
+## Historical checkpoint — clinic membership (superseded) — 2026-10-07
 
 - Review URL: `http://127.0.0.1:8017/teletena/`, production-built Frappe app,
   not Vite. Bench `/home/frappe/frappe/frappe-bench`; site
