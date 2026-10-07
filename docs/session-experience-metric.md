@@ -53,3 +53,19 @@ The English strings are implemented. Amharic and Afaan Oromo strings are
 provisional and require native-language review. Frappe migration, direct API
 permissions, metric queries, profile rendering, and connected browser behavior
 remain pending until the isolated current-source site is available.
+
+## Local acceptance — 2026-10-07
+
+The production-built Frappe app was verified on isolated site
+`tele-tena-pr12-fresh.localhost`. `tests/presentation.py` passed 23/23,
+including patient/clinician/admin authorization, private-note omission,
+concurrent same-rating idempotency, and changed-rating rejection;
+`tests/trust_metrics.py` passed 4/4. A browser session at
+`http://127.0.0.1:8017/teletena/patient/consultations/<synthetic appointment>`
+rendered the patient prompt, submitted a 5/5 rating (HTTP 200), reloaded the
+persisted result, and confirmed exactly one feedback row for that encounter.
+The patient detail omitted the private note. English, Amharic and Afaan Oromo
+headings rendered; Amharic/Afaan Oromo remain provisional and have not had
+native review. This synthetic fixture did not exchange call media. The package
+source SHA was `1e2f8c00f6d354e27f99ac1d924e5476abc4cbe4`; asset integrity passed
+with `scripts/check_review_assets.py`.

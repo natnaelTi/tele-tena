@@ -3238,11 +3238,11 @@
       "module": "Consultations/records",
       "backend_reference": "consultations, presentation",
       "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Built /teletena/ browser journey passed on 2026-10-07 using a persisted synthetic completed encounter: localized feedback prompt, patient-only submission, reload persistence, and exact one-row 5/5 result. Private note absent from patient detail. Source/build commit 1e2f8c00f6d354e27f99ac1d924e5476abc4cbe4; Amharic and Afaan Oromo rendered but remain provisional, not native-approved.",
       "prototype_route": "e12",
       "route": "/patient/consultations/:appointment (feedback section)",
       "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_appointment",
         "tt_consultation",
@@ -3288,7 +3288,7 @@
         "LiveKit Cloud revocation project for hosted token guarantees",
         "human/device and clinical sign-off"
       ],
-      "verification_evidence": "tests/trust_metrics.py; tests/presentation.py feedback authorization/idempotency assertions (database-backed portion pending isolated-site execution)."
+      "verification_evidence": "tests/presentation.py 23/23 on tele-tena-pr12-fresh.localhost, including direct API privacy, authorization and concurrent/idempotent feedback assertions; tests/trust_metrics.py 4/4; real browser at http://127.0.0.1:8017/teletena/patient/consultations/<synthetic appointment>, persisted rating 5 after reload, exactly one tt_session_feedback row, no page errors. Screenshots: docs/screenshots/session-feedback/. Package checked by scripts/check_review_assets.py. No real media exchange was part of this feedback fixture."
     },
     {
       "id": "E13",
