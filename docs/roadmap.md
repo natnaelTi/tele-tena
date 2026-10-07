@@ -56,7 +56,8 @@ private notification waves. Existing legacy review services remain separately
 marked and are never silently promoted into the public catalog. This does not
 complete a clinical taxonomy or credential-verification workflow. The proposed
 rubric is not an agreed rubric and needs medical-lead approval; independent
-credential verification, affiliations, evidence-by-scope, appeals, expiry and
+credential verification, affiliations, reviewer verification/source metadata,
+appeals, expiry and
 reverification UI, full jurisdiction/accessibility checks, reliability/experience
 reliability/response ranking, native catalog review, and feedback moderation remain pending. Structured sample-aware session-experience ratings are now implemented in source but not yet integration-verified. See
 `vetting-routing-verification.md` for local failure evidence and verification

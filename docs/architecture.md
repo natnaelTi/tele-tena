@@ -189,3 +189,16 @@ only the appointment being moved from the conflict set, updates it in place and
 adds an appointment event. Price, financial policy, disclosure and identity stay
 unchanged. Fresh installation bootstraps this additive patch and site upgrades
 run it through Patch Log.
+
+## Per-scope vetting evidence
+
+Patch v1.16 introduces the native `Tele Tena Scope Evidence` metadata DocType
+and an app-owned `tt_scope_evidence_content` binary table. This preserves the
+Frappe back-office model for searchable/reviewable metadata while keeping
+private bytes out of generic File routes and public URLs. The authenticated
+download method authorizes only the applicant owner or vetting approver. The
+applicant can append PDF revisions only while that exact scope application is
+a draft or requests clarification; evidence is retained after submission.
+Human assessments snapshot the presented evidence references and revisions.
+No migration modifies existing resume files or application rows, and the
+change does not claim independent credential verification or malware scanning.

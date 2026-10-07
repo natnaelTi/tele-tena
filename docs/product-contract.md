@@ -50,7 +50,7 @@ withdrawals after configured withholding period; external settlement is not inst
 ## Expanded approved product scope (2026-10-07)
 
 The product target now includes complete human-led vetting and per-scope
-credential evidence, a versioned service catalog, distinct trust indicators,
+credential evidence uploads and immutable revision references, a versioned service catalog, distinct trust indicators,
 private progressive open-request routing, the balanced demonstration earnings
 lifecycle and explicitly funded extensions. It also includes explicit clinic
 membership and encounter grants, adult couples/family consent, laboratory and

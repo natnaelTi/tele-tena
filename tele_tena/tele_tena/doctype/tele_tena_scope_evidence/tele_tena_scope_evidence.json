@@ -1,0 +1,27 @@
+{
+  "doctype": "DocType",
+  "name": "Tele Tena Scope Evidence",
+  "module": "Tele Tena",
+  "autoname": "hash",
+  "engine": "InnoDB",
+  "track_changes": 0,
+  "fields": [
+    {"fieldname":"scope_application","label":"Service-scope application","fieldtype":"Link","options":"Tele Tena Vetting Scope Application","reqd":1},
+    {"fieldname":"clinician","label":"Applicant","fieldtype":"Link","options":"User","reqd":1},
+    {"fieldname":"evidence_type","label":"Evidence type","fieldtype":"Select","options":"Qualification\nLicense or registration\nScope training\nApproach experience\nOther supporting evidence","reqd":1},
+    {"fieldname":"filename","label":"Private filename","fieldtype":"Data","reqd":1,"read_only":1},
+    {"fieldname":"revision","label":"Revision","fieldtype":"Int","reqd":1,"read_only":1},
+    {"fieldname":"content_size","label":"File size in bytes","fieldtype":"Int","reqd":1,"read_only":1},
+    {"fieldname":"content_sha256","label":"Content digest","fieldtype":"Data","reqd":1,"read_only":1},
+    {"fieldname":"uploaded_by","label":"Uploaded by","fieldtype":"Link","options":"User","reqd":1,"read_only":1},
+    {"fieldname":"uploaded_at","label":"Uploaded at","fieldtype":"Datetime","reqd":1,"read_only":1}
+  ],
+  "permissions": [
+    {"role":"Tele Tena Applicant","read":1,"create":1},
+    {"role":"Tele Tena Clinician","read":1,"create":1},
+    {"role":"Tele Tena Approver","read":1}
+  ],
+  "allow_rename": 0,
+  "sort_field": "uploaded_at",
+  "sort_order": "DESC"
+}

@@ -1,5 +1,8 @@
 """Human-led professional and per-service scope vetting."""
+import base64
+import hashlib
 import json
+import re
 import uuid
 
 import frappe
@@ -8,6 +11,11 @@ from tele_tena.api import journey
 from tele_tena.api.journey import actor, fail, integer, one, rows, text
 
 RUBRIC_VERSION = 'proposed-1.0'
+MAX_SCOPE_EVIDENCE_BYTES = 5 * 1024 * 1024
+SCOPE_EVIDENCE_TYPES = {
+    'Qualification', 'License or registration', 'Scope training',
+    'Approach experience', 'Other supporting evidence',
+}
 APPLICANT_FIELDS = {
     'professional_category': 80, 'qualification': 180, 'issuing_institution': 180,
     'registration_number': 100, 'issuing_authority': 180, 'jurisdiction': 120,
@@ -74,15 +82,105 @@ def my_scope_applications():
             ORDER BY FIELD(a.status,'Submitted','Resubmitted','Clarification','Draft'),a.submitted_at''')
         for item in result:
             item.resume_uploaded = bool(rows('SELECT 1 FROM tt_resume_evidence WHERE clinician=%s', (item.clinician,)))
+            item.scope_evidence = _scope_evidence_rows(item.name)
         return result
     user = _applicant(user)
-    return rows('''SELECT a.name,a.service,s.service_label,a.status,a.professional_category,a.qualification,
+    result = rows('''SELECT a.name,a.service,s.service_label,a.status,a.professional_category,a.qualification,
         a.issuing_institution,a.registration_number,a.issuing_authority,a.jurisdiction,a.credential_expiry,
         a.experience_years,a.approach_keys,a.population_adults,a.independent_practice,a.clinic_affiliations,
         a.relevant_training,a.applicant_statement,a.applicant_response,a.clarification_request,
         a.decision_reason,a.restrictions,a.submitted_at,a.decided_at,a.rubric_version
         FROM `tabTele Tena Vetting Scope Application` a JOIN `tabTele Tena Service` s ON s.name=a.service
         WHERE a.clinician=%s ORDER BY a.modified DESC''', (user,))
+    for item in result:
+        item.scope_evidence = _scope_evidence_rows(item.name)
+    return result
+
+
+def _scope_evidence_rows(application):
+    return rows('''SELECT name AS id,scope_application,evidence_type,filename,revision,
+        content_size,uploaded_at FROM `tabTele Tena Scope Evidence`
+        WHERE scope_application=%s ORDER BY evidence_type,revision DESC''', (application,))
+
+
+def _authorized_scope_application(application, user=None):
+    user = user or actor()
+    reviewer = user != 'Guest' and 'Tele Tena Approver' in frappe.get_roles(user)
+    result = rows('''SELECT name,clinician,status,service FROM `tabTele Tena Vetting Scope Application`
+        WHERE name=%s''', (application,))
+    if not result or (not reviewer and result[0].clinician != user):
+        frappe.throw('Scope evidence unavailable', frappe.PermissionError)
+    item = result[0]
+    return item
+
+
+@journey.command
+def upload_scope_evidence(application, evidence_type, filename, content_base64):
+    user = _applicant()
+    scope = _authorized_scope_application(application, user)
+    # Serialize evidence revisions against this application's submit/review
+    # transition without serializing unrelated applicants.
+    locked = rows('''SELECT name,status FROM `tabTele Tena Vetting Scope Application`
+        WHERE name=%s AND clinician=%s FOR UPDATE''', (scope.name, user))
+    if not locked:
+        frappe.throw('Scope evidence unavailable', frappe.PermissionError)
+    if locked[0].status not in ('Draft', 'Clarification'):
+        fail('Evidence can be changed only by the applicant while the application is a draft or requests clarification.',
+             'scope_evidence_locked')
+    if evidence_type not in SCOPE_EVIDENCE_TYPES:
+        fail('Choose a supported evidence type.')
+    if not isinstance(filename, str) or len(filename) > 255 or not filename.lower().endswith('.pdf'):
+        fail('Upload a PDF document.')
+    filename = re.sub(r'[^A-Za-z0-9 ._()-]', '_', filename.split('/')[-1].split('\\')[-1])[:180]
+    if not isinstance(content_base64, str) or len(content_base64) > ((MAX_SCOPE_EVIDENCE_BYTES + 2) // 3) * 4 + 8:
+        fail('The PDF must be 5 MiB or smaller.')
+    try:
+        content = base64.b64decode(content_base64, validate=True)
+    except (ValueError, TypeError):
+        fail('The PDF data could not be read.')
+    if (not content or len(content) > MAX_SCOPE_EVIDENCE_BYTES or not content.startswith(b'%PDF-')
+            or b'%%EOF' not in content[-1024:]):
+        fail('The uploaded file is not a valid PDF within the 5 MiB limit.')
+    prior = rows('''SELECT MAX(revision) revision FROM `tabTele Tena Scope Evidence`
+        WHERE scope_application=%s AND evidence_type=%s''', (scope.name, evidence_type))
+    revision = int(prior[0].revision or 0) + 1
+    now = frappe.utils.now_datetime()
+    digest = hashlib.sha256(content).hexdigest()
+    doc = frappe.get_doc({'doctype': 'Tele Tena Scope Evidence',
+        'scope_application': scope.name, 'clinician': user, 'evidence_type': evidence_type,
+        'filename': filename, 'revision': revision, 'content_size': len(content),
+        'content_sha256': digest, 'uploaded_by': user, 'uploaded_at': now})
+    frappe.local.tele_tena_scope_evidence_action = True
+    try:
+        doc.insert()
+    finally:
+        frappe.local.tele_tena_scope_evidence_action = False
+    frappe.db.sql('INSERT INTO tt_scope_evidence_content (evidence,content) VALUES (%s,%s)',
+                  (doc.name, content))
+    journey.audit(user, 'ScopeEvidenceUploaded', {'application': scope.name,
+        'evidence': doc.name, 'type': evidence_type, 'revision': revision, 'size': len(content)})
+    return {'id': doc.name, 'revision': revision, 'uploaded': True}
+
+
+@frappe.whitelist()
+def download_scope_evidence(evidence):
+    user = actor()
+    item = rows('''SELECT name,scope_application,clinician,filename FROM `tabTele Tena Scope Evidence`
+        WHERE name=%s''', (evidence,))
+    if not item:
+        frappe.throw('Scope evidence unavailable', frappe.PermissionError)
+    record = item[0]
+    reviewer = user != 'Guest' and 'Tele Tena Approver' in frappe.get_roles(user)
+    if not reviewer and (record.clinician != user or not set(frappe.get_roles(user)).intersection(
+            {'Tele Tena Applicant', 'Tele Tena Clinician'})):
+        frappe.throw('Scope evidence unavailable', frappe.PermissionError)
+    content = rows('SELECT content FROM tt_scope_evidence_content WHERE evidence=%s', (record.name,))
+    if not content:
+        frappe.throw('Scope evidence unavailable', frappe.DoesNotExistError)
+    frappe.local.response.filename = record.filename
+    frappe.local.response.filecontent = bytes(content[0].content)
+    frappe.local.response.type = 'download'
+    frappe.local.response.display_content_as = 'attachment'
 
 
 @journey.query()
@@ -184,6 +282,13 @@ def review_scope_application(application, decision, identity_reviewed=False,
         'scope_application': doc.name, 'reviewer': reviewer, **flags, 'decision': decision,
         'findings': findings, 'restrictions': restrictions,
         'evidence_revision': (rows('SELECT revision FROM tt_resume_evidence WHERE clinician=%s', (doc.clinician,)) or [frappe._dict(revision=0)])[0].revision,
+        'scope_evidence_snapshot': json.dumps([
+            {'id': evidence.name, 'type': evidence.evidence_type,
+             'revision': evidence.revision, 'sha256': evidence.content_sha256}
+            for evidence in rows('''SELECT name,evidence_type,revision,content_sha256
+                FROM `tabTele Tena Scope Evidence` WHERE scope_application=%s
+                ORDER BY evidence_type,revision''', (doc.name,))
+        ], separators=(',', ':'), sort_keys=True),
         'rubric_version': RUBRIC_VERSION, 'decided_at': frappe.utils.now_datetime()})
     frappe.local.tele_tena_vetting_assessment_action = True
     try:

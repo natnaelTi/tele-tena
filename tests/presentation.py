@@ -419,6 +419,34 @@ class Presentation(unittest.TestCase):
             'independent_practice':True,'relevant_training':'Synthetic supervised practice',
             'applicant_statement':'Synthetic evidence; no external credential claim.'})
         self.assertEqual(application['status'], 'Draft')
+        pdf = base64.b64encode(b'%PDF-1.4\nSynthetic service-scope evidence\n%%EOF').decode()
+        first_evidence = vetting.upload_scope_evidence(application['name'], 'License or registration',
+                                                       'synthetic-license.pdf', pdf)
+        second_evidence = vetting.upload_scope_evidence(application['name'], 'License or registration',
+                                                        'synthetic-license-revised.pdf', pdf)
+        self.assertEqual(second_evidence['revision'], 2)
+        listed = next(item for item in vetting.my_scope_applications()
+                      if item.name == application['name'])
+        self.assertEqual([item.revision for item in listed.scope_evidence], [2, 1])
+        self.assertNotIn('content', listed.scope_evidence[0])
+        stored = journey.one('SELECT content FROM tt_scope_evidence_content WHERE evidence=%s',
+                             (first_evidence['id'],))
+        self.assertEqual(bytes(stored.content), base64.b64decode(pdf))
+        with self.assertRaises(frappe.PermissionError):
+            frappe.get_doc('Tele Tena Scope Evidence', first_evidence['id']).insert()
+        fixtures.login('c1')
+        with self.assertRaises(frappe.PermissionError):
+            vetting.download_scope_evidence(first_evidence['id'])
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            vetting.download_scope_evidence(first_evidence['id'])
+        fixtures.login('admin')
+        vetting.download_scope_evidence(first_evidence['id'])
+        self.assertEqual(bytes(frappe.local.response.filecontent), base64.b64decode(pdf))
+        fixtures.login('vetting')
+        with self.assertRaises(frappe.ValidationError):
+            vetting.upload_scope_evidence(application['name'], 'Other supporting evidence',
+                                          'bad.pdf', base64.b64encode(b'not a pdf').decode())
         application = vetting.save_scope_application(service, {
             'professional_category':'Synthetic counselor','qualification':'Synthetic qualification',
             'issuing_institution':'Synthetic institution','registration_number':'TEST-ONLY',
@@ -427,6 +455,11 @@ class Presentation(unittest.TestCase):
             'independent_practice':True,'relevant_training':'Synthetic supervised practice',
             'applicant_statement':'Synthetic evidence; no external credential claim.'}, submit=True)
         self.assertEqual(application['status'], 'Submitted')
+        with self.assertRaises(frappe.ValidationError):
+            vetting.upload_scope_evidence(application['name'], 'Other supporting evidence',
+                'after-submit.pdf', pdf)
+        self.assertEqual(int(journey.one('''SELECT COUNT(*) n FROM `tabTele Tena Scope Evidence`
+            WHERE scope_application=%s''', (application['name'],)).n), 2)
         fixtures.login('admin')
         vetting.assign_scope_reviewer(application['name'], fixtures.USERS['admin'])
         vetting.review_scope_application(application['name'], 'Clarification', findings='Synthetic missing detail')
@@ -451,6 +484,10 @@ class Presentation(unittest.TestCase):
         assessments = journey.rows('SELECT name FROM `tabTele Tena Vetting Assessment` WHERE scope_application=%s',
                                    (application['name'],))
         self.assertEqual(len(assessments), 2)
+        latest_assessment = frappe.get_doc('Tele Tena Vetting Assessment', result['assessment'])
+        evidence_snapshot = json.loads(latest_assessment.scope_evidence_snapshot)
+        self.assertEqual(len(evidence_snapshot), 2)
+        self.assertEqual({item['revision'] for item in evidence_snapshot}, {1, 2})
         with self.assertRaises(frappe.PermissionError):
             assessment = frappe.get_doc('Tele Tena Vetting Assessment', result['assessment'])
             assessment.findings = 'Attempted overwrite'
