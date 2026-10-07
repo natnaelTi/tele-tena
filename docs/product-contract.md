@@ -228,6 +228,15 @@ patient records. Existing narrative affiliation fields are preserved and are
 not automatically converted into verified affiliations. Native DocType schema
 is additive and synchronized by normal Frappe migration.
 
+Verified Clinic Manager and Scheduling memberships (and a verified clinic
+owner) expose a separate `/clinic` operational workspace. A pending invitation
+appears only after the exact email is verified, and an account without a patient
+or clinician profile can be routed to that invitation workspace after sign-in.
+This session flag is navigation only: each clinic API independently checks
+membership, role, clinic status, and encounter-specific patient permission.
+Billing membership does not unlock the scheduling workspace. Invitation
+delivery is not configured; out-of-band coordination is still required.
+
 
 ## Clinic encounter access (scheduling-only initial slice)
 

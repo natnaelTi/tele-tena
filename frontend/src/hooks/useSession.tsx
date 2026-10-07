@@ -55,6 +55,8 @@ export function destination(session: Session | null) {
     ? "/sign-in"
     : session.roles.includes("Tele Tena Approver")
       ? "/admin"
+      : session.clinic_workspace && !session.profile
+        ? "/clinic"
       : session.profile?.kind === "clinician"
         ? "/clinician"
         : session.profile

@@ -156,6 +156,13 @@ consultation-note, resume, or service-scope access. Invite delivery is not
 implemented, so an invitee must already know to sign in and verify their
 address. Audit events record invitation, acceptance/decline, and revocation.
 
+Verified Clinic Manager/Scheduling members, verified clinic owners, and
+verified invitees receive a `clinic_workspace` routing hint from the
+authenticated session. `/clinic` is available without requiring a patient or
+clinician profile. This hint controls navigation only; every clinic API still
+enforces its own membership, role, status, and patient-consent checks. Billing
+membership does not qualify. Invitation email delivery remains unimplemented.
+
 
 ## Patient-controlled clinic scheduling disclosure
 

@@ -68,6 +68,9 @@ export default function App() {
             </Route>
             <Route element={<RequireSession />}>
               <Route path="/consultation/:id/room" element={<><div className="demo-bar" role="note">Demonstration environment — no real payments or clinical care.</div><ConsultationRoomPage /></>} />
+              <Route path="/clinic" element={<WorkspaceLayout kind="clinic" />}>
+                <Route index element={<ClinicMembershipPortal workspace />} />
+              </Route>
               <Route
                 path="/patient"
                 element={<WorkspaceLayout kind="patient" />}

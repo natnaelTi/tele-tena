@@ -227,6 +227,7 @@ class Presentation(unittest.TestCase):
         fixtures.login('p2')
         self.assertEqual(frappe.get_list('Tele Tena Clinic Membership', fields=['name']), [])
         self.assertEqual(clinics.my_clinic_memberships()['invitations'], [])
+        self.assertFalse(journey._clinic_workspace_available(fixtures.USERS['p2']))
         with self.assertRaises(frappe.PermissionError):
             clinics.respond_to_clinic_invitation(invitation['membership'], 'accept')
         with self.assertRaises(frappe.PermissionError):
@@ -241,8 +242,10 @@ class Presentation(unittest.TestCase):
         frappe.db.sql('''INSERT INTO tt_contact_identity(channel,contact,user,verified_at)
             VALUES ('email',%s,%s,NOW(6))''', (invite_email, fixtures.USERS['p2']))
         self.assertEqual(len(clinics.my_clinic_memberships()['invitations']), 1)
+        self.assertTrue(journey._clinic_workspace_available(fixtures.USERS['p2']))
         accepted = clinics.respond_to_clinic_invitation(invitation['membership'], 'accept')
         self.assertEqual(accepted['status'], 'Active')
+        self.assertTrue(journey._clinic_workspace_available(fixtures.USERS['p2']))
         self.assertTrue(clinics.respond_to_clinic_invitation(
             invitation['membership'], 'accept')['idempotent'])
         self.assertIn('Tele Tena Patient', frappe.get_roles(fixtures.USERS['p2']))
@@ -268,6 +271,7 @@ class Presentation(unittest.TestCase):
             'Synthetic test revocation.')['idempotent'])
         fixtures.login('p2')
         self.assertEqual(clinics.my_clinic_memberships()['memberships'][0].status, 'Revoked')
+        self.assertFalse(journey._clinic_workspace_available(fixtures.USERS['p2']))
         self.assertTrue(frappe.has_permission('Tele Tena Clinic Membership', 'read',
             doc=frappe.get_doc('Tele Tena Clinic Membership', invitation['membership']),
             user=fixtures.USERS['p2']))
@@ -312,6 +316,7 @@ class Presentation(unittest.TestCase):
                 'status':'Active', 'granted_by':fixtures.USERS['p1']}).insert()
 
         fixtures.login('c1')  # verified clinic owner
+        self.assertTrue(journey._clinic_workspace_available(fixtures.USERS['c1']))
         schedule = clinic_access.clinic_schedule_access()
         self.assertEqual(len(schedule), 1)
         self.assertEqual(schedule[0]['patient_label'], 'Private patient')
@@ -333,6 +338,7 @@ class Presentation(unittest.TestCase):
         fixtures.login('c2')
         clinics.respond_to_clinic_invitation(billing['membership'], 'accept')
         self.assertEqual(clinic_access.clinic_schedule_access(), [])
+        self.assertFalse(journey._clinic_workspace_available(fixtures.USERS['c2']))
 
         fixtures.login('c1')
         scheduling = clinics.invite_clinic_member(clinic, fixtures.USERS['c3'], 'Scheduling')

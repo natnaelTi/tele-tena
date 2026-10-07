@@ -168,20 +168,24 @@ const adminNav = [
   ["/admin/financial-disputes", "Financial disputes", Wallet],
   ["/admin/exceptions", "Exceptions", Settings2],
 ] as const;
+const clinicNav = [["/clinic", "Clinic workspace", Building2]] as const;
 export function WorkspaceLayout({
   kind,
 }: {
-  kind: "patient" | "clinician" | "admin";
+  kind: "patient" | "clinician" | "admin" | "clinic";
 }) {
   const { session, refresh } = useSession();
   const { w } = useLocale();
   const location = useLocation();
-  const items =
+  const roleItems =
     kind === "patient"
       ? patientNav
       : kind === "clinician"
         ? clinicianNav
-        : adminNav;
+        : kind === "clinic" ? clinicNav : adminNav;
+  const items = kind !== "clinic" && session?.clinic_workspace
+    ? [...roleItems, ["/clinic", "Clinic workspace", Building2] as const]
+    : roleItems;
   useEffect(()=>{const revealActive=()=>{if(window.matchMedia("(max-width: 800px)").matches){document.querySelector<HTMLElement>(".workspace-nav a.active")?.scrollIntoView({block:"nearest",inline:"center"});}};revealActive();window.addEventListener("resize",revealActive);return()=>window.removeEventListener("resize",revealActive);},[location.pathname]);
   if (kind === "admin" && !session?.roles.includes("Tele Tena Approver"))
     return (
@@ -191,7 +195,15 @@ export function WorkspaceLayout({
         </InlineNotice>
       </main>
     );
-  if (kind !== "admin" && session?.profile?.kind !== kind)
+  if (kind === "clinic" && !session?.clinic_workspace)
+    return (
+      <main className="container">
+        <InlineNotice tone="danger">
+          {w("You don’t have access to a clinic workspace.")}
+        </InlineNotice>
+      </main>
+    );
+  if (kind !== "admin" && kind !== "clinic" && session?.profile?.kind !== kind)
     return <Navigate to="/onboarding" replace />;
   return (
     <div className="workspace">
@@ -200,6 +212,8 @@ export function WorkspaceLayout({
         <div className="workspace-label">
           {kind === "admin"
             ? "Review workspace"
+            : kind === "clinic"
+              ? w("Clinic workspace")
             : kind === "clinician"
               ? "Clinician workspace"
               : "Your space for care"}
@@ -234,12 +248,14 @@ export function WorkspaceLayout({
           <span>
             {kind === "admin"
               ? "Administration"
-              : session?.profile?.display_name}
+              : kind === "clinic"
+                ? w("Clinic workspace")
+                : session?.profile?.display_name}
           </span>
           <LanguageSelect />
         </header>
         {kind === "clinician" && session?.roles.includes("Tele Tena Clinician") && <ClinicianRequestAvailability />}
-        <WorkspaceTour role={kind} />
+        {kind !== "clinic" && <WorkspaceTour role={kind} />}
         <main className="workspace-main" id="main-content">
           <Outlet />
         </main>

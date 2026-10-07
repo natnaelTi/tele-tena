@@ -91,13 +91,18 @@ async function switchUser(page, user) {
     const membershipSection = page.locator('.clinic-record-section').filter({ has: page.getByRole('heading', { name: 'Your clinic memberships' }) });
     const acceptedRow = membershipSection.locator('.clinic-record-row').filter({ hasText: clinicName });
     await acceptedRow.getByText('Active', { exact: true }).waitFor();
+    checkpoint = 'role-scoped clinic workspace navigation';
+    await page.getByRole('link', { name: 'Clinic workspace', exact: true }).click();
+    await page.getByRole('heading', { name: 'Clinic workspace', exact: true }).waitFor();
+    assert.match(page.url(), /\/teletena\/clinic$/);
+    await page.getByRole('heading', { name: 'Your clinic memberships', exact: true }).waitFor();
     for (const width of [320, 390, 768, 1440]) {
-      checkpoint = 'invitee responsive width ' + width;
+      checkpoint = 'clinic workspace responsive width ' + width;
       await page.setViewportSize({ width, height: 900 });
       const pageWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       assert.ok(pageWidth <= width, 'Unexpected horizontal page overflow at ' + width + 'px');
       if (width === 390 || width === 1440)
-        await membershipSection.screenshot({ path: path.join(screenshots, 'invitee-membership-' + width + '.png') });
+        await page.locator('.clinic-access-page').screenshot({ path: path.join(screenshots, 'staff-workspace-' + width + '.png') });
     }
 
     checkpoint = 'manager revocation';
@@ -113,7 +118,7 @@ async function switchUser(page, user) {
     await activeTeam.locator('.clinic-record-row').filter({ hasText: 'Scheduling · Revoked' }).waitFor();
     await activeTeam.screenshot({ path: path.join(screenshots, 'manager-revocation.png') });
 
-    console.log('PASS: built Frappe clinic registration → reviewer verification → manager invite → verified patient acceptance → manager revocation. Synthetic screenshots: ' + screenshots);
+    console.log('PASS: built Frappe clinic registration → reviewer verification → manager invite → verified patient acceptance → membership-scoped clinic workspace → manager revocation. Synthetic screenshots: ' + screenshots);
   } finally {
     await browser.close();
   }

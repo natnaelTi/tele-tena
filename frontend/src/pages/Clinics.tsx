@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Building2, CheckCircle2, UsersRound } from "lucide-react";
 import { journeyApi } from "../journey-api";
 import { Button, Card, EmptyState, InlineNotice, Select, Skeleton, TextField } from "../components/ui";
@@ -7,6 +7,7 @@ import { PageTitle } from "../components/Domain";
 import { useAction } from "../hooks/useAction";
 import { useResource } from "../hooks/useResource";
 import { useLocale } from "../hooks/useLocale";
+import { destination, useSession } from "../hooks/useSession";
 
 export function ClinicianAffiliations() {
   const clinics = useResource(journeyApi.myClinicApplications);
@@ -85,16 +86,18 @@ function ClinicTeamSection({ clinic }: { clinic: {name:string;clinic_name:string
   </Card>;
 }
 
-export function ClinicMembershipPortal() {
+export function ClinicMembershipPortal({ workspace = false }: { workspace?: boolean }) {
   const managed = useResource(journeyApi.managedClinics);
   const mine = useResource(journeyApi.myClinicMemberships);
   const sharedSchedule = useResource(journeyApi.clinicScheduleAccess);
   const action = useAction();
   const { t, w } = useLocale();
+  const { refresh: refreshSession } = useSession();
+  const navigate = useNavigate();
   const refresh = async () => { await Promise.all([managed.refresh(), mine.refresh(), sharedSchedule.refresh()]); };
-  const respond = (id:string, decision:"accept"|"decline") => void action.run(async()=>{await journeyApi.respondToClinicInvitation(id,decision);await refresh();});
+  const respond = (id:string, decision:"accept"|"decline") => void action.run(async()=>{await journeyApi.respondToClinicInvitation(id,decision);const updated=await refreshSession();await refresh();if(decision==="decline"&&!updated?.clinic_workspace)navigate(destination(updated),{replace:true});});
   return <div className="clinic-access-page">
-    <PageTitle eyebrow={w("CLINIC OPERATIONS")} title={w("Clinic access")} description={w("Clinic membership supports operational work only. It does not grant access to patient records or authorize clinical services.")}/>
+    <PageTitle eyebrow={w("CLINIC OPERATIONS")} title={workspace?w("Clinic workspace"):w("Clinic access")} description={w("Clinic membership supports operational work only. It does not grant access to patient records or authorize clinical services.")}/>
     {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
     {(mine.error||managed.error)&&<InlineNotice tone="danger">{w("Clinic access could not be loaded.")} <Button variant="secondary" onClick={()=>void refresh()}>{w("Try again")}</Button></InlineNotice>}
     <section className="clinic-record-section"><h2>{w("Invitations for you")}</h2>{!mine.data&&!mine.error?<Skeleton/>:mine.data?.invitations.length?mine.data.invitations.map(invite=><Card className="clinic-review-card" key={invite.name}><div className="clinic-review-heading"><div><h3>{invite.clinic_name}</h3><p className="supporting">{invite.jurisdiction} · {w(invite.membership_role)}</p></div><span className="status-pill status-invited">{w("Invited")}</span></div><p>{w("Accept only if you recognize this clinic and want this operational role. You can withdraw access later or ask a clinic manager to revoke it.")}</p><div className="actions"><Button disabled={action.busy} onClick={()=>respond(invite.name,"accept")}>{w("Accept invitation")}</Button><Button variant="secondary" disabled={action.busy} onClick={()=>respond(invite.name,"decline")}>{w("Decline")}</Button></div></Card>):<EmptyState title={w("No clinic invitations.")}>{w("Invitations sent to an email you have verified will appear here.")}</EmptyState>}</section>

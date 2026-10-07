@@ -6368,28 +6368,30 @@
       "family": "J",
       "title": "Clinic overview",
       "module": "Clinic operations",
-      "backend_reference": "Full backend pending",
+      "backend_reference": "journey.session, clinic_access.clinic_schedule_access, clinics.my_clinic_memberships",
       "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "A membership-scoped /clinic shell and read-only patient-consented schedule projection are implemented. Clinic calendars/resources, patient access requests, clinic management, and billing remain pending.",
       "prototype_route": "j01",
-      "route": "/j01 (not implemented)",
-      "actor": "Clinic owner/admin and explicitly invited staff",
-      "status": "Designed",
+      "route": "/clinic",
+      "actor": "Verified clinic owner or verified active Clinic Manager/Scheduling member; Billing and non-members denied",
+      "status": "Implementation in progress",
       "persistent_models": [
-        "Proposed Clinic",
-        "Proposed Clinic Membership",
-        "Proposed Clinic Location",
-        "Proposed Clinic Resource",
-        "Proposed Encounter Access Grant"
+        "Tele Tena Clinic",
+        "Tele Tena Clinic Membership",
+        "Tele Tena Clinic Encounter Access",
+        "tt_appointment"
       ],
       "queries": [
-        "No clinic workspace API implemented"
+        "tele_tena.api.clinics.my_clinic_memberships",
+        "tele_tena.api.clinic_access.clinic_schedule_access"
       ],
       "commands": [
-        "No clinic workspace commands implemented"
+        "tele_tena.api.clinics.respond_to_clinic_invitation",
+        "tele_tena.api.clinics.invite_clinic_member (Clinic Manager only)",
+        "tele_tena.api.clinics.revoke_clinic_membership (Clinic Manager only)"
       ],
-      "server_permissions": "Membership grants only the named operational permissions; no blanket patient or clinician record access.",
-      "workflow_transitions": "Draft clinic → verification pending → verified/suspended; invitation pending → accepted/revoked; encounter grant requested → granted/revoked.",
+      "server_permissions": "Session clinic_workspace is navigation only. API queries independently require a verified clinic and an allowed manager/scheduling member; patient consent is bound to one future appointment. Billing membership returns no schedule. No clinical notes or wider record access.",
+      "workflow_transitions": "Verified invite -> active or declined membership; active -> revoked. Patient grant -> schedule projection -> revoked/expired/closed on appointment completion or cancellation.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -6413,14 +6415,13 @@
       },
       "dependencies": [
         "clinic verification",
-        "membership/roles",
-        "resource calendar",
-        "explicit clinical access grants"
+        "verified contact for invite acceptance",
+        "patient encounter-specific scheduling grant"
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J01) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Local clinic staff route and session navigation hint; not a full clinic calendar or management product.",
+        "current_local": "Frappe presentation coverage includes eligibility for verified invitation, manager, scheduling, billing, owner, and revoked membership. Production-built browser navigation acceptance is pending."
       }
     },
     {
