@@ -5,8 +5,8 @@ deployment, real-patient-readiness, or real-money claim.
 
 ## Current source and preview
 
-- Worktree: branch `feat/clinic-staff-workspace`, app-code commit
-  `a1f62b10f710fa758ccbc84228947847d8e93f77`, stacked locally on
+- Worktree: branch `feat/clinic-staff-workspace`, app-code changes through
+  `fa57df0` (membership-history composition), stacked locally on
   `feat/clinic-encounter-access` → PR #20 head branch
   `fix/session-feedback-translations`. PR #20 remains open. The clinic branch
   has not yet been pushed or opened as a PR because GitHub returned HTTP 500
@@ -15,9 +15,10 @@ deployment, real-patient-readiness, or real-money claim.
 - Local review URL: `http://127.0.0.1:8017/teletena/`, site
   `tele-tena-pr12-fresh.localhost`, Bench
   `/home/frappe/frappe/frappe-bench`. The app is production-built and served by
-  the dedicated Gunicorn process; it is not Vite. `release.json` identifies app
-  source `a1f62b10f710fa758ccbc84228947847d8e93f77`. The backend checkout is the
-  same working tree; its isolated preview workers were gracefully reloaded.
+  the dedicated Gunicorn process; it is not Vite. `release.json` identifies the
+  clean build source checkout `66834eb4be4b282311ef33f5166458bcf7fbd659`. The
+  backend checkout is the same working tree; its isolated preview workers were
+  gracefully reloaded.
 - Local framework tested: Frappe 15.121.2 / ERPNext 15.121.6, Python 3.12.3,
   Node 22.23.3. The review site's scheduler is disabled. Shared Bench workers,
   scheduler, original `erp.localhost`, and remote Selfmade were not changed.

@@ -6,7 +6,7 @@
   `/home/frappe/frappe/frappe-bench`, isolated site
   `tele-tena-pr12-fresh.localhost`. The production package at
   `tele_tena/public/review/release.json` identifies source/build commit
-  `a1f62b10f710fa758ccbc84228947847d8e93f77` on branch
+  `66834eb4be4b282311ef33f5166458bcf7fbd659` on branch
   `feat/clinic-staff-workspace`. The dedicated Gunicorn master bound to
   `127.0.0.1:8017` was gracefully reloaded; its environment selects the isolated
   site. Frappe serves hashed packaged assets; Vite is not serving the page.
@@ -16,7 +16,9 @@
   observed in the route navigation; the backend independently filters each
   query. Width checks passed at 320, 390, 768, and 1440 CSS px. A 320px
   document overflow from a long invitation email was found, fixed by wrapping
-  clinic member rows, and rechecked. Screenshots are in
+  clinic member rows, and rechecked. Past memberships are grouped in an
+  accessible disclosure while active membership stays visible. Screenshots at
+  390px and 1440px were visually inspected and are in
   `docs/screenshots/clinic-staff-workspace/`.
 - `TELE_TENA_TEST_SITE=tele-tena-pr12-fresh.localhost ./env/bin/python
   apps/tele_tena/tests/presentation.py` passed **24/24** on Frappe 15.121.2 /
