@@ -15,7 +15,7 @@ let checkpoint='launch';
   const context=await browser.newContext();const page=await context.newPage();
   const errors=[];page.on('pageerror',()=>errors.push('page error'));
   checkpoint='built public homepage';await page.goto(app+'/');
-  await page.getByRole('heading',{name:'Find someone you feel comfortable talking to.'}).waitFor();
+  await page.getByRole('heading',{name:'Find support. Make time for care.'}).waitFor();
   assert.ok((await page.locator('img').first().getAttribute('src')).startsWith('/assets/tele_tena/review/'));
   checkpoint='guest direct route and sign-in redirect';await page.goto(app+'/patient/appointments');
   await page.waitForURL(/\/teletena\/sign-in(?:\?.*)?$/);
