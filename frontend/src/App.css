@@ -1855,6 +1855,14 @@ button:active {
 .clinic-schedule-sharing { margin-top: 24px; }
 .clinic-schedule-sharing .field { margin-top: 16px; }
 .clinic-shared-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--border-default); }
+.scope-evidence-panel { display:grid; gap:10px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-default); min-width:0; }
+.scope-evidence-panel h3 { margin:0; font-size:16px; }
+.scope-evidence-panel .supporting { margin:0; }
+.scope-evidence-list { list-style:none; display:grid; gap:8px; margin:0; padding:0; }
+.scope-evidence-list li { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:10px 12px; border:1px solid var(--border-default); border-radius:12px; background:var(--surface-card); overflow-wrap:anywhere; }
+.scope-evidence-upload { display:grid; grid-template-columns:minmax(180px,1fr) minmax(220px,2fr); align-items:end; gap:12px; }
+.scope-evidence-upload input[type=file] { width:100%; min-height:44px; padding:8px; border:1px solid var(--border-default); border-radius:12px; background:var(--surface-card); color:var(--text-primary); }
+@media (max-width:600px) { .scope-evidence-upload { grid-template-columns:1fr; } .scope-evidence-list li > button { width:100%; } }
 @media (max-width: 600px) {
   .clinic-shared-row > button { width: 100%; }
 }
