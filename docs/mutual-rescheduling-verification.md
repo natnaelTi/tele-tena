@@ -113,3 +113,47 @@ keeps the calendar grid hidden, and has no horizontal overflow. The editor now
 keeps a sticky Save action reachable on mobile and translates its saving and
 saved states. Screenshot:
 `docs/screenshots/mutual-rescheduling/availability-390.png`.
+
+## Verification update — 2026-10-07
+
+The focused Account change was committed as
+`63470939cd652d454b341c70922e7383cd8f5cae` on
+`feat/mutual-rescheduling`; its production asset manifest reported that source
+SHA during browser verification. The report update is documentation-only; the
+packaged asset manifest is regenerated from the final source commit. The local review URL remains
+`http://127.0.0.1:8017/teletena/` on the isolated
+`tele-tena-pr12-fresh.localhost` site. No Vite server is used. The isolated
+Gunicorn process serves this app checkout and production assets; the original
+`erp.localhost` site was not migrated or reset.
+
+The clinician Account > Personal profile view no longer repeats an Earnings
+panel unrelated to that section. A browser authenticated as the synthetic
+clinician verified that the built page contains no Earnings heading. The
+earnings activity remains under its dedicated workspace route. The PWA update
+prompt test passed against the built Frappe route, and a separate real-worker
+browser probe verified the service-worker controller and offline fallback.
+
+`npm run build`, `npm run lint` (exit 0 with existing Oxlint warnings),
+`python3 -m compileall`, `git diff --check`, and
+`scripts/check_review_assets.py` passed. The backend presentation suite passed
+26/26 on the disposable review site. The repository-default `python3
+tests/presentation.py` cannot import Bench dependencies; it must use the Bench
+virtualenv and an explicitly allowed disposable `TELE_TENA_TEST_SITE`.
+GitHub checks passed for this commit on Node 22.23.3/24.13.0 and Python
+3.12/3.14.2.
+
+A separate fresh-site run installed Frappe, ERPNext and TeleTena; the asserted
+DocTypes, roles, migrations, guest denial, and disabled-by-default simulation
+state passed. The optional registration-enabled browser process timed out at
+300 seconds after homepage captures, before authentication journeys. This is
+recorded as an unresolved browser-harness result, not a fresh-site browser
+pass. The same run verified cleanup of the disposable site/database, temporary
+database administrator and mode-600 credential file, and confirmed retained
+site data fingerprints were unchanged. Its local MariaDB was 10.11.14, outside
+Frappe 15's tested range; this is not exact Selfmade-stack compatibility
+evidence. Fresh-install schema assertions passed, but full fresh-site browser
+acceptance remains open.
+
+`git status` was clean after packaging. The isolated local review preview is
+still available at the URL above. No live SMS, physical-device media, native
+translation approval, or remote deployment is claimed.
