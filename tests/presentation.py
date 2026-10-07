@@ -95,17 +95,21 @@ class Presentation(unittest.TestCase):
             with self.assertRaises(frappe.ValidationError):
                 journey.publish(service, 5600, 30, 'Changed title',
                     'Changed payload must not reuse a completed key.', retry_key=keys[0])
+            updated = journey.publish(service, 5750, 30, 'Synthetic brief session revised',
+                'Owner edit preserves offering identity.', offering_id=first['offering'])
+            self.assertEqual(updated['offering'], first['offering'])
 
             own = journey.practice()['offerings']
             by_id = {item.id: item for item in own if item.id in created}
             self.assertEqual(set(by_id), set(created))
-            self.assertEqual(int(by_id[first['offering']].price), 5500)
+            self.assertEqual(int(by_id[first['offering']].price), 5750)
+            self.assertEqual(by_id[first['offering']].title, 'Synthetic brief session revised')
             self.assertEqual(by_id[second['offering']].title, 'Synthetic longer session')
 
             fixtures.login('p1')
             visible = {item.id: item for item in journey.discover(service)}
             self.assertTrue(set(created).issubset(visible))
-            self.assertEqual(int(visible[first['offering']].price), 5500)
+            self.assertEqual(int(visible[first['offering']].price), 5750)
             self.assertEqual(int(visible[second['offering']].price), 8200)
 
             fixtures.login('c2')
