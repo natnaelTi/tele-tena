@@ -1316,6 +1316,7 @@ button:active {
   }
   .workspace {
     display: block;
+    overflow-x: clip;
   }
   .sidebar {
     position: static;
