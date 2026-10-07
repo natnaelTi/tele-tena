@@ -55,7 +55,6 @@ const words: Record<string, [string, string]> = {
   "Last session": ["የመጨረሻ ክፍለ ጊዜ", "Walgahii isa dhumaa"],
   "completed session": ["የተጠናቀቀ ክፍለ ጊዜ", "walgahii xumurame"],
   "completed sessions": ["የተጠናቀቁ ክፍለ ጊዜዎች", "walgahiiwwan xumuraman"],
-  "Appointments": ["ቀጠሮዎች", "Beellamoota"],
   "Try again": ["እንደገና ይሞክሩ", "Irra deebi'ii yaali"],
   "View profile": ["መገለጫውን ይመልከቱ", "Piroofaayila ilaali"],
   Home: ["መነሻ", "Mana"],
