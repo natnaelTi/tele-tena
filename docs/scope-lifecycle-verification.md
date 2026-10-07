@@ -1,0 +1,64 @@
+# Credential renewal and existing-appointment triage verification
+
+Date: 2026-10-08
+
+## Implemented behavior
+
+- Renewal is a separate `Tele Tena Vetting Scope Application` linked to one
+  approved application. New private license/registration evidence, issuer,
+  jurisdiction and current credential data are required before submission.
+- Repeating an identical submitted payload returns the original renewal; a
+  changed payload is rejected. Generic DocType writes cannot forge or edit the
+  renewal link/hash. Approval remains a human reviewer action.
+- Expired credentials fail closed for new offering publication, discovery and
+  direct booking using the Frappe site date. A pending renewal does not extend
+  an expired credential; rejection does not revoke a still-valid earlier
+  credential.
+- Future booked/pending-confirmation appointments affected by expired or
+  revoked scope receive a logistics-only review flag. A later distinct expiry
+  event on the same appointment has a separate audit row. The flag does not change
+  appointment or financial state and its reviewer projection omits patient
+  identity, disclosure, health narrative, notes and records.
+
+## Checks actually run
+
+- Frappe 15.121.2 / ERPNext 15.121.6 / Python 3.12.3, site
+  `tele-tena-pr12-fresh.localhost`: `tests/presentation.py` passed 30/30. This
+  includes fresh renewal evidence, exact retry, changed-payload rejection,
+  expired-credential booking/discovery denial, scheduler flag idempotency,
+  reviewer/patient authorization, a second expiry episode, and preservation of an existing booked
+  appointment and its reserved funds.
+- `tests/offer_status_unit.py` and `tests/hosted_phone_unit.py` passed; phone
+  unit suite 4/4.
+- `node tests/service_worker.mjs` passed both public-only cache/sensitive API
+  exclusion checks.
+- `python -m compileall` and `git diff --check` passed.
+- Frontend `npm run lint` exited successfully with existing hook/purity/Fast
+  Refresh warnings. `npm run build` succeeded; Vite reports the existing
+  LiveKit bundle chunk-size warning.
+- Backed up the isolated review site with database and files before schema
+migration. Frappe migration applied v1.20/v1.21 and a repeat migration
+succeeded.
+
+## Not yet verified
+
+- Fresh empty-site installation is pending because this WSL session has no
+  non-interactive MariaDB administrator access. The existing test site was not
+  deleted or reseeded. Run the documented setup helper with a unique disposable
+  site/database name to complete it; it prompts for sudo locally and removes
+  the temporary account/credential.
+- The new screen has not yet been exercised against the refreshed production
+  `/teletena/` bundle in Playwright; built-browser acceptance and screenshots
+  remain pending.
+- Frappe 16 migration/tests for v1.19–v1.21 and a running isolated scheduler
+  have not been completed. The current review-site scheduler remains disabled;
+  automatic date-expiry scanning must not be claimed until an isolated worker
+  check passes. Explicit reviewer suspension/expiry still creates flags
+  synchronously.
+- Credential issuer/registry verification, jurisdiction-specific expiry-date
+  semantics, reminders, malware scanning and patient-care continuity policy
+  remain human/external decisions.
+
+The currently served asset manifest still identifies the earlier frontend
+source until the feature branch is packaged after commit. Use the later
+checkpoint entry in the tracker as the preview authority.

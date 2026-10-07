@@ -1,6 +1,15 @@
 # Product roadmap and capability boundaries
 
-This roadmap reconciles the agreed product contract with the current delivery tracker. The tracker and operational screen map are evidence sources; a planned row is not evidence that it works. PRs #12–#15 remain open stacked work (PR #15 → #14 → #13 → #12); PR #11 is an open availability hotfix. Do not infer a merged/deployed state from this roadmap.
+## Vetting credential lifecycle continuation — 2026-10-08
+
+The current dependent `feat/scope-reverification` slice adds separate,
+evidence-backed credential renewal and reviewer-only operational flags for
+future appointments when a clinician scope is no longer eligible. It preserves
+appointments and their financial/disclosure snapshots. Frappe 15 migration and
+focused regression verification are in progress; this is not a complete
+clinical continuity policy or external credential verification.
+
+This roadmap reconciles the agreed product contract with the current delivery tracker. The tracker and operational screen map are evidence sources; a planned row is not evidence that it works. PRs #11–#25 currently form an open dependency chain; PR #25 (`feat/vetting-reconsideration`) depends on #24. The local feature branch may include changes that are not yet in main or on Selfmade. Do not infer a merged/deployed state from this roadmap.
 
 ## Demonstration sequence
 
@@ -57,7 +66,7 @@ marked and are never silently promoted into the public catalog. This does not
 complete a clinical taxonomy or credential-verification workflow. The proposed
 rubric is not an agreed rubric and needs medical-lead approval; independent
 credential verification, affiliations, reviewer verification/source metadata,
-  expiry and reverification UI, full jurisdiction/accessibility checks, reliability/experience
+full jurisdiction/accessibility checks, reliability/experience
 reliability/response ranking, native catalog review, and feedback moderation remain pending. Structured sample-aware session-experience ratings are now implemented in source but not yet integration-verified. See
 `vetting-routing-verification.md` for local failure evidence and verification
 boundaries.
