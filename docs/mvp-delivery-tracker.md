@@ -19,10 +19,13 @@ and browser-harness diagnostic improvements are in this branch. Focused
 Frappe 15 presentation regressions passed 26/26; production frontend build,
 lint (existing warnings), artifact-scope/secret check, and the built-route PWA
 update/offline checks passed. A separate fresh-site install passed schema,
-migration, guest-denial, and default-safeguard assertions, but its enabled-
-registration browser run timed out before authentication; cleanup and retained
-site fingerprints passed. See `mutual-rescheduling-verification.md` for exact
-evidence and limits.
+migration, guest-denial, and default-safeguard assertions. Its first browser
+run exposed a bare `/teletena` versus `/teletena/` service-worker scope issue;
+the renderer now redirects to the canonical scope, and a built-route Chromium
+check passes readiness, control, and offline fallback. The complete
+registration-enabled fresh-site journey still needs rerunning; cleanup and
+retained-site fingerprints passed for the earlier attempt. See
+`mutual-rescheduling-verification.md` for exact evidence and limits.
 
 This is an incremental implementation checkpoint, not completion of batches
 A–I or the 142-screen acceptance map. Clinic resources, couples consent, labs,

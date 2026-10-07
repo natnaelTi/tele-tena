@@ -154,11 +154,23 @@ Frappe 15's tested range; this is not exact Selfmade-stack compatibility
 evidence. Fresh-install schema assertions passed, but full fresh-site browser
 acceptance remains open.
 
-After that run, the browser harness was improved to emit fixed checkpoint
-labels, use bounded Playwright timeouts, and bound service-worker readiness.
-This makes any subsequent isolated rerun fail at a named phase instead of
-waiting for the full outer timeout. It has syntax-checked successfully; the
-changed harness has not yet been rerun on a freshly provisioned site.
+The timeout root cause was that the fresh-site journey opened `/teletena`
+without a trailing slash while the registered worker scope is `/teletena/`.
+Frappe normalized the renderer's internal path, so the first attempted redirect
+looped. The renderer now checks the original request path and issues a fixed
+308 redirect to `/teletena/`, preserving the query string. The browser journey
+asserts this canonical route. On the packaged preview, a real Chromium check
+verified the 308, `200` for `/teletena/`, service-worker readiness, controller
+after reload, and offline fallback rendering. The harness now emits safe fixed
+checkpoint labels, applies bounded Playwright timeouts, and bounds worker
+readiness. A complete fresh-site rerun is still pending; this probe does not
+substitute for its registration and authentication journeys.
+
+After this correction, `TELE_TENA_TEST_SITE=tele-tena-pr12-fresh.localhost
+../../env/bin/python tests/presentation.py` passed 26/26; Python and Node syntax
+checks and `git diff --check` also passed. This suite reruns the existing
+mutual-rescheduling, availability, financial, clinic-access, and request
+regressions against the retained disposable integration site.
 
 `git status` was clean after packaging. The isolated local review preview is
 still available at the URL above. No live SMS, physical-device media, native
