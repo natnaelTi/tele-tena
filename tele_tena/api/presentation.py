@@ -352,6 +352,20 @@ def appointment_detail(appointment):
     note = rows('SELECT status,current_revision FROM tt_consultation_note WHERE appointment=%s', (item.id,))
     events = rows('''SELECT event_type,actor,reason,created FROM tt_appointment_event
         WHERE appointment=%s ORDER BY created,id''', (item.id,))
+    event_labels = {
+        'Booked': 'Appointment booked', 'Requested': 'Confirmation requested',
+        'Confirmed': 'Appointment confirmed', 'Declined': 'Appointment declined',
+        'Cancelled': 'Appointment cancelled', 'Expired': 'Appointment expired',
+        'Completed': 'Consultation finalized', 'DocumentationDraftSaved': 'Notes draft saved',
+        'DocumentationFinalized': 'Consultation finalized',
+        'RescheduleProposed': 'New time proposed', 'RescheduleAccepted': 'New time accepted',
+        'RescheduleDeclined': 'New time declined', 'RescheduleWithdrawn': 'Time request withdrawn',
+        'RescheduleExpired': 'Time request expired', 'RescheduleUnavailable': 'Time change unavailable',
+        'RescheduleSlotUnavailable': 'Proposed time unavailable',
+        'ClinicScheduleAccessGranted': 'Clinic scheduling access shared',
+        'ClinicScheduleAccessRevoked': 'Clinic scheduling access stopped',
+        'SessionFeedbackSubmitted': 'Session feedback submitted',
+    }
     reschedule = rows('''SELECT id,proposer,start,timezone,state,expires_at FROM tt_reschedule_proposal
         WHERE appointment=%s AND state='Pending' AND expires_at>UTC_TIMESTAMP(6)
         ORDER BY created_at DESC LIMIT 1''', (item.id,))
@@ -384,7 +398,8 @@ def appointment_detail(appointment):
             'reason': item.cancel_reason,
             'policy': json.loads(item.policy_snapshot) if item.policy_snapshot else None,
         },
-        'timeline': [{'event': e.event_type, 'actor': 'You' if e.actor == user else
+        'timeline': [{'event': event_labels.get(e.event_type,
+                      re.sub(r'(?<!^)(?=[A-Z])', ' ', e.event_type)), 'actor': 'You' if e.actor == user else
                       ('System' if e.actor == 'System' else
                        'Care team' if role == 'patient' else 'Patient'),
                       'reason': e.reason, 'at': iso(e.created)} for e in events],

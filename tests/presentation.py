@@ -489,6 +489,10 @@ class Presentation(unittest.TestCase):
             self.assertEqual(result['start'], replacement['start'])
             repeated = presentation.respond_to_reschedule(original['id'], proposed['id'], 'accept')
             self.assertTrue(repeated['idempotent'])
+            fixtures.login('p1')
+            timeline = presentation.appointment_detail(original['id'])['timeline']
+            self.assertIn('New time accepted', [event['event'] for event in timeline])
+            self.assertNotIn('RescheduleAccepted', str(timeline))
             after = journey.one('SELECT start,end,price,state FROM tt_appointment WHERE id=%s',
                                 (original['id'],))
             moved_start = datetime.fromisoformat(replacement['start'].replace('Z', '+00:00')).replace(tzinfo=None)

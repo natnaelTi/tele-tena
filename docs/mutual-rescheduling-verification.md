@@ -49,3 +49,8 @@ appointment/proposal were confirmed persisted as `Booked`/`Accepted`. The
 captured desktop screens are `docs/screenshots/mutual-rescheduling/`. This is
 functional desktop evidence, not full responsive/accessibility acceptance. No
 fresh install, physical-device, or native-language approval is claimed.
+
+Appointment timeline events are presented as human-readable, localized labels;
+internal event codes remain private to persistence and are not rendered to
+participants. The regression suite checks the accepted-time label in the
+patient's authorized timeline.
