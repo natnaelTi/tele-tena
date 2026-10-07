@@ -6421,7 +6421,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J01) and design-handoff.md",
         "implementation": "Local clinic staff route and session navigation hint; not a full clinic calendar or management product.",
-        "current_local": "Frappe presentation coverage includes eligibility for verified invitation, manager, scheduling, billing, owner, and revoked membership. Production-built browser navigation acceptance is pending."
+        "current_local": "Production-built /teletena/ route exercised after sign-in. Membership-gated workspace navigation, invitation acceptance, schedule projection query and 320/390/768/1440 widths passed the clinic browser regression. The overview remains partial: no clinic calendar, resource management, billing or full patient workflow. Screenshots: docs/screenshots/clinic-membership/staff-workspace-*.png."
       }
     },
     {
@@ -6489,28 +6489,29 @@
       "family": "J",
       "title": "Your clinical team",
       "module": "Clinic operations",
-      "backend_reference": "Full backend pending",
+      "backend_reference": "tele_tena.api.clinics.managed_clinics, clinic_team",
       "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Implemented as a clinic-role-gated section in the shared /clinic and /clinician/clinic-access portal; the design’s separate focused routes are not yet implemented.",
       "prototype_route": "j03",
-      "route": "/j03 (not implemented)",
+      "route": "/clinic; /clinician/clinic-access",
       "actor": "Clinic owner/admin and explicitly invited staff",
-      "status": "Designed",
+      "status": "Implementation in progress",
       "persistent_models": [
-        "Proposed Clinic",
-        "Proposed Clinic Membership",
-        "Proposed Clinic Location",
-        "Proposed Clinic Resource",
-        "Proposed Encounter Access Grant"
+        "Tele Tena Clinic",
+        "Tele Tena Clinic Membership"
       ],
       "queries": [
-        "No clinic workspace API implemented"
+        "managed_clinics (submitting owner/Clinic Manager)",
+        "clinic_team (Clinic Manager only)",
+        "my_clinic_memberships (own invitations and memberships)"
       ],
       "commands": [
-        "No clinic workspace commands implemented"
+        "invite_clinic_member (Clinic Manager only; verified clinic; verified email required for acceptance)",
+        "respond_to_clinic_invitation (exact verified email owner)",
+        "revoke_clinic_membership (audited, reason required)"
       ],
-      "server_permissions": "Membership grants only the named operational permissions; no blanket patient or clinician record access.",
-      "workflow_transitions": "Draft clinic → verification pending → verified/suspended; invitation pending → accepted/revoked; encounter grant requested → granted/revoked.",
+      "server_permissions": "Server requires submitting clinic owner or active Clinic Manager to manage teams. Invite acceptance requires the signed-in account to own an exact verified email. Scheduling/Billing memberships do not manage invitations. Membership never grants clinical records or service-scope access.",
+      "workflow_transitions": "Invited → Active | Declined | Revoked; Active → Revoked. Terminal membership states cannot be reopened.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -6540,8 +6541,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J03) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Persistent Frappe membership workflow; current UI groups team and invite actions inside the clinic access portal.",
+        "current_local": "Production-built browser journey verified clinic submit → human review → manager invitation → verified staff acceptance → membership-scoped /clinic navigation → manager revocation. 320/390/768/1440 widths passed overflow checks. Distinct screen composition, actual 200% zoom, and a fresh-site migration remain pending."
       }
     },
     {
@@ -6549,28 +6550,29 @@
       "family": "J",
       "title": "Invite a team member",
       "module": "Clinic operations",
-      "backend_reference": "Full backend pending",
+      "backend_reference": "tele_tena.api.clinics.invite_clinic_member, revoke_clinic_membership",
       "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Implemented as a clinic-role-gated section in the shared /clinic and /clinician/clinic-access portal; the design’s separate focused routes are not yet implemented.",
       "prototype_route": "j04",
-      "route": "/j04 (not implemented)",
+      "route": "/clinic; /clinician/clinic-access",
       "actor": "Clinic owner/admin and explicitly invited staff",
-      "status": "Designed",
+      "status": "Implementation in progress",
       "persistent_models": [
-        "Proposed Clinic",
-        "Proposed Clinic Membership",
-        "Proposed Clinic Location",
-        "Proposed Clinic Resource",
-        "Proposed Encounter Access Grant"
+        "Tele Tena Clinic",
+        "Tele Tena Clinic Membership"
       ],
       "queries": [
-        "No clinic workspace API implemented"
+        "managed_clinics (submitting owner/Clinic Manager)",
+        "clinic_team (Clinic Manager only)",
+        "my_clinic_memberships (own invitations and memberships)"
       ],
       "commands": [
-        "No clinic workspace commands implemented"
+        "invite_clinic_member (Clinic Manager only; verified clinic; verified email required for acceptance)",
+        "respond_to_clinic_invitation (exact verified email owner)",
+        "revoke_clinic_membership (audited, reason required)"
       ],
-      "server_permissions": "Membership grants only the named operational permissions; no blanket patient or clinician record access.",
-      "workflow_transitions": "Draft clinic → verification pending → verified/suspended; invitation pending → accepted/revoked; encounter grant requested → granted/revoked.",
+      "server_permissions": "Server requires submitting clinic owner or active Clinic Manager to manage teams. Invite acceptance requires the signed-in account to own an exact verified email. Scheduling/Billing memberships do not manage invitations. Membership never grants clinical records or service-scope access.",
+      "workflow_transitions": "Invited → Active | Declined | Revoked; Active → Revoked. Terminal membership states cannot be reopened.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -6600,8 +6602,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J04) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Persistent Frappe membership workflow; current UI groups team and invite actions inside the clinic access portal.",
+        "current_local": "Production-built browser journey verified clinic submit → human review → manager invitation → verified staff acceptance → membership-scoped /clinic navigation → manager revocation. 320/390/768/1440 widths passed overflow checks. Distinct screen composition, actual 200% zoom, and a fresh-site migration remain pending."
       }
     },
     {

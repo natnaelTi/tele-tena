@@ -11,6 +11,7 @@ const marker = JSON.parse(fs.readFileSync(path.join(site, 'private/tele_tena_rev
 const passwords = JSON.parse(fs.readFileSync(path.join(site, 'private/tele_tena_review_accounts.json')));
 const app = (process.env.TELE_TENA_BROWSER_ORIGIN || 'http://127.0.0.1:8017') + '/teletena';
 const screenshots = path.resolve('docs/screenshots/clinic-membership');
+const workspaceScreenshots = path.resolve('docs/screenshots/clinic-staff-workspace');
 const clinicName = 'Synthetic membership clinic ' + Date.now();
 const inviteEmail = marker.users.calendarpatient || marker.users.patient;
 let checkpoint = 'launch';
@@ -42,6 +43,7 @@ async function switchUser(page, user) {
         console.log('Clinic API', url.pathname.split('.').pop(), response.status());
     });
     fs.mkdirSync(screenshots, { recursive: true });
+    fs.mkdirSync(workspaceScreenshots, { recursive: true });
 
     checkpoint = 'clinician clinic registration';
     console.log('Browser checkpoint: clinician registration');
@@ -86,7 +88,7 @@ async function switchUser(page, user) {
 
     checkpoint = 'verified invitee acceptance';
     console.log('Browser checkpoint: invitee acceptance');
-    await switchUser(page, marker.users.patient);
+    await switchUser(page, inviteEmail);
     await page.goto(app + '/patient/clinic-access');
     const invitationCard = page.locator('.clinic-review-card').filter({ has: page.getByRole('heading', { name: clinicName }) });
     await invitationCard.getByRole('button', { name: 'Accept invitation' }).click();
@@ -97,6 +99,8 @@ async function switchUser(page, user) {
     await page.getByRole('link', { name: 'Clinic workspace', exact: true }).click();
     await page.getByRole('heading', { name: 'Clinic workspace', exact: true }).waitFor();
     assert.match(page.url(), /\/teletena\/clinic$/);
+    await page.reload();
+    await page.getByRole('heading', { name: 'Clinic workspace', exact: true }).waitFor();
     await page.getByRole('heading', { name: 'Your clinic memberships', exact: true }).waitFor();
     for (const width of [320, 390, 768, 1440]) {
       checkpoint = 'clinic workspace responsive width ' + width;
@@ -104,7 +108,7 @@ async function switchUser(page, user) {
       const pageWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       assert.ok(pageWidth <= width, 'Unexpected horizontal page overflow at ' + width + 'px');
       if (width === 390 || width === 1440)
-        await page.locator('.clinic-access-page').screenshot({ path: path.join(screenshots, 'staff-workspace-' + width + '.png') });
+        await page.locator('.clinic-access-page').screenshot({ path: path.join(workspaceScreenshots, 'staff-workspace-' + width + '.png') });
     }
 
     checkpoint = 'manager revocation';

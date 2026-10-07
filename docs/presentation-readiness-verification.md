@@ -1,6 +1,39 @@
 # Presentation release verification
 
-## Current local checkpoint — clinic scheduling access — 2026-10-07
+## Current local checkpoint — clinic staff workspace — 2026-10-07
+
+- Exact review URL: `http://127.0.0.1:8017/teletena/`, served from Bench
+  `/home/frappe/frappe/frappe-bench`, isolated site
+  `tele-tena-pr12-fresh.localhost`. The production package at
+  `tele_tena/public/review/release.json` identifies source/build commit
+  `a1f62b10f710fa758ccbc84228947847d8e93f77` on branch
+  `feat/clinic-staff-workspace`. The dedicated Gunicorn master bound to
+  `127.0.0.1:8017` was gracefully reloaded; its environment selects the isolated
+  site. Frappe serves hashed packaged assets; Vite is not serving the page.
+- The real browser journey passed clinic submission → reviewer verification →
+  manager invitation → verified invitee acceptance → membership-scoped
+  `/clinic` navigation → manager revocation. The frontend session hint was
+  observed in the route navigation; the backend independently filters each
+  query. Width checks passed at 320, 390, 768, and 1440 CSS px. A 320px
+  document overflow from a long invitation email was found, fixed by wrapping
+  clinic member rows, and rechecked. Screenshots are in
+  `docs/screenshots/clinic-staff-workspace/`.
+- `TELE_TENA_TEST_SITE=tele-tena-pr12-fresh.localhost ./env/bin/python
+  apps/tele_tena/tests/presentation.py` passed **24/24** on Frappe 15.121.2 /
+  ERPNext 15.121.6 / Python 3.12.3, including encounter-grant permissions,
+  owner/manager/Scheduling/Billing workspace eligibility, invitation
+  verification, and revocation. `npm run build`, `npm run lint` (exit 0 with
+  existing React warnings), `scripts/build_review.py`, and
+  `scripts/check_review_assets.py` passed. The clinic browser journey and the
+  controlled PWA waiting-worker/update flow passed. Vite still reports its
+  existing LiveKit chunk-size advisory.
+- The review-site scheduler remains disabled and shared workers were not
+  restarted or drained. Fresh-site migration for the clinic models remains
+  pending because interactive sudo is required for the scoped disposable DB
+  setup. No Frappe 16, live SMS/email, hosted LiveKit, native translation, or
+  physical-device claims are made. The full 142-screen scope is not complete.
+
+## Historical checkpoint — clinic scheduling access — 2026-10-07
 
 - Review URL: `http://127.0.0.1:8017/teletena/`. It is served by the dedicated
   Gunicorn process bound to `127.0.0.1:8017`, with
@@ -33,7 +66,7 @@
   Native Amharic/Afaan Oromo review, 200% zoom, physical-device behavior,
   Frappe 16, live SMS, and hosted LiveKit remain separate validation gates.
 
-## Current local checkpoint — session feedback UI — 2026-10-07
+## Historical checkpoint — session feedback UI — 2026-10-07
 
 - Review URL: `http://127.0.0.1:8017/teletena/`, production-built Frappe
   app on `/home/frappe/frappe/frappe-bench`, site

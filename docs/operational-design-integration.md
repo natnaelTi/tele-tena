@@ -4,7 +4,9 @@ This document captures an initial implementation plan and an earlier source snap
 
 7 October 2026. Authorized target: implement the complete approved design inventory and extended modules in the existing React/TypeScript + Frappe/ERPNext architecture. The 142-screen extracted source remains the visual/interaction reference, while the existing product and backend remain authoritative. Do not copy the static prototype as a fake implementation or create a second wallet.
 
-## Current slice
+## Historical PR #15 slice — superseded
+
+The following is a historical PR #15 snapshot, not the current branch. Current source and verification are recorded in `operational-progress-export.md`.
 
 Current branch `feat/teletena-operational-completion` starts at PR #15 head `3e0965c5fdf6485d945756b382c0a3c008450058`, based on PR #14 and preserving PR #12–14 ancestry. Current committed head is `c621b2fa63b33b09e7febfd3fb0785f49cb5d520`. PR #15 adds a two-sided homepage, server-state request motion, clinician-owned paginated offer history, a masked patient label from the original disclosure snapshot, accepted-appointment handoff and offer withdrawal. Those backend assertions have not yet run in this local Frappe 15 Bench.
 
