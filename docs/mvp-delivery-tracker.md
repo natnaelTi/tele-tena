@@ -1,6 +1,21 @@
 # TeleTena delivery tracker
 
-## Active integrated checkout — 2026-10-07
+## Current active continuation — consultation extensions — 2026-10-08
+
+The active feature branch is `feat/consultation-extensions`, based on the
+private-scope-evidence head and therefore dependent on PR #23. The matching
+production-built preview is `http://127.0.0.1:8017/teletena/`, isolated site
+`tele-tena-pr12-fresh.localhost` in `/home/frappe/frappe/frappe-bench`.
+`tele_tena/public/review/release.json` identifies the packaged frontend source
+SHA; this is not a Vite server. The extension backend has passed the 29-case
+presentation suite on Frappe 15.121.2 / ERPNext 15.121.6 / Python 3.12.3 and
+Frappe 16.2.1 / ERPNext 16.1.0 / Python 3.14.2 after additive v1.17 migration
+and repeat migration. The Frappe 16 test site was backed up before migration.
+Rendered call-panel browser interaction, fresh-empty-site install for v1.17,
+and actual scheduler worker execution are still pending; the retained local
+review site's scheduler remains disabled. No hosted site was changed.
+
+## Historical integrated checkout — 2026-10-07
 
 The active local checkout is `feat/mutual-rescheduling`; the exact source SHA
 is exposed by the current production asset manifest and the Git branch head.

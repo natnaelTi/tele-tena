@@ -21,6 +21,14 @@ reserved. Python compilation and the frontend TypeScript /
 Vite production build passed. `npm run lint` exited successfully with the
 existing React warnings; Vite retains its existing LiveKit chunk-size advisory.
 
+The same 29-case suite also passed on the isolated Frappe 16.2.1 / ERPNext
+16.1.0 / Python 3.14.2 compatibility site after a private site+files backup,
+v1.17 migration, and repeat migration. This confirms upgrade compatibility on
+that retained site, not a fresh-empty-site install. A real-browser smoke check
+against `/teletena/` verified the rendered homepage, release-manifest SHA,
+manifest scope, service-worker readiness, and guest redirect from a protected
+deep link; it did not exercise the authenticated extension panel.
+
 The panel is integrated under the open consultation, uses the existing
 balanced demonstration subledger and booking fee/withholding snapshot, and is
 localized in English, Amharic and Afaan Oromo (latter two remain provisional).
