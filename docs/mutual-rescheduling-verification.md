@@ -250,3 +250,29 @@ native-language approval, Frappe 16 compatibility, hosted deployment, or
 scheduled job execution. The earlier offline fallback and canonical
 `/teletena/` scope checks are recorded above; automated browser media remains
 fake-device evidence only.
+
+## Existing synthetic clinician request readiness diagnosis — 2026-10-07
+
+Without resetting the seeded patient or clinician, I called the authenticated
+`request_presence` query as the review clinician. It returned
+`configured=false`, `ready=false`, with the reason codes
+`language_required` and `immediate_policy_required`; the persisted presence was
+not fresh. Therefore this saved clinician configuration cannot receive an
+immediate request at this moment. The immediate-request matcher intentionally
+requires a saved care-language selection, an active service policy that permits
+immediate care, and a fresh server-side presence lease. The UI has corresponding
+setup links and disables “Go available” while hard requirements are unmet.
+Locale selection is not treated as a care-language claim.
+
+This reproduces the reported empty clinician inbox as an eligibility/setup
+failure rather than an offering/time-grid failure. The account had no care
+languages recorded and its legacy review service was not enabled for immediate
+requests. I did not modify either profile or service policy to make the account
+appear eligible. The local regression
+`test_immediate_request_policy_is_explicit_and_site_scoped` asserts these exact
+missing-setup reason codes and denial; the full presentation suite passed
+27/27. To complete a truthful synthetic journey, the clinician owner must
+select care languages in Account, and an authorized reviewer must enable the
+service's immediate-care policy; then the clinician can renew availability.
+The immediate policy remains separately gated from general scope approval and
+from published recurring availability.
