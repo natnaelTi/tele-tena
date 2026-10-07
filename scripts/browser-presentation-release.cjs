@@ -46,7 +46,8 @@ async function main() {
     const guest = await pageFor()
     checkpoint = 'homepage screenshots'
     await guest.goto(base)
-    await guest.getByRole('heading', { name: 'Find someone you feel comfortable talking to.' }).waitFor()
+    await guest.getByRole('heading', { name: 'Find support. Make time for care.' }).waitFor()
+    await guest.getByRole('heading', { name: 'Talk to someone who fits your needs.' }).waitFor()
     await capture(guest, 'homepage', [320, 390, 768, 1440])
     const manifest=await guest.locator('link[rel="manifest"]').getAttribute('href')
     assert.ok(['/manifest.webmanifest','/assets/tele_tena/review/manifest.webmanifest'].includes(manifest),
