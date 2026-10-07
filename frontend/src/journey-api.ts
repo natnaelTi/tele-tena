@@ -63,7 +63,8 @@ export const journeyApi = {
   reviewServiceScope: (clinician: string, service: string, decision: 'Approved' | 'Revoked') =>
     api('review_service_scope', { clinician, service, decision }, true),
   apply: (statement: string, requested_services:string[] = []) => api('apply', { statement, requested_services }, true),
-  publish: (service: string, price: string, minutes: string) => api('publish', { service, price, minutes }, true),
+  publish: (service: string, price: string, minutes: string, title:string, description:string,
+    retry_key:string, offering_id?:string) => api('publish', { service, price, minutes, title, description, retry_key, offering_id }, true),
   walletActivity: () => api<{available:number;reserved:number;currency:string;activity:{kind:string;amount:number;created:string}[]}>('tele_tena.api.presentation.wallet_summary'),
   simulatedDeposit: (retryKey: string) => api('simulated_deposit', { amount: 10000, retry_key: retryKey }, true),
   preview: (requestText: string, sharing: Sharing) =>

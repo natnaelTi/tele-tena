@@ -25,3 +25,4 @@ tele_tena.patches.v1_19_scope_reverification
 tele_tena.patches.v1_20_scope_appointment_review
 tele_tena.patches.v1_21_scope_review_history
 tele_tena.patches.v1_22_immediate_service_policy
+tele_tena.patches.v1_23_multiple_offerings

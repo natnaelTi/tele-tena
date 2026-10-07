@@ -49,6 +49,16 @@ PWA installation is planned, not implemented in this foundation. Cache static as
 only; no clinical data, tokens, API responses or offline financial commands. No guarantee
 of background calling on locked mobile devices.
 
+## Offering model extension v1.23
+
+The additive v1.23 migration removes the frozen v1.0 clinician/service uniqueness
+rule without changing offering IDs or dependent schedules and appointments. A
+clinician may publish multiple titled offerings within a currently approved scope.
+Every new or edited offering remains scope-checked; scope identity is immutable.
+Create retries carry a clinician-scoped idempotency key and canonical payload hash.
+This change does not alter booking/finance tables or imply that catalog-only
+couple, family, group, diagnostic or laboratory entries are operational.
+
 ## Milestone 1 storage implementation
 
 App-owned InnoDB tables (`tt_*`) back the private authorized command/query APIs. Private

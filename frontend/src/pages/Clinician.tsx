@@ -25,7 +25,7 @@ import { useResource } from "../hooks/useResource";
 import { useLocale } from "../hooks/useLocale";
 type Practice = {
   application: { status: string; statement: string } | null;
-  offerings: { id: string; label: string; price: number; minutes: number }[];
+  offerings: { id: string; service:string; label: string; title?:string; description?:string; price: number; minutes: number }[];
   availability: { start: string; end: string }[];
   schedules?: import("../journey-api").Schedule[];
 };
@@ -201,7 +201,7 @@ export function Availability() {
       <div className="schedule-editor" data-tour-unsaved={dirty?"true":"false"} onChange={()=>setDirty(true)}>
         <aside className="schedule-config">
           <TextField label="Schedule name" value={name} error={nameError} onChange={e=>{setName(e.target.value);setNameError("");}} required />
-          <Select label="Service" value={offering} error={serviceError} onChange={e=>{setOffering(e.target.value);setServiceError("");}} required>
+          <Select label="Service" value={offering} error={serviceError} onChange={e=>{e.stopPropagation();if(dirty&&!window.confirm(w("Discard unsaved schedule changes?")))return;setDirty(false);setOffering(e.target.value);setServiceError("");}} required>
             <option value="">Choose a published service</option>{offerings.data?.offerings.map(o=><option key={o.id} value={o.id}>{o.label} · {o.minutes} min</option>)}
           </Select>
           <TextField label="Timezone" value={zone} onChange={e=>setZone(e.target.value)} required placeholder="Africa/Addis_Ababa" />
@@ -259,11 +259,16 @@ export function Availability() {
   );
 }
 export function Services() {
+  const { w } = useLocale();
   const current = useResource(practice);
   const services = useResource(journeyApi.services);
   const [service, setService] = useState("");
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("30");
+  const [title,setTitle]=useState("");
+  const [description,setDescription]=useState("");
+  const [editing,setEditing]=useState<string|undefined>();
+  const [retryKey,setRetryKey]=useState(()=>crypto.randomUUID());
   const action = useAction();
   return (
     <>
@@ -283,15 +288,19 @@ export function Services() {
                 BigInt(whole) * 100n +
                 BigInt(fraction.padEnd(2, "0"))
               ).toString();
-              await journeyApi.publish(service, minor, duration);
+              await journeyApi.publish(service, minor, duration, title, description, retryKey, editing);
               await current.refresh();
+              setEditing(undefined);setTitle("");setDescription("");setPrice("");
+              setRetryKey(crypto.randomUUID());
             }, "Service published.");
           }}
         >
+          <TextField label={w("Offering title")} required value={title} onChange={e=>setTitle(e.target.value)} maxLength={160} />
           <Select
             label="Service"
             required
             value={service}
+            disabled={Boolean(editing)}
             onChange={(e) => setService(e.target.value)}
           >
             <option value="">Choose an approved service</option>
@@ -301,6 +310,7 @@ export function Services() {
               </option>
             ))}
           </Select>
+          <TextField label={w("Offering description")} value={description} onChange={e=>setDescription(e.target.value)} maxLength={1000} />
           <TextField
             label="Session price (ETB)"
             inputMode="decimal"
@@ -319,9 +329,10 @@ export function Services() {
               </option>
             ))}
           </Select>
-          <Button type="submit" loading={action.busy}>
-            Publish offering
+          <Button type="submit" loading={action.busy} disabled={action.busy||!service||!title||!price}>
+            {w(editing?"Save offering":"Publish offering")}
           </Button>
+          {editing&&<Button type="button" variant="quiet" disabled={action.busy} onClick={()=>{setEditing(undefined);setTitle("");setDescription("");setPrice("");}}> {w("Cancel edit")} </Button>}
           {action.error && (
             <InlineNotice tone="danger">{action.error}</InlineNotice>
           )}
@@ -334,10 +345,15 @@ export function Services() {
           {current.data?.offerings.length ? (
             current.data.offerings.map((item) => (
               <Card key={item.id}>
-                <h3>{item.label}</h3>
+                <h3>{item.title||item.label}</h3>
+                {item.description&&<p>{item.description}</p>}
                 <p>
-                  ETB {money(item.price)} · {item.minutes} minutes
+                  {item.label} · ETB {money(item.price)} · {item.minutes} minutes
                 </p>
+                <Button variant="secondary" disabled={action.busy} onClick={()=>{
+                  setEditing(item.id);setService(item.service);setTitle(item.title||item.label);
+                  setDescription(item.description||"");setPrice((item.price/100).toFixed(2));setDuration(String(item.minutes));
+                }}>{w("Edit offering")}</Button>
               </Card>
             ))
           ) : (

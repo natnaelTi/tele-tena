@@ -90,8 +90,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A01) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "v1.23 supports multiple named offerings within one approved scope, owner-only edits, idempotent creates, patient discovery, and immutable scope identity. See docs/multiple-offerings.md.",
+        "current_local": "Frappe 15 tests/presentation.py 33/33, including create retry/conflict, multiple distinct patient-visible offers, ownership denial and repeat migration. At http://127.0.0.1:8017/teletena/ source/build 44694b4364e466b1aec3308d01521b9739641ab9, the existing clinician created a second offering and reloaded; a separate patient session found it in discovery without account-email exposure. Screenshots: docs/screenshots/multiple-offerings/. Booking on the second offering remains pending."
       }
     },
     {

@@ -15,7 +15,9 @@ belong to the doctor. Guided patient profile and private medical history.
 Natural language request -> suggested service and eligible clinicians, with editable
 filters and optional relevance feedback. No diagnostic claim. Eligibility precedes
 ratings/proximity. Proximity is relevant particularly for in-person care.
-Direct booking uses published price. Private open requests distinguish immediate
+Direct booking uses a selected published offering; one approved service scope may
+contain multiple clinician-owned titles, descriptions, prices and durations, none of
+which can expand the underlying authorization. Private open requests distinguish immediate
 care-seeking from scheduled care; deterministic eligibility requires current
 approval, exact active service scope, language, format, an enabled service policy
 for immediate care, fresh presence for immediate care, and feasible full-duration

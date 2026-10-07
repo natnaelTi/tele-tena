@@ -409,17 +409,74 @@ def services():
 
 
 @command
-def publish(service, price, minutes):
+def publish(service, price, minutes, title=None, description='', offering_id=None, retry_key=None):
+    """Create an offering or edit one owned offering without widening scope.
+
+    New clients supply a retry key for safe create retries. Legacy clients keep
+    the prior upsert behavior only while exactly one matching offering exists.
+    """
     p = profile('clinician', True)
+    fee, duration = integer(price, 1, 100000000), integer(minutes, 5, 240)
+    service_row = one('SELECT service_label FROM `tabTele Tena Service` WHERE name=%s AND active=1', (service,))
+    normalized_title = (str(title).strip() if title is not None else service_row.service_label)
+    normalized_description = str(description or '').strip()
+    if not normalized_title or len(normalized_title) > 160 or len(normalized_description) > 1000:
+        fail('Add a title up to 160 characters and a description up to 1,000 characters.', 'offering_text_invalid')
+    key = str(retry_key or '').strip()
+    if key and (len(key) > 100 or not re.fullmatch(r'[A-Za-z0-9._:-]{12,100}', key)):
+        fail('Use a valid offering submission key.', 'offering_retry_key_invalid')
+    payload = {'service': service, 'title': normalized_title, 'description': normalized_description,
+               'price': fee, 'minutes': duration}
+    payload_hash = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+
+    # The same short-lived gate used by booking commands serializes create
+    # retries so a duplicate browser submission cannot create another row.
+    frappe.db.sql('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    if key:
+        prior = rows('SELECT id,payload_hash FROM tt_offering WHERE clinician=%s AND retry_key=%s FOR UPDATE',
+                     (p.user, key))
+        if prior:
+            if prior[0].payload_hash != payload_hash:
+                fail('This submission key was already used for different offering details.', 'offering_retry_conflict')
+            return {'saved': True, 'offering': prior[0].id, 'replayed': True}
+
     approved(p.user, True)
     approved_service(p.user, service, True)
-    one('SELECT name FROM `tabTele Tena Service` WHERE name=%s AND active=1', (service,))
-    fee, duration = integer(price, 1, 100000000), integer(minutes, 5, 240)
-    frappe.db.sql('''INSERT INTO tt_offering (id,clinician,service,price,minutes,active) VALUES (%s,%s,%s,%s,%s,1)
-        ON DUPLICATE KEY UPDATE price=VALUES(price),minutes=VALUES(minutes),active=1''',
-        (str(uuid.uuid4()), p.user, service, fee, duration))
-    audit(p.user, 'Offering', {'service': service, 'price': fee, 'minutes': duration})
-    return {'saved': True}
+    if offering_id:
+        current = rows('SELECT id,service FROM tt_offering WHERE id=%s AND clinician=%s FOR UPDATE',
+                       (offering_id, p.user))
+        if not current:
+            frappe.throw('Offering unavailable.', frappe.PermissionError)
+        if current[0].service != service:
+            fail('An offering cannot be changed to a different approved service. Create another offering instead.',
+                 'offering_scope_immutable')
+        frappe.db.sql('''UPDATE tt_offering SET title=%s,description=%s,price=%s,minutes=%s,active=1
+            WHERE id=%s AND clinician=%s''',
+            (normalized_title, normalized_description, fee, duration, offering_id, p.user))
+        saved_id = offering_id
+        action_name = 'Offering updated'
+    else:
+        existing = rows('SELECT id FROM tt_offering WHERE clinician=%s AND service=%s ORDER BY id FOR UPDATE',
+                        (p.user, service))
+        if not key and len(existing) > 1:
+            fail('Choose a specific offering to edit, or submit a new offering with a retry key.',
+                 'offering_selection_required')
+        if not key and existing:
+            saved_id = existing[0].id
+            frappe.db.sql('''UPDATE tt_offering SET title=%s,description=%s,price=%s,minutes=%s,active=1
+                WHERE id=%s AND clinician=%s''',
+                (normalized_title, normalized_description, fee, duration, saved_id, p.user))
+            action_name = 'Offering updated'
+        else:
+            saved_id = str(uuid.uuid4())
+            frappe.db.sql('''INSERT INTO tt_offering
+                (id,clinician,service,title,description,price,minutes,active,retry_key,payload_hash)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,1,%s,%s)''',
+                (saved_id, p.user, service, normalized_title, normalized_description, fee, duration,
+                 key or None, payload_hash))
+            action_name = 'Offering published'
+    audit(p.user, action_name, {'offering': saved_id, **payload})
+    return {'saved': True, 'offering': saved_id, 'replayed': False}
 
 
 @command
@@ -441,7 +498,8 @@ def discover(service=None):
     actor('Tele Tena Patient')
     from tele_tena.review import enabled as review_enabled
     legacy_allowed = int(review_enabled() or frappe.local.site == 'erp.localhost')
-    results = rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,o.clinician,o.service,s.service_label AS label,o.price,o.minutes,
+    results = rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,o.clinician,o.service,
+        COALESCE(NULLIF(o.title,''),s.service_label) AS label,o.description,o.price,o.minutes,
         sc.id AS schedule_id,sc.timezone AS schedule_timezone,sc.consultation_format
         FROM tt_offering o JOIN tt_profile p ON p.user=o.clinician
         JOIN tt_application a ON a.user=o.clinician JOIN `tabTele Tena Service` s ON s.name=o.service
@@ -607,7 +665,9 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     one('SELECT user FROM tt_profile WHERE user=%s AND kind=%s FOR UPDATE', (o.clinician, 'clinician'))
     approved(o.clinician, True)
     approved_service(o.clinician, o.service, True)
-    o = one('SELECT o.*,s.service_label AS label FROM tt_offering o JOIN `tabTele Tena Service` s ON s.name=o.service WHERE o.id=%s AND o.active=1 AND s.active=1 FOR UPDATE', (offering,))
+    o = one('''SELECT o.*,COALESCE(NULLIF(o.title,''),s.service_label) AS label
+        FROM tt_offering o JOIN `tabTele Tena Service` s ON s.name=o.service
+        WHERE o.id=%s AND o.active=1 AND s.active=1 FOR UPDATE''', (offering,))
     booking_price = int(o.price)
     immediate_request = False
     if custom_offer_id:
@@ -745,7 +805,8 @@ def practice():
     if p.kind != 'clinician':
         frappe.throw('Clinician profile required', frappe.PermissionError)
     applications = rows('SELECT status,statement FROM tt_application WHERE user=%s', (user,))
-    offerings = rows('''SELECT o.id,o.service,o.price,o.minutes,o.active,s.service_label label
+    offerings = rows('''SELECT o.id,o.service,COALESCE(NULLIF(o.title,''),s.service_label) label,
+        o.title,o.description,o.price,o.minutes,o.active,s.service_label service_label
         FROM tt_offering o JOIN `tabTele Tena Service` s ON s.name=o.service
         WHERE o.clinician=%s''', (user,))
     available = rows('SELECT start,end FROM tt_availability WHERE clinician=%s AND end>UTC_TIMESTAMP() ORDER BY start', (user,))

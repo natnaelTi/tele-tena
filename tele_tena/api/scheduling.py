@@ -42,7 +42,8 @@ def resolve_booking_link(token):
     actor('Tele Tena Patient')
     if not isinstance(token, str) or len(token) != 64:
         fail('This booking link is unavailable', 'booking_link_unavailable')
-    candidates = rows('''SELECT o.id,o.clinician,o.service,o.price,o.minutes,sc.service_label,
+    candidates = rows('''SELECT o.id,o.clinician,o.service,o.price,o.minutes,
+        COALESCE(NULLIF(o.title,''),sc.service_label) AS service_label,
         p.display_name,s.consultation_format,s.timezone FROM tt_offering o
         JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
         JOIN `tabTele Tena Service` sc ON sc.name=o.service
@@ -224,7 +225,8 @@ def save_schedule(offering, schedule_name, timezone_name, consultation_format,
 def schedules():
     clinician = actor('Tele Tena Clinician')
     profile('clinician')
-    result = rows('''SELECT sc.*,o.service,o.price,o.minutes,s.service_label
+    result = rows('''SELECT sc.*,o.service,o.price,o.minutes,
+        COALESCE(NULLIF(o.title,''),s.service_label) AS service_label
         FROM tt_schedule sc JOIN tt_offering o ON o.id=sc.offering
         JOIN `tabTele Tena Service` s ON s.name=o.service
         WHERE sc.clinician=%s ORDER BY sc.modified DESC''', (clinician,))
