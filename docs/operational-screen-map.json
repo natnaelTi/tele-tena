@@ -3128,48 +3128,45 @@
     {
       "id": "E10",
       "family": "E",
-      "title": "Extend your session",
+      "title": "Agree on extra consultation time",
       "module": "Consultations/records",
       "backend_reference": "consultations, presentation",
       "required_contract": "Participant authorization, end/revocation, notes, summary, extensions and feedback",
       "integration_status": "Pending screen-level operational acceptance",
       "prototype_route": "e10",
-      "route": "No extension route",
-      "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
-      "status": "Designed",
+      "route": "/consultation/:id/room (extension panel while call is open)",
+      "actor": "Booked appointment patient and clinician only",
+      "status": "Implemented, verification pending",
       "persistent_models": [
         "tt_appointment",
         "tt_consultation",
-        "tt_consultation_note",
-        "tt_note_revision",
-        "tt_appointment_event",
-        "tt_earning"
+        "tt_consultation_extension",
+        "tt_wallet",
+        "tt_journal",
+        "tt_earning",
+        "tt_appointment_event"
       ],
       "queries": [
-        "tele_tena.api.presentation.appointment_detail",
-        "tele_tena.api.presentation.care_directory",
-        "tele_tena.api.consultations.join (token response only)"
+        "tele_tena.api.extensions.extension_status"
       ],
       "commands": [
-        "tele_tena.api.consultations.join",
-        "tele_tena.api.consultations.end",
-        "tele_tena.api.presentation.save_note_draft",
-        "tele_tena.api.presentation.preview_patient_summary",
-        "tele_tena.api.presentation.finalize_consultation"
+        "tele_tena.api.extensions.propose_extension",
+        "tele_tena.api.extensions.respond_extension",
+        "tele_tena.api.extensions.withdraw_extension",
+        "tele_tena.api.extensions.start_extension"
       ],
-      "server_permissions": "Only authenticated booked participants may view details/join; only treating clinician may read private notes/end/finalize. Patient API returns published summary revisions only. No call-duration billing.",
-      "workflow_transitions": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+      "server_permissions": "Authenticated appointment participants only; clinician proposes/withdraws/starts, patient accepts/declines. Funds and schedule are revalidated under transaction locks; generic access is absent.",
+      "workflow_transitions": "Proposed → Accepted/Declined/Withdrawn/Expired; Accepted → Started/Released; Started → Settled only at explicit consultation finalization.",
       "states": {
-        "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
-        "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
-        "error": "Preserve safe user input; distinguish session expiry, permission, validation, service and retryable network failures.",
-        "success": "Confirm only the persisted server result; include the resulting status and next permitted action."
+        "loading": "Poll participant-authorized persisted extension state.",
+        "empty": "Clinician may offer an extension during an open consultation.",
+        "error": "Show safe API message; insufficient funds leave offer retryable while valid.",
+        "success": "Show exact duration, total ETB price and expiry before patient acceptance; reserve only on acceptance."
       },
       "responsive_accessibility": {
-        "breakpoints": "Acceptance at 320, 390, 768 and 1440 CSS px and browser zoom 200%; no page-level horizontal overflow.",
-        "keyboard": "Semantic labels/headings, visible focus, keyboard-operable controls, focus return from dialogs, no hover-only action.",
-        "mobile": "Task-specific mobile composition and 44px minimum touch targets; calendar uses agenda and consultations keep controls reachable.",
-        "motion": "Honor prefers-reduced-motion; progress visuals reflect server state only."
+        "mobile": "Compact panel below call controls without covering the media stage.",
+        "keyboard": "Native buttons, visible focus and semantic status announcements.",
+        "motion": "No animated or fabricated countdown."
       },
       "localization": {
         "languages": [
@@ -3177,17 +3174,15 @@
           "am",
           "om"
         ],
-        "translation_status": "English source; Amharic/Afaan Oromo provisional until human review",
-        "ethiopic_layout": "Verify font coverage, wrapping, line height and control labels on this screen."
+        "translation_status": "New labels in all three locales; Amharic and Afaan Oromo are provisional pending native review."
       },
       "dependencies": [
-        "LiveKit Cloud revocation project for hosted token guarantees",
-        "human/device and clinical sign-off"
+        "v1.17 additive migration",
+        "Frappe once-per-minute scheduler for durable unanswered-offer expiry"
       ],
       "verification_evidence": {
-        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E10) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "backend": "Frappe 15.121.2 isolated site: tests/presentation.py 29/29, including prefunded extension settlement once and end-release/scheduled-expiry idempotency.",
+        "frontend": "TypeScript and Vite production build passed; browser rendering of an open-call extension state remains pending."
       }
     },
     {

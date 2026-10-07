@@ -73,6 +73,10 @@ export const en = {
   'Invitations are not emailed yet. Invitees must sign in and verify this email address before accepting.':'Invitations are not emailed yet. Invitees must sign in and verify this email address before accepting.',
   'Revoke access':'Revoke access', 'Reason to revoke access':'Reason to revoke access', 'No team invitations yet.':'No team invitations yet.', 'Invite a staff member using the email address they can verify on TeleTena.':'Invite a staff member using the email address they can verify on TeleTena.',
   'Clinic team could not be loaded.':'Clinic team could not be loaded.', 'Clinic access could not be loaded.':'Clinic access could not be loaded.', 'Try again':'Try again',
+  extraTime:'Request more time', extensionConsent:'Extra time is optional. The exact price is shown before you agree; no charge starts without your acceptance and the clinician starting the block.',
+  extensionProposed:'Waiting for your response', extensionAccepted:'Accepted and reserved', extensionStarted:'In progress', extensionSettled:'Included in finalized consultation', extensionDeclined:'Declined', extensionWithdrawn:'Withdrawn', extensionExpired:'Expired', extensionReleased:'Reservation released',
+  extensionOfferExpiry:'Offer expires at', extensionLoadError:'Extension details could not be loaded.', extensionActionError:'That action could not be completed. Refresh and try again.',
+  offerExtraTime:'Offer more time', acceptAndReserve:'Accept and reserve funds', withdrawExtension:'Withdraw offer', extensionStartAfter:'Agreed block starts after', startAgreedExtension:'Start agreed time', extensionHistory:'Earlier offers', addFunds:'Add funds',
 } as const
 export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
@@ -138,6 +142,10 @@ export const am: Record<Key, string> = {
   'Invitations are not emailed yet. Invitees must sign in and verify this email address before accepting.':'ግብዣዎች እስካሁን በኢሜይል አይላኩም። የተጋበዘው ሰው ገብቶ ይህን ኢሜይል ካረጋገጠ በኋላ ይቀበላል።',
   'Revoke access':'መዳረሻ ሰርዝ', 'Reason to revoke access':'መዳረሻ የሚሰረዝበት ምክንያት', 'No team invitations yet.':'እስካሁን የቡድን ግብዣ የለም።', 'Invite a staff member using the email address they can verify on TeleTena.':'ሠራተኛው በTeleTena ላይ ማረጋገጥ በሚችለው ኢሜይል ጋብዘው።',
   'Clinic team could not be loaded.':'የክሊኒክ ቡድኑን ማምጣት አልተቻለም።', 'Clinic access could not be loaded.':'የክሊኒክ መዳረሻን ማምጣት አልተቻለም።', 'Try again':'እንደገና ሞክር',
+  extraTime:'ተጨማሪ ጊዜ ይጠይቁ', extensionConsent:'ተጨማሪ ጊዜ አማራጭ ነው። ከመስማማትዎ በፊት ትክክለኛው ዋጋ ይታያል፤ እርስዎ ካልተስማሙና ሐኪሙ ካልጀመረው ክፍያ አይፈጸምም።',
+  extensionProposed:'የእርስዎን ምላሽ በመጠባበቅ ላይ', extensionAccepted:'ተቀብሏል እና ተይዟል', extensionStarted:'በሂደት ላይ', extensionSettled:'በተጠናቀቀው ምክክር ውስጥ ተካቷል', extensionDeclined:'ውድቅ ተደርጓል', extensionWithdrawn:'ተመልሷል', extensionExpired:'ጊዜው አልፏል', extensionReleased:'የተያዘው ገንዘብ ተመልሷል',
+  extensionOfferExpiry:'ጥቆማው የሚያበቃው', extensionLoadError:'የተጨማሪ ጊዜ ዝርዝር ማምጣት አልተቻለም።', extensionActionError:'ይህን ማድረግ አልተቻለም። አድስና እንደገና ሞክር።',
+  offerExtraTime:'ተጨማሪ ጊዜ አቅርብ', acceptAndReserve:'ተቀበልና ገንዘብ ያዝ', withdrawExtension:'ጥቆማውን መልስ', extensionStartAfter:'የተስማሙበት ጊዜ የሚጀምረው ከ', startAgreedExtension:'የተስማሙበትን ጊዜ ጀምር', extensionHistory:'የቀድሞ ጥቆማዎች', addFunds:'ገንዘብ ጨምር',
 }
 export const om: Record<Key, string> = {
   sessionLifecycle:'Haala marii', mediaStatus:'Walqunnamtii miidiyaa', callNotConnected:'Hin wal qabamne', callToggleError:'Mikirofoonii ykn kaameraa jijjiiruun hin milkoofne. Hayyama meeshaalee ilaalii irra deebiʼi yaali.',
@@ -199,5 +207,9 @@ export const om: Record<Key, string> = {
   'Invitations are not emailed yet. Invitees must sign in and verify this email address before accepting.':'Affeerraan ammaaf imeeliidhaan hin ergamu. Fudhattoonni seenuun imeelii kana mirkaneessanii fudhachuu qabu.',
   'Revoke access':'Seensa haqi', 'Reason to revoke access':'Sababa seensa haquu', 'No team invitations yet.':'Affeerraan garee hanga ammaatti hin jiru.', 'Invite a staff member using the email address they can verify on TeleTena.':'Imeelii TeleTena irratti mirkaneessuu dandaʼaniin hojjetaa affeeri.',
   'Clinic team could not be loaded.':'Gareen kilinikaa hin feʼamne.', 'Clinic access could not be loaded.':'Seensi kilinikaa hin feʼamne.', 'Try again':'Irra deebiʼi yaali',
+  extraTime:'Yeroo dabalataa gaafadhu', extensionConsent:'Yeroon dabalataa filannoo dha. Waliigaluu kee dura gatiin isaa ni mulʼata; ati yoo hin fudhanneefi ogeessi yoo hin jalqabne kaffaltiin hin eegalu.',
+  extensionProposed:'Deebii kee eegaa jira', extensionAccepted:'Fudhatameefi qarshiin qabameera', extensionStarted:'Hojii irra jira', extensionSettled:'Marii xumurame keessatti hammatameera', extensionDeclined:'Didee', extensionWithdrawn:'Dhiyeessiin haqameera', extensionExpired:'Yeroon isaa darbeera', extensionReleased:'Qarshiin qabame deebifameera',
+  extensionOfferExpiry:'Dhiyeessiin kan xumuramu', extensionLoadError:'Odeeffannoo yeroo dabalataa feʼuun hin dandaʼamne.', extensionActionError:'Tarkaanfiin kun hin milkoofne. Haaromsiitii irra deebiʼi yaali.',
+  offerExtraTime:'Yeroo dabalataa dhiyeessi', acceptAndReserve:'Fudhadhuufi qarshii qabi', withdrawExtension:'Dhiyeessii haqii', extensionStartAfter:'Yeroon waliigalame kan jalqabu', startAgreedExtension:'Yeroo waliigalame jalqabi', extensionHistory:'Dhiyeessiiwwan duraanii', addFunds:'Qarshii dabali',
 }
 export const locales = { en, am, om }
