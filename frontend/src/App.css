@@ -1022,6 +1022,8 @@ button:active {
   margin-block: 24px;
   background: white;
 }
+.schedule-mobile-save{display:none}
+@media(max-width:800px){.schedule-config .schedule-config-save,.schedule-config>p[role=status]{display:none}.schedule-mobile-save{position:sticky;bottom:0;z-index:35;display:flex;align-items:center;gap:12px;margin:12px -16px 0;padding:10px 16px max(10px,env(safe-area-inset-bottom));background:#faf9f6ed;border-top:1px solid var(--border-default,#d7e2dc);backdrop-filter:blur(12px)}.schedule-mobile-save>button{flex:1}.schedule-mobile-save>span{max-width:44%;font-size:12px;color:var(--text-secondary)}}
 .disclosure-preview h3 {
   display: flex;
   gap: 8px;
