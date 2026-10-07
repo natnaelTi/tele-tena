@@ -1,6 +1,7 @@
 """State, recurring calendar and private-record regressions on isolated synthetic fixtures."""
 import base64
 import concurrent.futures
+from copy import deepcopy
 import importlib.util
 import json
 import secrets
@@ -70,6 +71,27 @@ class Presentation(unittest.TestCase):
 
     def setUp(self):
         fixtures.login('admin')
+
+    def test_authorized_user_change_preserves_authenticated_session_state(self):
+        from tele_tena.account_context import authorized_user_change
+        fixtures.login('p1')
+        session = frappe.local.session
+        original = deepcopy(session)
+        try:
+            session.sid = 'synthetic-active-session-id'
+            session.csrf_token = 'synthetic-csrf-token'
+            session.data = frappe._dict({'user': fixtures.USERS['p1'], 'session_marker': 'preserve'})
+            before = deepcopy(session)
+            with authorized_user_change():
+                self.assertEqual(frappe.session.user, 'Administrator')
+            self.assertIs(frappe.local.session, session)
+            self.assertEqual(frappe.session.user, fixtures.USERS['p1'])
+            self.assertEqual(session.sid, before.sid)
+            self.assertEqual(session.csrf_token, before.csrf_token)
+            self.assertEqual(dict(session.data), dict(before.data))
+        finally:
+            session.clear()
+            session.update(original)
 
     def fund_patient(self, kind='p1', amount=10000):
         fixtures.login(kind)
