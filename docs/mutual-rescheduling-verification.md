@@ -57,9 +57,8 @@ patient's authorized timeline.
 
 ## Current integrated local checkpoint
 
-The current branch source is `0660c0ae779e97c374c33553f226a3fbf3359b0f`;
-the running production-built `/teletena/` asset manifest reports that exact
-source SHA. The 390px patient-home screenshot is
+The current branch is `feat/mutual-rescheduling`; its production asset manifest
+reports source `a4c058d7496f38db7eeb8ff9711601eafbdd0154`. The 390px patient-home screenshot is
 `docs/screenshots/mutual-rescheduling/patient-home-390.png`. A fresh browser
 context signed into the seeded patient, reached `/teletena/patient`, received
 the service worker at `/teletena/sw.js`, and reported no page exceptions.
@@ -74,6 +73,13 @@ The invited-review browser check passes: the API reports phone OTP and public
 registration disabled, the phone Continue action is disabled, and the email /
 password alternative remains available. The real backend contact-auth suite
 passes 7/7 with registration policy enabled inside its isolated test setup.
+
+After the latest package build, the seeded patient signed into this URL again
+and reached `/teletena/patient`; the registered service worker controlled
+`/teletena/sw.js`, and the browser reported no page exceptions. The current
+clinician package displays setup links for the missing readiness conditions.
+No browser cache was cleared; this check used a new browser context and the
+asset manifest's current source SHA.
 
 A disposable fresh install reached and passed app installation, schema, role,
 guest-denial, and simulation-disabled assertions; its optional browser journey
