@@ -37,13 +37,6 @@ export default function SignIn() {
       .then((value) => {
         if (!active) return;
         setOptions(value);
-        // A disabled OTP route must never look like an available first step.
-        // On invited-review sites, land directly on the working password
-        // alternative; when email OTP is configured, use that instead.
-        if (!value.phone_otp) {
-          setChannel('email');
-          setPasswordMode(!value.email_otp);
-        }
       })
       .catch(() => { if (active) setOptionsError(true); });
     return () => { active = false; };
