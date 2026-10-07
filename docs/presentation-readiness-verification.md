@@ -4,10 +4,10 @@
 
 - Review URL: `http://127.0.0.1:8017/teletena/`, production-built Frappe app,
   not Vite. Bench `/home/frappe/frappe/frappe-bench`; site
-  `tele-tena-pr12-fresh.localhost`; branch `feat/clinic-membership`; source
-  commit `0b3d1bdecfede8180ebdbdf9e7bdfedc0f4cd60d`. The package is being
-  rebuilt from this clean source commit; report the build manifest's source SHA
-  after that finishes.
+  `tele-tena-pr12-fresh.localhost`; branch `feat/clinic-membership`.
+  Authentication UI source commit is `0b3d1bdecfede8180ebdbdf9e7bdfedc0f4cd60d`;
+  current package manifest source SHA is
+  `0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee`.
 - Environment: Frappe 15.121.2 / ERPNext 15.121.6, Python 3.12.3, Node
   22.23.3. The loopback Gunicorn preview is scoped to port 8017. Site review
   mode is enabled; phone OTP and patient/clinician public registration are
@@ -30,14 +30,27 @@
   `docs/screenshots/clinic-membership/`.
 - A focused correction keeps phone-first sign-in visible when phone OTP is
   disabled, shows the explicit disabled explanation, and leaves the email
-  alternative available. The built-browser check is pending after packaging;
-  its first run exposed the hidden phone-first screen and motivated this fix.
-- `npm run build` passed. Vite reports the existing LiveKit chunk-size
-  advisory. `scripts/build_review.py` requires a clean checkout, so the final
-  package build and manifest verification follow the verification commit.
+  alternative available. The built-browser journey passed for the invited
+  patient/clinician accounts and the explicit email/password switch. A
+  controlled code-entry path exercised invalid-code feedback. Screenshots at
+  390/1440 px are under `docs/screenshots/auth-invited/`.
+- The enabled-policy run of `tests/integration.py` passed **24/24**, including
+  patient/clinician registration, manual approval, CSRF, one-use code,
+  attempt/rate controls, uncertain provider result and concurrent verification.
+  All provider sends and OTP-key reads were mocked. The failed first run in
+  invited mode is expected policy enforcement, not an OTP regression.
+- `npm run build`, `scripts/build_review.py`, and `scripts/check_review_assets.py`
+  passed. The package asset scan found no credentials or public site config;
+  Vite reports the existing LiveKit chunk-size advisory. A controlled service
+  worker waiting-update test passed; it verifies explicit refresh after a
+  waiting worker, not browser-profile cache eviction on every installed device.
 - Site scheduler is disabled. Shared bench worker and scheduler processes are
   online for other sites and were not changed; this site's queued routing and
   financial release jobs have not been processed.
+- Phone OTP and both public-registration site flags were checked after the
+  integration run and are explicitly false. The existing email/password
+  reviewer path remains available. Sign-in options from the running API report
+  all contact-code and registration capabilities as false for this site.
 - This remains a focused clinic membership/auth UI checkpoint, not completion
   of the approved product scope. Frappe 16 compatibility, clean fresh install,
   actual 200% browser zoom, live SMS/email delivery, physical-device calling,

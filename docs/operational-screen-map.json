@@ -231,11 +231,11 @@
       "module": "Identity/public",
       "backend_reference": "contact_auth, onboarding",
       "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Built /teletena/ invited-review browser check passed at 390/1440: phone-first screen remains visible, Continue is disabled by site policy, email/password remains available, and existing patient/clinician accounts sign in. Auth source commit 0b3d1bd; packaged manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee. Phone OTP/public registration flags restored false. No live provider call.",
       "prototype_route": "a04",
       "route": "/sign-in",
       "actor": "Guest; authenticated account after contact verification",
-      "status": "External integration blocked",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_contact_identity",
         "tt_otp_challenge",
@@ -286,7 +286,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A04) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Built /teletena/ invited-review browser check passed at 390/1440: phone-first screen remains visible, Continue is disabled by site policy, email/password remains available, and existing patient/clinician accounts sign in. Auth source commit 0b3d1bd; packaged manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee. Phone OTP/public registration flags restored false. No live provider call."
       }
     },
     {
@@ -296,7 +296,7 @@
       "module": "Identity/public",
       "backend_reference": "contact_auth, onboarding",
       "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Built browser exercised code-step navigation and safe invalid/expired-code feedback; integration suite verified HMAC/single-use/attempt/race paths with mocked SMS. Live SMS delivery and native Amharic/Afaan Oromo review not tested. Auth source commit 0b3d1bd; package manifest 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee.",
       "prototype_route": "a05",
       "route": "/sign-in (OTP step)",
       "actor": "Guest; authenticated account after contact verification",
@@ -351,7 +351,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A05) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Built browser exercised code-step navigation and safe invalid/expired-code feedback; integration suite verified HMAC/single-use/attempt/race paths with mocked SMS. Live SMS delivery and native Amharic/Afaan Oromo review not tested. Auth source commit 0b3d1bd; package manifest 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee."
       }
     },
     {
@@ -361,11 +361,11 @@
       "module": "Identity/public",
       "backend_reference": "contact_auth, onboarding",
       "required_contract": "Public copy, role-specific registration and capability-aware sign-in",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Invited-review email/password path and explicit switch from phone were verified in Chromium; email OTP UI/error path exercised with controlled responses, backend enabled-policy OTP tests use mocked delivery. SMTP is not configured, so delivery is blocked. Screenshots: docs/screenshots/auth-invited/. Package manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee.",
       "prototype_route": "a06",
       "route": "/sign-in (email method)",
       "actor": "Guest; authenticated account after contact verification",
-      "status": "External integration blocked",
+      "status": "Implemented, verification pending",
       "persistent_models": [
         "tt_contact_identity",
         "tt_otp_challenge",
@@ -416,7 +416,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A06) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Invited-review email/password path and explicit switch from phone were verified in Chromium; email OTP UI/error path exercised with controlled responses, backend enabled-policy OTP tests use mocked delivery. SMTP is not configured, so delivery is blocked. Screenshots: docs/screenshots/auth-invited/. Package manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee."
       }
     },
     {
