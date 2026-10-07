@@ -8,7 +8,7 @@ real-patient-readiness, real-money, or market-performance claim.
 - Current branch: `feat/mutual-rescheduling`, draft PR #22 against
   `feat/clinic-staff-workspace` (PR #21); no merge or remote deployment.
 - Backend source is the PR branch checkout. The latest packaged frontend source
-  SHA is `5f9aa2a40ee75edb5a5f458f8d1e8dbcafb3243f`.
+  SHA is `b627c8ba7518acb3a923e03607e9ea0317e99ccd`.
 - Review URL: `http://127.0.0.1:8017/teletena/`, site
   `tele-tena-pr12-fresh.localhost`, Bench
   `/home/frappe/frappe/frappe-bench`. Frappe 15.121.2 / ERPNext 15.121.6 /
@@ -39,6 +39,14 @@ real-patient-readiness, real-money, or market-performance claim.
   network outage. Screenshots across English, Amharic and Afaan Oromo at 390px
   and 1440px are under
   `/tmp/tele-tena-presentation-review/request-readiness/`.
+- The clinician workspace now uses three focused mobile shortcuts plus a
+  keyboard-accessible “More workspace links” dialog. Browser coverage verified
+  role-specific routes, Escape dismissal, and focus restoration. The
+  readiness/error journey was rerun at 320/390/768/1440px in all three locales
+  with no horizontal document overflow. Latest screenshots include
+  `blocked-{en,am,om}-{320,390,768,1440}.png` and `mobile-more-menu.png` in the
+  directory above. Amharic and Afaan Oromo remain provisional, not natively
+  approved.
 - The packaged Frappe browser check returned HTTP 200 at `/teletena/`, and its
   service worker controlled the canonical `/teletena/` scope after reload.
 - Frontend TypeScript/Vite production build passed; lint exited 0 with existing

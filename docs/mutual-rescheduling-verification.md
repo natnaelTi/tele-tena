@@ -298,3 +298,32 @@ overflow; six synthetic screenshots are under
 `/tmp/tele-tena-presentation-review/request-readiness/`. The fault-injection
 validates UI error handling only; it does not replace a real successful offer
 journey. New copy remains provisional pending native-language review.
+
+## Built preview update — mobile workspace navigation — 2026-10-07
+
+The production asset manifest now records frontend source
+`b627c8ba7518acb3a923e03607e9ea0317e99ccd`. The review URL remains
+`http://127.0.0.1:8017/teletena/` on
+`tele-tena-pr12-fresh.localhost`; it returned HTTP 200 and is served by the
+isolated Gunicorn process from this TeleTena checkout, not Vite. The original
+development site was not migrated. The browser receives the packaged app under
+the `/teletena/` scope.
+
+Mobile workspace navigation now has three role-specific shortcuts and a “More
+workspace links” dialog instead of a cramped horizontal strip. The authenticated
+browser check verified that the menu opens, exposes its links, closes with
+Escape, and restores focus. The seeded clinician readiness/error state was
+rendered at 320, 390, 768 and 1440 CSS pixels in English, Amharic and Afaan
+Oromo; there was no horizontal document overflow. The actual synthetic account
+still reports missing care-language setup and service-level immediate-care
+authorization. The controlled HTTP 422 injection checks error wording only; it
+is not a real request-service rejection. Screenshots are in
+`/tmp/tele-tena-presentation-review/request-readiness/`, including
+`blocked-{en,am,om}-{320,390,768,1440}.png` and `mobile-more-menu.png`.
+
+The focused authenticated browser check passed against the built Frappe route.
+Frontend build and focused lint passed before these documentation-only edits.
+The last backend presentation run passed 27/27 before this frontend-only change.
+The preview scheduler remains disabled; this checkpoint does not claim a
+successful offer route, routing wave, or earnings release. Amharic and Afaan
+Oromo remain provisional and have not had native-language approval.

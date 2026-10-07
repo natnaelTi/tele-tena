@@ -35,11 +35,9 @@ let checkpoint = 'launch'
     await actualPage.getByLabel('Language / ቋንቋ / Afaan').selectOption('en')
     checkpoint = 'wait for live readiness reasons'
     await actualPage.screenshot({ path: '/tmp/tele-tena-presentation-review/request-readiness/live-state.png', fullPage: true })
-    console.log(`READINESS_DIAGNOSTIC: languageLink=${await actualPage.getByRole('link', { name: 'Add a care language', exact: true }).count()}; immediatePolicyLink=${await actualPage.getByRole('link', { name: 'Ask a reviewer to enable immediate requests for a service', exact: true }).count()}; goAvailableDisabled=${await actualPage.getByRole('button', { name: 'Go available', exact: true }).isDisabled().catch(()=>false)}`)
     await actualPage.getByRole('link', { name: 'Add a care language', exact: true }).waitFor()
     checkpoint = 'wait for immediate policy setup link'
     await actualPage.getByRole('link', { name: 'Ask a reviewer to enable immediate requests for a service', exact: true }).waitFor()
-    console.log(`READINESS_ASSERTIONS: goAvailableDisabled=${await actualPage.getByRole('button', { name: 'Go available', exact: true }).isDisabled()}; pausedLabelCount=${await actualPage.getByText('Requests paused', { exact: true }).count()}`)
     assert.equal(await actualPage.getByRole('button', { name: 'Go available', exact: true }).isDisabled(), true)
     assert.equal(await actualPage.getByText('Requests paused', { exact: true }).count(), 1)
     await actualPage.setViewportSize({ width: 320, height: 900 })

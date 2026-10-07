@@ -3577,7 +3577,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map. Read-only authenticated query on source 5f9aa2a40ee75edb5a5f458f8d1e8dbcafb3243f against the retained synthetic reviewer clinician returned language_required and immediate_policy_required, so that account was not eligible for immediate delivery. This explains the current empty inbox but is not a successful routing journey; no profile or service policy was edited."
+        "current_local": "Pending successful eligible-offer journey. On source/build b627c8ba7518acb3a923e03607e9ea0317e99ccd, the authenticated synthetic clinician readiness query returns language_required and immediate_policy_required; its inbox is correctly not offered a request. The actual UI exposes setup links and paused state. This is not a routing pass; profile/service policy were not edited."
       }
     },
     {
@@ -3793,7 +3793,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F05) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map. On source/build 5f9aa2a40ee75edb5a5f458f8d1e8dbcafb3243f, an authenticated built-app browser check on the seeded clinician confirmed the real readiness response shows Add a care language and immediate-policy review links, keeps Go available disabled, and reports Requests paused. A controlled 422 fault-injection check confirms a server rejection is announced as an update failure rather than a connection outage. 390px and 1440px English/Amharic/Afaan Oromo screenshots: /tmp/tele-tena-presentation-review/request-readiness/. This verifies the setup/error state only; it does not verify a successful readiness transition or routed offer."
+        "current_local": "Pending successful readiness and routed-offer journey. The built-app browser verifies setup links, disabled readiness action, and useful distinction for a controlled HTTP 422 fault at 320/390/768/1440px in en/am/om. The real clinician remains ineligible due to language_required and immediate_policy_required. Mobile More navigation, Escape close and focus restoration passed. Screenshots: /tmp/tele-tena-presentation-review/request-readiness/. This does not verify a successful request or offer."
       }
     },
     {
