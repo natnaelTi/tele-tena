@@ -22,6 +22,7 @@ dist = FRONTEND / 'dist'
 (dist / 'licenses').mkdir(exist_ok=True)
 for font in ('manrope', 'noto-sans-ethiopic'):
     shutil.copyfile(FRONTEND / 'node_modules/@fontsource' / font / 'LICENSE', dist / 'licenses' / (font + '.txt'))
+shutil.copyfile(FRONTEND / 'src/assets/fonts/inter/OFL.txt', dist / 'licenses/inter.txt')
 manifest = json.loads((dist / 'manifest.webmanifest').read_text())
 manifest.update(id='/teletena/', start_url='/teletena/', scope='/teletena/')
 for icon in manifest['icons']:

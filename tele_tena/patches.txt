@@ -15,3 +15,5 @@ tele_tena.patches.v1_9_open_requests
 tele_tena.patches.v1_10_request_public_identity
 tele_tena.patches.v1_11_progressive_routing
 tele_tena.patches.v1_12_catalog_vetting
+tele_tena.patches.v1_13_financial_reconciliation_audit
+tele_tena.patches.v1_14_session_feedback

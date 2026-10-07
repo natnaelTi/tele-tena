@@ -11,7 +11,10 @@ import time
 
 APP = Path(__file__).resolve().parents[1]
 BENCH = APP.parents[1]
-SITE = BENCH / 'sites' / 'erp.localhost'
+SITE_NAME = os.environ.get('TELE_TENA_TEST_SITE')
+if not SITE_NAME or not SITE_NAME.startswith(('tele-tena-', 'teletena-')) or not SITE_NAME.endswith('.localhost'):
+    raise SystemExit('Set TELE_TENA_TEST_SITE to a disposable TeleTena site; retained development sites are refused')
+SITE = BENCH / 'sites' / SITE_NAME
 SECRET_FILE = SITE / 'private' / 'tele_tena_livekit.json'
 SERVER = Path('/tmp/livekit-server')
 os.chdir(BENCH / 'sites')
@@ -70,6 +73,7 @@ def main():
             else:
                 raise RuntimeError('Temporary LiveKit server did not become ready')
 
+            fixtures.SITE = SITE_NAME
             fixtures.Integration.setUpClass()
             fixtures_ready = True
             fixtures.login('p1')

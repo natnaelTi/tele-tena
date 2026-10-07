@@ -30,8 +30,9 @@ def write_private(path, value):
 
 
 def main():
-    site = os.environ.get('TELE_TENA_TEST_SITE', 'erp.localhost')
-    assert site in ('erp.localhost', 'tele-tena-pr2-test.localhost')
+    site = os.environ.get('TELE_TENA_TEST_SITE')
+    assert site and site.startswith(('tele-tena-', 'teletena-')) and site.endswith('.localhost'), \
+        'Set TELE_TENA_TEST_SITE to a disposable TeleTena site; retained development sites are refused'
     frappe.init(site=site, sites_path=str(BENCH / 'sites'))
     url, _, _ = livekit._credentials()
     host = (urlsplit(url).hostname or '').lower()

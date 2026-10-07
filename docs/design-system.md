@@ -9,13 +9,13 @@ frontend changes. Preserve historical verification reports separately.
 - Do not rename technical identifiers, tables or migration history for branding.
 
 ## Design direction
-Calm, human, precise. Warm neutral surfaces, deep ink typography, distinctive teal
-accents, restrained original illustrations and generous but purposeful spacing.
-Reference Headspace for approachable care presentation and Linear for hierarchy
-and restrained interface density. Inspect their public pages; borrow principles,
-not logos, assets, exact layouts or copy. Avoid generic giant cards, excessively
-wide forms, repeated banners, decorative gradients everywhere, and a dashboard
-made from one long form.
+Calm, human, precise, mobile-first. The extracted source at
+`/home/frappe/teletena-design-reference` is the current visual and interaction
+reference; its HTML is not operational code. Port composition and interaction
+patterns into the existing React application and connect actions to Frappe APIs.
+Keep the TeleTena mark already in `Brand.tsx` and the existing product rules.
+Use task-focused hierarchy and a blue–teal identity. Avoid giant generic cards,
+excessively wide forms, repeated banners, and dashboard-as-one-long-form.
 
 ## Brand and logo
 Create an original SVG mark using two rounded opposing forms suggesting
@@ -27,22 +27,24 @@ minimum sizes; verify 16, 24 and 32 px. Keep assets local and reusable.
 ## Color tokens
 | Token | Value |
 |---|---|
-| brand.primary | #126B64 |
-| brand.hover | #0D5751 |
-| text.primary | #182B2A |
-| text.secondary | #526561 |
-| surface.canvas | #FAF9F6 |
+| brand.primary | #145D7A |
+| brand.hover | #104A62 |
+| brand.teal | #087F8C |
+| text.primary | #102A33 |
+| text.secondary | #52636A |
+| surface.canvas | #F5F7F8 |
 | surface.card | #FFFFFF |
-| surface.subtle | #EAF2EE |
-| border.default | #D7E2DC |
+| surface.subtle | #EAF5F5 |
+| border.default | #DFE7E9 |
 | accent.apricot | #F2BC97 |
 Define semantic success, warning, danger, information and focus tokens. Verify
 actual foreground/background contrast. Apricot is decorative, never small text.
 Status never relies on color alone.
 
 ## Typography
-Self-host properly licensed **Manrope** (English and Afaan Oromo) and **Noto Sans
-Ethiopic** (Amharic), with fallbacks. Body 16 px at 1.5–1.65 line height; normal
+Self-host properly licensed **Inter** (English and Afaan Oromo) and **Noto Sans
+Ethiopic** (Amharic), with fallbacks. Inter files and the OFL license are copied
+from the extracted reference into `frontend/public/fonts/inter`. Body 16 px at 1.5–1.65 line height; normal
 supporting copy at least 14 px. Scale 14 / 16 / 20 / 24 / 32 / 48 / 64 px.
 Marketing headline responsive 36–64 px; application title 28–32 px. Weights
 400/500/600/700 purposefully. Verify Ethiopian-script wrapping, line height and
@@ -209,20 +211,24 @@ unimplemented screens/backend dependencies explicitly. Build/lint are not visual
 acceptance.
 
 ## Reference inspection
-Inspected https://www.headspace.com/ and https://linear.app/ on 2026-10-01.
-Take approachable task-oriented care navigation from the former; compact hierarchy
-and disciplined content grouping from the latter. All brand art and layouts here
-are original. No third-party marks, illustrations, metrics or testimonials copied.
+Inspected the extracted 142-screen source and `design-handoff.md` at
+`/home/frappe/teletena-design-reference` on 2026-10-07. Its HTML gallery, CSS,
+and scripts contain presentation concepts and synthetic interactions only. The
+screen inventory and source styles guide visual composition; the product
+contract, server APIs, authorization and persistent state remain authoritative.
+The reference's stethoscope JPEG is not substituted for the existing original
+TeleTena conversation mark. No prototype credentials, fake data, client-only
+funds, or fake working interactions are copied.
 
 ## Brand implementation
 Local `frontend/public/brand/` contains symbol, horizontal lockup, monochrome,
 reversed and favicon SVGs. Two opposed rounded speech forms share a vertical
 negative-space rhythm that suggests a lowercase t. Minimum symbol size 16 px;
 preferred interface size 32–40 px. Clear space is one quarter of symbol height.
-Use the React Brand component for the locally typeset Manrope wordmark. SVG
-lockups use the same font with a sans-serif fallback; no external asset requests.
-Manrope and Noto Sans Ethiopic are distributed locally through their Fontsource
-packages with included SIL Open Font License files. No Google Fonts runtime calls.
+Use the React Brand component for the locally typeset Inter wordmark. SVG
+lockups use a sans-serif fallback; no external asset requests. Inter is vendored
+with its SIL Open Font License; Noto Sans Ethiopic remains locally bundled through
+Fontsource. No Google Fonts runtime calls.
 
 ### Review deployment URL
 

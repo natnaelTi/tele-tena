@@ -1,6 +1,6 @@
 # Product roadmap and capability boundaries
 
-This roadmap reconciles the agreed product contract with the current delivery tracker. The tracker and verification report are evidence sources; a planned row is not evidence that it works.
+This roadmap reconciles the agreed product contract with the current delivery tracker. The tracker and operational screen map are evidence sources; a planned row is not evidence that it works. PRs #12–#15 remain open stacked work (PR #15 → #14 → #13 → #12); PR #11 is an open availability hotfix. Do not infer a merged/deployed state from this roadmap.
 
 ## Demonstration sequence
 
@@ -21,9 +21,30 @@ This roadmap reconciles the agreed product contract with the current delivery tr
 - A bounded eligible group receives notices. Current in-app reconnect uses authenticated polling; notifications contain no request text or identity. The three-minute target depends on real coverage and response behavior and requires pilot evidence.
 - Presence expires server-side. Current demonstration defaults (90-second presence; 15-minute request and offer lifetimes; configured per-site publication/offer limits) are adjustable demonstration values, not agreed commercial SLAs.
 
+## Approved future capability groups
+
+The full approved target now includes the groups below. The group names indicate
+product scope, not shipped capability:
+
+- Human-led clinician identity/qualification vetting, individual scope decisions,
+  credential lifecycle and multidimensional non-composite trust indicators.
+- Linked service categories, professional scopes, approaches, patient support
+  topics, participant formats, typed versioned service attributes and tailored
+  offerings. Clinical catalog entries remain drafts until medical-lead review.
+- Persisted clinic profiles, staff/membership roles, affiliation checks, resource
+  scheduling and encounter-specific record grants.
+- Adult multi-participant care with independent identities, invitations, consent,
+  disclosure, LiveKit authorization and recipient-specific notes.
+- Laboratory/diagnostics orders, partner roles, specimen custody, review,
+  correction, release and consent-based sharing.
+- Subscription entitlements, second-opinion case-sharing, and medical-travel
+  coordination with conditional estimates and jurisdiction checks.
+- Auditable clinic/lab/financial/routing/support administration with separation
+  between vetting, clinical records and finance permissions.
+
 ## Explicitly outside the current implementation
 
-Clinic membership/workspaces and referral attribution, natural-language clinical matching or relevance feedback, ratings, couples consent, mutual rescheduling, no-show workflows, email summary delivery, real money movement, real credential verification and emergency escalation are not represented as working features. See `mvp-delivery-tracker.md` for current status and evidence.
+Clinic membership/workspaces and referral attribution, natural-language clinical matching or relevance feedback, public free-text reviews/moderation, couples consent, mutual rescheduling, no-show workflows, email summary delivery, real money movement, real credential verification and emergency escalation are not represented as working features. Separate session-experience, eligible-inbox response, and clinician-attributed cancellation indicators are being added in the current branch; database/browser verification remains pending. See `mvp-delivery-tracker.md` for current status and evidence.
 
 ## Current vetting and routing checkpoint (2026-10)
 
@@ -37,6 +58,6 @@ complete a clinical taxonomy or credential-verification workflow. The proposed
 rubric is not an agreed rubric and needs medical-lead approval; independent
 credential verification, affiliations, evidence-by-scope, appeals, expiry and
 reverification UI, full jurisdiction/accessibility checks, reliability/experience
-ranking, patient feedback, and native catalog review remain pending. See
+reliability/response ranking, native catalog review, and feedback moderation remain pending. Structured sample-aware session-experience ratings are now implemented in source but not yet integration-verified. See
 `vetting-routing-verification.md` for local failure evidence and verification
 boundaries.

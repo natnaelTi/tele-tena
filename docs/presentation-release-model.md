@@ -118,3 +118,21 @@ the legacy activity log remains unchanged. Completed appointments with reserved
 funds are marked `LegacyHold`, preserved for review, and never automatically
 settled or released. See `demo-earnings-model.md` for account mappings and the
 acceptance arithmetic.
+
+### Owner-level legacy reconciliation (v1.13)
+
+The additive v1.13 patch records each patient's legacy event projection, current
+wallet snapshot, subledger projection, unknown-event count, and any event whose
+timestamp exactly equals the opening-journal timestamp. It never changes the
+wallet, event log, appointment, or historical journal. Mismatched owners are
+held from deposits and bookings until an authorized `Tele Tena Approver` records
+a reasoned `AcceptCurrentSnapshot` decision. This is an explicit choice to use
+the unchanged wallet/subledger-equal snapshot for future demonstration activity;
+the unresolved legacy difference remains in the audit record. If wallet and
+subledger differ, acceptance is refused. Exact timestamp boundary cases remain
+held because event ordering cannot be established from the legacy schema.
+
+Safe cutover requires stopping every old web, worker and scheduler writer before
+activating v1.7 onward, migrating only the intended site, checking owner-by-owner
+reconciliation, and starting processes on the same code revision. Old and new
+financial writers must never overlap.

@@ -201,6 +201,15 @@ def appointment_detail(appointment):
         clinician = one('SELECT display_name FROM tt_profile WHERE user=%s AND kind=%s',
                         (item.clinician, 'clinician'))
         selected['clinician'] = clinician.display_name
+        feedback = rows('''SELECT rating,created_at FROM tt_session_feedback
+            WHERE appointment=%s AND patient=%s''', (item.id, item.patient))
+        selected['session_feedback'] = ({'submitted': True, 'rating': int(feedback[0].rating),
+                                         'submitted_at': iso(feedback[0].created_at)}
+                                        if feedback else {'submitted': False, 'rating': None,
+                                                          'submitted_at': None})
+        call_ended = bool(call and call[0].state == 'Ended')
+        selected['can_submit_feedback'] = (item.state == 'Completed' and call_ended and
+                                           not feedback)
         # Critically, this SELECT never reads private_note.
         revisions = rows('''SELECT revision,patient_summary,created FROM tt_note_revision
             WHERE appointment=%s AND summary_published=1 ORDER BY revision''', (item.id,))

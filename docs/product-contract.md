@@ -27,7 +27,13 @@ Couples have individual consent and optional mutually accepted relationship link
 paying or partnership does not grant private record access.
 
 Real voice/video, audio-only option, clinician notes, patient-authorized summaries,
-follow-up booking, completed-session ratings. Email links to an authenticated summary;
+follow-up booking, and one structured patient session-experience rating per
+completed encounter. Clinician profile indicators keep patient experience,
+immediate-inbox offer response, clinician-attributed cancellations, and approved
+credentials/scopes separate. Patient experience is distinct from clinical
+competence and outcomes; aggregates suppress rates/averages below a minimum
+sample. No-show attribution and free-text review moderation remain unimplemented.
+Email links to an authenticated summary;
 no sensitive summary in notification body. No recording/transcription by default.
 
 Simulated deposits; available/reserved patient funds; pending/available clinician earnings;
@@ -41,13 +47,49 @@ accepted price/policy versions are immutable snapshots. Disputes hold relevant e
 Unused funds refundable through verified supported routes. On-demand and scheduled
 withdrawals after configured withholding period; external settlement is not instant.
 
+## Expanded approved product scope (2026-10-07)
+
+The product target now includes complete human-led vetting and per-scope
+credential evidence, a versioned service catalog, distinct trust indicators,
+private progressive open-request routing, the balanced demonstration earnings
+lifecycle and explicitly funded extensions. It also includes explicit clinic
+membership and encounter grants, adult couples/family consent, laboratory and
+diagnostics workflows, subscriptions, second opinions, medical-tourism
+coordination, and their focused administrator operations. These additions are
+approved implementation scope, not evidence of completion. Every capability
+must use persisted Frappe models, server-enforced authorization, auditable state
+transitions, connected-browser evidence and its own integration/partner gates.
+
+The design source is the extracted 142-screen inventory at
+`/home/frappe/teletena-design-reference`; it is a visual/interaction reference,
+not a system of record. Natural-language need descriptions may suggest a service
+category but must not create or imply diagnoses. Patient requests remain private;
+matching cannot relax an explicit scope, credential, age, format, language,
+consent, availability or budget condition. An offer does not reserve funds or a
+slot. Acceptance must revalidate authorization and create one appointment and
+one reservation atomically.
+
+Clinic membership never grants blanket access to clinical records. Shared adult
+care requires each participant's separate identity, consent and disclosure.
+Laboratory results require a real partner, specimen chain-of-custody and human
+review before release. Second-opinion and medical-travel estimates are
+conditional, not treatment guarantees or confirmed capacity. Subscriptions may
+not gate basic personal-record access. No paid ranking is permitted.
+
+The demonstration finance target adds balanced immutable subledger postings,
+owner-by-owner legacy reconciliation and explicit mismatch holds, scheduled
+earnings release, dispute holds, reserved/cancellable payout requests and
+prefunded consent-based extensions. It remains separate from custody, payment
+providers and ERPNext accounting. A legacy discrepancy requires a reasoned,
+audited reviewer decision; no migration may rewrite or delete it.
+
 ## Commercial direction
 Free patient discovery/booking; consultation charges; clinician bring-your-own-patient
 links. Acquisition belongs to patient-clinician relationship. Layered clinician/clinic
 workspace and later patient convenience subscriptions. Basic record access/export is
 not a subscription hostage. No paid clinical ranking.
 
-## Deferred or unresolved
+## External and policy gates
 Real-money provider authorization, payment integration activation, actual fees,
 policy windows/caps, dispute operations, production safety/escalation protocol,
 SMS provider, LiveKit credentials, translated clinical copy review, production hosting.
@@ -120,7 +162,11 @@ the implemented contract; the delivery tracker is authoritative for pending scop
 
 The versioned v1.8 reconciliation imports known legacy deposit, reservation and
 release events created after each v1.7 wallet opening snapshot into balanced,
-idempotent journals. It preserves the wallet projection, original activity log,
-appointments and reserved obligations. Unknown legacy event kinds stop for
-review. A deployment cutover stops all old web and background writers before
-migration, then verifies wallet/subledger equality before starting matching code.
+idempotent journals. v1.13 audits each owner against both the original activity
+log and wallet/subledger projection, recording unknown events and exact snapshot
+boundary ambiguity without rewriting records. A mismatched owner is held until
+an authorized, reasoned decision accepts the unchanged wallet snapshot for
+future demo operations; the historical mismatch remains visible. Unknown legacy
+event kinds stop for review. A deployment cutover stops all old web and
+background writers before migration, then verifies owner-by-owner wallet and
+subledger equality or records an explicit hold before starting matching code.

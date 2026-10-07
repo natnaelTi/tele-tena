@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%brand/favicon.svg" />
     <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
-    <meta name="theme-color" content="#126B64" />
+    <meta name="theme-color" content="#145D7A" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="TeleTena" />
@@ -14,6 +14,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('%MODE%' === 'production' ? '/teletena/sw.js' : '/sw.js', {scope: '%MODE%' === 'production' ? '/teletena/' : '/'}).catch(() => {}));</script>
   </body>
 </html>

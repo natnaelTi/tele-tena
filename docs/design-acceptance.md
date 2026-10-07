@@ -75,3 +75,30 @@ The presentation identity and flows are unchanged. Production URLs add the
 `/teletena` namespace; root-relative API authorization remains on Frappe. Built
 browser verification and deployment limitations are recorded separately in
 `review-deployment-verification.md`, not inferred from prior Vite screenshots.
+
+## Extracted 142-screen product design integration (current branch)
+
+The source visual reference is `/home/frappe/teletena-design-reference`; the
+latest `screen-inventory.json` has 142 screens in 14 journeys (the older handoff
+mentions 138 concepts). The HTML/CSS is not accepted as application behavior.
+This branch has begun porting the approved blue–teal palette and self-hosted
+Inter typography into the existing Frappe-served React app, retaining Noto Sans
+Ethiopic and the existing TeleTena conversation logo. These code changes are
+not yet rendered in the built `/teletena/` app, so no extended visual acceptance
+is claimed.
+
+- [ ] Route all 142 screen/state entries through real persisted APIs or mark the
+  exact dependency that blocks them in `operational-screen-map.json`.
+- [ ] Finish Batch A authentication/onboarding layout and three-language flows.
+- [ ] Finish human-led vetting, per-scope catalog and verified trust indicators.
+- [ ] Finish discovery, schedule, direct booking and consultation journeys.
+- [ ] Finish request routing/offer acceptance and clinician presence states.
+- [ ] Finish subledger, dispute, release, payout and explicit extension states.
+- [ ] Add clinic memberships/encounter grants and multi-participant adult consent.
+- [ ] Add laboratory, subscription, second-opinion and medical-travel operations
+  only with real models, permissions and required external partner validation.
+- [ ] Complete focused administration, support and audit routes.
+- [ ] Render connected populated/empty/error flows at 320/390/768/1440 and 200%
+  zoom; capture Amharic and Afaan Oromo layout; get human translation review.
+- [ ] Verify fresh/repeat migration and owner-by-owner financial reconciliation
+  without editing existing wallet or appointment history.

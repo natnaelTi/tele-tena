@@ -33,12 +33,14 @@ import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage
 import Showcase from "./pages/Showcase";
 import { ClinicianRequestInbox, PatientOpenRequests, PublicClinicianProfile } from "./pages/OpenRequests";
 import { ClinicianScopeApplications, VettingQueue } from "./pages/Vetting";
+import PWAUpdateNotice from "./components/PWAUpdateNotice";
 import "./App.css";
 export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.PROD ? "/teletena" : "/"}>
       <SessionProvider>
         <LocaleProvider>
+          <PWAUpdateNotice />
           <a className="skip-link" href="#main-content">
             Skip to content
           </a>

@@ -87,3 +87,10 @@ def install():
     progressive_routing()
     from tele_tena.patches.v1_12_catalog_vetting import execute as catalog_vetting
     catalog_vetting()
+    # Fresh installs mark post-model-sync patches complete before after_install.
+    # Bootstrap the v1.13 audit table explicitly so fresh and upgraded sites
+    # expose the same fail-closed financial reconciliation boundary.
+    from tele_tena.patches.v1_13_financial_reconciliation_audit import execute as financial_reconciliation
+    financial_reconciliation()
+    from tele_tena.patches.v1_14_session_feedback import execute as session_feedback
+    session_feedback()

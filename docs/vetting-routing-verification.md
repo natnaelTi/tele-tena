@@ -41,6 +41,27 @@ the site-scoped `tele_tena_demo_immediate_care_enabled` switch before immediate
 presence/request use. New catalog services remain inactive until clinical review
 and activation. This does not change scheduled-care rules or production defaults.
 
+### Read-only recheck on 2026-10-07
+
+The preserved synthetic site was inspected again without resetting its data.
+The site-level demonstration-immediate switch and review-site binding are on, so
+the legacy service's false per-record `immediate_care_enabled` value is allowed
+through the narrowly scoped legacy-review fallback. It is not the active blocker
+on this snapshot. Its existing presence row says `ready=1`, but its expiry is
+2026-10-06 13:31:12 UTC; the API correctly treats that as stale. The request table
+has no `Open` rows: its immediate requests are already `Expired`, `Cancelled` or
+`Matched`, so none can appear in the current inbox. Their date-bound columns are
+present. One earlier immediate request has a recipient and a matched state,
+showing the existing delivery path has completed successfully at least once.
+
+This read-only snapshot cannot establish what happened in the exact browser
+attempt the patient described. It does establish that the currently saved
+presence is stale and the currently stored requests are terminal. The next
+reproduction must use a newly published request while the clinician's
+authenticated workspace is renewing presence, then compare the request's
+eligibility/route events and the clinician's scoped inbox response. An open tab
+alone is not persisted evidence that presence is still fresh.
+
 ## Preview and process boundary
 
 - Review URL: `http://127.0.0.1:8017/teletena/`

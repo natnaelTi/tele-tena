@@ -23,6 +23,7 @@ from tele_tena.api import presentation
 from tele_tena.api import scheduling
 from tele_tena.api import open_requests
 from tele_tena.api import vetting
+from tele_tena.api import trust
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -857,6 +858,9 @@ class Presentation(unittest.TestCase):
         patient_detail = presentation.appointment_detail(appointment)
         self.assertNotIn('private_note', patient_detail)
         self.assertNotIn('Private synthetic observation', str(patient_detail))
+        self.assertFalse(patient_detail['can_submit_feedback'])
+        with self.assertRaises(frappe.ValidationError):
+            trust.submit_session_feedback(appointment, 5)
         fixtures.login('admin')
         with self.assertRaises(frappe.PermissionError):
             presentation.appointment_detail(appointment)
@@ -868,6 +872,50 @@ class Presentation(unittest.TestCase):
         shared = presentation.appointment_detail(appointment)
         self.assertNotIn('private_note', shared)
         self.assertEqual(shared['patient_summary_revisions'][0]['summary'], 'Helpful next steps')
+        self.assertTrue(shared['can_submit_feedback'])
+        frappe.db.commit()
+        feedback_barrier = threading.Barrier(2)
+        def submit_feedback():
+            fixtures.connect()
+            try:
+                fixtures.login('p1')
+                feedback_barrier.wait(timeout=10)
+                result = trust.submit_session_feedback(appointment, 5)
+                frappe.db.commit()
+                return result
+            finally:
+                frappe.destroy()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            feedback_results = list(pool.map(lambda _index: submit_feedback(), range(2)))
+        frappe.db.rollback()
+        self.assertEqual(sum(not result['idempotent'] for result in feedback_results), 1)
+        self.assertTrue(all(result['submitted'] for result in feedback_results))
+        self.assertTrue(trust.submit_session_feedback(appointment, 5)['idempotent'])
+        self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_appointment_event WHERE appointment=%s AND event_type='PatientSessionExperienceSubmitted'", (appointment,)).n, 1)
+        with self.assertRaises(frappe.ValidationError):
+            trust.submit_session_feedback(appointment, 4)
+        with self.assertRaises(frappe.ValidationError):
+            trust.submit_session_feedback(appointment, 6)
+        fixtures.login('p2')
+        with self.assertRaises(frappe.PermissionError):
+            trust.submit_session_feedback(appointment, 5)
+        fixtures.login('c1')
+        with self.assertRaises(frappe.PermissionError):
+            trust.submit_session_feedback(appointment, 5)
+        fixtures.login('p1')
+        clinician_id = journey.one('SELECT public_id FROM tt_profile WHERE user=%s',
+                                   (fixtures.USERS['c1'],)).public_id
+        public_profile = open_requests.clinician_profile(clinician_id)
+        metric = public_profile['trust_indicators']['session_experience']
+        self.assertEqual(metric['sample_count'], 1)
+        self.assertIsNone(metric['average'])
+        self.assertEqual(metric['status'], 'more_feedback_needed')
+        response_metric = public_profile['trust_indicators']['responsiveness']
+        self.assertEqual(response_metric['sample_count'], 0)
+        self.assertIsNone(response_metric['rate_percent'])
+        reliability_metric = public_profile['trust_indicators']['reliability']
+        self.assertEqual(reliability_metric['sample_count'], 1)
+        self.assertIsNone(reliability_metric['rate_percent'])
         fixtures.login('c1')
         presentation.save_note_draft(appointment, 'Amended private observation', 'New next steps')
         presentation.finalize_consultation(appointment, 0)
@@ -949,6 +997,59 @@ class Presentation(unittest.TestCase):
             self.assertEqual(int(journey.one('''SELECT COUNT(*) n FROM tt_journal
                 WHERE event_type='LegacyEventImported' AND
                 (event_ref='deposit:synthetic-unposted' OR event_ref LIKE 'booking:synthetic-unposted-%%')''').n), 6)
+        finally:
+            frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
+            frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
+
+    def test_07_legacy_wallet_mismatch_is_held_until_audited_decision(self):
+        from tele_tena import accounting
+        from tele_tena.patches.v1_13_financial_reconciliation_audit import audit_wallet
+        savepoint = 'tt_fin_audit_' + uuid.uuid4().hex[:16]
+        frappe.db.sql('SAVEPOINT ' + savepoint)
+        patient = fixtures.USERS['p1']
+        try:
+            wallet = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
+            journey.simulation_log(patient, 'Deposit', 1000, 'deposit:mismatch-test-' + uuid.uuid4().hex)
+            result = audit_wallet(patient)
+            self.assertFalse(result['matches'])
+            self.assertEqual(result['legacy']['available'], int(wallet.available) + 1000)
+            self.assertEqual(result['wallet']['available'], int(wallet.available))
+            self.assertEqual(accounting.balance('patient', patient, 'available'), int(wallet.available))
+            fixtures.login('p1')
+            with self.assertRaises(frappe.ValidationError):
+                journey.simulated_deposit(250, 'held-wallet-test-' + uuid.uuid4().hex)
+            after = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
+            self.assertEqual((after.available, after.reserved), (wallet.available, wallet.reserved))
+            with self.assertRaises(frappe.PermissionError):
+                accounting.financial_reconciliation_queue()
+            fixtures.login('admin')
+            queue = accounting.financial_reconciliation_queue()
+            self.assertIn(patient, [row.patient for row in queue])
+            accepted = accounting.accept_wallet_snapshot(patient, 'Synthetic review accepted current opening snapshot')
+            self.assertTrue(accepted['historical_difference_preserved'])
+            accounting.check_wallet_projection(patient, after)
+            audit = journey.one('''SELECT status,decision,reason FROM tt_financial_reconciliation
+                WHERE patient=%s''', (patient,))
+            self.assertEqual(audit.status, 'SnapshotAccepted')
+            self.assertIn('legacy_diff', audit.reason)
+
+            boundary_owner = 'boundary-' + uuid.uuid4().hex[:16] + '@example.invalid'
+            frappe.db.sql('INSERT INTO tt_wallet (patient,available,reserved) VALUES (%s,100,0)',
+                          (boundary_owner,))
+            account = accounting.account_id('patient', boundary_owner, 'available')
+            opening_ref = 'opening:' + boundary_owner
+            accounting.post(opening_ref, 'Opening', opening_ref,
+                            [(account, 0, 100), ('demo:opening-control', 100, 0)],
+                            {'source': 'synthetic exact-boundary test'})
+            journey.simulation_log(boundary_owner, 'Deposit', 100, 'deposit:boundary-test-' + uuid.uuid4().hex)
+            frappe.db.sql('''UPDATE tt_ledger SET created=(SELECT created FROM tt_journal WHERE event_ref=%s)
+                WHERE patient=%s ORDER BY id DESC LIMIT 1''', (opening_ref, boundary_owner))
+            boundary_result = audit_wallet(boundary_owner)
+            self.assertFalse(boundary_result['matches'])
+            boundary_case = journey.one('''SELECT status,boundary_event_count FROM tt_financial_reconciliation
+                WHERE patient=%s''', (boundary_owner,))
+            self.assertEqual(boundary_case.status, 'ReviewRequired')
+            self.assertEqual(int(boundary_case.boundary_event_count), 1)
         finally:
             frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)

@@ -428,8 +428,45 @@ def clinician_profile(clinician_id):
         JOIN `tabTele Tena Service` s ON s.name=o.service AND s.active=1
         JOIN tt_schedule schedule ON schedule.offering=o.id AND schedule.status='Published'
         WHERE o.clinician=%s AND o.active=1 ORDER BY s.service_label''', (clinician.user,))
+    from tele_tena.trust_metrics import (
+        summarize_clinician_cancellations,
+        summarize_response_behavior,
+        summarize_session_experience,
+    )
+    experience = one('''SELECT COUNT(*) sample_count,AVG(rating) mean_rating
+        FROM tt_session_feedback WHERE clinician=%s
+        AND created_at>=UTC_TIMESTAMP(6)-INTERVAL 365 DAY''', (clinician.user,))
+    response = one('''SELECT COUNT(DISTINCT rr.request_id) presented_count,
+        COUNT(DISTINCT CASE WHEN offer.request_id IS NOT NULL THEN rr.request_id END) offered_count
+        FROM tt_request_recipient rr
+        JOIN tt_open_request r ON r.id=rr.request_id AND r.urgency='immediate'
+        LEFT JOIN tt_request_offer offer ON offer.request_id=rr.request_id
+            AND offer.clinician=rr.clinician AND offer.created_at>=rr.inbox_fetched_at
+        WHERE rr.clinician=%s AND rr.inbox_fetched_at IS NOT NULL
+          AND rr.inbox_fetched_at>=UTC_TIMESTAMP(6)-INTERVAL 90 DAY''', (clinician.user,))
+    reliability = one('''SELECT
+        SUM(CASE WHEN a.state='Completed' THEN 1 ELSE 0 END) completed_count,
+        SUM(CASE WHEN a.state='Cancelled' AND a.cancelled_by=%s THEN 1 ELSE 0 END) clinician_cancelled_count
+        FROM tt_appointment a
+        WHERE a.clinician=%s AND a.confirmed_at IS NOT NULL
+          AND ((a.state='Completed' AND EXISTS (
+                  SELECT 1 FROM tt_appointment_event e WHERE e.appointment=a.id
+                  AND e.event_type='Completed' AND e.created>=UTC_TIMESTAMP(6)-INTERVAL 365 DAY))
+            OR (a.state='Cancelled' AND a.cancelled_by=%s
+                AND a.cancelled_at>=UTC_TIMESTAMP(6)-INTERVAL 365 DAY))''',
+        (clinician.user, clinician.user, clinician.user))
     return {'display_name': clinician.display_name, 'services': services,
-            'approval_meaning': 'Application and listed service scopes are manually approved.'}
+            'approval_meaning': 'Application and listed service scopes are manually approved.',
+            'trust_indicators': {
+                'credential_status': 'Manually reviewed application and listed scopes',
+                'relevant_expertise': 'See the approved service scopes above',
+                'responsiveness': summarize_response_behavior(
+                    response.presented_count, response.offered_count),
+                'reliability': summarize_clinician_cancellations(
+                    reliability.completed_count, reliability.clinician_cancelled_count),
+                'session_experience': summarize_session_experience(
+                    experience.sample_count, experience.mean_rating),
+            }}
 
 
 @query()
@@ -538,7 +575,10 @@ def acknowledge_inbox_fetch(request_ids):
         recipient = rows('''SELECT rr.wave,rr.inbox_fetched_at FROM tt_request_recipient rr
             JOIN tt_open_request r ON r.id=rr.request_id
             WHERE rr.request_id=%s AND rr.clinician=%s AND r.state='Open' AND r.expires_at>UTC_TIMESTAMP(6)
-            FOR UPDATE''', (request_id, clinician))
+              AND (r.urgency<>'immediate' OR EXISTS (
+                  SELECT 1 FROM tt_clinician_request_presence pr WHERE pr.clinician=%s
+                  AND pr.ready=1 AND pr.expires_at>UTC_TIMESTAMP(6)))
+            FOR UPDATE''', (request_id, clinician, clinician))
         if recipient and not recipient[0].inbox_fetched_at:
             frappe.db.sql('''UPDATE tt_request_recipient SET inbox_fetched_at=UTC_TIMESTAMP(6)
                 WHERE request_id=%s AND clinician=%s AND inbox_fetched_at IS NULL''', (request_id, clinician))

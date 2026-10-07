@@ -2,7 +2,7 @@
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const base = 'http://127.0.0.1:8017';
+const base = process.env.TELE_TENA_BROWSER_BASE || 'http://127.0.0.1:8017';
 const output = '/tmp/tele-tena-hosted-phone-review';
 fs.mkdirSync(output, {recursive:true});
 (async()=>{

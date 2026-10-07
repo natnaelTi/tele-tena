@@ -102,9 +102,64 @@ def balance(kind, owner, bucket):
 
 
 def check_wallet_projection(patient, wallet):
+    review = frappe.db.sql('''SELECT status FROM tt_financial_reconciliation
+        WHERE patient=%s''', (patient,), as_dict=True)
+    if review and review[0].status == 'ReviewRequired':
+        frappe.local.response['tele_tena_error'] = 'financial_reconciliation_required'
+        frappe.throw('Balance requires authorized financial review before this action',
+                     frappe.ValidationError)
     if balance('patient', patient, 'available') != int(wallet.available) or balance('patient', patient, 'reserved') != int(wallet.reserved):
         frappe.local.response['tele_tena_error'] = 'financial_reconciliation_required'
         frappe.throw('Balance needs authorized reconciliation before this action', frappe.ValidationError)
+
+
+@frappe.whitelist()
+def financial_reconciliation_queue():
+    reviewer = frappe.session.user
+    if reviewer == 'Guest' or 'Tele Tena Approver' not in frappe.get_roles(reviewer):
+        frappe.throw('Authorized financial reviewer required', frappe.PermissionError)
+    return frappe.db.sql('''SELECT id,patient,legacy_available,legacy_reserved,
+        wallet_available,wallet_reserved,subledger_available,subledger_reserved,
+        event_count,unknown_event_count,boundary_event_count,status,reason,created
+        FROM tt_financial_reconciliation ORDER BY created LIMIT 200''', as_dict=True)
+
+
+@frappe.whitelist(methods=['POST'])
+def accept_wallet_snapshot(patient, reason):
+    """Explicitly authorize the current balanced opening snapshot for forward use.
+
+    This does not edit a wallet, erase legacy events, or create a balancing journal.
+    The unresolved historical difference remains visible in the audit record.
+    """
+    reviewer = frappe.session.user
+    if reviewer == 'Guest' or 'Tele Tena Approver' not in frappe.get_roles(reviewer):
+        frappe.throw('Authorized financial reviewer required', frappe.PermissionError)
+    from tele_tena.api.journey import text
+    reason = text(reason, 500)
+    frappe.db.sql('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    rows = frappe.db.sql('''SELECT * FROM tt_financial_reconciliation
+        WHERE patient=%s FOR UPDATE''', (patient,), as_dict=True)
+    if not rows:
+        frappe.throw('Financial reconciliation case unavailable', frappe.PermissionError)
+    item = rows[0]
+    wallet = frappe.db.sql('SELECT available,reserved FROM tt_wallet WHERE patient=%s FOR UPDATE',
+                           (patient,), as_dict=True)
+    if not wallet:
+        frappe.throw('Financial reconciliation case unavailable', frappe.PermissionError)
+    if (balance('patient', patient, 'available') != int(wallet[0].available) or
+            balance('patient', patient, 'reserved') != int(wallet[0].reserved)):
+        frappe.local.response['tele_tena_error'] = 'financial_reconciliation_required'
+        frappe.throw('Wallet and subledger must agree before authorizing the snapshot',
+                     frappe.ValidationError)
+    if item.status == 'SnapshotAccepted':
+        return {'status': item.status, 'idempotent': True}
+    if item.status != 'ReviewRequired':
+        frappe.throw('Financial reconciliation case is not reviewable', frappe.ValidationError)
+    frappe.db.sql('''UPDATE tt_financial_reconciliation SET status='SnapshotAccepted',
+        reviewed_by=%s,decision='AcceptCurrentSnapshot',decision_reason=%s,
+        decided_at=UTC_TIMESTAMP(6),modified=UTC_TIMESTAMP(6) WHERE id=%s''',
+        (reviewer, reason, item.id))
+    return {'status': 'SnapshotAccepted', 'historical_difference_preserved': True}
 
 
 def totals(kind, owner, buckets):

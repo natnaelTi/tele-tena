@@ -56,6 +56,13 @@ export const en = {
   adultRequired: 'Confirm that you are 18 or older to continue.', clinicianActivationPending: 'Phone verification is not professional approval. An administrator must approve your application and separately provision clinician access and service scopes.',
   navLabel:'Your workspace', navProfile:'Profile and privacy', navCare:'Find care', navPractice:'Practice setup', navApprovals:'Applications and approvals', navCatalog:'Service catalog', navAppointments:'Appointments', timezoneLabel:'Times shown in', simulationLabel:'Demonstration only · simulated funds', workspacePatient:'Patient workspace', workspaceClinician:'Clinician workspace', workspaceApplicant:'Clinician application', workspaceAdmin:'Administrator workspace', loadingError:'Some information could not be loaded. Refresh to try again.',
   'Copy patient booking link':'Copy patient booking link', 'Patient booking link':'Patient booking link', 'Booking link copied.':'Booking link copied.', 'Copy the link from the field below.':'Copy the link from the field below.',
+  'A TeleTena update is ready. Refresh when you have finished what you’re doing.':'A TeleTena update is ready. Refresh when you have finished what you’re doing.', 'Refresh to update':'Refresh to update', 'Dismiss update notice':'Dismiss update notice', 'Later':'Later',
+  sessionExperience:'How was your session?', sessionExperienceExplainer:'Share your experience of this session. This is not a rating of clinical outcomes.', sessionExperienceScale:'Rate your experience from 1 (not positive) to 5 (very positive).', submitSessionFeedback:'Send feedback', feedbackSubmitted:'Thank you. Your session feedback was recorded.',
+  sessionExperienceNew:'New to TeleTena', sessionExperienceMore:'More feedback needed', sessionExperienceMetric:'Session experience', sessionExperienceNotMeasured:'Not yet measured',
+  trustIndicators:'Trust indicators', professionalReview:'Professional review', manuallyReviewedScopes:'Application and each listed service scope are manually reviewed.', approvedScope:'Approved for this service', responseBehavior:'Response behavior', reliability:'Appointment reliability', evidenceCount:'sessions',
+  trustInsufficientData:'More data needed', immediateRequestsPresented:'immediate requests returned to the inbox', offersMade:'offers made', clinicianCancellations:'clinician-initiated cancellations',
+  completedAndCancelledSessions:'completed or clinician-cancelled sessions', offerResponseRate:'received an offer',
+  noRequestHistory:'No eligible requests presented yet', noAppointmentHistory:'No completed or clinician-cancelled sessions yet',
 } as const
 export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
@@ -104,6 +111,13 @@ export const am: Record<Key, string> = {
   adultRequired:'ለመቀጠል 18 ዓመት ወይም ከዚያ በላይ መሆንዎን ያረጋግጡ።', clinicianActivationPending:'ስልክ ማረጋገጥ የሙያ ማጽደቅ አይደለም። አስተዳዳሪ ማመልከቻዎን ማጽደቅ እና የሐኪም መዳረሻን እና የአገልግሎት ፈቃዶችን በተለይ መስጠት አለበት።',
   navLabel:'የእርስዎ የሥራ ቦታ', navProfile:'መገለጫ እና ግላዊነት', navCare:'እንክብካቤ ፈልግ', navPractice:'የሙያ ቅንብር', navApprovals:'ማመልከቻዎች እና ማጽደቂያ', navCatalog:'የአገልግሎት ዝርዝር', navAppointments:'ቀጠሮዎች', timezoneLabel:'ጊዜዎቹ የሚታዩት በ', simulationLabel:'የማሳያ ብቻ · የተመሳሰለ ገንዘብ', workspacePatient:'የታካሚ የሥራ ቦታ', workspaceClinician:'የሐኪም የሥራ ቦታ', workspaceApplicant:'የሐኪም ማመልከቻ', workspaceAdmin:'የአስተዳዳሪ የሥራ ቦታ', loadingError:'አንዳንድ መረጃ መጫን አልተቻለም። እንደገና ለመሞከር ያድሱ፣',
   'Copy patient booking link':'የታካሚ ቀጠሮ አገናኝ ቅዳ', 'Patient booking link':'የታካሚ ቀጠሮ አገናኝ', 'Booking link copied.':'የቀጠሮ አገናኙ ተቀድቷል።', 'Copy the link from the field below.':'ከታች ካለው መስክ አገናኙን ይቅዱ።',
+  'A TeleTena update is ready. Refresh when you have finished what you’re doing.':'የTeleTena ዝማኔ ዝግጁ ነው። ያሉትን ሥራዎች ከጨረሱ በኋላ ገጹን ያድሱ።', 'Refresh to update':'ለማዘመን ገጹን ያድሱ', 'Dismiss update notice':'የዝማኔ ማሳወቂያውን ዝጋ', 'Later':'በኋላ',
+  sessionExperience:'የክፍለ ጊዜዎ ተሞክሮ እንዴት ነበር?', sessionExperienceExplainer:'የዚህን ክፍለ ጊዜ ተሞክሮ ያጋሩ። ይህ የሕክምና ውጤት ደረጃ አይደለም።', sessionExperienceScale:'ተሞክሮዎን ከ1 (ጥሩ አይደለም) እስከ 5 (በጣም ጥሩ) ይምረጡ።', submitSessionFeedback:'አስተያየት ላክ', feedbackSubmitted:'እናመሰግናለን። የክፍለ ጊዜ አስተያየትዎ ተመዝግቧል።',
+  sessionExperienceNew:'በTeleTena አዲስ', sessionExperienceMore:'ተጨማሪ አስተያየት ያስፈልጋል', sessionExperienceMetric:'የክፍለ ጊዜ ተሞክሮ', sessionExperienceNotMeasured:'ገና አልተለካም',
+  trustIndicators:'የእምነት መለኪያዎች', professionalReview:'የሙያ ግምገማ', manuallyReviewedScopes:'ማመልከቻውና የተዘረዘሩ የሙያ ፈቃዶች በተናጠል በሰው ይገመገማሉ።', approvedScope:'ለዚህ አገልግሎት ተፈቅዷል', responseBehavior:'ምላሽ መስጠት', reliability:'የቀጠሮ ታማኝነት', evidenceCount:'ክፍለ ጊዜዎች',
+  trustInsufficientData:'ተጨማሪ መረጃ ያስፈልጋል', immediateRequestsPresented:'ወደ መጠባበቂያ ሳጥኑ የተመለሱ ፈጣን ጥያቄዎች', offersMade:'የቀረቡ ጥቆማዎች', clinicianCancellations:'በሐኪም የተጀመሩ ስረዛዎች',
+  completedAndCancelledSessions:'የተጠናቀቁ ወይም በሐኪም የተሰረዙ ክፍለ ጊዜዎች', offerResponseRate:'ጥቆማ የተቀረበላቸው',
+  noRequestHistory:'ገና ብቁ የሆኑ ጥያቄዎች አልቀረቡም', noAppointmentHistory:'ገና የተጠናቀቁ ወይም በሐኪም የተሰረዙ ክፍለ ጊዜዎች የሉም',
 }
 export const om: Record<Key, string> = {
   sessionLifecycle:'Haala marii', mediaStatus:'Walqunnamtii miidiyaa', callNotConnected:'Hin wal qabamne', callToggleError:'Mikirofoonii ykn kaameraa jijjiiruun hin milkoofne. Hayyama meeshaalee ilaalii irra deebiʼi yaali.',
@@ -148,5 +162,12 @@ export const om: Record<Key, string> = {
   adultRequired:'Itti fufuuf umuriin kee waggaa 18 ykn isaa ol taʼuu mirkaneessi.', clinicianActivationPending:'Bilbila mirkaneessuun hayyama ogummaa miti. Bulchaan iyyata kee raggaasisee hayyama ogeessaa fi tajaajilaa addaan kennuu qaba.',
   navLabel:'Bakka hojii kee', navProfile:'Ibsaa fi iccitii', navCare:'Tajaajila barbaadi', navPractice:'Qophii hojii', navApprovals:'Iyyata fi raggaasisa', navCatalog:'Tarree tajaajilaa', navAppointments:'Beellamoota', timezoneLabel:'Yeroon kun naannoo saʼaatii kana keessa', simulationLabel:'Agarsiisa qofa · maallaqa fakkeeffame', workspacePatient:'Bakka hojii dhukkubsataa', workspaceClinician:'Bakka hojii ogeessaa', workspaceApplicant:'Iyyata ogeessa fayyaa', workspaceAdmin:'Bakka hojii bulchaa', loadingError:'Odeeffannoon tokko tokko hin feʼamne. Haaromsuun irra deebiʼi yaali.',
   'Copy patient booking link':'Geessituu beellama dhukkubsataa waraabi', 'Patient booking link':'Geessituu beellama dhukkubsataa', 'Booking link copied.':'Geessituun beellamaa waraabameera.', 'Copy the link from the field below.':'Geessituu dirree armaan gadii irraa waraabi.',
+  'A TeleTena update is ready. Refresh when you have finished what you’re doing.':'Fooyyaʼinsi TeleTena qophaaʼeera. Hojii kee erga xumurte booda fuula haaromsi.', 'Refresh to update':'Fooyyaʼuuf fuula haaromsi', 'Dismiss update notice':'Beeksisa fooyyaʼinsaa cufi', 'Later':'Booda',
+  sessionExperience:'Muuxannoon marii kee akkam ture?', sessionExperienceExplainer:'Muuxannoo marii kanaa qoodi. Kun madaallii buʼaa yaalaa miti.', sessionExperienceScale:'Muuxannoo kee 1 (gaarii miti) irraa hanga 5 (baayʼee gaarii)tti filadhu.', submitSessionFeedback:'Yaada ergi', feedbackSubmitted:'Galatoomi. Yaadni muuxannoo marii kee galmaaʼeera.',
+  sessionExperienceNew:'TeleTena irratti haaraa', sessionExperienceMore:'Yaadni dabalataa barbaachisa', sessionExperienceMetric:'Muuxannoo marii', sessionExperienceNotMeasured:'Hanga ammaatti hin safaramne',
+  trustIndicators:'Agarsiistota amanamummaa', professionalReview:'Gamaaggama ogummaa', manuallyReviewedScopes:'Iyyannoon fi tajaajiloonni tarreeffaman tokkoon tokkoon isaanii namaan gamaaggamamu.', approvedScope:'Tajaajila kanaaf hayyamame', responseBehavior:'Amala deebii kennuu', reliability:'Amanamummaa beellamaa', evidenceCount:'marii',
+  trustInsufficientData:'Odeeffannoo dabalataa barbaachisa', immediateRequestsPresented:'gaaffii ariifachiisaa sanduuqa keessatti agarsiifaman', offersMade:'dhiyeessiiwwan godhaman', clinicianCancellations:'haquu ogeessi jalqabe',
+  completedAndCancelledSessions:'marii xumurame ykn ogeessi haqe', offerResponseRate:'dhiyeessii argatan',
+  noRequestHistory:'Hanga ammaatti gaaffiin ulaagaa guute hin dhiyaanne', noAppointmentHistory:'Hanga ammaatti mariin hin xumuramne ykn ogeessi hin haqne',
 }
 export const locales = { en, am, om }
