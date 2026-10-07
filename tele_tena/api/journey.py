@@ -147,11 +147,33 @@ def disclosure(p, request_text, selected):
     return result
 
 
+def _clinic_workspace_available(user):
+    # Clinic navigation is a convenience hint only. Every clinic API still
+    # checks its own membership role and verified-clinic state.
+    return bool(frappe.db.sql('''
+        SELECT 1 FROM `tabTele Tena Clinic Membership` m
+        JOIN `tabTele Tena Clinic` c ON c.name=m.clinic
+        WHERE m.member_user=%s AND m.status='Active'
+          AND m.membership_role IN ('Clinic Manager','Scheduling')
+          AND c.status='Verified'
+        UNION ALL
+        SELECT 1 FROM `tabTele Tena Clinic` c
+        WHERE c.submitted_by=%s AND c.status='Verified'
+        UNION ALL
+        SELECT 1 FROM `tabTele Tena Clinic Membership` m
+        JOIN `tabTele Tena Clinic` c ON c.name=m.clinic
+        JOIN tt_contact_identity i ON i.channel='email' AND i.contact=m.invite_email
+          AND i.user=%s AND i.verified_at IS NOT NULL
+        WHERE m.status='Invited' AND c.status='Verified'
+        LIMIT 1''', (user, user, user)))
+
+
 @query()
 def session():
     user = actor()
     p = rows('SELECT * FROM tt_profile WHERE user=%s', (user,))
     return {'user': user, 'roles': frappe.get_roles(user), 'profile': p[0] if p else None,
+            'clinic_workspace': _clinic_workspace_available(user),
             'csrf_token': get_csrf_token(), 'simulation': simulation_enabled()}
 
 

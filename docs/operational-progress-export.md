@@ -1,93 +1,71 @@
-## Current local checkpoint — 2026-10-07
+# TeleTena operational progress export
 
-- Source branch `fix/session-feedback-translations`, commit
-  `1e2f8c00f6d354e27f99ac1d924e5476abc4cbe4`, is a dependent review branch
-  based on the open PR #19 head `8d4e70606c5785dcb0dabb94f445aca4290dec8a`.
-  No merge or remote deployment occurred.
-- The isolated built preview is `http://127.0.0.1:8017/teletena/` on site
-  `tele-tena-pr12-fresh.localhost`. Frappe serves the packaged React app; the
-  asset manifest's frontend source SHA is the feature commit above. Scheduler
-  remains disabled for this site; shared bench worker services were untouched.
-- Fixed translation-key rendering on finalized patient-session feedback and
-  public clinician trust indicators. `npm run build`, `build_review.py`,
-  `check_review_assets.py`, `tests/presentation.py` (23/23), and
-  `tests/trust_metrics.py` (4/4) passed. Built-browser feedback persisted one
-  synthetic 5/5 response through reload without exposing the private note.
-- Screenshots are in `docs/screenshots/session-feedback/`. This is one
-  localized acceptance correction, not completion of the full 142-screen/
-  14-journey design inventory. Live SMS, device media, native-language review,
-  scheduler execution, fresh install/migration preservation, and multiple
-  planned clinical and partner workflows remain unverified or unimplemented.
+Sanitized local development checkpoint for roadmap updates. This is not a merge,
+deployment, real-patient-readiness, or real-money claim.
 
-# Current operational checkpoint — 2026-10-07
+## Current source and preview
 
-## Clinic affiliation subflow — 2026-10-07
+- Worktree: draft PR #21 at head `6474a3c4a66d814da916f1de6d4623fb46642f66`,
+  branch `feat/clinic-staff-workspace`, based on open PR #20 head branch
+  `fix/session-feedback-translations`. PR #20 remains open. PR #21 CI passes on
+  Node 22/24 and Python 3.12/3.14.2. No branches were force-pushed, merged, or
+  deployed.
+- Local review URL: `http://127.0.0.1:8017/teletena/`, site
+  `tele-tena-pr12-fresh.localhost`, Bench
+  `/home/frappe/frappe/frappe-bench`. The app is production-built and served by
+  the dedicated Gunicorn process; it is not Vite. `release.json` identifies the
+  clean build source checkout `66834eb4be4b282311ef33f5166458bcf7fbd659`. The
+  backend checkout is the same working tree; its isolated preview workers were
+  gracefully reloaded.
+- Local framework tested: Frappe 15.121.2 / ERPNext 15.121.6, Python 3.12.3,
+  Node 22.23.3. The review site's scheduler is disabled. Shared Bench workers,
+  scheduler, original `erp.localhost`, and remote Selfmade were not changed.
 
-The focused branch `feat/clinic-affiliation-review` continues from
-`feat/previous-clinicians`. On disposable Frappe 15, presentation API tests
-passed 22/22, OTP state-machine tests passed 7/7 with a mocked mail provider
-and enabled-registration test fixture, and a built `/teletena/` browser journey
-passed clinic and affiliation human-review workflows. The local preview is
-`http://127.0.0.1:8017/teletena/`, site `tele-tena-pr12-fresh.localhost`; both
-backend and production asset source match this branch. No live email/SMS was
-sent. The branch remains partial: clinic staff/workspace/resource/billing and
-encounter-grant operations, Frappe 16 compatibility, and responsive/native
-language evidence remain outstanding. This checkpoint does not claim the wider
-screen/product inventory complete.
+## Verified work in this checkpoint
 
-The exact production asset source is recorded as
-`8e3a298bdc3f2624cdf0fb5d256fc469177fea36`; the branch's later commits only
-update tests and verification documents, with no app source change.
+- Clinic encounter schedule grants: patient consent is bound to one future
+  booked encounter and one verified clinic affiliated with the treating
+  clinician. The clinic receives a minimal scheduling projection only;
+  membership, appointment, and generic DocType checks remain server-enforced.
+  Patient grant/reload/revoke passed in the built browser app. Backend
+  `tests/presentation.py` passed 24/24, including membership-role boundaries,
+  another-patient denial, exact projection fields, idempotency, and revocation.
+- Clinic staff entry: authenticated session includes a navigation hint for a
+  verified invitation, verified clinic owner, or active Clinic Manager/Scheduling
+  membership. `/clinic` is guarded by that hint; all data APIs independently
+  authorize each operation. Billing membership does not qualify. The browser
+  journey passed clinic submit → reviewer verification → manager invite →
+  verified invitee acceptance → `/clinic` workspace → audited revocation.
+  Width checks passed at 320, 390, 768, and 1440 CSS px. A 320px overflow caused
+  by long invitation email text was found and fixed. Screenshots are in
+  `docs/screenshots/clinic-staff-workspace/` and
+  `docs/screenshots/clinic-encounter-access/`.
+- `npm run build`, `npm run lint` (exit 0; existing React warnings),
+  `scripts/build_review.py`, `scripts/check_review_assets.py`, the 24-case Frappe
+  presentation suite, browser clinic flow, and controlled PWA update check
+  passed. Vite retains its LiveKit bundle-size advisory. The hosted LiveKit
+  two-party End/revocation suite was not rerun in this clinic-only slice.
 
-The presentation/integration regressions now pass 22/22 and 24/24 respectively;
-integration temporarily enabled only this disposable site's signup flags,
-restored invited-review mode, and mocked SMS. The test site's scheduler remains
-disabled and no site-isolated worker runs, so queued financial release/routing
-is not represented as operational.
+## Full approved scope remains active
 
-## Later dependent branch checkpoint
+The 142-screen acceptance map is `docs/operational-screen-map.json`; statuses
+are evidence states, not assumptions from UI presence. Current work is a partial
+clinic slice. Clinic calendars/resources, clinic billing, dedicated clinic team
+routes, clinic-wide or broader clinical-record access, couples/family, lab and
+diagnostics workflows, subscriptions, second opinions, medical tourism,
+extensions, complete administrator operations, and whole-product visual
+acceptance remain incomplete. See `docs/mvp-delivery-tracker.md` and the
+per-screen evidence.
 
-Current source is `fb58ab13815bd3cc16b9e12675c6f6e2474967a1` on
-`feat/previous-clinicians`; draft PR #17 depends on PR #16 at
-`503a39df2993cbced46ea067cef97917bac8bcf8`. The browser code and patient-only
-query for returning clinicians are implemented. PR #17 CI passed. The
-Frappe-backed regression and matching local `/teletena/` preview remain pending.
-The original Frappe 15 site was preserved and not migrated. Port 8017 is still
-the separate Frappe 16 compatibility WSGI app and does not serve this checkout.
+The isolated site's scheduler remains off, so scheduled earnings release and
+background request routing are not claimed operational. A fresh-site install
+for the clinic DocTypes is pending. The scoped setup helper now targets a new
+disposable database, but local `sudo -n` is unavailable; the operator must run
+`python3 /home/frappe/frappe/frappe-bench/apps/tele_tena/scripts/prepare_fresh_install_db_admin.py`
+in WSL to authorize that setup. The previous temporary scoped database account
+and file were removed; existing review-site records were preserved.
 
-This current section supersedes the historical checkpoint below. Do not use its old source SHA as the current release.
-
-- Current implementation branch: `feat/teletena-operational-completion`; draft PR #16 targets PR #15’s integration branch and retains PR #12–#15 ancestry. It is pushed for review but remains unmerged; no remote deployment occurred.
-- Added one immutable 1–5 patient session-experience rating after an ended and explicitly finalized encounter. Same-payload retry is idempotent; changed retry, premature feedback, other-patient access, clinician access, and concurrent duplicate submissions have regression assertions. Public clinician profiles expose a rolling 365-day experience aggregate, a 90-day offer response rate for immediate requests actually fetched while availability is fresh, and a 365-day clinician-attributed cancellation rate. Each metric has separate evidence counts and hides rates below five observations. Patient cancellations, unconfirmed holds, and unsupported no-shows are not attributed to clinicians. These are operational/experience indicators, not clinical competence or outcome evidence. See `session-experience-metric.md`.
-- Added v1.14 migration/bootstrap, migration-preservation and fresh-install assertions, English/Amharic/Afaan Oromo provisional UI strings, and focused backend regression assertions. Pure metric tests pass (4/4), Python compile, TypeScript/Vite build, and lint pass; lint retains existing React warnings. Frappe query/migration/browser verification has not run.
-- Dependent branch `feat/previous-clinicians` adds a patient-only returning-care query and dashboard cards, limited to the signed-in patient's own completed appointments and clinicians who currently have an approved scope and published schedule. It exposes only the clinician's opaque public profile key and display name; no other patient's history is linked. An integration regression covers patient isolation and clinician denial but is pending a disposable Frappe site.
-- The latest source still has no isolated disposable site: `/tmp/tele-tena-pr12-db-admin.json` and `sites/tele-tena-pr12-fresh.localhost` are absent. Frappe migration/integration/browser assertions for this feature have not run. There is no current-source preview URL. The existing port 8017 process is the older Frappe 16 compatibility checkout and is not valid for this branch.
-- `docs/operational-screen-map.json` still covers 142 screens/14 journeys; E12 and F12 moved from Designed to Implemented, verification pending. This is not full acceptance. Clinic, couples, laboratory/diagnostics, subscriptions, second opinions, medical tourism, feedback moderation, and other designed screens remain incomplete or externally gated as recorded in the map/tracker.
-- No live SMS, physical-device, clinical/native translation, provider settlement, remote Selfmade update, or production-care acceptance is claimed.
-
-## Historical checkpoint — superseded source
-
-This is a concise, sanitized progress export for roadmap updates. It is not a release or deployment claim.
-
-- Repository: `natnaelTi/tele-tena`.
-- Local branch: `feat/teletena-operational-completion`, current source commit `c621b2fa63b33b09e7febfd3fb0785f49cb5d520`, based on open draft PR #15 head `3e0965c5fdf6485d945756b382c0a3c008450058`; ancestry includes open PR #14 → #13 → #12. PR #11 is separately open. No merge/deploy occurred.
-- Active original WSL Bench: `/home/frappe/frappe/frappe-bench`; site `erp.localhost`; Frappe 15.121.2 / ERPNext 15.121.6 / Python 3.12.3 / Node 22.23.3. The site was backed up before changes and has not been migrated. Existing web/worker processes remain untouched.
-- Extracted design: `/home/frappe/teletena-design-reference`; inventory contains 142 screens/14 journeys. It is a visual source, not an operational product.
-- PR #15 adds the two-sided hero, real request progress, clinician-owned paginated offer history, disclosure-safe patient labels, accepted appointment handoff and offer withdrawal. Current local Frappe integration assertions are pending.
-- Added v1.13 financial mismatch audit/hold code and an additive review decision. It preserves source wallet/events and blocks affected wallet writes pending explicit review. The code has compile/unit coverage only until a disposable Frappe site can be migrated.
-- Began token/font port to the extracted blue–teal/Inter direction; self-hosted Inter is locally licensed and Noto Sans Ethiopic remains. Built React compilation succeeds, but no current Frappe-served visual/browser acceptance has occurred on this feature worktree.
-- Static results: `tests/review_package.py` 9/9; `offer_status_unit.py` 4/4; `hosted_phone_unit.py` 4/4; `dependency_checkpoint.py` 3/3; frontend `npm run build` passes (large LiveKit bundle warning); frontend `npm run lint` exits 0 with pre-existing React warnings; Python compile and `git diff --check` pass.
-- Current non-destructive database inspection found one preserved patient wallet whose event projection differs by 1,800 minor units. No financial record was altered. v1.13 is intended to preserve and hold it, pending migration verification.
-- No current `/teletena/` preview matching this branch has been started. The older port-8000 root app and Frappe-16 port-8017 preview are different source/site combinations and must not be used to review this branch.
-
-## External gates
-
-No live SMS/SMTP delivery, physical-device media, native language approval, clinical credential validation, laboratory/clinic partner integration, real custody/provider settlement, remote Selfmade update, or production clinical-readiness claim is made.
-
-## Next verification actions
-
-1. Run the disposable fresh-install and registration-mode check, retaining that new disposable site only after a successful check.
-2. Run the Frappe 15 integration, presentation, vetting/routing and migration-preservation tests on that disposable site.
-3. Exercise the actual built `/teletena/` app and availability/request/booking journeys on the matching backend.
-4. Verify owner-by-owner subledger reconciliation, then start only workers/scheduler isolated to that preview site.
-5. Continue approved batches and update screen-level statuses only with concrete browser/API evidence.
+SMS/SMPP/email provider delivery, physical-device calling, native Amharic/Afaan
+Oromo approval, clinical/legal approval, partner integrations, real custody or
+settlement, Frappe 16 compatibility for the latest clinic addition, and Selfmade
+installation remain separate gates.

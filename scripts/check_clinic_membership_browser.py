@@ -12,7 +12,7 @@ if not SITE.startswith('tele-tena-') or not SITE.endswith('.localhost'):
     raise SystemExit('Set TELE_TENA_TEST_SITE to the isolated synthetic review site.')
 SITE_PATH = BENCH / 'sites' / SITE
 SEED = json.loads((SITE_PATH / 'private' / 'tele_tena_review_seed.json').read_text())
-patient = SEED['users']['patient']
+invitee = SEED['users'].get('calendarpatient', SEED['users']['patient'])
 
 os.chdir(BENCH / 'sites')
 sys.path.insert(0, str(BENCH / 'apps' / 'frappe'))
@@ -23,13 +23,13 @@ try:
     frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
     frappe.connect()
     exists = frappe.db.exists('tt_contact_identity', {
-        'channel': 'email', 'contact': patient, 'user': patient,
+        'channel': 'email', 'contact': invitee, 'user': invitee,
     })
     if not exists:
         # This temporary synthetic fixture represents an already verified
         # account contact; it does not bypass any HTTP endpoint or OTP policy.
         frappe.db.sql('''INSERT INTO tt_contact_identity(channel,contact,user,verified_at)
-            VALUES ('email',%s,%s,NOW(6))''', (patient, patient))
+            VALUES ('email',%s,%s,NOW(6))''', (invitee, invitee))
         frappe.db.commit()
         created_identity = True
     frappe.destroy()
@@ -51,6 +51,6 @@ finally:
         frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
         frappe.connect()
         frappe.db.sql('''DELETE FROM tt_contact_identity
-            WHERE channel='email' AND contact=%s AND user=%s''', (patient, patient))
+            WHERE channel='email' AND contact=%s AND user=%s''', (invitee, invitee))
         frappe.db.commit()
         frappe.destroy()

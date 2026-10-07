@@ -10,9 +10,15 @@ from pathlib import Path
 import secrets
 import subprocess
 
-USER = 'tt_pr12_site_admin'
-DATABASE = 'teletenapr12fresh'
-CREDENTIALS = Path('/tmp/tele-tena-pr12-db-admin.json')
+# This dedicated test database/site must never alias the retained review site.
+USER = os.environ.get('TELE_TENA_DB_ADMIN_USER', 'tt_clinic_access_admin')
+DATABASE = os.environ.get('TELE_TENA_FRESH_DB', 'teletenaclinicaccessfresh')
+SITE = os.environ.get('TELE_TENA_FRESH_SITE', 'tele-tena-clinic-access-fresh.localhost')
+CREDENTIALS = Path(os.environ.get('TELE_TENA_DB_CREDENTIALS', '/tmp/tele-tena-clinic-access-db-admin.json'))
+if not SITE.endswith('.localhost') or SITE == os.environ.get('TELE_TENA_RETAINED_SITE', 'erp.localhost'):
+    raise SystemExit('Disposable fresh-site name must be a distinct localhost site')
+if not DATABASE.replace('_', '').isalnum():
+    raise SystemExit('Disposable database name is invalid')
 
 if os.geteuid() == 0:
     raise SystemExit('Run as the normal Linux user, not root')
@@ -41,4 +47,4 @@ except Exception:
                    text=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     raise
 
-print('Created temporary localhost database access. Run scripts/check_fresh_install.py; it removes the account and mode-600 credential file.')
+print('Created temporary localhost database access for the disposable fresh-install site. Run scripts/check_fresh_install.py with the same site/database environment; it removes the account and mode-600 credential file.')

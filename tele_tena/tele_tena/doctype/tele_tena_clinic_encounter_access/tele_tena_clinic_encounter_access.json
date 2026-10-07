@@ -1,0 +1,32 @@
+{
+  "doctype": "DocType",
+  "name": "Tele Tena Clinic Encounter Access",
+  "module": "Tele Tena",
+  "autoname": "hash",
+  "title_field": "clinic",
+  "search_fields": "clinic,appointment,status",
+  "fields": [
+    {"fieldname":"clinic","label":"Clinic","fieldtype":"Link","options":"Tele Tena Clinic","reqd":1,"in_list_view":1},
+    {"fieldname":"appointment","label":"Appointment","fieldtype":"Data","reqd":1},
+    {"fieldname":"patient","label":"Patient","fieldtype":"Link","options":"User","reqd":1},
+    {"fieldname":"clinician","label":"Treating Clinician","fieldtype":"Link","options":"User","reqd":1},
+    {"fieldname":"purpose","label":"Access Purpose","fieldtype":"Select","options":"Scheduling coordination","default":"Scheduling coordination","reqd":1},
+    {"fieldname":"status","label":"Status","fieldtype":"Select","options":"Active\nRevoked","default":"Active","reqd":1,"in_list_view":1},
+    {"fieldname":"granted_by","label":"Granted By","fieldtype":"Link","options":"User","read_only":1},
+    {"fieldname":"granted_at","label":"Granted At","fieldtype":"Datetime","read_only":1},
+    {"fieldname":"expires_at","label":"Expires At","fieldtype":"Datetime","read_only":1},
+    {"fieldname":"revoked_by","label":"Revoked By","fieldtype":"Link","options":"User","read_only":1},
+    {"fieldname":"revoked_at","label":"Revoked At","fieldtype":"Datetime","read_only":1},
+    {"fieldname":"revocation_reason","label":"Revocation Reason","fieldtype":"Small Text","read_only":1}
+  ],
+  "permissions": [
+    {"role":"Tele Tena Patient","read":1,"write":1,"create":1},
+    {"role":"Tele Tena Clinician","read":1},
+    {"role":"Tele Tena Approver","read":1}
+  ],
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "allow_rename": 0,
+  "sort_field": "granted_at",
+  "sort_order": "DESC"
+}

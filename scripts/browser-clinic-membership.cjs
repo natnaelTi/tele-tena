@@ -11,12 +11,15 @@ const marker = JSON.parse(fs.readFileSync(path.join(site, 'private/tele_tena_rev
 const passwords = JSON.parse(fs.readFileSync(path.join(site, 'private/tele_tena_review_accounts.json')));
 const app = (process.env.TELE_TENA_BROWSER_ORIGIN || 'http://127.0.0.1:8017') + '/teletena';
 const screenshots = path.resolve('docs/screenshots/clinic-membership');
+const workspaceScreenshots = path.resolve('docs/screenshots/clinic-staff-workspace');
 const clinicName = 'Synthetic membership clinic ' + Date.now();
-const inviteEmail = marker.users.patient;
+const inviteEmail = marker.users.calendarpatient || marker.users.patient;
 let checkpoint = 'launch';
 
 async function signIn(page, user) {
   await page.goto(app + '/sign-in');
+  const emailAlternative = page.getByRole('button', { name: 'Use email instead', exact: true });
+  if (await emailAlternative.count()) await emailAlternative.click();
   await page.getByLabel('Email', { exact: true }).waitFor();
   await page.getByLabel('Email', { exact: true }).fill(user);
   await page.getByLabel('Password', { exact: true }).fill(passwords[user]);
@@ -40,6 +43,7 @@ async function switchUser(page, user) {
         console.log('Clinic API', url.pathname.split('.').pop(), response.status());
     });
     fs.mkdirSync(screenshots, { recursive: true });
+    fs.mkdirSync(workspaceScreenshots, { recursive: true });
 
     checkpoint = 'clinician clinic registration';
     console.log('Browser checkpoint: clinician registration');
@@ -84,20 +88,27 @@ async function switchUser(page, user) {
 
     checkpoint = 'verified invitee acceptance';
     console.log('Browser checkpoint: invitee acceptance');
-    await switchUser(page, marker.users.patient);
+    await switchUser(page, inviteEmail);
     await page.goto(app + '/patient/clinic-access');
     const invitationCard = page.locator('.clinic-review-card').filter({ has: page.getByRole('heading', { name: clinicName }) });
     await invitationCard.getByRole('button', { name: 'Accept invitation' }).click();
     const membershipSection = page.locator('.clinic-record-section').filter({ has: page.getByRole('heading', { name: 'Your clinic memberships' }) });
     const acceptedRow = membershipSection.locator('.clinic-record-row').filter({ hasText: clinicName });
     await acceptedRow.getByText('Active', { exact: true }).waitFor();
+    checkpoint = 'role-scoped clinic workspace navigation';
+    await page.getByRole('link', { name: 'Clinic workspace', exact: true }).click();
+    await page.getByRole('heading', { name: 'Clinic workspace', exact: true }).waitFor();
+    assert.match(page.url(), /\/teletena\/clinic$/);
+    await page.reload();
+    await page.getByRole('heading', { name: 'Clinic workspace', exact: true }).waitFor();
+    await page.getByRole('heading', { name: 'Your clinic memberships', exact: true }).waitFor();
     for (const width of [320, 390, 768, 1440]) {
-      checkpoint = 'invitee responsive width ' + width;
+      checkpoint = 'clinic workspace responsive width ' + width;
       await page.setViewportSize({ width, height: 900 });
       const pageWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       assert.ok(pageWidth <= width, 'Unexpected horizontal page overflow at ' + width + 'px');
       if (width === 390 || width === 1440)
-        await membershipSection.screenshot({ path: path.join(screenshots, 'invitee-membership-' + width + '.png') });
+        await page.locator('.clinic-access-page').screenshot({ path: path.join(workspaceScreenshots, 'staff-workspace-' + width + '.png') });
     }
 
     checkpoint = 'manager revocation';
@@ -113,7 +124,7 @@ async function switchUser(page, user) {
     await activeTeam.locator('.clinic-record-row').filter({ hasText: 'Scheduling · Revoked' }).waitFor();
     await activeTeam.screenshot({ path: path.join(screenshots, 'manager-revocation.png') });
 
-    console.log('PASS: built Frappe clinic registration → reviewer verification → manager invite → verified patient acceptance → manager revocation. Synthetic screenshots: ' + screenshots);
+    console.log('PASS: built Frappe clinic registration → reviewer verification → manager invite → verified patient acceptance → membership-scoped clinic workspace → manager revocation. Synthetic screenshots: ' + screenshots);
   } finally {
     await browser.close();
   }

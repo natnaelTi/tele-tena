@@ -596,6 +596,10 @@ button:active {
 .clinic-record-row p {
   margin: 4px 0 0;
 }
+.clinic-record-row > div { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.clinic-record-row strong { overflow-wrap: anywhere; word-break: break-word; }
+.clinic-membership-history { margin-top: 12px; border-top: 1px solid var(--border-default); }
+.clinic-membership-history > summary { display: flex; align-items: center; min-height: 48px; cursor: pointer; color: var(--text-secondary); font-weight: 600; }
 .clinic-review-card {
   margin: 12px 0;
   padding: 20px;
@@ -1765,4 +1769,20 @@ button:active {
   .pwa-update-notice { right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100vw - 16px); gap: 6px; padding: 10px; }
   .pwa-update-notice p { font-size: 13px; }
   .pwa-update-notice .button { padding-inline: 10px; }
+}
+
+.clinic-shared-schedules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+.clinic-shared-schedule { padding: 18px; min-width: 0; }
+.clinic-shared-schedule h3 { margin: 0; font-size: 17px; }
+.clinic-shared-schedule p { overflow-wrap: anywhere; }
+.clinic-schedule-sharing { margin-top: 24px; }
+.clinic-schedule-sharing .field { margin-top: 16px; }
+.clinic-shared-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--border-default); }
+@media (max-width: 600px) {
+  .clinic-shared-row > button { width: 100%; }
 }
