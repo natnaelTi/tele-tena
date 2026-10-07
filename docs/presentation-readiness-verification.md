@@ -5,8 +5,10 @@
 - Review URL: `http://127.0.0.1:8017/teletena/` (production-built Frappe app,
   not Vite). Bench `/home/frappe/frappe/frappe-bench`; site
   `tele-tena-pr12-fresh.localhost`; branch `feat/clinic-affiliation-review`;
-  backend checkout and packaged source SHA
+  packaged asset source SHA
   `8e3a298bdc3f2624cdf0fb5d256fc469177fea36`.
+  The pushed branch head includes later test/documentation-only commits; the
+  app source and production assets did not change after this package build.
 - Environment: Frappe 15.121.2 / ERPNext 15.121.6, Python 3.12.3, Node
   22.23.3. The review WSGI process is Gunicorn on loopback 8017. This site is
   configured for invited password review; its public phone and registration

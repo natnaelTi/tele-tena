@@ -2,8 +2,7 @@
 
 ## Clinic affiliation subflow — 2026-10-07
 
-The focused branch `feat/clinic-affiliation-review` is at
-`8e3a298bdc3f2624cdf0fb5d256fc469177fea36`, based on
+The focused branch `feat/clinic-affiliation-review` continues from
 `feat/previous-clinicians`. On disposable Frappe 15, presentation API tests
 passed 22/22, OTP state-machine tests passed 7/7 with a mocked mail provider
 and enabled-registration test fixture, and a built `/teletena/` browser journey
@@ -14,6 +13,10 @@ sent. The branch remains partial: clinic staff/workspace/resource/billing and
 encounter-grant operations, Frappe 16 compatibility, and responsive/native
 language evidence remain outstanding. This checkpoint does not claim the wider
 screen/product inventory complete.
+
+The exact production asset source is recorded as
+`8e3a298bdc3f2624cdf0fb5d256fc469177fea36`; the branch's later commits only
+update tests and verification documents, with no app source change.
 
 The presentation/integration regressions now pass 22/22 and 24/24 respectively;
 integration temporarily enabled only this disposable site's signup flags,

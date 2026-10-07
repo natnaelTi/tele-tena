@@ -2,15 +2,18 @@
 
 ## Current clinic and authentication verification — 2026-10-07
 
-Current branch `feat/clinic-affiliation-review` is at
-`8e3a298bdc3f2624cdf0fb5d256fc469177fea36`, based on
-`feat/previous-clinicians`; it is a focused dependent slice, not the complete
+Current branch `feat/clinic-affiliation-review` is a focused dependent slice
+on `feat/previous-clinicians`; its latest pushed head is shown by PR #18. The
+reviewed backend/product code and packaged frontend source are at
+`8e3a298bdc3f2624cdf0fb5d256fc469177fea36`; subsequent branch commits update
+tests and verification documents only. This is not the complete
 approved A–I product scope. The matching built preview is
 `http://127.0.0.1:8017/teletena/`, served from
 `/home/frappe/frappe/frappe-bench`, site
 `tele-tena-pr12-fresh.localhost`, Frappe 15.121.2 / ERPNext 15.121.6 / Python
-3.12.3 / Node 22.23.3. Backend checkout and packaged frontend source are both
-this branch at `8e3a298`; assets are production-built, not served by Vite.
+3.12.3 / Node 22.23.3. The running backend imported the branch's matching
+product code and the production asset manifest records source `8e3a298`; the
+app is not served by Vite.
 The retained `erp.localhost` site has not been migrated or reseeded. The review
 site remains invited-review configuration; phone OTP and public registration
 are disabled there.
