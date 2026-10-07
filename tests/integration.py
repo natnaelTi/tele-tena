@@ -131,6 +131,11 @@ class Integration(unittest.TestCase):
         for email in USERS.values():
             # Clinic applications retain their submitter Link as audit history;
             # remove only rows created by this synthetic fixture before users.
+            clinic_ids = frappe.db.sql('SELECT name FROM `tabTele Tena Clinic` WHERE submitted_by=%s',
+                                       (email,), pluck=True)
+            if clinic_ids:
+                frappe.db.sql('DELETE FROM `tabTele Tena Clinic Membership` WHERE clinic IN %s',
+                              (tuple(clinic_ids),))
             frappe.db.sql('DELETE FROM `tabTele Tena Clinic Affiliation` WHERE clinician=%s', (email,))
             frappe.db.sql('DELETE FROM `tabTele Tena Clinic` WHERE submitted_by=%s', (email,))
             frappe.db.sql('DELETE FROM tt_resume_evidence WHERE clinician=%s', (email,))

@@ -63,6 +63,15 @@ export const en = {
   trustInsufficientData:'More data needed', immediateRequestsPresented:'immediate requests returned to the inbox', offersMade:'offers made', clinicianCancellations:'clinician-initiated cancellations',
   completedAndCancelledSessions:'completed or clinician-cancelled sessions', offerResponseRate:'received an offer',
   noRequestHistory:'No eligible requests presented yet', noAppointmentHistory:'No completed or clinician-cancelled sessions yet',
+  'Clinic access':'Clinic access', 'CLINIC OPERATIONS':'CLINIC OPERATIONS', 'Clinic membership supports operational work only. It does not grant access to patient records or authorize clinical services.':'Clinic membership supports operational work only. It does not grant access to patient records or authorize clinical services.',
+  'Invitations for you':'Invitations for you', 'No clinic invitations.':'No clinic invitations.', 'Invitations sent to an email you have verified will appear here.':'Invitations sent to an email you have verified will appear here.',
+  'Accept only if you recognize this clinic and want this operational role. You can withdraw access later or ask a clinic manager to revoke it.':'Accept only if you recognize this clinic and want this operational role. You can withdraw access later or ask a clinic manager to revoke it.',
+  'Accept invitation':'Accept invitation', 'Decline':'Decline', 'Your clinic memberships':'Your clinic memberships', 'No active clinic memberships.':'No active clinic memberships.',
+  'Manage clinic teams':'Manage clinic teams', 'These permissions cover clinic operations only. Patient charts remain restricted to encounter-specific grants.':'These permissions cover clinic operations only. Patient charts remain restricted to encounter-specific grants.',
+  'Invite team member':'Invite team member', 'Team member email':'Team member email', 'Clinic role':'Clinic role', 'Clinic Manager':'Clinic Manager', 'Scheduling':'Scheduling', 'Billing':'Billing',
+  'Invitations are not emailed yet. Invitees must sign in and verify this email address before accepting.':'Invitations are not emailed yet. Invitees must sign in and verify this email address before accepting.',
+  'Revoke access':'Revoke access', 'Reason to revoke access':'Reason to revoke access', 'No team invitations yet.':'No team invitations yet.', 'Invite a staff member using the email address they can verify on TeleTena.':'Invite a staff member using the email address they can verify on TeleTena.',
+  'Clinic team could not be loaded.':'Clinic team could not be loaded.', 'Clinic access could not be loaded.':'Clinic access could not be loaded.', 'Try again':'Try again',
 } as const
 export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
@@ -118,6 +127,15 @@ export const am: Record<Key, string> = {
   trustInsufficientData:'ተጨማሪ መረጃ ያስፈልጋል', immediateRequestsPresented:'ወደ መጠባበቂያ ሳጥኑ የተመለሱ ፈጣን ጥያቄዎች', offersMade:'የቀረቡ ጥቆማዎች', clinicianCancellations:'በሐኪም የተጀመሩ ስረዛዎች',
   completedAndCancelledSessions:'የተጠናቀቁ ወይም በሐኪም የተሰረዙ ክፍለ ጊዜዎች', offerResponseRate:'ጥቆማ የተቀረበላቸው',
   noRequestHistory:'ገና ብቁ የሆኑ ጥያቄዎች አልቀረቡም', noAppointmentHistory:'ገና የተጠናቀቁ ወይም በሐኪም የተሰረዙ ክፍለ ጊዜዎች የሉም',
+  'Clinic access':'የክሊኒክ መዳረሻ', 'CLINIC OPERATIONS':'የክሊኒክ አስተዳደር', 'Clinic membership supports operational work only. It does not grant access to patient records or authorize clinical services.':'የክሊኒክ አባልነት ለአስተዳደር ሥራ ብቻ ነው። የታካሚ መዝገብ መዳረሻ ወይም የሕክምና ፈቃድ አይሰጥም።',
+  'Invitations for you':'የእርስዎ ግብዣዎች', 'No clinic invitations.':'የክሊኒክ ግብዣ የለም።', 'Invitations sent to an email you have verified will appear here.':'ያረጋገጡት ኢሜይል ላይ የተላኩ ግብዣዎች እዚህ ይታያሉ።',
+  'Accept only if you recognize this clinic and want this operational role. You can withdraw access later or ask a clinic manager to revoke it.':'ክሊኒኩን ካወቁና ይህን ሚና ከፈለጉ ብቻ ይቀበሉ። በኋላ መውጣት ወይም ሥራ አስኪያጁ መዳረሻን እንዲሰርዝ መጠየቅ ይችላሉ።',
+  'Accept invitation':'ግብዣውን ተቀበል', 'Decline':'እምቢ በል', 'Your clinic memberships':'የእርስዎ የክሊኒክ አባልነቶች', 'No active clinic memberships.':'ንቁ የክሊኒክ አባልነት የለም።',
+  'Manage clinic teams':'የክሊኒክ ቡድኖችን አስተዳድር', 'These permissions cover clinic operations only. Patient charts remain restricted to encounter-specific grants.':'እነዚህ ፈቃዶች ለክሊኒክ ሥራ ብቻ ናቸው። የታካሚ መዝገቦች በተለይ በተፈቀደ የምክክር መዳረሻ ብቻ ይከፈታሉ።',
+  'Invite team member':'የቡድን አባል ጋብዝ', 'Team member email':'የቡድን አባል ኢሜይል', 'Clinic role':'የክሊኒክ ሚና', 'Clinic Manager':'የክሊኒክ ሥራ አስኪያጅ', 'Scheduling':'የቀጠሮ መርሐግብር', 'Billing':'ክፍያ አስተዳደር',
+  'Invitations are not emailed yet. Invitees must sign in and verify this email address before accepting.':'ግብዣዎች እስካሁን በኢሜይል አይላኩም። የተጋበዘው ሰው ገብቶ ይህን ኢሜይል ካረጋገጠ በኋላ ይቀበላል።',
+  'Revoke access':'መዳረሻ ሰርዝ', 'Reason to revoke access':'መዳረሻ የሚሰረዝበት ምክንያት', 'No team invitations yet.':'እስካሁን የቡድን ግብዣ የለም።', 'Invite a staff member using the email address they can verify on TeleTena.':'ሠራተኛው በTeleTena ላይ ማረጋገጥ በሚችለው ኢሜይል ጋብዘው።',
+  'Clinic team could not be loaded.':'የክሊኒክ ቡድኑን ማምጣት አልተቻለም።', 'Clinic access could not be loaded.':'የክሊኒክ መዳረሻን ማምጣት አልተቻለም።', 'Try again':'እንደገና ሞክር',
 }
 export const om: Record<Key, string> = {
   sessionLifecycle:'Haala marii', mediaStatus:'Walqunnamtii miidiyaa', callNotConnected:'Hin wal qabamne', callToggleError:'Mikirofoonii ykn kaameraa jijjiiruun hin milkoofne. Hayyama meeshaalee ilaalii irra deebiʼi yaali.',
@@ -169,5 +187,14 @@ export const om: Record<Key, string> = {
   trustInsufficientData:'Odeeffannoo dabalataa barbaachisa', immediateRequestsPresented:'gaaffii ariifachiisaa sanduuqa keessatti agarsiifaman', offersMade:'dhiyeessiiwwan godhaman', clinicianCancellations:'haquu ogeessi jalqabe',
   completedAndCancelledSessions:'marii xumurame ykn ogeessi haqe', offerResponseRate:'dhiyeessii argatan',
   noRequestHistory:'Hanga ammaatti gaaffiin ulaagaa guute hin dhiyaanne', noAppointmentHistory:'Hanga ammaatti mariin hin xumuramne ykn ogeessi hin haqne',
+  'Clinic access':'Seensa kilinikaa', 'CLINIC OPERATIONS':'BULCHIINSA KILINIKAA', 'Clinic membership supports operational work only. It does not grant access to patient records or authorize clinical services.':'Miseensummaan kilinikaa hojii bulchiinsaa qofaaf. Galmee dhukkubsataa hin banu; tajaajila yaalaas hin hayyamu.',
+  'Invitations for you':'Affeerraa siif ergaman', 'No clinic invitations.':'Affeerraan kilinikaa hin jiru.', 'Invitations sent to an email you have verified will appear here.':'Affeerraan imeelii ati mirkaneessite irratti ergaman asitti mulʼatu.',
+  'Accept only if you recognize this clinic and want this operational role. You can withdraw access later or ask a clinic manager to revoke it.':'Kilinika kana yoo beekteefi gahee kana yoo barbaadde qofa fudhadhu. Booda bahuu ykn bulchaan akka haqamu gaafachuu dandeessa.',
+  'Accept invitation':'Affeerraa fudhadhu', 'Decline':'Didi', 'Your clinic memberships':'Miseensummaa kilinikaa kee', 'No active clinic memberships.':'Miseensummaan kilinikaa sochoʼaa hin jiru.',
+  'Manage clinic teams':'Garee kilinikaa bulchi', 'These permissions cover clinic operations only. Patient charts remain restricted to encounter-specific grants.':'Hayyamni kun hojii kilinikaa qofaaf. Galmeen dhukkubsataa hayyama marii addaa malee hin banamu.',
+  'Invite team member':'Miseensa garee affeeri', 'Team member email':'Imeelii miseensaa', 'Clinic role':'Gahee kilinikaa', 'Clinic Manager':'Bulchaa kilinikaa', 'Scheduling':'Sagantaa beellamaa', 'Billing':'Bulchiinsa kaffaltii',
+  'Invitations are not emailed yet. Invitees must sign in and verify this email address before accepting.':'Affeerraan ammaaf imeeliidhaan hin ergamu. Fudhattoonni seenuun imeelii kana mirkaneessanii fudhachuu qabu.',
+  'Revoke access':'Seensa haqi', 'Reason to revoke access':'Sababa seensa haquu', 'No team invitations yet.':'Affeerraan garee hanga ammaatti hin jiru.', 'Invite a staff member using the email address they can verify on TeleTena.':'Imeelii TeleTena irratti mirkaneessuu dandaʼaniin hojjetaa affeeri.',
+  'Clinic team could not be loaded.':'Gareen kilinikaa hin feʼamne.', 'Clinic access could not be loaded.':'Seensi kilinikaa hin feʼamne.', 'Try again':'Irra deebiʼi yaali',
 }
 export const locales = { en, am, om }

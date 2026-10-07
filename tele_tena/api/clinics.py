@@ -7,6 +7,7 @@ import frappe
 from frappe.utils import now_datetime
 
 from tele_tena.api.journey import actor, command, fail, one, rows, text
+from tele_tena.tele_tena.doctype.tele_tena_clinic_membership.tele_tena_clinic_membership import clinic_admin
 
 
 def clinic_applicant():
@@ -222,3 +223,174 @@ def review_queue():
         item.clinician_display_name = name[0].display_name if name else 'Clinician profile unavailable'
         item.clinic_name = frappe.db.get_value('Tele Tena Clinic', item.clinic, 'clinic_name') or 'Clinic unavailable'
     return {'clinics': clinics, 'affiliations': affiliations}
+
+
+def _clinic_manager(user, clinic):
+    return clinic_admin(user, clinic)
+
+
+@frappe.whitelist()
+def managed_clinics():
+    user = actor()
+    return frappe.db.sql('''SELECT DISTINCT c.name,c.clinic_name,c.jurisdiction,c.status
+        FROM `tabTele Tena Clinic` c
+        LEFT JOIN `tabTele Tena Clinic Membership` m
+          ON m.clinic=c.name AND m.member_user=%s
+          AND m.membership_role='Clinic Manager' AND m.status='Active'
+        WHERE c.submitted_by=%s OR m.name IS NOT NULL
+        ORDER BY c.clinic_name LIMIT 100''', (user, user), as_dict=True)
+
+
+@command
+def clinic_team(clinic):
+    user = actor()
+    if not _clinic_manager(user, clinic):
+        frappe.throw('Clinic manager access required.', frappe.PermissionError)
+    if not frappe.db.exists('Tele Tena Clinic', clinic):
+        frappe.throw('Clinic unavailable.', frappe.PermissionError)
+    return frappe.get_list('Tele Tena Clinic Membership',
+        fields=['name', 'invite_email', 'membership_role', 'status',
+                'invited_at', 'accepted_at', 'revoked_at', 'revocation_reason'],
+        filters={'clinic': clinic}, order_by='invited_at desc', limit_page_length=100)
+
+
+@command
+def invite_clinic_member(clinic, invite_email, membership_role):
+    user = actor()
+    if not _clinic_manager(user, clinic):
+        frappe.throw('Clinic manager access required.', frappe.PermissionError)
+    if frappe.db.get_value('Tele Tena Clinic', clinic, 'status') != 'Verified':
+        fail('Only a verified clinic may invite team members.', 'clinic_unavailable')
+    if membership_role not in ('Clinic Manager', 'Scheduling', 'Billing'):
+        fail('Choose a supported clinic role.', 'invalid_membership_role')
+    from tele_tena.api.contact_auth import normalize
+    invite_email = normalize('email', invite_email)
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    existing = rows('''SELECT name,status,membership_role,invited_by FROM `tabTele Tena Clinic Membership`
+        WHERE clinic=%s AND invite_email=%s AND status IN ('Invited','Active') FOR UPDATE''',
+        (clinic, invite_email))
+    if existing:
+        if existing[0].membership_role == membership_role and existing[0].invited_by == user:
+            return {'membership': existing[0].name, 'status': existing[0].status,
+                    'idempotent': True}
+        fail('An invitation or active membership already exists for this contact.',
+             'membership_exists')
+    doc = frappe.new_doc('Tele Tena Clinic Membership')
+    doc.clinic = clinic
+    doc.invite_email = invite_email
+    doc.membership_role = membership_role
+    doc.invited_by = user
+    doc.status = 'Invited'
+    frappe.local.tele_tena_clinic_membership_action = True
+    frappe.local.tele_tena_clinic_membership_admin = True
+    try:
+        doc.insert()
+    finally:
+        frappe.local.tele_tena_clinic_membership_action = False
+        frappe.local.tele_tena_clinic_membership_admin = False
+    from tele_tena.api.journey import audit
+    audit(user, 'ClinicMemberInvited', {'clinic': clinic, 'membership': doc.name,
+                                        'role': membership_role})
+    return {'membership': doc.name, 'status': doc.status}
+
+
+@frappe.whitelist()
+def my_clinic_memberships():
+    user = actor()
+    email_rows = frappe.db.sql('''SELECT contact FROM tt_contact_identity
+        WHERE user=%s AND channel='email' ORDER BY verified_at DESC LIMIT 5''', (user,))
+    emails = [row[0] for row in email_rows]
+    invitations = []
+    if emails:
+        placeholders = ','.join(['%s'] * len(emails))
+        invitations = frappe.db.sql(f'''SELECT m.name,m.clinic,m.membership_role,m.invited_at,
+                c.clinic_name,c.jurisdiction
+            FROM `tabTele Tena Clinic Membership` m
+            JOIN `tabTele Tena Clinic` c ON c.name=m.clinic
+            WHERE m.invite_email IN ({placeholders}) AND m.status='Invited'
+              AND c.status='Verified'
+            ORDER BY m.invited_at DESC LIMIT 50''', tuple(emails), as_dict=True)
+    memberships = frappe.db.sql('''SELECT m.name,m.clinic,m.membership_role,m.status,
+            m.invited_at,m.accepted_at,c.clinic_name,c.jurisdiction,c.status AS clinic_status
+        FROM `tabTele Tena Clinic Membership` m
+        JOIN `tabTele Tena Clinic` c ON c.name=m.clinic
+        WHERE m.member_user=%s AND m.status IN ('Active','Revoked')
+        ORDER BY m.invited_at DESC LIMIT 100''', (user,), as_dict=True)
+    return {'invitations': invitations, 'memberships': memberships}
+
+
+def _invitation_for_verified_contact(invitation, user):
+    contacts = frappe.db.sql('''SELECT contact FROM tt_contact_identity
+        WHERE user=%s AND channel='email' ''', (user,), pluck=True)
+    if not contacts or invitation.invite_email not in contacts:
+        frappe.throw('This invitation is unavailable for the signed-in account.',
+                     frappe.PermissionError)
+
+
+@command
+def respond_to_clinic_invitation(membership, decision):
+    user = actor()
+    if decision not in ('accept', 'decline'):
+        fail('Choose accept or decline.')
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    try:
+        doc = frappe.get_doc('Tele Tena Clinic Membership', membership)
+    except frappe.DoesNotExistError:
+        frappe.throw('Invitation unavailable.', frappe.PermissionError)
+    _invitation_for_verified_contact(doc, user)
+    if doc.status == 'Active' and doc.member_user == user and decision == 'accept':
+        return {'membership': doc.name, 'status': doc.status, 'idempotent': True}
+    if doc.status == 'Declined' and decision == 'decline':
+        return {'membership': doc.name, 'status': doc.status, 'idempotent': True}
+    if doc.status != 'Invited':
+        fail('This invitation is no longer active.', 'invitation_closed')
+    if decision == 'accept' and frappe.db.get_value('Tele Tena Clinic', doc.clinic, 'status') != 'Verified':
+        fail('This clinic is no longer verified.', 'clinic_unavailable')
+    doc.status = 'Active' if decision == 'accept' else 'Declined'
+    if decision == 'accept':
+        doc.member_user = user
+        doc.accepted_at = now_datetime()
+    frappe.local.tele_tena_clinic_membership_action = True
+    frappe.local.tele_tena_clinic_membership_invitee = True
+    try:
+        doc.save()
+    finally:
+        frappe.local.tele_tena_clinic_membership_action = False
+        frappe.local.tele_tena_clinic_membership_invitee = False
+    from tele_tena.api.journey import audit
+    audit(user, 'ClinicInvitation' + ('Accepted' if decision == 'accept' else 'Declined'),
+          {'clinic': doc.clinic, 'membership': doc.name})
+    return {'membership': doc.name, 'status': doc.status}
+
+
+@command
+def revoke_clinic_membership(membership, reason):
+    user = actor()
+    reason = text(reason, 1000)
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    try:
+        doc = frappe.get_doc('Tele Tena Clinic Membership', membership)
+    except frappe.DoesNotExistError:
+        frappe.throw('Membership unavailable.', frappe.PermissionError)
+    if not _clinic_manager(user, doc.clinic):
+        frappe.throw('Clinic manager access required.', frappe.PermissionError)
+    if (doc.status == 'Revoked' and doc.revoked_by == user
+            and doc.revocation_reason == reason):
+        return {'membership': doc.name, 'status': doc.status, 'idempotent': True}
+    if doc.status not in ('Invited', 'Active'):
+        fail('Only an active membership or invitation may be revoked.')
+    doc.status = 'Revoked'
+    doc.revoked_by = user
+    doc.revoked_at = now_datetime()
+    doc.revocation_reason = reason
+    frappe.local.tele_tena_clinic_membership_action = True
+    frappe.local.tele_tena_clinic_membership_admin = True
+    try:
+        doc.save()
+    finally:
+        frappe.local.tele_tena_clinic_membership_action = False
+        frappe.local.tele_tena_clinic_membership_admin = False
+    from tele_tena.api.journey import audit
+    audit(user, 'ClinicMembershipRevoked', {'clinic': doc.clinic,
+                                             'membership': doc.name})
+    return {'membership': doc.name, 'status': doc.status}

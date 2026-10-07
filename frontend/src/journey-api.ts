@@ -90,4 +90,10 @@ export const journeyApi = {
   clinicReviewQueue: () => api<{clinics:any[];affiliations:any[]}>('tele_tena.api.clinics.review_queue'),
   reviewClinic: (application:string,decision:'Verified'|'Rejected'|'Suspended',reason:string) => api<any>('tele_tena.api.clinics.review_clinic',{application,decision,reason},true),
   reviewAffiliation: (application:string,decision:'Verified'|'Clarification'|'Rejected'|'Revoked',reason:string) => api<any>('tele_tena.api.clinics.review_affiliation',{application,decision,reason},true),
+  managedClinics: () => api<any[]>('tele_tena.api.clinics.managed_clinics'),
+  clinicTeam: (clinic:string) => api<any[]>('tele_tena.api.clinics.clinic_team',{clinic},true),
+  inviteClinicMember: (data:{clinic:string;invite_email:string;membership_role:string}) => api<any>('tele_tena.api.clinics.invite_clinic_member',data,true),
+  myClinicMemberships: () => api<{invitations:any[];memberships:any[]}>('tele_tena.api.clinics.my_clinic_memberships'),
+  respondToClinicInvitation: (membership:string,decision:'accept'|'decline') => api<any>('tele_tena.api.clinics.respond_to_clinic_invitation',{membership,decision},true),
+  revokeClinicMembership: (membership:string,reason:string) => api<any>('tele_tena.api.clinics.revoke_clinic_membership',{membership,reason},true),
 }

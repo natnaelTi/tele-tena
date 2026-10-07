@@ -35,9 +35,23 @@ record. No `ignore_permissions` path is used.
 
 Clinic legal names and registration references remain private. The clinician
 selector returns only verified clinic names and jurisdictions. Affiliation
-summaries must not contain patient information. Uploads, clinic staff invitations,
-membership roles, calendars/resources, clinic billing and encounter access grants
-are explicit future work; this slice does not expose controls for them.
+summaries must not contain patient information.
+
+### Operational clinic memberships
+
+A verified clinic's submitter or an active Clinic Manager may invite a verified
+email address as Clinic Manager, Scheduling, or Billing. The invited account
+must verify that exact address before it can see or accept the invitation.
+Invitations are in-app only; email delivery is not implemented. Acceptance
+records the account and timestamp. A clinic manager can revoke an invitation
+or active membership with a reason; audit history is retained. Scheduling and
+Billing labels do not yet grant calendar, resource, or billing capabilities.
+Clinic Manager permits membership administration only. No role grants patient
+record or appointment access; clinic membership is operational identity, not a
+clinical encounter grant.
+
+Calendars/resources, clinic billing and encounter access grants remain future
+work. This slice does not expose controls for them.
 
 Schema is supplied as additive native DocTypes and installed by normal Frappe
 model synchronization. No existing clinic affiliation narrative or appointment
@@ -60,8 +74,13 @@ This was an additive migration onto a site created earlier in the same
 checkpoint, followed by Frappe model synchronization; it is not yet a clean
 fresh-install proof for the final DocType package. Frappe 16 schema/API
 compatibility, responsive review at narrow widths and human Amharic/Afaan Oromo
-review remain unverified. Generic API permissions are covered; private uploads,
-staff membership, clinic workspaces and explicit encounter grants do not exist
-in this slice.
+review remain unverified. The separate membership feature is additive and now
+has focused database coverage for verified-email visibility/acceptance,
+unverified denial, immutable invite identity, non-manager restrictions,
+idempotent invite/accept/revoke retries, retained membership history, and the
+invariant that a patient membership does not grant clinic or clinical-record
+access. Current browser and migration results are recorded in the latest
+presentation-readiness report. Private uploads, clinic calendars/resources,
+billing and explicit encounter grants remain unimplemented.
 
 Frontend build/lint alone does not establish workflow or visual acceptance.
