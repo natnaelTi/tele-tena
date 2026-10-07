@@ -5,13 +5,11 @@ deployment, real-patient-readiness, or real-money claim.
 
 ## Current source and preview
 
-- Worktree: branch `feat/clinic-staff-workspace`, app-code changes through
-  `fa57df0` (membership-history composition), stacked locally on
-  `feat/clinic-encounter-access` → PR #20 head branch
-  `fix/session-feedback-translations`. PR #20 remains open. The clinic branch
-  has not yet been pushed or opened as a PR because GitHub returned HTTP 500
-  Internal Server Error on repeated push attempts. No branches were force-pushed,
-  merged, or deployed.
+- Worktree: draft PR #21 at head `6474a3c4a66d814da916f1de6d4623fb46642f66`,
+  branch `feat/clinic-staff-workspace`, based on open PR #20 head branch
+  `fix/session-feedback-translations`. PR #20 remains open. PR #21 CI passes on
+  Node 22/24 and Python 3.12/3.14.2. No branches were force-pushed, merged, or
+  deployed.
 - Local review URL: `http://127.0.0.1:8017/teletena/`, site
   `tele-tena-pr12-fresh.localhost`, Bench
   `/home/frappe/frappe/frappe-bench`. The app is production-built and served by

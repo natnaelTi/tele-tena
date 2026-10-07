@@ -7,7 +7,9 @@
   `tele-tena-pr12-fresh.localhost`. The production package at
   `tele_tena/public/review/release.json` identifies source/build commit
   `66834eb4be4b282311ef33f5166458bcf7fbd659` on branch
-  `feat/clinic-staff-workspace`. The dedicated Gunicorn master bound to
+  `feat/clinic-staff-workspace`. Draft PR #21 is open against PR #20's head
+  branch; PR #21 head `6474a3c4a66d814da916f1de6d4623fb46642f66` has passing
+  Node 22/24 and Python 3.12/3.14.2 checks. The dedicated Gunicorn master bound to
   `127.0.0.1:8017` was gracefully reloaded; its environment selects the isolated
   site. Frappe serves hashed packaged assets; Vite is not serving the page.
 - The real browser journey passed clinic submission → reviewer verification →
