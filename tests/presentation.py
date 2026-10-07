@@ -27,6 +27,7 @@ from tele_tena.api import vetting
 from tele_tena.api import trust
 from tele_tena.api import clinics
 from tele_tena.api import clinic_access
+from tele_tena.api import extensions
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -1000,6 +1001,105 @@ class Presentation(unittest.TestCase):
         after = frappe.db.sql('''SELECT weekday,start_local,end_local FROM tt_schedule_rule
             WHERE schedule_id=%s ORDER BY weekday,start_local''', (schedule_id,))
         self.assertEqual(after, before)
+
+    def test_prefunded_extension_requires_consent_and_settles_once(self):
+        from tele_tena import accounting
+        offering = fixtures.Integration.offers['c1']
+        day, _, _ = self.make_schedule(mode='automatic', offering=offering)
+        slot = self.slots(offering, day)[0]
+        self.fund_patient(kind='p1', amount=10000)
+        booked = self.book_slot(offering, slot, 'extension-flow-' + secrets.token_hex(6))
+        appointment = booked['id']
+        patient = fixtures.USERS['p1']
+        clinician = fixtures.USERS['c1']
+        wallet_before = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql('''INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created)
+            VALUES (%s,%s,%s,%s,%s,'Open',%s)''',
+            (appointment, str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex, uuid.uuid4().hex, now))
+        fixtures.login('c1')
+        proposal = extensions.propose_extension(appointment, 'extension-retry-' + secrets.token_hex(6))
+        self.assertEqual(proposal['duration_minutes'], 15)
+        self.assertEqual(proposal['amount_minor'], 300)
+        retry_key = journey.one('SELECT retry_key FROM tt_consultation_extension WHERE id=%s',
+                                (proposal['id'],)).retry_key
+        idem = extensions.propose_extension(appointment, retry_key)
+        self.assertTrue(idem['idempotent'])
+        duplicate = extensions.propose_extension(appointment, 'lost-response-retry-' + secrets.token_hex(6))
+        self.assertTrue(duplicate['idempotent'])
+        self.assertEqual(duplicate['id'], proposal['id'])
+        fixtures.login('p1')
+        accepted = extensions.respond_extension(appointment, proposal['id'], 'accept')
+        self.assertEqual(accepted['state'], 'Accepted')
+        self.assertTrue(extensions.respond_extension(appointment, proposal['id'], 'accept')['idempotent'])
+        wallet_reserved = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
+        self.assertEqual(int(wallet_reserved.available), int(wallet_before.available) - 300)
+        self.assertEqual(int(wallet_reserved.reserved), int(wallet_before.reserved) + 300)
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s',
+                                     ('extension-reserve:' + proposal['id'],)).n, 1)
+        with self.assertRaises(frappe.ValidationError):
+            presentation.cancel_appointment(appointment, 'Synthetic attempt during open call')
+        self.assertEqual(frappe.local.response.get('tele_tena_error'), 'cancellation_call_active')
+        self.assertEqual(int(journey.one('SELECT reserved FROM tt_wallet WHERE patient=%s', (patient,)).reserved),
+                         int(wallet_reserved.reserved))
+        # The clinician explicitly starts the accepted block; elapsed call time
+        # alone is not used as consent or billing evidence.
+        pending_before = accounting.balance('clinician', clinician, 'pending')
+        frappe.set_user('Administrator')
+        frappe.db.sql('UPDATE tt_consultation_extension SET start_after=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND WHERE id=%s',
+                      (proposal['id'],))
+        fixtures.login('c1')
+        self.assertEqual(extensions.start_extension(appointment, proposal['id'])['state'], 'Started')
+        frappe.db.sql("UPDATE tt_consultation SET state='Ended',ended=UTC_TIMESTAMP(6) WHERE appointment=%s", (appointment,))
+        presentation.save_note_draft(appointment, 'Synthetic private note', 'Synthetic patient summary')
+        with patch.dict(frappe.conf, {'tele_tena_demo_platform_fee_bps': 0,
+                                     'tele_tena_demo_dispute_window_minutes': 30}):
+            presentation.finalize_consultation(appointment, 1)
+            presentation.finalize_consultation(appointment, 1)
+        earning = journey.one('SELECT gross_minor,net_minor,policy_snapshot FROM tt_earning WHERE appointment=%s',
+                              (appointment,))
+        self.assertEqual(int(earning.gross_minor), 900)
+        self.assertEqual(int(earning.net_minor), 900)
+        self.assertEqual(len(json.loads(earning.policy_snapshot)['extension_blocks']), 1)
+        self.assertEqual(journey.one('SELECT state FROM tt_consultation_extension WHERE id=%s',
+                                     (proposal['id'],)).state, 'Settled')
+        self.assertEqual(accounting.balance('clinician', clinician, 'pending'), pending_before + 900)
+
+    def test_ending_releases_unstarted_extension_once_and_expiry_is_scheduled(self):
+        offering = fixtures.Integration.offers['c1']
+        day, _, _ = self.make_schedule(mode='automatic', offering=offering)
+        slot = self.slots(offering, day)[0]
+        self.fund_patient(kind='p2', amount=10000)
+        booked = self.book_slot(offering, slot, 'extension-release-' + secrets.token_hex(6), who='p2')
+        patient = fixtures.USERS['p2']
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql('''INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created)
+            VALUES (%s,%s,%s,%s,%s,'Open',%s)''',
+            (booked['id'], str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex, uuid.uuid4().hex, now))
+        fixtures.login('c1')
+        proposal = extensions.propose_extension(booked['id'], 'extension-release-key-' + secrets.token_hex(6))
+        fixtures.login('p2')
+        extensions.respond_extension(booked['id'], proposal['id'], 'accept')
+        reserved_before_end = int(journey.one('SELECT reserved FROM tt_wallet WHERE patient=%s', (patient,)).reserved)
+        fixtures.login('c1')
+        extensions.close_unstarted_extensions(booked['id'], fixtures.USERS['c1'])
+        extensions.close_unstarted_extensions(booked['id'], fixtures.USERS['c1'])
+        wallet = journey.one('SELECT reserved FROM tt_wallet WHERE patient=%s', (patient,))
+        self.assertEqual(int(wallet.reserved), reserved_before_end - proposal['amount_minor'])
+        self.assertEqual(journey.one('SELECT state FROM tt_consultation_extension WHERE id=%s',
+                                     (proposal['id'],)).state, 'Released')
+        # Expiry is durable via the scheduled worker; a second run is a no-op.
+        expiry_proposal = extensions.propose_extension(booked['id'], 'extension-expire-key-' + secrets.token_hex(6))
+        frappe.db.sql('UPDATE tt_consultation_extension SET expires_at=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND WHERE id=%s',
+                      (expiry_proposal['id'],))
+        extensions.expire_extensions()
+        extensions.expire_extensions()
+        self.assertEqual(journey.one('SELECT state FROM tt_consultation_extension WHERE id=%s',
+                                     (expiry_proposal['id'],)).state, 'Expired')
+        self.assertEqual(journey.one('''SELECT COUNT(*) n FROM tt_appointment_event
+            WHERE appointment=%s AND event_type='ExtensionExpired' ''', (booked['id'],)).n, 1)
 
     def test_balanced_earnings_dispute_release_and_payout(self):
         from tele_tena import accounting

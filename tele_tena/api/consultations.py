@@ -117,6 +117,8 @@ def end(appointment):
         fail('Appointment is not active', 'appointment_inactive')
     session = frappe.db.sql('SELECT * FROM tt_consultation WHERE appointment=%s FOR UPDATE',
                             (item.id,), as_dict=True)
+    from tele_tena.api.extensions import close_unstarted_extensions
+    close_unstarted_extensions(item.id, user)
     if not session or session[0].state != 'Ended':
         if not session:
             fail('Consultation has not started', 'consultation_not_started')

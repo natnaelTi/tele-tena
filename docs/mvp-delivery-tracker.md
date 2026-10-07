@@ -1,6 +1,21 @@
 # TeleTena delivery tracker
 
-## Active integrated checkout — 2026-10-07
+## Current active continuation — consultation extensions — 2026-10-08
+
+The active feature branch is `feat/consultation-extensions`, based on the
+private-scope-evidence head and therefore dependent on PR #23. The matching
+production-built preview is `http://127.0.0.1:8017/teletena/`, isolated site
+`tele-tena-pr12-fresh.localhost` in `/home/frappe/frappe/frappe-bench`.
+`tele_tena/public/review/release.json` identifies the packaged frontend source
+SHA; this is not a Vite server. The extension backend has passed the 29-case
+presentation suite on Frappe 15.121.2 / ERPNext 15.121.6 / Python 3.12.3 and
+Frappe 16.2.1 / ERPNext 16.1.0 / Python 3.14.2 after additive v1.17 migration
+and repeat migration. The Frappe 16 test site was backed up before migration.
+Rendered call-panel browser interaction, fresh-empty-site install for v1.17,
+and actual scheduler worker execution are still pending; the retained local
+review site's scheduler remains disabled. No hosted site was changed.
+
+## Historical integrated checkout — 2026-10-07
 
 The active local checkout is `feat/mutual-rescheduling`; the exact source SHA
 is exposed by the current production asset manifest and the Git branch head.
@@ -155,7 +170,7 @@ test in `selfmade-phone-access-update.md`. Provider acceptance is not delivery.
 | Completed-session ratings/reviews | implemented; focused local verification passed | One immutable 1–5 session-experience response is allowed after clinician finalization; same-rating retry is idempotent, changed retry is rejected, and public aggregates are sample-suppressed separately from clinical competence. `tests/presentation.py` 23/23 and `tests/trust_metrics.py` 4/4 passed; built `/teletena/` patient submission/reload showed one persisted rating and omitted private notes. UI translation-key rendering was fixed in `1e2f8c00f6d354e27f99ac1d924e5476abc4cbe4`. No free-text review/moderation, clinical outcome metric, native translation approval, or real media exchange in this fixture. See `session-experience-metric.md`. |
 | Cancellation rules differ by actor; bounded clinician policy, immutable accepted snapshot, disputes/earnings hold | partial | Authorized pre-start cancellation, accepted demo policy snapshot and exact-once full simulated reservation release are implemented. This is one explicit demo policy, not the requested actor-specific production policy or disputes/earnings hold. |
 | Simulated patient deposit and atomic available/reserved booking balance | implemented | Labeled development-only simulation, integer minor units, MariaDB atomicity and rollback tests. Not real-money funding. |
-| Balanced demonstration subledger, clinician pending/available earnings, authorized extensions and explicit consent/funds reservation | partial | v1.7 adds an immutable balanced demonstration journal distinct from the old `tt_ledger` activity log; booking, explicit finalization, dispute holds, scheduled release and payout reservations are tested. Paid extensions remain absent. This is not ERPNext accounting or real-money readiness. |
+| Balanced demonstration subledger, clinician pending/available earnings, authorized extensions and explicit consent/funds reservation | partial | v1.7 adds an immutable balanced demonstration journal distinct from the old `tt_ledger` activity log; booking, explicit finalization, dispute holds, scheduled release, payout reservations, and v1.17 prefunded consent-based extension blocks are implemented. The Frappe 15 suite passes 29/29, including extension reservation, explicit start/finalization exactly once, release on End, scheduled expiry idempotency, and prevention of cancellation during an active call from stranding extension funds. The live call panel still needs rendered-browser acceptance; Frappe 16 and fresh-empty-site migration checks for v1.17 remain pending. This is not ERPNext accounting or real-money readiness. See `consultation-extensions.md`. |
 | Simulated payouts and snapshotted withholding | partial | Zero-fee policy and dispute window are captured per booking; release is retry-safe; clinician payout request/cancel reserves/releases available funds exactly once. No external transfer, processing or paid state exists. Post-release refund and dispute workflows are deliberately unsupported pending authorized resolution. |
 | Refund unused funds using verified supported route | partial | Demo pre-start release restores simulated balance exactly once; no real refund rails or production refund policy exist. |
 | ERPNext accounting/reporting integration and production reconciliation | pending | The demonstration journal has durable references, balance checks and a migration preservation check, but no ERPNext posting, real custody or production reconciliation exists. |

@@ -1,5 +1,44 @@
 # Presentation release verification
 
+## Current focused continuation — prefunded consultation extensions — 2026-10-08
+
+This continuation is on `feat/consultation-extensions`, based on the current
+private-scope-evidence branch. The exact source SHA is the branch HEAD after
+the focused implementation commits. The preview is the production-built
+Frappe app at `http://127.0.0.1:8017/teletena/`, site
+`tele-tena-pr12-fresh.localhost` on `/home/frappe/frappe/frappe-bench`; it is
+not Vite. The current Frappe 15.121.2 / ERPNext 15.121.6 preview site was
+migrated twice through additive v1.17. No Selfmade or `erp.localhost` changes
+were made.
+
+`tests/presentation.py` passed **29/29** after the repeat migrations. New
+coverage verifies consent and atomic extension reservation, idempotent retry,
+explicit clinician start, inclusion exactly once in finalized earnings,
+release of an accepted-but-unstarted block when the consultation ends, and
+idempotent scheduler expiry. It also verifies an open consultation cannot be
+cancelled through the older appointment endpoint while extension funds remain
+reserved. Python compilation and the frontend TypeScript /
+Vite production build passed. `npm run lint` exited successfully with the
+existing React warnings; Vite retains its existing LiveKit chunk-size advisory.
+
+The same 29-case suite also passed on the isolated Frappe 16.2.1 / ERPNext
+16.1.0 / Python 3.14.2 compatibility site after a private site+files backup,
+v1.17 migration, and repeat migration. This confirms upgrade compatibility on
+that retained site, not a fresh-empty-site install. A real-browser smoke check
+against `/teletena/` verified the rendered homepage, release-manifest SHA,
+manifest scope, service-worker readiness, and guest redirect from a protected
+deep link; it did not exercise the authenticated extension panel.
+
+The panel is integrated under the open consultation, uses the existing
+balanced demonstration subledger and booking fee/withholding snapshot, and is
+localized in English, Amharic and Afaan Oromo (latter two remain provisional).
+No external charge follows call duration. The review-site scheduler is disabled;
+the expiry function was invoked directly in a regression test, so no claim is
+made that the preview worker ran it. Rendered-browser interaction of the new
+panel and current-source built asset packaging remain to be checked after the
+branch is committed and packaged. Fresh-empty-site and Frappe 16 v1.17 tests
+also remain pending.
+
 ## Current local checkpoint — clinic staff workspace — 2026-10-07
 
 - Exact review URL: `http://127.0.0.1:8017/teletena/`, served from Bench

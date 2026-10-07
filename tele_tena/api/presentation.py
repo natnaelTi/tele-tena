@@ -112,6 +112,9 @@ def cancel_appointment(appointment, reason):
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     if item.start <= now:
         fail('Cancellations are available before the scheduled start', 'cancellation_cutoff')
+    active_call = rows("SELECT state FROM tt_consultation WHERE appointment=%s AND state='Open'", (item.id,))
+    if active_call:
+        fail('End the active consultation before cancelling the appointment', 'cancellation_call_active')
     snapshot = json.loads(item.policy_snapshot) if item.policy_snapshot else {}
     if snapshot.get('version') != DEMO_CANCELLATION_POLICY:
         fail('The accepted cancellation policy is unavailable', 'policy_unavailable')
@@ -537,31 +540,46 @@ def finalize_consultation(appointment, publish_summary=0):
     if item.state != 'Completed':
         import json
         from tele_tena.accounting import account_id, check_wallet_projection, post
+        extensions = rows('''SELECT id,duration_minutes,amount_minor,price_snapshot,policy_snapshot
+            FROM tt_consultation_extension WHERE appointment=%s AND state='Started'
+            ORDER BY started_at FOR UPDATE''', (item.id,))
+        extension_total = sum(int(extension.amount_minor) for extension in extensions)
+        gross = int(item.price) + extension_total
         wallet = one('SELECT available,reserved FROM tt_wallet WHERE patient=%s FOR UPDATE', (item.patient,))
         snapshot = json.loads(item.policy_snapshot) if item.policy_snapshot else {}
         finance = snapshot.get('financial', {})
         if finance.get('version') != 'demo-earnings-v1' or finance.get('external_settlement') is not False:
             fail('Accepted earnings policy is unavailable for this appointment', 'financial_policy_missing')
-        fee = (int(item.price) * int(finance.get('fee_bps', 0))) // 10000
-        net = int(item.price) - fee
-        if int(wallet.reserved) < int(item.price):
+        fee = (gross * int(finance.get('fee_bps', 0))) // 10000
+        net = gross - fee
+        if int(wallet.reserved) < gross:
             fail('Reservation is inconsistent; consultation remains unfinalized', 'reservation_inconsistent')
         check_wallet_projection(item.patient, wallet)
         earning_id = str(uuid.uuid4())
         release_at = now + timedelta(minutes=int(finance.get('dispute_window_minutes', 60)))
-        frappe.db.sql('''UPDATE tt_wallet SET reserved=reserved-%s WHERE patient=%s''', (item.price, item.patient))
-        entries = [(account_id('patient', item.patient, 'reserved'), item.price, 0),
+        frappe.db.sql('''UPDATE tt_wallet SET reserved=reserved-%s WHERE patient=%s''', (gross, item.patient))
+        entries = [(account_id('patient', item.patient, 'reserved'), gross, 0),
                    (account_id('clinician', clinician, 'pending'), 0, net)]
         if fee:
             entries.append((account_id('', '', 'platform_fee_revenue'), 0, fee))
         reference = 'completion:' + item.id
-        post(reference, 'ConsultationFinalized', reference, entries, {'appointment': item.id, 'simulated': True})
+        policy_snapshot = {**finance, 'extension_blocks': [
+            {'id': extension.id, 'duration_minutes': int(extension.duration_minutes),
+             'amount_minor': int(extension.amount_minor), 'price_snapshot': json.loads(extension.price_snapshot),
+             'policy_snapshot': json.loads(extension.policy_snapshot)} for extension in extensions]}
+        post(reference, 'ConsultationFinalized', reference, entries,
+             {'appointment': item.id, 'simulated': True,
+              'extension_ids': [extension.id for extension in extensions]})
         frappe.db.sql('''INSERT INTO tt_earning
             (id,appointment,patient,clinician,gross_minor,fee_minor,net_minor,policy_snapshot,
              state,completed_at,release_at,created,modified)
             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Pending',%s,%s,%s,%s)''',
-            (earning_id, item.id, item.patient, clinician, item.price, fee, net,
-             json.dumps(finance, separators=(',', ':'), sort_keys=True), now, release_at, now, now))
+            (earning_id, item.id, item.patient, clinician, gross, fee, net,
+             json.dumps(policy_snapshot, separators=(',', ':'), sort_keys=True), now, release_at, now, now))
+        for extension in extensions:
+            frappe.db.sql("UPDATE tt_consultation_extension SET state='Settled',closed_at=%s WHERE id=%s AND state='Started'",
+                          (now, extension.id))
+            _event(item.id, 'ExtensionSettled', clinician)
         frappe.db.sql("UPDATE tt_appointment SET state='Completed' WHERE id=%s", (item.id,))
         _event(item.id, 'Completed', clinician)
     _event(item.id, 'DocumentationFinalized', clinician)

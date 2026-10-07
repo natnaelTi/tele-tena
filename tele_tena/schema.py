@@ -96,3 +96,5 @@ def install():
     session_feedback()
     from tele_tena.patches.v1_15_mutual_rescheduling import execute as mutual_rescheduling
     mutual_rescheduling()
+    from tele_tena.patches.v1_17_consultation_extensions import execute as consultation_extensions
+    consultation_extensions()

@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import type { Room as LiveKitRoom } from "livekit-client";
 import { api } from "../../api";
 import type { Key } from "../../i18n";
+import ExtensionPanel from "./ExtensionPanel";
 type Appointment = { id: string; display_identity?:string; call_state?:string };
 type ConsultationInfo = {
   state: "Not started" | "Open" | "Ended";
@@ -417,6 +418,9 @@ export default function Consultation({
         >
           {t("endConsultation")}
         </button>
+      )}
+      {info?.state === "Open" && (
+        <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t} />
       )}
       <Dialog
         open={confirmEnd}
