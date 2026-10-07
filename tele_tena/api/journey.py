@@ -443,6 +443,50 @@ def discover(service=None):
 
 
 @query()
+def previous_clinicians():
+    """Return only clinicians this patient personally consulted and completed.
+
+    The opaque public profile key is intentionally unrelated to account names or
+    emails. No encounter is linked across patients, and only clinicians with a
+    currently approved scope and a public active offering are included.
+    """
+    patient = profile('patient')
+    history = rows('''SELECT p.public_id AS clinician_id,p.display_name,
+        MAX(a.start) AS last_consultation,COUNT(DISTINCT a.id) AS completed_sessions,
+        p.user AS clinician_account
+        FROM tt_appointment a JOIN tt_profile p ON p.user=a.clinician AND p.kind='clinician'
+        JOIN tt_application app ON app.user=p.user AND app.status='Approved'
+        JOIN tabUser u ON u.name=p.user AND u.enabled=1
+        JOIN `tabHas Role` hr ON hr.parent=p.user AND hr.role='Tele Tena Clinician'
+        WHERE a.patient=%s AND a.state='Completed'
+        AND EXISTS (
+          SELECT 1 FROM tt_offering o
+          JOIN `tabTele Tena Service` svc ON svc.name=o.service AND svc.active=1
+          JOIN `tabTele Tena Service Scope` sc ON sc.clinician=o.clinician
+            AND sc.service=o.service AND sc.status='Approved'
+          JOIN tt_schedule sched ON sched.offering=o.id AND sched.status='Published'
+          WHERE o.clinician=p.user AND o.active=1
+        )
+        GROUP BY p.public_id,p.display_name,p.user
+        ORDER BY last_consultation DESC LIMIT 20''', (patient.user,))
+    visible = []
+    for item in history:
+        if not service_scope_is_current_for_any_offering(item.clinician_account):
+            continue
+        item.pop('clinician_account', None)
+        item.completed_sessions = int(item.completed_sessions)
+        visible.append(item)
+    return visible
+
+
+def service_scope_is_current_for_any_offering(clinician):
+    offerings = rows('''SELECT o.service FROM tt_offering o
+        JOIN tt_schedule s ON s.offering=o.id AND s.status='Published'
+        WHERE o.clinician=%s AND o.active=1''', (clinician,))
+    return any(service_scope_is_current(clinician, item.service) for item in offerings)
+
+
+@query()
 def windows(offering):
     actor('Tele Tena Patient')
     o = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (offering,))

@@ -35,6 +35,7 @@ export function PatientHome() {
   const appointments = useResource(journeyApi.appointments);
   const wallet = useResource(journeyApi.wallet);
   const requests = useResource(journeyApi.myRequests);
+  const previousClinicians = useResource(journeyApi.previousClinicians);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
   return (
@@ -101,12 +102,29 @@ export function PatientHome() {
         </EmptyState>
       )}
       <div className="section-line">
-        <h2>People you’ve spoken with</h2>
+        <h2>{w("People you’ve spoken with")}</h2>
+        <Link to="/patient/appointments">{w("Appointments")} <ArrowRight size={16} /></Link>
       </div>
-      <p className="supporting">
-        Your past appointments are available in Appointments. A dedicated
-        previous-clinician view is planned.
-      </p>
+      {previousClinicians.error ? (
+        <InlineNotice tone="danger">{w("Your previous clinicians could not be loaded.")} <Button onClick={() => void previousClinicians.refresh()}>{w("Try again")}</Button></InlineNotice>
+      ) : !previousClinicians.data ? (
+        <Skeleton />
+      ) : previousClinicians.data.length ? (
+        <div className="previous-clinician-list">
+          {previousClinicians.data.map((clinician) => (
+            <article className="previous-clinician-row" key={clinician.clinician_id}>
+              <div className="avatar" aria-hidden="true">{clinician.display_name.slice(0, 1).toUpperCase()}</div>
+              <div className="previous-clinician-copy">
+                <h3>{clinician.display_name}</h3>
+                <p className="supporting">{w("Last session")} {date(clinician.last_consultation)} · {clinician.completed_sessions} {w(clinician.completed_sessions === 1 ? "completed session" : "completed sessions")}</p>
+              </div>
+              <Link className="button secondary" to={`/patient/clinicians/${encodeURIComponent(clinician.clinician_id)}`}>{w("View profile")} <ArrowRight size={16} /></Link>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p className="supporting">{w("Clinicians you have completed a consultation with will appear here when they have current approved services available.")}</p>
+      )}
     </>
   );
 }

@@ -1297,25 +1297,32 @@
         "tt_schedule_exception",
         "tt_appointment",
         "tt_wallet",
-        "tt_ledger"
+        "tt_ledger",
+        "tt_appointment",
+        "tt_profile",
+        "Tele Tena Service Scope",
+        "tt_offering",
+        "tt_schedule"
       ],
       "queries": [
         "tele_tena.api.journey.services",
         "tele_tena.api.journey.discover",
+        "tele_tena.api.journey.previous_clinicians",
         "tele_tena.api.scheduling.calendar",
         "tele_tena.api.journey.preview",
-        "tele_tena.api.presentation.appointment_detail"
+        "tele_tena.api.presentation.appointment_detail",
+        "tele_tena.api.journey.previous_clinicians"
       ],
       "commands": [
         "tele_tena.api.scheduling.save_schedule",
         "tele_tena.api.journey.book",
         "tele_tena.api.presentation.cancel_appointment"
       ],
-      "server_permissions": "Patient reads only public approved offerings and generated slots; all offering/scope/availability/price/balance checks repeat server-side. Appointment access is participant-only.",
-      "workflow_transitions": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
+      "server_permissions": "Only the authenticated Tele Tena Patient profile owner may query. Results derive exclusively from that patient’s completed appointment history and currently enabled clinician accounts with current approved scope and active published offerings. No other patient encounters are joined.",
+      "workflow_transitions": "Patient completed appointment → patient-scoped previous-clinician query → current public clinician profile → optional discovery/booking through existing APIs.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
-        "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
+        "empty": "Show a concise explanation when no previously consulted clinician currently has an eligible public offering; retain all past records in Appointments.",
         "error": "Preserve safe user input; distinguish session expiry, permission, validation, service and retryable network failures.",
         "success": "Confirm only the persisted server result; include the resulting status and next permitted action."
       },
@@ -1341,8 +1348,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C01) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Patient dashboard now loads a signed-in-patient-only previous-clinician list from completed encounters, filtered to current approved scope and active published availability. Opaque profile key only; no cross-patient encounter linking.",
+        "current_local": "Backend integration test covers a completed patient-owned appointment, another patient sees no row, clinician role is denied, and account email is absent. Pending execution on the disposable Frappe site; browser rendering pending."
       }
     },
     {

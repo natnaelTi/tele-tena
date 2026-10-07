@@ -1,5 +1,22 @@
 # TeleTena delivery tracker
 
+## Returning-care checkpoint — 2026-10-07
+
+The current dependent branch is `feat/previous-clinicians` at
+`fb58ab13815bd3cc16b9e12675c6f6e2474967a1`. Draft PR #17 targets the open
+PR #16 branch `feat/teletena-operational-completion` at `503a39df2993cbced46ea067cef97917bac8bcf8`;
+neither PR is merged. The patient-home returning-clinician slice is implemented
+but Frappe integration and browser verification are pending. PR #17 CI passed
+frontend builds on Node 22/24 and Python syntax jobs on Python 3.12/3.14.2.
+
+No valid `/teletena/` preview for this source currently runs. Port 8000 is the
+retained Frappe 15 `erp.localhost` bench using its pre-existing checkout; port
+8017 is the separate Frappe 16 compatibility test WSGI process at
+`/home/frappe/teletena-compat/bench` and is not this branch's matching preview.
+Neither service was restarted or migrated. The disposable integration site and
+its temporary DB credential are absent. Do not review either URL as this
+branch's built application.
+
 ## Current implementation checkpoint — 2026-10-07
 
 The active local branch is `feat/teletena-operational-completion` at the PR #15
@@ -39,7 +56,7 @@ test in `selfmade-phone-access-update.md`. Provider acceptance is not delivery.
 | Independent clinicians and multi-clinic affiliations without implied record access | partial | Single-clinician ownership and no affiliation-based access currently; clinic/partner workspace, membership and multiple affiliations not built. |
 | Service definitions, approved clinician offerings, published ETB price and fixed duration | implemented | Native Service and Service Scope; scoped publication/discovery/booking and stale-ID regression checks. |
 | Natural-language request suggestions, eligible clinician matching, editable filters, relevance feedback; eligibility before ranking | partial | Service filter/discovery exists. Natural-language suggestion, relevance ranking/feedback and proximity matching are absent. |
-| Previous clinicians and repeat care discovery | pending | Not represented in current journey/API. |
+| Previous clinicians and repeat care discovery | partial | Dependent slice `feat/previous-clinicians` adds a patient-only dashboard query sourced solely from that patient's Completed appointments and currently approved/publicly bookable clinician offerings, plus profile links and loading/empty/error states. The query returns an opaque profile key and never links other patients' masked encounters. Frappe DB permission and browser verification remain pending because the disposable integration site is not provisioned. |
 | Private open patient requests and clinician offers, isolated from competing clinicians | partial | `feat/open-requests` provides private owner-scoped APIs, offers, fund/slot acceptance and polling. Dependent `feat/vetting-catalog-routing` adds bounded waves, scope revalidation, presence readiness reasons, immediate-policy enforcement and continuous feasible-start selection. On 2026-10-05 the Frappe 16 presentation suite passed 20/20 and the packaged two-session journey passed publication → eligible inbox delivery → private offer → acceptance → one appointment and one reservation journal. A separate test correctly received no Wednesday recipient because the retained schedule is Monday/Tuesday only. Immediate grid-boundary regression is fixed; phone/SMS, pilot performance and call-to-earnings acceptance remain separate gaps. See `vetting-routing-verification.md`. |
 | Progressive explainable routing, service catalog and clinician vetting | partial | Additive linked native category/approach/topic/format/attribute and per-scope application/assessment DocTypes; catalog remains draft/inactive pending clinical review. Applicant drafts, reviewer assignment, clarification/resubmission, per-scope decisions and private resume reference exist. Proposed rubric v1.0 is not approved. Full mandatory credential/jurisdiction/accessibility validation, affiliation verification, scored assessment, appeals/reverification and transparent eligibility-first ranking remain pending. Structured session-experience, immediate-inbox offer-response, and clinician-attributed cancellation indicators now have versioned formulas and sample suppression in source; Frappe migration/query/privacy/browser acceptance is pending. See `session-experience-metric.md`. |
 | Free patient discovery/booking and bring-your-own-patient links | partial | Current demo supports direct discovery/booking; clinician referral links/acquisition attribution not built. |

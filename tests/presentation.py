@@ -873,6 +873,18 @@ class Presentation(unittest.TestCase):
         self.assertNotIn('private_note', shared)
         self.assertEqual(shared['patient_summary_revisions'][0]['summary'], 'Helpful next steps')
         self.assertTrue(shared['can_submit_feedback'])
+        previous = journey.previous_clinicians()
+        self.assertEqual(len(previous), 1)
+        self.assertEqual(previous[0].display_name, 'Synthetic clinician c1')
+        self.assertEqual(previous[0].completed_sessions, 1)
+        self.assertNotEqual(previous[0].clinician_id, fixtures.USERS['c1'])
+        self.assertNotIn(fixtures.USERS['c1'], json.dumps(previous))
+        fixtures.login('p2')
+        self.assertEqual(journey.previous_clinicians(), [])
+        fixtures.login('c2')
+        with self.assertRaises(frappe.PermissionError):
+            journey.previous_clinicians()
+        fixtures.login('p1')
         frappe.db.commit()
         feedback_barrier = threading.Barrier(2)
         def submit_feedback():

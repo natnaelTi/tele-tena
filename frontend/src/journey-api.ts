@@ -13,12 +13,14 @@ export type TimeSlot = {start: string; end: string; local_time: string; timezone
 export type ScheduleInterval = {weekday: number; start_local: string; end_local: string}
 export type ScheduleException = {date: string; kind: 'unavailable' | 'replace' | 'break'; start_local?: string | null; end_local?: string | null}
 export type Schedule = {id: string; offering: string; schedule_name: string; timezone: string; consultation_format: 'audio'|'video'; confirmation_mode: 'automatic'|'manual'; minimum_notice_minutes: number; horizon_days: number; buffer_before: number; buffer_after: number; status: 'Draft'|'Published'|'Paused'; service_label: string; minutes: number; intervals: ScheduleInterval[]; exceptions: ScheduleException[]}
+export type PreviousClinician = {clinician_id:string;display_name:string;last_consultation:string;completed_sessions:number}
 
 /** Domain-facing API. Frappe method names and HTTP/CSRF details stay out of views. */
 export const journeyApi = {
   session: () => api<Session>('session'),
   services: () => api<Service[]>('services'),
   discover: (service = '') => api<Offer[]>('discover', service ? { service } : {}),
+  previousClinicians: () => api<PreviousClinician[]>('previous_clinicians'),
   wallet: () => api<{ available: number; reserved: number }>('wallet'),
   applications: () => api<Application[]>('applications'),
   serviceScopes: () => api<{ clinician: string; service: string; status: string }[]>('service_scopes'),

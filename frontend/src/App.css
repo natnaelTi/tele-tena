@@ -553,6 +553,45 @@ button:active {
   margin: 0;
   font-size: 20px;
 }
+.previous-clinician-list {
+  display: grid;
+  gap: 10px;
+}
+.previous-clinician-row {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-card, #fff);
+}
+.previous-clinician-copy {
+  flex: 1;
+  min-width: 0;
+}
+.previous-clinician-copy h3,
+.previous-clinician-copy p {
+  margin: 0;
+}
+.previous-clinician-row .button {
+  min-height: 44px;
+}
+@media (max-width: 520px) {
+  .previous-clinician-row {
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    padding: 14px;
+  }
+  .previous-clinician-copy {
+    flex-basis: calc(100% - 56px);
+  }
+  .previous-clinician-row .button {
+    width: 100%;
+    justify-content: center;
+  }
+}
 .section-line a {
   font-size: 14px;
 }

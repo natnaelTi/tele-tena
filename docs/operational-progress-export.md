@@ -1,10 +1,21 @@
 # Current operational checkpoint — 2026-10-07
 
+## Later dependent branch checkpoint
+
+Current source is `fb58ab13815bd3cc16b9e12675c6f6e2474967a1` on
+`feat/previous-clinicians`; draft PR #17 depends on PR #16 at
+`503a39df2993cbced46ea067cef97917bac8bcf8`. The browser code and patient-only
+query for returning clinicians are implemented. PR #17 CI passed. The
+Frappe-backed regression and matching local `/teletena/` preview remain pending.
+The original Frappe 15 site was preserved and not migrated. Port 8017 is still
+the separate Frappe 16 compatibility WSGI app and does not serve this checkout.
+
 This current section supersedes the historical checkpoint below. Do not use its old source SHA as the current release.
 
 - Current implementation branch: `feat/teletena-operational-completion`; draft PR #16 targets PR #15’s integration branch and retains PR #12–#15 ancestry. It is pushed for review but remains unmerged; no remote deployment occurred.
 - Added one immutable 1–5 patient session-experience rating after an ended and explicitly finalized encounter. Same-payload retry is idempotent; changed retry, premature feedback, other-patient access, clinician access, and concurrent duplicate submissions have regression assertions. Public clinician profiles expose a rolling 365-day experience aggregate, a 90-day offer response rate for immediate requests actually fetched while availability is fresh, and a 365-day clinician-attributed cancellation rate. Each metric has separate evidence counts and hides rates below five observations. Patient cancellations, unconfirmed holds, and unsupported no-shows are not attributed to clinicians. These are operational/experience indicators, not clinical competence or outcome evidence. See `session-experience-metric.md`.
 - Added v1.14 migration/bootstrap, migration-preservation and fresh-install assertions, English/Amharic/Afaan Oromo provisional UI strings, and focused backend regression assertions. Pure metric tests pass (4/4), Python compile, TypeScript/Vite build, and lint pass; lint retains existing React warnings. Frappe query/migration/browser verification has not run.
+- Dependent branch `feat/previous-clinicians` adds a patient-only returning-care query and dashboard cards, limited to the signed-in patient's own completed appointments and clinicians who currently have an approved scope and published schedule. It exposes only the clinician's opaque public profile key and display name; no other patient's history is linked. An integration regression covers patient isolation and clinician denial but is pending a disposable Frappe site.
 - The latest source still has no isolated disposable site: `/tmp/tele-tena-pr12-db-admin.json` and `sites/tele-tena-pr12-fresh.localhost` are absent. Frappe migration/integration/browser assertions for this feature have not run. There is no current-source preview URL. The existing port 8017 process is the older Frappe 16 compatibility checkout and is not valid for this branch.
 - `docs/operational-screen-map.json` still covers 142 screens/14 journeys; E12 and F12 moved from Designed to Implemented, verification pending. This is not full acceptance. Clinic, couples, laboratory/diagnostics, subscriptions, second opinions, medical tourism, feedback moderation, and other designed screens remain incomplete or externally gated as recorded in the map/tracker.
 - No live SMS, physical-device, clinical/native translation, provider settlement, remote Selfmade update, or production-care acceptance is claimed.
