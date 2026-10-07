@@ -598,6 +598,8 @@ button:active {
 }
 .clinic-record-row > div { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
 .clinic-record-row strong { overflow-wrap: anywhere; word-break: break-word; }
+.clinic-membership-history { margin-top: 12px; border-top: 1px solid var(--border-default); }
+.clinic-membership-history > summary { display: flex; align-items: center; min-height: 48px; cursor: pointer; color: var(--text-secondary); font-weight: 600; }
 .clinic-review-card {
   margin: 12px 0;
   padding: 20px;

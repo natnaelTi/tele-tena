@@ -83,6 +83,7 @@ const words: Record<string, [string, string]> = {
   "Clinic membership supports operational work only. It does not grant access to patient records or authorize clinical services.": ["የክሊኒክ አባልነት ለአስተዳደር ሥራ ብቻ ነው። የታካሚ መዝገብ መዳረሻ ወይም የሕክምና ፈቃድ አይሰጥም።", "Miseensummaan kilinikaa hojii bulchiinsaa qofaaf. Galmee dhukkubsataa hin banu; tajaajila yaalaas hin hayyamu."],
   "Clinic workspace": ["የክሊኒክ የሥራ ቦታ", "Iddoo hojii kilinikaa"],
   "You don’t have access to a clinic workspace.": ["የክሊኒክ የሥራ ቦታ መዳረሻ የለዎትም።", "Iddoo hojii kilinikaa seenuuf hayyamni hin jiru."],
+  "Past memberships": ["ያለፉ አባልነቶች", "Miseensummaa darban"],
   "CLINIC OPERATIONS": ["የክሊኒክ አስተዳደር", "BULCHIINSA KILINIKAA"],
   "Invitations for you": ["የእርስዎ ግብዣዎች", "Affeerraa siif ergaman"],
   "No clinic invitations.": ["የክሊኒክ ግብዣ የለም።", "Affeerraan kilinikaa hin jiru."],
