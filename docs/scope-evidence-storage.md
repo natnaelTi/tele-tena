@@ -34,11 +34,21 @@ record is rewritten by migration.
 
 ## Verification
 
-On the isolated Frappe 15 site, the presentation suite checks that applicants
-can create revisions before submission, invalid and post-submission uploads do
-not persist, unrelated clinicians and patients cannot download evidence,
-reviewers can retrieve it, and the assessment stores the revision snapshot.
-Fresh-site installation from an empty database and rendered applicant/reviewer
-browser acceptance remain pending for this patch. Human credential checks,
-medical-lead approval of the proposed rubric and external malware scanning are
-separate gates.
+On the isolated Frappe 15 site, `tests/presentation.py` passed 27/27. It checks
+that applicants can create revisions before submission, invalid and
+post-submission uploads do not persist, unrelated clinicians and patients
+cannot download evidence, reviewers can retrieve it, and the assessment stores
+the revision snapshot. Patch v1.16 migrated twice on both retained isolated
+sites without removing data.
+
+The production-built `/teletena/` browser journey passed on
+`tele-tena-pr12-fresh.localhost`: synthetic applicant sign-in, two private PDF
+revisions, scope application submission, reviewer queue visibility, and
+authorized download of the newest revision. The screenshot evidence is in
+`/tmp/tele-tena-presentation-review/scope-evidence/`. The preview returned HTTP
+200 and uses the packaged Frappe app, not Vite. This browser run exercised the
+retained migrated site; it is not a fresh-empty-database install check.
+
+Fresh-empty-site installation for this patch remains pending. Human credential
+checks, medical-lead approval of the proposed rubric and external malware
+scanning are separate gates.

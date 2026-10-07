@@ -1036,11 +1036,11 @@
       "module": "Profiles/vetting",
       "backend_reference": "journey, vetting, private evidence",
       "required_contract": "Guided profiles, scoped review decisions, protected evidence",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Applicant browser flow locally verified on isolated Frappe 15; clean fresh install remains pending",
       "prototype_route": "b09",
       "route": "/clinician/vetting",
       "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_profile",
         "tt_onboarding",
@@ -1095,8 +1095,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B09) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Backend/API regression on Frappe 15 retained isolated site passed in tests/presentation.py (27/27), including PDF validation, revision history, submitted-state lock, owner/reviewer download, patient/unrelated-clinician denial, and assessment evidence snapshot. Patch v1.16 repeat migration passed after a site/database/private-files backup. Rendered browser and fresh-empty-site checks for this screen are pending; no external credential validation or malware scanning is claimed."
+        "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
+        "current_local": "Frappe 15 isolated presentation regressions passed 27/27; built-browser applicant sign-in, two PDF revisions, submission, persistence on revisit, and reviewer-visible submitted evidence passed on tele-tena-pr12-fresh.localhost. Evidence screenshots: /tmp/tele-tena-presentation-review/scope-evidence/applicant-revisions.png. Patch v1.16 repeat migration passed after backup. Fresh-empty-site check remains pending; no external credential validation or malware scanning is claimed."
       }
     },
     {
@@ -1106,11 +1106,11 @@
       "module": "Profiles/vetting",
       "backend_reference": "journey, vetting, private evidence",
       "required_contract": "Guided profiles, scoped review decisions, protected evidence",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Reviewer browser flow locally verified on isolated Frappe 15; clean fresh install remains pending",
       "prototype_route": "b10",
       "route": "/clinician/vetting",
       "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_profile",
         "tt_onboarding",
@@ -1165,8 +1165,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B10) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Backend/API regression on Frappe 15 retained isolated site passed in tests/presentation.py (27/27), including PDF validation, revision history, submitted-state lock, owner/reviewer download, patient/unrelated-clinician denial, and assessment evidence snapshot. Patch v1.16 repeat migration passed after a site/database/private-files backup. Rendered browser and fresh-empty-site checks for this screen are pending; no external credential validation or malware scanning is claimed."
+        "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
+        "current_local": "Frappe 15 isolated presentation regressions passed 27/27, including owner/reviewer authorization and assessment evidence snapshot. Built-browser reviewer queue displayed submitted applicant and evidence; authorized reviewer downloaded the newest private PDF revision successfully. Screenshot: /tmp/tele-tena-presentation-review/scope-evidence/reviewer-evidence.png. Patch v1.16 repeat migration passed after backup. Fresh-empty-site check remains pending; no external credential validation or malware scanning is claimed."
       }
     },
     {
