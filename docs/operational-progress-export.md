@@ -1,5 +1,29 @@
 # Current operational checkpoint — 2026-10-07
 
+## Clinic affiliation subflow — 2026-10-07
+
+The focused branch `feat/clinic-affiliation-review` continues from
+`feat/previous-clinicians`. On disposable Frappe 15, presentation API tests
+passed 22/22, OTP state-machine tests passed 7/7 with a mocked mail provider
+and enabled-registration test fixture, and a built `/teletena/` browser journey
+passed clinic and affiliation human-review workflows. The local preview is
+`http://127.0.0.1:8017/teletena/`, site `tele-tena-pr12-fresh.localhost`; both
+backend and production asset source match this branch. No live email/SMS was
+sent. The branch remains partial: clinic staff/workspace/resource/billing and
+encounter-grant operations, Frappe 16 compatibility, and responsive/native
+language evidence remain outstanding. This checkpoint does not claim the wider
+screen/product inventory complete.
+
+The exact production asset source is recorded as
+`8e3a298bdc3f2624cdf0fb5d256fc469177fea36`; the branch's later commits only
+update tests and verification documents, with no app source change.
+
+The presentation/integration regressions now pass 22/22 and 24/24 respectively;
+integration temporarily enabled only this disposable site's signup flags,
+restored invited-review mode, and mocked SMS. The test site's scheduler remains
+disabled and no site-isolated worker runs, so queued financial release/routing
+is not represented as operational.
+
 ## Later dependent branch checkpoint
 
 Current source is `fb58ab13815bd3cc16b9e12675c6f6e2474967a1` on

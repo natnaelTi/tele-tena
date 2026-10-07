@@ -82,4 +82,12 @@ export const journeyApi = {
   saveScopeApplication: (service:string, values:Record<string,unknown>, submit=false) => api<any>('tele_tena.api.vetting.save_scope_application',{service,values,submit:submit?1:0},true),
   reviewScopeApplication: (data:Record<string,unknown>) => api<any>('tele_tena.api.vetting.review_scope_application',data,true),
   assignScopeReviewer: (application:string,reviewer:string) => api<any>('tele_tena.api.vetting.assign_scope_reviewer',{application,reviewer},true),
+  myClinicApplications: () => api<any[]>('tele_tena.api.clinics.my_clinic_applications'),
+  submitClinicApplication: (data:Record<string,unknown>) => api<any>('tele_tena.api.clinics.submit_clinic_application',data,true),
+  myAffiliations: () => api<any[]>('tele_tena.api.clinics.my_affiliations'),
+  verifiedClinics: () => api<any[]>('tele_tena.api.clinics.verified_clinics'),
+  submitAffiliation: (data:Record<string,unknown>) => api<any>('tele_tena.api.clinics.submit_affiliation',data,true),
+  clinicReviewQueue: () => api<{clinics:any[];affiliations:any[]}>('tele_tena.api.clinics.review_queue'),
+  reviewClinic: (application:string,decision:'Verified'|'Rejected'|'Suspended',reason:string) => api<any>('tele_tena.api.clinics.review_clinic',{application,decision,reason},true),
+  reviewAffiliation: (application:string,decision:'Verified'|'Clarification'|'Rejected'|'Revoked',reason:string) => api<any>('tele_tena.api.clinics.review_affiliation',{application,decision,reason},true),
 }

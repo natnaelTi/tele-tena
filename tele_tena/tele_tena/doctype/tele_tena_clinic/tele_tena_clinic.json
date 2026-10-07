@@ -1,0 +1,33 @@
+{
+  "doctype": "DocType",
+  "name": "Tele Tena Clinic",
+  "module": "Tele Tena",
+  "autoname": "hash",
+  "title_field": "clinic_name",
+  "search_fields": "clinic_name,legal_name,jurisdiction",
+  "fields": [
+    {"fieldname":"clinic_name","label":"Clinic Name","fieldtype":"Data","reqd":1,"in_list_view":1,"in_standard_filter":1},
+    {"fieldname":"legal_name","label":"Legal Name","fieldtype":"Data","reqd":1},
+    {"fieldname":"registration_reference","label":"Registration Reference","fieldtype":"Data","reqd":1},
+    {"fieldname":"jurisdiction","label":"Jurisdiction","fieldtype":"Data","reqd":1,"in_list_view":1},
+    {"fieldname":"public_description","label":"Public Description","fieldtype":"Small Text"},
+    {"fieldname":"status","label":"Status","fieldtype":"Select","options":"Draft\nSubmitted\nVerified\nRejected\nSuspended","default":"Draft","reqd":1,"in_list_view":1,"in_standard_filter":1},
+    {"fieldname":"previous_application","label":"Previous Application","fieldtype":"Link","options":"Tele Tena Clinic","read_only":1,"no_copy":1},
+    {"fieldname":"submitted_by","label":"Submitted By","fieldtype":"Link","options":"User","read_only":1},
+    {"fieldname":"submitted_at","label":"Submitted At","fieldtype":"Datetime","read_only":1},
+    {"fieldname":"reviewed_by","label":"Reviewed By","fieldtype":"Link","options":"User","read_only":1},
+    {"fieldname":"reviewed_at","label":"Reviewed At","fieldtype":"Datetime","read_only":1},
+    {"fieldname":"decision_reason","label":"Decision Reason","fieldtype":"Small Text","read_only":1}
+  ],
+  "permissions": [
+    {"role":"Tele Tena Clinician","read":1,"write":1,"create":1},
+    {"role":"Tele Tena Applicant","read":1,"write":1,"create":1},
+    {"role":"Tele Tena Approver","read":1,"write":1,"create":1},
+    {"role":"System Manager","read":1,"write":1,"create":1}
+  ],
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "allow_rename": 0,
+  "sort_field": "modified",
+  "sort_order": "DESC"
+}

@@ -1,5 +1,55 @@
 # TeleTena delivery tracker
 
+## Current clinic and authentication verification — 2026-10-07
+
+Current branch `feat/clinic-affiliation-review` is a focused dependent slice
+on `feat/previous-clinicians`; its latest pushed head is shown by PR #18. The
+reviewed backend/product code and packaged frontend source are at
+`8e3a298bdc3f2624cdf0fb5d256fc469177fea36`; subsequent branch commits update
+tests and verification documents only. This is not the complete
+approved A–I product scope. The matching built preview is
+`http://127.0.0.1:8017/teletena/`, served from
+`/home/frappe/frappe/frappe-bench`, site
+`tele-tena-pr12-fresh.localhost`, Frappe 15.121.2 / ERPNext 15.121.6 / Python
+3.12.3 / Node 22.23.3. The running backend imported the branch's matching
+product code and the production asset manifest records source `8e3a298`; the
+app is not served by Vite.
+The retained `erp.localhost` site has not been migrated or reseeded. The review
+site remains invited-review configuration; phone OTP and public registration
+are disabled there.
+
+Clinic registration and clinician affiliation now have persistent native
+DocTypes, applicant-owned submission/resubmission, separate human decisions,
+audited reasoned transitions, and generic DocType permission checks. A real
+Playwright journey against the built Frappe app passed clinician clinic
+submission → reviewer verification → clinician affiliation request → separate
+reviewer decision. `tests/presentation.py` passed 22/22. The contact-auth
+regressions passed 7/7 after separating test configuration from the retained
+invited-review site: SMTP configuration and registration policy are mocked
+only for that enabled-registration state-machine suite; no mail was sent and
+the site's flags were not changed. Screenshots are in
+`docs/screenshots/clinic-review/`.
+
+The Frappe integration suite also passed 24/24 after aligning its HTTP origin
+with the built port 8017 and replacing stale calls to the retired guest-phone
+API with the current `contact_auth` API. The disposable site's phone and public
+registration flags were temporarily enabled for that run and restored in
+cleanup; the preview is again invited-only. SMS transport was mocked and no
+live message was sent.
+
+This is partial clinic onboarding/review, not clinic operations. Memberships,
+staff invitations, shared calendars/resources, clinic billing and encounter
+grants remain pending. Responsive clinic/admin review, real SMTP/SMS, mobile
+devices, native-language review, and Frappe 16 compatibility for this added
+schema are not verified. Other A–I scope remains at the per-screen status in
+`operational-screen-map.json`; the map is not an implementation claim.
+
+Scheduler status on this disposable site is disabled and no worker is running.
+The integration suite covers scheduling/dispatch command behavior but does not
+prove queued earnings release or routing executes. Do not demonstrate those
+scheduled transitions until an isolated queue and worker are configured; the
+shared bench queue must not be drained accidentally.
+
 ## Returning-care checkpoint — 2026-10-07
 
 The current dependent branch is `feat/previous-clinicians` at
@@ -53,7 +103,7 @@ test in `selfmade-phone-access-update.md`. Provider acceptance is not delivery.
 | Phone/email possession codes, expiry, single use, rate/abuse controls and separated onboarding | partial | `contact_auth.py`, `email_delivery.py`, v1_5 migration, 7 contact-auth and 24 integration regressions. SMS/email send adapters are mocked. SMTP and SMS credentials/consenting recipients are not configured or live-tested. Professional evidence intake is narrative only; code proves contact possession, not credential verification. |
 
 | Clinician approval and per-service approval | implemented | Manual approver flow and native Service Scope DocType; PR #2 review verification and MariaDB integration tests. |
-| Independent clinicians and multi-clinic affiliations without implied record access | partial | Single-clinician ownership and no affiliation-based access currently; clinic/partner workspace, membership and multiple affiliations not built. |
+| Independent clinicians and multi-clinic affiliations without implied record access | partial | Current branch adds native clinic registrations, individually reviewed affiliations, verified clinic name/jurisdiction lookup, correction/reapplication linked to rejected history, and generic DocType list/document permission hooks. `tests/presentation.py` passed 22/22 and the built Frappe Playwright flow passed clinician registration → clinic verification → affiliation submission → separate affiliation decision. Screenshots are in `docs/screenshots/clinic-review/`. Clinic status and affiliation never create service scopes or patient access; legacy narrative affiliations are untouched. Staff invitations/memberships, clinic workspace, resources, billing and encounter-grant administration remain unimplemented. Responsive/translation evidence and Frappe 16 compatibility for this addition remain pending. |
 | Service definitions, approved clinician offerings, published ETB price and fixed duration | implemented | Native Service and Service Scope; scoped publication/discovery/booking and stale-ID regression checks. |
 | Natural-language request suggestions, eligible clinician matching, editable filters, relevance feedback; eligibility before ranking | partial | Service filter/discovery exists. Natural-language suggestion, relevance ranking/feedback and proximity matching are absent. |
 | Previous clinicians and repeat care discovery | partial | Dependent slice `feat/previous-clinicians` adds a patient-only dashboard query sourced solely from that patient's Completed appointments and currently approved/publicly bookable clinician offerings, plus profile links and loading/empty/error states. The query returns an opaque profile key and never links other patients' masked encounters. Frappe DB permission and browser verification remain pending because the disposable integration site is not provisioned. |
@@ -82,7 +132,7 @@ test in `selfmade-phone-access-update.md`. Provider acceptance is not delivery.
 
 ## Current delivery and remaining sequence
 
-1. Contact verification and onboarding are implemented on the consolidation branch. Live delivery awaits secure local configuration and a consenting recipient. Do not treat codes as SMS/email delivery proof or professional approval.
+1. Contact verification and onboarding are implemented. The email OTP state-machine suite passed 7/7 with a mocked provider and enabled-registration fixture; the retained review site remains invitation-only. Live delivery awaits secure local configuration and a consenting recipient. Do not treat codes as SMS/email delivery proof or professional approval.
 2. The TeleTena design and focused React journeys are implemented on merged main through PR #6 (`7222836`). This presentation feature branch extends that baseline; its new visual and behavioral evidence is in `docs/presentation-readiness-verification.md`.
 3. Discovery, previous clinicians, private requests and offers.
 4. Mutual rescheduling, actor-specific production cancellation policy, no-show actions, and production refund rules. This branch adds only an explicit pre-start demonstration cancellation/release policy.

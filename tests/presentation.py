@@ -24,6 +24,7 @@ from tele_tena.api import scheduling
 from tele_tena.api import open_requests
 from tele_tena.api import vetting
 from tele_tena.api import trust
+from tele_tena.api import clinics
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -107,6 +108,94 @@ class Presentation(unittest.TestCase):
                 'decision':'Approved','findings':'Synthetic direct-write attempt'}).insert()
         fixtures.login('c1')
         with self.assertRaises(frappe.ValidationError): journey.publish(service,50000,30)
+
+    def test_clinic_registration_and_affiliation_are_separate_from_scope_and_records(self):
+        baseline_scopes = frappe.db.count('Tele Tena Service Scope',
+            {'clinician': fixtures.USERS['c1']})
+        fixtures.login('c1')
+        values = dict(clinic_name='Synthetic North Clinic', legal_name='Synthetic North Care Ltd',
+            registration_reference='TEST-CLINIC-' + secrets.token_hex(4),
+            jurisdiction='Synthetic jurisdiction', public_description='Synthetic test clinic')
+        clinic = clinics.submit_clinic_application(**values)
+        self.assertEqual(clinic['status'], 'Submitted')
+        self.assertTrue(clinics.submit_clinic_application(**values)['idempotent'])
+        application = clinic['application']
+        fixtures.login('c2')
+        with self.assertRaises(frappe.ValidationError):
+            clinics.submit_clinic_application(**values)
+        self.assertFalse(frappe.has_permission('Tele Tena Clinic', 'read',
+            doc=frappe.get_doc('Tele Tena Clinic', application), user=fixtures.USERS['c2']))
+        self.assertEqual(frappe.get_list('Tele Tena Clinic', fields=['name']), [])
+        fixtures.login('admin')
+        reviewed = clinics.review_clinic(application, 'Verified',
+            'Synthetic registry lookup recorded for test only.')
+        self.assertEqual(reviewed['status'], 'Verified')
+        with self.assertRaises(frappe.ValidationError):
+            clinics.review_clinic(application, 'Rejected', 'Conflicting second decision.')
+        from tele_tena.account_context import authorized_user_change
+        clinician_user = frappe.get_doc('User', fixtures.USERS['c1'])
+        with authorized_user_change():
+            clinician_user.add_roles('Tele Tena Approver')
+        frappe.clear_cache(user=clinician_user.name)
+        fixtures.login('c1')
+        with self.assertRaises(frappe.PermissionError):
+            clinics.review_clinic(application, 'Suspended', 'Self-review is forbidden.')
+        fixtures.login('admin')
+        with authorized_user_change():
+            clinician_user.remove_roles('Tele Tena Approver')
+        frappe.clear_cache(user=clinician_user.name)
+        self.assertIn('Tele Tena Clinician', frappe.get_roles(fixtures.USERS['c1']))
+        fixtures.login('c1')
+        affiliation = clinics.submit_affiliation(application, 'Synthetic counselor',
+            'Synthetic affiliation evidence summary for test only.')
+        self.assertEqual(affiliation['status'], 'Submitted')
+        self.assertTrue(clinics.submit_affiliation(application, 'Synthetic counselor',
+            'Synthetic affiliation evidence summary for test only.')['idempotent'])
+        affiliation_id = affiliation['application']
+        with self.assertRaises(frappe.PermissionError):
+            clinics.review_affiliation(affiliation_id, 'Verified', 'Not authorized')
+        applicant_doc = frappe.get_doc('Tele Tena Clinic Affiliation', affiliation_id)
+        applicant_doc.status = 'Verified'
+        with self.assertRaises(frappe.PermissionError):
+            applicant_doc.save()
+        fixtures.login('c2')
+        self.assertEqual(clinics.my_affiliations(), [])
+        self.assertEqual(frappe.get_list('Tele Tena Clinic Affiliation', fields=['name']), [])
+        self.assertFalse(frappe.has_permission('Tele Tena Clinic Affiliation', 'read',
+            doc=frappe.get_doc('Tele Tena Clinic Affiliation', affiliation_id),
+            user=fixtures.USERS['c2']))
+        fixtures.login('admin')
+        requested = clinics.review_affiliation(affiliation_id, 'Clarification',
+            'Synthetic reviewer requested supporting detail.')
+        self.assertEqual(requested['status'], 'Clarification')
+        fixtures.login('c1')
+        resubmitted = clinics.submit_affiliation(application, 'Synthetic counselor',
+            'Synthetic clarification response.', application=affiliation_id)
+        self.assertEqual(resubmitted['status'], 'Submitted')
+        fixtures.login('admin')
+        approved_affiliation = clinics.review_affiliation(affiliation_id, 'Verified',
+            'Synthetic affiliation evidence checked for test only.')
+        self.assertEqual(approved_affiliation['status'], 'Verified')
+        self.assertEqual(frappe.db.count('Tele Tena Service Scope',
+            {'clinician': fixtures.USERS['c1']}), baseline_scopes)
+
+        # A rejected registration remains immutable history while its owner can
+        # correct and resubmit the same registration reference.
+        rejected_values = dict(values, registration_reference='TEST-REJECT-' + secrets.token_hex(4))
+        fixtures.login('c1')
+        rejected = clinics.submit_clinic_application(**rejected_values)['application']
+        fixtures.login('admin')
+        clinics.review_clinic(rejected, 'Rejected', 'Synthetic missing evidence.')
+        fixtures.login('c1')
+        corrected_values = dict(rejected_values, public_description='Corrected synthetic evidence note')
+        resubmission = clinics.submit_clinic_application(**corrected_values)
+        self.assertEqual(resubmission['status'], 'Submitted')
+        self.assertNotEqual(resubmission['application'], rejected)
+        self.assertEqual(frappe.db.get_value('Tele Tena Clinic',
+            resubmission['application'], 'previous_application'), rejected)
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            clinics.review_queue()
 
     def test_vetting_draft_clarification_resubmission_and_scope_decision(self):
         service = fixtures.PREFIX + '-reviewed-scope'
@@ -414,7 +503,9 @@ class Presentation(unittest.TestCase):
     def test_two_patients_cannot_claim_one_offer_slot_concurrently(self):
         offering = fixtures.Integration.offers['c1']
         service = fixtures.PREFIX
-        day = day_offset(28)
+        # Avoid colliding with an intentionally retained appointment from a
+        # prior interrupted run of this suite on the same disposable site.
+        day = day_offset(28 + secrets.randbelow(20))
         fixtures.login('c1')
         journey.save_profile('clinician', 'Synthetic slot clinician', 1, languages=['en'])
         journey.publish(service, 30000, 30)
@@ -462,8 +553,10 @@ class Presentation(unittest.TestCase):
         frappe.db.rollback()
         self.assertEqual(sum(state == 'matched' for state, _appointment in results), 1)
         self.assertEqual(sum(state == 'conflict' for state, _appointment in results), 1)
-        self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_appointment WHERE start=%s AND state='Booked'",
-                                     (slot['start'],)).n, 1)
+        booked_rows = journey.rows("SELECT start,end,state FROM tt_appointment WHERE start=%s AND state='Booked'",
+                                   (slot['start'],))
+        self.assertEqual(len(booked_rows), 1,
+                         msg='Expected one globally reserved start; found ' + repr([(str(r.start), str(r.end), r.state) for r in booked_rows]))
         self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_request_offer WHERE id IN %s AND state='Accepted'",
                                      (tuple(offers),)).n, 1)
 
@@ -875,10 +968,10 @@ class Presentation(unittest.TestCase):
         self.assertTrue(shared['can_submit_feedback'])
         previous = journey.previous_clinicians()
         self.assertEqual(len(previous), 1)
-        self.assertEqual(previous[0].display_name, 'Synthetic clinician c1')
+        self.assertEqual(previous[0].display_name, 'Synthetic Test')
         self.assertEqual(previous[0].completed_sessions, 1)
         self.assertNotEqual(previous[0].clinician_id, fixtures.USERS['c1'])
-        self.assertNotIn(fixtures.USERS['c1'], json.dumps(previous))
+        self.assertNotIn(fixtures.USERS['c1'], json.dumps(previous, default=str))
         fixtures.login('p2')
         self.assertEqual(journey.previous_clinicians(), [])
         fixtures.login('c2')
@@ -903,7 +996,7 @@ class Presentation(unittest.TestCase):
         self.assertEqual(sum(not result['idempotent'] for result in feedback_results), 1)
         self.assertTrue(all(result['submitted'] for result in feedback_results))
         self.assertTrue(trust.submit_session_feedback(appointment, 5)['idempotent'])
-        self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_appointment_event WHERE appointment=%s AND event_type='PatientSessionExperienceSubmitted'", (appointment,)).n, 1)
+        self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_appointment_event WHERE appointment=%s AND event_type='SessionFeedbackSubmitted'", (appointment,)).n, 1)
         with self.assertRaises(frappe.ValidationError):
             trust.submit_session_feedback(appointment, 4)
         with self.assertRaises(frappe.ValidationError):

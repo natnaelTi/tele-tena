@@ -11,6 +11,7 @@ import {
   Wallet,
   Clock3,
   FileHeart,
+  Building2,
 } from "lucide-react";
 import { Brand } from "../components/Brand";
 import { Button, InlineNotice, Skeleton } from "../components/ui";
@@ -152,6 +153,7 @@ const clinicianNav = [
   ["/clinician/availability", "Availability", Clock3],
   ["/clinician/services", "Services & pricing", Stethoscope],
   ["/clinician/vetting", "Professional review", ClipboardCheck],
+  ["/clinician/affiliations", "Clinics & affiliations", Building2],
   ["/clinician/care", "Care records", FileHeart],
   ["/clinician/earnings", "Earnings", Wallet],
   ["/clinician/account", "Account", Settings2],
@@ -160,6 +162,7 @@ const adminNav = [
   ["/admin", "Applications", ClipboardCheck],
   ["/admin/scopes", "Service scopes", Stethoscope],
   ["/admin/vetting", "Scope vetting", ClipboardCheck],
+  ["/admin/clinics", "Clinics", Building2],
   ["/admin/financial-disputes", "Financial disputes", Wallet],
   ["/admin/exceptions", "Exceptions", Settings2],
 ] as const;

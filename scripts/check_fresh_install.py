@@ -207,6 +207,8 @@ try:
     assert 'tt_consultation' in frappe.db.get_tables(cached=False)
     assert frappe.db.exists('DocType', 'Tele Tena Service')
     assert frappe.db.exists('DocType', 'Tele Tena Service Scope')
+    assert frappe.db.exists('DocType', 'Tele Tena Clinic')
+    assert frappe.db.exists('DocType', 'Tele Tena Clinic Affiliation')
     assert frappe.db.sql("SHOW COLUMNS FROM tt_appointment LIKE 'policy_snapshot'")
     assert frappe.db.sql("SHOW COLUMNS FROM tt_application LIKE 'requested_services'")
     assert frappe.db.count('Tele Tena Service Scope') == 0

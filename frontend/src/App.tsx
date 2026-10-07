@@ -33,6 +33,7 @@ import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage
 import Showcase from "./pages/Showcase";
 import { ClinicianRequestInbox, PatientOpenRequests, PublicClinicianProfile } from "./pages/OpenRequests";
 import { ClinicianScopeApplications, VettingQueue } from "./pages/Vetting";
+import { ClinicianAffiliations, ClinicReview } from "./pages/Clinics";
 import PWAUpdateNotice from "./components/PWAUpdateNotice";
 import "./App.css";
 export default function App() {
@@ -106,11 +107,13 @@ export default function App() {
                 <Route path="care/:id" element={<CareRecordDetail />} />
                 <Route path="earnings" element={<ClinicianEarnings />} />
                 <Route path="vetting" element={<ClinicianScopeApplications />} />
+                <Route path="affiliations" element={<ClinicianAffiliations />} />
               </Route>
               <Route path="/admin" element={<WorkspaceLayout kind="admin" />}>
                 <Route index element={<Applications />} />
                 <Route path="scopes" element={<Scopes />} />
                 <Route path="vetting" element={<VettingQueue />} />
+                <Route path="clinics" element={<ClinicReview />} />
                 <Route path="financial-disputes" element={<FinancialDisputes />} />
                 <Route
                   path="exceptions"

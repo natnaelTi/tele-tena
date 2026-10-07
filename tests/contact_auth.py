@@ -50,6 +50,25 @@ class ContactAuth(unittest.TestCase):
         frappe.set_user('Guest')
         self.contact = 'tt-contact-' + secrets.token_hex(8) + '@example.invalid'
         self.contacts.append(self.contact)
+        # The site intentionally has no live email provider. Authentication
+        # tests exercise the mocked delivery path, so satisfy the separate
+        # configuration gate without creating a credential file or sending mail.
+        self.email_configuration = patch(
+            'tele_tena.email_delivery.configuration',
+            return_value={'host': 'mock.invalid', 'sender': 'noreply@example.invalid',
+                          'username': 'mock', 'password': 'mock', 'port': 587},
+        )
+        self.email_configuration.start()
+        self.addCleanup(self.email_configuration.stop)
+        # These OTP state-machine tests exercise the enabled-registration
+        # configuration. The retained review site remains invitation-only;
+        # site-policy enforcement is covered by its separate disabled-mode
+        # integration checks.
+        self.registration_policy = patch(
+            'tele_tena.review.registration_enabled', return_value=True,
+        )
+        self.registration_policy.start()
+        self.addCleanup(self.registration_policy.stop)
         self.peer = patch.object(phone_auth, '_peer_ip', return_value='synthetic-' + secrets.token_hex(8))
         self.peer.start()
         self.addCleanup(self.peer.stop)
