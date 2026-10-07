@@ -36,6 +36,13 @@ Date: 2026-10-08
 - Frontend `npm run lint` exited successfully with existing hook/purity/Fast
   Refresh warnings. `npm run build` succeeded; Vite reports the existing
   LiveKit bundle chunk-size warning.
+- Packaged Frappe browser check at
+  `http://127.0.0.1:8017/teletena/admin/vetting` signed in as the local
+  synthetic reviewer, loaded the persistent empty operational queue, and
+  completed with zero page errors. Screenshot:
+  `docs/screenshots/scope-lifecycle/reviewer-empty-1440.png`. The page also
+  displayed existing synthetic vetting fixtures; it did not expose real
+  personal or clinical data.
 - Backed up the isolated review site with database and files before schema
 migration. Frappe migration applied v1.20/v1.21 and a repeat migration
 succeeded.
@@ -47,9 +54,9 @@ succeeded.
   deleted or reseeded. Run the documented setup helper with a unique disposable
   site/database name to complete it; it prompts for sudo locally and removes
   the temporary account/credential.
-- The new screen has not yet been exercised against the refreshed production
-  `/teletena/` bundle in Playwright; built-browser acceptance and screenshots
-  remain pending.
+- The populated operational review card has backend coverage but has not yet
+  been exercised in the rendered browser. Only the reviewer empty state was
+  captured.
 - Frappe 16 migration/tests for v1.19–v1.21 and a running isolated scheduler
   have not been completed. The current review-site scheduler remains disabled;
   automatic date-expiry scanning must not be claimed until an isolated worker
@@ -59,6 +66,6 @@ succeeded.
   semantics, reminders, malware scanning and patient-care continuity policy
   remain human/external decisions.
 
-The currently served asset manifest still identifies the earlier frontend
-source until the feature branch is packaged after commit. Use the later
-checkpoint entry in the tracker as the preview authority.
+The production asset manifest currently identifies `fbbf5c1414a5a5cc0856a46755cbcf24e07d8833`.
+The preview is an isolated Frappe 15 review site, not Vite. A later
+documentation-only commit may cause the source SHA to be repackaged.

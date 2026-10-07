@@ -8,10 +8,12 @@ renewal and reviewer-only operational flags for future appointments when a
 scope is no longer eligible. The flag cannot reveal patient records or mutate
 booking/financial state. Frappe 15 presentation verification passed 30/30;
 repeat migration, hosted-phone unit tests, service-worker tests, frontend
-build/lint, and compile checks passed. Frappe 16, fresh-site install, and
-refreshed built-browser verification remain pending. The review-site scheduler
-is disabled, so automatic date-expiry discovery is not claimed until an
-isolated worker check passes. See
+build/lint, and compile checks passed. The packaged `/teletena/admin/vetting`
+reviewer empty-state rendered without browser errors; see the screenshot in
+the verification report. Frappe 16, fresh-site install, and populated queue
+browser verification remain pending. The review-site scheduler is disabled,
+so automatic date-expiry discovery is not claimed until an isolated worker
+check passes. See
 [`scope-lifecycle-verification.md`](scope-lifecycle-verification.md).
 
 ## Current active continuation — consultation extensions — 2026-10-08
