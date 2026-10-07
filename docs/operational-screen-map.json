@@ -5711,7 +5711,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Built /teletena/ browser journey on source/build e227fde07dee02e7845c5103c05fb3e2051f8ad2 verified synthetic applicant appeal submission, reviewer reopen, applicant reload/resume, private synthetic PDF evidence upload, and resubmission. Screenshots: docs/screenshots/vetting-appeals/populated-applicant-390.png and populated-resubmitted-390.png. Final ordinary approval after resubmission was backend-tested; browser script stopped at an ambiguous duplicate Decision label locator before that optional action. Empty-site v1.18, native-language review, external credential checks and broader screen acceptance remain pending."
       }
     },
     {
@@ -5777,7 +5777,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I03) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Built /teletena/ browser journey on source/build e227fde07dee02e7845c5103c05fb3e2051f8ad2 verified the synthetic reviewer reopening a scope appeal; screenshot: docs/screenshots/vetting-appeals/populated-reviewer-1440.png. Applicant resubmission with new private evidence then passed after reload. The follow-up ordinary approval UI locator was ambiguous and not counted as a browser pass. Backend transition and permission regressions pass 29/29 on Frappe 15 and 16. Full reviewer workspace, empty-site install, policy approval and credential verification remain pending."
       }
     },
     {
