@@ -276,3 +276,25 @@ select care languages in Account, and an authorized reviewer must enable the
 service's immediate-care policy; then the clinician can renew availability.
 The immediate policy remains separately gated from general scope approval and
 from published recurring availability.
+
+The clinician shell previously treated every failed `set_request_presence`
+request as “Connection lost,” including HTTP validation/permission failures.
+That could make a policy rejection look like the toggle had succeeded before
+the server presence lease expired. Commit `5f9aa2a` classifies network, expired
+session, denied permission, and other update failures without exposing raw
+Frappe response text; it refreshes the authoritative readiness reasons after a
+rejection. New copy has provisional Amharic and Afaan Oromo translations.
+
+`frontend && npm run build` and `npm run lint` passed (lint exits 0 with existing
+React warnings). `scripts/build_review.py` and `scripts/check_review_assets.py`
+passed; the packaged app now identifies frontend source
+`5f9aa2a40ee75edb5a5f458f8d1e8dbcafb3243f`. An authenticated built-app browser
+check using the real synthetic clinician confirmed the missing language and
+immediate-policy actions are visible, the readiness control remains disabled,
+and the state is labeled paused. A separate controlled HTTP 422 fault-injection
+asserted a useful update error rather than a network-loss message. Both checks
+passed at 390px and 1440px in English, Amharic and Afaan Oromo with no horizontal
+overflow; six synthetic screenshots are under
+`/tmp/tele-tena-presentation-review/request-readiness/`. The fault-injection
+validates UI error handling only; it does not replace a real successful offer
+journey. New copy remains provisional pending native-language review.
