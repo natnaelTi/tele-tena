@@ -1,6 +1,27 @@
 # TeleTena operational progress export
 
-## Current local checkpoint — immediate request visible inbox — 2026-10-08
+## Current local checkpoint — progressive request-wave regression — 2026-10-08
+
+- `test/progressive-request-wave-acceptance` is stacked on draft PR #37, which
+  depends on PR #36. It adds a real Frappe presentation regression for persisted
+  dispatcher behavior: three approved synthetic clinicians, matching
+  availability, one-recipient waves, test-only 10/20-second delays, distinct
+  recipients, and retry deduplication. The focused test and full presentation
+  suite pass (41/41). It invokes the dispatcher directly; queued worker
+  execution and the full offer→appointment→consultation→earnings browser chain
+  remain unverified.
+- The production-built preview remains
+  `http://127.0.0.1:8017/teletena/`, site
+  `tele-tena-pr12-fresh.localhost`, Bench
+  `/home/frappe/frappe/frappe-bench`. The source/build SHA is authoritative in
+  `frontend/dist/release.json`; `scripts/build_review.py` regenerates the
+  manifest for the current commit before review handoff.
+- Site scheduler is enabled; shared worker/scheduler processes are running but
+  this branch has not been verified through their asynchronous queue. Fresh-site
+  verification remains pending. No hosted changes were made; A–I scope remains
+  incomplete as recorded in the tracker.
+
+## Prior checkpoint — immediate request visible inbox — 2026-10-08
 
 - `fix/open-request-visible-inbox` is a focused branch from PR #36's latest
   commit. It preserves the financial reconciliation repair; the intended PR is

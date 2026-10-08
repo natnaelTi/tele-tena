@@ -1155,6 +1155,104 @@ class Presentation(unittest.TestCase):
         self.assertEqual(own_loser.state, 'Superseded')
         self.assertIsNone(own_loser.appointment)
 
+    def test_progressive_request_waves_are_due_bounded_and_deduplicated(self):
+        """The scheduler widens to new eligible clinicians without repeat notices."""
+        from zoneinfo import ZoneInfo
+
+        savepoint = 'tt_request_waves_' + uuid.uuid4().hex[:14]
+        frappe.db.sql('SAVEPOINT ' + savepoint)
+        try:
+            service = fixtures.PREFIX
+            day = day_offset(21)
+            offering_by_clinician = dict(fixtures.Integration.offers)
+
+            # c3 begins as an unapproved synthetic applicant. Approval is an
+            # explicit fixture action; no scope is inferred from profile data.
+            fixtures.login('admin')
+            journey.review(fixtures.USERS['c3'], 'Approved')
+            journey.review_service_scope(fixtures.USERS['c3'], service, 'Approved')
+            fixtures.login('c3')
+            created = journey.publish(service, 600, 30, 'Wave test consultation',
+                'Synthetic offer for progressive routing coverage.', retry_key='wave-test-' + secrets.token_hex(8))
+            offering_by_clinician['c3'] = created['offering']
+
+            for kind, offering in offering_by_clinician.items():
+                fixtures.login(kind)
+                journey.save_profile('clinician', 'Synthetic clinician ' + kind, True,
+                                     languages=['en'])
+                payload = schedule_payload(offering, day, mode='automatic')
+                payload['minimum_notice_minutes'] = 0
+                payload['buffer_before'] = 0
+                payload['buffer_after'] = 0
+                scheduling.save_schedule(**payload)
+
+            fixtures.login('p1')
+            common_slots = None
+            for offering in offering_by_clinician.values():
+                starts = {slot['start'] for slot in self.slots(offering, day)}
+                common_slots = starts if common_slots is None else common_slots.intersection(starts)
+            self.assertTrue(common_slots, 'Synthetic clinicians must share at least one conflict-free slot')
+            start = sorted(common_slots)[0]
+            with patch.dict(frappe.conf, {
+                'tele_tena_request_wave_1_size': 1,
+                'tele_tena_request_wave_2_size': 1,
+                'tele_tena_request_wave_3_size': 1,
+                'tele_tena_request_wave_2_seconds': 10,
+                'tele_tena_request_wave_3_seconds': 20,
+            }):
+                published = open_requests.publish_request(
+                    service=service,
+                    request_text='Synthetic scheduled request for bounded wave delivery.',
+                    urgency='scheduled', language='en', consultation_format='video',
+                    sharing={'name': False, 'history': False},
+                    retry_key='routing-waves-' + secrets.token_hex(8),
+                    timezone_name='Africa/Addis_Ababa',
+                    earliest_start=start,
+                    latest_start=start)
+                self.assertEqual(published['eligible_supply'], 3)
+                self.assertEqual(published['notified'], 1)
+                self.assertEqual(published['wave'], 1)
+
+                request = journey.one('SELECT * FROM tt_open_request WHERE id=%s',
+                                      (published['id'],))
+                first = journey.rows('SELECT clinician,wave FROM tt_request_recipient WHERE request_id=%s',
+                                     (published['id'],))
+                self.assertEqual(len(first), 1)
+                self.assertEqual(first[0].wave, 1)
+
+                for expected_wave, delay_seconds in ((2, 11), (3, 21)):
+                    request = journey.one('SELECT last_routed_at FROM tt_open_request WHERE id=%s',
+                                          (published['id'],))
+                    due_at = request.last_routed_at + timedelta(seconds=delay_seconds)
+                    with patch.object(open_requests, 'now', return_value=due_at):
+                        open_requests.dispatch_open_requests()
+                    recipients = journey.rows(
+                        'SELECT clinician,wave FROM tt_request_recipient WHERE request_id=%s ORDER BY wave',
+                        (published['id'],))
+                    self.assertEqual(len(recipients), expected_wave)
+                    self.assertEqual([int(row.wave) for row in recipients],
+                                     list(range(1, expected_wave + 1)))
+                    self.assertEqual(len({row.clinician for row in recipients}), expected_wave)
+                    self.assertEqual(int(journey.one(
+                        "SELECT COUNT(*) n FROM tt_request_route_log WHERE request_id=%s "
+                        "AND event='NotificationEnqueued' AND wave=%s",
+                        (published['id'], expected_wave)).n), 1)
+
+                # Re-running the due reconciler after the last wave cannot
+                # create duplicate recipients or repeat the terminal wave.
+                with patch.object(open_requests, 'now', return_value=due_at + timedelta(seconds=1)):
+                    open_requests.dispatch_open_requests()
+                self.assertEqual(int(journey.one(
+                    'SELECT COUNT(*) n FROM tt_request_recipient WHERE request_id=%s',
+                    (published['id'],)).n), 3)
+                self.assertEqual(int(journey.one(
+                    "SELECT COUNT(*) n FROM tt_request_route_log WHERE request_id=%s "
+                    "AND event='NotificationEnqueued'",
+                    (published['id'],)).n), 3)
+        finally:
+            frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
+            frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
+
     def test_immediate_request_matches_continuous_time_between_booking_grid_points(self):
         """Fresh presence plus continuous time must not require a 15-minute grid start."""
         from zoneinfo import ZoneInfo
