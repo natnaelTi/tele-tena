@@ -12,8 +12,12 @@ The production frontend build, Python compile, and new Frappe owner/privacy
 assertions pass. The broad presentation run is not clean: reconciliation tests
 leave a synthetic wallet mismatch that causes later funding assertions to fail;
 no retained user data was reconciled or removed. Built-browser route acceptance
-is still pending, so inventory item G03 remains `Implemented, verification
-pending`. See `docs/financial-activity-verification.md`.
+passed for a patient reservation detail, refresh and generic unknown-record
+denial at the built preview. Screenshots at 390/768/1440 CSS px are in
+`docs/screenshots/financial-activity/`. The clinician-owned route, 320px and
+200% zoom checks remain pending, so inventory item G03 stays
+`Implemented, verification pending`. See
+`docs/financial-activity-verification.md`.
 
 ## Current local continuation — private offer review — 2026-10-08
 

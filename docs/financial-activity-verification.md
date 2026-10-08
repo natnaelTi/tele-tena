@@ -36,8 +36,20 @@ refund settlement, and payout provider operations remain out of scope.
   the detail endpoint failed. It must be isolated before claiming a clean full
   suite.
 - Production-built browser verification of the new transaction detail route
-  has not yet been run. The current checked-in asset manifest still identifies
-  the prior source until this feature branch is committed and packaged.
+  passed for the patient journey: password alternative on the invited-review
+  site → Payments → an existing persisted reservation → detail → reload →
+  generic unknown-record denial. The browser used the review account file
+  without printing credentials. Screenshots are in
+  `docs/screenshots/financial-activity/` at 390, 768 and 1440 CSS px. Visual
+  inspection found no horizontal overflow at those sizes; 320px and 200% zoom,
+  plus a clinician-owned detail browser journey, remain pending.
+
+The packaged preview was built from source commit
+`464dde31d94205ff2ccbe9fe6dec4e53e8e2bc3e` and served at
+`http://127.0.0.1:8017/teletena/` by the isolated review site. The user selected
+the visible “Use email instead” path because this site intentionally has no
+SMS/email OTP delivery configured; this does not alter the authentication
+policy or imply OTP delivery works.
 
 The retained site contains synthetic review data. No patient or clinician
 records were reset or manually reconciled for this check.
