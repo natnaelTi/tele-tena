@@ -1,5 +1,22 @@
 # TeleTena delivery tracker
 
+## Current local checkpoint — patient-shared clinic calendar — 2026-10-08
+
+The active branch is `feat/clinic-shared-calendar`, in draft PR #42, stacked on
+PR #41 → PR #40. PR #42 CI passed on Node 22.23.3/24.13.0 and Python
+3.12/3.14.2. The isolated Frappe 15.121.2 review site at
+`tele-tena-pr12-fresh.localhost` serves the production-built app at
+`http://127.0.0.1:8017/teletena/`; the packaged frontend source SHA is recorded
+in `docs/clinic-shared-calendar-verification.md`. Presentation tests passed
+45/45, integration tests 24/24, and the built-browser calendar journey passed.
+The screen map now records 9 locally verified screens, 78 implemented pending
+verification, 51 designed, 3 implementation in progress, and 1 externally
+blocked. This slice is read-only patient-shared scheduling; it does not finish
+clinic operations or the broader roadmap. Fresh-site/Frappe 16 checks and the
+many designed roadmap journeys remain open. No PR was merged and Selfmade was
+not changed.
+
+
 ## Current local checkpoint — appointment-scoped acquisition — 2026-10-08
 
 The active feature branch is `feat/relationship-acquisition-attribution`,
