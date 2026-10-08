@@ -28,18 +28,23 @@ provisional pending native review.
 - `scripts/browser-patient-request-details.cjs`: passed against the packaged
   `/teletena/` Frappe application. It signs in with the private local synthetic
   patient fixture (credentials are not emitted), opens a persisted request by
-  opaque ID, reloads, returns to the request list, and checks an unknown ID
-  shows the generic unavailable state without the prior request text.
+  opaque ID, reloads, returns to the request list, follows the list's detail
+  link, and checks an unknown ID shows the generic unavailable state without
+  the prior request text. Playwright is supplied from the bench's isolated
+  browser-test installation via `NODE_PATH=/tmp/tele-tena-browser/node_modules`.
 - Rendered-browser overflow checks passed at 320, 390, 768 and 1440 CSS px;
   localized request headings rendered in Amharic and Afaan Oromo. The exact
   screenshots are `docs/screenshots/request-details/patient-detail-390.png` and
   `docs/screenshots/request-details/patient-detail-1440.png`.
 - `npm run lint` and `npm run build` passed. Lint has existing warnings in
   surrounding components; the build reports the existing large-chunk advisory.
-- The package manifest source is `72f64236fa2ce537191f677053267adffaac96d4`;
-  the backend API was introduced in `1a9eeeaa9a83808e4725150aa9e6bdae64354832`.
-  The running preview at `http://127.0.0.1:8017/teletena/` returned HTTP 200
-  after a graceful reload of the identified loopback Gunicorn master.
+- The current package manifest source is
+  `662d5ec6ae869a568a0105285cd36ad23a03315f`; the backend API was introduced in
+  `1a9eeeaa9a83808e4725150aa9e6bdae64354832`. The focused browser assertion and
+  screenshot commit is `0dc27cf476e66adbd99af9add6264b6c5299c2bd`; it does not
+  change application source, so no rebuild was needed. The running preview at
+  `http://127.0.0.1:8017/teletena/` returned HTTP 200 and the complete journey
+  passed after the added list-link assertion.
 
 This slice does not add a separate clinician-side offer detail page or prove a
 complete open-request waiting/dispatch pilot. Worker-backed wave widening,
