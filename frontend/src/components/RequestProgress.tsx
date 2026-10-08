@@ -15,7 +15,7 @@ export function RequestProgress({state,hasOffer=false,wave=1,clinician=false,imm
     ['Looking for a good fit','Reaching eligible clinicians','Waiting for a response'];
   const description=confirmed?'Open the appointment to review the agreed details and join window.':closed?
     'This outcome is retained in your history.':clinician?'No appointment is confirmed until the patient accepts. Your quote is private.':
-    immediate&&eligibleSupply===0?'No clinician met every requirement when you posted. Matching continues without changing your requirements.':
+    immediate&&eligibleSupply===0?'Matching continues without changing your requirements.':
     'We aim to connect you within three minutes. Availability and your choice may take longer.';
   return <section className={`request-progress ${closed?'settled':''}`} aria-label="Request progress">
     <span className="request-beacon" aria-hidden="true"><span/><span/><span/>{confirmed?'✓':clinician?'↗':'…'}</span>

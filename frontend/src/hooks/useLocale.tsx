@@ -257,6 +257,7 @@ const words: Record<string, [string, string]> = {
   "Your requirements stay in place": ["መስፈርቶችዎ እንዳሉ ይቆያሉ", "Ulaagaaleen kee akkuma jiranitti turu"],
   "You can keep waiting or choose later": ["መጠበቅ መቀጠል ወይም ሌላ ጊዜ መምረጥ ይችላሉ", "Eeguu itti fufuu ykn yeroo boodaa filachuu dandeessa"],
   "No clinician met every requirement when you posted. Matching continues without changing your requirements.": ["ጥያቄዎን በላኩበት ጊዜ ሁሉንም መስፈርቶች ያሟላ ባለሙያ አልተገኘም። መስፈርቶችዎን ሳንቀይር ማዛመዱ ይቀጥላል።", "Yeroo gaaffii kee ergite ogeessi ulaagaalee hunda guutu hin turre. Ulaagaalee kee osoo hin jijjiirin walitti fiduun itti fufa."],
+  "Matching continues without changing your requirements.": ["መስፈርቶችዎን ሳንቀይር ማዛመዱ ይቀጥላል።", "Ulaagaalee kee osoo hin jijjiirin walitti fiduun itti fufa."],
   "minutes. Your published hours can still be used for scheduled requests.": ["ደቂቃ። የታተመ የሥራ ሰዓትዎ ለቀጣይ ቀጠሮ ጥያቄዎች አሁንም ይጠቅማል።", "daqiiqaa. Yeroon hojii maxxanfame gaaffii beellama fuulduraatiif ni tajaajila."],
   "No eligible clinician can start within": ["በዚህ ጊዜ ውስጥ መጀመር የሚችል ብቁ ሐኪም የለም:", "Ogeessi ulaagaa guutu yeroo kana keessatti jalqabu hin jiru:"],
   "minutes. You can keep waiting, schedule for later, or browse clinicians. Your requirements will not change automatically.": ["ደቂቃ። መጠበቅ፣ ለሌላ ጊዜ ማስያዝ ወይም ሐኪሞችን ማሰስ ይችላሉ። የመረጧቸው መስፈርቶች በራስ-ሰር አይቀየሩም።", "daqiiqaa. Eeguu, boodarra beellamuu ykn ogeeyyii fayyaa barbaaduu dandeessa. Ulaagaaleen kee ofumaan hin jijjiiraman."],
