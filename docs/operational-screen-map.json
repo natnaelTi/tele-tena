@@ -6457,11 +6457,11 @@
       "module": "Clinic operations",
       "backend_reference": "tele_tena.api.clinic_access.clinic_schedule_week; tele_tena.api.journey.session",
       "required_contract": "Read-only calendar projection over future appointments explicitly shared by patients; no clinic-wide visibility or resources.",
-      "integration_status": "Implementation in progress: verified-clinic owner/Manager/Scheduling calendar over active patient schedule grants. Clinic resources, room allocation, shifts, booking, billing and broader clinic management remain pending.",
+      "integration_status": "Locally verified as a read-only view over active patient-shared future appointments. Clinic resources, room allocation, shifts, booking, billing and broader clinic management remain pending.",
       "prototype_route": "j02",
       "route": "/clinic/calendar",
       "actor": "Verified clinic owner or active Clinic Manager/Scheduling member; Care Coordination, Billing and other accounts denied.",
-      "status": "Implementation in progress",
+      "status": "Locally verified",
       "persistent_models": [
         "Tele Tena Clinic",
         "Tele Tena Clinic Membership",
@@ -6506,7 +6506,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J02) and design-handoff.md",
         "implementation": "Read-only weekly view of existing patient-authorized scheduling grants; no new schema or resource/booking behavior.",
-        "current_local": "Backend endpoint and responsive React weekly/agenda page implemented on the branch; focused Frappe 15 authorization, timezone and disclosure test passed. Built-browser and full suites are pending."
+        "current_local": "Frappe 15.121.2 on tele-tena-pr12-fresh.localhost: tests/presentation.py 45/45 and tests/integration.py 24/24 passed. The production-built application at http://127.0.0.1:8017/teletena/ passed owner access, direct route, empty state, next-week navigation, timezone update/invalid-timezone feedback, responsive no-overflow checks at 320/390/768/1440 CSS px, and patient API denial. The browser fixture currently has no shared appointment in this week, so its screenshot demonstrates the empty state; populated response minimization and role matrix are verified by the backend test. Screenshots: docs/screenshots/clinic-shared-calendar/."
       }
     },
     {
