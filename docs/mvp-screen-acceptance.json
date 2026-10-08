@@ -17,7 +17,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A01) and design-handoff.md",
         "implementation": "v1.23 supports multiple named offerings within one approved scope, owner-only edits, idempotent creates, patient discovery, and immutable scope identity. See docs/multiple-offerings.md.",
-        "current_local": "Frappe 15 tests/presentation.py 33/33, including create retry/conflict, multiple distinct patient-visible offers, ownership denial and repeat migration. At http://127.0.0.1:8017/teletena/ source/build 44694b4364e466b1aec3308d01521b9739641ab9, the existing clinician created a second offering and reloaded; a separate patient session found it in discovery without account-email exposure. Screenshots: docs/screenshots/multiple-offerings/. Booking on the second offering remains pending."
+        "current_local": "Frappe 15 tests/presentation.py 33/33, including create retry/conflict, multiple distinct patient-visible offers, ownership denial and repeat migration. At http://127.0.0.1:8017/teletena/ source/build 44694b4364e466b1aec3308d01521b9739641ab9, the existing clinician created a second offering and reloaded; a separate patient session found it in discovery without account-email exposure. Screenshots: docs/screenshots/multiple-offerings/. Booking on the second offering remains pending.",
+        "mvp_private_query": "Built-app 390px password-flow check passes on 42574c4; no URL/history/storage query, clear on sign-out. Full visual and OTP/onboarding acceptance still pending; see mvp-release-verification.md."
       }
     },
     {
@@ -62,7 +63,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A04) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Built /teletena/ invited-review browser check passed at 390/1440: phone-first screen remains visible, Continue is disabled by site policy, email/password remains available, and existing patient/clinician accounts sign in. Auth source commit 0b3d1bd; packaged manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee. Phone OTP/public registration flags restored false. No live provider call."
+        "current_local": "Built /teletena/ invited-review browser check passed at 390/1440: phone-first screen remains visible, Continue is disabled by site policy, email/password remains available, and existing patient/clinician accounts sign in. Auth source commit 0b3d1bd; packaged manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee. Phone OTP/public registration flags restored false. No live provider call.",
+        "mvp_private_query": "Built-app 390px password-flow check passes on 42574c4; no URL/history/storage query, clear on sign-out. Full visual and OTP/onboarding acceptance still pending; see mvp-release-verification.md."
       }
     },
     {
@@ -92,7 +94,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A06) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Invited-review email/password path and explicit switch from phone were verified in Chromium; email OTP UI/error path exercised with controlled responses, backend enabled-policy OTP tests use mocked delivery. SMTP is not configured, so delivery is blocked. Screenshots: docs/screenshots/auth-invited/. Package manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee."
+        "current_local": "Invited-review email/password path and explicit switch from phone were verified in Chromium; email OTP UI/error path exercised with controlled responses, backend enabled-policy OTP tests use mocked delivery. SMTP is not configured, so delivery is blocked. Screenshots: docs/screenshots/auth-invited/. Package manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee.",
+        "mvp_private_query": "Built-app 390px password-flow check passes on 42574c4; no URL/history/storage query, clear on sign-out. Full visual and OTP/onboarding acceptance still pending; see mvp-release-verification.md."
       }
     },
     {
@@ -306,7 +309,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C01) and design-handoff.md",
         "implementation": "Patient dashboard now loads a signed-in-patient-only previous-clinician list from completed encounters, filtered to current approved scope and active published availability. Opaque profile key only; no cross-patient encounter linking.",
-        "current_local": "Backend integration test covers a completed patient-owned appointment, another patient sees no row, clinician role is denied, and account email is absent. Pending execution on the disposable Frappe site; browser rendering pending."
+        "current_local": "Backend integration test covers a completed patient-owned appointment, another patient sees no row, clinician role is denied, and account email is absent. Pending execution on the disposable Frappe site; browser rendering pending.",
+        "mvp_private_query": "Built-app 390px password-flow check passes on 42574c4; no URL/history/storage query, clear on sign-out. Full visual and OTP/onboarding acceptance still pending; see mvp-release-verification.md."
       }
     },
     {
@@ -321,7 +325,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "mvp_private_query": "Built-app 390px password-flow check passes on 42574c4; no URL/history/storage query, clear on sign-out. Full visual and OTP/onboarding acceptance still pending; see mvp-release-verification.md."
       }
     },
     {

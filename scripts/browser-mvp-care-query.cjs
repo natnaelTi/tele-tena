@@ -46,9 +46,12 @@ let stage='launch';
   assert.equal(await page.getByLabel('Clinician or service',{exact:true}).inputValue(),query);
   await privateIntent();
   stage='clear on sign-out';await page.getByRole('button',{name:'Sign out',exact:true}).first().click();
-  await page.waitForURL(/\/sign-in/);await passwordLogin();
-  await page.waitForURL(/\/patient$/);
-  await page.getByRole('link',{name:'Find care',exact:true}).first().click();
+  await page.waitForURL(/\/sign-in/);
+  stage='sign back in after clearing intent';await passwordLogin();
+  await page.waitForURL(/\/patient(?:\/discovery)?$/);
+  if(new URL(page.url()).pathname.endsWith('/patient')) {
+   await page.getByRole('link',{name:'Find care',exact:true}).first().click();
+  }
   await page.waitForURL(/\/patient\/discovery$/);
   assert.equal(await page.getByLabel('Clinician or service',{exact:true}).inputValue(),'');
   await privateIntent();
