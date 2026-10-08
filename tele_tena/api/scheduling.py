@@ -26,6 +26,15 @@ def _booking_link_token(offering, initialize_key=False):
     return hmac.new(key.encode(), message, hashlib.sha256).hexdigest()
 
 
+def validate_booking_link_token(token, offering):
+    """Validate that this patient's booking originated from this offering link."""
+    if not isinstance(token, str) or len(token) != 64:
+        fail('This booking link is unavailable', 'booking_link_unavailable')
+    if not hmac.compare_digest(_booking_link_token(offering), token):
+        fail('This booking link is unavailable', 'booking_link_unavailable')
+    return True
+
+
 @frappe.whitelist(methods=['POST'])
 def booking_link(offering):
     clinician = actor('Tele Tena Clinician')
