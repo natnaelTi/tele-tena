@@ -688,12 +688,19 @@ Verification on Frappe 15.121.2 / `tele-tena-pr12-fresh.localhost`:
   responsive overflow checks at 320/390/768/1440 CSS px passed. Screenshots:
   `docs/screenshots/clinic-staff-workspace/staff-workspace-390.png` and
   `staff-workspace-1440.png`.
+- On 2026-10-08, a populated production-built journey passed patient summary
+  consent → persisted grant → separate Care Coordination account read. The
+  authorized API response excluded patient identity/contact, private notes,
+  request text, and disclosure fields. Synthetic screenshots are in
+  `/tmp/tele-tena-clinic-summary-browser/`.
 - Production asset build and `check_review_assets.py` passed; no embedded
   credentials/config files. Local `/teletena/` returned HTTP 200.
 
 Fresh-site installation, Frappe 16 checks, mobile device/assistive-technology
-review, and native Amharic/Afaan Oromo review remain pending. The empty-state
-browser journey does not claim that a populated shared-summary read has been
-verified through the browser; that data projection and privacy path are covered
-by the backend regression test. This local consent pattern is not a legal
-determination of clinic data-controller obligations.
+review, and native Amharic/Afaan Oromo review remain pending. This local
+consent pattern is not a legal determination of clinic data-controller
+obligations. The 2026-10-08 journey also found that a null expiry on a valid
+summary grant caused the patient grant-history query to fail; this was fixed
+and covered by the 45-test presentation suite. The browser test's earlier
+timeout was its wait for a closed native select option to become visible, not
+an application or API failure; it now waits for the option to be attached.

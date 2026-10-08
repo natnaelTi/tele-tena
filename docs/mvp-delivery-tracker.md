@@ -625,9 +625,22 @@ On Frappe 15.121.2, `tests/presentation.py` passes 45/45 and
 checks patient ownership/consent, idempotent grant, published-summary-only
 projection, private-note exclusion, manager/Billing denial, Care Coordination
 access, membership/affiliation revocation, and patient revoke. Frontend TypeScript
-production build passed; lint exited 0 with existing warnings. Rendered-browser
-verification of the new consent and clinic workspace screens and clean fresh-site
-installation are still pending. Draft PR #41 is open against PR #40; it is not merged or deployed. The built
-Frappe browser flow passed Care Coordination invitation/acceptance, summary
-empty state, revocation, and responsive overflow checks at 320/390/768/1440 CSS
-px. Synthetic screenshots are in `docs/screenshots/clinic-staff-workspace/`.
+production build passed; lint exited 0 with existing warnings. Draft PR #41 is
+open against PR #40; it is not merged or deployed. The clinic staff
+invitation/acceptance and summary-empty-state browser flow passed earlier at
+320/390/768/1440 CSS px. On 2026-10-08, the production-built Frappe journey also
+passed fresh patient consent → persisted summary grant → a separate Care
+Coordination account reading the published summary. Its response omitted
+patient identity, contact fields, private notes, request text, and disclosure
+data. Screenshots are under `/tmp/tele-tena-clinic-summary-browser/`; earlier
+clinic staff screenshots are in `docs/screenshots/clinic-staff-workspace/`.
+
+That browser run exposed and fixed an API projection bug: an active summary
+grant intentionally has no expiry, but the patient's grant-history query
+compared `None` with the current timestamp. Summary grants now remain Active
+without an expiry comparison; scheduling grants still expire normally. The
+focused regression and full 45-test presentation and 24-test integration suites
+passed on Frappe 15.121.2. The browser harness initially waited for a closed
+native select option to become visible; it now waits for the option to be
+attached and selects it normally. Clean fresh-site installation and Frappe 16
+validation of this addition remain pending.

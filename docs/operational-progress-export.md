@@ -1,5 +1,33 @@
 # TeleTena operational progress export
 
+## Current verification delta — 2026-10-08
+
+- PR #41 remains a draft stacked on PR #40. Remote PR head was
+  `5c1865411f65a8e68647ee7b972b0fa6c6eb4352` when inspected; a focused fix
+  and populated-browser evidence are being added without merge/deployment.
+- Found and fixed a patient grant-history exception when a valid published-
+  summary consent had `expires_at = NULL`. Scheduling coordination still uses
+  its expiry; summary sharing remains active until patient revocation or the
+  underlying eligibility changes. Focused regression passed.
+- Frappe 15.121.2 isolated review site: `tests/presentation.py` 45/45 and
+  `tests/integration.py` 24/24 passed. Production-built browser journey passed
+  patient consent → persisted grant → a separate Care Coordination account
+  reading the summary, with identity/contact/private-note/request/disclosure
+  fields absent from the response. Screenshots:
+  `/tmp/tele-tena-clinic-summary-browser/{patient-consent-390,care-coordination-390,care-coordination-1440}.png`.
+- The browser test first failed because it waited for a closed native select
+  option to become visible. The harness now waits for the option to be attached
+  and the journey passes. The old invitation fixture was already active; the
+  rerun correctly treated that idempotent membership as existing.
+- Map size remains 142 screens/14 journeys: 8 `Locally verified`, 78
+  `Implemented, verification pending`, 3 `Implementation in progress`, 52
+  `Designed`, and 1 `External integration blocked`. These are evidence labels,
+  not a completion percentage. Broad roadmap work remains, especially full
+  clinic operations, shared adult-care consent, lab workflows, subscriptions,
+  second opinions, medical tourism, and cross-product acceptance.
+- Clean fresh-site install and Frappe 16 validation of this latest addition
+  remain pending. Preview remains local only; Selfmade was not changed.
+
 ## Current local checkpoint — patient-authorized clinic summary access — 2026-10-08
 
 - Branch `feat/clinic-shared-summary-grants`, based on the vetting-rubric
