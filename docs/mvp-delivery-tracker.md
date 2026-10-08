@@ -1,5 +1,36 @@
 # TeleTena delivery tracker
 
+## Current local continuation — immediate request reproduction — 2026-10-08
+
+The integrated preview is `http://127.0.0.1:8017/teletena/` on
+`tele-tena-pr12-fresh.localhost`, served from `/home/frappe/frappe/frappe-bench`
+as a production-built Frappe application. Source and packaged frontend SHA:
+`9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e` on
+`feat/request-inbox-eligibility-refresh`. This is not a Vite preview.
+
+The persisted synthetic Review Clinician setup did not initially meet the
+immediate-request rules: no care language was saved, the reviewer-controlled
+immediate policy for the legacy review service was off, and the recurring
+schedule began at 08:00 Addis time while the reproduction ran at 03:17. After
+these were configured through their authorized application workflows and a
+temporary date-specific interval was added, a separate patient session
+published an immediate request, the clinician received it and submitted a
+published-price offer, and the patient accepted. Exactly one appointment and
+one ETB 600 reservation were created. The temporary availability override was
+removed without changing the original recurrence or the booked appointment.
+Detailed evidence and screenshots are in
+[`vetting-routing-verification.md`](vetting-routing-verification.md).
+
+Before schema work on the already-existing isolated
+`tele-tena-clinic-access-fresh.localhost`, a full database/config/file backup
+was completed. Repeat migration passed twice on the current checkout and
+`tests/presentation.py` passed 33/33. The installer correctly refused to
+overwrite this existing site, so a fresh installation at this exact head is
+still pending. The site-level scheduler flag is enabled and bench-wide
+`frappe schedule`/worker processes are running; isolated scheduled-wave and
+earnings-release execution is not verified. Broader scope A–I remains
+incomplete; see the status matrix and historical checkpoints below.
+
 ## Current continuation — scope credential lifecycle — 2026-10-08
 
 Active branch `feat/scope-reverification` is a dependent follow-up to the

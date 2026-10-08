@@ -1,7 +1,88 @@
 # Vetting, catalog, and routing verification
 
-Status: local dependent feature work on `feat/vetting-catalog-routing`; not
-merged or deployed. This report separates observed failure causes from broader
+## Current packaged-preview reproduction — 2026-10-08
+
+This section supersedes the older preview/site references below for the current
+request-discovery reproduction. Source branch `feat/request-inbox-eligibility-refresh`
+was at `9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e`; the `release.json` packaged
+frontend reported the same source SHA. The review URL was
+`http://127.0.0.1:8017/teletena/`, served by the production-built Frappe route
+on site `tele-tena-pr12-fresh.localhost` in `/home/frappe/frappe/frappe-bench`.
+The app was not served by Vite.
+
+### Persisted eligibility findings
+
+Before changing synthetic test configuration, the saved `Review Clinician`
+profile had no care languages, the `Review conversation` immediate-care policy
+was disabled, and the published `Africa/Addis_Ababa` schedule began at 08:00 on
+each weekday. At the observed local time (03:17 EAT), the schedule had no
+conflict-free 30-minute start in the next 30 minutes. The presence API returned
+`no_immediate_capacity`; the saved presence was not live. The patient fixture
+had no prior open request at that point. Thus approval, offering and weekly
+availability by themselves did not meet the immediate-request eligibility
+rules. The persisted state did not support the earlier assumption that all
+request requirements were active. The exact initial empty-inbox state cannot
+be reconstructed from an unrecorded earlier browser attempt, but the current
+server-side blockers were directly observed rather than inferred from the
+availability toggle.
+
+Through the built application only, the synthetic clinician saved English as
+a care language, and the reviewer enabled immediate requests for the legacy
+review service with a recorded synthetic-only reason. A temporary date-only
+replacement interval from 03:30–04:30 EAT was added alongside the existing
+08:00–20:00 date interval. Presence then became live with an expiry. A separate
+patient browser published a synthetic immediate request while the clinician
+session was reachable. The clinician inbox returned that request with a
+server-suggested 03:30 EAT start; the clinician submitted an offer at the
+published ETB 600 price; the patient reviewed the disclosure and accepted.
+Persisted results were one Matched request, one Booked appointment and one
+accepted offer. The patient's synthetic wallet moved from ETB 3,151 available /
+ETB 1,849 reserved to ETB 2,551 available / ETB 2,449 reserved. The amount was
+reserved once. The temporary date exceptions were then removed through the
+availability UI; the original daily 08:00–20:00 recurrence remains, and the
+accepted appointment remains Booked. No historical data was reset.
+
+The review-service immediate policy and clinician English language are still
+saved synthetic fixture configuration. Presence is lease-based and expires
+when the clinician session stops renewing it. The schedule was restored to its
+original recurring hours; therefore it does not currently offer an immediate
+start outside those hours. The accepted appointment is preserved even though
+the temporary interval was removed, as required for schedule edits.
+
+Screenshots from the actual packaged UI are in
+[`docs/screenshots/request-inbox/current/`](screenshots/request-inbox/current/):
+the patient's matched request at 390 px and the clinician's accepted offer
+history at 1440 px. They use synthetic copy and accounts.
+
+### Compatibility-site migration and tests
+
+The named disposable site `tele-tena-clinic-access-fresh.localhost` already
+existed from a prior fresh-install attempt. The fresh-install harness refused
+to overwrite it. Before touching its schema, a full database, config, public-
+file and private-file backup was made under that site's private backups. A
+site-scoped repeat migration then completed successfully on this branch, and
+`tests/presentation.py` passed **33/33** against that site. A second migration
+also completed successfully. This is repeat-migration evidence on a retained
+isolated site, not a new fresh-install run at the current branch head. The prior
+site's synthetic records were preserved. The original `erp.localhost` and
+Selfmade were not migrated or changed.
+
+The main bench scheduler flag is enabled, with its `frappe schedule` and worker
+processes running. These are bench-wide processes, not a dedicated queue for
+the isolated site. This check did not establish execution of a scheduled
+routing wave or earnings-release job. No unrelated process was restarted.
+
+Current evidence proves that a properly configured synthetic clinician can
+receive, offer and match an immediate request in the production-built preview.
+It does not prove the three-minute pilot target, a new fresh install at this
+head, worker-isolated scheduled waves, live SMS, hosted LiveKit behavior,
+physical-device calls, native translation approval, or completion of the
+broader approved A–I scope. Those remain separate acceptance items.
+
+Historical report context (earlier `feat/vetting-catalog-routing` checkpoint;
+not the current branch): the entries below preserve earlier failure analysis
+and test results. The packaged-preview reproduction above is the latest
+observation. This report separates observed failure causes from broader
 requirements that remain incomplete.
 
 ## Reproduced inbox failure
