@@ -2,25 +2,25 @@
 
 ## Current local operational checkpoint — legacy finance projection — 2026-10-08
 
-The active checkout is `fix/legacy-wallet-projection-audit` at
-`fb8aa98e65e98d9753f5993d512da76586cd1385`, based on PR #35's current head
+The active checkout is `fix/legacy-wallet-projection-audit` at the current
+feature head (the asset manifest is rebuilt after the final commit), based on PR #35's current head
 `1d2a65ecfb450d938cb36a82f74fb80e9202e961` and dependent on PR #35/#34. The
 preview is again serving `http://127.0.0.1:8017/teletena/` from isolated site
 `tele-tena-pr12-fresh.localhost`; production asset manifest source is the
 feature commit above. Its `/teletena/` WSGI process was reloaded after building.
 
-The isolated site was privately backed up before v1.24 migration. At cutover,
-its site scheduler was disabled and had no pending jobs; maintenance mode
-blocked web writes during migration. The site scheduler was restored. No shared
-worker or unrelated Bench service was restarted. The patch added 14 exact,
-journal-proven completion activity rows. The pre-migration backup comparison
-confirmed 91 original activity rows were unchanged. Repeated migration and
-finance snapshot checks passed. All 9 patient wallets match subledger balances,
-all journals balance, and 6 of 9 owners' legacy projections match. The other 3
-have journal-proven 600-minor-unit refund events absent from the legacy activity
-log; v1.25 is being added to backfill those without changing wallets or journals.
-They remain held until migrated, audited, and explicitly accepted. The Review
-Patient wallet matches.
+The isolated site was backed up before v1.24 and again before v1.25. At each
+cutover its scheduler was disabled with no pending jobs and maintenance mode
+blocked web writes. The site scheduler was restored afterward; no shared worker
+or unrelated Bench service was restarted. v1.24 added 14 exact, journal-proven
+completion activity rows; comparison confirmed all 91 pre-existing rows were
+unchanged. v1.25 added 3 journal-proven refund rows; comparison confirmed all
+105 pre-existing rows were unchanged. Repeated migration and finance snapshot
+checks passed. All 9 patient wallets now match their subledger and activity
+projection; all journals balance and no unknown event kinds remain. Three
+`ReviewRequired` cases remain held pending an authorized decision; the refresh
+preserved their earlier evidence and did not auto-accept them. The Review Patient
+wallet matches.
 
 `tests/presentation.py` passes 40/40; `tests/integration.py` passes 24/24.
 Production asset secret/scope verification passed. Built-browser review passed

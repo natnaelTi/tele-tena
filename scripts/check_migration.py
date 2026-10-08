@@ -132,4 +132,4 @@ scope_after = sorted(tuple(row) for row in frappe.db.sql('''SELECT name,clinicia
     creation,modified FROM `tabTele Tena Service Scope`'''))
 assert scope_after == scope_before, 'Migration changed service scopes'
 frappe.destroy()
-print('PASS: additive upgrade, patch log, phone-auth, presentation, subledger and reconciliation schemas/key, catalog copy, no scope changes, repeat migration, all pre-existing records preserved, and only journal-proven completion activity added')
+print('PASS: additive upgrade, patch log, phone-auth, presentation, subledger and reconciliation schemas/key, catalog copy, no scope changes, repeat migration, pre-existing records and review decisions preserved, and only journal-proven completion/refund activity added')

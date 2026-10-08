@@ -145,9 +145,12 @@ for each patient; it records exact opening-boundary and unknown-event cases but
 never adjusts any source. A `ReviewRequired` owner is blocked from further
 patient-fund mutations. Only an explicitly authorized reviewer can accept the
 unchanged current snapshot with a reason, and only if wallet and subledger agree.
-That audited choice preserves the unresolved historical difference; it does not
-claim to reconstruct missing history or create a balancing entry. All future
-financial records remain on the existing subledger path.
+The audited choice never adjusts a wallet or clears history. When later migration
+evidence proves a specifically omitted event, the projection fields refresh and
+the earlier audit snapshot is retained in private audit history; the hold still
+requires explicit review. Unexplained differences are never reconstructed or
+balanced by inference. All future financial records remain on the existing
+subledger path.
 
 The v1.24 financial activity correction addresses a historical omission: old
 consultation finalization posted a balanced completion journal and consumed the

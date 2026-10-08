@@ -2,8 +2,7 @@
 
 ## Current local checkpoint — finance projection correction — 2026-10-08
 
-- Focused branch `fix/legacy-wallet-projection-audit`, commit
-  `fb8aa98e65e98d9753f5993d512da76586cd1385`, is based on open PR #35 head
+- Focused branch `fix/legacy-wallet-projection-audit` is based on open PR #35 head
   `1d2a65ecfb450d938cb36a82f74fb80e9202e961` and depends on PR #35/#34. No
   PR is merged and no remote site is changed.
 - Preview: `http://127.0.0.1:8017/teletena/`, isolated site
@@ -11,21 +10,20 @@
   `/home/frappe/frappe/frappe-bench`. Current React build manifest and
   `/teletena/` test WSGI source report the focused commit. It is a packaged
   Frappe application, not Vite.
-- v1.24 was applied after a site+files backup, site-scoped scheduler pause,
-  empty pending-job check, and site maintenance mode. The scheduler was
-  re-enabled and only the isolated local web process reloaded; no shared worker
-  or unrelated service restarted.
-- Migration added 14 exact, journal-proven completion activity rows. Comparison
-  against the pre-migration database backup confirmed all 91 prior `tt_ledger`
-  rows unchanged and no unproven rows added. Repeat migration and finance
-  snapshot checks passed. All 9 wallet/subledger pairs match; journals are
-  balanced. Six owners also match the legacy activity projection. Three have
-  evidence-backed missing 600-minor-unit refund activity. Patch v1.25 adds a
-  journal-verified backfill while preserving their existing review holds; it is
-  not yet applied to the retained site.
+- v1.24 and v1.25 each ran after a site+files backup, site-scoped scheduler
+  pause, empty pending-job check, and site maintenance mode. The scheduler was
+  re-enabled afterward; no shared worker or unrelated service restarted.
+- v1.24 added 14 exact, journal-proven completion activity rows; backup
+  comparison verified all 91 prior `tt_ledger` rows unchanged. v1.25 added 3
+  exact refund rows; backup comparison verified all 105 prior rows unchanged.
+  Repeat migration and financial snapshot checks passed. All 9 wallet/subledger
+  and activity projections now match; journals are balanced and unknown event
+  kinds are zero. Three `ReviewRequired` cases persist until explicitly
+  accepted by an authorized reviewer; prior evidence remains in private history.
 - `tests/presentation.py`: 40/40; `tests/integration.py`: 24/24. Production
   build, asset/privacy scan, browser package, and controlled PWA update-prompt
-  checks passed. The update prompt used a controlled fake waiting worker, not an
+  checks passed on the prior package; final package is rebuilt before preview
+  reactivation. The update prompt used a controlled fake waiting worker, not an
   installed-device update. Fresh-site install/browser verification is still
   waiting on a disposable DB credential setup. Live SMS/device calling and
   native translation review remain external validation gaps.

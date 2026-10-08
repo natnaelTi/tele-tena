@@ -193,12 +193,13 @@ does not change balances, earnings, appointments, or journals. v1.25 applies the
 same exact-evidence rule to a missing historical `Refund` activity event, using
 the `EarningRefunded` journal, patient available credit, clinician pending debit,
 and refunded earning amount. New completions and supported dispute refunds
-append their activity events atomically with the subledger posting. Unexplained mismatches remain held until an authorized,
-reasoned decision accepts the unchanged current snapshot; the historical
-difference remains visible. Unknown event kinds and conflicting evidence stop
-for review. A deployment cutover stops all old web and background writers before
-migration, then verifies owner-by-owner wallet and subledger equality or records
-an explicit hold before starting matching code.
+append their activity events atomically with the subledger posting. Owner audit
+refreshes preserve prior snapshots in the private audit history and never clear
+a review hold. Unexplained mismatches remain held until an authorized, reasoned
+decision accepts the unchanged current snapshot. Unknown event kinds and
+conflicting evidence stop for review. A deployment cutover stops all old web and
+background writers before migration, then verifies owner-by-owner wallet and
+subledger equality or records an explicit hold before starting matching code.
 # Returning care and previous clinicians
 
 The patient workspace may offer a returning-care shortcut only for clinicians

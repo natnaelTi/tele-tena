@@ -40,7 +40,9 @@ other synthetic wallets, four discrepancies matched the gross amount of
 finalized earnings and are consistent with the missing completion activity
 described above. Three additional owners each had a residual 600 minor-unit
 available/reserved category difference after that explanation; no records were
-deleted or adjusted during that audit.
+deleted or adjusted during that audit. Inspection showed each difference was a
+refunded 600-minor-unit earning whose refund journal and wallet credit existed
+without a legacy activity event.
 
 Before migration, the isolated preview site and private files were backed up
 with Bench at 2026-10-08 11:39 local time. Its site-scoped scheduler was
@@ -52,29 +54,31 @@ Patch v1.24 added 14 journal-proven `Consumption` activity events. The patch's
 write path is insert-only, and it checks exact journal and earning evidence
 before each insert. A direct comparison with the pre-migration database backup
 confirmed all 91 prior activity rows remain identical; exactly 14 rows were
-added and each matches its completion journal and earning. Repeat migration
-checks passed without adding more events; wallet and subledger balances,
-earnings, and balanced journals remained unchanged on repeat. Owner-level
-read-only reconciliation after migration found all 9/9 wallets
-equal their subledger accounts, 0 unbalanced journals, and 6/9 owners whose
-legacy activity projection also matches. Each of the other three is short 600
-minor units in the legacy available projection, exactly equal to its refunded
-earning; the reserved bucket matches. This is an evidenced missing refund event,
-not an arbitrary balance adjustment. Since v1.24 is already applied, v1.25 is a
-separate patch. Until it is backed up, migrated and audited, those three owners
-remain `ReviewRequired`. The existing Review Patient wallet matches.
+added and each matches its completion journal and earning. A second backup was
+taken before v1.25. Its direct comparison confirmed all 105 prior activity rows
+remain identical; exactly 3 `Refund` rows were added, each matching its earning,
+journal, posting sides, amount, and timestamp. Repeat migration checks passed
+without adding more events; wallet and subledger balances, earnings, and
+balanced journals remained unchanged on repeat. Owner-level read-only
+reconciliation now finds all 9/9 wallets equal both their subledger accounts and
+legacy activity projections, 0 unknown event kinds, and 0 unbalanced journals.
+The 3 existing `ReviewRequired` cases remain held intentionally until an
+authorized reviewer accepts the now-matching current snapshot. v1.25 refreshed
+their visible projection and retained prior evidence in the private audit
+history without changing their status. The Review Patient wallet matches.
 
 `tests/presentation.py` passes 40/40, including a synthetic backfill test for
 idempotency, timestamp provenance, exact journal/earning evidence and no wallet
-mutation. `tests/integration.py` passes 24/24. The built-browser package check
+mutation. `tests/integration.py` passes 24/24. Repeat migration and financial
+snapshot checks passed after both versions. The built-browser package check
 passed guest/deep-link access, reviewer sign-in/out, consultation reload, PWA
 scope, offline fallback and responsive widths at 390/768/1440. The fresh-site
 install/browser check is still pending the operator's disposable database
-setup. This is not proof that the remaining owner discrepancies are resolved.
+setup. This does not automatically accept the three preserved review cases.
 
 ## Remaining financial gates
 
-- Apply v1.25 under a fresh backup; verify the three refund cases align without
-  changing wallets or journals, and repeat migration.
-- Verify on a new disposable site after v1.25.
+- Verify fresh installation after v1.25 on a new disposable site.
+- Record an authorized reviewer decision for each preserved case only after
+  inspecting the refreshed evidence; migration does not accept it.
 - Clinician payouts remain simulated reservations, not external transfers.
