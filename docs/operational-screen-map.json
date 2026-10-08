@@ -2470,7 +2470,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D08) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "The synthetic patient returned from the request detail route to the owner-scoped persisted request list in the current packaged browser check; see docs/patient-request-detail-verification.md. Preview: http://127.0.0.1:8017/teletena/; asset source SHA recorded in the report."
+        "current_local": "On the isolated Frappe 15 site, `tests/presentation.py` passed 38/38 including persisted owner-scoped request state and a new no-capacity dispatch regression. The retained Review Patient request was matched to a different clinician; the Review Clinician had no recipient because its first Addis interval started after the immediate window. Patient zero-supply messaging and prefilled schedule-later recovery are implemented; browser verification of this path remains pending."
       }
     },
     {
@@ -2537,7 +2537,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D09) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Owner-scoped request detail API, persisted disclosure snapshot, offer summary, reload and generic unavailable behavior passed the current packaged browser check and Frappe 15 owner-boundary regression; see docs/patient-request-detail-verification.md. Preview: http://127.0.0.1:8017/teletena/; asset source SHA recorded in the report."
+        "current_local": "The patient request detail remains owner-scoped and polling-backed. Request publication records eligible supply; immediate zero-supply requests show a no-broadening explanation and schedule-later/browse alternatives. The back-to-later path preserves request narrative, service, language, format, disclosure choices and budget. Backend presentation suite passed 38/38; packaged browser verification of these new alternatives remains pending."
       }
     },
     {
@@ -3588,7 +3588,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Frappe 15 presentation suite passed 33/33 on feat/request-inbox-eligibility-refresh. The immediate-request regression verifies routed disclosure is hidden on inbox reads after matching language or fresh presence expires and reappears after restoration; server eligibility continues to require current approval/scope, service policy, and continuous full-duration capacity. On the retained production-built /teletena/ preview, a separate authenticated Playwright session observed actual readiness ready=false with language_required and immediate_policy_required; UI clarifies that scope approval alone does not enable this reviewer-controlled policy and links to language setup. Empty inbox screenshot: docs/screenshots/request-inbox/review-clinician-readiness-1440.png. A successful eligible patient-to-clinician offer/accept browser journey remains pending."
+        "current_local": "The retained Review Clinician had no recipient for the patient’s latest request because its published schedule began at 08:00 Addis time, outside the immediate start window at publication; the request matched another clinician. A focused test now verifies live presence is shown paused when schedule changes eliminate full-duration immediate capacity, and no route is created when none fits. Frappe 15 presentation suite passed 38/38. A full browser delivery specifically to this clinician remains pending."
       }
     },
     {
