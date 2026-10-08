@@ -4,7 +4,12 @@
 
 The patient request list links to a dedicated owner-scoped route at
 `/teletena/patient/requests/:requestId`; the patient dashboard uses the same
-opaque request identifier for an active request. `my_request_detail` selects by
+opaque request identifier for an active request. Each offer also has a dedicated
+review route at `/teletena/patient/requests/:requestId/offers/:offerId`, built
+from the same owner-scoped response. The detail shows the exact proposed time,
+timezone, format, duration, total price and disclosure snapshot. Acceptance
+invokes the existing atomic offer command; this page adds no booking or wallet
+implementation. `my_request_detail` selects by
 both request ID and authenticated patient. Unknown IDs and another patient's
 IDs return the same `request_unavailable` outcome; non-patient roles fail the
 patient-profile permission check. The query includes only the saved request,
@@ -29,9 +34,13 @@ provisional pending native review.
   `/teletena/` Frappe application. It signs in with the private local synthetic
   patient fixture (credentials are not emitted), opens a persisted request by
   opaque ID, reloads, returns to the request list, follows the list's detail
-  link, and checks an unknown ID shows the generic unavailable state without
-  the prior request text. Playwright is supplied from the bench's isolated
-  browser-test installation via `NODE_PATH=/tmp/tele-tena-browser/node_modules`.
+  link, inspects/reloads its persisted offer detail and disclosure snapshot,
+  then checks an unknown ID shows the generic unavailable state without the
+  prior request text. This fixture had a persisted **accepted** offer, so this
+  proves read-only offer-detail rendering; it does not prove the active-offer
+  Accept action through this new route. Playwright is supplied from the bench's
+  isolated browser-test installation via
+  `NODE_PATH=/tmp/tele-tena-browser/node_modules`.
 - Rendered-browser overflow checks passed at 320, 390, 768 and 1440 CSS px;
   localized request headings rendered in Amharic and Afaan Oromo. The exact
   screenshots are `docs/screenshots/request-details/patient-detail-390.png` and
@@ -39,12 +48,14 @@ provisional pending native review.
 - `npm run lint` and `npm run build` passed. Lint has existing warnings in
   surrounding components; the build reports the existing large-chunk advisory.
 - The current package manifest source is
-  `662d5ec6ae869a568a0105285cd36ad23a03315f`; the backend API was introduced in
-  `1a9eeeaa9a83808e4725150aa9e6bdae64354832`. The focused browser assertion and
-  screenshot commit is `0dc27cf476e66adbd99af9add6264b6c5299c2bd`; it does not
-  change application source, so no rebuild was needed. The running preview at
+  `a71833ee58ef839358d8b1493af3ec0924bec1e4`; the backend API was introduced in
+  `1a9eeeaa9a83808e4725150aa9e6bdae64354832`. The offer-detail route and packaged
+  assets are included in that build. The running preview at
   `http://127.0.0.1:8017/teletena/` returned HTTP 200 and the complete journey
   passed after the added list-link assertion.
+- Offer-detail screenshots: `docs/screenshots/request-details/offer-detail-390.png`
+  and `offer-detail-1440.png`. The newest Playwright script/screenshot evidence
+  is committed separately from the packaged application source.
 
 This slice does not add a separate clinician-side offer detail page or prove a
 complete open-request waiting/dispatch pilot. Worker-backed wave widening,

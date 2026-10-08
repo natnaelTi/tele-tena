@@ -10,6 +10,7 @@ const entry = Object.entries(accounts).find(([email]) => /patient/i.test(email))
 if (!entry || typeof entry[1] !== 'string') throw new Error('Patient review account is missing.');
 const [email, password] = entry;
 let checkpoint = 'launch';
+let offerDetailOpened = false;
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
@@ -91,6 +92,7 @@ let checkpoint = 'launch';
 
     if (Array.isArray(request.offers) && request.offers.length) {
       checkpoint = 'open owner-scoped offer details';
+      offerDetailOpened = true;
       const offer = request.offers[0];
       await page.goto(base + '/patient/requests/' + encodeURIComponent(request.id) + '/offers/' + encodeURIComponent(offer.id));
       await page.getByRole('heading', { name: 'Review offer details', exact: true }).waitFor();
@@ -122,7 +124,7 @@ let checkpoint = 'launch';
     await page.getByText('Request unavailable.', { exact: true }).waitFor();
     if ((await page.locator('body').innerText()).includes(privateText)) throw new Error('An unavailable request leaked the prior request narrative.');
     if (pageErrors.length) throw new Error('The request detail journey raised a browser exception.');
-    console.log('PASS: synthetic patient opens an owner-scoped persisted request detail by opaque ID, reloads it, returns to the list, and receives a generic unavailable state for an unknown ID. Responsive checks passed at 320/390/768/1440 CSS px; Amharic and Afaan Oromo headings render. Screenshots captured; account data and request content are withheld.');
+    console.log('PASS: synthetic patient opens the owner-scoped persisted request detail' + (offerDetailOpened ? ' and offer detail' : '') + ', reloads the detail page, returns through the request list, and receives a generic unavailable state for an unknown request ID. Responsive checks passed at 320/390/768/1440 CSS px; Amharic and Afaan Oromo headings render. Screenshots captured; account data and request content are withheld.');
   } finally {
     await context.close();
     await browser.close();
