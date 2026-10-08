@@ -651,6 +651,19 @@ const words: Record<string, [string, string]> = {
   "Decision recorded. The historical difference remains preserved.": ["ውሳኔው ተመዝግቧል። የታሪክ ልዩነቱ እንዳለ ይጠበቃል።", "Murtiin galmaa'eera. Garaagarummaan seenaa akkuma jirutti eegama."],
   "Accept unchanged snapshot": ["ያልተቀየረውን ምስል ተቀበል", "Suuraa hin jijjiiramne fudhadhu"],
   "No wallet reconciliation cases need review.": ["ግምገማ የሚያስፈልጋቸው የቀሪ ሂሳብ ማስታረቂያ ጉዳዮች የሉም።", "Dhimmoota baalansii wal-simsiisuu gamaaggamuun barbaachisu hin jiru."],
+  "Clinic calendar": ["የክሊኒክ ቀን መቁጠሪያ", "Kaalandarii kilinikaa"],
+  "Appointments appear here only when a patient has shared their schedule with this verified clinic.": ["ታካሚው የቀጠሮ መረጃውን ለዚህ የተረጋገጠ ክሊኒክ ሲያጋራ ብቻ ቀጠሮዎች እዚህ ይታያሉ።", "Beellamni kan mul'atu dhukkubsataan sagantaa isaa kilinikaa mirkanaa'e kanaaf yeroo qoodu qofa."],
+  "Calendar week controls": ["የሳምንት ቀን መቆጣጠሪያዎች", "To'annoo torban kaalandarii"],
+  "Previous week": ["ያለፈው ሳምንት", "Torban darbe"],
+  "Next week": ["ቀጣይ ሳምንት", "Torban itti aanu"],
+  "Display timezone": ["የማሳያ የሰዓት ክልል", "Naannoo sa'aatii agarsiisaa"],
+  "Update calendar": ["ቀን መቁጠሪያውን አዘምን", "Kaalandarii haaromsi"],
+  "Clinic calendar could not be loaded. Check your clinic access and timezone.": ["የክሊኒኩን ቀን መቁጠሪያ መጫን አልተቻለም። የክሊኒክ ፈቃድዎንና የሰዓት ክልሉን ይፈትሹ።", "Kaalandarii kilinikaa fe'uun hin danda'amne. Hayyama kilinikaa fi naannoo sa'aatii ilaali."],
+  "No patient-shared appointments this week.": ["በዚህ ሳምንት ታካሚዎች ያጋሯቸው ቀጠሮዎች የሉም።", "Torban kana beellamni dhukkubsataan qoodde hin jiru."],
+  "Appointments appear only after a patient shares a future booking with this clinic.": ["ታካሚው ወደፊት ያለውን ቀጠሮ ለዚህ ክሊኒክ ካጋራ በኋላ ብቻ ይታያል።", "Beellamni gara fuulduraa dhukkubsataan kilinikaa kanaaf qoodu qofa asitti mul'ata."],
+  "Patient-shared appointment week": ["ታካሚ ያጋራው የቀጠሮ ሳምንት", "Torban beellamaa dhukkubsataan qoodde"],
+  "No shared appointments": ["የተጋራ ቀጠሮ የለም", "Beellamni qoodame hin jiru"],
+  "Enter a valid IANA timezone, such as Africa/Addis_Ababa.": ["እንደ Africa/Addis_Ababa ያለ ትክክለኛ የIANA የሰዓት ክልል ያስገቡ።", "Naannoo sa'aatii IANA sirrii kan akka Africa/Addis_Ababa galchi."],
 };
 const Context = createContext<{
   locale: Locale;

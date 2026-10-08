@@ -209,7 +209,11 @@ const adminNav = [
   ["/admin/financial-disputes", "Financial disputes", Wallet],
   ["/admin/exceptions", "Exceptions", Settings2],
 ] as const;
-const clinicNav = [["/clinic", "Clinic workspace", Building2]] as const;
+const clinicHomeNav = [["/clinic", "Clinic workspace", Building2]] as const;
+const clinicNav = [
+  ["/clinic", "Clinic workspace", Building2],
+  ["/clinic/calendar", "Clinic calendar", CalendarDays],
+] as const;
 export function WorkspaceLayout({
   kind,
 }: {
@@ -224,7 +228,9 @@ export function WorkspaceLayout({
       ? patientNav
       : kind === "clinician"
         ? clinicianNav
-        : kind === "clinic" ? clinicNav : adminNav;
+        : kind === "clinic"
+          ? session?.clinic_schedule_workspace ? clinicNav : clinicHomeNav
+          : adminNav;
   const items = kind !== "clinic" && session?.clinic_workspace
     ? [...roleItems, ["/clinic", "Clinic workspace", Building2] as const]
     : roleItems;

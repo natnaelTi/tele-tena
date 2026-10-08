@@ -1874,6 +1874,40 @@ button:active {
 .clinic-schedule-sharing { margin-top: 24px; }
 .clinic-schedule-sharing .field { margin-top: 16px; }
 .clinic-shared-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--border-default); }
+.clinic-calendar-page { min-width: 0; }
+.clinic-calendar-toolbar { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin: 16px 0 22px; }
+.clinic-calendar-period { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.clinic-calendar-period strong { font-size: 16px; font-weight: 650; }
+.clinic-calendar-zone { display: flex; align-items: end; gap: 10px; width: min(100%, 440px); }
+.clinic-calendar-zone .field { margin: 0; flex: 1; min-width: 0; }
+.clinic-calendar-zone .button { min-height: 48px; flex: 0 0 auto; }
+.clinic-week-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1px solid var(--border-default); border-radius: 18px; overflow: hidden; background: var(--surface-card); }
+.clinic-week-day { min-width: 0; min-height: 200px; padding: 12px; border-left: 1px solid var(--border-default); }
+.clinic-week-day:first-child { border-left: 0; }
+.clinic-week-day h2 { min-height: 44px; margin: 0 0 10px; display: flex; align-items: center; font-size: 14px; line-height: 1.35; }
+.clinic-week-day h2.is-today { color: var(--brand-primary); }
+.clinic-day-empty { margin: 0; padding: 10px 0; color: var(--text-secondary); font-size: 13px; }
+.clinic-calendar-event { padding: 12px; margin-bottom: 10px; border-left: 3px solid var(--brand-primary); background: var(--surface-subtle); box-shadow: none; }
+.clinic-calendar-event h3 { margin: 6px 0; font-size: 15px; overflow-wrap: anywhere; }
+.clinic-calendar-event p { margin: 5px 0; font-size: 14px; overflow-wrap: anywhere; }
+.clinic-calendar-event .clinic-calendar-event-time { font-weight: 650; color: var(--text-primary); }
+.clinic-calendar-event .supporting { font-size: 13px; }
+.clinic-calendar-event .status-pill { display: inline-flex; margin-top: 5px; }
+@media (max-width: 900px) {
+  .clinic-week-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .clinic-week-day:nth-child(5) { border-left: 0; }
+}
+@media (max-width: 640px) {
+  .clinic-calendar-toolbar { align-items: stretch; flex-direction: column; gap: 12px; }
+  .clinic-calendar-period { justify-content: space-between; }
+  .clinic-calendar-period strong { font-size: 14px; text-align: center; }
+  .clinic-calendar-zone { width: 100%; }
+  .clinic-week-grid { display: flex; flex-direction: column; border: 0; background: transparent; gap: 8px; }
+  .clinic-week-day { min-height: 0; padding: 10px 0; border: 0; border-bottom: 1px solid var(--border-default); }
+  .clinic-week-day h2 { min-height: 44px; margin: 0; }
+  .clinic-day-empty { padding: 4px 0 10px; }
+  .clinic-calendar-event { margin: 8px 0; }
+}
 .scope-evidence-panel { display:grid; gap:10px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-default); min-width:0; }
 .vetting-scored-rubric { display:grid; gap:12px; margin:16px 0; padding:14px; border:1px solid var(--border-default); border-radius:14px; background:var(--surface-subtle); }
 .vetting-scored-rubric > summary { cursor:pointer; font-weight:650; min-height:44px; display:flex; align-items:center; }

@@ -35,6 +35,7 @@ import Showcase from "./pages/Showcase";
 import { ClinicianRequestInbox, PatientOpenRequests, PatientRequestDetail, PatientRequestOfferDetail, PublicClinicianProfile } from "./pages/OpenRequests";
 import { ClinicianScopeApplications, VettingQueue, VettingRubricManagementPage } from "./pages/Vetting";
 import { ClinicianAffiliations, ClinicMembershipPortal, ClinicReview } from "./pages/Clinics";
+import ClinicCalendar from "./pages/ClinicCalendar";
 import FinancialActivityDetail from "./pages/FinancialActivity";
 import PWAUpdateNotice from "./components/PWAUpdateNotice";
 import "./App.css";
@@ -73,6 +74,7 @@ export default function App() {
               <Route path="/consultation/:id/room" element={<><div className="demo-bar" role="note">Demonstration environment — no real payments or clinical care.</div><ConsultationRoomPage /></>} />
               <Route path="/clinic" element={<WorkspaceLayout kind="clinic" />}>
                 <Route index element={<ClinicMembershipPortal workspace />} />
+                <Route path="calendar" element={<ClinicCalendar />} />
               </Route>
               <Route
                 path="/patient"
