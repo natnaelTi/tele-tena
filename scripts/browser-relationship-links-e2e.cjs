@@ -18,15 +18,20 @@ let diagnosticPage = null;
 
 async function signIn(page, account) {
   if (!new URL(page.url()).pathname.endsWith('/sign-in')) await page.goto(app + '/sign-in');
+  stage = 'select email sign-in';
   if (await page.getByRole('button', { name: 'Use email instead', exact: true }).count()) {
     await page.getByRole('button', { name: 'Use email instead', exact: true }).click();
   }
+  stage = 'select password sign-in';
   if (await page.getByRole('button', { name: 'Use password instead', exact: true }).count()) {
     await page.getByRole('button', { name: 'Use password instead', exact: true }).click();
   }
+  stage = 'enter sign-in credentials';
   await page.getByLabel('Email', { exact: true }).fill(account.email);
   await page.getByLabel('Password', { exact: true }).fill(account.password);
+  stage = 'submit sign-in';
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  stage = 'wait for signed-in destination';
   await page.waitForURL(/\/teletena\/(?:patient(?:\/|$)|relationship-invitation(?:\/|$))/, { timeout: 15000 });
   const language = page.getByLabel('Language / ቋንቋ / Afaan');
   if (await language.count()) await language.selectOption('en');
@@ -124,6 +129,11 @@ async function checkedNoOverflow(page) {
       details.heading = (await safePage.locator('h1').first().innerText().catch(() => '')).slice(0, 100);
       details.notices = (await safePage.locator('.notice.danger').allInnerTexts().catch(() => []))
         .map(value => value.replace(/[\w.+-]+@[\w.-]+/g, '[contact]').slice(0, 180));
+      details.fields = await safePage.locator('input').evaluateAll(nodes => nodes.map(node => ({
+        type: node.type,
+        label: node.labels?.[0]?.innerText?.slice(0, 80) || node.getAttribute('aria-label') || '',
+      }))).catch(() => []);
+      details.actions = await safePage.getByRole('button').allInnerTexts().catch(() => []);
     }
     console.error(`FAIL: relationship browser journey at ${stage}; account data and response bodies withheld; ${error.name}; state=${JSON.stringify(details)}`);
     process.exitCode = 1;
