@@ -3,6 +3,34 @@
 Sanitized local checkpoint for roadmap updates. It is not a merge, deployment,
 real-patient-readiness, real-money, or market-performance claim.
 
+## Current source and preview — patient offer detail — 2026-10-08
+
+- Current feature branch: `feat/patient-request-offer-detail`, draft PR #31,
+  dependent on draft PR #30 → #29 → #28. No merge or remote deployment.
+- Current feature branch head is tracked on PR #31; the built frontend manifest
+  source is `f9d01703a3e46edbf80fe674f3fd4753256f22b5`.
+- The review URL is `http://127.0.0.1:8017/teletena/`, site
+  `tele-tena-pr12-fresh.localhost`, bench
+  `/home/frappe/frappe/frappe-bench`; the frontend is a built Frappe app. The
+  new route is `/teletena/patient/requests/:requestId/offers/:offerId` and
+  reuses the patient-owner request query and existing atomic offer acceptance.
+  Gunicorn master PID 287561 and worker PIDs 326665/326666 serve this build.
+- Browser rendering and reload of a persisted accepted offer passed; the page
+  showed its timezone, duration, format, price, exact request disclosure and
+  appointment link. The existing browser journey also covered direct request
+  access, return to list, entry from the list, and generic unknown-request
+  handling. No active-offer Accept click was made because the available
+  synthetic offer was already accepted. Amharic/Afaan Oromo text is provisional.
+- Screenshots: `docs/screenshots/request-details/offer-detail-390.png` and
+  `offer-detail-1440.png`. Layout overflow checks passed at 320/390/768/1440px.
+  `npm run build` passed, `npm run lint` exited 0 with existing warnings, and
+  the dependent Frappe presentation suite passed 34/34 on the prior code slice.
+- Existing review data was preserved. There was no schema migration, reseed,
+  live SMS, physical-device test, hosted deployment or remote site change.
+- The service worker/update behavior was not separately exercised for this new
+  route in this slice. Scheduled release/routing execution and the remaining
+  designed/verification-pending screens stay outstanding in the map.
+
 ## Current source and preview — 2026-10-08
 
 - Current branch: `feat/patient-request-detail-route`, head

@@ -1,5 +1,26 @@
 # TeleTena delivery tracker
 
+## Current local continuation — private offer review — 2026-10-08
+
+Branch `feat/patient-request-offer-detail` is the head of draft PR #31 and is
+based on draft PR #30 (`feat/patient-request-detail-route`, head
+`a2f017dc2e5684d9fb9277a6e83c9420e5043808`). Dependency ancestry continues
+through PR #29 and #28. No PR is merged. The local review remains
+`http://127.0.0.1:8017/teletena/` on site `tele-tena-pr12-fresh.localhost` in
+the original Frappe bench's isolated review site; it is production-built, not
+Vite. The feature branch's current head is tracked on PR #31; the packaged
+asset manifest source is `f9d01703a3e46edbf80fe674f3fd4753256f22b5`. Gunicorn master PID 287561 serves
+the current build with worker PIDs 326665 and 326666. The offer review route
+uses the owner-scoped `my_request_detail` query
+and existing atomic `respond_offer` command. The real browser route showed a
+persisted accepted offer, immutable sharing snapshot, total price and
+appointment link. Browser coverage does not claim the active-offer acceptance
+button was used; direct accept, expired-offer, and no-funds cases through this
+new route remain pending. Visual screenshots are under
+`docs/screenshots/request-details/`. No migration, reseed, or remote deployment
+was performed. The rest of the approved 142-screen and A–I scope remains
+incomplete; the per-screen map retains verification-pending/designed statuses.
+
 ## Current local continuation — patient request detail — 2026-10-08
 
 The current branch is `feat/patient-request-detail-route` at

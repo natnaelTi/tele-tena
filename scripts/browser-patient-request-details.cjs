@@ -10,6 +10,7 @@ const entry = Object.entries(accounts).find(([email]) => /patient/i.test(email))
 if (!entry || typeof entry[1] !== 'string') throw new Error('Patient review account is missing.');
 const [email, password] = entry;
 let checkpoint = 'launch';
+let offerDetailOpened = false;
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
@@ -38,7 +39,9 @@ let checkpoint = 'launch';
       return result.message;
     });
     if (!Array.isArray(requests) || requests.length === 0) throw new Error('The synthetic patient has no persisted request for this journey.');
-    const request = requests.find(item => item.state === 'Matched' || item.offers?.length) || requests[0];
+    const request = requests.find(item => item.state === 'Open' && item.offers?.some(offer => offer.state === 'Active' && new Date(offer.valid_until).getTime() > Date.now()))
+      || requests.find(item => item.offers?.length)
+      || requests[0];
     if (!request.request_text || !request.id) throw new Error('The selected persisted request is incomplete.');
 
     checkpoint = 'open direct request route';
@@ -70,12 +73,16 @@ let checkpoint = 'launch';
     await page.getByRole('link', { name: /Back to requests/ }).click();
     await page.getByRole('heading', { name: 'Your requests', exact: true }).waitFor();
     checkpoint = 'open request from persisted list';
-    const listCard = page.locator('.request-card').filter({ hasText: request.request_text }).first();
+    await page.waitForFunction(id => document.querySelector('[data-request-id="' + CSS.escape(id) + '"]') || document.querySelector('details.request-history'), request.id);
+    const listCard = page.locator('.request-card[data-request-id="' + request.id.replaceAll('"', '') + '"]');
     if (!(await listCard.isVisible())) {
       const history = page.locator('details.request-history');
       if (await history.count()) await history.locator('summary').click();
     }
-    if (await listCard.count() === 0) throw new Error('The request is not present on the patient list page.');
+    if (await listCard.count() === 0) {
+      const counts = await page.evaluate(() => ({ cards: document.querySelectorAll('.request-card').length, history: document.querySelectorAll('details.request-history').length }));
+      throw new Error('The request is not present on the patient list page (cards=' + counts.cards + ', history=' + counts.history + ').');
+    }
     if (await listCard.getByRole('link', { name: 'Open request details', exact: true }).count() === 0) {
       throw new Error('The matched request card has no details link.');
     }
@@ -83,13 +90,41 @@ let checkpoint = 'launch';
     await page.waitForURL('**/teletena/patient/requests/' + encodeURIComponent(request.id));
     await page.getByRole('heading', { name: 'Request details', exact: true }).waitFor();
 
+    if (Array.isArray(request.offers) && request.offers.length) {
+      checkpoint = 'open owner-scoped offer details';
+      offerDetailOpened = true;
+      const offer = request.offers[0];
+      await page.goto(base + '/patient/requests/' + encodeURIComponent(request.id) + '/offers/' + encodeURIComponent(offer.id));
+      await page.getByRole('heading', { name: 'Review offer details', exact: true }).waitFor();
+      await page.getByText(offer.clinician_name, { exact: true }).waitFor();
+      await page.getByText(offer.specialty, { exact: true }).waitFor();
+      if (request.state === 'Open' && offer.state === 'Active' && new Date(offer.valid_until).getTime() > Date.now()) {
+        await page.getByRole('button', { name: 'Accept offer', exact: true }).waitFor();
+      }
+      for (const value of Object.values(request.disclosure_snapshot || {})) {
+        await page.getByText(value, { exact: true }).waitFor();
+      }
+      await page.reload();
+      await page.getByRole('heading', { name: 'Review offer details', exact: true }).waitFor();
+      for (const width of [320, 390, 768, 1440]) {
+        await page.setViewportSize({ width, height: 920 });
+        const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
+        if (overflow) throw new Error('Offer details overflow at ' + width + ' CSS px.');
+        if (width === 390 || width === 1440) {
+          await page.screenshot({ path: path.join(screenshotDir, 'offer-detail-' + width + '.png'), fullPage: true });
+        }
+      }
+      await page.getByRole('link', { name: /Back to request/ }).click();
+      await page.getByRole('heading', { name: 'Request details', exact: true }).waitFor();
+    }
+
     checkpoint = 'verify unknown request isolation';
     const privateText = request.request_text;
     await page.goto(base + '/patient/requests/00000000-0000-0000-0000-000000000000');
     await page.getByText('Request unavailable.', { exact: true }).waitFor();
     if ((await page.locator('body').innerText()).includes(privateText)) throw new Error('An unavailable request leaked the prior request narrative.');
     if (pageErrors.length) throw new Error('The request detail journey raised a browser exception.');
-    console.log('PASS: synthetic patient opens an owner-scoped persisted request detail by opaque ID, reloads it, returns to the list, and receives a generic unavailable state for an unknown ID. Responsive checks passed at 320/390/768/1440 CSS px; Amharic and Afaan Oromo headings render. Screenshots captured; account data and request content are withheld.');
+    console.log('PASS: synthetic patient opens the owner-scoped persisted request detail' + (offerDetailOpened ? ' and offer detail' : '') + ', reloads the detail page, returns through the request list, and receives a generic unavailable state for an unknown request ID. Responsive checks passed at 320/390/768/1440 CSS px; Amharic and Afaan Oromo headings render. Screenshots captured; account data and request content are withheld.');
   } finally {
     await context.close();
     await browser.close();

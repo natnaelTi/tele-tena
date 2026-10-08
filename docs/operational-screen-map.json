@@ -2285,34 +2285,28 @@
       "module": "Marketplace",
       "backend_reference": "open_requests",
       "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Dedicated patient route is connected to the owner-scoped request-detail API and rendered with a persisted accepted offer. Active acceptance, expiry and direct-access denial cases remain to verify.",
       "prototype_route": "d06",
-      "route": "/patient/requests/:id (standalone offer-detail screen absent)",
+      "route": "/patient/requests/:requestId/offers/:offerId",
       "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
-      "status": "Designed",
+      "status": "Implemented, verification pending",
       "persistent_models": [
         "tt_open_request",
-        "tt_offer",
-        "tt_presence",
-        "tt_routing_event",
+        "tt_request_offer",
         "tt_appointment",
         "tt_wallet",
-        "tt_journal"
+        "tt_ledger",
+        "tt_journal",
+        "tt_journal_line"
       ],
       "queries": [
-        "tele_tena.api.open_requests.my_requests",
-        "tele_tena.api.open_requests.clinician_requests",
-        "tele_tena.api.open_requests.clinician_offers"
+        "tele_tena.api.open_requests.my_request_detail"
       ],
       "commands": [
-        "tele_tena.api.open_requests.publish_request",
-        "tele_tena.api.open_requests.submit_offer",
-        "tele_tena.api.open_requests.respond_offer",
-        "tele_tena.api.open_requests.close_request",
-        "tele_tena.api.open_requests.withdraw_offer"
+        "tele_tena.api.open_requests.respond_offer"
       ],
       "server_permissions": "Patient sees own request and all own offers; clinician sees only authorized request disclosure and own offers; competing offers and unrelated patient records are denied. Admin route details use reason codes and minimum necessary disclosure.",
-      "workflow_transitions": "Request Open → Matched/Cancelled/Expired; Offer Active → Accepted/Declined/Withdrawn/Expired/Superseded; match acceptance atomically creates one appointment and one reservation.",
+      "workflow_transitions": "Patient can inspect only an offer belonging to their own request. Acceptance uses respond_offer, which revalidates request/offer, availability, price, disclosure and funds and atomically confirms one appointment and reservation.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -2341,8 +2335,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D06) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Dedicated /patient/requests/:requestId/offers/:offerId route reuses my_request_detail and the existing respond_offer command; no parallel booking or financial path.",
+        "current_local": "Production-built Frappe browser journey rendered a persisted accepted offer, exact booking disclosure, price and appointment link; owner-scoped detail endpoint is covered by tests/presentation.py. Active-offer acceptance through this dedicated route and unavailable/expired offer states remain pending."
       }
     },
     {
