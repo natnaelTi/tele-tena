@@ -79,6 +79,30 @@ GitHub checks for the current PR head `025fa5ff862f363574c47febd9c2340bb4694246`
 passed: frontend on Node 22.23.3 and 24.13.0, plus Python syntax on 3.12 and
 3.14.2. This documentation-only commit did not alter application code.
 
+### Capacity-state copy follow-up — source `75ef08be1a726b5515584771668a3120b3dc2500`
+
+The clinician shell now says “No complete session fits the next 30 minutes”
+when that exact server reason is present and links directly to Availability.
+“Go available” remains disabled until the server allows presence. This replaces
+the generic “Complete setup” message in the capacity-only state; no matching or
+availability checks were loosened. The Amharic and Afaan Oromo action labels
+are provisional and still need human review.
+
+`scripts/browser-request-availability-error.cjs` passed against the packaged
+`/teletena/` application. It authenticated a real synthetic clinician while
+injecting controlled readiness responses for language/policy/capacity states,
+verified the capacity-specific copy and route, checked keyboard/mobile
+navigation and width overflow at 320/390/768/1440 px in all three locales, and
+confirmed authenticated validation errors are not called connection errors.
+This script is a UI-state test; the real API capacity response was separately
+observed as `ready=false, reasons=[no_immediate_capacity]` for the saved review
+clinician, and the rendered real-state screenshot is
+[`clinician-paused-no-capacity-1440.png`](screenshots/request-inbox/current/clinician-paused-no-capacity-1440.png).
+The production asset build was rebuilt at `75ef08be1a726b5515584771668a3120b3dc2500`
+and the identified preview Gunicorn master was HUP-reloaded; `/teletena/`
+returned HTTP 200. `npm run lint` and `npm run build` passed before the package
+build, with existing lint warnings and the existing large-bundle advisory.
+
 Current evidence proves that a properly configured synthetic clinician can
 receive, offer and match an immediate request in the production-built preview.
 It does not prove the three-minute pilot target, a new fresh install at this
