@@ -663,3 +663,37 @@ encounter grants, and membership-driven access to clinical workflows remain
 unverified or unimplemented. The review-site scheduler switch is off. Shared
 bench worker and scheduler processes remain online for other sites but were
 left untouched; no queued work was drained or scheduled processing claimed.
+
+
+## Patient-authorized clinic summary access — 2026-10-08
+
+Draft PR #41 (`feat/clinic-shared-summary-grants`) is stacked on PR #40. The
+patient may grant one verified treating-clinician-affiliated clinic access to
+published patient-summary revisions from one completed encounter. Only active
+Care Coordination members can read it. Private notes and unrelated encounter
+data remain server-side excluded; role, clinic, affiliation, grant, completion,
+and published-summary conditions are rechecked on reads. Generic DocType access
+remains denied.
+
+Verification on Frappe 15.121.2 / `tele-tena-pr12-fresh.localhost`:
+
+- `tests/presentation.py`: 45/45 passed, including explicit patient consent,
+  idempotent grant, private-note exclusion, role denials, and membership/clinic
+  affiliation revocation.
+- `tests/integration.py`: 24/24 passed.
+- Frontend `npm run lint`: exit 0 with existing warnings; `npm run build`: passed
+  with the existing large LiveKit bundle warning.
+- Built-browser clinic registration/reviewer decision, Care Coordination
+  invitation/acceptance, empty summary state, membership revocation and
+  responsive overflow checks at 320/390/768/1440 CSS px passed. Screenshots:
+  `docs/screenshots/clinic-staff-workspace/staff-workspace-390.png` and
+  `staff-workspace-1440.png`.
+- Production asset build and `check_review_assets.py` passed; no embedded
+  credentials/config files. Local `/teletena/` returned HTTP 200.
+
+Fresh-site installation, Frappe 16 checks, mobile device/assistive-technology
+review, and native Amharic/Afaan Oromo review remain pending. The empty-state
+browser journey does not claim that a populated shared-summary read has been
+verified through the browser; that data projection and privacy path are covered
+by the backend regression test. This local consent pattern is not a legal
+determination of clinic data-controller obligations.

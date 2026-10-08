@@ -627,4 +627,7 @@ projection, private-note exclusion, manager/Billing denial, Care Coordination
 access, membership/affiliation revocation, and patient revoke. Frontend TypeScript
 production build passed; lint exited 0 with existing warnings. Rendered-browser
 verification of the new consent and clinic workspace screens and clean fresh-site
-installation are still pending. The feature branch is not merged or deployed.
+installation are still pending. Draft PR #41 is open against PR #40; it is not merged or deployed. The built
+Frappe browser flow passed Care Coordination invitation/acceptance, summary
+empty state, revocation, and responsive overflow checks at 320/390/768/1440 CSS
+px. Synthetic screenshots are in `docs/screenshots/clinic-staff-workspace/`.

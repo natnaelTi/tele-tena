@@ -3,8 +3,8 @@
 ## Current local checkpoint — patient-authorized clinic summary access — 2026-10-08
 
 - Branch `feat/clinic-shared-summary-grants`, based on the vetting-rubric
-  checkpoint. The clinic summary access slice is uncommitted at this export
-  point; no merge or deployment occurred.
+  checkpoint. The clinic summary access slice is in draft PR #41, based on PR #40; no merge
+  or deployment occurred.
 - Adds a purpose-specific patient grant for published summaries of a single
   completed encounter. Only active Care Coordination clinic members can read;
   clinic owner/manager, Billing, Scheduling, administrators, and generic
