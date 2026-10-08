@@ -35,8 +35,8 @@ and saves rendered screenshots at:
 
 The screenshot names refer to CSS viewport widths. Screenshots are synthetic
 review-site content. The production asset manifest's `source_commit` is the
-authoritative frontend build source. The final screenshot/browser run used
-packaged source `ef9a370fb7af211ae1d29b3e4efb64f6e93d23be`; the manifest was
+authoritative frontend build source. The latest screenshot/browser run used
+packaged source `19e4862e0b9fa210d02a0eca4f4f167b3d9dc4e2`; the manifest was
 read from the running Frappe static asset route and matched that source. The
 app route returned HTTP 200. The browser journey passed on the same
 `/teletena/` app and site after a targeted Gunicorn master reload.
