@@ -17,6 +17,11 @@ let checkpoint = 'launch';
     const page = await context.newPage();
     await page.goto(app + '/sign-in');
     checkpoint = 'patient reviewer sign-in';
+    if (await page.getByRole('button', { name: 'Use email instead' }).count()) {
+      // Review access intentionally avoids unconfigured SMS/email delivery;
+      // this uses the visible email/password alternative, not an OTP bypass.
+      await page.getByRole('button', { name: 'Use email instead' }).click();
+    }
     await page.getByLabel('Email', { exact: true }).fill(seed.users.patient);
     await page.getByLabel('Password', { exact: true }).fill(passwords[seed.users.patient]);
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
