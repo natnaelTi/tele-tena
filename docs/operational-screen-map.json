@@ -5850,7 +5850,7 @@
       ],
       "verification_evidence": {
         "implementation": "Persistent v1.28 registry and role; exact rubric approval authority, immutable proposals and integrity checks implemented on feat/vetting-rubric-assessment-engine.",
-        "current_local": "Frappe 15.121.2 isolated-site v1.28 migration and repeat migration passed; tests/presentation.py 44/44, tests/integration.py 24/24; production browser route verification pending."
+        "current_local": "Frappe 15 isolated site v1.28 first/repeat migrations passed; presentation 44/44 and integration 24/24. Production-built reviewer manager rendered at 390/768/1440px. Approver may inspect a proposal; direct Medical Lead governance route correctly denies that role. Screenshots: docs/screenshots/vetting-rubric/. Clean fresh-site v1.28 install pending."
       }
     },
     {
@@ -6185,7 +6185,7 @@
       ],
       "verification_evidence": {
         "implementation": "React management route and authenticated Frappe API use the v1.28 persistent registry.",
-        "current_local": "Backend/API/migration regression tests pass; production-built connected browser interaction remains pending."
+        "current_local": "Frappe 15 isolated site v1.28 first/repeat migrations passed; presentation 44/44 and integration 24/24. Production-built reviewer manager rendered at 390/768/1440px. Approver may inspect a proposal; direct Medical Lead governance route correctly denies that role. Screenshots: docs/screenshots/vetting-rubric/. Clean fresh-site v1.28 install pending."
       }
     },
     {
