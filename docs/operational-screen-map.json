@@ -3588,7 +3588,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "The retained Review Clinician had no recipient for the patient’s latest request because its published schedule began at 08:00 Addis time, outside the immediate start window at publication; the request matched another clinician. A focused test now verifies live presence is shown paused when schedule changes eliminate full-duration immediate capacity, and no route is created when none fits. Frappe 15 presentation suite passed 38/38. A full browser delivery specifically to this clinician remains pending."
+        "current_local": "A real two-context flow on the packaged isolated site enabled presence after the 08:00 Addis interval entered the 30-minute immediate window, then published a patient request. Persisted publication metric showed one eligible clinician; the Review Clinician had one recipient row and `NotificationEnqueued` plus `InboxFetched` route events. The request was cancelled and presence paused. A Playwright selector assertion failed because `.clinician-request[data-request-id]` is not rendered; no screenshot/visible-card assertion was captured. Re-run with a text-based selector for rendered acceptance. See `docs/request-inbox-routing-browser-verification.md`."
       }
     },
     {

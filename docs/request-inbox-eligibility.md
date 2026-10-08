@@ -68,3 +68,16 @@ records successful site-qualified runs of both
 invokes the idempotent due-wave dispatcher; this confirms handler execution,
 not that a specific due wave delivered to additional eligible clinicians.
 That outcome still needs a controlled eligible-supply scenario.
+
+## Subsequent real two-session routing check
+
+At a later local time, when the 08:00 clinician schedule fell inside the
+immediate window, an authenticated clinician session enabled request presence
+and an independent synthetic patient session published an immediate video
+request. The persisted publication metric recorded one eligible clinician; a
+recipient row belonged to the Review Clinician, and the routing audit recorded
+both notification enqueue and clinician inbox fetch. The UI acknowledged that
+fetch. The test's final visible-card assertion used a nonexistent DOM attribute,
+so there is no captured inbox screenshot or verified rendered-card assertion
+yet. The synthetic request was cancelled and clinician presence was paused.
+Detailed evidence is in `request-inbox-routing-browser-verification.md`.

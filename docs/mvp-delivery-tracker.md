@@ -19,13 +19,16 @@ prefills the request choices and disclosure instead of broadening requirements.
 The focused regression and the Frappe 15 presentation suite pass 38/38 on the
 isolated site. Its enabled scheduler and worker logged successful site-qualified
 executions of the request expiry/routing reconciler and earnings release
-handler. A specific due wave finding and notifying additional eligible
-clinicians and a complete browser journey routed specifically to the Review
-Clinician remain pending. The real built-browser patient zero-supply path now
-passes publication → no-supply explanation → preserved schedule-later inputs →
-application cancellation and persisted-state reread; see
-`open-request-no-supply-verification.md`. Do not describe the complete
-open-request system as accepted from these checks.
+handler. A later real two-context request inside the clinician's immediate
+window recorded one eligible recipient, `NotificationEnqueued`, and
+`InboxFetched` for the Review Clinician. The last DOM assertion used an
+attribute the inbox card does not render, so visible-card acceptance is still
+pending; the request was cancelled and presence paused. The patient zero-supply
+browser path passes publication → explanation → preserved schedule-later inputs
+→ cancellation and persisted-state reread. See
+`open-request-no-supply-verification.md` and
+`request-inbox-routing-browser-verification.md`. Offer submission/acceptance,
+due-wave widening outcome and complete open-request acceptance remain pending.
 
 ## Current continuation — owner-scoped transaction details — 2026-10-08
 
@@ -373,7 +376,7 @@ needed for clean financial cutover verification.
 |---|---|---|
 | Extracted design, React design system, all 142 screens | partial | Existing React flows remain authoritative and the visual tokens now begin moving toward the extracted Inter/blue–teal reference. Screen-level map covers 142 concepts. Most routes still need direct visual and connected interaction review; prototype-only states are not accepted. |
 | Clinician vetting and service catalog | partial | Native per-scope applications/decisions exist. Applicant-owned private PDF revisions and immutable assessment evidence references, credential expiry/reverification and reconsideration are implemented. Frappe 15 `tests/presentation.py` passes 33/33 on the current worktree, but this is not fresh-install or Frappe 16 evidence. The proposed rubric v1.0 needs medical-lead approval; independent credential/source verification, affiliation verification, renewal browser acceptance and approved clinical terminology review remain. |
-| Open requests, private offers and progressive routing | partial | Persisted request/offer state, hard eligibility, presence leases, bounded waves, owned paginated history, atomic offer acceptance and progress metrics are implemented. Latest retained request state was matched to a different clinician; the Review Clinician's schedule began at 08:00 Addis time, outside the immediate start window at publication. The presentation suite passes 38/38 including stale readiness after schedule changes and zero dispatch when no complete immediate slot exists. The built browser now verifies real patient publication, zero-supply recovery, schedule-later input preservation and cancellation; site scheduler/worker logs confirm successful execution of the expiry/routing reconciler. A controlled due-wave outcome, an end-to-end route specifically to the retained Review Clinician, routing privacy/abuse audit and pilot performance remain pending. The under-three-minute target is not guaranteed. See `request-inbox-eligibility.md` and `vetting-routing-verification.md`. |
+| Open requests, private offers and progressive routing | partial | Persisted request/offer state, hard eligibility, presence leases, bounded waves, owned paginated history, atomic offer acceptance and progress metrics are implemented. The earlier request was matched elsewhere while the Review Clinician's 08:00 Addis interval was outside the immediate window. A later real two-context request within that window recorded one eligible recipient for the Review Clinician, `NotificationEnqueued` and `InboxFetched`; the visible-card assertion used a nonexistent attribute, so rendered-card acceptance remains pending. The request was cancelled and presence paused. Frappe 15 presentation suite passes 38/38; the patient zero-supply/recovery browser journey passes with persisted cancellation. Site scheduler/worker logs confirm the expiry/routing reconciler executed. Due-wave widening, offer submission/acceptance, privacy/abuse audit and pilot performance remain pending. The under-three-minute target is not guaranteed. See `request-inbox-eligibility.md`, `request-inbox-routing-browser-verification.md` and `vetting-routing-verification.md`. |
 | Owner-level legacy financial reconciliation | implementation in progress | New v1.13 migration records legacy-event, wallet-snapshot, subledger and exact opening-boundary differences without changing existing records. Mismatched owners are held until an authorized reasoned snapshot decision. Fresh/upgrade/repeat tests on a disposable site remain pending. |
 | Extensions and dispute/refund policy | pending | No prefunded explicit extension workflow. Refunds/disputes after release or payout state remain gated for authorized operations; no negative balance or history edits are allowed. |
 | Clinic operations and record grants | partial | Verified clinic registration/affiliation and limited memberships are implemented. A verified invite/Manager/Scheduling member can reach `/clinic`; a browser flow verified clinic application → reviewer decision → manager invitation → exact verified-contact acceptance → staff workspace navigation → reasoned revocation at 320/390/768/1440px. A patient can grant one verified clinic scheduling-only access to a future booked encounter; the built `/teletena/` journey persisted and revoked that grant across reload. The 24-case presentation suite verifies idempotency, minimized fields, patient and clinic role boundaries, and membership revocation. Fresh-site installation is still pending. Clinic calendars/resources, clinic billing, dedicated team screens, broader staff operations, and clinical-record access grants are not implemented; membership alone grants none. See `clinic-encounter-access.md` and the current sections of `presentation-readiness-verification.md`. |
