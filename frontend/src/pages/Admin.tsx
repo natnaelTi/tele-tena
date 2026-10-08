@@ -372,7 +372,7 @@ export function FinancialDisputes() {
       <div><h2 id="wallet-reconciliation-title">{w("Wallet reconciliation")}</h2><p className="supporting">{w("Review existing balance differences. Accepting a snapshot does not change balances or erase history.")}</p></div>
       {reconciliation.error ? <InlineNotice tone="danger">{w("Reconciliation cases could not be loaded.")} <Button onClick={() => void reconciliation.refresh()}>{w("Try again")}</Button></InlineNotice>
         : !reconciliation.data ? <Skeleton />
-        : reviewCases.length ? reviewCases.map(item => <Card key={item.id}>
+        : reviewCases.length ? reviewCases.map(item => <Card key={item.case_ref}>
           <div className="row-between"><h3>{w("Balance review required")}</h3><StatusBadge tone="warning">{w("Review required")}</StatusBadge></div>
           <p className="supporting">{w("Case reference")}: {item.case_ref.slice(0, 15)} · {w("Recorded")}: {date(item.created)}</p>
           <div className="form-grid two-column reconciliation-balances">
