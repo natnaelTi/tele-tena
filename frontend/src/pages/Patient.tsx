@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowRight, Search } from "lucide-react";
 import { api } from "../api";
@@ -134,16 +134,53 @@ export function Discovery() {
   const offers = useResource(journeyApi.discover);
   const services = useResource(journeyApi.services);
   const [category, setCategory] = useState("");
+  const [languageFilter, setLanguageFilter] = useState("");
+  const [formatFilter, setFormatFilter] = useState("");
+  const [availabilityFilter, setAvailabilityFilter] = useState("");
+  const [availableOfferIds, setAvailableOfferIds] = useState<Set<string> | null>(null);
+  const [availabilityError, setAvailabilityError] = useState(false);
   const [query, setQuery] = useState(
     (routeLocation.state as {careQuery?:string}|null)?.careQuery || new URLSearchParams(location.search).get("q") || "",
   );
+  useEffect(() => {
+    if (availabilityFilter !== "next14" || !offers.data) return;
+    let active = true;
+    const checkAvailability = async () => {
+      const today = new Date();
+      const fromDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+      const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Africa/Addis_Ababa";
+      const available = new Set<string>();
+      try {
+        for (let offset=0; offset<offers.data!.length; offset+=5) {
+          const batch = offers.data!.slice(offset, offset+5);
+          const results = await Promise.all(batch.map(async offer => {
+            const calendar = await journeyApi.calendar(offer.id, fromDate, zone, 14);
+            return {id:offer.id, hasOpenSlot:calendar.days.some(day=>day.slots.length>0)};
+          }));
+          results.filter(result=>result.hasOpenSlot).forEach(result=>available.add(result.id));
+        }
+        if (active) setAvailableOfferIds(available);
+      } catch {
+        if (active) {
+          setAvailabilityError(true);
+        }
+      }
+    };
+    void checkAvailability();
+    return () => { active = false; };
+  }, [availabilityFilter, offers.data]);
+  const availabilityBusy = availabilityFilter === "next14" && !!offers.data && !availableOfferIds && !availabilityError;
   const shown = offers.data?.filter(
     (offer) =>
-      (!category || offer.label === category) &&
-      `${offer.display_name} ${offer.label}`
+      (!category || offer.service_category === category) &&
+      (!languageFilter || offer.care_languages?.includes(languageFilter as "en"|"am"|"om")) &&
+      (!formatFilter || offer.consultation_format === formatFilter) &&
+      (availabilityFilter !== "next14" || !availableOfferIds || availableOfferIds.has(offer.id)) &&
+      `${offer.display_name} ${offer.label} ${offer.service_category || ""}`
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
+  const requestDraft={request_text:query,service_label:category,language:languageFilter||undefined,format:formatFilter||undefined};
   return (
     <>
       <PageTitle
@@ -168,12 +205,21 @@ export function Discovery() {
             <option key={service.id}>{service.label}</option>
           ))}
         </Select>
+        <Select label={w("Care language")} value={languageFilter} onChange={e=>setLanguageFilter(e.target.value)}>
+          <option value="">{w("Any language")}</option><option value="en">English</option><option value="am">አማርኛ</option><option value="om">Afaan Oromo</option>
+        </Select>
+        <Select label={w("Session format")} value={formatFilter} onChange={e=>setFormatFilter(e.target.value)}>
+          <option value="">{w("Any format")}</option><option value="video">{w("Video")}</option><option value="audio">{w("Audio")}</option>
+        </Select>
+        <Select label={w("Availability")} value={availabilityFilter} onChange={e=>{setAvailabilityFilter(e.target.value);setAvailableOfferIds(null);setAvailabilityError(false);}}>
+          <option value="">{w("Any date")}</option><option value="next14">{w("Open times in the next 14 days")}</option>
+        </Select>
       </div>
-      <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link to="/patient/requests" state={{requestDraft:{request_text:query,service_label:category}}}>{w("Post a request")}</Link></section>
+      <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link to="/patient/requests" state={{requestDraft}}>{w("Post a request")}</Link></section>
       <p className="supporting">
-        Online sessions · Times shown in {timezone}. Language and format filters
-        will appear when verified clinician details are available.
+        {w("Filter approved services by care language, format and currently open times.")} · {w("Times shown in")} {timezone}.
       </p>
+      {availabilityError&&<InlineNotice tone="danger">{w("Available times could not be checked. Clear this filter or try again.")}</InlineNotice>}
       {offers.error ? (
         <InlineNotice tone="danger">
           Care options could not be loaded.{" "}
@@ -181,16 +227,18 @@ export function Discovery() {
         </InlineNotice>
       ) : !offers.data ? (
         <Skeleton />
+      ) : availabilityBusy ? (
+        <p role="status" className="supporting">{w("Checking open times in the next 14 days…")}</p>
       ) : shown?.length ? (
         <div className="offering-grid">
           {shown.map((offer) => (
             <ClinicianCard key={offer.id} offer={offer} />
           ))}
         </div>
-      ) : (
+        ) : (
         <EmptyState title="No matching services yet.">
           Try another search or return when more approved offerings are
-          available. <Link to="/patient/requests" state={{requestDraft:{request_text:query,service_label:category}}}>Post a private request</Link> without relaxing your preferences.
+          available. <Link to="/patient/requests" state={{requestDraft}}>Post a private request</Link> without relaxing your preferences.
         </EmptyState>
       )}
       <p className="verification-note">

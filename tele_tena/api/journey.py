@@ -498,8 +498,8 @@ def discover(service=None):
     actor('Tele Tena Patient')
     from tele_tena.review import enabled as review_enabled
     legacy_allowed = int(review_enabled() or frappe.local.site == 'erp.localhost')
-    results = rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,o.clinician,o.service,
-        COALESCE(NULLIF(o.title,''),s.service_label) AS label,o.description,o.price,o.minutes,
+    results = rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,p.languages AS care_languages,o.clinician,o.service,
+        COALESCE(NULLIF(o.title,''),s.service_label) AS label,s.service_label AS service_category,o.description,o.price,o.minutes,
         sc.id AS schedule_id,sc.timezone AS schedule_timezone,sc.consultation_format
         FROM tt_offering o JOIN tt_profile p ON p.user=o.clinician
         JOIN tt_application a ON a.user=o.clinician JOIN `tabTele Tena Service` s ON s.name=o.service
@@ -515,6 +515,13 @@ def discover(service=None):
     for item in results:
         if not service_scope_is_current(item.clinician, item.service):
             continue
+        try:
+            languages = json.loads(item.care_languages or '[]')
+        except (TypeError, ValueError):
+            languages = []
+        if not isinstance(languages, list):
+            languages = []
+        item.care_languages = sorted({value for value in languages if value in {'en', 'am', 'om'}})
         # The account key is needed only for the server-side eligibility
         # filter. Never serialize an account email to patient discovery.
         item.pop('clinician', None)
