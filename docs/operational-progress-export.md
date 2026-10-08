@@ -1,6 +1,36 @@
 # TeleTena operational progress export
 
-## Current local checkpoint — legacy reconciliation UI — 2026-10-08
+## Current local checkpoint — immediate request visible inbox — 2026-10-08
+
+- `fix/open-request-visible-inbox` is a focused branch from PR #36's latest
+  commit. It preserves the financial reconciliation repair; the intended PR is
+  stacked on PR #36 and both remain unmerged. Selfmade is unchanged.
+- Exact preview source/build SHA is recorded in `frontend/dist/release.json`.
+  Preview: `http://127.0.0.1:8017/teletena/`, isolated site
+  `tele-tena-pr12-fresh.localhost`, Bench `/home/frappe/frappe/frappe-bench`.
+  This is the packaged Frappe app, not Vite.
+- A separate patient and clinician Chromium context published/fetched a real
+  persisted immediate request. Publication recorded one eligible clinician;
+  database audit confirmed one recipient and `NotificationEnqueued` plus
+  `InboxFetched`. The rendered inbox card showed only the authorized disclosure
+  and omitted the patient account email. The synthetic request was cancelled;
+  no offer, booking, reservation, or balance change occurred. The clinician's
+  previous request-availability state was restored.
+- Built-browser no-overflow checks and screenshots passed at 390/768/1440px.
+  See `docs/request-inbox-routing-browser-verification.md` and
+  `docs/screenshots/open-request-routed/`.
+- The original empty inbox occurred before the clinician's 08:00 Addis interval
+  began; the request therefore had no feasible full-session start in the
+  immediate window. A presence toggle alone does not create capacity. Due-wave
+  widening, offers/acceptance and the completion-to-earnings chain remain
+  unverified. Site scheduler is enabled with no pending jobs, but shared worker
+  and scheduler processes predate the current checkout, so current-branch
+  scheduled execution is not claimed.
+- Fresh-site install/browser verification remains pending the disposable DB
+  admin setup. This fixes a rendered inbox acceptance gap; it does not complete
+  the broader approved A–I product scope.
+
+## Historical local checkpoint — legacy reconciliation UI — 2026-10-08
 
 - Draft PR #36 is open on `fix/legacy-wallet-projection-audit`, based on PR #35
   head `1d2a65ecfb450d938cb36a82f74fb80e9202e961` and dependent on PR #35/#34.

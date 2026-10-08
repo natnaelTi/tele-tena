@@ -1,5 +1,39 @@
 # TeleTena delivery tracker
 
+## Current local checkpoint — rendered immediate-request inbox — 2026-10-08
+
+The active continuation is `fix/open-request-visible-inbox`, based on the
+current PR #36 head (`fix/legacy-wallet-projection-audit`). Its focused change
+adds a two-browser acceptance check for the clinician's rendered inbox, in
+addition to persisted recipient/fetch events. On the built preview at
+`http://127.0.0.1:8017/teletena/` (isolated site
+`tele-tena-pr12-fresh.localhost`), the patient published an immediate request,
+one eligible clinician was recorded, the inbox API and rendered card contained
+the request, and the patient's account email was absent. The test cancelled
+its synthetic request and restored clinician presence without creating an
+offer, appointment, or financial posting. Screenshots are in
+`docs/screenshots/open-request-routed/`; the executable journey is
+`scripts/browser-open-request-routed-inbox.cjs`.
+
+PR #37 is draft and depends on PR #36. The production asset build,
+asset/privacy scan, and two-context browser journey passed; the newer doc-only
+checkpoint build SHA and PR #37 CI are recorded below. Fresh-site v1.7/expanded-
+catalog verification requested in the broader product checkpoint remains
+pending; no fresh-site credentials or successful helper completion are
+available at this checkpoint. This verifies only the routed inbox slice, not
+offer acceptance or the full A–I scope. Live SMS, physical devices, and
+native-language review remain external validation items.
+
+Follow-up verification on this branch: `tests/integration.py` passed 24/24 and
+`tests/presentation.py` passed 40/40 on `tele-tena-pr12-fresh.localhost`; PR #37
+CI passed both frontend Node versions (22.23.3 and 24.13.0) and Python syntax
+checks (3.12 and 3.14.2). The source/build SHA at that run was
+`0339c1483043c1e047d1e7f509b67c6bc3a3ebd1`. The active preview returned HTTP
+200 from the packaged `/teletena/` route. These backend suites include the
+continuous immediate-start boundary, request eligibility, private competing
+offers, concurrent acceptance, and payment reservation regressions; they do not
+verify the full downstream consultation and earnings journey in two browsers.
+
 ## Current local operational checkpoint — legacy finance projection — 2026-10-08
 
 The active checkout is `fix/legacy-wallet-projection-audit` at the current
@@ -404,7 +438,7 @@ test in `selfmade-phone-access-update.md`. Provider acceptance is not delivery.
 | Service definitions, approved clinician offerings, published ETB price and fixed duration | partial | Native Service and Service Scope; scoped publication/discovery/booking and stale-ID regression checks. Multiple named offerings per scope are implemented by v1.23 with idempotent creation/edit, owner/scope enforcement, patient discovery and migration preservation tests (33/33 presentation suite). Broader catalog attributes and clinical taxonomy remain pending. See `multiple-offerings.md`. |
 | Natural-language request suggestions, eligible clinician matching, editable filters, relevance feedback; eligibility before ranking | partial | Discovery now filters persisted approved offerings by service, clinician-declared care language, supported format, and server-generated open calendar slots in the next 14 days. The packaged browser check verifies these controls and carries the search text and selected constraints into the private-request draft. See `discovery-filter-verification.md`. Natural-language service suggestions, relevance feedback, and proximity ranking remain absent. |
 | Previous clinicians and repeat care discovery | partial | Dependent slice `feat/previous-clinicians` adds a patient-only dashboard query sourced solely from that patient's Completed appointments and currently approved/publicly bookable clinician offerings, plus profile links and loading/empty/error states. The query returns an opaque profile key and never links other patients' masked encounters. Frappe DB permission and browser verification remain pending because the disposable integration site is not provisioned. |
-| Private open patient requests and clinician offers, isolated from competing clinicians | partial | Persisted private requests/offers, bounded waves, hard eligibility, owner-scoped history, atomic acceptance and capacity revalidation are implemented. Latest persisted reviewer scenario: patient request matched another clinician; retained Review Clinician had no recipient because its 08:00 Addis interval could not fit a full session in the immediate window at publication. Readiness now reflects current capacity even if a prior presence lease has not expired; Frappe 15 presentation suite passes 38/38. Specific Review Clinician end-to-end delivery and fresh scheduler-backed widening remain pending. The under-three-minute target is not guaranteed. See `request-inbox-eligibility.md` and `vetting-routing-verification.md`. |
+| Private open patient requests and clinician offers, isolated from competing clinicians | partial | Persisted private requests/offers, bounded waves, hard eligibility, owner-scoped history, atomic acceptance and capacity revalidation are implemented. The earlier empty inbox was explained by the Review Clinician's 08:00 Addis interval being outside the immediate window at request publication. A new two-context built-browser journey now verifies the same clinician is a recipient, fetches the inbox, and sees the request card when the full session fits; the patient email is omitted. The synthetic request was cancelled, with no offer or balance change. Frappe presentation tests cover immediate starts between grid boundaries. Scheduler-backed widening, offer acceptance, and full journey to completed consultation/earnings remain pending; the under-three-minute target is not guaranteed. See `request-inbox-eligibility.md` and `request-inbox-routing-browser-verification.md`. |
 | Progressive explainable routing, service catalog and clinician vetting | partial | Additive linked native category/approach/topic/format/attribute and per-scope application/assessment DocTypes; catalog remains draft/inactive pending clinical review. Applicant drafts, reviewer assignment, clarification/resubmission, per-scope decisions, private clinician CVs and immutable per-scope private evidence revisions exist. PR #25 adds immutable per-decision reconsideration, with `Upheld` or `Reopened`; the current dependent branch adds a separate credential re-verification application linked to the previously approved scope. Credential expiry is enforced against the configured Frappe site date across service-scope eligibility; fresh private license evidence and a new human decision are required to restore expired-scope eligibility. Rejected renewal evidence does not revoke a still-valid prior credential. Backend presentation suite passes 30/30 on Frappe 15 for this stack. The appeal browser journey is captured in `docs/screenshots/vetting-appeals/`; renewal browser acceptance remains pending. Fresh empty-site v1.19, Frappe 16 migration/browser rerun, verified credential sources, proposed rubric v1.0 approval, jurisdiction-specific expiry policy, full credential/accessibility validation, affiliation verification and transparent eligibility-first ranking remain pending. Structured trust indicators exist but broader browser/metric review remains. See `scope-evidence-storage.md`, `session-experience-metric.md`, `vetting-appeals.md`, and `scope-reverification.md`. |
 | Free patient discovery/booking and bring-your-own-patient links | partial | Current demo supports direct discovery/booking; clinician referral links/acquisition attribution not built. |
 | Automatic/manual booking confirmation, slot holds/expiry and mutual rescheduling | partial | Recurring server-generated slots, configurable automatic/manual confirmation, atomic slot/fund holds and 24-hour demonstration expiry/release are implemented and regression tested. This branch adds mutual time proposals with counterpart consent, idempotent retry, generated-slot revalidation, preserved original hold until acceptance, expiry/withdraw/decline and no financial reposting. Frappe presentation regression and the independent patient→clinician→patient packaged-browser acceptance pass. Demo proposal expiry defaults to 48 hours, configurable per site. Fresh-install and full responsive/accessibility acceptance remain pending. |
