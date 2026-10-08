@@ -14,7 +14,8 @@
   `http://127.0.0.1:8017/teletena/`, site
   `tele-tena-pr12-fresh.localhost`, Bench
   `/home/frappe/frappe/frappe-bench`. The source/build SHA is authoritative in
-  `frontend/dist/release.json` and will be rebuilt after final documentation.
+  `frontend/dist/release.json`; `scripts/build_review.py` regenerates the
+  manifest for the current commit before review handoff.
 - Site scheduler is enabled; shared worker/scheduler processes are running but
   this branch has not been verified through their asynchronous queue. Fresh-site
   verification remains pending. No hosted changes were made; A–I scope remains

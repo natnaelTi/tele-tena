@@ -15,13 +15,12 @@ prove execution through the asynchronous Bench worker or demonstrate a full
 clinician-offer-to-completed-consultation journey.
 
 The production-built preview remains `http://127.0.0.1:8017/teletena/` on
-`tele-tena-pr12-fresh.localhost`. The asset manifest currently reflects the
-parent preview commit and will be rebuilt after this branch's final commit. The
-site scheduler is enabled. The shared Bench worker and scheduler processes are
-running, but this turn has not verified a queued routing or earnings job on
-them. Fresh-site install verification remains pending. Existing data and
-credentials are preserved. The asset manifest will be rebuilt for the final
-source commit before PR handoff.
+`tele-tena-pr12-fresh.localhost`. The release manifest is regenerated from the
+current checkout by `scripts/build_review.py`; its source SHA is authoritative.
+The site scheduler is enabled. The shared Bench worker and scheduler processes
+are running, but this turn has not verified a queued routing or earnings job
+on them. Fresh-site install verification remains pending. Existing data and
+credentials are preserved.
 
 ## Prior checkpoint — rendered immediate-request inbox — 2026-10-08
 
