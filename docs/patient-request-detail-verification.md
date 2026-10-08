@@ -48,11 +48,12 @@ provisional pending native review.
 - `npm run lint` and `npm run build` passed. Lint has existing warnings in
   surrounding components; the build reports the existing large-chunk advisory.
 - The current package manifest source is
-  `a71833ee58ef839358d8b1493af3ec0924bec1e4`; the backend API was introduced in
+  `f9d01703a3e46edbf80fe674f3fd4753256f22b5`; the backend API was introduced in
   `1a9eeeaa9a83808e4725150aa9e6bdae64354832`. The offer-detail route and packaged
   assets are included in that build. The running preview at
   `http://127.0.0.1:8017/teletena/` returned HTTP 200 and the complete journey
-  passed after the added list-link assertion.
+  passed after the added list-link assertion. Gunicorn master PID 287561 served
+  worker PIDs 326665 and 326666 after a graceful HUP reload.
 - Offer-detail screenshots: `docs/screenshots/request-details/offer-detail-390.png`
   and `offer-detail-1440.png`. The newest Playwright script/screenshot evidence
   is committed separately from the packaged application source.

@@ -7,11 +7,14 @@ real-patient-readiness, real-money, or market-performance claim.
 
 - Current feature branch: `feat/patient-request-offer-detail`, draft PR #31,
   dependent on draft PR #30 → #29 → #28. No merge or remote deployment.
+- Exact branch and built frontend manifest source:
+  `f9d01703a3e46edbf80fe674f3fd4753256f22b5`.
 - The review URL is `http://127.0.0.1:8017/teletena/`, site
   `tele-tena-pr12-fresh.localhost`, bench
   `/home/frappe/frappe/frappe-bench`; the frontend is a built Frappe app. The
   new route is `/teletena/patient/requests/:requestId/offers/:offerId` and
   reuses the patient-owner request query and existing atomic offer acceptance.
+  Gunicorn master PID 287561 and worker PIDs 326665/326666 serve this build.
 - Browser rendering and reload of a persisted accepted offer passed; the page
   showed its timezone, duration, format, price, exact request disclosure and
   appointment link. The existing browser journey also covered direct request
