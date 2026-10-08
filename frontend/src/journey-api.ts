@@ -124,4 +124,7 @@ export const journeyApi = {
   revokeClinicScheduleAccess: (grant:string,reason='') => api<any>('tele_tena.api.clinic_access.revoke_schedule_access',{grant,reason},true),
   myClinicScheduleAccess: (appointment:string) => api<any[]>('tele_tena.api.clinic_access.my_schedule_access',{appointment}),
   clinicScheduleAccess: () => api<any[]>('tele_tena.api.clinic_access.clinic_schedule_access'),
+  eligibleClinicsForSummary: (appointment:string) => api<{clinic:string;clinic_name:string;jurisdiction:string;already_shared:boolean}[]>('tele_tena.api.clinic_access.eligible_clinics_for_summary',{appointment}),
+  grantClinicSummaryAccess: (appointment:string,clinic:string) => api<any>('tele_tena.api.clinic_access.grant_published_summary_access',{appointment,clinic},true),
+  clinicSharedSummaries: () => api<any[]>('tele_tena.api.clinic_access.clinic_shared_summaries'),
 }

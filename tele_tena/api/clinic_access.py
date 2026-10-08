@@ -32,6 +32,12 @@ def _staff_clinic_ids(user):
     return {r.clinic for r in (*roles, *owned)}
 
 
+def _care_clinic_ids(user):
+    return {r.clinic for r in rows('''SELECT DISTINCT clinic
+        FROM `tabTele Tena Clinic Membership`
+        WHERE member_user=%s AND status='Active' AND membership_role='Care Coordination' ''', (user,))}
+
+
 @query()
 def eligible_clinics_for_appointment(appointment):
     patient = _patient()
@@ -45,7 +51,8 @@ def eligible_clinics_for_appointment(appointment):
         WHERE a.clinician=%s AND a.status='Verified' AND c.status='Verified'
         ORDER BY c.clinic_name LIMIT 100''', (item.clinician,))
     active = {r.clinic for r in rows('''SELECT clinic FROM `tabTele Tena Clinic Encounter Access`
-        WHERE appointment=%s AND patient=%s AND status='Active' AND expires_at>UTC_TIMESTAMP(6)''',
+        WHERE appointment=%s AND patient=%s AND purpose='Scheduling coordination'
+          AND status='Active' AND expires_at>UTC_TIMESTAMP(6)''',
         (item.id, patient))}
     return [{'clinic': c.name, 'clinic_name': c.clinic_name,
              'jurisdiction': c.jurisdiction, 'already_shared': c.name in active}
@@ -67,7 +74,7 @@ def grant_schedule_access(appointment, clinic):
     if not valid:
         fail('Choose a verified clinic linked to your treating clinician.', 'clinic_not_eligible')
     existing = rows('''SELECT name FROM `tabTele Tena Clinic Encounter Access`
-        WHERE appointment=%s AND clinic=%s AND patient=%s AND status='Active'
+        WHERE appointment=%s AND clinic=%s AND patient=%s AND purpose='Scheduling coordination' AND status='Active'
           AND expires_at>UTC_TIMESTAMP(6) FOR UPDATE''', (item.id, clinic, patient))
     if existing:
         return {'grant': existing[0].name, 'status': 'Active', 'idempotent': True}
@@ -90,6 +97,61 @@ def grant_schedule_access(appointment, clinic):
         frappe.local.tele_tena_clinic_access_action = None
     from tele_tena.api.presentation import _event
     _event(item.id, 'ClinicScheduleAccessGranted', patient)
+    return {'grant': doc.name, 'status': 'Active', 'idempotent': False}
+
+
+@query()
+def eligible_clinics_for_summary(appointment):
+    patient = _patient()
+    item = _appointment_for_patient(appointment, patient)
+    if item.state != 'Completed' or not rows('''SELECT revision FROM tt_note_revision
+        WHERE appointment=%s AND summary_published=1 LIMIT 1''', (item.id,)):
+        return []
+    affiliations = rows('''SELECT c.name,c.clinic_name,c.jurisdiction
+        FROM `tabTele Tena Clinic Affiliation` a
+        JOIN `tabTele Tena Clinic` c ON c.name=a.clinic
+        WHERE a.clinician=%s AND a.status='Verified' AND c.status='Verified'
+        ORDER BY c.clinic_name LIMIT 100''', (item.clinician,))
+    active = {r.clinic for r in rows('''SELECT clinic FROM `tabTele Tena Clinic Encounter Access`
+        WHERE appointment=%s AND patient=%s AND purpose='Patient-shared summary'
+          AND status='Active' ''', (item.id, patient))}
+    return [{'clinic': c.name, 'clinic_name': c.clinic_name,
+             'jurisdiction': c.jurisdiction, 'already_shared': c.name in active}
+            for c in affiliations]
+
+
+@command
+def grant_published_summary_access(appointment, clinic):
+    patient = _patient()
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    item = _appointment_for_patient(appointment, patient, lock=True)
+    if item.state != 'Completed' or not rows('''SELECT revision FROM tt_note_revision
+        WHERE appointment=%s AND summary_published=1 LIMIT 1''', (item.id,)):
+        fail('A published summary is required before sharing this encounter.', 'summary_not_shareable')
+    valid = rows('''SELECT c.name FROM `tabTele Tena Clinic` c
+        JOIN `tabTele Tena Clinic Affiliation` a ON a.clinic=c.name
+        WHERE c.name=%s AND c.status='Verified' AND a.clinician=%s AND a.status='Verified' ''',
+        (clinic, item.clinician))
+    if not valid:
+        fail('Choose a verified clinic linked to your treating clinician.', 'clinic_not_eligible')
+    existing = rows('''SELECT name FROM `tabTele Tena Clinic Encounter Access`
+        WHERE appointment=%s AND clinic=%s AND patient=%s
+          AND purpose='Patient-shared summary' AND status='Active' FOR UPDATE''',
+        (item.id, clinic, patient))
+    if existing:
+        return {'grant': existing[0].name, 'status': 'Active', 'idempotent': True}
+    doc = frappe.new_doc('Tele Tena Clinic Encounter Access')
+    doc.update({'clinic': clinic, 'appointment': item.id, 'patient': patient,
+        'clinician': item.clinician, 'purpose': 'Patient-shared summary',
+        'status': 'Active', 'granted_by': patient, 'granted_at': now_datetime(),
+        'expires_at': None})
+    frappe.local.tele_tena_clinic_access_action = 'grant'
+    try:
+        doc.insert()
+    finally:
+        frappe.local.tele_tena_clinic_access_action = None
+    from tele_tena.api.presentation import _event
+    _event(item.id, 'ClinicSummaryAccessGranted', patient)
     return {'grant': doc.name, 'status': 'Active', 'idempotent': False}
 
 
@@ -126,13 +188,14 @@ def my_schedule_access(appointment=None):
     patient = _patient()
     extra = ' AND g.appointment=%s' if appointment else ''
     params = (patient, appointment) if appointment else (patient,)
-    grants = rows('''SELECT g.name,g.status,g.granted_at,g.expires_at,g.revoked_at,
+    grants = rows('''SELECT g.name,g.status,g.purpose,g.granted_at,g.expires_at,g.revoked_at,
         g.appointment,c.clinic_name,a.state,a.start,a.timezone,a.service_label
         FROM `tabTele Tena Clinic Encounter Access` g
         JOIN `tabTele Tena Clinic` c ON c.name=g.clinic
         JOIN tt_appointment a ON a.id=g.appointment
         WHERE g.patient=%s''' + extra + ' ORDER BY g.granted_at DESC LIMIT 100', params)
     return [{'grant': r.name, 'appointment': r.appointment,
+             'purpose': r.purpose,
              'status': ('Expired' if r.status == 'Active' and r.expires_at <= now_datetime() else r.status),
              'granted_at': r.granted_at,
              'expires_at': r.expires_at, 'revoked_at': r.revoked_at,
@@ -153,7 +216,8 @@ def clinic_schedule_access():
         FROM `tabTele Tena Clinic Encounter Access` g
         JOIN `tabTele Tena Clinic` c ON c.name=g.clinic
         JOIN tt_appointment a ON a.id=g.appointment
-        WHERE g.status='Active' AND g.expires_at>UTC_TIMESTAMP(6) AND c.status='Verified'
+        WHERE g.purpose='Scheduling coordination' AND g.status='Active'
+          AND g.expires_at>UTC_TIMESTAMP(6) AND c.status='Verified'
           AND a.state='Booked' AND a.start>UTC_TIMESTAMP(6)
           AND g.clinic IN ({})
         ORDER BY a.start LIMIT 200'''.format(','.join(['%s'] * len(allowed_clinics))),
@@ -173,4 +237,36 @@ def clinic_schedule_access():
             'minutes': int(item.minutes),
             'status': item.state,
         })
+    return output
+
+
+@query()
+def clinic_shared_summaries():
+    user = actor()
+    allowed_clinics = _care_clinic_ids(user)
+    if not allowed_clinics:
+        return []
+    grants = rows('''SELECT g.name access,g.clinic,g.appointment,g.granted_at,c.clinic_name,
+        a.start,a.timezone,a.service_label,a.disclosure,n.revision,n.patient_summary,n.created published_at
+        FROM `tabTele Tena Clinic Encounter Access` g
+        JOIN `tabTele Tena Clinic Membership` m ON m.clinic=g.clinic AND m.member_user=%s
+          AND m.status='Active' AND m.membership_role='Care Coordination'
+        JOIN `tabTele Tena Clinic` c ON c.name=g.clinic AND c.status='Verified'
+        JOIN `tabTele Tena Clinic Affiliation` af ON af.clinic=g.clinic
+          AND af.clinician=g.clinician AND af.status='Verified'
+        JOIN tt_appointment a ON a.id=g.appointment AND a.patient=g.patient AND a.state='Completed'
+        JOIN tt_note_revision n ON n.appointment=a.id AND n.summary_published=1
+        WHERE g.status='Active' AND g.purpose='Patient-shared summary'
+          AND g.clinic IN ({})
+        ORDER BY n.created DESC LIMIT 200'''.format(','.join(['%s'] * len(allowed_clinics))),
+        (user, *sorted(allowed_clinics)))
+    output=[]
+    for item in grants:
+        disclosure=json.loads(item.disclosure or '{}')
+        output.append({'access': item.access, 'clinic': item.clinic_name,
+            'patient_label': disclosure.get('name') or 'Private patient',
+            'service': item.service_label, 'start': item.start.isoformat() + 'Z', 'timezone': item.timezone,
+            'summary': item.patient_summary, 'revision': int(item.revision),
+            'published_at': item.published_at.isoformat() + 'Z',
+            'shared_at': item.granted_at.isoformat() + 'Z'})
     return output

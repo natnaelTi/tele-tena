@@ -33,7 +33,7 @@ class TeleTenaClinicMembership(Document):
         else:
             if self.status != 'Invited' or self.member_user or not self.invited_by or self.invited_by != user:
                 frappe.throw('Clinic membership invitations must be created by the acting manager.', frappe.PermissionError)
-            if self.membership_role not in ('Clinic Manager', 'Scheduling', 'Billing'):
+            if self.membership_role not in ('Clinic Manager', 'Scheduling', 'Billing', 'Care Coordination'):
                 frappe.throw('Choose a supported clinic role.')
             if not self.invite_email:
                 frappe.throw('An invitation email is required.')

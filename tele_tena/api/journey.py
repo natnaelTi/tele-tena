@@ -154,7 +154,7 @@ def _clinic_workspace_available(user):
         SELECT 1 FROM `tabTele Tena Clinic Membership` m
         JOIN `tabTele Tena Clinic` c ON c.name=m.clinic
         WHERE m.member_user=%s AND m.status='Active'
-          AND m.membership_role IN ('Clinic Manager','Scheduling')
+          AND m.membership_role IN ('Clinic Manager','Scheduling','Care Coordination')
           AND c.status='Verified'
         UNION ALL
         SELECT 1 FROM `tabTele Tena Clinic` c
