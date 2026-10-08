@@ -250,8 +250,8 @@ affiliation cannot be used to create or approve a `Tele Tena Service Scope`.
 
 This is an initial registry/affiliation workflow. A separate operational
 membership workflow lets a verified clinic's submitting manager invite a
-staff email into one of three limited roles: Clinic Manager, Scheduling, or
-Billing. The invitee must sign in and prove possession of the exact invited
+staff email into limited roles: Clinic Manager, Scheduling, Billing, or
+Care Coordination. The invitee must sign in and prove possession of the exact invited
 email before accepting. Invitations are not emailed by this local slice; they
 are visible only after the invited contact is verified. Managers can revoke
 active memberships with a recorded reason. Membership grants no clinical
@@ -262,13 +262,12 @@ projection contains only the booking-approved identity label and appointment
 logistics; it excludes notes, contact details, request text, history, balances,
 and other encounters. The patient may revoke at any time; membership revocation,
 expiry, cancellation, or completion also closes access. This does not grant
-clinical-record access. The
-Scheduling and Billing roles are currently descriptive and do not expose
+clinical-record access. Scheduling and Billing roles are currently descriptive and do not expose
 calendar, resource, or billing capabilities. Clinic Manager may manage clinic
 memberships only. Clinic verification and affiliation never enable clinic
-calendars/resources, clinic billing, explicit encounter grants, or clinic-wide
-patient records. Existing narrative affiliation fields are preserved and are
-not automatically converted into verified affiliations. Native DocType schema
+calendars/resources, clinic billing, or clinic-wide patient records. Existing
+narrative affiliation fields are preserved and are not automatically converted
+into verified affiliations. Native DocType schema
 is additive and synchronized by normal Frappe migration.
 
 Verified Clinic Manager and Scheduling memberships (and a verified clinic
@@ -294,6 +293,19 @@ when the appointment is cancelled/completed or the membership is revoked. It
 does not allow joining, confirmation, cancellation, rescheduling, notes, shared
 summary, contact details, request text, profile history, balances, or access to
 other encounters. This is not a clinic-wide record grant or shared calendar.
+
+A separate patient-controlled `Patient-shared summary` grant may expose only
+published patient-summary revisions from one completed encounter to an active
+`Care Coordination` member of a verified clinic affiliated with the treating
+clinician. The patient reviews consent before granting and may revoke future
+API access; revocation cannot make previously viewed content unseen. Private
+clinician notes, unpublished drafts, intake, contact details, balances and all
+other encounters remain excluded. Clinic owners, managers, scheduling/billing
+staff, administrators, and generic DocType APIs gain no summary access from
+clinic membership alone. Current verified clinic status, affiliation and the
+Care Coordination membership are rechecked on each read. This is a local
+demonstration consent workflow, not a jurisdictional determination of clinic
+record-controller obligations. See `clinic-shared-summary-access.md`.
 
 ## Mutual appointment rescheduling (demonstration)
 

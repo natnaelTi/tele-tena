@@ -561,6 +561,72 @@ class Presentation(unittest.TestCase):
         fixtures.login('c1')
         self.assertEqual(clinic_access.clinic_schedule_access(), [])
 
+        # Completed encounters expose only a patient-published summary to a
+        # separately invited Care Coordination member after explicit consent.
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        clinician = fixtures.USERS['c1']
+        frappe.db.sql('''INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended_by,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,%s,1)''',
+            (appointment, secrets.token_hex(16), secrets.token_hex(32), secrets.token_hex(24),
+             secrets.token_hex(24), now, clinician, now))
+        frappe.db.commit()
+        fixtures.login('c1')
+        presentation.save_note_draft(appointment, 'Private synthetic clinician note',
+                                     'Patient-authorized synthetic next steps')
+        presentation.finalize_consultation(appointment, 1)
+        fixtures.login('p1')
+        self.assertNotIn('private_note', presentation.appointment_detail(appointment))
+        summary_clinics = clinic_access.eligible_clinics_for_summary(appointment)
+        self.assertIn(clinic, [row['clinic'] for row in summary_clinics])
+        self.assertTrue(all(row['clinic_name'] and row['jurisdiction']
+                            for row in summary_clinics))
+        summary_grant = clinic_access.grant_published_summary_access(appointment, clinic)
+        self.assertEqual(summary_grant['status'], 'Active')
+        visible_grants = clinic_access.my_schedule_access(appointment)
+        summary_history = [row for row in visible_grants
+                           if row['purpose'] == 'Patient-shared summary']
+        self.assertTrue(summary_history)
+        self.assertEqual(summary_history[0]['status'], 'Active')
+        self.assertIsNone(summary_history[0]['expires_at'])
+        self.assertTrue(clinic_access.grant_published_summary_access(
+            appointment, clinic)['idempotent'])
+        self.assertEqual(frappe.get_list('Tele Tena Clinic Encounter Access', fields=['name']), [])
+        self.assertFalse(frappe.has_permission('Tele Tena Clinic Encounter Access', 'read',
+            doc=frappe.get_doc('Tele Tena Clinic Encounter Access', summary_grant['grant']),
+            user=fixtures.USERS['c1']))
+        fixtures.login('c1')  # Verified clinic owner/manager has no implicit care access.
+        self.assertEqual(clinic_access.clinic_shared_summaries(), [])
+        fixtures.login('c1')
+        care = clinics.invite_clinic_member(clinic, fixtures.USERS['c3'], 'Care Coordination')
+        fixtures.login('c3')
+        clinics.respond_to_clinic_invitation(care['membership'], 'accept')
+        shared = clinic_access.clinic_shared_summaries()
+        self.assertEqual(len(shared), 1)
+        self.assertEqual(shared[0]['summary'], 'Patient-authorized synthetic next steps')
+        self.assertEqual(shared[0]['patient_label'], 'Private patient')
+        self.assertNotIn('patient', shared[0])
+        self.assertNotIn('private_note', shared[0])
+        self.assertNotIn('Private synthetic clinician note', json.dumps(shared, default=str))
+        self.assertEqual(clinic_access.clinic_schedule_access(), [])
+        self.assertFalse(frappe.has_permission('Tele Tena Clinic Encounter Access', 'read',
+            doc=frappe.get_doc('Tele Tena Clinic Encounter Access', summary_grant['grant']),
+            user=fixtures.USERS['c3']))
+        fixtures.login('c2')  # Billing member remains outside the care disclosure.
+        self.assertEqual(clinic_access.clinic_shared_summaries(), [])
+        with self.assertRaises(frappe.PermissionError):
+            clinic_access.grant_published_summary_access(appointment, clinic)
+        fixtures.login('admin')
+        clinics.review_affiliation(affiliation['application'], 'Revoked',
+                                   'Synthetic affiliation revocation test.')
+        fixtures.login('c3')
+        self.assertEqual(clinic_access.clinic_shared_summaries(), [])
+        fixtures.login('p1')
+        self.assertEqual(clinic_access.revoke_schedule_access(
+            summary_grant['grant'], 'Synthetic summary sharing revoke.')['status'], 'Revoked')
+        fixtures.login('c3')
+        self.assertEqual(clinic_access.clinic_shared_summaries(), [])
+
     def test_vetting_rubric_definition_is_reviewer_scoped_and_migration_is_repeatable(self):
         before = journey.rows('''SELECT name,scope_application,decision,rubric_version,findings
             FROM `tabTele Tena Vetting Assessment` ORDER BY name''')

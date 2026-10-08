@@ -10,7 +10,7 @@
     {"fieldname":"appointment","label":"Appointment","fieldtype":"Data","reqd":1},
     {"fieldname":"patient","label":"Patient","fieldtype":"Link","options":"User","reqd":1},
     {"fieldname":"clinician","label":"Treating Clinician","fieldtype":"Link","options":"User","reqd":1},
-    {"fieldname":"purpose","label":"Access Purpose","fieldtype":"Select","options":"Scheduling coordination","default":"Scheduling coordination","reqd":1},
+    {"fieldname":"purpose","label":"Access Purpose","fieldtype":"Select","options":"Scheduling coordination\nPatient-shared summary","default":"Scheduling coordination","reqd":1},
     {"fieldname":"status","label":"Status","fieldtype":"Select","options":"Active\nRevoked","default":"Active","reqd":1,"in_list_view":1},
     {"fieldname":"granted_by","label":"Granted By","fieldtype":"Link","options":"User","read_only":1},
     {"fieldname":"granted_at","label":"Granted At","fieldtype":"Datetime","read_only":1},

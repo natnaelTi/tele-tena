@@ -1,5 +1,63 @@
 # TeleTena operational progress export
 
+## Current verification delta — 2026-10-08
+
+- PR #41 remains a draft stacked on PR #40. Updated head:
+  `3720df45dfff72202b5221ddc3dff06ab111767f`; GitHub checks are pending. No
+  merge/deployment occurred. The packaged asset manifest records this exact
+  source commit.
+- Current review preview is `http://127.0.0.1:8017/teletena/`, site
+  `tele-tena-pr12-fresh.localhost`, served by the isolated Frappe 15 bench at
+  `/home/frappe/frappe/frappe-bench`. Built app, not Vite; the built-browser
+  journey passed after the matching source bundle was served. The retained
+  `erp.localhost` site and Selfmade were not changed.
+- Found and fixed a patient grant-history exception when a valid published-
+  summary consent had `expires_at = NULL`. Scheduling coordination still uses
+  its expiry; summary sharing remains active until patient revocation or the
+  underlying eligibility changes. Focused regression passed.
+- Frappe 15.121.2 isolated review site: `tests/presentation.py` 45/45 and
+  `tests/integration.py` 24/24 passed. Production-built browser journey passed
+  patient consent → persisted grant → a separate Care Coordination account
+  reading the summary, with identity/contact/private-note/request/disclosure
+  fields absent from the response. Screenshots:
+  `/tmp/tele-tena-clinic-summary-browser/{patient-consent-390,care-coordination-390,care-coordination-1440}.png`.
+- The browser test first failed because it waited for a closed native select
+  option to become visible. The harness now waits for the option to be attached
+  and the journey passes. The old invitation fixture was already active; the
+  rerun correctly treated that idempotent membership as existing.
+- Map size remains 142 screens/14 journeys: 8 `Locally verified`, 78
+  `Implemented, verification pending`, 3 `Implementation in progress`, 52
+  `Designed`, and 1 `External integration blocked`. These are evidence labels,
+  not a completion percentage. Broad roadmap work remains, especially full
+  clinic operations, shared adult-care consent, lab workflows, subscriptions,
+  second opinions, medical tourism, and cross-product acceptance.
+- Clean fresh-site install and Frappe 16 validation of this latest addition
+  remain pending. Preview remains local only; Selfmade was not changed.
+
+## Current local checkpoint — patient-authorized clinic summary access — 2026-10-08
+
+- Branch `feat/clinic-shared-summary-grants`, based on the vetting-rubric
+  checkpoint. The clinic summary access slice is in draft PR #41, based on PR #40; no merge
+  or deployment occurred.
+- Adds a purpose-specific patient grant for published summaries of a single
+  completed encounter. Only active Care Coordination clinic members can read;
+  clinic owner/manager, Billing, Scheduling, administrators, and generic
+  DocType access do not grant it. Verified clinic and treating-clinician
+  affiliation are rechecked. Revocation preserves the audit record and stops
+  later API reads.
+- Frappe 15.121.2 on `tele-tena-pr12-fresh.localhost`: presentation suite
+  45/45 and integration suite 24/24 passed. Frontend build passed; lint exited
+  0 with existing warnings. The built Frappe browser flow verified Care Coordination invitation/acceptance,
+  role-scoped clinic workspace access, the consultation-summary empty state,
+  manager revocation, and no horizontal overflow at 320/390/768/1440 CSS px.
+  Screenshots: `docs/screenshots/clinic-staff-workspace/staff-workspace-{390,1440}.png`.
+  Fresh-site install and Frappe 16 compatibility for this addition remain pending.
+- Production assets were built for source `4e7d06dc4edeb07307ff53be4b6fefdd844878cf`,
+  deployed to the isolated local review server, and `GET /teletena/` returned 200.
+  The release manifest pins that SHA; documentation/test-only changes after the
+  build will be repackaged at the final branch head.
+
+
 ## Current local checkpoint — credential-verification provenance — 2026-10-08
 
 - Branch `feat/vetting-rubric-assessment-engine`, current source/build commit

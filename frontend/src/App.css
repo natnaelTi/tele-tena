@@ -1870,6 +1870,7 @@ button:active {
 .clinic-shared-schedule { padding: 18px; min-width: 0; }
 .clinic-shared-schedule h3 { margin: 0; font-size: 17px; }
 .clinic-shared-schedule p { overflow-wrap: anywhere; }
+.clinic-shared-schedule .patient-shared-summary { white-space: pre-wrap; line-height: 1.65; }
 .clinic-schedule-sharing { margin-top: 24px; }
 .clinic-schedule-sharing .field { margin-top: 16px; }
 .clinic-shared-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--border-default); }

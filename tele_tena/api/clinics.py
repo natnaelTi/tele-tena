@@ -261,7 +261,7 @@ def invite_clinic_member(clinic, invite_email, membership_role):
         frappe.throw('Clinic manager access required.', frappe.PermissionError)
     if frappe.db.get_value('Tele Tena Clinic', clinic, 'status') != 'Verified':
         fail('Only a verified clinic may invite team members.', 'clinic_unavailable')
-    if membership_role not in ('Clinic Manager', 'Scheduling', 'Billing'):
+    if membership_role not in ('Clinic Manager', 'Scheduling', 'Billing', 'Care Coordination'):
         fail('Choose a supported clinic role.', 'invalid_membership_role')
     from tele_tena.api.contact_auth import normalize
     invite_email = normalize('email', invite_email)

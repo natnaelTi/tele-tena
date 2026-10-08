@@ -62,8 +62,34 @@ export default function ConsultationPage() {
       {!clinician&&item.session_feedback?.submitted&&<Card className="session-feedback"><h2>{t("sessionExperience")}</h2><p>{item.session_feedback.rating} / 5 · {t("feedbackSubmitted")}</p></Card>}
       {!clinician&&item.can_open_financial_dispute&&<Card><h2>Ask for a payment review</h2><p>Use this for a payment concern. Do not include private clinical details.</p><label className="field">Reason<textarea rows={3} maxLength={500} value={disputeReason} onChange={e=>setDisputeReason(e.target.value)} /></label><Button loading={action.busy} disabled={action.busy||!disputeReason.trim()} onClick={()=>void action.run(async()=>{await api("tele_tena.accounting.open_earning_dispute",{appointment:id,reason:disputeReason},true);setDisputeReason("");await detail.refresh();},"Payment review requested. The related simulated earnings are on hold.")}>Request payment review</Button></Card>}
       {!clinician&&item.financial_state==="Disputed"&&<InlineNotice>A payment review is open. Related simulated earnings remain on hold.</InlineNotice>}
+      {!clinician&&item.status==="Completed"&&item.patient_summary_revisions?.length>0&&<PatientClinicSummarySharing appointment={id}/>}
     </main><aside><Card><h2>Session details</h2><dl className="summary-list"><dt>Appointment state</dt><dd>{appointmentStateLabel}</dd><dt>Service</dt><dd>{item.service}</dd><dt>Scheduled</dt><dd>{date(item.start,item.timezone)}<br/>{item.timezone||"Timezone unavailable"}</dd><dt>Format</dt><dd>{item.format}</dd><dt>Booked duration</dt><dd>{item.booked_minutes} minutes</dd><dt>Call state</dt><dd>{item.call_state==="Ended"?"Call ended":item.call_state}</dd><dt>Call ended</dt><dd>{item.call_ended_at?date(item.call_ended_at,item.timezone):"Unavailable"}</dd><dt>Connected time</dt><dd>{item.actual_connected_time_available?"Available":"Unavailable"}</dd><dt>Price</dt><dd>ETB {money(item.price)}</dd><dt>Reservation</dt><dd>{item.status==="Cancelled"||item.status==="Expired"?"Released":item.financial_state==="Pending"||item.financial_state==="Released"?"Consumed":item.status==="Completed"?"Consumed":"Reserved"}</dd></dl></Card><Card><h2>What you’ll share</h2><p>{item.disclosure.request}</p><dl className="summary-list"><dt>Preferred name</dt><dd>{item.disclosure.name||"Not shared"}</dd><dt>Saved history</dt><dd>{item.disclosure.history||"Not shared"}</dd></dl></Card><Card><h2>Timeline</h2><ol className="consultation-timeline">{item.timeline.map((event:any,index:number)=><li key={index}><strong>{w(event.event)}</strong><span>{date(event.at,item.timezone)} · {event.actor}</span>{event.reason&&<p>{event.reason}</p>}</li>)}</ol></Card></aside></div>
   </div>;
+}
+
+function PatientClinicSummarySharing({appointment}:{appointment:string}) {
+  const {t}=useLocale();
+  const eligible=useResource(useCallback(()=>journeyApi.eligibleClinicsForSummary(appointment),[appointment]));
+  const grants=useResource(useCallback(()=>journeyApi.myClinicScheduleAccess(appointment),[appointment]));
+  const action=useAction();
+  const [clinic,setClinic]=useState('');
+  const [consented,setConsented]=useState(false);
+  const choices=eligible.data||[];
+  const summaryGrants=(grants.data||[]).filter((grant:any)=>grant.purpose==='Patient-shared summary');
+  const active=summaryGrants.filter((grant:any)=>grant.status==='Active');
+  const past=summaryGrants.filter((grant:any)=>grant.status!=='Active');
+  const refresh=async()=>{await Promise.all([eligible.refresh(),grants.refresh()]);};
+  return <Card className="clinic-schedule-sharing"><h2>{t('shareSummaryTitle')}</h2><p>{t('shareSummaryExplainer')}</p>
+    {eligible.error||grants.error?<InlineNotice tone="danger">{t('clinicShareLoadError')} <Button variant="secondary" onClick={()=>void refresh()}>{t('tryAgain')}</Button></InlineNotice>:null}
+    {!eligible.error&&!grants.error&&(!eligible.data||!grants.data)&&<Skeleton/>}
+    {active.map((grant:any)=><div className="clinic-shared-row" key={grant.grant}><p><strong>{grant.clinic_name}</strong> · {t('sharedSummary')}</p><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.revokeClinicScheduleAccess(grant.grant);await refresh();})}>{t('stopSharing')}</Button></div>)}
+    {past.map((grant:any)=><p className="supporting" key={grant.grant}>{grant.clinic_name} · {t('summaryPreviouslyShared')} {grant.revoked_at?date(grant.revoked_at):''}</p>)}
+    {choices.filter(item=>!item.already_shared).length>0&&<><Select label={t('chooseClinic')} value={clinic} onChange={event=>{setClinic(event.target.value);setConsented(false);}}><option value="">{t('chooseClinic')}</option>{choices.filter(item=>!item.already_shared).map(item=><option key={item.clinic} value={item.clinic}>{item.clinic_name} · {item.jurisdiction}</option>)}</Select>
+      {clinic&&<><Checkbox label={t('clinicSummaryConsent')} checked={consented} onChange={event=>setConsented(event.target.checked)}/><Button disabled={!consented||action.busy} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.grantClinicSummaryAccess(appointment,clinic);setClinic('');setConsented(false);await refresh();},t('sharedSummary'))}>{t('shareSummary')}</Button></>}
+    </>}
+    {eligible.data&&!choices.length&&!active.length&&<p className="supporting">{t('noEligibleClinic')}</p>}
+    {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}{action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
+  </Card>;
 }
 
 function ReschedulePanel({appointment,refresh}:{appointment:any;refresh:()=>Promise<void>}) {

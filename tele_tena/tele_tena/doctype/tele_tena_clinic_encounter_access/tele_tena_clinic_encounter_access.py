@@ -20,9 +20,11 @@ class TeleTenaClinicEncounterAccess(Document):
         else:
             if action != 'grant' or self.status != 'Active':
                 frappe.throw('Only a patient-approved scheduling grant may be created.', frappe.PermissionError)
-            if self.granted_by != self.patient or self.granted_at is None or self.expires_at is None:
+            if self.granted_by != self.patient or self.granted_at is None:
                 frappe.throw('The patient grant is incomplete.', frappe.PermissionError)
-            if self.purpose != 'Scheduling coordination':
+            if self.purpose == 'Scheduling coordination' and self.expires_at is None:
+                frappe.throw('Scheduling access must expire after the appointment.', frappe.PermissionError)
+            if self.purpose not in ('Scheduling coordination', 'Patient-shared summary'):
                 frappe.throw('Unsupported clinic-access purpose.')
 
     def on_trash(self):

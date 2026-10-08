@@ -72,10 +72,10 @@ async function switchUser(page, user) {
     checkpoint = 'manager clinic card';
     const teamCard = page.locator('.clinic-team-card').filter({ has: page.getByRole('heading', { name: clinicName }) });
     await teamCard.getByLabel('Team member email', { exact: true }).fill(inviteEmail);
-    await teamCard.getByLabel('Clinic role', { exact: true }).selectOption('Scheduling');
+    await teamCard.getByLabel('Clinic role', { exact: true }).selectOption('Care Coordination');
     checkpoint = 'manager invitation submit';
     await teamCard.getByRole('button', { name: 'Invite team member' }).click();
-    const invitedRow = teamCard.locator('.clinic-record-row').filter({ hasText: 'Scheduling · Invited' });
+    const invitedRow = teamCard.locator('.clinic-record-row').filter({ hasText: 'Care Coordination · Invited' });
     await invitedRow.waitFor();
     for (const width of [320, 390, 768, 1440]) {
       checkpoint = 'manager responsive width ' + width;
@@ -96,12 +96,20 @@ async function switchUser(page, user) {
     const acceptedRow = membershipSection.locator('.clinic-record-row').filter({ hasText: clinicName });
     await acceptedRow.getByText('Active', { exact: true }).waitFor();
     checkpoint = 'role-scoped clinic workspace navigation';
+    await page.waitForTimeout(300);
     await page.getByRole('link', { name: 'Clinic workspace', exact: true }).click();
+    checkpoint = 'clinic workspace route';
     await page.getByRole('heading', { name: 'Clinic workspace', exact: true }).waitFor();
     assert.match(page.url(), /\/teletena\/clinic$/);
     await page.reload();
+    checkpoint = 'clinic workspace reload';
     await page.getByRole('heading', { name: 'Clinic workspace', exact: true }).waitFor();
+    checkpoint = 'clinic memberships after reload';
     await page.getByRole('heading', { name: 'Your clinic memberships', exact: true }).waitFor();
+    checkpoint = 'summary section after reload';
+    await page.getByRole('heading', { name: 'Patient-shared consultation summaries' }).waitFor();
+    checkpoint = 'empty summary state after reload';
+    await page.getByText('No consultation summaries have been shared with this clinic.', { exact: true }).waitFor();
     for (const width of [320, 390, 768, 1440]) {
       checkpoint = 'clinic workspace responsive width ' + width;
       await page.setViewportSize({ width, height: 900 });
@@ -117,14 +125,14 @@ async function switchUser(page, user) {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(app + '/clinician/clinic-access');
     const activeTeam = page.locator('.clinic-team-card').filter({ has: page.getByRole('heading', { name: clinicName }) });
-    const activeRow = activeTeam.locator('.clinic-record-row').filter({ hasText: 'Scheduling · Active' });
+    const activeRow = activeTeam.locator('.clinic-record-row').filter({ hasText: 'Care Coordination · Active' });
     await activeRow.waitFor();
     await activeRow.getByLabel('Reason to revoke access', { exact: true }).fill('Synthetic browser verification complete.');
     await activeRow.getByRole('button', { name: 'Revoke access' }).click();
-    await activeTeam.locator('.clinic-record-row').filter({ hasText: 'Scheduling · Revoked' }).waitFor();
+    await activeTeam.locator('.clinic-record-row').filter({ hasText: 'Care Coordination · Revoked' }).waitFor();
     await activeTeam.screenshot({ path: path.join(screenshots, 'manager-revocation.png') });
 
-    console.log('PASS: built Frappe clinic registration → reviewer verification → manager invite → verified patient acceptance → membership-scoped clinic workspace → manager revocation. Synthetic screenshots: ' + screenshots);
+    console.log('PASS: built Frappe clinic registration → reviewer verification → Care Coordination invite/acceptance → summary-only clinic workspace empty state → membership revocation. Synthetic screenshots: ' + screenshots);
   } finally {
     await browser.close();
   }
