@@ -4,7 +4,8 @@ The focused implementation is in commit
 `d46edbb9f899146dc2390143f53f73f70ef81b07` on
 `feat/adult-relationship-links`, based on the local clinic-calendar checkpoint
 `5c62499dd89af5b5918aa5a699cf37b1465b1325`. The dependent branch remains
-unmerged. The release manifest at `tele_tena/public/review/release.json` is the
+unmerged in draft PR [#43](https://github.com/natnaelTi/tele-tena/pull/43),
+stacked on PR #42. The release manifest at `tele_tena/public/review/release.json` is the
 authoritative source SHA for the currently packaged frontend; it is rebuilt
 from the clean branch checkout after verification documentation is committed.
 

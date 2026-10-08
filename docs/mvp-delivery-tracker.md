@@ -20,8 +20,9 @@ the patient links page at 390 and 1440 px; screenshots are under
 through the browser. The packaged release manifest identifies the exact
 source SHA served by the running preview. Fresh-site installation,
 enabled-registration browser configuration, built UI invitation acceptance,
-and 320/768/200%-zoom checks remain pending. The work is unmerged and no
-remote site changed.
+and 320/768/200%-zoom checks remain pending. The work is in draft PR #43,
+stacked on open PR #42 (`feat/clinic-shared-calendar`). Neither PR is merged;
+no remote site changed.
 
 ## Current local checkpoint — patient-shared clinic calendar — 2026-10-08
 
