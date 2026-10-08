@@ -3,8 +3,10 @@
 ## Implementation
 
 Branch: `feat/vetting-rubric-assessment-engine`, stacked on the open draft
-PR #39 head (`feat/relationship-acquisition-attribution`, 524c7f8). The current
-source and packaged frontend commit is `4cb0c99c288646077f83318d32e9dd98cdd1fc53`.
+PR #39 head (`feat/relationship-acquisition-attribution`, 524c7f8). Rubric
+implementation is commit `4cb0c99c288646077f83318d32e9dd98cdd1fc53`. The final
+packaged source SHA is the value in `tele_tena/public/review/release.json`,
+generated after the verification-report commit; frontend source is unchanged.
 
 The rubric begins as `proposed-1.0`; no historical approval was assumed. Patch
 v1.27 adds a read-only structured-assessment snapshot field. Patch v1.28 creates
@@ -34,12 +36,14 @@ in the vetting queue and also has a focused `/teletena/admin/rubrics` route.
 - `tests/integration.py`: **24/24 passed** on the isolated site.
 - `npm run build`: passed with the existing large LiveKit chunk warning.
 - `npm run lint`: exit 0 with existing repository warnings.
-- `scripts/build_review.py`: packaged source and frontend commit
-  `4cb0c99c288646077f83318d32e9dd98cdd1fc53`.
+- `scripts/build_review.py`: packaged commit recorded in
+  `tele_tena/public/review/release.json`; artifact verification passed with 40
+  generated files, expected scope, and no private credentials.
 - Production-built browser check at `http://127.0.0.1:8017/teletena/`: the
   synthetic reviewer opened `/teletena/admin/vetting`, viewed the proposal, and
   was denied the Medical Lead-only route. Captures at 390/768/1440px are in
-  `docs/screenshots/vetting-rubric/`.
+  `docs/screenshots/vetting-rubric/`. That browser capture used frontend source
+  commit `4cb0c99`, which is unchanged by the verification-report commit.
 
 The preview uses Bench `/home/frappe/frappe/frappe-bench`, site
 `tele-tena-pr12-fresh.localhost`, and Gunicorn master 287561 bound to loopback
