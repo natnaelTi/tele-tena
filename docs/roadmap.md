@@ -1,5 +1,9 @@
 # Product roadmap and capability boundaries
 
+## MVP-first release boundary — 2026-10-08
+
+Deliver the agreed mental-health/counseling MVP, approved redesign and clean handover before expanded modules. See `mvp-release-scope.md` and `mvp-screen-acceptance.json` for the exact gate. Working two-adult couples consultations are required; no-show adjudication is explicitly deferred. Do not resume full clinic management, labs, subscriptions, second opinions or medical tourism for this release. Existing foundations remain preserved in the post-handover backlog.
+
 ## Vetting credential lifecycle continuation — 2026-10-08
 
 The current dependent `feat/scope-reverification` slice adds separate,

@@ -1,5 +1,9 @@
 # Agreed product contract
 
+## MVP handover priority — 2026-10-08
+
+The current release boundary is `mvp-release-scope.md` and `mvp-screen-acceptance.json`. The user superseded delivery of the entire expanded platform with the agreed mental-health/counseling MVP and its complete redesign. Working two-adult couples consultations and explicitly prefunded fixed-block extensions remain MVP requirements. Full clinic management, family/group expansion, laboratory operations, subscriptions, second opinions, medical tourism and metered hourly pricing are post-handover. No-show adjudication is explicitly deferred; current pre-start cancellation limits remain. Preserve all existing source/schema/data. Older expanded-scope sections below describe retained future authorization, not the present release gate.
+
 Credential lifecycle update (2026-10-08): future booked or pending-confirmation
 appointments affected by expired or revoked scopes receive a logistics-only
 operational review flag. It does not change appointment or financial state and

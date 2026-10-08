@@ -1,5 +1,9 @@
 # TeleTena operational progress export
 
+## Current MVP release priority — 2026-10-08
+
+The user bounded this handover to the agreed MVP and its redesign. Preserve the entire 142-screen reference, but use `mvp-release-scope.md` and `mvp-screen-acceptance.json` for release acceptance. Two-adult couples consultations are required; full clinic/lab/subscription/second-opinion/tourism expansion and no-show adjudication are deferred. The current release is not ready. Prior entries below are historical checkpoint evidence, not current-release completion claims.
+
 ## Current verification delta — 2026-10-08
 
 - Draft PR #42 (`feat/clinic-shared-calendar`) is stacked on PR #41 → PR #40;

@@ -1,0 +1,2191 @@
+{
+  "version": 1,
+  "release_branch": "feat/mvp-release-handover",
+  "source_checkpoint": "1e8d161468eb8d3563f1b5743982722c749bbcbf",
+  "scope_document": "docs/mvp-release-scope.md",
+  "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
+  "screens": [
+    {
+      "id": "A01",
+      "title": "Welcome to TeleTena",
+      "route": "/",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#A01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A01) and design-handoff.md",
+        "implementation": "v1.23 supports multiple named offerings within one approved scope, owner-only edits, idempotent creates, patient discovery, and immutable scope identity. See docs/multiple-offerings.md.",
+        "current_local": "Frappe 15 tests/presentation.py 33/33, including create retry/conflict, multiple distinct patient-visible offers, ownership denial and repeat migration. At http://127.0.0.1:8017/teletena/ source/build 44694b4364e466b1aec3308d01521b9739641ab9, the existing clinician created a second offering and reloaded; a separate patient session found it in discovery without account-email exposure. Screenshots: docs/screenshots/multiple-offerings/. Booking on the second offering remains pending."
+      }
+    },
+    {
+      "id": "A02",
+      "title": "How TeleTena works",
+      "route": "/#how-it-works (section destination requires route verification)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#A02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Packaged Frappe /teletena/ browser journey on tele-tena-pr12-fresh.localhost verified service, declared care-language, format, and 14-day generated-slot filters, no horizontal overflow at 390/768/1440, and search/service/language/format carryover into the request composer without publishing. Screenshots and current build/source SHA are recorded in docs/discovery-filter-verification.md. Full discovery and booking screen acceptance remains pending; natural-language suggestions, relevance feedback, previous-clinician filter, proximity ranking, Amharic/Afaan Oromo human review, 320px/200% zoom and Frappe 16 screen check remain incomplete."
+      }
+    },
+    {
+      "id": "A03",
+      "title": "For clinicians",
+      "route": "/for-clinicians",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#A03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "A04",
+      "title": "Phone sign-in",
+      "route": "/sign-in",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Locally verified",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#A04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Built /teletena/ invited-review browser check passed at 390/1440: phone-first screen remains visible, Continue is disabled by site policy, email/password remains available, and existing patient/clinician accounts sign in. Auth source commit 0b3d1bd; packaged manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee. Phone OTP/public registration flags restored false. No live provider call."
+      }
+    },
+    {
+      "id": "A05",
+      "title": "Enter your code",
+      "route": "/sign-in (OTP step)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "External integration blocked",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#A05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Built browser exercised code-step navigation and safe invalid/expired-code feedback; integration suite verified HMAC/single-use/attempt/race paths with mocked SMS. Live SMS delivery and native Amharic/Afaan Oromo review not tested. Auth source commit 0b3d1bd; package manifest 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee."
+      }
+    },
+    {
+      "id": "A06",
+      "title": "Email sign-in",
+      "route": "/sign-in (email method)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#A06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Invited-review email/password path and explicit switch from phone were verified in Chromium; email OTP UI/error path exercised with controlled responses, backend enabled-policy OTP tests use mocked delivery. SMTP is not configured, so delivery is blocked. Screenshots: docs/screenshots/auth-invited/. Package manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee."
+      }
+    },
+    {
+      "id": "A07",
+      "title": "Choose your account",
+      "route": "/onboarding (account-choice screen is absent; role intent starts at clinician entry)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#A07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "B01",
+      "title": "Adult eligibility",
+      "route": "/onboarding",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B01) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "B02",
+      "title": "A little about you",
+      "route": "/onboarding",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "B03",
+      "title": "Your privacy defaults",
+      "route": "/onboarding",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "B04",
+      "title": "Care background",
+      "route": "/onboarding",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "B05",
+      "title": "You’re ready",
+      "route": "/onboarding",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "B06",
+      "title": "Your professional profile",
+      "route": "/onboarding?intent=clinician",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "B07",
+      "title": "Qualifications & résumé",
+      "route": "/clinician/vetting",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending."
+      }
+    },
+    {
+      "id": "B08",
+      "title": "Clinic affiliations",
+      "route": "/clinician/affiliations; /clinician/clinic-access; /patient/clinic-access",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Locally verified",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B08",
+      "verification_evidence": {
+        "backend": "Existing Frappe 15 site migrated after a private backup. tests/presentation.py passed 24/24, including patient ownership, generic API denial, exact minimized fields, Billing exclusion, Manager/Scheduling allow, membership revocation, and idempotent patient revoke.",
+        "browser": "Pending: use production-built /teletena/ on the same isolated site.",
+        "fresh_install": "Not run. The existing preview already occupies tele-tena-pr12-fresh.localhost and database teletenapr12fresh; the earlier temporary admin credential was removed without changing this site."
+      }
+    },
+    {
+      "id": "B09",
+      "title": "Choose your service scopes",
+      "route": "/clinician/vetting",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B09",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B09) and design-handoff.md",
+        "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
+        "current_local": "Frappe 15.121.2 isolated site tele-tena-pr12-fresh.localhost: the synthetic applicant browser flow uploaded two private evidence revisions, submitted a scope application, and the authorized reviewer opened/downloaded the current revision. After v1.29, the reviewer form displayed the four provenance controls at 390/1440px; no decision was submitted. tests/presentation.py 45/45 and tests/integration.py 24/24 pass. Fresh-site v1.29 install, 320/768/200%-zoom coverage, native-language review, and Frappe 16 browser verification remain pending.",
+        "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending."
+      }
+    },
+    {
+      "id": "B10",
+      "title": "Review your application",
+      "route": "/clinician/vetting",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B10",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B10) and design-handoff.md",
+        "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
+        "current_local": "Frappe 15 isolated presentation regressions passed 27/27, including owner/reviewer authorization and assessment evidence snapshot. Built-browser reviewer queue displayed submitted applicant and evidence; authorized reviewer downloaded the newest private PDF revision successfully. Frappe 16.2.1/ERPNext 16.1.0/Python 3.14.2 disposable site was backed up, migrated v1.8→v1.16, repeat-migrated, and passed the 27-test backend suite. Screenshot: /tmp/tele-tena-presentation-review/scope-evidence/reviewer-evidence.png. Fresh-empty-site check and Frappe 16 browser journey remain pending; no external credential validation or malware scanning is claimed.",
+        "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending."
+      }
+    },
+    {
+      "id": "B11",
+      "title": "Application progress",
+      "route": "/clinician/vetting",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B11",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B11) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending."
+      }
+    },
+    {
+      "id": "B12",
+      "title": "Set up your practice",
+      "route": "/clinician/services",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#B12",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B12) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "C01",
+      "title": "Your care, in one place",
+      "route": "/patient",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#C01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C01) and design-handoff.md",
+        "implementation": "Patient dashboard now loads a signed-in-patient-only previous-clinician list from completed encounters, filtered to current approved scope and active published availability. Opaque profile key only; no cross-patient encounter linking.",
+        "current_local": "Backend integration test covers a completed patient-owned appointment, another patient sees no row, clinician role is denied, and account email is absent. Pending execution on the disposable Frappe site; browser rendering pending."
+      }
+    },
+    {
+      "id": "C02",
+      "title": "Find your care",
+      "route": "/patient/discovery",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#C02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "C03",
+      "title": "Your matching clinicians",
+      "route": "/patient/discovery",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#C03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "C04",
+      "title": "Meet your clinician",
+      "route": "/patient/clinicians/:clinicianId",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#C04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "C05",
+      "title": "About this consultation",
+      "route": "/patient/book/:offering",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#C05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "C06",
+      "title": "Choose a time",
+      "route": "/patient/book/:offering",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#C06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "C07",
+      "title": "Preview what you share",
+      "route": "/patient/book/:offering (disclosure step)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#C07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "C08",
+      "title": "Review your booking",
+      "route": "/patient/book/:offering (review step)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#C08",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C08) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Patch v1.26 adds appointment-scoped acquisition source. The built share-link route forwards its opaque token to journey.book; the backend revalidates it inside the booking transaction and stores clinician_share. Direct bookings store direct_booking; accepted private offers store open_request. Existing appointments default to unknown and profile schema is unchanged. Presentation suite 42/42, integration suite 24/24, production build, asset-scope scan, and packaged browser route assertion pass on the isolated review site; the browser assertion aborts before persistence, with persistence covered by backend tests. Fresh-site check remains pending; see docs/acquisition-attribution-verification.md."
+      }
+    },
+    {
+      "id": "C09",
+      "title": "Your appointment is confirmed",
+      "route": "/patient/appointments",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#C09",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C09) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "D01",
+      "title": "What support do you need?",
+      "route": "/patient/requests/new (composer step)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#D01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D01) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "D02",
+      "title": "When and how?",
+      "route": "/patient/requests/new (care mode step)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#D02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "D03",
+      "title": "Review your open request",
+      "route": "/patient/requests/new (preview step)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#D03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "D04",
+      "title": "Finding your clinician",
+      "route": "/patient/requests/:id (live progress is polling; realtime delivery is incomplete)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#D04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "D05",
+      "title": "Compare private offers",
+      "route": "/patient/requests/:id",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#D05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "D06",
+      "title": "Review your offer",
+      "route": "/patient/requests/:requestId/offers/:offerId",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#D06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D06) and design-handoff.md",
+        "implementation": "Dedicated /patient/requests/:requestId/offers/:offerId route reuses my_request_detail and the existing respond_offer command; no parallel booking or financial path.",
+        "current_local": "Production-built Frappe browser journey rendered a persisted accepted offer, exact booking disclosure, price and appointment link; owner-scoped detail endpoint is covered by tests/presentation.py. Active-offer acceptance through this dedicated route and unavailable/expired offer states remain pending."
+      }
+    },
+    {
+      "id": "D07",
+      "title": "More ways to find care",
+      "route": "/patient/discovery",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#D07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "D08",
+      "title": "Your requests",
+      "route": "/patient/requests",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Locally verified",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#D08",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D08) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "The real production-built `/teletena/` browser journey on the isolated Frappe 15 site published an immediate audio request through the patient UI and Frappe API, observed zero eligible clinicians from persisted request state, showed the no-supply explanation and schedule-later/browse alternatives, preserved description/service/language/format/disclosure/budget in the later-time composer, then cancelled and re-read the persisted state. Screenshot: `docs/screenshots/open-request/zero-supply-390.png`; repeatable script: `scripts/browser-open-request-zero-supply.cjs`. A later-window offer/accept browser journey routed specifically to the retained Review Clinician remains pending; native translation review is pending."
+      }
+    },
+    {
+      "id": "D09",
+      "title": "Live request progress",
+      "route": "/patient/requests/:id",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Locally verified",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#D09",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D09) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "The patient request detail remains owner-scoped and polling-backed. Request publication records eligible supply; immediate zero-supply requests show a no-broadening explanation and schedule-later/browse alternatives. The back-to-later path preserves request narrative, service, language, format, disclosure choices and budget. Backend presentation suite passed 38/38; packaged browser verification of these new alternatives remains pending."
+      }
+    },
+    {
+      "id": "E01",
+      "title": "Your appointments",
+      "route": "/patient/appointments or /clinician/appointments",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E01) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "E02",
+      "title": "Appointment details",
+      "route": "/patient/consultations/:id or /clinician/consultations/:id",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "E03",
+      "title": "Choose a new time",
+      "route": "/patient/consultations/:id and /clinician/consultations/:id (appointment detail; reschedule proposal panel)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E03",
+      "verification_evidence": {
+        "implementation": "Mutual rescheduling backend, UI panel and v1.15 persistence added on feat/mutual-rescheduling; timeline events use localized human-readable labels.",
+        "backend": "Frappe presentation regression covers participant permissions, changed-payload retry rejection, idempotent submission/acceptance, unchanged reservation, successful in-place move, and the New time accepted patient timeline label.",
+        "browser": "Passed against http://127.0.0.1:8017/teletena/ using independent synthetic patient/clinician sessions: generate/select slot → propose → clinician accepts → persisted appointment remains Booked with proposal Accepted. The seeded patient also signed in through the production package at source 9eb66d9db6b96367fb17f7f8c53b491735e2dc59; its service worker controlled /teletena/. Screenshots: docs/screenshots/mutual-rescheduling/patient-proposal-1440.png, clinician-response-1440.png and patient-home-390.png.",
+        "migration": "v1.15 applied and repeated successfully on isolated tele-tena-pr12-fresh.localhost after a site backup.",
+        "responsive": "Desktop 1280px proposal/response and mobile 390px signed-in patient-home screenshots inspected. 320/390/768/1440 reschedule flow, 200% zoom, keyboard-only and Amharic/Afaan Oromo visual acceptance remain pending."
+      }
+    },
+    {
+      "id": "E04",
+      "title": "Cancel your appointment",
+      "route": "/patient/consultations/:id (pre-start cancellation only)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "E05",
+      "title": "Check your devices",
+      "route": "/consultation/:id/room (preflight)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "E06",
+      "title": "Your waiting room",
+      "route": "/consultation/:id/room (waiting state)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "E07",
+      "title": "A space to talk",
+      "route": "/consultation/:id/room",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "E08",
+      "title": "Audio consultation",
+      "route": "/consultation/:id/room (audio-only mode)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E08",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E08) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "E09",
+      "title": "Let’s reconnect",
+      "route": "/consultation/:id/room (reconnection state)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E09",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E09) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "E10",
+      "title": "Agree on extra consultation time",
+      "route": "/consultation/:id/room (extension panel while call is open)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E10",
+      "verification_evidence": {
+        "backend": "Frappe 15.121.2 isolated site: tests/presentation.py 29/29, including prefunded extension settlement once and end-release/scheduled-expiry idempotency.",
+        "frontend": "TypeScript and Vite production build passed; browser rendering of an open-call extension state remains pending."
+      }
+    },
+    {
+      "id": "E11",
+      "title": "Finish the consultation",
+      "route": "/clinician/consultations/:id (post-call notes)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E11",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E11) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "E12",
+      "title": "How was your session?",
+      "route": "/patient/consultations/:appointment (feedback section)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Locally verified",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E12",
+      "verification_evidence": "tests/presentation.py 23/23 on tele-tena-pr12-fresh.localhost, including direct API privacy, authorization and concurrent/idempotent feedback assertions; tests/trust_metrics.py 4/4; real browser at http://127.0.0.1:8017/teletena/patient/consultations/<synthetic appointment>, persisted rating 5 after reload, exactly one tt_session_feedback row, no page errors. Screenshots: docs/screenshots/session-feedback/. Package checked by scripts/check_review_assets.py. No real media exchange was part of this feedback fixture."
+    },
+    {
+      "id": "E13",
+      "title": "Your consultation record",
+      "route": "/patient/consultations/:id or /clinician/consultations/:id",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E13",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E13) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "E14",
+      "title": "Plan your follow-up",
+      "route": "Same-clinician follow-up booking route",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#E14",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E14) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "F01",
+      "title": "Your day at a glance",
+      "route": "/clinician",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F01) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "F02",
+      "title": "Open requests inbox",
+      "route": "/clinician/requests",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "A two-context flow on the packaged isolated Frappe app passed: with the 08:00 Addis interval inside the immediate window, the Review Patient published through the UI, publication recorded eligible_supply=1, the clinician inbox API returned the request, and the visible .clinician-request card showed the authorized request. DB audit showed one recipient, NotificationEnqueued, and InboxFetched. Patient account email was absent. Request was cancelled, no offer/booking/funds were created, and the clinician's original presence state was restored. Browser screenshots/no-overflow checks: 390/768/1440 CSS px in docs/screenshots/open-request-routed/. The prior selector failure was test-only; the original empty inbox was correctly explained by schedule start being outside the immediate window. See docs/request-inbox-routing-browser-verification.md. A focused persisted-backend regression now creates three manually approved synthetic clinicians and invokes the due-wave reconciler at test-only 10/20-second thresholds; it verifies one distinct recipient per wave and retry deduplication. This calls the handler directly and does not prove asynchronous worker execution. See tests/presentation.py::test_progressive_request_waves_are_due_bounded_and_deduplicated and docs/mvp-delivery-tracker.md."
+      }
+    },
+    {
+      "id": "F03",
+      "title": "Send a private offer",
+      "route": "/clinician/requests",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "F04",
+      "title": "Your offers",
+      "route": "/clinician/requests (offers/history)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "F05",
+      "title": "Make time for care",
+      "route": "/clinician/availability",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending successful readiness and routed-offer journey. The built-app browser verifies setup links, disabled readiness action, and useful distinction for a controlled HTTP 422 fault at 320/390/768/1440px in en/am/om. The real clinician remains ineligible due to language_required and immediate_policy_required. Mobile More navigation, Escape close and focus restoration passed. Screenshots: /tmp/tele-tena-presentation-review/request-readiness/. This does not verify a successful request or offer."
+      }
+    },
+    {
+      "id": "F06",
+      "title": "Edit your booking schedule",
+      "route": "/clinician/availability",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Locally verified",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Built Frappe /teletena/ Frappe 15 browser journey passed keyboard time entry, specific reversed-time error with input preserved, POST save of start_local/end_local (HTTP 200), reload persistence, patient generated slot and booking (HTTP 200). The weekly editor was restored afterward to the site's pre-test schedule snapshot. New synthetic patient/appointment retained. On packaged source a4c058d7496f38db7eeb8ff9711601eafbdd0154, a read-only seeded-clinician browser check at http://127.0.0.1:8017/teletena/ confirmed the calendar and first work block are visible without overflow. At 390px, the agenda/editor has sticky Save and no horizontal overflow. Screenshots: docs/screenshots/mutual-rescheduling/availability-1440.png and availability-390.png. Prior save/booking evidence: docs/screenshots/availability-regression/. Frappe 16, scheduler, actual 200% zoom and native-language review pending."
+      }
+    },
+    {
+      "id": "F07",
+      "title": "Date-specific hours",
+      "route": "/clinician/availability (exceptions)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "F08",
+      "title": "Your services",
+      "route": "/clinician/services",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F08",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F08) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "F09",
+      "title": "Create an offering",
+      "route": "/clinician/services",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F09",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F09) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "F10",
+      "title": "Your patients",
+      "route": "/clinician/care",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F10",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F10) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "F11",
+      "title": "Patient care timeline",
+      "route": "/clinician/care/:id",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F11",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F11) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "F12",
+      "title": "Your practice indicators",
+      "route": "/patient/clinicians/:opaque_clinician_id (public trust summary)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F12",
+      "verification_evidence": "Public profile now exposes separate approved-scope, immediate-inbox offer-response (90-day), clinician-attributed cancellation (365-day), and patient session-experience (365-day) indicators. All hide rates/means below five observations and include counts/version metadata. No-show attribution and ranking remain unsupported. Migration, direct authorization, and browser verification pending; see docs/session-experience-metric.md."
+    },
+    {
+      "id": "F13",
+      "title": "Offer detail",
+      "route": "/clinician/requests (own offer card; standalone detail route absent)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F13",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F13) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "F14",
+      "title": "Offers history",
+      "route": "/clinician/requests (paginated own history)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F14",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F14) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "F15",
+      "title": "Accepted offer",
+      "route": "/clinician/consultations/:id",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#F15",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F15) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "G01",
+      "title": "Your balance",
+      "route": "/patient/payments or /clinician/earnings",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#G01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (G01) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Frappe 15 presentation suite includes Approver denial, reasoned snapshot acceptance, idempotency, opaque case references without patient account identifiers, and historical-difference preservation. The reviewer screen is implemented at /admin/financial-disputes; production-built browser rendering and no-email-leak assertion are verified in docs/financial-reconciliation-review-ui.md. Retained demo cases were displayed but not accepted. Amharic/Afaan Oromo remain provisional."
+      }
+    },
+    {
+      "id": "G02",
+      "title": "Add funds",
+      "route": "/patient/payments (demo funding guarded by site policy)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#G02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (G02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "G03",
+      "title": "Transaction details",
+      "route": "/patient/payments/transactions/:activityId and /clinician/earnings/transactions/:activityId",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#G03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (G03) and design-handoff.md",
+        "implementation": "Owner-scoped persisted transaction-detail API covers patient legacy log and subledger entries plus clinician earnings and payout requests. Route links are present in Payments and Earnings; cross-owner reads return a generic unavailable response.",
+        "current_local": "Frappe assertions for patient journal/log privacy and clinician payout ownership passed; tests/presentation.py passes 36/36. Built patient reservation and clinician released-earning detail routes pass reload and generic unknown-ID denial. Patient layout checked at 320/390/768/1440 and clinician at 390/1440; browser 200% zoom remains pending."
+      }
+    },
+    {
+      "id": "G04",
+      "title": "Request a refund",
+      "route": "No general refund request route",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#G04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (G04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "G05",
+      "title": "See your earnings",
+      "route": "/clinician/earnings",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#G05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (G05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "G06",
+      "title": "Earnings breakdown",
+      "route": "/clinician/earnings",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#G06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (G06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "G07",
+      "title": "Request a payout",
+      "route": "/clinician/earnings",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#G07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (G07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "G08",
+      "title": "Resolve a payment concern",
+      "route": "/admin/financial-disputes",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#G08",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (G08) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "H01",
+      "title": "Your account",
+      "route": "/patient/account or /clinician/account",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#H01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H01) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "H02",
+      "title": "Professional account",
+      "route": "/clinician/account",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#H02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "H03",
+      "title": "Privacy & sharing",
+      "route": "/patient/account (privacy)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#H03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "H04",
+      "title": "Your preferences",
+      "route": "/patient/account (preferences)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#H04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "H05",
+      "title": "Account security",
+      "route": "No contact-change/security route",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#H05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "H06",
+      "title": "Notifications",
+      "route": "No notification-preferences route",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#H06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "H07",
+      "title": "How can we help?",
+      "route": "No support route",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#H07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "H08",
+      "title": "Take a quick tour",
+      "route": "Help & tours entry in workspace",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Locally verified",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#H08",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H08) and design-handoff.md",
+        "implementation": "Versioned server-side tour state, role-scoped route steps, dismissal, replay, missing-target recovery and reduced-motion behavior; current source 2f6277519174490374cb395ac4b96d6c92fa3866",
+        "current_local": "Production-built Frappe 15 browser suite on tele-tena-clinic-access-fresh.localhost verified patient/clinician/admin tours, route transitions, dismissal/replay and missing-target recovery at 320/390/768/1440 CSS px plus 200%-equivalent viewport; see docs/screenshots/scope-lifecycle-current/tour-*.png and docs/scope-lifecycle-verification.md. Provisional Amharic/Afaan Oromo remain unreviewed by native speakers."
+      }
+    },
+    {
+      "id": "I01",
+      "title": "Review workspace",
+      "route": "/admin (review workspace); /admin/clinics (clinic and affiliation review)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implementation in progress",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I01) and design-handoff.md",
+        "implementation": "Existing reviewer application/scope workflows plus the focused `/admin/clinics` route. Clinic identity and affiliation decisions are audited separately from clinical scope; no patient-record access is implied.",
+        "current_local": "Actual built Frappe browser journey verified clinic registration and affiliation review with the seeded synthetic reviewer account. Screenshot: docs/screenshots/clinic-review/reviewer-affiliation-approval.png. Other reviewer queues and widths retain their prior evidence/limitations."
+      }
+    },
+    {
+      "id": "I02",
+      "title": "Clinician applications",
+      "route": "/admin",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Built /teletena/ browser journey on source/build e227fde07dee02e7845c5103c05fb3e2051f8ad2 verified synthetic applicant appeal submission, reviewer reopen, applicant reload/resume, private synthetic PDF evidence upload, and resubmission. Screenshots: docs/screenshots/vetting-appeals/populated-applicant-390.png and populated-resubmitted-390.png. Final ordinary approval after resubmission was backend-tested; browser script stopped at an ambiguous duplicate Decision label locator before that optional action. Empty-site v1.18, native-language review, external credential checks and broader screen acceptance remain pending. The current dependent slice adds a separate renewal application from an approved scope; the applicant UI is implemented, with production-built browser acceptance and Frappe 16/fresh-site migration verification pending."
+      }
+    },
+    {
+      "id": "I03",
+      "title": "Application review",
+      "route": "/admin (application review)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Built /teletena/ browser journey on source/build e227fde07dee02e7845c5103c05fb3e2051f8ad2 verified the synthetic reviewer reopening a scope appeal; screenshot: docs/screenshots/vetting-appeals/populated-reviewer-1440.png. Applicant resubmission with new private evidence then passed after reload. The follow-up ordinary approval UI locator was ambiguous and not counted as a browser pass. Backend transition and permission regressions pass 29/29 on Frappe 15 and 16. Full reviewer workspace, empty-site install, policy approval and credential verification remain pending. Renewal submissions carry a prior-application link and require fresh private license evidence. Reviewer UI identifies renewals; human approval and expired-date rejection are backend-tested, with production-built renewal-browser acceptance and Frappe 16/fresh-site checks pending."
+      }
+    },
+    {
+      "id": "I04",
+      "title": "Clinical vetting rubric",
+      "route": "/admin/vetting",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I04",
+      "verification_evidence": {
+        "implementation": "Immutable v1.28 registry and Medical Lead role; reviewer APIs expose digest-verified definitions; only Medical Lead approves. v1.29 requires issuer/source, check date, registry reference, and same-application license evidence for credential verification, then stores a digest-checked provenance snapshot. Applicant/patient responses omit this data.",
+        "current_local": "Frappe 15 isolated site v1.29 first/repeat migration passed; tests/presentation.py 45/45 and tests/integration.py 24/24. Production-built /teletena/admin/vetting reviewer controls were rendered at 390/1440px against a synthetic submitted application; evidence screenshots are docs/screenshots/vetting-rubric/credential-source-reviewer-{390,1440}.png. Fresh-site install, Frappe 16, Medical Lead approval and native-language/accessibility review remain pending."
+      }
+    },
+    {
+      "id": "I05",
+      "title": "Service scope decisions",
+      "route": "/admin/scopes and /admin/vetting",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Backend/API regression on Frappe 15 retained isolated site passed in tests/presentation.py (27/27), including PDF validation, revision history, submitted-state lock, owner/reviewer download, patient/unrelated-clinician denial, and assessment evidence snapshot. Patch v1.16 repeat migration passed after a site/database/private-files backup. Rendered browser and fresh-empty-site checks for this screen are pending; no external credential validation or malware scanning is claimed.",
+        "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending."
+      }
+    },
+    {
+      "id": "I06",
+      "title": "Reconsideration and reverification",
+      "route": "/clinician/vetting; /admin/vetting",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I06) and design-handoff.md",
+        "implementation": "PR feature branch feat/vetting-reconsideration: native append-only appeal DocType, authenticated commands, reviewer/applicant UI, and focused tests.",
+        "current_local": "29/29 presentation tests passed on Frappe 15.121.2 and Frappe 16.2.1; migration and repeat migration passed on retained isolated sites. Built browser verified applicant normal page and reviewer empty queue at 1440/390px; populated appeal actions remain unverified in browser. See docs/vetting-appeals-verification.md."
+      }
+    },
+    {
+      "id": "I07",
+      "title": "Service catalog",
+      "route": "/admin/scopes (limited catalog)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "I08",
+      "title": "Service definition",
+      "route": "/teletena/admin/services",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Locally verified",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I08",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I08) and design-handoff.md",
+        "implementation": "Dedicated reviewer route /teletena/admin/services uses existing Tele Tena Service, Category, Participant Format and Service Attribute Definition DocTypes. Draft save forces inactive/vetting-required/immediate-disabled; draft locks on review request. No terminology approval or service activation is exposed.",
+        "current_local": "2026-10-08: `tests/presentation.py` 37/37 passed on isolated tele-tena-pr12-fresh.localhost; packaged reviewer route create/reload/typed draft/review-lock browser journey passed at 390/768/1440 with no horizontal overflow. Evidence: docs/service-catalog-editor-verification.md and docs/screenshots/service-catalog/."
+      }
+    },
+    {
+      "id": "I09",
+      "title": "Rubric versions",
+      "route": "/admin/rubrics",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I09",
+      "verification_evidence": {
+        "implementation": "Immutable v1.28 registry and role; reviewer APIs expose digest-verified full definitions; Medical Lead-only approval; version pinned to applications and copied into immutable assessment snapshots.",
+        "current_local": "Frappe 15 isolated v1.28 first/repeat migrations passed; presentation 44/44 and integration 24/24. Packaged reviewer browser viewed the full definition/digest at 390/768/1440px; Approver cannot open Medical Lead route. Evidence: docs/screenshots/vetting-rubric/. Clean fresh-site v1.28 installation pending."
+      }
+    },
+    {
+      "id": "I10",
+      "title": "Matching operations",
+      "route": "No full routing operations page",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I10",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I10) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "I11",
+      "title": "Financial operations",
+      "route": "/admin/financial-disputes (limited)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I11",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I11) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "I12",
+      "title": "Feedback moderation",
+      "route": "No feedback moderation route",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#I12",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I12) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "J01",
+      "title": "Clinic overview",
+      "route": "/clinic",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Implementation in progress",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#J01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J01) and design-handoff.md",
+        "implementation": "Local clinic staff route and session navigation hint; not a full clinic calendar or management product.",
+        "current_local": "Production-built /teletena/ route exercised after sign-in. Membership-gated workspace navigation, invitation acceptance, schedule projection query and 320/390/768/1440 widths passed the clinic browser regression. The overview remains partial: no clinic calendar, resource management, billing or full patient workflow. Screenshots: docs/screenshots/clinic-membership/staff-workspace-*.png. On 2026-10-08, a second production-built browser journey passed explicit patient summary consent, persisted grant, and a separate Care Coordination account reading the published summary; the response omitted patient identity/contact, private notes, request text, and disclosure fields. Screenshot evidence: /tmp/tele-tena-clinic-summary-browser/care-coordination-{390,1440}.png and patient-consent-390.png. A None-expiry status comparison discovered during this path now has a focused regression. Fresh-site and Frappe 16 checks remain pending."
+      }
+    },
+    {
+      "id": "J02",
+      "title": "Clinic calendar",
+      "route": "/clinic/calendar",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Locally verified",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#J02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J02) and design-handoff.md",
+        "implementation": "Read-only weekly view of existing patient-authorized scheduling grants; no new schema or resource/booking behavior.",
+        "current_local": "Frappe 15.121.2 on tele-tena-pr12-fresh.localhost: tests/presentation.py 45/45 and tests/integration.py 24/24 passed. The production-built application at http://127.0.0.1:8017/teletena/ passed owner access, direct route, empty state, next-week navigation, timezone update/invalid-timezone feedback, responsive no-overflow checks at 320/390/768/1440 CSS px, and patient API denial. The browser fixture currently has no shared appointment in this week, so its screenshot demonstrates the empty state; populated response minimization and role matrix are verified by the backend test. Screenshots: docs/screenshots/clinic-shared-calendar/."
+      }
+    },
+    {
+      "id": "J03",
+      "title": "Your clinical team",
+      "route": "/clinic; /clinician/clinic-access",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#J03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J03) and design-handoff.md",
+        "implementation": "Persistent Frappe membership workflow; current UI groups team and invite actions inside the clinic access portal.",
+        "current_local": "Production-built browser journey verified clinic submit → human review → manager invitation → verified staff acceptance → membership-scoped /clinic navigation → manager revocation. 320/390/768/1440 widths passed overflow checks. Distinct screen composition, actual 200% zoom, and a fresh-site migration remain pending."
+      }
+    },
+    {
+      "id": "J04",
+      "title": "Invite a team member",
+      "route": "/clinic; /clinician/clinic-access",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#J04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J04) and design-handoff.md",
+        "implementation": "Persistent Frappe membership workflow; current UI groups team and invite actions inside the clinic access portal.",
+        "current_local": "Production-built browser journey verified clinic submit → human review → manager invitation → verified staff acceptance → membership-scoped /clinic navigation → manager revocation. 320/390/768/1440 widths passed overflow checks. Distinct screen composition, actual 200% zoom, and a fresh-site migration remain pending."
+      }
+    },
+    {
+      "id": "J05",
+      "title": "Clinic patients",
+      "route": "/j05 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#J05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "J06",
+      "title": "Clinic encounter record",
+      "route": "/j06 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#J06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "J07",
+      "title": "Clinic services",
+      "route": "/j07 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#J07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "J08",
+      "title": "Locations & resources",
+      "route": "/j08 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#J08",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J08) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "J09",
+      "title": "Clinic billing",
+      "route": "/j09 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#J09",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J09) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "J10",
+      "title": "Permissions & audit",
+      "route": "/j10 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#J10",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J10) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "J11",
+      "title": "Set up your clinic",
+      "route": "/clinician/affiliations (initial clinic registration; broader clinic setup pending)",
+      "release_disposition": "MVP",
+      "reason": "MVP limited clinic registration and affiliation only; full clinic-management setup deferred.",
+      "inherited_status": "Implementation in progress",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#J11",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J11) and design-handoff.md",
+        "implementation": "Initial clinician clinic registration and separately reviewed clinician affiliation now use native persistent records. Clinic staff/membership, workspace, calendar, resources, billing and explicit patient-record grants remain unimplemented.",
+        "current_local": "Built Frappe `/teletena/` browser flow passed clinician application → human clinic verification → affiliation request → separate human affiliation review. Backend regression asserts generic DocType list/document permissions, applicant/reviewer boundaries and no scope creation. This does not verify clinic workspace operations."
+      }
+    },
+    {
+      "id": "J12",
+      "title": "Practice insights",
+      "route": "/j12 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#J12",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J12) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K01",
+      "title": "Find a test",
+      "route": "/k01 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K01) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K02",
+      "title": "Choose a diagnostic center",
+      "route": "/k02 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K03",
+      "title": "About this test",
+      "route": "/k03 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K04",
+      "title": "Referral & sharing",
+      "route": "/k04 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K05",
+      "title": "Book sample collection",
+      "route": "/k05 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K06",
+      "title": "Track your test",
+      "route": "/k06 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K07",
+      "title": "Your laboratory report",
+      "route": "/k07 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K08",
+      "title": "Laboratory overview",
+      "route": "/k08 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K08",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K08) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K09",
+      "title": "Collection worklist",
+      "route": "/k09 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K09",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K09) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K10",
+      "title": "Review & release results",
+      "route": "/k10 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K10",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K10) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K11",
+      "title": "Laboratory catalog",
+      "route": "/k11 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K11",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K11) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "K12",
+      "title": "Quality & corrections",
+      "route": "/k12 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#K12",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (K12) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "L01",
+      "title": "Care beyond borders",
+      "route": "/l01 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#L01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (L01) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "L02",
+      "title": "Tell us about your care need",
+      "route": "/l02 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#L02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (L02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "L03",
+      "title": "Second-opinion specialists",
+      "route": "/l03 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#L03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (L03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "L04",
+      "title": "Compare care plans",
+      "route": "/l04 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#L04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (L04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "L05",
+      "title": "Understand your estimate",
+      "route": "/l05 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#L05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (L05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "L06",
+      "title": "Prepare for your journey",
+      "route": "/l06 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#L06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (L06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "L07",
+      "title": "Your care itinerary",
+      "route": "/l07 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#L07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (L07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "L08",
+      "title": "Care coordinator workspace",
+      "route": "/l08 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#L08",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (L08) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "L09",
+      "title": "Review a travel provider",
+      "route": "/l09 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#L09",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (L09) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "M01",
+      "title": "Care that stays connected",
+      "route": "/m01 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#M01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (M01) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "M02",
+      "title": "Compare memberships",
+      "route": "/m02 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#M02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (M02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "M03",
+      "title": "Review your membership",
+      "route": "/m03 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#M03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (M03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "M04",
+      "title": "Your membership",
+      "route": "/m04 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#M04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (M04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "M05",
+      "title": "Benefits & credits",
+      "route": "/m05 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#M05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (M05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "M06",
+      "title": "Manage renewal",
+      "route": "/m06 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#M06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (M06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "M07",
+      "title": "Membership administration",
+      "route": "/m07 (not implemented)",
+      "release_disposition": "Post-handover",
+      "reason": "Post-handover extended or unagreed standalone module; preserve implementation and design.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Not a release gate",
+      "requirements_source": "docs/operational-screen-map.json#M07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (M07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "N01",
+      "title": "Care, together",
+      "route": "/n01 (not implemented)",
+      "release_disposition": "MVP",
+      "reason": "Working two-adult couples required by user decision 2026-10-08; family/group workflows deferred.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#N01",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N01) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "N02",
+      "title": "Invite your partner",
+      "route": "/n02 (not implemented)",
+      "release_disposition": "MVP",
+      "reason": "Working two-adult couples required by user decision 2026-10-08; family/group workflows deferred.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#N02",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N02) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "N03",
+      "title": "Your invitation",
+      "route": "/n03 (not implemented)",
+      "release_disposition": "MVP",
+      "reason": "Working two-adult couples required by user decision 2026-10-08; family/group workflows deferred.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#N03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "N04",
+      "title": "Your private intake",
+      "route": "/n04 (not implemented)",
+      "release_disposition": "MVP",
+      "reason": "Working two-adult couples required by user decision 2026-10-08; family/group workflows deferred.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#N04",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N04) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "N05",
+      "title": "Ready for your shared session",
+      "route": "/n05 (not implemented)",
+      "release_disposition": "MVP",
+      "reason": "Working two-adult couples required by user decision 2026-10-08; family/group workflows deferred.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#N05",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N05) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "N06",
+      "title": "Together in consultation",
+      "route": "/n06 (not implemented)",
+      "release_disposition": "MVP",
+      "reason": "Working two-adult couples required by user decision 2026-10-08; family/group workflows deferred.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#N06",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N06) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "N07",
+      "title": "Notes & recipients",
+      "route": "/n07 (not implemented)",
+      "release_disposition": "MVP",
+      "reason": "Working two-adult couples required by user decision 2026-10-08; family/group workflows deferred.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#N07",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N07) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    },
+    {
+      "id": "N08",
+      "title": "Your shared care record",
+      "route": "/n08 (not implemented)",
+      "release_disposition": "MVP",
+      "reason": "Working two-adult couples required by user decision 2026-10-08; family/group workflows deferred.",
+      "inherited_status": "Designed",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#N08",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N08) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+      }
+    }
+  ],
+  "supplemental_screens": [
+    {
+      "id": "SH01",
+      "title": "Mutual adult relationship links",
+      "module": "Shared adult care",
+      "status": "Implemented, verification pending",
+      "route": [
+        "/patient/relationships",
+        "/relationship-invitation#invite=<opaque token>"
+      ],
+      "actors": [
+        "Patient inviter",
+        "Patient invitee"
+      ],
+      "persistent_models": [
+        "tt_relationship_invitation",
+        "tt_relationship_link",
+        "tt_relationship_event"
+      ],
+      "queries": [
+        "tele_tena.api.relationships.my_relationships",
+        "tele_tena.api.relationships.preview_relationship_invitation (authenticated POST body)"
+      ],
+      "commands": [
+        "tele_tena.api.relationships.create_relationship_invitation",
+        "tele_tena.api.relationships.respond_to_relationship_invitation",
+        "tele_tena.api.relationships.revoke_relationship",
+        "tele_tena.api.relationships.revoke_relationship_invitation"
+      ],
+      "server_permissions": "Tele Tena Patient role and matching patient profile required. Invitation token alone is insufficient. Each participant sees only the other chosen display name; no clinical record, appointment, note, balance or call grant.",
+      "workflow_transitions": "No link → invitation pending → accepted/declined/expired/revoked; accepted → active relationship → revoked. Both adults attest separately. Invitations expire after a configurable demonstration default.",
+      "states": {
+        "loading": "Skeleton for own relationships and invitation preview.",
+        "empty": "Explain no link exists and offer create invitation.",
+        "error": "Show actionable invite/session/permission/network feedback; preserve confirmation state.",
+        "success": "Confirm persisted invitation, acceptance, decline, withdrawal or revocation."
+      },
+      "responsive_accessibility": "Responsive patient workspace and invitation card; keyboard-operable consent checkbox, copy and revoke controls; verify 320/390/768/1440 CSS px and 200% zoom.",
+      "localization": {
+        "languages": [
+          "en",
+          "am",
+          "om"
+        ],
+        "translation_status": "English source; Amharic/Afaan Oromo provisional pending human review."
+      },
+      "dependencies": [
+        "medical/legal review of adult-attestation and consent text",
+        "future participant-specific appointment, disclosure, call and note workflows"
+      ],
+      "verification_evidence": {
+        "backend": "Frappe 15 presentation 47/47 and integration 24/24 pass; focused reviewer-denial assertion and repeat v1.30 migration invocation pass. Disposable fresh-site install remains pending.",
+        "frontend": "Production-built Frappe browser checks: two separate synthetic patient sessions completed invitation → authenticated consent/acceptance → alias-limited mutual link → revocation visible to both; zero page errors at 390px. Screenshots are retained in docs/screenshots/adult-relationship-links/. Registration-enabled mode, fresh install, 320/768px and 200%-zoom coverage remain pending."
+      }
+    }
+  ]
+}

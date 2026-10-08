@@ -1,5 +1,9 @@
 # TeleTena delivery tracker
 
+## Current release priority — MVP handover — 2026-10-08
+
+The active branch is `feat/mvp-release-handover`, based on preserved/pushed `feat/adult-relationship-links` at `1e8d161`. The authoritative bounded release scope is `mvp-release-scope.md`; `mvp-screen-acceptance.json` maps all 142 reference screens to 99 MVP screen/state concepts and 43 post-handover concepts. This is scope coverage, not 99 operationally accepted screens. Couples consultations are mandatory and remain missing beyond relationship links. No-show adjudication is deferred by explicit user decision. Critical current-release gaps are scheduler-driven routing/earnings evidence, full fresh/owner-level upgrade verification, non-diagnostic discovery/query continuity, complete couples permissions/calls/documentation and current-source MVP redesign acceptance. The older checkpoints below are historical per-slice evidence. No merge or remote deployment occurred.
+
 ## Current local checkpoint — optional adult relationship links — 2026-10-08
 
 The active worktree is `feat/adult-relationship-links`, based on the local
