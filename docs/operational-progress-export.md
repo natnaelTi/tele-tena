@@ -3,7 +3,7 @@
 ## Current local checkpoint — credential-verification provenance — 2026-10-08
 
 - Branch `feat/vetting-rubric-assessment-engine`, current source/build commit
-  `9b2c96b69ab190f9ad98abc2eeef63150be63e9e`, stacked on open draft PR #39.
+  `4841e280221f4fbb13d212f2bca60a04c757c828`, stacked on open draft PR #39.
   PR #40 remains draft and unmerged.
 - New scope approvals marked credential-verified require an issuer/source,
   check date, registry reference and license evidence attached to the same
@@ -12,11 +12,12 @@
   existing assessments were not rewritten or backfilled.
 - Frappe 15.121.2 isolated site `tele-tena-pr12-fresh.localhost`:
   `tests/presentation.py` 45/45 and `tests/integration.py` 24/24 passed;
-  v1.29 migration and repeat migration passed; frontend lint exited 0 with
-  existing warnings.
+  v1.29 migration and repeat migration passed. A focused provenance-edge
+  regression also passed before the 45-case full suite; frontend lint exited 0
+  with existing warnings.
 - The preview remains `http://127.0.0.1:8017/teletena/`, built Frappe assets,
   site `tele-tena-pr12-fresh.localhost`; its release manifest records source
-  `9b2c96b69ab190f9ad98abc2eeef63150be63e9e`. The synthetic application
+  `4841e280221f4fbb13d212f2bca60a04c757c828`. The synthetic application
   journey submitted through the UI, reviewer evidence access succeeded, and
   the four provenance controls were rendered at 390/1440px; no scope decision
   was recorded. Screenshots are under `docs/screenshots/vetting-rubric/`.
