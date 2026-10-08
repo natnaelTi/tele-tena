@@ -2130,12 +2130,14 @@ class Presentation(unittest.TestCase):
                 accounting.accept_reconciliation_case('unknown-case', 'Unauthorized test')
             fixtures.login('admin')
             queue = accounting.financial_reconciliation_queue()
-            case = next(row for row in queue if row.status == 'ReviewRequired' and row.id ==
-                        journey.one('SELECT id FROM tt_financial_reconciliation WHERE patient=%s', (patient,)).id)
-            self.assertNotIn('patient', case.keys())
-            accepted = accounting.accept_reconciliation_case(case.id, 'Synthetic review accepted current opening snapshot')
+            audit_id = journey.one('SELECT id FROM tt_financial_reconciliation WHERE patient=%s', (patient,)).id
+            case = next(row for row in queue if row.status == 'ReviewRequired' and
+                        row.case_ref == accounting._reconciliation_case_ref(audit_id))
+            self.assertNotIn('id', case.keys())
+            self.assertNotIn('@', json.dumps(dict(case), default=str))
+            accepted = accounting.accept_reconciliation_case(case.case_ref, 'Synthetic review accepted current opening snapshot')
             self.assertTrue(accepted['historical_difference_preserved'])
-            retried = accounting.accept_reconciliation_case(case.id, 'Synthetic review accepted current opening snapshot')
+            retried = accounting.accept_reconciliation_case(case.case_ref, 'Synthetic review accepted current opening snapshot')
             self.assertTrue(retried['idempotent'])
             accounting.check_wallet_projection(patient, after)
             audit = journey.one('''SELECT status,decision,reason FROM tt_financial_reconciliation

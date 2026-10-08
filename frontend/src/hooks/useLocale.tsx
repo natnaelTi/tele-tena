@@ -608,6 +608,7 @@ const words: Record<string, [string, string]> = {
   "at snapshot boundary": ["በቅጽበት ምስሉ ድንበር ላይ", "daangaa suuraa irratti"],
   "Audit details": ["የኦዲት ዝርዝሮች", "Bal'ina odiitii"],
   "No additional audit detail.": ["ተጨማሪ የኦዲት ዝርዝር የለም።", "Bal'inni odiitii dabalataa hin jiru."],
+  "Historical activity remains unchanged. Review the account’s source records through the authorized financial operations process before deciding.": ["የታሪክ እንቅስቃሴው አልተቀየረም። ከመወሰንዎ በፊት የሂሳቡን ዋና መዝገቦች በተፈቀደው የፋይናንስ ሥራ ሂደት ይመርምሩ።", "Sochiin seenaa hin jijjiiramne. Murteessuu dura galmeewwan herregaa karaa hojii faayinaansii hayyamameen ilaali."],
   "Reviewer decision reason": ["የገምጋሚ ውሳኔ ምክንያት", "Sababa murtii gamaaggamaa"],
   "Required. This records authorization to continue from the unchanged wallet and subledger snapshot; it does not resolve the historical difference.": ["ያስፈልጋል። ይህ ከያልተቀየረው የቀሪ ሂሳብና ንዑስ መዝገብ ምስል በመነሳት እንዲቀጥል ያለውን ፈቃድ ይመዘግባል፤ የታሪክ ልዩነቱን አይፈታም።", "Barbaachisaa dha. Kun baalansii fi galmee xiqqaa osoo hin jijjiiramin akka itti fufu hayyama galmeessa; garaagarummaa seenaa hin furuu."],
   "Decision recorded. The historical difference remains preserved.": ["ውሳኔው ተመዝግቧል። የታሪክ ልዩነቱ እንዳለ ይጠበቃል።", "Murtiin galmaa'eera. Garaagarummaan seenaa akkuma jirutti eegama."],
