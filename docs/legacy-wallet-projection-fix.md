@@ -27,7 +27,7 @@ then reruns the owner audit; existing `ReviewRequired` decisions are not silentl
 cleared. An authorized reviewer must explicitly accept an unchanged balanced
 snapshot with a reason before that owner can transact again.
 
-## Local evidence
+## Local evidence and migration result
 
 On the retained isolated Frappe 15 review site, the read-only audit found that
 the Review Patient wallet matched its known activity and subledger. Among eight
@@ -37,20 +37,37 @@ described above. Three additional owners each had a residual 600 minor-unit
 available/reserved category difference after that explanation; those remain
 unexplained and held. No records were deleted or adjusted during that audit.
 
-`tests/presentation.py` passes 40/40 on the same site, including a synthetic
-backfill test that proves exact idempotency, timestamp provenance, balanced
-wallet projection, and no wallet mutation. This is not yet proof that v1.24 has
-been applied to the retained site or that the remaining owner discrepancies
-have been resolved. A site backup and migration run are still required. The
-fresh-install browser/install check is also pending the operator's disposable
-database setup.
+Before migration, the isolated preview site and private files were backed up
+with Bench at 2026-10-08 11:39 local time. Its site-scoped scheduler was
+temporarily disabled; the site had no pending jobs. Maintenance mode blocked
+web writes during the migration. No shared worker or unrelated Bench service
+was stopped. The scheduler and site availability were restored afterward.
+
+Patch v1.24 added 14 journal-proven `Consumption` activity events. The patch's
+write path is insert-only, and it checks exact journal and earning evidence
+before each insert. A direct comparison with the pre-migration database backup
+confirmed all 91 prior activity rows remain identical; exactly 14 rows were
+added and each matches its completion journal and earning. Repeat migration
+checks passed without adding more events; wallet and subledger balances,
+earnings, and balanced journals remained unchanged on repeat. Owner-level
+read-only reconciliation after migration found all 9/9 wallets
+equal their subledger accounts, 0 unbalanced journals, and 6/9 owners whose
+legacy activity projection also matches. The other 3 owners have no unknown
+event kinds but retain their unexplained historical category differences and
+remain `ReviewRequired`. The existing Review Patient wallet matches.
+
+`tests/presentation.py` passes 40/40, including a synthetic backfill test for
+idempotency, timestamp provenance, exact journal/earning evidence and no wallet
+mutation. `tests/integration.py` passes 24/24. The built-browser package check
+passed guest/deep-link access, reviewer sign-in/out, consultation reload, PWA
+scope, offline fallback and responsive widths at 390/768/1440. The fresh-site
+install/browser check is still pending the operator's disposable database
+setup. This is not proof that the remaining owner discrepancies are resolved.
 
 ## Remaining financial gates
 
-- Re-run the migration/reconciliation check after a private backup and compare
-  every pre-existing ledger row, wallet, earning, appointment, and journal.
-- Confirm the four explainable projections align after backfill while their
-  previous review cases remain visible pending explicit authorization.
+- Compare the pre-migration backup with the migrated site to independently
+  verify every pre-existing event and obligation is retained.
 - Keep the three unexplained 600-minor-unit cases held; do not infer a correction.
 - Verify on a new disposable site and repeat migration after v1.24.
 - Clinician payouts remain simulated reservations, not external transfers.

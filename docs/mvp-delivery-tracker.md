@@ -1,14 +1,39 @@
 # TeleTena delivery tracker
 
-## Continuation checkpoint — legacy wallet projection audit — 2026-10-08
+## Current local operational checkpoint — legacy finance projection — 2026-10-08
 
-Current focused branch: `fix/legacy-wallet-projection-audit`, based on the
-current open PR #35 head (`1d2a65ecfb450d938cb36a82f74fb80e9202e961`), which
-depends on PR #34. The active local WSGI preview remains
-`http://127.0.0.1:8017/teletena/` on isolated site
-`tele-tena-pr12-fresh.localhost`; its last built asset manifest predates this
-finance patch. Do not review until the package is rebuilt and the matching
-backend process is reloaded.
+The active checkout is `fix/legacy-wallet-projection-audit` at
+`fb8aa98e65e98d9753f5993d512da76586cd1385`, based on PR #35's current head
+`1d2a65ecfb450d938cb36a82f74fb80e9202e961` and dependent on PR #35/#34. The
+preview is again serving `http://127.0.0.1:8017/teletena/` from isolated site
+`tele-tena-pr12-fresh.localhost`; production asset manifest source is the
+feature commit above. Its `/teletena/` WSGI process was reloaded after building.
+
+The isolated site was privately backed up before v1.24 migration. At cutover,
+its site scheduler was disabled and had no pending jobs; maintenance mode
+blocked web writes during migration. The site scheduler was restored. No shared
+worker or unrelated Bench service was restarted. The patch added 14 exact,
+journal-proven completion activity rows. The pre-migration backup comparison
+confirmed 91 original activity rows were unchanged. Repeated migration and
+finance snapshot checks passed. All 9 patient wallets match subledger balances,
+all journals balance, 6 of 9 owners' legacy projections match, and 3 owners with
+unexplained category differences remain held. The Review Patient wallet matches.
+
+`tests/presentation.py` passes 40/40; `tests/integration.py` passes 24/24.
+Production asset secret/scope verification passed. Built-browser review passed
+sign-in/out, deep-link reload, private consultation access, PWA scope/cache,
+offline fallback, 390/768/1440 layouts, and a controlled update prompt. That
+update test simulates a waiting worker; it is not an existing-device PWA update
+or physical-device test. Fresh-site install/browser verification remains
+pending a disposable database credential setup. The broad approved A–I product
+scope remains incomplete; this checkpoint is only the focused finance repair.
+See `legacy-wallet-projection-fix.md`.
+
+## Historical note — pre-migration legacy wallet audit — 2026-10-08
+
+The original read-only audit identified the missing legacy `Consumption`
+activity row on old consultation finalization. This note predates v1.24; use the
+current checkpoint above for migration and preview status.
 
 The owner audit traced a missing legacy `Consumption` activity row on old
 consultation finalization. A new completion/refund event is logged in the same
@@ -17,14 +42,13 @@ historical completion activity proved by the matching immutable earning and
 journal. Wallets and old events are not overwritten. Synthetic evidence shows
 four owners whose reserved difference matches finalized gross earnings; three
 other owners retain an unexplained 600-minor-unit available/reserved residual
-each and remain held. The new backfill test and full Frappe presentation suite
-passed 40/40. Fresh install and applying v1.24 to a backed-up retained preview
-are pending. Details: `legacy-wallet-projection-fix.md`.
+each and remain held. See `legacy-wallet-projection-fix.md` for the current
+migration result and verification.
 
 The whole approved screen map and batches A–I remain incomplete. This is one
 finance correction slice, not full-product acceptance.
 
-## Current test-fixture checkpoint — 2026-10-08
+## Historical test-fixture checkpoint — before discovery-filter branch — 2026-10-08
 
 The current continuation is `fix/immediate-readiness-window` (exact source
 SHA is the current Git head; packaged preview manifest still points to the
