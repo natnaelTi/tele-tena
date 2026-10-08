@@ -29,6 +29,7 @@ let stage = 'launch';
     stage = 'case visibility';
     await page.getByText('Review required', { exact: true }).first().waitFor({ timeout: 10000 });
     await page.getByRole('button', { name: 'Accept unchanged snapshot' }).first().waitFor();
+    assert.equal((await page.locator('main').innerText()).includes('@example.invalid'), false, 'account email leaked into reviewer queue');
     // Never accept existing site records in a visual verification.
     assert.equal(await page.getByLabel('Reviewer decision reason').count() > 0, true);
     fs.mkdirSync('docs/screenshots/financial-reconciliation', { recursive: true });

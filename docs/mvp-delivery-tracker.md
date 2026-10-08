@@ -23,8 +23,9 @@ preserved their earlier evidence and did not auto-accept them. The Review Patien
 wallet matches.
 
 The `/admin/financial-disputes` reviewer page now also exposes the authorized
-wallet reconciliation queue, recorded balances/evidence, and a reason-required
-acceptance action backed by the existing locked server command. This action
+wallet reconciliation queue, recorded balances/evidence, opaque case references,
+and a reason-required acceptance action backed by a locked server command. The
+queue does not expose patient account identifiers. This action
 authorizes continued use of an unchanged wallet/subledger snapshot; it does not
 settle or repair the historical difference. Existing held records were not
 accepted during UI verification. See `financial-reconciliation-review-ui.md`.

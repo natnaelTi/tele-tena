@@ -345,7 +345,7 @@ export function ServiceCatalog() {
 
 type OpenDispute = { earning_id: string; appointment: string; net_minor: number; state: string; reason: string; opened_at: string };
 type ReconciliationCase = {
-  id: string; patient: string; legacy_available: number; legacy_reserved: number;
+  id: string; legacy_available: number; legacy_reserved: number;
   wallet_available: number; wallet_reserved: number; subledger_available: number;
   subledger_reserved: number; event_count: number; unknown_event_count: number;
   boundary_event_count: number; status: string; reason: string; created: string;
@@ -374,7 +374,7 @@ export function FinancialDisputes() {
         : !reconciliation.data ? <Skeleton />
         : reviewCases.length ? reviewCases.map(item => <Card key={item.id}>
           <div className="row-between"><h3>{w("Balance review required")}</h3><StatusBadge tone="warning">{w("Review required")}</StatusBadge></div>
-          <p className="supporting">{w("Account reference")}: {item.patient} · {w("Recorded")}: {date(item.created)}</p>
+          <p className="supporting">{w("Case reference")}: {item.id} · {w("Recorded")}: {date(item.created)}</p>
           <div className="form-grid two-column reconciliation-balances">
             <p>{w("Activity record")}: ETB {money(item.legacy_available)} {w("available")}; ETB {money(item.legacy_reserved)} {w("reserved")}</p>
             <p>{w("Current balance")}: ETB {money(item.wallet_available)} {w("available")}; ETB {money(item.wallet_reserved)} {w("reserved")}</p>
@@ -382,10 +382,10 @@ export function FinancialDisputes() {
             <p>{w("Evidence")}: {item.event_count} {w("events")}; {item.unknown_event_count} {w("unknown")}; {item.boundary_event_count} {w("at snapshot boundary")}</p>
           </div>
           <details><summary>{w("Audit details")}</summary><p className="prewrap">{item.reason || w("No additional audit detail.")}</p></details>
-          <TextField label={w("Reviewer decision reason")} value={snapshotReasons[item.patient] || ""} onChange={e => setSnapshotReasons(previous => ({...previous, [item.patient]: e.target.value}))} maxLength={500} hint={w("Required. This records authorization to continue from the unchanged wallet and subledger snapshot; it does not resolve the historical difference.")} />
-          <Button variant="secondary" disabled={action.busy || !(snapshotReasons[item.patient] || "").trim()} loading={action.busy} onClick={() => void action.run(async () => {
-            await api("tele_tena.accounting.accept_wallet_snapshot", {patient: item.patient, reason: snapshotReasons[item.patient]}, true);
-            setSnapshotReasons(previous => ({...previous, [item.patient]: ""}));
+          <TextField label={w("Reviewer decision reason")} value={snapshotReasons[item.id] || ""} onChange={e => setSnapshotReasons(previous => ({...previous, [item.id]: e.target.value}))} maxLength={500} hint={w("Required. This records authorization to continue from the unchanged wallet and subledger snapshot; it does not resolve the historical difference.")} />
+          <Button variant="secondary" disabled={action.busy || !(snapshotReasons[item.id] || "").trim()} loading={action.busy} onClick={() => void action.run(async () => {
+            await api("tele_tena.accounting.accept_reconciliation_case", {case_id: item.id, reason: snapshotReasons[item.id]}, true);
+            setSnapshotReasons(previous => ({...previous, [item.id]: ""}));
             await reconciliation.refresh();
           }, w("Decision recorded. The historical difference remains preserved."))}>{w("Accept unchanged snapshot")}</Button>
         </Card>) : <EmptyState title={w("No wallet reconciliation cases need review.")} />}

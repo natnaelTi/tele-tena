@@ -4559,7 +4559,7 @@
         "tele_tena.accounting.cancel_payout",
         "tele_tena.accounting.open_earning_dispute",
         "tele_tena.accounting.resolve_earning_dispute",
-        "tele_tena.accounting.accept_wallet_snapshot"
+        "tele_tena.accounting.accept_reconciliation_case"
       ],
       "server_permissions": "Owners see only their own balances/activity/earnings; financial reviewer does not gain clinical-note access. Every posting is immutable, balanced, idempotent and transactional.",
       "workflow_transitions": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
@@ -4592,7 +4592,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (G01) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Frappe 15 presentation suite includes Approver denial, explicit reasoned snapshot acceptance, and historical-difference preservation. The reviewer reconciliation screen is implemented at /admin/financial-disputes; production-built browser rendering is verified in docs/financial-reconciliation-review-ui.md. The retained demo cases were displayed but not accepted. Amharic/Afaan Oromo remain provisional."
+        "current_local": "Frappe 15 presentation suite includes Approver denial, reasoned snapshot acceptance, idempotency, opaque case references without patient account identifiers, and historical-difference preservation. The reviewer screen is implemented at /admin/financial-disputes; production-built browser rendering and no-email-leak assertion are verified in docs/financial-reconciliation-review-ui.md. Retained demo cases were displayed but not accepted. Amharic/Afaan Oromo remain provisional."
       }
     },
     {

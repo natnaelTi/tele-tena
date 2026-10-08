@@ -598,6 +598,7 @@ const words: Record<string, [string, string]> = {
   "Balance review required": ["የቀሪ ሂሳብ ግምገማ ያስፈልጋል", "Baalansii gamaaggamuun barbaachisa"],
   "Review required": ["ግምገማ ያስፈልጋል", "Gamaaggamuun barbaachisa"],
   "Account reference": ["የሂሳብ መለያ", "Wabii herregaa"],
+  "Case reference": ["የጉዳይ መለያ", "Wabii dhimmaa"],
   "Activity record": ["የእንቅስቃሴ መዝገብ", "Galmee sochii"],
   "Current balance": ["የአሁኑ ቀሪ ሂሳብ", "Baalansii ammaa"],
   "Subledger": ["ንዑስ መዝገብ", "Galmee xiqqaa"],

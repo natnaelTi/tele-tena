@@ -2126,11 +2126,17 @@ class Presentation(unittest.TestCase):
             self.assertEqual((after.available, after.reserved), (wallet.available, wallet.reserved))
             with self.assertRaises(frappe.PermissionError):
                 accounting.financial_reconciliation_queue()
+            with self.assertRaises(frappe.PermissionError):
+                accounting.accept_reconciliation_case('unknown-case', 'Unauthorized test')
             fixtures.login('admin')
             queue = accounting.financial_reconciliation_queue()
-            self.assertIn(patient, [row.patient for row in queue])
-            accepted = accounting.accept_wallet_snapshot(patient, 'Synthetic review accepted current opening snapshot')
+            case = next(row for row in queue if row.status == 'ReviewRequired' and row.id ==
+                        journey.one('SELECT id FROM tt_financial_reconciliation WHERE patient=%s', (patient,)).id)
+            self.assertNotIn('patient', case.keys())
+            accepted = accounting.accept_reconciliation_case(case.id, 'Synthetic review accepted current opening snapshot')
             self.assertTrue(accepted['historical_difference_preserved'])
+            retried = accounting.accept_reconciliation_case(case.id, 'Synthetic review accepted current opening snapshot')
+            self.assertTrue(retried['idempotent'])
             accounting.check_wallet_projection(patient, after)
             audit = journey.one('''SELECT status,decision,reason FROM tt_financial_reconciliation
                 WHERE patient=%s''', (patient,))

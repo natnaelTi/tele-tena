@@ -118,13 +118,12 @@ def financial_reconciliation_queue():
     reviewer = frappe.session.user
     if reviewer == 'Guest' or 'Tele Tena Approver' not in frappe.get_roles(reviewer):
         frappe.throw('Authorized financial reviewer required', frappe.PermissionError)
-    return frappe.db.sql('''SELECT id,patient,legacy_available,legacy_reserved,
+    return frappe.db.sql('''SELECT id,legacy_available,legacy_reserved,
         wallet_available,wallet_reserved,subledger_available,subledger_reserved,
         event_count,unknown_event_count,boundary_event_count,status,reason,created
         FROM tt_financial_reconciliation ORDER BY created LIMIT 200''', as_dict=True)
 
 
-@frappe.whitelist(methods=['POST'])
 def accept_wallet_snapshot(patient, reason):
     """Explicitly authorize the current balanced opening snapshot for forward use.
 
@@ -160,6 +159,19 @@ def accept_wallet_snapshot(patient, reason):
         decided_at=UTC_TIMESTAMP(6),modified=UTC_TIMESTAMP(6) WHERE id=%s''',
         (reviewer, reason, item.id))
     return {'status': 'SnapshotAccepted', 'historical_difference_preserved': True}
+
+
+@frappe.whitelist(methods=['POST'])
+def accept_reconciliation_case(case_id, reason):
+    """Accept a snapshot via its opaque audit reference, without exposing patient identity."""
+    reviewer = frappe.session.user
+    if reviewer == 'Guest' or 'Tele Tena Approver' not in frappe.get_roles(reviewer):
+        frappe.throw('Authorized financial reviewer required', frappe.PermissionError)
+    rows = frappe.db.sql('''SELECT patient FROM tt_financial_reconciliation WHERE id=%s''',
+                         (case_id,), as_dict=True)
+    if not rows:
+        frappe.throw('Financial reconciliation case unavailable', frappe.PermissionError)
+    return accept_wallet_snapshot(rows[0].patient, reason)
 
 
 def totals(kind, owner, buckets):
