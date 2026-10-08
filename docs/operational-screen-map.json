@@ -156,7 +156,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (A02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Packaged Frappe /teletena/ browser journey on tele-tena-pr12-fresh.localhost verified service, declared care-language, format, and 14-day generated-slot filters, no horizontal overflow at 390/768/1440, and search/service/language/format carryover into the request composer without publishing. Screenshots and current build/source SHA are recorded in docs/discovery-filter-verification.md. Full discovery and booking screen acceptance remains pending; natural-language suggestions, relevance feedback, previous-clinician filter, proximity ranking, Amharic/Afaan Oromo human review, 320px/200% zoom and Frappe 16 screen check remain incomplete."
       }
     },
     {
