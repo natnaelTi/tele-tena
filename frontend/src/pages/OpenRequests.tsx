@@ -116,12 +116,56 @@ export function PatientRequestDetail(){
         {live&&<div className="actions">{(request.current_wave||1)<3&&<Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.findMoreOptions(request.id);await detail.refresh();})}>{w('Find more options')}</Button>}<Button variant="quiet" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.cancelRequest(request.id);await detail.refresh();},w('Request cancelled'))}>{w('Cancel request')}</Button></div>}
       </article>
       <section className="open-request-list"><h2>{w('Offers')}</h2>{request.offers.length?request.offers.map(offer=><article className="request-offer" key={offer.id}>
-        <div><strong>{offer.clinician_name}</strong><span>{offer.specialty} · {offer.consultation_format} · {offer.duration_minutes} {w('minutes')}</span><time>{new Date(offer.start).toLocaleString(undefined,{timeZone:offer.timezone})} · {offer.timezone}</time><Link to={'/patient/clinicians/'+offer.clinician_id} target="_blank" rel="noreferrer" className="text-link">{w('View clinician profile')}</Link></div>
+        <div><strong>{offer.clinician_name}</strong><span>{offer.specialty} · {offer.consultation_format} · {offer.duration_minutes} {w('minutes')}</span><time>{new Date(offer.start).toLocaleString(undefined,{timeZone:offer.timezone})} · {offer.timezone}</time><Link to={'/patient/requests/'+encodeURIComponent(request.id)+'/offers/'+encodeURIComponent(offer.id)} className="text-link">{w('Review offer details')}</Link><Link to={'/patient/clinicians/'+offer.clinician_id} target="_blank" rel="noreferrer" className="text-link">{w('View clinician profile')}</Link></div>
         <strong>ETB {money(offer.price_minor)}</strong><span>{offer.state==='Active'&&new Date(offer.valid_until).getTime()>Date.now()?w('Offer available until')+' '+new Date(offer.valid_until).toLocaleString():w(offer.state)}</span>
         {offer.state==='Active'&&live&&<div className="actions"><Button variant="secondary" onClick={()=>setSelectedOffer(offer)}>{w('Review and accept')}</Button><Button variant="quiet" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondOffer(request.id,offer.id,'decline');await detail.refresh();})}>{w('Decline')}</Button></div>}
       </article>):<EmptyState title={w('No offers yet')}>{live?w('We will show eligible clinician offers here.'):w('This request has no available offers.')}</EmptyState>}</section>
       {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
       {selectedOffer&&<div className="request-confirm-overlay" role="presentation"><section className="request-confirm" role="dialog" aria-modal="true" aria-labelledby="request-detail-confirm-title"><h2 id="request-detail-confirm-title">{w('Review this offer')}</h2><p><strong>{selectedOffer.clinician_name}</strong> · {selectedOffer.specialty}</p><p>{new Date(selectedOffer.start).toLocaleString(undefined,{timeZone:selectedOffer.timezone})} · {selectedOffer.duration_minutes} {w('minutes')} · {selectedOffer.consultation_format} · {selectedOffer.timezone}</p><p><strong>{w('Total price')}: ETB {money(selectedOffer.price_minor)}</strong></p><h3>{w('What you’ll share')}</h3><div className="disclosure-preview">{Object.values(request.disclosure_snapshot).map((value,index)=><p key={index}>{value}</p>)}</div><p className="supporting">{w('Accepting confirms this appointment and reserves the amount from your balance.')}</p><div className="dialog-actions"><Button loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondOffer(request.id,selectedOffer.id,'accept',undefined,request.disclosure_snapshot);setSelectedOffer(null);await detail.refresh();})}>{w('Accept offer')}</Button><Button variant="secondary" onClick={()=>setSelectedOffer(null)}>{w('Back')}</Button><Link to="/patient/payments" className="text-link">{w('Add funds')}</Link></div></section></div>}
+    </>}
+  </>;
+}
+
+export function PatientRequestOfferDetail(){
+  const {requestId='',offerId=''}=useParams();
+  const {w}=useLocale();
+  const detail=usePolling<PatientRequest>(()=>journeyApi.myRequestDetail(requestId));
+  const action=useAction();
+  const request=detail.data;
+  const offer=request?.offers.find(item=>item.id===offerId);
+  const live=!!request&&request.state==='Open'&&new Date(request.expires_at).getTime()>Date.now();
+  const available=!!offer&&offer.state==='Active'&&new Date(offer.valid_until).getTime()>Date.now()&&live;
+  const detailErrorCode=(detail.errorDetail as {code?:string}|null)?.code;
+  const detailErrorMessage=detailErrorCode==='request_unavailable'?w('Request unavailable.'):
+    detailErrorCode==='session_required'?w('Your sign-in session ended. Sign in again to view this request.'):
+    detailErrorCode==='permission_denied'?w('You do not have permission to view this request.'):
+    w('Could not load this request. Check your connection and try again.');
+  const accept=()=>void action.run(async()=>{
+    if(!request||!offer)throw new Error(w('This offer is no longer available.'));
+    await journeyApi.respondOffer(request.id,offer.id,'accept',undefined,request.disclosure_snapshot);
+    await detail.refresh();
+  });
+  return <>
+    <p><Link className="text-link" to={'/patient/requests/'+encodeURIComponent(requestId)}>← {w('Back to request')}</Link></p>
+    <PageTitle title={w('Review offer details')} description={w('Check the appointment, total price and sharing choices before you decide.')}/>
+    {detail.error?<InlineNotice tone="danger">{detailErrorMessage} {detailErrorCode!=='request_unavailable'&&<Button variant="quiet" onClick={()=>void detail.refresh()}>{w('Retry')}</Button>}</InlineNotice>:!request?<Skeleton/>:!offer?<InlineNotice tone="danger">{w('This offer is no longer available.')}</InlineNotice>:<>
+      <article className="request-card request-detail-card">
+        <header><strong>{offer.clinician_name}</strong><span>{w(offer.state)}</span></header>
+        <p>{offer.specialty}</p>
+        <dl className="offer-facts">
+          <div><dt>{w('Proposed time')}</dt><dd>{new Date(offer.start).toLocaleString(undefined,{timeZone:offer.timezone})}<br/>{offer.timezone}</dd></div>
+          <div><dt>{w('Session format')}</dt><dd>{offer.consultation_format} · {offer.duration_minutes} {w('minutes')}</dd></div>
+          <div><dt>{w('Total price')}</dt><dd>ETB {money(offer.price_minor)}</dd></div>
+          <div><dt>{w('Offer available until')}</dt><dd>{new Date(offer.valid_until).toLocaleString(undefined,{timeZone:offer.timezone})}<br/>{offer.timezone}</dd></div>
+        </dl>
+        <Link className="text-link" to={'/patient/clinicians/'+offer.clinician_id} target="_blank" rel="noreferrer">{w('View clinician profile')}</Link>
+        <section className="request-disclosure-history"><h2>{w('What you’ll share')}</h2><p className="supporting">{w('This is the disclosure snapshot you accepted when you published the request.')}</p><div className="disclosure-preview">{Object.values(request.disclosure_snapshot).map((value,index)=><p key={index}>{value}</p>)}</div></section>
+        {offer.state==='Accepted'&&request.appointment&&<Link className="button primary" to={'/patient/consultations/'+request.appointment}>{w('View appointment')}</Link>}
+        {available&&<><InlineNotice>{w('Accepting confirms this appointment and reserves the amount from your balance. We will check the offer and time again when you accept.')}</InlineNotice><div className="actions"><Button loading={action.busy} onClick={accept}>{w('Accept offer')}</Button><Link className="text-link" to="/patient/payments">{w('Add funds')}</Link></div></>}
+        {offer.state==='Active'&&!available&&<InlineNotice tone="info">{w('This offer is no longer available. Return to your request to see other options.')}</InlineNotice>}
+        {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
+      </article>
+      <Link className="text-link" to={'/patient/requests/'+encodeURIComponent(request.id)}>{w('View all offers for this request')}</Link>
     </>}
   </>;
 }

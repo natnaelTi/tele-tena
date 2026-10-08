@@ -83,6 +83,30 @@ let checkpoint = 'launch';
     await page.waitForURL('**/teletena/patient/requests/' + encodeURIComponent(request.id));
     await page.getByRole('heading', { name: 'Request details', exact: true }).waitFor();
 
+    if (Array.isArray(request.offers) && request.offers.length) {
+      checkpoint = 'open owner-scoped offer details';
+      const offer = request.offers[0];
+      await page.goto(base + '/patient/requests/' + encodeURIComponent(request.id) + '/offers/' + encodeURIComponent(offer.id));
+      await page.getByRole('heading', { name: 'Review offer details', exact: true }).waitFor();
+      await page.getByText(offer.clinician_name, { exact: true }).waitFor();
+      await page.getByText(offer.specialty, { exact: true }).waitFor();
+      for (const value of Object.values(request.disclosure_snapshot || {})) {
+        await page.getByText(value, { exact: true }).waitFor();
+      }
+      await page.reload();
+      await page.getByRole('heading', { name: 'Review offer details', exact: true }).waitFor();
+      for (const width of [320, 390, 768, 1440]) {
+        await page.setViewportSize({ width, height: 920 });
+        const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
+        if (overflow) throw new Error('Offer details overflow at ' + width + ' CSS px.');
+        if (width === 390 || width === 1440) {
+          await page.screenshot({ path: path.join(screenshotDir, 'offer-detail-' + width + '.png'), fullPage: true });
+        }
+      }
+      await page.getByRole('link', { name: /Back to request/ }).click();
+      await page.getByRole('heading', { name: 'Request details', exact: true }).waitFor();
+    }
+
     checkpoint = 'verify unknown request isolation';
     const privateText = request.request_text;
     await page.goto(base + '/patient/requests/00000000-0000-0000-0000-000000000000');
