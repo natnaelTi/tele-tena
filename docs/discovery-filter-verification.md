@@ -18,8 +18,8 @@ records; it does not seed, publish a request, or change their schedules.
 - Search text, selected service, language and format are carried in router state
   into the request composer. The browser check confirms the draft fields and
   stops before publishing.
-- The controls remain within the viewport at the tested widths. The tablet
-  layout uses two columns; mobile uses one column.
+- The controls remain within the viewport at 320, 390, 768, and 1440 CSS px.
+  The tablet layout uses two columns; mobile uses one column.
 
 ## Evidence
 
@@ -29,6 +29,7 @@ the server-generated availability query, inspects request-draft preservation,
 and saves rendered screenshots at:
 
 - [`screenshots/discovery-filters/filtered-390.png`](screenshots/discovery-filters/filtered-390.png)
+- [`screenshots/discovery-filters/filtered-320.png`](screenshots/discovery-filters/filtered-320.png)
 - [`screenshots/discovery-filters/filtered-768.png`](screenshots/discovery-filters/filtered-768.png)
 - [`screenshots/discovery-filters/filtered-1440.png`](screenshots/discovery-filters/filtered-1440.png)
 
@@ -53,5 +54,5 @@ Natural-language service suggestions, relevance feedback, previous-clinician
 filtering, and proximity ranking are not implemented. Locale keys exist for
 English, Amharic, and Afaan Oromo, but this browser run used English; the two
 Ethiopian-language translations remain provisional pending native review.
-320px, 200% browser zoom, Frappe 16 and live SMS/device validation are not part
-of this check.
+200% browser zoom, Frappe 16 and live SMS/device validation are not part of
+this check.

@@ -58,7 +58,7 @@ let page
     assert.equal(await page.getByText('Available times could not be checked. Clear this filter or try again.', { exact: false }).count(), 0)
     assert.ok(await results.count() > 0)
     fs.mkdirSync(output, { recursive: true })
-    for (const width of [390, 768, 1440]) {
+    for (const width of [320, 390, 768, 1440]) {
       await page.setViewportSize({ width, height: 960 })
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true)
       await page.screenshot({ path: `${output}/filtered-${width}.png`, fullPage: true })
