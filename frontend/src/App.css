@@ -1874,6 +1874,11 @@ button:active {
 .clinic-schedule-sharing .field { margin-top: 16px; }
 .clinic-shared-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 0; border-bottom: 1px solid var(--border-default); }
 .scope-evidence-panel { display:grid; gap:10px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-default); min-width:0; }
+.vetting-scored-rubric { display:grid; gap:12px; margin:16px 0; padding:14px; border:1px solid var(--border-default); border-radius:14px; background:var(--surface-subtle); }
+.vetting-scored-rubric > summary { cursor:pointer; font-weight:650; min-height:44px; display:flex; align-items:center; }
+.vetting-scored-rubric .inline-notice { margin:0; }
+.vetting-rubric-dimension { display:grid; grid-template-columns:minmax(160px,1fr) minmax(220px,2fr) minmax(200px,1.2fr); align-items:end; gap:12px; min-width:0; margin:0; padding:12px; border:1px solid var(--border-default); border-radius:12px; background:var(--surface-card); }
+.vetting-rubric-dimension legend { grid-column:1/-1; font-weight:600; padding:0 4px; }
 .scope-evidence-panel h3 { margin:0; font-size:16px; }
 .scope-evidence-panel .supporting { margin:0; }
 .scope-evidence-list { list-style:none; display:grid; gap:8px; margin:0; padding:0; }
@@ -1897,6 +1902,18 @@ button:active {
 .service-attribute-row { display:grid; gap:5px; padding:12px 0; border-bottom:1px solid var(--border-default); }
 @media(max-width:760px) { .service-catalog-workspace { grid-template-columns:minmax(0,1fr); } .service-catalog-list { position:static; max-height:280px; } .service-catalog-editor { padding:16px; } }
 @media (max-width:600px) { .scope-evidence-upload { grid-template-columns:1fr; } .scope-evidence-list li > button { width:100%; } }
+@media (max-width:760px) { .vetting-rubric-dimension { grid-template-columns:minmax(0,1fr); } .vetting-rubric-dimension legend { grid-column:1; } .vetting-scored-rubric { padding:12px; } }
 @media (max-width: 600px) {
   .clinic-shared-row > button { width: 100%; }
 }
+.rubric-version-definition { margin-top: 14px; padding: 12px 14px; border: 1px solid var(--border-default); border-radius: 12px; background: var(--surface-subtle); overflow-wrap: anywhere; }
+.rubric-version-definition > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; }
+.rubric-version-definition h3, .rubric-version-definition h4 { margin: 12px 0 6px; }
+.rubric-version-definition p { margin: 7px 0; }
+.rubric-version-definition ul { margin: 6px 0; padding-inline-start: 22px; }
+.rubric-version-definition code { overflow-wrap: anywhere; }
+.credential-verification-inputs, .credential-verification-history { display:grid; gap:10px; margin:16px 0; padding:14px; border:1px solid var(--border-default); border-radius:14px; background:var(--surface-subtle); min-width:0; }
+.credential-verification-inputs legend { font-weight:650; }
+.credential-verification-inputs .supporting { margin:0; }
+.credential-verification-history > summary { min-height:44px; display:flex; align-items:center; cursor:pointer; font-weight:600; }
+.credential-verification-history p { overflow-wrap:anywhere; }

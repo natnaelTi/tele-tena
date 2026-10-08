@@ -529,7 +529,7 @@ needed for clean financial cutover verification.
 | Approved area | Current status | Evidence / remaining work |
 |---|---|---|
 | Extracted design, React design system, all 142 screens | partial | Existing React flows remain authoritative and the visual tokens now begin moving toward the extracted Inter/blue–teal reference. Screen-level map covers 142 concepts. Most routes still need direct visual and connected interaction review; prototype-only states are not accepted. |
-| Clinician vetting and service catalog | partial | Native per-scope applications/decisions exist. Applicant-owned private PDF revisions and immutable assessment evidence references, credential expiry/reverification and reconsideration are implemented. Frappe 15 `tests/presentation.py` passes 33/33 on the current worktree, but this is not fresh-install or Frappe 16 evidence. The proposed rubric v1.0 needs medical-lead approval; independent credential/source verification, affiliation verification, renewal browser acceptance and approved clinical terminology review remain. |
+| Clinician vetting and service catalog | partial | Native per-scope applications/decisions, private evidence revisions, expiry/reverification, reconsideration, an immutable proposed rubric registry, digest-bound assessment snapshots, and credential-verification provenance are implemented. On Frappe 15.121.2, `tests/presentation.py` passes 45/45 and `tests/integration.py` 24/24. New credential verification requires source, check date, registry reference, and license evidence from the same scope; applicant and patient API views omit the snapshot. Historical assessments are preserved with provenance blank rather than fabricated. A synthetic applicant/reviewer browser flow rendered provenance controls at 390/1440px without recording a decision. The rubric remains a proposal pending Medical Lead approval; external registry checks, affiliation verification, fresh-install verification and clinical terminology approval remain. This is not Frappe 16 or real-world credential verification evidence. See `vetting-rubric-verification.md`. |
 | Open requests, private offers and progressive routing | partial | Persisted request/offer state, hard eligibility, presence leases, bounded waves, owned paginated history, atomic offer acceptance and progress metrics are implemented. Built-browser acceptance verified publication → eligible recipient → clinician inbox API → rendered request card with account email omitted; synthetic request cancelled afterward. Frappe presentation test now directly exercises three due waves with distinct eligible clinicians and retry deduplication. The test-only accelerated timing does not establish production cadence or asynchronous worker execution. Offer submission/acceptance through consultation completion, privacy/abuse audit and pilot performance remain pending. The under-three-minute target is not guaranteed. See `request-inbox-eligibility.md`, `request-inbox-routing-browser-verification.md` and `vetting-routing-verification.md`. |
 | Owner-level legacy financial reconciliation | implementation in progress | New v1.13 migration records legacy-event, wallet-snapshot, subledger and exact opening-boundary differences without changing existing records. Mismatched owners are held until an authorized reasoned snapshot decision. Fresh/upgrade/repeat tests on a disposable site remain pending. |
 | Extensions and dispute/refund policy | pending | No prefunded explicit extension workflow. Refunds/disputes after release or payout state remain gated for authorized operations; no negative balance or history edits are allowed. |
@@ -583,3 +583,26 @@ acceptance. Catalog activation,
 medical-lead terminology/source approval, runtime dynamic intake validation and
 native-language review remain outstanding. See `service-catalog-data-dictionary.md`, `service-catalog-editor-verification.md`,
 and screen I08 in `operational-screen-map.json`.
+
+### Versioned human-led rubric checkpoint (2026-10-08)
+
+On `feat/vetting-rubric-assessment-engine` (dependent on the progressive
+routing/acquisition stack), v1.28 adds an append-only proposed rubric registry
+with definition digests and a distinct `Tele Tena Medical Lead` role. Reviewers
+may propose immutable versions; only a medical lead may approve. Scope
+applications pin their version and assessment records snapshot the definition,
+digest, scores, rationale and application-scoped evidence revisions. Integrity
+failure denies use. The rubric remains proposed until an actual medical lead
+review; no score grants scope approval. A site-specific backup preceded the
+additive migration on `tele-tena-pr12-fresh.localhost`; first and repeat
+migrations passed. Frappe 15 presentation tests pass **44/44** and integration
+tests **24/24**. Frontend TypeScript/Vite production build passes; lint exits 0
+with existing warnings. The packaged `/teletena/admin/vetting` rubric manager
+was opened with the synthetic approver account; the full proposed definition
+and digest rendered at 390, 768 and 1440px, and direct access to
+`/teletena/admin/rubrics` was denied to that role. Captures are in
+`docs/screenshots/vetting-rubric/`. A clean
+fresh-site install has not been verified for v1.28. Clinical/credential authority, primary
+source verification, translation review and complete product scope remain
+external or pending. See `vetting-rubric-v1.md`, and screens I04/I09 in
+`operational-screen-map.json`.

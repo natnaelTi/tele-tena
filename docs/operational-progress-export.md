@@ -1,5 +1,56 @@
 # TeleTena operational progress export
 
+## Current local checkpoint — credential-verification provenance — 2026-10-08
+
+- Branch `feat/vetting-rubric-assessment-engine`, current source/build commit
+  `4841e280221f4fbb13d212f2bca60a04c757c828`, stacked on open draft PR #39.
+  PR #40 remains draft and unmerged.
+- New scope approvals marked credential-verified require an issuer/source,
+  check date, registry reference and license evidence attached to the same
+  scope. Reviewer/time/evidence revision and content hash are captured in a
+  digest-checked assessment snapshot. Applicant/patient API responses omit it;
+  existing assessments were not rewritten or backfilled.
+- Frappe 15.121.2 isolated site `tele-tena-pr12-fresh.localhost`:
+  `tests/presentation.py` 45/45 and `tests/integration.py` 24/24 passed;
+  v1.29 migration and repeat migration passed. A focused provenance-edge
+  regression also passed before the 45-case full suite; frontend lint exited 0
+  with existing warnings.
+- The preview remains `http://127.0.0.1:8017/teletena/`, built Frappe assets,
+  site `tele-tena-pr12-fresh.localhost`; its release manifest records source
+  `4841e280221f4fbb13d212f2bca60a04c757c828`. The synthetic application
+  journey submitted through the UI, reviewer evidence access succeeded, and
+  the four provenance controls were rendered at 390/1440px; no scope decision
+  was recorded. Screenshots are under `docs/screenshots/vetting-rubric/`.
+  Fresh v1.29 install remains pending because the requested temporary
+  database-admin setup was not completed; existing site preserved.
+- The proposed rubric still needs Medical Lead approval; native-language review,
+  Frappe 16, real registry verification, provider/device validation and the
+  broader A–I operational scope remain open.
+
+## Current local checkpoint — versioned vetting rubric — 2026-10-08
+
+- `feat/vetting-rubric-assessment-engine` is based on current open draft PR #39
+  (`feat/relationship-acquisition-attribution`, head `524c7f8`). No PR was
+  merged. Implementation commits are `205e08e` (assessment snapshot),
+  `4cb0c99` (registry and governance), and `49b8be1` (review the full rubric
+  definition before approval).
+- Frappe 15.121.2 isolated site `tele-tena-pr12-fresh.localhost` was backed up
+  before schema changes. v1.28 first and repeat migrations passed. Presentation
+  suite 44/44 and integration suite 24/24 pass.
+- Built `/teletena/` reviewer journey passed on the current worktree: complete
+  proposal definition/digest visible to the synthetic Approver; Medical Lead-
+  only governance route denied to that account. Screenshots are in
+  `docs/screenshots/vetting-rubric/`.
+  This site remains at `http://127.0.0.1:8017/teletena/`; it is the Frappe
+  packaged app, not Vite. `frontend/dist/release.json` identifies the asset
+  source. Gunicorn master 287561 serves this checkout/site. The scheduler is
+  active and no pending jobs are reported; a bench worker exists but is
+  long-lived and its execution of this new code was not required or claimed.
+- The `proposed-1.0` rubric is still unapproved. A clean fresh-site v1.28
+  install, Frappe 16, native-language approval, full 142-screen acceptance and
+  the rest of the A–I product scope remain pending/external. Selfmade was not
+  accessed or changed.
+
 ## Current local checkpoint — appointment acquisition source — 2026-10-08
 
 - `feat/relationship-acquisition-attribution` is stacked on draft PR #38 →

@@ -5,6 +5,7 @@ import {
   AuthLayout,
   PublicLayout,
   RequireSession,
+  MedicalLeadLayout,
   WorkspaceLayout,
 } from "./layouts/Layouts";
 import Homepage, { ClinicianInvitation } from "./pages/Homepage";
@@ -32,7 +33,7 @@ import { Applications, FinancialDisputes, Scopes, ServiceCatalog } from "./pages
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
 import Showcase from "./pages/Showcase";
 import { ClinicianRequestInbox, PatientOpenRequests, PatientRequestDetail, PatientRequestOfferDetail, PublicClinicianProfile } from "./pages/OpenRequests";
-import { ClinicianScopeApplications, VettingQueue } from "./pages/Vetting";
+import { ClinicianScopeApplications, VettingQueue, VettingRubricManagementPage } from "./pages/Vetting";
 import { ClinicianAffiliations, ClinicMembershipPortal, ClinicReview } from "./pages/Clinics";
 import FinancialActivityDetail from "./pages/FinancialActivity";
 import PWAUpdateNotice from "./components/PWAUpdateNotice";
@@ -68,6 +69,7 @@ export default function App() {
             </Route>
             </Route>
             <Route element={<RequireSession />}>
+              <Route path="/admin/rubrics" element={<MedicalLeadLayout />}><Route index element={<VettingRubricManagementPage />} /></Route>
               <Route path="/consultation/:id/room" element={<><div className="demo-bar" role="note">Demonstration environment — no real payments or clinical care.</div><ConsultationRoomPage /></>} />
               <Route path="/clinic" element={<WorkspaceLayout kind="clinic" />}>
                 <Route index element={<ClinicMembershipPortal workspace />} />

@@ -118,3 +118,9 @@ def install():
     legacy_refund_activity()
     from tele_tena.patches.v1_26_appointment_acquisition_source import execute as appointment_acquisition_source
     appointment_acquisition_source()
+    from tele_tena.patches.v1_27_vetting_rubric_assessment import execute as vetting_rubric_assessment
+    vetting_rubric_assessment()
+    from tele_tena.patches.v1_28_vetting_rubric_registry import execute as vetting_rubric_registry
+    vetting_rubric_registry()
+    from tele_tena.patches.v1_29_credential_verification_provenance import execute as credential_verification_provenance
+    credential_verification_provenance()

@@ -53,6 +53,8 @@ export function useSession() {
 export function destination(session: Session | null) {
   return !session
     ? "/sign-in"
+    : session.roles.includes("Tele Tena Medical Lead")
+      ? "/admin/rubrics"
     : session.roles.includes("Tele Tena Approver")
       ? "/admin"
       : session.clinic_workspace && !session.profile

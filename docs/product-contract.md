@@ -68,6 +68,13 @@ approved implementation scope, not evidence of completion. Every capability
 must use persisted Frappe models, server-enforced authorization, auditable state
 transitions, connected-browser evidence and its own integration/partner gates.
 
+No prior vetting rubric was agreed. `docs/vetting-rubric-v1.md` is a proposed
+human-review instrument, not a clinical standard. Version proposals are
+immutable and digest-checked; each scope application and assessment retains its
+own rubric snapshot. Only a separately assigned Medical Lead may approve a
+version. Until that review occurs, the rubric remains explicitly proposed and
+cannot be described as a verified credentialing standard.
+
 The design source is the extracted 142-screen inventory at
 `/home/frappe/teletena-design-reference`; it is a visual/interaction reference,
 not a system of record. Natural-language need descriptions may suggest a service

@@ -28,6 +28,12 @@
       "fieldtype": "Check"
     },
     {
+      "fieldname": "credential_verification_snapshot",
+      "label": "Credential verification source snapshot (immutable)",
+      "fieldtype": "Long Text",
+      "read_only": 1
+    },
+    {
       "fieldname": "qualification_relevant",
       "label": "Qualification relevant to requested scope",
       "fieldtype": "Check"
@@ -78,6 +84,12 @@
     {
       "fieldname": "scope_evidence_snapshot",
       "label": "Scope evidence reviewed (immutable IDs and revisions)",
+      "fieldtype": "Long Text",
+      "read_only": 1
+    },
+    {
+      "fieldname": "scored_criteria_snapshot",
+      "label": "Proposed rubric scores and evidence references (immutable)",
       "fieldtype": "Long Text",
       "read_only": 1
     },
