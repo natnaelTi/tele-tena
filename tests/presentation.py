@@ -583,6 +583,12 @@ class Presentation(unittest.TestCase):
                             for row in summary_clinics))
         summary_grant = clinic_access.grant_published_summary_access(appointment, clinic)
         self.assertEqual(summary_grant['status'], 'Active')
+        visible_grants = clinic_access.my_schedule_access(appointment)
+        summary_history = [row for row in visible_grants
+                           if row['purpose'] == 'Patient-shared summary']
+        self.assertTrue(summary_history)
+        self.assertEqual(summary_history[0]['status'], 'Active')
+        self.assertIsNone(summary_history[0]['expires_at'])
         self.assertTrue(clinic_access.grant_published_summary_access(
             appointment, clinic)['idempotent'])
         self.assertEqual(frappe.get_list('Tele Tena Clinic Encounter Access', fields=['name']), [])

@@ -196,7 +196,9 @@ def my_schedule_access(appointment=None):
         WHERE g.patient=%s''' + extra + ' ORDER BY g.granted_at DESC LIMIT 100', params)
     return [{'grant': r.name, 'appointment': r.appointment,
              'purpose': r.purpose,
-             'status': ('Expired' if r.status == 'Active' and r.expires_at <= now_datetime() else r.status),
+             'status': ('Expired' if r.status == 'Active'
+                        and r.purpose == 'Scheduling coordination'
+                        and r.expires_at and r.expires_at <= now_datetime() else r.status),
              'granted_at': r.granted_at,
              'expires_at': r.expires_at, 'revoked_at': r.revoked_at,
              'clinic_name': r.clinic_name, 'appointment_status': r.state,
