@@ -28,6 +28,8 @@ async function signIn(page, account) {
   await page.getByLabel('Password', { exact: true }).fill(account.password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await page.waitForURL(/\/teletena\/(?:patient(?:\/|$)|relationship-invitation(?:\/|$))/, { timeout: 15000 });
+  const language = page.getByLabel('Language / ቋንቋ / Afaan');
+  if (await language.count()) await language.selectOption('en');
 }
 
 async function checkedNoOverflow(page) {
@@ -59,7 +61,11 @@ async function checkedNoOverflow(page) {
     assert.equal(parsed.search, '', 'Invitation token must not be in a query string');
     assert.match(parsed.hash, /^#invite=[A-Za-z0-9_-]{40,64}$/);
     await checkedNoOverflow(pageA);
-    await pageA.screenshot({ path: path.join(output, 'patient-invitation-created-390.png'), fullPage: true });
+    await pageA.screenshot({
+      path: path.join(output, 'patient-invitation-created-390.png'),
+      fullPage: true,
+      mask: [field],
+    });
 
     stage = 'invitee sign-in and preview';
     stage = 'invitee opens link';
@@ -80,8 +86,10 @@ async function checkedNoOverflow(page) {
     await pageB.getByRole('button', { name: 'Accept invitation', exact: true }).click();
     await pageB.getByText('You are now linked. No appointments or records were shared.', { exact: true }).waitFor();
     await pageB.goto(app + '/patient/relationships', { waitUntil: 'networkidle' });
+    await pageB.locator('[data-relationship-state="Active"]').waitFor();
     await pageB.getByText(inviter.display_name, { exact: true }).waitFor();
     await pageA.reload({ waitUntil: 'networkidle' });
+    await pageA.locator('[data-relationship-state="Active"]').waitFor();
     await pageA.getByText(invitee.display_name, { exact: true }).waitFor();
     assert.equal((await pageA.locator('main').innerText()).includes(invitee.email), false);
     await checkedNoOverflow(pageB);
@@ -92,10 +100,11 @@ async function checkedNoOverflow(page) {
     stage = 'inviter revocation confirmation';
     await pageA.getByText('Relationship link revoked.', { exact: true }).waitFor();
     stage = 'inviter revoked state';
-    await pageA.getByText('Revoked', { exact: true }).waitFor();
+    await pageA.locator('[data-relationship-state="Revoked"]').waitFor();
     stage = 'invitee revoked state';
     await pageB.reload({ waitUntil: 'networkidle' });
-    await pageB.getByText('Revoked', { exact: true }).waitFor();
+    await pageB.locator('[data-relationship-state="Revoked"]').waitFor();
+    await pageB.screenshot({ path: path.join(output, 'patient-link-revoked-390.png'), fullPage: true });
     assert.deepEqual(errors, []);
     console.log(JSON.stringify({
       separateSessions: true,

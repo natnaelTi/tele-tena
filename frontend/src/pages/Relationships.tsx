@@ -153,7 +153,7 @@ export default function Relationships() {
         {!data&&!loadError&&<Skeleton/>}
         {data&&!data.relationships.length&&<EmptyState title={w('No relationship links yet.')}>{w('A link is created only after both adults accept.')}</EmptyState>}
         {data?.relationships.map((item:any)=><Card className="relationship-row" key={item.id}>
-          <UserRound size={20}/><div><strong>{item.other_name}</strong><p className="supporting">{w(item.state)} · {w('No records are shared')}</p></div>
+          <UserRound size={20}/><div><strong>{item.other_name}</strong><p className="supporting" data-relationship-state={item.state}>{w(item.state)} · {w('No records are shared')}</p></div>
           {item.state==='Active'&&<Button variant="danger" disabled={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.revokeRelationship(item.id);await refresh();},w('Relationship link revoked.'))}>{w('Revoke link')}</Button>}
         </Card>)}
         {data?.invitations.length>0&&<details className="relationship-invitations"><summary>{w('Invitation history')} ({data.invitations.length})</summary>{data.invitations.map((item:any)=><div className="relationship-row" key={item.id}><div><strong>{w(item.state)}</strong><p className="supporting">{w('Expires')} {new Date(item.expires_at).toLocaleString()}</p></div>{item.state==='Pending'&&<Button variant="quiet" onClick={()=>void action.run(async()=>{await journeyApi.revokeRelationshipInvitation(item.id);await refresh();})}>{w('Withdraw invitation')}</Button>}</div>)}</details>}
