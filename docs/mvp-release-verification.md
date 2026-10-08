@@ -1,5 +1,7 @@
 # MVP release verification — current bounded release
 
+Active design correction evidence: [mvp-design-fidelity-verification.md](mvp-design-fidelity-verification.md). The historical care-query batch below is not visual acceptance.
+
 This is the current release acceptance record. Older per-slice reports remain
 preserved and must not be read as a complete current-candidate pass.
 Scope: [mvp-release-scope.md](mvp-release-scope.md).

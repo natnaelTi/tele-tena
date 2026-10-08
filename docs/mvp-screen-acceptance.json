@@ -34,7 +34,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Header/footer and operational demo/language/signup additions; language/zoom comparisons pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -42,10 +42,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; visual acceptance pending",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-design-fidelity/A01-reference-390.png",
+          "docs/screenshots/mvp-design-fidelity/A01-reference-768.png",
+          "docs/screenshots/mvp-design-fidelity/A01-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-design-fidelity/A01-application-390.png",
+          "docs/screenshots/mvp-design-fidelity/A01-application-768.png",
+          "docs/screenshots/mvp-design-fidelity/A01-application-1440.png"
+        ],
+        "comparison_notes": [
+          "See docs/mvp-design-fidelity-verification.md; current differences remain release gates."
+        ],
         "viewports": [
           390,
           768,
@@ -197,7 +207,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Invited-only policy state; enabled backend signup and auth spacing remain pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -205,10 +215,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; visual acceptance pending",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-design-fidelity/A04-reference-390.png",
+          "docs/screenshots/mvp-design-fidelity/A04-reference-768.png",
+          "docs/screenshots/mvp-design-fidelity/A04-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-design-fidelity/A04-application-390.png",
+          "docs/screenshots/mvp-design-fidelity/A04-application-768.png",
+          "docs/screenshots/mvp-design-fidelity/A04-application-1440.png"
+        ],
+        "comparison_notes": [
+          "See docs/mvp-design-fidelity-verification.md; current differences remain release gates."
+        ],
         "viewports": [
           390,
           768,
@@ -306,7 +326,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Explicit password choice fixed; unavailable delivery is visible. Enabled email OTP and auth composition pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -314,10 +334,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; visual acceptance pending",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-design-fidelity/A06-reference-390.png",
+          "docs/screenshots/mvp-design-fidelity/A06-reference-768.png",
+          "docs/screenshots/mvp-design-fidelity/A06-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-design-fidelity/A06-application-390.png",
+          "docs/screenshots/mvp-design-fidelity/A06-application-768.png",
+          "docs/screenshots/mvp-design-fidelity/A06-application-1440.png"
+        ],
+        "comparison_notes": [
+          "See docs/mvp-design-fidelity-verification.md; current differences remain release gates."
+        ],
         "viewports": [
           390,
           768,
@@ -1338,7 +1368,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Sidebar shell/session card and preserved fixture content differ from reference; monthly generated-slot selection works, full composition pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -1346,10 +1376,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; visual acceptance pending",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-design-fidelity/C06-reference-390.png",
+          "docs/screenshots/mvp-design-fidelity/C06-reference-768.png",
+          "docs/screenshots/mvp-design-fidelity/C06-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-design-fidelity/C06-application-390.png",
+          "docs/screenshots/mvp-design-fidelity/C06-application-768.png",
+          "docs/screenshots/mvp-design-fidelity/C06-application-1440.png"
+        ],
+        "comparison_notes": [
+          "See docs/mvp-design-fidelity-verification.md; current differences remain release gates."
+        ],
         "viewports": [
           390,
           768,
