@@ -30,3 +30,16 @@ both are restored. Other tests cover exact-scope/policy checks, continuous
 availability between grid boundaries, privacy of the recipient payload, offer
 submission and atomic acceptance. Existing request-recipient audit rows remain
 untouched by inbox reads.
+
+The packaged `http://127.0.0.1:8017/teletena/` browser check on source/build
+`e5acea215be9948b538c138cc04f43e9918bcb88` authenticated as the retained Review
+Clinician and observed the actual readiness response: `ready=false`,
+`language_required`, and `immediate_policy_required`. The page now says that
+service-scope approval alone does not enable immediate requests, links directly
+to the missing care-language setting, and no longer links this reviewer-only
+policy gate to the clinician's scope-application page. The inbox correctly
+shows its empty state. Screenshot:
+`docs/screenshots/request-inbox/review-clinician-readiness-1440.png`. This is
+diagnosis and clear recovery guidance, not a successful request delivery test.
+Frontend lint and production build pass with existing warnings and the
+large-chunk advisory.
