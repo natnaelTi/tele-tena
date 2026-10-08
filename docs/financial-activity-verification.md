@@ -33,14 +33,15 @@ refund settlement, and payout provider operations remain out of scope.
   updating the legacy wallet projection, so later spending tests correctly
   failed closed. The fixture now moves both projections together and posts a
   matching release. The rerun passed **36/36** on the retained isolated site.
-- Production-built browser verification of the new transaction detail route
-  passed for the patient journey: password alternative on the invited-review
-  site → Payments → an existing persisted reservation → detail → reload →
-  generic unknown-record denial. The browser used the review account file
-  without printing credentials. Screenshots are in
-  `docs/screenshots/financial-activity/` at 390, 768 and 1440 CSS px. Visual
-  inspection found no horizontal overflow at those sizes; 320px and 200% zoom,
-  plus a clinician-owned detail browser journey, remain pending.
+- Production-built browser verification passed for both owners. Patient journey:
+  password alternative on the invited-review site → Payments → persisted
+  reservation → detail → reload → generic unknown-record denial. Clinician
+  journey: Earnings → persisted released earning → detail → reload. The browser
+  used the private review account file without printing credentials. Patient
+  screenshots at 320, 390, 768 and 1440 CSS px and clinician screenshots at 390
+  and 1440 CSS px are in `docs/screenshots/financial-activity/`; automated
+  overflow checks passed at those widths. Actual browser 200% zoom remains
+  pending.
 
 The packaged preview was built from the source commit recorded in its
 `release.json` manifest and served at `http://127.0.0.1:8017/teletena/` by the

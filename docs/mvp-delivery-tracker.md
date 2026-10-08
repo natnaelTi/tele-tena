@@ -12,11 +12,11 @@ The production frontend build, Python compile, and new Frappe owner/privacy
 assertions pass. The initial broad presentation run caught a wallet/subledger
 projection mismatch in the new test fixture; its reservation and release now
 update both projections together. `tests/presentation.py` then passed 36/36.
-Built-browser route acceptance
-passed for a patient reservation detail, refresh and generic unknown-record
-denial at the built preview. Screenshots at 390/768/1440 CSS px are in
-`docs/screenshots/financial-activity/`. The clinician-owned route, 320px and
-200% zoom checks remain pending, so inventory item G03 stays
+Built-browser route acceptance passed for a patient reservation detail and a
+clinician released earning, including refresh and generic unknown-record
+denial. Patient screenshots at 320/390/768/1440 and clinician screenshots at
+390/1440 CSS px are in `docs/screenshots/financial-activity/`. Actual 200% zoom
+remains pending, so inventory item G03 stays
 `Implemented, verification pending`. See
 `docs/financial-activity-verification.md`.
 

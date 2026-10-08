@@ -15,11 +15,11 @@
   clinician earnings/payout rows have corresponding owner-scoped routes. The
   presentation suite passed 36/36 after correcting the new test fixture to keep
   wallet and subledger projections aligned.
-- Built browser acceptance passed for a patient account: visible email/password
-  alternative → existing payment reservation → detail → reload → generic
-  unknown-ID denial. Responsive screenshots at 390, 768 and 1440 CSS px are in
-  `docs/screenshots/financial-activity/`. 320px, 200% zoom, clinician-route
-  browser coverage and native-language review remain pending.
+- Built browser acceptance passed for patient reservation and clinician
+  released-earning detail routes, including reload and generic unknown-ID
+  denial. Patient screenshots at 320, 390, 768 and 1440 CSS px and clinician
+  screenshots at 390 and 1440 are in `docs/screenshots/financial-activity/`.
+  Actual 200% zoom and native-language review remain pending.
 - This is one incremental presentation slice. It does not complete the larger
   operational design scope, enable real payments, verify provider delivery,
   prove physical-device calls, or establish clinical/legal readiness.
