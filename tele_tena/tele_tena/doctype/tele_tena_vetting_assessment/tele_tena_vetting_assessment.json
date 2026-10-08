@@ -82,6 +82,12 @@
       "read_only": 1
     },
     {
+      "fieldname": "scored_criteria_snapshot",
+      "label": "Proposed rubric scores and evidence references (immutable)",
+      "fieldtype": "Long Text",
+      "read_only": 1
+    },
+    {
       "fieldname": "rubric_version",
       "label": "Rubric version",
       "fieldtype": "Data",

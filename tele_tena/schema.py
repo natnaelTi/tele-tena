@@ -118,3 +118,5 @@ def install():
     legacy_refund_activity()
     from tele_tena.patches.v1_26_appointment_acquisition_source import execute as appointment_acquisition_source
     appointment_acquisition_source()
+    from tele_tena.patches.v1_27_vetting_rubric_assessment import execute as vetting_rubric_assessment
+    vetting_rubric_assessment()
