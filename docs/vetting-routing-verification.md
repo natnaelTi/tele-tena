@@ -406,3 +406,51 @@ check. Capture: `docs/screenshots/immediate-policy/reviewer-services-1440.png`.
 - Scheduler: enabled for this review site; `bench doctor` reports one worker
   online and `show-pending-jobs` reported no pending jobs at this check. This
   does not prove a future request or earnings job has executed.
+
+### Current request-readiness verification (PR #29, 2026-10-08)
+
+The current branch is `feat/request-inbox-eligibility-refresh` at
+`31260d6b2c55faab604787e25c6ce894ac21af7e`. The running loopback Gunicorn
+preview returned HTTP 200 at the same `/teletena/` URL above. The packaged
+asset manifest identifies frontend source `75ef08be1a726b5515584771668a3120b3dc2500`;
+the UI behavior fix is `3a532274c184792ce6a93365b826617acb2a5f5b`. Backend
+Python files in this slice are unchanged from `9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e`.
+This is the packaged Frappe app, not a Vite server.
+
+Checks actually run at this head:
+
+- `tests/presentation.py`: **33/33 passed** against the retained synthetic
+  Frappe 15 site. This covers calendar/DST, permissions, offer acceptance,
+  immediate continuous-time starts, financial invariants, and regressions.
+- `scripts/browser-request-availability-error.cjs`: passed against the
+  packaged app. It verifies clinician language, reviewer-policy and capacity
+  readiness explanations, their navigation target, translated responsive
+  layouts at 320/390/768/1440 CSS px, and distinguishes authenticated validation
+  errors from connection failures.
+- GitHub PR #29 checks: all **8 jobs passed** on head `31260d6`, including
+  frontend on Node 22.23.3 and 24.13.0 and Python syntax on 3.12 and 3.14.2.
+- `curl` to the preview returned HTTP 200. The production release manifest
+  matches source `75ef08b` and contains hashes for the built JS/CSS, fonts,
+  service worker, manifest and local brand assets.
+- The disposable browser-install harness did not pass at this head. Its target
+  `tele-tena-clinic-access-fresh.localhost` already exists, and the safe harness
+  refused to overwrite it. No data was deleted or reseeded. A fresh install at
+  this exact head and both invited/enabled registration browser journeys remain
+  unverified. The earlier failed `bench run-tests` command invoked ERPNext's
+  generic setup hook without a country and stopped before executing tests;
+  backup/current inspection showed no changed setup flags, user count or
+  company records. It is not counted as a passing test.
+
+The earlier actual two-session immediate-request journey remains valid evidence:
+request publication → eligible inbox → private offer → patient acceptance →
+one appointment and one ETB 600 reservation. The current UI also states the
+precise `no_immediate_capacity` reason with an availability link. It does not
+claim the clinician is ready outside configured hours. Exact earlier fixture
+and financial values are documented above; no accounts, services, balances or
+appointments were reset for this follow-up.
+
+The review site's scheduler flag is enabled and the bench-wide scheduler and
+worker are running. They share the bench queue; isolated routing-wave and
+earnings-release job execution remain unverified. Live SMS, hosted LiveKit
+revocation, physical-device testing, and human translation approval also remain
+external or pending checks. The full approved A–I scope is not complete.

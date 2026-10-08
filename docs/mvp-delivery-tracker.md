@@ -5,7 +5,7 @@
 The integrated preview is `http://127.0.0.1:8017/teletena/` on
 `tele-tena-pr12-fresh.localhost`, served from `/home/frappe/frappe/frappe-bench`
 as a production-built Frappe application. Current branch HEAD is
-`471b15524ba7b6ef61495da3cf0f932c5a714cc9` (documentation and evidence only).
+`31260d6b2c55faab604787e25c6ce894ac21af7e` (documentation and evidence only).
 The backend Python implementation loaded by the preview is unchanged from
 `9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e`. The readiness UI fix was authored
 in `3a532274c184792ce6a93365b826617acb2a5f5b`; the packaged frontend manifest
@@ -28,6 +28,16 @@ directly to the availability editor; an authenticated built-browser regression
 checks this state in English, Amharic, and Afaan Oromo at responsive widths.
 Detailed evidence and screenshots are in
 [`vetting-routing-verification.md`](vetting-routing-verification.md).
+
+At this head, the packaged clinician readiness browser regression passes and
+the Frappe 15 `tests/presentation.py` suite passes 33/33. GitHub checks on PR
+#29 pass for Node 22.23.3 and 24.13.0 plus Python syntax on 3.12 and 3.14.2.
+The disposable registration-browser check did not complete on this head: its
+named site already exists, and the harness correctly refuses to overwrite it.
+The retained site's repeat migration and data fingerprint check passed on the
+preceding schema-bearing checkout; a new unique-site installation with both
+registration configurations is still required. See the current verification
+section in `vetting-routing-verification.md`.
 
 Before schema work on the already-existing isolated
 `tele-tena-clinic-access-fresh.localhost`, a full database/config/file backup
