@@ -2,9 +2,15 @@
 
 ## Current verification delta — 2026-10-08
 
-- PR #41 remains a draft stacked on PR #40. Remote PR head was
-  `5c1865411f65a8e68647ee7b972b0fa6c6eb4352` when inspected; a focused fix
-  and populated-browser evidence are being added without merge/deployment.
+- PR #41 remains a draft stacked on PR #40. Updated head:
+  `3720df45dfff72202b5221ddc3dff06ab111767f`; GitHub checks are pending. No
+  merge/deployment occurred. The packaged asset manifest records this exact
+  source commit.
+- Current review preview is `http://127.0.0.1:8017/teletena/`, site
+  `tele-tena-pr12-fresh.localhost`, served by the isolated Frappe 15 bench at
+  `/home/frappe/frappe/frappe-bench`. Built app, not Vite; the built-browser
+  journey passed after the matching source bundle was served. The retained
+  `erp.localhost` site and Selfmade were not changed.
 - Found and fixed a patient grant-history exception when a valid published-
   summary consent had `expires_at = NULL`. Scheduling coordination still uses
   its expiry; summary sharing remains active until patient revocation or the
