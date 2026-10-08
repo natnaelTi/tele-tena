@@ -49,10 +49,12 @@
 .reference-public-footer p { margin:0; font-size:14px; }
 .reference-public-header .brand img { object-fit:contain; border-radius:8px; }
 .reference-public-header .button { min-height:40px; font-size:14px; padding:8px 14px; }
-@media(max-width:900px) { .reference-public-header nav > a:not(.button) { display:none; } }
+@media(max-width:900px) { .public-header.reference-public-header nav > a:not(.button) { display:none; } }
 @media(max-width:700px) { .public-header.reference-public-header { padding:16px 20px; gap:12px; justify-content:space-between; } .reference-public-header nav { gap:8px; } .reference-public-header .language-select { max-width:100px; } .reference-public-footer { padding:25px 20px; } }
 
 .landing-entries > section > p:not(.landing-note) { color:var(--ink); }
 .auth-registration { display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:24px; font-size:14px; }
 .auth-registration p { width:100%; margin:0; }
 .auth-registration a { min-height:44px; display:inline-flex; align-items:center; }
+
+@media(max-width:700px) { .public-header.reference-public-header nav { margin-left:auto; } }
