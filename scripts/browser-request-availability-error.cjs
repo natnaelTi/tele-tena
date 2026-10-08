@@ -20,6 +20,10 @@ let checkpoint = 'launch'
   try {
     const actualContext = await browser.newContext()
     const actualPage = await actualContext.newPage()
+    await actualPage.route('**/api/method/tele_tena.api.open_requests.request_presence**', route =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+        message: { ready: false, configured: false, reasons: ['language_required', 'immediate_policy_required', 'no_immediate_capacity'] },
+      }) }))
     checkpoint = 'real clinician sign-in page'
     await actualPage.goto(app + '/sign-in')
     checkpoint = 'select email sign-in'
@@ -61,9 +65,9 @@ let checkpoint = 'launch'
     const screenshots = '/tmp/tele-tena-presentation-review/request-readiness'
     fs.mkdirSync(screenshots, { recursive: true })
     const translations = {
-      en: ['Add a care language', 'Ask a reviewer to enable immediate requests for a service'],
-      am: ['የእንክብካቤ ቋንቋ ያክሉ', 'ገምጋሚውን ለአገልግሎት ፈጣን ጥያቄዎችን እንዲያነቃ ይጠይቁ'],
-      om: ['Afaan tajaajilaa dabali', 'Gamaaggamaa tajaajilaaf gaaffii ariifataa akka banu gaafadhu'],
+      en: ['Add a care language', 'Ask a reviewer to enable immediate requests for a service', 'Review availability'],
+      am: ['የእንክብካቤ ቋንቋ ያክሉ', 'ገምጋሚውን ለአገልግሎት ፈጣን ጥያቄዎችን እንዲያነቃ ይጠይቁ', 'የሚገኙበትን ጊዜ ይመልከቱ'],
+      om: ['Afaan tajaajilaa dabali', 'Gamaaggamaa tajaajilaaf gaaffii ariifataa akka banu gaafadhu', 'Yeroo argamuu ilaali'],
     }
     for (const [locale, labels] of Object.entries(translations)) {
       checkpoint = `readiness copy ${locale}`
@@ -91,6 +95,28 @@ let checkpoint = 'launch'
       }
     }
     await actualContext.close()
+
+    const capacityContext = await browser.newContext()
+    const capacityPage = await capacityContext.newPage()
+    checkpoint = 'capacity-specific readiness sign-in'
+    await capacityPage.route('**/api/method/tele_tena.api.open_requests.request_presence**', route =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+        message: { ready: false, configured: false, reasons: ['no_immediate_capacity'] },
+      }) }))
+    await capacityPage.goto(app + '/sign-in')
+    await capacityPage.getByRole('button', { name: 'Use email instead' }).click()
+    await capacityPage.getByLabel('Email', { exact: true }).fill(account)
+    await capacityPage.getByLabel('Password', { exact: true }).fill(credentials[account])
+    await capacityPage.getByRole('button', { name: 'Sign in', exact: true }).click()
+    await capacityPage.waitForURL(/\/teletena\/clinician(?:\/|$)/)
+    checkpoint = 'specific no-capacity guidance'
+    await capacityPage.getByText('No complete session fits the next 30 minutes', { exact: true }).waitFor()
+    assert.equal(await capacityPage.getByRole('button', { name: 'Go available', exact: true }).isDisabled(), true)
+    const reviewAvailability = capacityPage.getByRole('link', { name: 'Review availability', exact: true })
+    await reviewAvailability.waitFor()
+    await reviewAvailability.click()
+    await capacityPage.waitForURL('**/teletena/clinician/availability')
+    await capacityContext.close()
 
     const context = await browser.newContext()
     const page = await context.newPage()

@@ -201,6 +201,7 @@ const words: Record<string, [string, string]> = {
   "Publish availability": ["የሚገኙበትን ጊዜ ያትሙ", "Yeroo argamuu maxxansi"],
   "Ask a reviewer to enable immediate requests for a service": ["ገምጋሚውን ለአገልግሎት ፈጣን ጥያቄዎችን እንዲያነቃ ይጠይቁ", "Gamaaggamaa tajaajilaaf gaaffii ariifataa akka banu gaafadhu"],
   "No complete session fits the next 30 minutes": ["በሚቀጥሉት 30 ደቂቃዎች ውስጥ ሙሉ ቀጠሮ የሚስማማ ጊዜ የለም", "Daqiiqaa 30 itti aanan keessatti yeroo guutuun hin jiru"],
+  "Review availability": ["የሚገኙበትን ጊዜ ይመልከቱ", "Yeroo argamuu ilaali"],
   "Approved services could not be loaded.": ["የተፈቀዱ አገልግሎቶችን መጫን አልተቻለም።", "Tajaajiloota mirkanaa'an fe'uun hin danda'amne."],
   "Loading approved services…": ["የተፈቀዱ አገልግሎቶች በመጫን ላይ…", "Tajaajiloota mirkanaa'an fe'aa jira…"],
   "No approved offering is ready for this request. Check your service scope and published offering.": ["ለዚህ ጥያቄ የተዘጋጀ የተፈቀደ አገልግሎት የለም። የአገልግሎት ወሰንዎን እና የታተመውን አገልግሎት ያረጋግጡ።", "Dhiyeessi mirkanaa'e gaaffii kanaaf hin jiru. Daangaa tajaajilaa fi tajaajila maxxanfame ilaali."],

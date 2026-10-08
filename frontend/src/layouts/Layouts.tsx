@@ -90,11 +90,14 @@ function ClinicianRequestAvailability() {
     offering_required:{label:"Publish an offering",to:"/clinician/services"},
     scope_approval_required:{label:"Get approval for a service scope",to:"/clinician/vetting"},
     published_schedule_required:{label:"Publish availability",to:"/clinician/availability"},
-    no_immediate_capacity:{label:"No complete session fits the next 30 minutes",to:"/clinician/availability"},
+    no_immediate_capacity:{label:"Review availability",to:"/clinician/availability"},
   };
+  const pausedMessage = data?.reasons?.includes("no_immediate_capacity")
+    ? "No complete session fits the next 30 minutes"
+    : "Complete setup before receiving requests.";
   return <section className="request-presence-shell" aria-label={w("Request availability")}>
     <div><strong>{w(data?.ready ? "Available for requests" : "Requests paused")}</strong>
-      <span>{w(failureMessage || (data?.ready ? "Ready status expires if this session disconnects." : "Complete setup before receiving requests."))}</span>
+      <span>{w(failureMessage || (data?.ready ? "Ready status expires if this session disconnects." : pausedMessage))}</span>
       {data?.reasons?.includes("immediate_policy_required") && <span>{w("A reviewer must enable immediate requests for this service. Service-scope approval alone does not enable this. This does not guarantee a request or match.")}</span>}
       {!!data?.reasons?.length && <nav className="request-readiness-actions" aria-label={w("Setup needed")}>{data.reasons.filter((reason: string)=>reason!=="immediate_policy_required").map((reason: string) => {const item=guidance[reason];return item?<Link key={reason} to={item.to}>{w(item.label)}</Link>:<span key={reason}>{w("Complete setup before receiving requests.")}</span>;})}</nav>}
     </div>
