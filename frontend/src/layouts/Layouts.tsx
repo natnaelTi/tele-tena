@@ -93,7 +93,7 @@ function ClinicianRequestAvailability() {
     no_immediate_capacity:{label:"Review availability",to:"/clinician/availability"},
   };
   const pausedMessage = data?.reasons?.includes("no_immediate_capacity")
-    ? "No complete session fits the next 30 minutes"
+    ? `${w("No full session can start within")} ${data.immediate_window_minutes || 30} ${w("minutes. Your published hours can still be used for scheduled requests.")}`
     : "Complete setup before receiving requests.";
   return <section className="request-presence-shell" aria-label={w("Request availability")}>
     <div><strong>{w(data?.ready ? "Available for requests" : "Requests paused")}</strong>

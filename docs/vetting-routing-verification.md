@@ -1,5 +1,49 @@
 # Vetting, catalog, and routing verification
 
+## Current authentication fixture correction — 2026-10-08
+
+On branch `fix/immediate-readiness-window`, the Frappe 15 presentation suite
+passed **38/38** against `tele-tena-pr12-fresh.localhost`. The first wider
+`tests/integration.py` run exposed that its five SMS OTP/signup state-machine
+tests inherited the retained invited-review site's intentionally disabled
+phone switch. Those are enabled-registration tests, so the test fixture now
+patches the three site policy flags only in-process for those cases; SMS
+delivery and OTP keys remain mocked. The concurrent verification workers now
+receive the same explicit fixture in their own Frappe contexts. The site
+configuration was not changed.
+
+The rerun passed **24/24**, including existing-user/registration state, manual
+clinician approval, OTP replay/attempt limits, uncertain provider outcome,
+concurrent verification, booking/privacy authorization and LiveKit token
+revocation assertions. The invited-review policy remains tested independently
+by `scripts/check_review_site.py` and `scripts/browser-invited-review.cjs`;
+neither was rerun during this correction. No live SMS was sent. The current
+production-built preview remains
+`http://127.0.0.1:8017/teletena/` on
+`tele-tena-pr12-fresh.localhost`; frontend source SHA remains
+`5c1a976175f23029f8ee63efc3eaeee5a3383466` because this change is test-only.
+
+The first packaged-browser run exposed a stale test expectation: invited-review
+sign-in intentionally starts on the phone screen and requires choosing “Use
+email instead” before email/password fields render. The test had expected the
+email fields immediately. `scripts/browser-review-package.cjs` now follows the
+actual supported interaction; the built Frappe journey then passed guest
+deep-link redirect, password sign-in/sign-out, consultation detail refresh,
+390/768/1440 viewport checks, PWA scope/public-only cache checks and offline
+fallback. `scripts/browser-invited-review.cjs` passed separately, confirming
+phone OTP and both registrations remain disabled while reviewer password
+access is available. The controlled waiting-worker test in
+`scripts/browser-pwa-update.cjs` also passed against the packaged preview.
+These checks exercise the installed app, not Vite.
+
+Fresh installation with the redesigned enabled-registration browser journey
+is still pending at this exact branch head. The previous disposable site
+`tele-tena-clinic-access-fresh.localhost` is retained and the harness correctly
+refuses to overwrite it. The last setup attempt left no temporary credential
+file, and passwordless socket administration is unavailable. A new disposable
+site/database name is required for the next fresh-install run. The source
+change and other non-privileged checks can continue independently.
+
 ## Current packaged-preview reproduction — 2026-10-08
 
 This section supersedes the older preview/site references below for the current

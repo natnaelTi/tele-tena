@@ -12,6 +12,7 @@ import threading
 import unittest
 import uuid
 from datetime import datetime, timedelta, timezone
+from functools import wraps
 from unittest.mock import Mock, patch
 
 import requests
@@ -33,6 +34,26 @@ PASSWORD = secrets.token_urlsafe(24)
 BASE = os.environ.get('TELE_TENA_TEST_API_ORIGIN', os.environ.get('TELE_TENA_TEST_BASE', 'http://127.0.0.1:8017'))
 from urllib.parse import urlsplit
 assert urlsplit(BASE).hostname in ('127.0.0.1', 'localhost'), 'Integration tests require a loopback server'
+
+
+def enabled_contact_registration(test):
+    """Use an explicit enabled-policy fixture for phone signup state tests.
+
+    The retained review site is intentionally invited-only. These tests cover
+    the separate enabled configuration with a mocked SMS provider; patching
+    in-process config leaves the site's actual access policy unchanged.
+    Invited-mode denial is checked separately by the site-policy suite.
+    """
+    @wraps(test)
+    def run(self, *args, **kwargs):
+        flags = {
+            'tele_tena_phone_otp_enabled': True,
+            'tele_tena_patient_registration_enabled': True,
+            'tele_tena_clinician_registration_enabled': True,
+        }
+        with patch.dict(frappe.conf, flags):
+            return test(self, *args, **kwargs)
+    return run
 
 
 def connect():
@@ -751,6 +772,7 @@ class Integration(unittest.TestCase):
             with self.assertRaises(sms.SMSUncertain):
                 sms.send_otp('+251911234567', '012345')
 
+    @enabled_contact_registration
     def test_16_patient_phone_signup_is_hmac_single_use_and_privilege_bounded(self):
         import uuid
         phone = '+2519' + f'{secrets.randbelow(100_000_000):08d}'
@@ -797,6 +819,7 @@ class Integration(unittest.TestCase):
             self.assertEqual(len(sent), 1, 'cooldown must not trigger another SMS')
         frappe.db.commit()
 
+    @enabled_contact_registration
     def test_17_clinician_phone_signup_stays_unprivileged_until_manual_approval(self):
         import uuid
         phone = '+2517' + f'{secrets.randbelow(100_000_000):08d}'
@@ -835,6 +858,7 @@ class Integration(unittest.TestCase):
             self.assertNotIn('Tele Tena Applicant', frappe.get_roles(phone_user))
         frappe.db.commit()
 
+    @enabled_contact_registration
     def test_18_phone_auth_guest_csrf_and_wrong_code_attempts_are_persisted(self):
         phone = '+2519' + f'{secrets.randbelow(100_000_000):08d}'
         secret = 'test-key-' + secrets.token_hex(24)
@@ -867,6 +891,7 @@ class Integration(unittest.TestCase):
         self.assertNotEqual(rejected.status_code, 200)
         self.assertEqual(rejected.json()['tele_tena_error'], 'invalid_contact')
 
+    @enabled_contact_registration
     def test_19_uncertain_sms_is_never_retried_and_limits_are_enforced(self):
         import uuid
         from tele_tena import sms
@@ -914,6 +939,7 @@ class Integration(unittest.TestCase):
             send.assert_not_called()
         frappe.db.commit()
 
+    @enabled_contact_registration
     def test_20_concurrent_phone_attempts_and_success_are_atomic(self):
         import uuid
         phone = '+2519' + f'{secrets.randbelow(100_000_000):08d}'
@@ -933,7 +959,16 @@ class Integration(unittest.TestCase):
             connect()
             try:
                 frappe.set_user('Guest')
-                with patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret):
+                # Worker threads have their own Frappe config context; mirror
+                # the enabled fixture rather than inheriting the site's
+                # intentionally disabled invited-review setting.
+                flags = {
+                    'tele_tena_phone_otp_enabled': True,
+                    'tele_tena_patient_registration_enabled': True,
+                    'tele_tena_clinician_registration_enabled': True,
+                }
+                with patch.dict(frappe.conf, flags), \
+                     patch.object(phone_auth.sms, 'otp_hmac_key', return_value=secret):
                     contact_auth.verify_code('phone', phone, response['challenge_id'], code)
                     frappe.db.commit()
                     return 'ok'

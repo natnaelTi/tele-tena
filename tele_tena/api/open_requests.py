@@ -18,6 +18,15 @@ MAX_OFFERS = 10
 ROUTING_WAVES = ((0, 3), (30, 3), (75, 4))
 
 
+def immediate_window_minutes():
+    """One bounded policy window for readiness and immediate request matching."""
+    try:
+        configured = int(frappe.conf.get('tele_tena_immediate_window_minutes', 30))
+    except (TypeError, ValueError):
+        configured = 30
+    return max(5, min(60, configured))
+
+
 def now():
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
@@ -76,7 +85,7 @@ def _has_immediate_capacity(clinician, offerings):
     """Require a complete, conflict-free session in the current request window."""
     from tele_tena.api import scheduling
     earliest = now()
-    latest = earliest + timedelta(minutes=30)
+    latest = earliest + timedelta(minutes=immediate_window_minutes())
     for item in offerings:
         if not item.get('schedule_id') or not immediate_service_enabled(item):
             continue
@@ -304,8 +313,7 @@ def publish_request(service, request_text, urgency, language, consultation_forma
     current = now()
     if urgency == 'immediate':
         earliest = current
-        immediate_minutes = int(frappe.conf.get('tele_tena_immediate_window_minutes', 30))
-        latest = current + timedelta(minutes=max(5, min(60, immediate_minutes)))
+        latest = current + timedelta(minutes=immediate_window_minutes())
     else:
         earliest = timestamp(earliest_start)
         latest = timestamp(latest_start)
@@ -355,7 +363,8 @@ def publish_request(service, request_text, urgency, language, consultation_forma
     metric(req_id, 'Published', len(candidates))
     notified, _total = _deliver(req, candidates, wave=1)
     return {'id': req_id, 'state': 'Open', 'expires_at': expiry.isoformat() + 'Z',
-            'eligible_supply': len(candidates), 'notified': notified, 'wave': 1}
+            'eligible_supply': len(candidates), 'notified': notified, 'wave': 1,
+            'start_window_minutes': immediate_window_minutes() if urgency == 'immediate' else None}
 
 
 @journey.command
@@ -390,6 +399,9 @@ def my_requests():
 
 
 def _serialize_patient_request(req):
+    supply = rows('''SELECT eligible_supply FROM tt_request_metric
+        WHERE request_id=%s AND event='Published' ORDER BY occurred_at LIMIT 1''', (req.id,))
+    req.eligible_supply = int(supply[0].eligible_supply or 0) if supply else None
     offers = rows('''SELECT o.id,o.start,o.duration_minutes,o.consultation_format,o.price_minor,o.timezone,
         o.price_source,o.state,o.valid_until,p.display_name clinician_name,p.public_id clinician_id,
         s.service_label specialty
@@ -650,7 +662,11 @@ def request_presence():
     elif not _has_immediate_capacity(clinician, immediate_services):
         reasons.append('no_immediate_capacity')
     live = bool(row and row[0].ready and row[0].expires_at > now())
-    return {'ready': live, 'configured': not reasons, 'reasons': reasons,
+    # A previously valid lease is not enough after schedule, scope, or policy
+    # changes. Do not display Available while current hard eligibility fails.
+    effective_ready = live and not reasons
+    return {'ready': effective_ready, 'configured': not reasons, 'reasons': reasons,
+            'immediate_window_minutes': immediate_window_minutes(),
             'expires_at': row[0].expires_at.isoformat() + 'Z' if row else None}
 
 

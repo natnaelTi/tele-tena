@@ -2470,7 +2470,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D08) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "The synthetic patient returned from the request detail route to the owner-scoped persisted request list in the current packaged browser check; see docs/patient-request-detail-verification.md. Preview: http://127.0.0.1:8017/teletena/; asset source SHA recorded in the report."
+        "current_local": "The real production-built `/teletena/` browser journey on the isolated Frappe 15 site published an immediate audio request through the patient UI and Frappe API, observed zero eligible clinicians from persisted request state, showed the no-supply explanation and schedule-later/browse alternatives, preserved description/service/language/format/disclosure/budget in the later-time composer, then cancelled and re-read the persisted state. Screenshot: `docs/screenshots/open-request/zero-supply-390.png`; repeatable script: `scripts/browser-open-request-zero-supply.cjs`. A later-window offer/accept browser journey routed specifically to the retained Review Clinician remains pending; native translation review is pending."
       }
     },
     {
@@ -2537,7 +2537,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D09) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Owner-scoped request detail API, persisted disclosure snapshot, offer summary, reload and generic unavailable behavior passed the current packaged browser check and Frappe 15 owner-boundary regression; see docs/patient-request-detail-verification.md. Preview: http://127.0.0.1:8017/teletena/; asset source SHA recorded in the report."
+        "current_local": "The patient request detail remains owner-scoped and polling-backed. Request publication records eligible supply; immediate zero-supply requests show a no-broadening explanation and schedule-later/browse alternatives. The back-to-later path preserves request narrative, service, language, format, disclosure choices and budget. Backend presentation suite passed 38/38; packaged browser verification of these new alternatives remains pending."
       }
     },
     {
@@ -3588,7 +3588,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Frappe 15 presentation suite passed 33/33 on feat/request-inbox-eligibility-refresh. The immediate-request regression verifies routed disclosure is hidden on inbox reads after matching language or fresh presence expires and reappears after restoration; server eligibility continues to require current approval/scope, service policy, and continuous full-duration capacity. On the retained production-built /teletena/ preview, a separate authenticated Playwright session observed actual readiness ready=false with language_required and immediate_policy_required; UI clarifies that scope approval alone does not enable this reviewer-controlled policy and links to language setup. Empty inbox screenshot: docs/screenshots/request-inbox/review-clinician-readiness-1440.png. A successful eligible patient-to-clinician offer/accept browser journey remains pending."
+        "current_local": "A real two-context flow on the packaged isolated site enabled presence after the 08:00 Addis interval entered the 30-minute immediate window, then published a patient request. Persisted publication metric showed one eligible clinician; the Review Clinician had one recipient row and `NotificationEnqueued` plus `InboxFetched` route events. The request was cancelled and presence paused. A Playwright selector assertion failed because `.clinician-request[data-request-id]` is not rendered; no screenshot/visible-card assertion was captured. Re-run with a text-based selector for rendered acceptance. See `docs/request-inbox-routing-browser-verification.md`."
       }
     },
     {
