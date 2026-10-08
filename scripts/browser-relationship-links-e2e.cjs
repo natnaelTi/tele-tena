@@ -14,6 +14,7 @@ assert.ok(invitee.email && invitee.password && invitee.display_name);
 const app = (process.env.TELE_TENA_BROWSER_ORIGIN || 'http://127.0.0.1:8017') + '/teletena';
 const output = process.env.TELE_TENA_SCREENSHOT_DIR || 'docs/screenshots/adult-relationship-links';
 let stage = 'launch';
+let diagnosticPage = null;
 
 async function signIn(page, account) {
   if (!new URL(page.url()).pathname.endsWith('/sign-in')) await page.goto(app + '/sign-in');
@@ -40,6 +41,7 @@ async function checkedNoOverflow(page) {
   try {
     const pageA = await contextA.newPage();
     const pageB = await contextB.newPage();
+    diagnosticPage = pageB;
     const errors = [];
     pageA.on('pageerror', error => errors.push(error.name));
     pageB.on('pageerror', error => errors.push(error.name));
@@ -106,7 +108,15 @@ async function checkedNoOverflow(page) {
       screenshots: output,
     }));
   } catch (error) {
-    console.error(`FAIL: relationship browser journey at ${stage}; account data and response bodies withheld; ${error.name}`);
+    const safePage = diagnosticPage;
+    let details = {};
+    if (safePage) {
+      details.path = new URL(safePage.url()).pathname;
+      details.heading = (await safePage.locator('h1').first().innerText().catch(() => '')).slice(0, 100);
+      details.notices = (await safePage.locator('.notice.danger').allInnerTexts().catch(() => []))
+        .map(value => value.replace(/[\w.+-]+@[\w.-]+/g, '[contact]').slice(0, 180));
+    }
+    console.error(`FAIL: relationship browser journey at ${stage}; account data and response bodies withheld; ${error.name}; state=${JSON.stringify(details)}`);
     process.exitCode = 1;
   } finally {
     await contextA.close();
