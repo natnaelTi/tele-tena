@@ -16,10 +16,10 @@ attribute metadata is not a live patient intake form.
 - `TELE_TENA_TEST_SITE=tele-tena-pr12-fresh.localhost env/bin/python tests/presentation.py`: **37/37 passed**. Uses isolated synthetic fixtures; does not migrate `erp.localhost`.
 - `npm --prefix frontend run lint`: **passed with existing warnings**; no lint errors.
 - `npm --prefix frontend run build`: **passed**.
-- `scripts/build_review.py`: **passed**, generated and copied app-owned static assets with source SHA `e2d1617996919850b335cc93030a4f96b9e16005` at the time of this verification. This SHA is superseded by the final source commit noted below if later test/documentation changes are committed; rebuild before release.
+- `scripts/build_review.py`: the current run is performed after the final evidence commit; the generated `tele_tena/public/review/release.json` records the exact source SHA and asset hashes. That manifest is the authority for the preview build.
 - `scripts/browser-service-catalog.cjs` against the built Frappe route: **passed**. Reviewer signed in through the existing email/password path, created a synthetic inactive Draft, reloaded and reselected it, captured at 390/768/1440 CSS px with no horizontal overflow, and requested terminology review. The UI then locked edits; no clinical approval or activation was attempted.
 
-The first browser attempt selected an older similarly named fixture. The list now displays the stable service code as a secondary identifier, and the rerun passed. This was a test-selection defect, not a service-save defect.
+The first browser attempts selected an older similarly named fixture. The list now displays the stable service code as a secondary identifier, and the rerun passed. This was a test-selection defect, not a service-save defect.
 
 ## Screenshots
 
