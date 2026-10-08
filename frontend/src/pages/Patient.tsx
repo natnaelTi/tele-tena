@@ -285,10 +285,10 @@ export function BookingLink() {
   const resource = useResource(load);
   if (resource.error) return <InlineNotice tone="danger">This booking link is unavailable or no longer active. Find care to choose another clinician.</InlineNotice>;
   if (!resource.data) return <Skeleton />;
-  return <Booking offeringOverride={resource.data.offering} />;
+  return <Booking offeringOverride={resource.data.offering} bookingLinkToken={token} />;
 }
 
-export function Booking({ offeringOverride }: { offeringOverride?: string }) {
+export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverride?: string; bookingLinkToken?: string }) {
   const route = useParams();
   const offering = offeringOverride || route.offering;
   const { session } = useSession();
@@ -440,7 +440,11 @@ export function Booking({ offeringOverride }: { offeringOverride?: string }) {
                       ? submission.key
                       : crypto.randomUUID();
                   setSubmission({ key, fingerprint });
-                  await journeyApi.book({ ...payload, retry_key: key });
+                  await journeyApi.book({
+                    ...payload,
+                    ...(bookingLinkToken ? { booking_link_token: bookingLinkToken } : {}),
+                    retry_key: key,
+                  });
                   navigate("/patient/appointments");
                 }, "")
               }

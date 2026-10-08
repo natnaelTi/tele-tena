@@ -97,6 +97,12 @@ links. Acquisition belongs to patient-clinician relationship. Layered clinician/
 workspace and later patient convenience subscriptions. Basic record access/export is
 not a subscription hostage. No paid clinical ranking.
 
+Acquisition is recorded on the appointment event, not on the patient profile:
+direct bookings (`direct_booking`), clinician-shared booking links
+(`clinician_share`), and accepted private offers (`open_request`) have separate
+source values. Existing appointments remain `unknown`; the system does not
+infer historical attribution.
+
 ## External and policy gates
 Real-money provider authorization, payment integration activation, actual fees,
 policy windows/caps, dispute operations, production safety/escalation protocol,

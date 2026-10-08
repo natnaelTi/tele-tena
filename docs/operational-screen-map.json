@@ -1871,7 +1871,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C08) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Patch v1.26 adds appointment-scoped acquisition source. The built share-link route forwards its opaque token to journey.book; the backend revalidates it inside the booking transaction and stores clinician_share. Direct bookings store direct_booking; accepted private offers store open_request. Existing appointments default to unknown and profile schema is unchanged. Presentation suite 42/42, integration suite 24/24, production build, asset-scope scan, and packaged browser route assertion pass on the isolated review site; the browser assertion aborts before persistence, with persistence covered by backend tests. Fresh-site check remains pending; see docs/acquisition-attribution-verification.md."
       }
     },
     {

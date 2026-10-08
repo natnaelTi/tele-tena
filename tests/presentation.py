@@ -34,6 +34,7 @@ from tele_tena.api import financial_activity
 from tele_tena.patches import v1_23_multiple_offerings
 from tele_tena.patches import v1_24_legacy_completion_activity
 from tele_tena.patches import v1_25_legacy_refund_activity
+from tele_tena.patches import v1_26_appointment_acquisition_source
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -1128,6 +1129,8 @@ class Presentation(unittest.TestCase):
         match = open_requests.respond_offer(req_id, winning.id, 'accept', None, visible.disclosure_snapshot)
         self.assertEqual(match['state'], 'Matched')
         self.assertEqual(journey.one('SELECT state FROM tt_open_request WHERE id=%s', (req_id,)).state, 'Matched')
+        self.assertEqual(journey.one('SELECT acquisition_source FROM tt_appointment WHERE id=%s',
+                                     (match['appointment'],)).acquisition_source, 'open_request')
         self.assertEqual(journey.one('SELECT state FROM tt_request_offer WHERE id=%s', (losing.id,)).state, 'Superseded')
         duplicate = open_requests.respond_offer(req_id, winning.id, 'accept', None, visible.disclosure_snapshot)
         self.assertEqual(duplicate['appointment'], match['appointment'])
@@ -1554,7 +1557,7 @@ class Presentation(unittest.TestCase):
 
     def test_booking_link_is_opaque_owner_scoped_and_revocable(self):
         offering = fixtures.Integration.offers['c1']
-        self.make_schedule(offering=offering)
+        day, _, _ = self.make_schedule(day_offset(55), offering=offering)
         fixtures.login('c1')
         token = scheduling.booking_link(offering)['token']
         self.assertEqual(len(token), 64)
@@ -1570,6 +1573,31 @@ class Presentation(unittest.TestCase):
         self.assertEqual(preview['offering'], offering)
         self.assertNotIn('patient', preview)
         self.assertNotIn('email', preview)
+        self.fund_patient('p1', 100000)
+        sharing = {'name': False, 'history': False}
+        request_text = 'Synthetic clinician-share acquisition test.'
+        disclosure = journey.preview(request_text, sharing)['disclosure']
+        offering_row = journey.one('SELECT price,minutes FROM tt_offering WHERE id=%s', (offering,))
+        slot = self.slots(offering, day, who='p1')[0]
+        direct_payload = dict(offering=offering, start=slot['start'], request_text=request_text,
+            sharing=sharing, expected_price=offering_row.price, expected_minutes=offering_row.minutes,
+            expected_disclosure=disclosure, booked_timezone='Africa/Addis_Ababa')
+        with self.assertRaises(frappe.ValidationError):
+            journey.book(**direct_payload, retry_key='invalid-share-' + secrets.token_hex(5),
+                         booking_link_token='0' * 64)
+        share_retry = 'valid-share-' + secrets.token_hex(5)
+        linked = journey.book(**direct_payload, retry_key=share_retry, booking_link_token=token)
+        self.assertEqual(journey.one('SELECT acquisition_source FROM tt_appointment WHERE id=%s',
+                                     (linked['id'],)).acquisition_source, 'clinician_share')
+        self.assertEqual(journey.book(**direct_payload, retry_key=share_retry,
+                                      booking_link_token=token)['id'], linked['id'])
+        with self.assertRaises(frappe.ValidationError):
+            journey.book(**direct_payload, retry_key=share_retry, booking_link_token='0' * 64)
+        self.assertFalse(frappe.db.sql("SHOW COLUMNS FROM tt_profile LIKE 'acquisition_source'"))
+        next_slot = self.slots(offering, day, who='p1')[0]
+        direct = self.book_slot(offering, next_slot, 'direct-acquisition-' + secrets.token_hex(5))
+        self.assertEqual(journey.one('SELECT acquisition_source FROM tt_appointment WHERE id=%s',
+                                     (direct['id'],)).acquisition_source, 'direct_booking')
         fixtures.login('c2')
         with self.assertRaises(frappe.ValidationError):
             scheduling.booking_link(offering)
@@ -1582,6 +1610,21 @@ class Presentation(unittest.TestCase):
         fixtures.login('admin')
         review_service_scope(fixtures.USERS['c1'], fixtures.PREFIX, 'Approved')
         frappe.db.commit()
+
+    def test_appointment_acquisition_migration_is_repeatable_and_preserves_history(self):
+        before = journey.rows('SELECT id,state,patient,clinician,price FROM tt_appointment ORDER BY id')
+        v1_26_appointment_acquisition_source.execute()
+        after_first = journey.rows('''SELECT id,state,patient,clinician,price,acquisition_source
+            FROM tt_appointment ORDER BY id''')
+        v1_26_appointment_acquisition_source.execute()
+        after_second = journey.rows('''SELECT id,state,patient,clinician,price,acquisition_source
+            FROM tt_appointment ORDER BY id''')
+        self.assertEqual([(r.id, r.state, r.patient, r.clinician, r.price) for r in after_first],
+                         [(r.id, r.state, r.patient, r.clinician, r.price) for r in before])
+        self.assertEqual(after_first, after_second)
+        # Migrated history is explicitly unknown; no source is inferred.
+        self.assertTrue(all(r.acquisition_source in ('unknown', 'direct_booking', 'clinician_share', 'open_request')
+                            for r in after_first))
 
     def book_slot(self, offering, slot, key=None, share_name=False, who='p1'):
         fixtures.login(who)

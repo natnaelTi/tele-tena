@@ -631,7 +631,8 @@ def simulation_log(patient, kind, amount, reference):
 
 @command
 def book(offering, start, request_text, sharing, retry_key, expected_price, expected_minutes,
-         expected_disclosure, booked_timezone='UTC', custom_offer_id=None):
+         expected_disclosure, booked_timezone='UTC', custom_offer_id=None,
+         booking_link_token=None):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     p = profile('patient', True)
     selected = choices(sharing)
@@ -644,6 +645,10 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     key = text(retry_key, 80)
     payload_values = [offering, iso(start), request_text, selected, expected_price,
                       expected_minutes, expected_disclosure, booked_timezone]
+    # Keep the historic direct-booking digest stable. Link-origin retries bind
+    # the opaque token into their idempotency payload without storing it.
+    if booking_link_token:
+        payload_values.append({'booking_link_token': booking_link_token})
     if custom_offer_id:
         if getattr(frappe.local, 'tele_tena_accepting_offer', None) != custom_offer_id:
             frappe.throw('Offer acceptance must use its authorized request workflow', frappe.PermissionError)
@@ -675,6 +680,17 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     o = one('''SELECT o.*,COALESCE(NULLIF(o.title,''),s.service_label) AS label
         FROM tt_offering o JOIN `tabTele Tena Service` s ON s.name=o.service
         WHERE o.id=%s AND o.active=1 AND s.active=1 FOR UPDATE''', (offering,))
+    if booking_link_token:
+        if custom_offer_id:
+            fail('Choose either a clinician booking link or a private request offer.',
+                 'booking_source_conflict')
+        from tele_tena.api.scheduling import validate_booking_link_token
+        validate_booking_link_token(booking_link_token, o.id)
+        acquisition_source = 'clinician_share'
+    elif custom_offer_id:
+        acquisition_source = 'open_request'
+    else:
+        acquisition_source = 'direct_booking'
     booking_price = int(o.price)
     immediate_request = False
     if custom_offer_id:
@@ -740,11 +756,12 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
                             'dispute_window_minutes': dispute_minutes,
                             'external_settlement': False}}
     created = datetime.now(timezone.utc).replace(tzinfo=None)
-    frappe.db.sql('''INSERT INTO tt_appointment (id,patient,clinician,offering,start,end,state,price,minutes,
+    frappe.db.sql('''INSERT INTO tt_appointment (id,patient,clinician,offering,start,end,state,price,acquisition_source,minutes,
         service_label,disclosure,choices,retry_key,payload_hash,timezone,schedule_id,confirmation_mode,
         expires_at,confirmed_at,consultation_format,buffer_before,buffer_after,policy_snapshot,created)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
-        (appointment, p.user, o.clinician, offering, start, end, state, booking_price, o.minutes, o.label,
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+        (appointment, p.user, o.clinician, offering, start, end, state, booking_price,
+         acquisition_source, o.minutes, o.label,
          json.dumps(shared), json.dumps(selected), key, digest, schedule_timezone,
          schedule.id if schedule else None, mode, expires, confirmed,
          schedule.consultation_format if schedule else 'video', before, after, json.dumps(policy), created))

@@ -116,3 +116,5 @@ def install():
     legacy_completion_activity()
     from tele_tena.patches.v1_25_legacy_refund_activity import execute as legacy_refund_activity
     legacy_refund_activity()
+    from tele_tena.patches.v1_26_appointment_acquisition_source import execute as appointment_acquisition_source
+    appointment_acquisition_source()
