@@ -5,7 +5,8 @@
 - Draft PR #32, branch `feat/financial-transaction-details`, depends on PR #31
   and targets its feature branch to preserve ancestry. It remains unmerged and
   no hosted installation was changed.
-- Source commit: `a5998a56c0a43d906ec027524199e2c7033bb9b2`.
+- The exact source commit is the value in the served `release.json` manifest;
+  this report is updated before each final packaging pass.
 - Preview: `http://127.0.0.1:8017/teletena/`, site
   `tele-tena-pr12-fresh.localhost`, Frappe app production build (no Vite).
   The packaged release manifest matches the source commit. Gunicorn master

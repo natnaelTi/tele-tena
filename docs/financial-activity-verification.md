@@ -42,9 +42,9 @@ refund settlement, and payout provider operations remain out of scope.
   inspection found no horizontal overflow at those sizes; 320px and 200% zoom,
   plus a clinician-owned detail browser journey, remain pending.
 
-The packaged preview was built from source commit
-`464dde31d94205ff2ccbe9fe6dec4e53e8e2bc3e` and served at
-`http://127.0.0.1:8017/teletena/` by the isolated review site. The user selected
+The packaged preview was built from the source commit recorded in its
+`release.json` manifest and served at `http://127.0.0.1:8017/teletena/` by the
+isolated review site. The user selected
 the visible “Use email instead” path because this site intentionally has no
 SMS/email OTP delivery configured; this does not alter the authentication
 policy or imply OTP delivery works.
