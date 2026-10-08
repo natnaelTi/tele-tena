@@ -244,3 +244,18 @@ no acquisition field is added to patient profiles. The value is written only
 when creating the private appointment row and is not editable through a generic
 DocType API. This records local acquisition context; it does not prove a
 commercial referral, establish a payable commission, or authorize ranking.
+
+## Patient-shared clinic calendar projection
+
+The read-only `/clinic/calendar` view reuses patient-created
+`Scheduling coordination` grants and the accepted appointment disclosure
+snapshot. Each weekly query requires an active verified-clinic owner, Clinic
+Manager, or Scheduling membership, a live clinic and clinician affiliation, an
+active unexpired grant, and a future Booked appointment. The request supplies a
+Monday local date and IANA display timezone; the backend converts both local
+midnights to UTC before querying, so daylight-saving transitions do not shift
+the seven-day range. The response omits appointment/grant IDs, account identity,
+contact information, health history, request narrative, notes, and price. No
+schema migration is needed. This projection is not a clinic-owned calendar,
+resource scheduler, or booking authority; Care Coordination and Billing do not
+receive the schedule query.
