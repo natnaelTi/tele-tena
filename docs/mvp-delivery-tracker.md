@@ -9,9 +9,10 @@ from the authenticated account, returns no counterparty/account identifiers,
 and uses a generic denial for foreign or unknown references. Patient legacy
 simulation rows remain explicitly distinct from balanced subledger journals.
 The production frontend build, Python compile, and new Frappe owner/privacy
-assertions pass. The broad presentation run is not clean: reconciliation tests
-leave a synthetic wallet mismatch that causes later funding assertions to fail;
-no retained user data was reconciled or removed. Built-browser route acceptance
+assertions pass. The initial broad presentation run caught a wallet/subledger
+projection mismatch introduced by the new test fixture; its reservation and
+release now update both projections together. The full suite is being rerun.
+Built-browser route acceptance
 passed for a patient reservation detail, refresh and generic unknown-record
 denial at the built preview. Screenshots at 390/768/1440 CSS px are in
 `docs/screenshots/financial-activity/`. The clinician-owned route, 320px and

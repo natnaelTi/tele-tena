@@ -191,6 +191,10 @@ class Presentation(unittest.TestCase):
             (accounting.account_id('patient', patient, 'available'), 125, 0),
             (accounting.account_id('patient', patient, 'reserved'), 0, 125),
         ], {'synthetic': True})
+        # Keep the legacy wallet projection aligned with the test posting; the
+        # public API correctly refuses future spending on a mismatched wallet.
+        frappe.db.sql('UPDATE tt_wallet SET available=available-125,reserved=reserved+125 WHERE patient=%s',
+                      (patient,))
         journal_id = journey.one('SELECT id FROM tt_journal WHERE event_ref=%s', (event_ref,)).id
         detail = financial_activity.transaction_detail('journal-' + journal_id)
         self.assertEqual(int(detail['amount_minor']), 125)
@@ -206,6 +210,13 @@ class Presentation(unittest.TestCase):
             financial_activity.transaction_detail('log-' + legacy.id)
         with self.assertRaises(frappe.PermissionError):
             financial_activity.transaction_detail('journal-' + journal_id)
+        release_ref = event_ref + '-release'
+        accounting.post(release_ref, 'ReservationRelease', release_ref, [
+            (accounting.account_id('patient', patient, 'available'), 0, 125),
+            (accounting.account_id('patient', patient, 'reserved'), 125, 0),
+        ], {'synthetic': True})
+        frappe.db.sql('UPDATE tt_wallet SET available=available+125,reserved=reserved-125 WHERE patient=%s',
+                      (patient,))
 
     def test_clinician_payout_detail_is_private_and_never_claims_transfer(self):
         from tele_tena import accounting

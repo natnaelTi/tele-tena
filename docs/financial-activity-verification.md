@@ -28,13 +28,12 @@ refund settlement, and payout provider operations remain out of scope.
 - Bench Python `compileall` for `tele_tena` and `tests/presentation.py`: passed.
 - Focused Frappe assertions for patient log/journal owner privacy and clinician
   payout ownership passed during the presentation run.
-- The complete `tests/presentation.py` run on
-  `tele-tena-pr12-fresh.localhost` had 32 passing tests, 3 errors, and 1
-  failure. The failures were financial reconciliation holds affecting the
-  synthetic `p1` fixture after `test_07_legacy_wallet_mismatch_is_held_until_audited_decision`;
-  this indicates test-state leakage/order interaction and is not evidence that
-  the detail endpoint failed. It must be isolated before claiming a clean full
-  suite.
+- The first complete `tests/presentation.py` run had 32 passing tests, 3
+  errors, and 1 failure. Root cause: the new transaction-detail test posted a
+  reservation to the subledger without updating the legacy wallet projection,
+  so later spending tests correctly failed closed. The regression fixture now
+  moves both projections together and posts a matching release. The complete
+  suite is being rerun before reporting final status.
 - Production-built browser verification of the new transaction detail route
   passed for the patient journey: password alternative on the invited-review
   site → Payments → an existing persisted reservation → detail → reload →
