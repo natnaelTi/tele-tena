@@ -1108,6 +1108,21 @@ class Presentation(unittest.TestCase):
         self.assertNotIn(fixtures.USERS['p1'], json.dumps(inbox_item))
         self.assertNotIn('_routing_patient', inbox_item)
         self.assertIsNotNone(inbox_item.suggested_start)
+        # Enqueued delivery is not a durable privacy/eligibility grant. A
+        # clinician who loses the matching language or whose ready lease goes
+        # stale must no longer receive the request disclosure from inbox reads.
+        profile_row = journey.one('SELECT languages FROM tt_profile WHERE user=%s',
+                                  (fixtures.USERS['c1'],))
+        frappe.db.sql("UPDATE tt_profile SET languages='[]' WHERE user=%s", (fixtures.USERS['c1'],))
+        self.assertFalse(any(item.id == immediate['id'] for item in open_requests.clinician_requests()))
+        frappe.db.sql('UPDATE tt_profile SET languages=%s WHERE user=%s',
+                      (profile_row.languages, fixtures.USERS['c1']))
+        frappe.db.sql("UPDATE tt_clinician_request_presence SET expires_at='2000-01-01 00:00:00' WHERE clinician=%s",
+                      (fixtures.USERS['c1'],))
+        self.assertFalse(any(item.id == immediate['id'] for item in open_requests.clinician_requests()))
+        frappe.db.sql('UPDATE tt_clinician_request_presence SET expires_at=%s WHERE clinician=%s',
+                      (current + timedelta(seconds=90), fixtures.USERS['c1']))
+        self.assertTrue(any(item.id == immediate['id'] for item in open_requests.clinician_requests()))
         open_requests.acknowledge_inbox_fetch([immediate['id']])
         self.assertTrue(journey.rows("SELECT id FROM tt_request_route_log WHERE request_id=%s AND clinician=%s AND event='InboxFetched'",
                                     (immediate['id'], fixtures.USERS['c1'])))
