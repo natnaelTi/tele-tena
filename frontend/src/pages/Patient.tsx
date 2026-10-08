@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowRight, Search } from "lucide-react";
+import { pendingCareQuery, rememberCareQuery } from "../care-intent";
 import { api } from "../api";
 import { journeyApi } from "../journey-api";
 import type { Disclosure, Offer } from "../journey-api";
@@ -50,7 +51,8 @@ export function PatientHome() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            navigate("/patient/discovery?q=" + encodeURIComponent(query));
+            rememberCareQuery(query);
+            navigate("/patient/discovery");
           }}
         >
           <TextField
@@ -130,6 +132,7 @@ export function PatientHome() {
 }
 export function Discovery() {
   const routeLocation=useLocation();
+  const navigate = useNavigate();
   const { w } = useLocale();
   const offers = useResource(journeyApi.discover);
   const services = useResource(journeyApi.services);
@@ -140,8 +143,17 @@ export function Discovery() {
   const [availableOfferIds, setAvailableOfferIds] = useState<Set<string> | null>(null);
   const [availabilityError, setAvailabilityError] = useState(false);
   const [query, setQuery] = useState(
-    (routeLocation.state as {careQuery?:string}|null)?.careQuery || new URLSearchParams(location.search).get("q") || "",
+    pendingCareQuery(),
   );
+  useEffect(() => {
+    // Retire legacy care-query URLs without retaining their text in history.
+    if (new URLSearchParams(routeLocation.search).has("q")) {
+      navigate(routeLocation.pathname, { replace: true });
+    }
+  }, [routeLocation.pathname, routeLocation.search, navigate]);
+  useEffect(() => {
+    rememberCareQuery(query);
+  }, [query]);
   useEffect(() => {
     if (availabilityFilter !== "next14" || !offers.data) return;
     let active = true;

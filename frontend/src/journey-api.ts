@@ -1,4 +1,5 @@
 import { api } from './api'
+import { clearCareQuery } from './care-intent'
 
 type Sharing = { name: boolean; history: boolean }
 export type Profile = { kind: 'patient' | 'clinician'; display_name: string; history: string; share_name: boolean; share_history: boolean; languages?: string }
@@ -59,7 +60,7 @@ export const journeyApi = {
   uploadResume: (filename:string,content_base64:string) => api('tele_tena.api.presentation.upload_resume', {filename,content_base64}, true),
   removeResume: () => api('tele_tena.api.presentation.remove_resume', {}, true),
   windows: (offering: string) => api<{ windows: Window[]; busy: Window[] }>('windows', { offering }),
-  logout: () => api('frappe.handler.logout', {}, true),
+  logout: () => { clearCareQuery(); return api('frappe.handler.logout', {}, true) },
   saveProfile: (data: Record<string, unknown>) => api('save_profile', data, true),
   saveService: (service: string, label: string) => api('save_service', { service, label }, true),
   reviewApplication: (clinician: string, decision: 'Approved' | 'Rejected') =>

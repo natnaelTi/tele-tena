@@ -8,6 +8,7 @@ import {
   Sprout,
 } from "lucide-react";
 
+import { rememberCareQuery } from "../care-intent";
 import { useLocale } from "../hooks/useLocale";
 export default function Homepage() {
   const { w } = useLocale();
@@ -20,7 +21,7 @@ export default function Homepage() {
         <header><p className="eyebrow">MENTAL HEALTH & RELATIONSHIP CARE · ETHIOPIA</p><h1>Find support.<br/>Make time for care.</h1><p className="hero-intro">Private voice and video consultations with approved mental health and counseling professionals.</p></header>
         <div className="care-entry-columns">
           <section className="patient-care-entry"><p className="eyebrow">FOR PATIENTS</p><h2>Talk to someone who fits your needs.</h2><p>Choose your clinician, see the fee, and decide what you share. Browse directly or ask eligible clinicians for a private offer.</p>
-            <form onSubmit={e=>{e.preventDefault();navigate('/patient/discovery',{state:{careQuery:query}});}}><label htmlFor="landing-care-query">What would you like support with?</label><input id="landing-care-query" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Stress, relationships, feeling low…" required/><button className="button primary" type="submit">{w('Find care')}</button></form>
+            <form onSubmit={e=>{e.preventDefault();rememberCareQuery(query);navigate('/patient/discovery');}}><label htmlFor="landing-care-query">What would you like support with?</label><input id="landing-care-query" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Stress, relationships, feeling low…" required/><button className="button primary" type="submit">{w('Find care')}</button></form>
             <div className="care-entry-chips">{['Work stress','Relationships','Anxiety'].map(text=><button type="button" key={text} onClick={()=>setQuery(text)}>{text}</button>)}</div>
             <Link className="text-link" to="/patient/requests">Post a private request</Link><p className="supporting">Free to browse · Pay the agreed session fee · Adults 18+</p>
           </section>

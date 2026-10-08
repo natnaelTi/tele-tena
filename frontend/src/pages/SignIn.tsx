@@ -9,6 +9,7 @@ import {
   PhoneField,
   TextField,
 } from "../components/ui";
+import { pendingCareQuery } from "../care-intent";
 import { destination, useSession } from "../hooks/useSession";
 import { useLocale } from "../hooks/useLocale";
 type SignInOptions = { phone_otp: boolean; email_otp: boolean; patient_registration: boolean; clinician_registration: boolean };
@@ -109,7 +110,8 @@ export default function SignIn() {
     navigate(
       (safeBookingReturn || safeRelationshipReturn || (next === "/patient/discovery" && current?.profile?.kind === "patient")) ? next : !current?.profile && params.get("intent") === "clinician"
         ? "/onboarding?intent=clinician"
-        : destination(current),
+        : current?.profile?.kind === "patient" && pendingCareQuery()
+          ? "/patient/discovery" : destination(current),
       { replace: true, state: routeLocation.state },
     );
   }
