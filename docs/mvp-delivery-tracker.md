@@ -598,9 +598,10 @@ additive migration on `tele-tena-pr12-fresh.localhost`; first and repeat
 migrations passed. Frappe 15 presentation tests pass **44/44** and integration
 tests **24/24**. Frontend TypeScript/Vite production build passes; lint exits 0
 with existing warnings. The packaged `/teletena/admin/vetting` rubric manager
-was opened with the synthetic approver account; the rubric proposal rendered at
-390, 768 and 1440px and direct access to `/teletena/admin/rubrics` was denied
-to that role. Captures are in `docs/screenshots/vetting-rubric/`. A clean
+was opened with the synthetic approver account; the full proposed definition
+and digest rendered at 390, 768 and 1440px, and direct access to
+`/teletena/admin/rubrics` was denied to that role. Captures are in
+`docs/screenshots/vetting-rubric/`. A clean
 fresh-site install has not been verified for v1.28. Clinical/credential authority, primary
 source verification, translation review and complete product scope remain
 external or pending. See `vetting-rubric-v1.md`, and screens I04/I09 in

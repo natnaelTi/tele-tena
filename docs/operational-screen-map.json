@@ -5849,8 +5849,8 @@
         "independent credential source verification"
       ],
       "verification_evidence": {
-        "implementation": "Persistent v1.28 registry and role; exact rubric approval authority, immutable proposals and integrity checks implemented on feat/vetting-rubric-assessment-engine.",
-        "current_local": "Frappe 15 isolated site v1.28 first/repeat migrations passed; presentation 44/44 and integration 24/24. Production-built reviewer manager rendered at 390/768/1440px. Approver may inspect a proposal; direct Medical Lead governance route correctly denies that role. Screenshots: docs/screenshots/vetting-rubric/. Clean fresh-site v1.28 install pending."
+        "implementation": "Immutable v1.28 registry and role; reviewer APIs expose digest-verified full definitions; Medical Lead-only approval; version pinned to applications and copied into immutable assessment snapshots.",
+        "current_local": "Frappe 15 isolated v1.28 first/repeat migrations passed; presentation 44/44 and integration 24/24. Packaged reviewer browser viewed the full definition/digest at 390/768/1440px; Approver cannot open Medical Lead route. Evidence: docs/screenshots/vetting-rubric/. Clean fresh-site v1.28 installation pending."
       }
     },
     {
@@ -6184,8 +6184,8 @@
         "Human medical-lead content review and explicit role assignment"
       ],
       "verification_evidence": {
-        "implementation": "React management route and authenticated Frappe API use the v1.28 persistent registry.",
-        "current_local": "Frappe 15 isolated site v1.28 first/repeat migrations passed; presentation 44/44 and integration 24/24. Production-built reviewer manager rendered at 390/768/1440px. Approver may inspect a proposal; direct Medical Lead governance route correctly denies that role. Screenshots: docs/screenshots/vetting-rubric/. Clean fresh-site v1.28 install pending."
+        "implementation": "Immutable v1.28 registry and role; reviewer APIs expose digest-verified full definitions; Medical Lead-only approval; version pinned to applications and copied into immutable assessment snapshots.",
+        "current_local": "Frappe 15 isolated v1.28 first/repeat migrations passed; presentation 44/44 and integration 24/24. Packaged reviewer browser viewed the full definition/digest at 390/768/1440px; Approver cannot open Medical Lead route. Evidence: docs/screenshots/vetting-rubric/. Clean fresh-site v1.28 installation pending."
       }
     },
     {

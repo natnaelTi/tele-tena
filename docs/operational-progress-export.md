@@ -4,14 +4,16 @@
 
 - `feat/vetting-rubric-assessment-engine` is based on current open draft PR #39
   (`feat/relationship-acquisition-attribution`, head `524c7f8`). No PR was
-  merged. Implementation commits are `205e08e` (assessment snapshot) and
-  `4cb0c99` (registry, governance, UI and regressions).
+  merged. Implementation commits are `205e08e` (assessment snapshot),
+  `4cb0c99` (registry and governance), and `49b8be1` (review the full rubric
+  definition before approval).
 - Frappe 15.121.2 isolated site `tele-tena-pr12-fresh.localhost` was backed up
   before schema changes. v1.28 first and repeat migrations passed. Presentation
   suite 44/44 and integration suite 24/24 pass.
-- Built `/teletena/` reviewer journey passed on the current worktree: proposal
-  visible to the synthetic Approver; Medical Lead-only governance route denied
-  to that account. Screenshots are in `docs/screenshots/vetting-rubric/`.
+- Built `/teletena/` reviewer journey passed on the current worktree: complete
+  proposal definition/digest visible to the synthetic Approver; Medical Lead-
+  only governance route denied to that account. Screenshots are in
+  `docs/screenshots/vetting-rubric/`.
   This site remains at `http://127.0.0.1:8017/teletena/`; it is the Frappe
   packaged app, not Vite. `frontend/dist/release.json` identifies the asset
   source. Gunicorn master 287561 serves this checkout/site. The scheduler is
