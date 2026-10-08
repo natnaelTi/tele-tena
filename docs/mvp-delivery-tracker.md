@@ -4,12 +4,14 @@
 
 The integrated preview is `http://127.0.0.1:8017/teletena/` on
 `tele-tena-pr12-fresh.localhost`, served from `/home/frappe/frappe/frappe-bench`
-as a production-built Frappe application. The latest product and packaged
-frontend source SHA is `75ef08be1a726b5515584771668a3120b3dc2500` on
-`feat/request-inbox-eligibility-refresh`. The identified preview Gunicorn master
-was reloaded after the build; this is not a Vite preview. The earlier real
-matching journey at `9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e` remains recorded
-in the linked verification report.
+as a production-built Frappe application. Current branch HEAD is
+`471b15524ba7b6ef61495da3cf0f932c5a714cc9` (documentation and evidence only).
+The backend Python implementation loaded by the preview is unchanged from
+`9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e`. The readiness UI fix was authored
+in `3a532274c184792ce6a93365b826617acb2a5f5b`; the packaged frontend manifest
+identifies build source `75ef08be1a726b5515584771668a3120b3dc2500`. The
+identified preview Gunicorn master was reloaded after that build. This is not a
+Vite preview.
 
 The persisted synthetic Review Clinician setup did not initially meet the
 immediate-request rules: no care language was saved, the reviewer-controlled

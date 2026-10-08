@@ -3,12 +3,14 @@
 ## Current packaged-preview reproduction — 2026-10-08
 
 This section supersedes the older preview/site references below for the current
-request-discovery reproduction. The source and packaged frontend used during
-the browser journey were `9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e` on
-`feat/request-inbox-eligibility-refresh`. The pushed branch now ends at
-`025fa5ff862f363574c47febd9c2340bb4694246`, a documentation-and-evidence-only
-commit after that product-code/build SHA. `release.json` still reports the
-unchanged frontend source SHA `9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e`. The review URL was
+request-discovery reproduction. The backend Python implementation used during
+the journey is the unchanged code tree from
+`9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e` on
+`feat/request-inbox-eligibility-refresh`. The readiness UI fix was authored in
+`3a532274c184792ce6a93365b826617acb2a5f5b`, and `release.json` reports packaged
+frontend build source `75ef08be1a726b5515584771668a3120b3dc2500`. Current branch
+head is `471b15524ba7b6ef61495da3cf0f932c5a714cc9`, which adds only verification
+docs and screenshots after the product build. The review URL was
 `http://127.0.0.1:8017/teletena/`, served by the production-built Frappe route
 on site `tele-tena-pr12-fresh.localhost` in `/home/frappe/frappe/frappe-bench`.
 The app was not served by Vite.
