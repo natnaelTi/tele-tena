@@ -30,6 +30,7 @@ const words: Record<string, [string, string]> = {
   "Policy history could not be loaded.": ["የፖሊሲ ታሪክ መጫን አልተቻለም።", "Seenaa imaammataa fe'uun hin danda'amne."],
   "No policy decisions recorded yet.": ["እስካሁን የፖሊሲ ውሳኔ አልተመዘገበም።", "Ammaaf murtiin imaammataa hin galmoofne."],
   "A reviewer must enable immediate requests for this service. This does not guarantee a request or match.": ["ለዚህ አገልግሎት ፈጣን ጥያቄዎችን ገምጋሚ ማንቃት አለበት። ይህ ጥያቄ ወይም ግጥሚያ እንደሚመጣ ዋስትና አይሰጥም።", "Gamaaggamaan tajaajila kanaaf gaaffiiwwan ariifachiisoo banuu qaba. Kun gaaffii ykn walitti dhufeenya mirkaneessu miti."],
+  "A reviewer must enable immediate requests for this service. Service-scope approval alone does not enable this. This does not guarantee a request or match.": ["ለዚህ አገልግሎት ፈጣን ጥያቄዎችን ገምጋሚ ማንቃት አለበት። የአገልግሎት ወሰን ማጽደቅ ብቻውን ይህን አያነቃም። ጥያቄ ወይም ግጥሚያ እንደሚመጣ ዋስትና አይሰጥም።", "Gamaaggamaan gaaffiiwwan ariifachiisoo tajaajila kanaaf banuu qaba. Mirkaneessi daangaa tajaajilaa qofti kana hin banu. Gaaffii ykn walitti dhufeenya hin mirkaneessu."],
   "Open a care request": ["የእንክብካቤ ጥያቄ ይክፈቱ", "Gaaffii kunuunsaa bani"],
   "Open requests are not an emergency response service.": ["ክፍት ጥያቄዎች የአደጋ ጊዜ ምላሽ አገልግሎት አይደሉም።", "Gaaffiin banaan tajaajila deebii balaa ariifachiisaa miti."],
   "What would you like help with?": ["በምን እንርዳዎ?", "Maal irratti gargaarsa barbaadda?"],
