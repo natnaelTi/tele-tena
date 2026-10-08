@@ -9253,5 +9253,61 @@
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
       }
     }
+  ],
+  "supplemental_screens": [
+    {
+      "id": "SH01",
+      "title": "Mutual adult relationship links",
+      "module": "Shared adult care",
+      "status": "Implemented, verification pending",
+      "route": [
+        "/patient/relationships",
+        "/relationship-invitation#invite=<opaque token>"
+      ],
+      "actors": [
+        "Patient inviter",
+        "Patient invitee"
+      ],
+      "persistent_models": [
+        "tt_relationship_invitation",
+        "tt_relationship_link",
+        "tt_relationship_event"
+      ],
+      "queries": [
+        "tele_tena.api.relationships.my_relationships",
+        "tele_tena.api.relationships.preview_relationship_invitation (authenticated POST body)"
+      ],
+      "commands": [
+        "tele_tena.api.relationships.create_relationship_invitation",
+        "tele_tena.api.relationships.respond_to_relationship_invitation",
+        "tele_tena.api.relationships.revoke_relationship",
+        "tele_tena.api.relationships.revoke_relationship_invitation"
+      ],
+      "server_permissions": "Tele Tena Patient role and matching patient profile required. Invitation token alone is insufficient. Each participant sees only the other chosen display name; no clinical record, appointment, note, balance or call grant.",
+      "workflow_transitions": "No link → invitation pending → accepted/declined/expired/revoked; accepted → active relationship → revoked. Both adults attest separately. Invitations expire after a configurable demonstration default.",
+      "states": {
+        "loading": "Skeleton for own relationships and invitation preview.",
+        "empty": "Explain no link exists and offer create invitation.",
+        "error": "Show actionable invite/session/permission/network feedback; preserve confirmation state.",
+        "success": "Confirm persisted invitation, acceptance, decline, withdrawal or revocation."
+      },
+      "responsive_accessibility": "Responsive patient workspace and invitation card; keyboard-operable consent checkbox, copy and revoke controls; verify 320/390/768/1440 CSS px and 200% zoom.",
+      "localization": {
+        "languages": [
+          "en",
+          "am",
+          "om"
+        ],
+        "translation_status": "English source; Amharic/Afaan Oromo provisional pending human review."
+      },
+      "dependencies": [
+        "medical/legal review of adult-attestation and consent text",
+        "future participant-specific appointment, disclosure, call and note workflows"
+      ],
+      "verification_evidence": {
+        "backend": "Two focused Frappe presentation tests pass on tele-tena-pr12-fresh.localhost; v1.30 migration applied and idempotent execution checked twice.",
+        "frontend": "Production Vite build passes. Built-route/browser flow and fresh-site install remain pending."
+      }
+    }
   ]
 }

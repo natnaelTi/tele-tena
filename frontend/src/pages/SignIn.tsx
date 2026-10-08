@@ -99,9 +99,15 @@ export default function SignIn() {
   async function proceed() {
     const current = await refresh();
     const next = params.get("next") || "";
+    const inviteToken = (routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken || "";
     const safeBookingReturn = /^\/patient\/book-link\/[a-f0-9]{64}$/.test(next);
+    const safeRelationshipReturn = next === "/relationship-invitation" && /^[A-Za-z0-9_-]{40,64}$/.test(inviteToken);
+    if (inviteToken && !current?.profile) {
+      navigate("/onboarding?intent=patient", { replace:true, state:{relationshipInvitationToken:inviteToken} });
+      return;
+    }
     navigate(
-      (safeBookingReturn || (next === "/patient/discovery" && current?.profile?.kind === "patient")) ? next : !current?.profile && params.get("intent") === "clinician"
+      (safeBookingReturn || safeRelationshipReturn || (next === "/patient/discovery" && current?.profile?.kind === "patient")) ? next : !current?.profile && params.get("intent") === "clinician"
         ? "/onboarding?intent=clinician"
         : destination(current),
       { replace: true, state: routeLocation.state },

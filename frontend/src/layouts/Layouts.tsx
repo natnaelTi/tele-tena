@@ -13,6 +13,7 @@ import {
   FileHeart,
   Building2,
   MoreHorizontal,
+  HeartHandshake,
 } from "lucide-react";
 import { Brand } from "../components/Brand";
 import { Button, Dialog, InlineNotice, Skeleton } from "../components/ui";
@@ -186,6 +187,7 @@ const patientNav = [
   ["/patient/appointments", "Appointments", CalendarDays],
   ["/patient/account", "Account", Settings2],
   ["/patient/clinic-access", "Clinic access", Building2],
+  ["/patient/relationships", "Shared care", HeartHandshake],
 ] as const;
 const clinicianNav = [
   ["/clinician", "Today", Home],

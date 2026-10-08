@@ -1893,6 +1893,29 @@ button:active {
 .clinic-calendar-event .clinic-calendar-event-time { font-weight: 650; color: var(--text-primary); }
 .clinic-calendar-event .supporting { font-size: 13px; }
 .clinic-calendar-event .status-pill { display: inline-flex; margin-top: 5px; }
+.relationship-workspace { display:grid; grid-template-columns:minmax(280px,0.85fr) minmax(0,1.15fr); gap:24px; align-items:start; }
+.relationship-create,.relationship-card { display:grid; gap:14px; padding:24px; }
+.relationship-create > p,.relationship-card > p { margin:0; }
+.relationship-heading { display:flex; gap:10px; align-items:center; color:var(--brand-primary); }
+.relationship-heading h2 { margin:0; color:var(--text-primary); font-size:20px; }
+.relationship-create .field { margin:0; }
+.relationship-link-field { display:grid; gap:8px; padding:16px; border:1px solid var(--border-default); border-radius:14px; background:var(--surface-subtle); }
+.relationship-boundary { display:flex; gap:10px; align-items:flex-start; padding:12px; border-radius:12px; background:var(--surface-subtle); color:var(--text-secondary); }
+.relationship-boundary p { margin:0; font-size:14px; line-height:1.55; }
+.relationship-list { min-width:0; }
+.relationship-list > h2 { margin:0 0 14px; font-size:20px; }
+.relationship-row { display:flex; align-items:center; gap:12px; padding:16px; margin-bottom:10px; }
+.relationship-row > div { min-width:0; flex:1; }
+.relationship-row p { margin:4px 0 0; }
+.relationship-invitations { margin-top:16px; }
+.relationship-invitations > summary { min-height:44px; display:flex; align-items:center; cursor:pointer; font-weight:600; }
+.relationship-entry { max-width:680px; padding-block:48px; }
+.relationship-card { padding:clamp(22px,5vw,36px); }
+.relationship-card h1 { margin:0; font-size:clamp(26px,4vw,34px); }
+.relationship-card > svg { color:var(--brand-primary); }
+.relationship-card .actions { display:flex; gap:10px; flex-wrap:wrap; }
+@media (max-width:800px) { .relationship-workspace { grid-template-columns:1fr; } }
+@media (max-width:480px) { .relationship-create,.relationship-card { padding:18px; } .relationship-row { align-items:flex-start; flex-wrap:wrap; } .relationship-row .button { width:100%; } }
 @media (max-width: 900px) {
   .clinic-week-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .clinic-week-day:nth-child(5) { border-left: 0; }

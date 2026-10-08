@@ -86,6 +86,13 @@ one reservation atomically.
 
 Clinic membership never grants blanket access to clinical records. Shared adult
 care requires each participant's separate identity, consent and disclosure.
+The initial shared-care release provides only an optional, mutually accepted
+adult relationship link. It shows each participant's chosen profile name after
+acceptance and grants no appointment, history, note, balance, or call access.
+Couple/family offerings remain unavailable until participant-specific booking,
+disclosure, multi-party call authorization, and recipient-scoped documentation
+are implemented and verified. Adult attestations do not independently verify
+age or identity.
 Laboratory results require a real partner, specimen chain-of-custody and human
 review before release. Second-opinion and medical-travel estimates are
 conditional, not treatment guarantees or confirmed capacity. Subscriptions may

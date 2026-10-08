@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import {
   Button,
@@ -28,6 +28,7 @@ export default function Onboarding() {
   const { session, refresh } = useSession();
   const { w } = useLocale();
   const navigate = useNavigate();
+  const routeLocation = useLocation();
   const [params] = useSearchParams();
   const [step, setStep] = useState(0);
   const [kind, setKind] = useState("patient");
@@ -95,7 +96,9 @@ export default function Onboarding() {
       setSaved(true);
       if (complete) {
         const current = await refresh();
-        navigate(destination(current));
+        const invitationToken=(routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken;
+        navigate(invitationToken && current?.profile?.kind==='patient' ? '/relationship-invitation' : destination(current),
+          { replace:true, state: invitationToken ? {relationshipInvitationToken:invitationToken} : undefined });
       }
     } catch {
       setError(

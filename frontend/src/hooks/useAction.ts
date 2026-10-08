@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { ApiError } from "../api";
 const messages: Record<string, string> = {
+  adult_required: "Confirm that you are 18 or older before continuing.",
+  relationship_retry_changed: "This invitation submission changed. Start a new invitation.",
+  relationship_invitation_rate_limited: "You have reached the invitation limit. Try again later.",
+  relationship_invitation_expired: "This invitation has expired. Ask the person to send a new one.",
+  relationship_invitation_unavailable: "This invitation is no longer available.",
+  relationship_self_invite: "You cannot accept your own invitation.",
+  relationship_decision_invalid: "Choose whether to accept or decline the invitation.",
   outside_availability:
     "Choose a time inside an available window, allowing for the full session.",
   appointment_conflict: "That time has just been booked. Choose another time.",

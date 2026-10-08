@@ -9,7 +9,20 @@ appointments and their financial/disclosure snapshots. Frappe 15 migration and
 focused regression verification are in progress; this is not a complete
 clinical continuity policy or external credential verification.
 
-This roadmap reconciles the agreed product contract with the current delivery tracker. The tracker and operational screen map are evidence sources; a planned row is not evidence that it works. At the 2026-10-08 checkpoint, PRs #11–#41 are open in a dependency chain; PR #41 depends on #40, and the active clinic-calendar branch is based on #41. These dependent changes are not in main or Selfmade. Confirm actual GitHub state before relying on this note.
+This roadmap reconciles the agreed product contract with the delivery tracker.
+The tracker and operational screen map are evidence sources; a planned row is
+not evidence that it works. PR/branch ancestry must be checked in GitHub before
+release; local feature branches and draft PRs do not imply a merge or deployment.
+
+## Optional adult relationship links — 2026-10-08
+
+The dependent `feat/adult-relationship-links` slice adds patient-only mutual
+adult link invitations with hashed one-time tokens, separate adult attestations,
+expiry, withdrawal, revocation, rate limits and no clinical-record permissions.
+It is based on the clinic-calendar checkpoint and remains unmerged. This does
+not enable couple/family booking, participant invitations for appointments,
+multi-party calls, private intake, or recipient-specific notes; those remain
+future workflows and the corresponding shared-care screens stay designed.
 
 ## Demonstration sequence
 
