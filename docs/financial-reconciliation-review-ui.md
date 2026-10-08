@@ -19,8 +19,21 @@ reviewer must investigate the preserved evidence before deciding. Review holds
 must never be accepted automatically to unblock an account.
 
 The three Amharic and Afaan Oromo labels added for this queue are provisional and
-need native-language review. The browser regression renders current synthetic
-held cases at mobile, tablet, and desktop widths but deliberately does not submit
-a decision against retained site records. The browser assertion also checks
-that patient email identifiers do not render. Backend decision authorization,
-idempotency, and mismatch checks remain covered by the Frappe presentation suite.
+need native-language review. The browser regression passed on the built
+`/teletena/` Frappe app at 390, 768, and 1440 CSS px with no horizontal overflow.
+It renders the three retained synthetic held cases and confirms neither email
+identifiers nor free-form audit reasons are returned/rendered; it deliberately
+does not submit a decision against retained site records. Backend decision
+authorization, HMAC-reference privacy, idempotency, and mismatch checks pass in
+`tests/presentation.py` (40/40). Screenshots:
+
+- `docs/screenshots/financial-reconciliation/queue-390.png`
+- `docs/screenshots/financial-reconciliation/queue-768.png`
+- `docs/screenshots/financial-reconciliation/queue-1440.png`
+
+The preview at `http://127.0.0.1:8017/teletena/admin/financial-disputes` uses
+the isolated `tele-tena-pr12-fresh.localhost` site. Backend checkout is
+`fix/legacy-wallet-projection-audit` at `f975952d53ca2390b91d708b148890b851ac893f`;
+the matching production asset bundle was built from that exact SHA. The isolated
+Gunicorn preview was HUP-reloaded after the final backend build. Shared Bench
+workers and scheduler were not restarted for this UI-only change.
