@@ -26,14 +26,27 @@ fields and is safe to repeat.
   ../../env/bin/python tests/integration.py` — **24/24 passed**. Includes
   booking idempotency, transactional rollback, concurrent booking/overspend,
   scope and privacy enforcement, OTP, and consultation authorization.
-- Packaged browser flow and clean fresh-site installation: pending. The browser
-  check aborts the final booking request deliberately after checking that the
-  built route forwards its opaque token; persisted source behavior is covered
-  by backend tests.
+- `../../env/bin/python scripts/build_review.py` — passed using locked frontend
+  dependencies; `scripts/check_review_assets.py` — passed, with zero configured
+  private credential values found in public artifacts. The release manifest
+  identifies the packaged frontend source commit.
+- `NODE_PATH=/tmp/tele-tena-browser/node_modules
+  TELE_TENA_REVIEW_SITE_PATH=/home/frappe/frappe/frappe-bench/sites/tele-tena-pr12-fresh.localhost
+  node scripts/browser-booking-acquisition-source.cjs` — passed against the
+  built `/teletena/` application. It signs in as the synthetic clinician,
+  opens their share link as the patient, selects a time and disclosure, then
+  verifies that the final command includes the opaque token. It deliberately
+  aborts that command before persistence; the backend suite verifies persisted
+  source behavior. This is a browser integration check, not a second booking.
+- Clean fresh-site installation remains pending.
 - The migration was applied only to isolated
   `tele-tena-pr12-fresh.localhost`, after a database and private-files backup,
   under that site's maintenance mode. It adds one column; it does not modify
   existing balances, reservations, or appointment outcomes.
+- Local preview: `http://127.0.0.1:8017/teletena/`, served by the isolated
+  `tele-tena-pr12-fresh.localhost` site and `scripts.review_test_wsgi` under
+  `/home/frappe/frappe/frappe-bench`. The Gunicorn master was HUP-reloaded after
+  build to load the current backend checkout. No Vite server is involved.
 
 No hosted site was changed. Automated checks use synthetic local records;
 physical-device, live SMS, and live-money behavior are outside this slice.

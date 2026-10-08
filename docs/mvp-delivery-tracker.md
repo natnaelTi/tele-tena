@@ -16,8 +16,10 @@ The focused clinician-link backend test passes, including rejection of a wrong
 token, persisted source, same-payload retry, and rejection of a changed-token
 retry. The migration repeat/preservation test passes. The complete Frappe
 presentation suite passes 42/42 and integration suite passes 24/24 on the
-isolated review site. The production-built route test and fresh-site
-installation remain pending; no remote site is changed.
+isolated review site. Production assets built for this branch pass the asset
+scope scan, and the packaged share-link route test passes. Fresh-site
+installation remains pending; no remote site is changed. See
+`docs/acquisition-attribution-verification.md`.
 
 ## Current local checkpoint — progressive request waves — 2026-10-08
 

@@ -12,9 +12,10 @@
   `http://127.0.0.1:8017/teletena/`; see `frontend/dist/release.json` for the
   built source SHA after final packaging.
 - The Frappe presentation suite passes 42/42 and integration suite 24/24 on the
-  isolated review site. Packaged route verification and fresh-site installation
-  remain pending. No hosted installation changed; the overall A–I product
-  scope remains partial.
+  isolated review site. Production assets and the packaged share-link route
+  passed; the route check aborts before booking persistence, which is tested in
+  the backend suite. Fresh-site installation remains pending. No hosted
+  installation changed; the overall A–I product scope remains partial.
 
 ## Current local checkpoint — progressive request-wave regression — 2026-10-08
 
