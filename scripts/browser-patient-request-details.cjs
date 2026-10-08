@@ -44,6 +44,24 @@ const [email, password] = entry;
     await page.getByText(request.request_text, { exact: true }).waitFor();
     await page.reload();
     await page.getByText(request.request_text, { exact: true }).waitFor();
+    const screenshotDir = path.resolve('docs/screenshots/request-details');
+    fs.mkdirSync(screenshotDir, { recursive: true });
+    for (const width of [320, 390, 768, 1440]) {
+      await page.setViewportSize({ width, height: 920 });
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
+      if (overflow) throw new Error('Request details overflow at ' + width + ' CSS px.');
+      if (width === 390 || width === 1440) {
+        await page.screenshot({ path: path.join(screenshotDir, 'patient-detail-' + width + '.png'), fullPage: true });
+      }
+    }
+    const language = page.getByLabel('Language / ቋንቋ / Afaan');
+    for (const [locale, heading] of [['am', 'የጥያቄ ዝርዝሮች'], ['om', "Bal'ina gaaffii"]]) {
+      await language.selectOption(locale);
+      await page.getByRole('heading', { name: heading, exact: true }).waitFor();
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
+      if (overflow) throw new Error('Localized request details overflow in ' + locale + '.');
+    }
+    await language.selectOption('en');
     await page.getByRole('link', { name: /Back to requests/ }).click();
     await page.getByRole('heading', { name: 'Your requests', exact: true }).waitFor();
 
@@ -52,7 +70,7 @@ const [email, password] = entry;
     await page.getByText('Request unavailable.', { exact: true }).waitFor();
     if ((await page.locator('body').innerText()).includes(privateText)) throw new Error('An unavailable request leaked the prior request narrative.');
     if (pageErrors.length) throw new Error('The request detail journey raised a browser exception.');
-    console.log('PASS: synthetic patient opens an owner-scoped persisted request detail by opaque ID, reloads it, returns to the list, and receives a generic unavailable state for an unknown ID. Account data and request content are withheld.');
+    console.log('PASS: synthetic patient opens an owner-scoped persisted request detail by opaque ID, reloads it, returns to the list, and receives a generic unavailable state for an unknown ID. Responsive checks passed at 320/390/768/1440 CSS px; Amharic and Afaan Oromo headings render. Screenshots captured; account data and request content are withheld.');
   } finally {
     await context.close();
     await browser.close();

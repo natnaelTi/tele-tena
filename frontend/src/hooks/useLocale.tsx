@@ -510,6 +510,7 @@ const words: Record<string, [string, string]> = {
   "Request cancelled": ["ጥያቄው ተሰርዟል", "Gaaffiin haqameera"],
   "View appointment": ["ቀጠሮውን ይመልከቱ", "Beellama ilaali"],
   "Maximum total price": ["ከፍተኛ ጠቅላላ ዋጋ", "Gatii waliigalaa ol'aanaa"],
+  "Requested time window": ["የተጠየቀው የጊዜ ክልል", "Daangaa yeroo gaafatame"],
   "What clinicians saw": ["ሐኪሞች ያዩት", "Waan ogeeyyiin fayyaa argan"],
   "No offer has arrived within three minutes. You can continue waiting, schedule for later, or browse clinicians.": ["በሶስት ደቂቃ ውስጥ ቅናሽ አልደረሰም። መጠበቅ መቀጠል፣ ለሌላ ጊዜ ማስያዝ ወይም ሐኪሞችን ማሰስ ይችላሉ።", "Daqiiqaa sadii keessatti dhiyeessiin hin dhufne. Eeguu itti fufuu, boodarra beellamuu ykn ogeeyyii fayyaa barbaaduu dandeessa."],
   "Your sign-in session ended. Sign in again to view this request.": ["የመግቢያ ክፍለ ጊዜዎ አብቅቷል። ይህን ጥያቄ ለማየት እንደገና ይግቡ።", "Yeroon seensaa xumurameera. Gaaffii kana ilaaluuf irra deebi'ii seeni."],
