@@ -1,6 +1,7 @@
 """Patient-controlled, encounter-specific clinic scheduling disclosure."""
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, time, timedelta, timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import frappe
 from frappe.utils import now_datetime
@@ -36,6 +37,13 @@ def _care_clinic_ids(user):
     return {r.clinic for r in rows('''SELECT DISTINCT clinic
         FROM `tabTele Tena Clinic Membership`
         WHERE member_user=%s AND status='Active' AND membership_role='Care Coordination' ''', (user,))}
+
+
+def _calendar_week_utc_bounds(start_day, zone):
+    end_day = start_day + timedelta(days=7)
+    start_utc = datetime.combine(start_day, time.min, zone).astimezone(timezone.utc).replace(tzinfo=None)
+    end_utc = datetime.combine(end_day, time.min, zone).astimezone(timezone.utc).replace(tzinfo=None)
+    return start_utc, end_utc
 
 
 @query()
@@ -240,6 +248,67 @@ def clinic_schedule_access():
             'status': item.state,
         })
     return output
+
+
+@query()
+def clinic_schedule_week(week_start=None, display_timezone='Africa/Addis_Ababa'):
+    """Return only patient-shared upcoming appointments for one local week."""
+    user = actor()
+    allowed_clinics = _staff_clinic_ids(user)
+    if not allowed_clinics:
+        frappe.throw('Clinic calendar access required.', frappe.PermissionError)
+    if not isinstance(display_timezone, str) or len(display_timezone) > 80:
+        fail('Choose a valid calendar timezone.', 'invalid_timezone')
+    try:
+        zone = ZoneInfo(display_timezone)
+    except (ZoneInfoNotFoundError, ValueError):
+        fail('Choose a valid calendar timezone.', 'invalid_timezone')
+    try:
+        if week_start:
+            if not isinstance(week_start, str):
+                fail('Choose a valid week start date.', 'invalid_week')
+            start_day = date.fromisoformat(week_start)
+            if start_day.isoformat() != week_start:
+                fail('Choose a valid week start date.', 'invalid_week')
+        else:
+            today = datetime.now(zone).date()
+            start_day = today - timedelta(days=today.weekday())
+    except (TypeError, ValueError):
+        fail('Choose a valid week start date.', 'invalid_week')
+    if start_day.weekday() != 0:
+        fail('A calendar week must start on Monday.', 'invalid_week')
+    start_utc, end_utc = _calendar_week_utc_bounds(start_day, zone)
+    grants = rows('''SELECT c.clinic_name,a.start,a.end,a.timezone,a.service_label,
+            a.consultation_format,a.minutes,a.disclosure,a.state
+        FROM `tabTele Tena Clinic Encounter Access` g
+        JOIN `tabTele Tena Clinic` c ON c.name=g.clinic AND c.status='Verified'
+        JOIN `tabTele Tena Clinic Affiliation` af ON af.clinic=g.clinic
+          AND af.clinician=g.clinician AND af.status='Verified'
+        JOIN tt_appointment a ON a.id=g.appointment AND a.patient=g.patient
+          AND a.state='Booked' AND a.start>UTC_TIMESTAMP(6)
+          AND a.start >= %s AND a.start < %s
+        WHERE g.purpose='Scheduling coordination' AND g.status='Active'
+          AND g.expires_at>UTC_TIMESTAMP(6) AND g.clinic IN ({})
+        ORDER BY a.start LIMIT 200'''.format(','.join(['%s'] * len(allowed_clinics))),
+        (start_utc, end_utc, *sorted(allowed_clinics)))
+    output = []
+    for item in grants:
+        disclosure = json.loads(item.disclosure or '{}')
+        start = item.start.replace(tzinfo=timezone.utc) if item.start.tzinfo is None else item.start.astimezone(timezone.utc)
+        end = item.end.replace(tzinfo=timezone.utc) if item.end.tzinfo is None else item.end.astimezone(timezone.utc)
+        output.append({
+            'clinic_name': item.clinic_name,
+            'patient_label': disclosure.get('name') or 'Private patient',
+            'service': item.service_label,
+            'start': start.isoformat(),
+            'end': end.isoformat(),
+            'appointment_timezone': item.timezone,
+            'format': item.consultation_format,
+            'minutes': int(item.minutes),
+            'status': item.state,
+        })
+    return {'week_start': start_day.isoformat(), 'display_timezone': display_timezone,
+            'appointments': output}
 
 
 @query()

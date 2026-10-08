@@ -6455,28 +6455,27 @@
       "family": "J",
       "title": "Clinic calendar",
       "module": "Clinic operations",
-      "backend_reference": "Full backend pending",
-      "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
-      "integration_status": "Pending screen-level operational acceptance",
+      "backend_reference": "tele_tena.api.clinic_access.clinic_schedule_week; tele_tena.api.journey.session",
+      "required_contract": "Read-only calendar projection over future appointments explicitly shared by patients; no clinic-wide visibility or resources.",
+      "integration_status": "Locally verified as a read-only view over active patient-shared future appointments. Clinic resources, room allocation, shifts, booking, billing and broader clinic management remain pending.",
       "prototype_route": "j02",
-      "route": "/j02 (not implemented)",
-      "actor": "Clinic owner/admin and explicitly invited staff",
-      "status": "Designed",
+      "route": "/clinic/calendar",
+      "actor": "Verified clinic owner or active Clinic Manager/Scheduling member; Care Coordination, Billing and other accounts denied.",
+      "status": "Locally verified",
       "persistent_models": [
-        "Proposed Clinic",
-        "Proposed Clinic Membership",
-        "Proposed Clinic Location",
-        "Proposed Clinic Resource",
-        "Proposed Encounter Access Grant"
+        "Tele Tena Clinic",
+        "Tele Tena Clinic Membership",
+        "Tele Tena Clinic Affiliation",
+        "Tele Tena Clinic Encounter Access",
+        "tt_appointment"
       ],
       "queries": [
-        "No clinic workspace API implemented"
+        "clinic_schedule_week(week_start, display_timezone): one local Monday-to-Monday week; only active, unexpired patient scheduling grants.",
+        "session: clinic_schedule_workspace navigation capability."
       ],
-      "commands": [
-        "No clinic workspace commands implemented"
-      ],
-      "server_permissions": "Membership grants only the named operational permissions; no blanket patient or clinician record access.",
-      "workflow_transitions": "Draft clinic → verification pending → verified/suspended; invitation pending → accepted/revoked; encounter grant requested → granted/revoked.",
+      "commands": [],
+      "server_permissions": "Requires a verified clinic owned by the actor or an active Clinic Manager/Scheduling membership. Each row also requires an active patient-created scheduling grant, a currently verified clinic and treating-clinician affiliation, a future Booked appointment, and an instant inside the validated timezone week. Care Coordination and Billing have no calendar access. Response omits account identifiers, appointment/grant IDs, contact information, health history, request text, notes and price.",
+      "workflow_transitions": "Read only. Patient grant Active → visible schedule item; revocation, expiry, appointment cancellation/completion, clinic suspension, affiliation revocation, or membership revocation removes it from later reads.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -6499,15 +6498,15 @@
         "ethiopic_layout": "Verify font coverage, wrapping, line height and control labels on this screen."
       },
       "dependencies": [
-        "clinic verification",
-        "membership/roles",
-        "resource calendar",
-        "explicit clinical access grants"
+        "verified clinic",
+        "owner or active Clinic Manager/Scheduling membership",
+        "explicit patient scheduling grant",
+        "verified treating-clinician affiliation"
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (J02) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Read-only weekly view of existing patient-authorized scheduling grants; no new schema or resource/booking behavior.",
+        "current_local": "Frappe 15.121.2 on tele-tena-pr12-fresh.localhost: tests/presentation.py 45/45 and tests/integration.py 24/24 passed. The production-built application at http://127.0.0.1:8017/teletena/ passed owner access, direct route, empty state, next-week navigation, timezone update/invalid-timezone feedback, responsive no-overflow checks at 320/390/768/1440 CSS px, and patient API denial. The browser fixture currently has no shared appointment in this week, so its screenshot demonstrates the empty state; populated response minimization and role matrix are verified by the backend test. Screenshots: docs/screenshots/clinic-shared-calendar/."
       }
     },
     {

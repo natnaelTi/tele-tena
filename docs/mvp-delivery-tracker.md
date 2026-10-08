@@ -1,5 +1,22 @@
 # TeleTena delivery tracker
 
+## Current local checkpoint — patient-shared clinic calendar — 2026-10-08
+
+The active branch is `feat/clinic-shared-calendar`, in draft PR #42, stacked on
+PR #41 → PR #40. PR #42 CI passed on Node 22.23.3/24.13.0 and Python
+3.12/3.14.2. The isolated Frappe 15.121.2 review site at
+`tele-tena-pr12-fresh.localhost` serves the production-built app at
+`http://127.0.0.1:8017/teletena/`; the packaged frontend source SHA is recorded
+in `docs/clinic-shared-calendar-verification.md`. Presentation tests passed
+45/45, integration tests 24/24, and the built-browser calendar journey passed.
+The screen map now records 9 locally verified screens, 78 implemented pending
+verification, 51 designed, 3 implementation in progress, and 1 externally
+blocked. This slice is read-only patient-shared scheduling; it does not finish
+clinic operations or the broader roadmap. Fresh-site/Frappe 16 checks and the
+many designed roadmap journeys remain open. No PR was merged and Selfmade was
+not changed.
+
+
 ## Current local checkpoint — appointment-scoped acquisition — 2026-10-08
 
 The active feature branch is `feat/relationship-acquisition-attribution`,
@@ -533,7 +550,7 @@ needed for clean financial cutover verification.
 | Open requests, private offers and progressive routing | partial | Persisted request/offer state, hard eligibility, presence leases, bounded waves, owned paginated history, atomic offer acceptance and progress metrics are implemented. Built-browser acceptance verified publication → eligible recipient → clinician inbox API → rendered request card with account email omitted; synthetic request cancelled afterward. Frappe presentation test now directly exercises three due waves with distinct eligible clinicians and retry deduplication. The test-only accelerated timing does not establish production cadence or asynchronous worker execution. Offer submission/acceptance through consultation completion, privacy/abuse audit and pilot performance remain pending. The under-three-minute target is not guaranteed. See `request-inbox-eligibility.md`, `request-inbox-routing-browser-verification.md` and `vetting-routing-verification.md`. |
 | Owner-level legacy financial reconciliation | implementation in progress | New v1.13 migration records legacy-event, wallet-snapshot, subledger and exact opening-boundary differences without changing existing records. Mismatched owners are held until an authorized reasoned snapshot decision. Fresh/upgrade/repeat tests on a disposable site remain pending. |
 | Extensions and dispute/refund policy | pending | No prefunded explicit extension workflow. Refunds/disputes after release or payout state remain gated for authorized operations; no negative balance or history edits are allowed. |
-| Clinic operations and record grants | partial | Verified clinic registration/affiliation and limited memberships are implemented. A verified invite/Manager/Scheduling member can reach `/clinic`; a browser flow verified clinic application → reviewer decision → manager invitation → exact verified-contact acceptance → staff workspace navigation → reasoned revocation at 320/390/768/1440px. A patient can grant one verified clinic scheduling-only access to a future booked encounter; the built `/teletena/` journey persisted and revoked that grant across reload. The 24-case presentation suite verifies idempotency, minimized fields, patient and clinic role boundaries, and membership revocation. Fresh-site installation is still pending. Clinic calendars/resources, clinic billing, dedicated team screens, broader staff operations, and clinical-record access grants are not implemented; membership alone grants none. See `clinic-encounter-access.md` and the current sections of `presentation-readiness-verification.md`. |
+| Clinic operations and record grants | partial | Verified clinic registration/affiliation and limited memberships are implemented. A patient can grant a clinic scheduling-only access to one future booked encounter and separately grant published summaries from one completed encounter to Care Coordination. The latest clinic-summary browser journey read a persisted patient-authorized summary while omitting private fields; Frappe 15 presentation/integration suites passed 45/45 and 24/24. This branch adds a read-only weekly `/clinic/calendar` projection over the same future schedule grants, with server-validated timezone bounds and role-specific navigation; its Frappe 15 authorization/timezone/privacy regression passes. The built `/teletena/` browser journey and full suites now pass on the retained isolated review site; fresh-site installation/Frappe 16 checks remain pending. Clinic resources, room/shift scheduling, clinic booking, clinic billing, broader staff operations, and broad clinical-record access remain unimplemented; membership alone grants none. See `clinic-encounter-access.md`, `clinic-shared-summary-access.md`, and `clinic-shared-calendar.md`. |
 | Adult couples/family care | pending | Separate participant identity, invitations, per-person consent/disclosure, multi-party call permissions and recipient-specific documentation are absent. |
 | Laboratory and diagnostics | pending | The v1.12 inactive typed-attribute example is a schema illustration only. Partners, orders, specimen custody, processing, result review/correction/release and integration are absent. |
 | Subscriptions | pending | No durable plan entitlements or provider event workflow. Basic records must remain outside any subscription gate. |
@@ -644,3 +661,18 @@ passed on Frappe 15.121.2. The browser harness initially waited for a closed
 native select option to become visible; it now waits for the option to be
 attached and selects it normally. Clean fresh-site installation and Frappe 16
 validation of this addition remain pending.
+
+
+## Patient-shared clinic calendar — 2026-10-08
+
+The dependent `feat/clinic-shared-calendar` branch builds on draft PR #41, which
+itself depends on PR #40. It adds a read-only weekly clinic schedule view over
+existing patient-consented future appointment grants. Verified clinic owners,
+Clinic Managers and Scheduling members are eligible; Care Coordination,
+Billing and unrelated accounts are denied by the calendar query. The query
+validates Monday week starts and IANA timezones server-side, uses local-midnight
+UTC boundaries for daylight-saving correctness, and returns only disclosure-safe
+calendar fields without appointment or grant identifiers. No migration is
+needed.
+
+The focused `Presentation.test_patient_clinic_grant_is_scheduling_only_revocable_and_membership_scoped` regression passed on `tele-tena-pr12-fresh.localhost` after adding week filtering, privacy shape, timezone validation, and role-denial assertions. Current branch `feat/clinic-shared-calendar` builds to source `deac339f353b3c5ca1e9042cebbe609cc789d0a4`; the built `/teletena/` browser journey passed, and full Frappe 15 suites passed (45 presentation, 24 integration). Browser coverage includes owner route/API, empty state, week navigation, timezone validation, 320/390/768/1440 widths and patient API denial. The current browser fixture has no shared appointment in its week; populated response privacy and role matrix are covered by backend tests. Screenshot evidence is in `docs/screenshots/clinic-shared-calendar/`. Frontend build passes with the existing large LiveKit bundle warning. Fresh-site/Frappe 16 checks remain pending. The route covers shared appointment viewing only; it is not clinic resource or booking management.

@@ -262,10 +262,14 @@ projection contains only the booking-approved identity label and appointment
 logistics; it excludes notes, contact details, request text, history, balances,
 and other encounters. The patient may revoke at any time; membership revocation,
 expiry, cancellation, or completion also closes access. This does not grant
-clinical-record access. Scheduling and Billing roles are currently descriptive and do not expose
-calendar, resource, or billing capabilities. Clinic Manager may manage clinic
-memberships only. Clinic verification and affiliation never enable clinic
-calendars/resources, clinic billing, or clinic-wide patient records. Existing
+clinical-record access. Clinic Manager and Scheduling members now have a
+read-only weekly calendar view over these same active patient-shared future
+appointments, with an explicit display timezone. It cannot show unshared
+appointments or edit, book, confirm, cancel, or reschedule them. Billing remains
+descriptive and grants no calendar access. There are still no clinic resources,
+room allocation, clinic-owned availability, clinic-wide patient directory,
+billing operations, or blanket patient records. Clinic verification and
+affiliation alone enable none of these capabilities. Existing
 narrative affiliation fields are preserved and are not automatically converted
 into verified affiliations. Native DocType schema
 is additive and synchronized by normal Frappe migration.
@@ -292,7 +296,9 @@ seven days after the scheduled end, can be revoked by the patient, and closes
 when the appointment is cancelled/completed or the membership is revoked. It
 does not allow joining, confirmation, cancellation, rescheduling, notes, shared
 summary, contact details, request text, profile history, balances, or access to
-other encounters. This is not a clinic-wide record grant or shared calendar.
+other encounters. This is not a clinic-wide record grant. The dedicated weekly
+calendar is only a read-only view of active grants and does not create clinic-
+owned schedules or resources.
 
 A separate patient-controlled `Patient-shared summary` grant may expose only
 published patient-summary revisions from one completed encounter to an active

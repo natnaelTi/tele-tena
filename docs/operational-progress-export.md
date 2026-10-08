@@ -2,6 +2,28 @@
 
 ## Current verification delta — 2026-10-08
 
+- Draft PR #42 (`feat/clinic-shared-calendar`) is stacked on PR #41 → PR #40;
+  all PR #42 checks passed. No merge or deployment occurred.
+- The local preview remains `http://127.0.0.1:8017/teletena/` on isolated site
+  `tele-tena-pr12-fresh.localhost`, through the production-built Frappe app.
+  This branch's build manifest and exact source SHA are recorded in the current
+  clinic-calendar verification report. `erp.localhost` and Selfmade are
+  unchanged.
+- Frappe 15.121.2 presentation tests passed 45/45, integration tests 24/24,
+  and the built browser flow verified staff authorization, patient API denial,
+  timezone/week navigation, invalid timezone feedback, empty state, and 320,
+  390, 768 and 1440 CSS px overflow. The fixture has no shared appointment in
+  its current week; populated row privacy is backend-tested, not claimed as a
+  rendered browser journey.
+- Current screen-map status: 9 locally verified; 78 implemented, verification
+  pending; 51 designed; 3 implementation in progress; 1 external integration
+  blocked. Broad roadmap work remains. Fresh-site/Frappe 16 checks, human
+  translation review, physical-device testing, live SMS, and hosted deployment
+  remain unverified or blocked as documented.
+
+
+## Current verification delta — 2026-10-08
+
 - PR #41 remains a draft stacked on PR #40. Updated head:
   `3720df45dfff72202b5221ddc3dff06ab111767f`; GitHub checks are pending. No
   merge/deployment occurred. The packaged asset manifest records this exact

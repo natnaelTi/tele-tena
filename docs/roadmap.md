@@ -9,7 +9,7 @@ appointments and their financial/disclosure snapshots. Frappe 15 migration and
 focused regression verification are in progress; this is not a complete
 clinical continuity policy or external credential verification.
 
-This roadmap reconciles the agreed product contract with the current delivery tracker. The tracker and operational screen map are evidence sources; a planned row is not evidence that it works. PRs #11–#25 currently form an open dependency chain; PR #25 (`feat/vetting-reconsideration`) depends on #24. The local feature branch may include changes that are not yet in main or on Selfmade. Do not infer a merged/deployed state from this roadmap.
+This roadmap reconciles the agreed product contract with the current delivery tracker. The tracker and operational screen map are evidence sources; a planned row is not evidence that it works. At the 2026-10-08 checkpoint, PRs #11–#41 are open in a dependency chain; PR #41 depends on #40, and the active clinic-calendar branch is based on #41. These dependent changes are not in main or Selfmade. Confirm actual GitHub state before relying on this note.
 
 ## Demonstration sequence
 
@@ -53,7 +53,7 @@ product scope, not shipped capability:
 
 ## Explicitly outside the current implementation
 
-Clinic membership/workspaces and referral attribution, natural-language clinical matching or relevance feedback, public free-text reviews/moderation, couples consent, mutual rescheduling, no-show workflows, email summary delivery, real money movement, real credential verification and emergency escalation are not represented as working features. Separate session-experience, eligible-inbox response, and clinician-attributed cancellation indicators are being added in the current branch; database/browser verification remains pending. See `mvp-delivery-tracker.md` for current status and evidence.
+Clinic registration, limited staff memberships, patient-controlled scheduling grants, and patient-authorized summary grants are implemented in slices; full clinic resource scheduling, billing, staff operations and broader patient-record access remain incomplete. Referral attribution, natural-language matching/relevance feedback, free-text review moderation, couples consent, no-show workflows, email summary delivery, real-money movement, independent credential verification and emergency escalation are not complete. Mutual rescheduling and structured session-experience feedback have focused implementation and checks; see `mvp-delivery-tracker.md` for their evidence and remaining gaps.
 
 ## Current vetting and routing checkpoint (2026-10)
 
