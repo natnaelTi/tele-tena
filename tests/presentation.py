@@ -10,7 +10,7 @@ import sys
 import unittest
 import threading
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
@@ -513,6 +513,7 @@ class Presentation(unittest.TestCase):
 
         fixtures.login('c1')  # verified clinic owner
         self.assertTrue(journey._clinic_workspace_available(fixtures.USERS['c1']))
+        self.assertTrue(journey._clinic_schedule_workspace_available(fixtures.USERS['c1']))
         schedule = clinic_access.clinic_schedule_access()
         self.assertEqual(len(schedule), 1)
         self.assertEqual(schedule[0]['patient_label'], 'Private patient')
@@ -522,8 +523,41 @@ class Presentation(unittest.TestCase):
         self.assertNotIn('price', schedule[0])
         self.assertEqual(set(schedule[0]), {'access','clinic','patient_label','service',
             'start','end','timezone','format','minutes','status'})
+        shared_start = schedule[0]['start']
+        if isinstance(shared_start, str):
+            shared_start = datetime.fromisoformat(shared_start)
+        if shared_start.tzinfo is None:
+            shared_start = shared_start.replace(tzinfo=timezone.utc)
+        local_day = shared_start.astimezone(ZoneInfo('Africa/Addis_Ababa')).date()
+        week_start = (local_day - timedelta(days=local_day.weekday())).isoformat()
+        week = clinic_access.clinic_schedule_week(week_start, 'Africa/Addis_Ababa')
+        self.assertEqual(datetime.fromisoformat(
+            clinic_access.clinic_schedule_week()['week_start']).weekday(), 0)
+        self.assertEqual(week['week_start'], week_start)
+        self.assertEqual(week['display_timezone'], 'Africa/Addis_Ababa')
+        spring_start, spring_end = clinic_access._calendar_week_utc_bounds(
+            date(2026, 3, 2), ZoneInfo('America/New_York'))
+        fall_start, fall_end = clinic_access._calendar_week_utc_bounds(
+            date(2026, 10, 26), ZoneInfo('America/New_York'))
+        self.assertEqual((spring_end - spring_start).total_seconds(), 167 * 3600)
+        self.assertEqual((fall_end - fall_start).total_seconds(), 169 * 3600)
+        self.assertEqual(len(week['appointments']), 1)
+        calendar_item = week['appointments'][0]
+        self.assertEqual(calendar_item['patient_label'], 'Private patient')
+        self.assertEqual(set(calendar_item), {'clinic_name','patient_label','service',
+            'start','end','appointment_timezone','format','minutes','status'})
+        for forbidden in ('appointment','access','patient','email','phone','disclosure',
+                          'history','private_note','price'):
+            self.assertNotIn(forbidden, calendar_item)
+        with self.assertRaises(frappe.ValidationError):
+            clinic_access.clinic_schedule_week(week_start, 'Not/A_Timezone')
+        with self.assertRaises(frappe.ValidationError):
+            clinic_access.clinic_schedule_week(
+                (local_day + timedelta(days=1)).isoformat(), 'Africa/Addis_Ababa')
         fixtures.login('c2')
         self.assertEqual(clinic_access.clinic_schedule_access(), [])
+        with self.assertRaises(frappe.PermissionError):
+            clinic_access.clinic_schedule_week(week_start, 'Africa/Addis_Ababa')
         with self.assertRaises(frappe.PermissionError):
             clinic_access.eligible_clinics_for_appointment(appointment)
 
@@ -535,6 +569,7 @@ class Presentation(unittest.TestCase):
         clinics.respond_to_clinic_invitation(billing['membership'], 'accept')
         self.assertEqual(clinic_access.clinic_schedule_access(), [])
         self.assertFalse(journey._clinic_workspace_available(fixtures.USERS['c2']))
+        self.assertFalse(journey._clinic_schedule_workspace_available(fixtures.USERS['c2']))
 
         fixtures.login('c1')
         scheduling = clinics.invite_clinic_member(clinic, fixtures.USERS['c3'], 'Scheduling')
@@ -543,6 +578,8 @@ class Presentation(unittest.TestCase):
         fixtures.login('c3')
         clinics.respond_to_clinic_invitation(scheduling['membership'], 'accept')
         self.assertEqual(len(clinic_access.clinic_schedule_access()), 1)
+        self.assertEqual(len(clinic_access.clinic_schedule_week(
+            week_start, 'Africa/Addis_Ababa')['appointments']), 1)
         fixtures.login('c1')
         clinics.revoke_clinic_membership(scheduling['membership'], 'Synthetic revocation test.')
         fixtures.login('c3')
@@ -601,6 +638,9 @@ class Presentation(unittest.TestCase):
         care = clinics.invite_clinic_member(clinic, fixtures.USERS['c3'], 'Care Coordination')
         fixtures.login('c3')
         clinics.respond_to_clinic_invitation(care['membership'], 'accept')
+        self.assertFalse(journey._clinic_schedule_workspace_available(fixtures.USERS['c3']))
+        with self.assertRaises(frappe.PermissionError):
+            clinic_access.clinic_schedule_week(week_start, 'Africa/Addis_Ababa')
         shared = clinic_access.clinic_shared_summaries()
         self.assertEqual(len(shared), 1)
         self.assertEqual(shared[0]['summary'], 'Patient-authorized synthetic next steps')

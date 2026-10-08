@@ -168,12 +168,26 @@ def _clinic_workspace_available(user):
         LIMIT 1''', (user, user, user)))
 
 
+def _clinic_schedule_workspace_available(user):
+    return bool(frappe.db.sql('''
+        SELECT 1 FROM `tabTele Tena Clinic Membership` m
+        JOIN `tabTele Tena Clinic` c ON c.name=m.clinic
+        WHERE m.member_user=%s AND m.status='Active'
+          AND m.membership_role IN ('Clinic Manager','Scheduling')
+          AND c.status='Verified'
+        UNION ALL
+        SELECT 1 FROM `tabTele Tena Clinic` c
+        WHERE c.submitted_by=%s AND c.status='Verified'
+        LIMIT 1''', (user, user)))
+
+
 @query()
 def session():
     user = actor()
     p = rows('SELECT * FROM tt_profile WHERE user=%s', (user,))
     return {'user': user, 'roles': frappe.get_roles(user), 'profile': p[0] if p else None,
             'clinic_workspace': _clinic_workspace_available(user),
+            'clinic_schedule_workspace': _clinic_schedule_workspace_available(user),
             'csrf_token': get_csrf_token(), 'simulation': simulation_enabled()}
 
 
