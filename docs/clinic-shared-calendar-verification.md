@@ -3,7 +3,7 @@
 ## Release identity
 
 - Branch: `feat/clinic-shared-calendar`, stacked on draft PR #41 (`feat/clinic-shared-summary-grants`), which depends on PR #40.
-- Source/build commit embedded in the packaged release: `3e433a4b8bf1bfa06941fff3dd998d2b6755dbe0`.
+- Source/build commit embedded in the packaged release: `deac339f353b3c5ca1e9042cebbe609cc789d0a4`.
 - Local URL: `http://127.0.0.1:8017/teletena/`.
 - Site: `tele-tena-pr12-fresh.localhost`, isolated Frappe 15.121.2 review site.
 - The page uses the packaged Frappe app assets, not Vite. `release.json` identifies the source commit above; the asset integrity/private-file check passed with zero credential matches.
@@ -12,7 +12,7 @@
 ## Checks run
 
 - `frontend`: `npm run build` passed (TypeScript and Vite production build). Existing warning: LiveKit bundle exceeds 500 kB.
-- `scripts/build_review.py` passed for a clean checkout and packaged the current source SHA.
+- `scripts/build_review.py` passed for clean checkout `deac339f353b3c5ca1e9042cebbe609cc789d0a4`; the running app serves the same manifest SHA. The subsequent tracker/report edit is documentation-only.
 - `scripts/check_review_assets.py --site-private .../private` passed artifact hashes, scope and sensitive-file checks; exact private credential scan count was zero.
 - `TELE_TENA_TEST_SITE=tele-tena-pr12-fresh.localhost ./env/bin/python apps/tele_tena/tests/presentation.py`: 45/45 passed, including clinic calendar role, timezone, DST-boundary and minimized-response coverage.
 - `TELE_TENA_TEST_SITE=tele-tena-pr12-fresh.localhost ./env/bin/python apps/tele_tena/tests/integration.py`: 24/24 passed.
