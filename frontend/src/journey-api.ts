@@ -4,7 +4,7 @@ type Sharing = { name: boolean; history: boolean }
 export type Profile = { kind: 'patient' | 'clinician'; display_name: string; history: string; share_name: boolean; share_history: boolean; languages?: string }
 export type Session = { user: string; roles: string[]; profile: Profile | null; csrf_token: string; simulation: boolean; clinic_workspace?: boolean }
 export type Service = { id: string; label: string }
-export type Offer = { id: string; clinician_id:string; display_name: string; label: string; price: number; minutes: number; schedule_id?: string | null; schedule_timezone?: string | null; consultation_format?: 'video' | 'audio' }
+export type Offer = { id: string; clinician_id:string; display_name: string; label: string; service_category?: string; price: number; minutes: number; care_languages?: ('en'|'am'|'om')[]; schedule_id?: string | null; schedule_timezone?: string | null; consultation_format?: 'video' | 'audio' }
 export type Application = { user: string; display_name: string; statement: string; status: 'Pending' | 'Approved' | 'Rejected'; requested_services?: string[]; requested_service_labels?:string[]; resume_uploaded?: boolean; resume_size?: number; submission_date_available?: boolean; submitted_at?: string | null; evidence_complete?: boolean; verified_contacts?: {channel: string; contact: string; verified_at: string}[] }
 export type Disclosure = { request: string; name?: string; history?: string }
 export type Appointment = { id: string; start: string; end: string; state: string; price: number; minutes: number; service_label: string; disclosure: Disclosure; timezone?: string | null; consultation_format?: string; confirmation_mode?: string; expires_at?: string | null; confirmed_at?: string | null; cancelled_by?: string | null; cancelled_at?: string | null; cancel_reason?: string | null; call_state?: string; call_ended?: string | null; documentation_state?: string | null; display_identity?:string }
@@ -32,8 +32,8 @@ export const journeyApi = {
   setImmediatePolicy: (service:string,enabled:boolean,reason:string,idempotency_key:string) => api<any>('tele_tena.api.service_policy.set_immediate_policy',{service,enabled,reason,idempotency_key},true),
   immediatePolicyHistory: (service:string) => api<any[]>('tele_tena.api.service_policy.immediate_policy_history',{service}),
   appointments: () => api<Appointment[]>('appointments'),
-  calendar: (offering: string, from_date: string, display_timezone: string) =>
-    api<{days:{date:string;slots:TimeSlot[]}[];timezone:string;schedule_timezone:string|null;duration:number;format:string;price:number}>('tele_tena.api.scheduling.calendar', { offering, from_date, days: 35, display_timezone }),
+  calendar: (offering: string, from_date: string, display_timezone: string, days=35) =>
+    api<{days:{date:string;slots:TimeSlot[]}[];timezone:string;schedule_timezone:string|null;duration:number;format:string;price:number}>('tele_tena.api.scheduling.calendar', { offering, from_date, days, display_timezone }),
   schedules: () => api<Schedule[]>('tele_tena.api.scheduling.schedules'),
   saveSchedule: (data: Record<string, unknown>) => api('tele_tena.api.scheduling.save_schedule', data, true),
   bookingLink: (offering: string) => api<{token:string}>('tele_tena.api.scheduling.booking_link',{offering},true),

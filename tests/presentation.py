@@ -124,6 +124,19 @@ class Presentation(unittest.TestCase):
                 frappe.db.sql('DELETE FROM tt_offering WHERE id IN %s', (tuple(created),))
             frappe.db.commit()
 
+    def test_discovery_exposes_declared_care_languages_without_account_identity(self):
+        fixtures.login('c1')
+        journey.save_profile('clinician', 'Synthetic language listing', True, languages=['en', 'am'])
+        fixtures.login('p1')
+        results = journey.discover(fixtures.PREFIX)
+        self.assertTrue(results)
+        target = next(item for item in results if item.display_name == 'Synthetic language listing')
+        self.assertEqual(target.care_languages, ['am', 'en'])
+        serialized = json.dumps([dict(item) for item in results], sort_keys=True)
+        self.assertNotIn(fixtures.USERS['c1'], serialized)
+        self.assertNotIn('example.invalid', serialized)
+        self.assertNotIn('history', target)
+
     def test_multiple_offerings_migration_is_repeatable_and_preserves_legacy_row(self):
         offering_id = str(uuid.uuid4())
         clinician = fixtures.USERS['c1']

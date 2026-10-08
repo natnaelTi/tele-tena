@@ -796,8 +796,12 @@ button:active {
 }
 .filter-row {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 1100px) {
+  .filter-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filter-row > .field:first-child { grid-column: 1 / -1; }
 }
 .verification-note {
   font-size: 14px;

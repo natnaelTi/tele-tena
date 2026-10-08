@@ -1,6 +1,47 @@
 # TeleTena operational progress export
 
-## Current local checkpoint — financial transaction details — 2026-10-08
+## Current local checkpoint — discovery filters and packaged preview — 2026-10-08
+
+- Draft PR #35, branch `feat/discovery-language-format-filters`, depends on
+  PR #34 `fix/immediate-readiness-window`; PR #34 itself remains stacked on
+  earlier open catalog/request branches. No PR was merged and Selfmade was not
+  changed.
+- Current branch/source and production asset manifest: `9f515d84d186245666928e4482873b2437332c8f`.
+- Exact local preview: `http://127.0.0.1:8017/teletena/`, isolated site
+  `tele-tena-pr12-fresh.localhost`, bench
+  `/home/frappe/frappe/frappe-bench`. The app is the built React frontend
+  served by the Frappe test WSGI process, not Vite. Gunicorn master 287561 was
+  reloaded after packaging. The checkout loaded by its app Python path is
+  `apps/tele_tena` on the branch above. Bench's stored app-version label still
+  reports an older branch name; it does not identify the current checkout SHA.
+- Local stack observed: Frappe 15.121.2, ERPNext 15.121.6, Python 3.12.3 and
+  Node 22.23.3. This checkpoint is not a Frappe 16 retest.
+- Discovery filters now use persisted approved service metadata, clinician
+  declared languages, consultation format, and actual generated open slots in
+  the next 14 days. Search and selected constraints carry into the private
+  request draft; the browser test stops before publishing. Screenshots at
+  320/390/768/1440 CSS px are in `docs/screenshots/discovery-filters/`.
+- Current branch verification: presentation suite 39/39; integration suite
+  24/24; production app build passed; lint exited 0 with existing warnings;
+  built browser discovery, sign-in/deep-link/reload/sign-out/PWA scope/offline,
+  and controlled update-prompt checks passed. PR #35 CI passed on Node
+  22.23.3/24.13.0 and Python syntax 3.12/3.14.2.
+- Site scheduler is enabled. Shared Bench worker and scheduler processes are
+  running but started on 6 October before this checkout; they were not
+  restarted because they serve the shared development Bench. Current-branch
+  routing-wave or scheduled-earnings execution is therefore not claimed.
+- A new fresh-install check has not run. The earlier temporary database
+  administrator and mode-600 credential file belonged to a different
+  disposable database; that account/file were removed and its database left
+  untouched. A unique scoped setup is awaiting the operator's local sudo step.
+- This is an incremental discovery slice. The rest of the accepted screen map
+  and batches A–I remain in progress, including fresh/upgrade migration and
+  owner-level financial reconciliation, complete routed-offer acceptance,
+  clinic/couples/diagnostic/subscription/second-opinion/travel operations,
+  native-language approval, live SMS/device checks, and whole-product
+  acceptance. No remote deployment or real-money operation occurred.
+
+## Historical checkpoint — financial transaction details — 2026-10-08
 
 - Draft PR #32, branch `feat/financial-transaction-details`, depends on PR #31
   and targets its feature branch to preserve ancestry. It remains unmerged and
@@ -27,7 +68,7 @@
 Sanitized local checkpoint for roadmap updates. It is not a merge, deployment,
 real-patient-readiness, real-money, or market-performance claim.
 
-## Current source and preview — patient offer detail — 2026-10-08
+## Historical source and preview — patient offer detail — 2026-10-08
 
 - Current feature branch: `feat/patient-request-offer-detail`, draft PR #31,
   dependent on draft PR #30 → #29 → #28. No merge or remote deployment.
@@ -55,7 +96,7 @@ real-patient-readiness, real-money, or market-performance claim.
   route in this slice. Scheduled release/routing execution and the remaining
   designed/verification-pending screens stay outstanding in the map.
 
-## Current source and preview — 2026-10-08
+## Historical source and preview — patient request detail — 2026-10-08
 
 - Current branch: `feat/patient-request-detail-route`, head
   `29d267de5f510799f44db9506d91b4412a519a23`; draft PR #30 targets the open
