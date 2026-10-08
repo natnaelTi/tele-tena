@@ -34,8 +34,16 @@ and saves rendered screenshots at:
 
 The screenshot names refer to CSS viewport widths. Screenshots are synthetic
 review-site content. The production asset manifest's `source_commit` is the
-authoritative frontend build source and must match the commit recorded in the
-current verification update before review.
+authoritative frontend build source. For this check, the packaged build was
+generated from `5a34118858a8c0ca68b05538a19695c107fcbba0`; the manifest was read
+from the running Frappe static asset route and matched that source. The app
+route returned HTTP 200. The browser journey passed on the same `/teletena/`
+app and site after a targeted Gunicorn master reload.
+
+The Frappe 15 presentation regression suite passed 39/39. The frontend
+production build passed; lint exited successfully with existing repository
+warnings. These focused checks do not establish acceptance for every screen in
+the product inventory.
 
 ## Limits
 
