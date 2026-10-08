@@ -3,9 +3,12 @@
 ## Current packaged-preview reproduction — 2026-10-08
 
 This section supersedes the older preview/site references below for the current
-request-discovery reproduction. Source branch `feat/request-inbox-eligibility-refresh`
-was at `9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e`; the `release.json` packaged
-frontend reported the same source SHA. The review URL was
+request-discovery reproduction. The source and packaged frontend used during
+the browser journey were `9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e` on
+`feat/request-inbox-eligibility-refresh`. The pushed branch now ends at
+`025fa5ff862f363574c47febd9c2340bb4694246`, a documentation-and-evidence-only
+commit after that product-code/build SHA. `release.json` still reports the
+unchanged frontend source SHA `9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e`. The review URL was
 `http://127.0.0.1:8017/teletena/`, served by the production-built Frappe route
 on site `tele-tena-pr12-fresh.localhost` in `/home/frappe/frappe/frappe-bench`.
 The app was not served by Vite.
@@ -71,6 +74,10 @@ The main bench scheduler flag is enabled, with its `frappe schedule` and worker
 processes running. These are bench-wide processes, not a dedicated queue for
 the isolated site. This check did not establish execution of a scheduled
 routing wave or earnings-release job. No unrelated process was restarted.
+
+GitHub checks for the current PR head `025fa5ff862f363574c47febd9c2340bb4694246`
+passed: frontend on Node 22.23.3 and 24.13.0, plus Python syntax on 3.12 and
+3.14.2. This documentation-only commit did not alter application code.
 
 Current evidence proves that a properly configured synthetic clinician can
 receive, offer and match an immediate request in the production-built preview.

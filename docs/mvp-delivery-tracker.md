@@ -4,9 +4,11 @@
 
 The integrated preview is `http://127.0.0.1:8017/teletena/` on
 `tele-tena-pr12-fresh.localhost`, served from `/home/frappe/frappe/frappe-bench`
-as a production-built Frappe application. Source and packaged frontend SHA:
-`9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e` on
-`feat/request-inbox-eligibility-refresh`. This is not a Vite preview.
+as a production-built Frappe application. The product-code/backend process and
+packaged frontend were built from `9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e`
+on `feat/request-inbox-eligibility-refresh`. The current branch head is
+`025fa5ff862f363574c47febd9c2340bb4694246`, a documentation-and-evidence-only
+commit after that code/build SHA. This is not a Vite preview.
 
 The persisted synthetic Review Clinician setup did not initially meet the
 immediate-request rules: no care language was saved, the reviewer-controlled
