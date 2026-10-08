@@ -56,3 +56,15 @@ journey. The built preview remains `http://127.0.0.1:8017/teletena/`; build
 source SHA and browser check are recorded in the current delivery checkpoint.
 Frontend lint completes with existing warnings; the build retains its existing
 large-chunk advisory.
+
+## Isolated scheduler and worker status
+
+On `tele-tena-pr12-fresh.localhost`, `bench --site … scheduler status` reports
+enabled and `show-pending-jobs` reports no queued jobs. The shared Bench's
+existing `frappe schedule` process and a worker are running. The worker log
+records successful site-qualified runs of both
+`tele_tena.api.open_requests.expire_requests` and
+`tele_tena.accounting.release_eligible_earnings` on 2026-10-08. The former
+invokes the idempotent due-wave dispatcher; this confirms handler execution,
+not that a specific due wave delivered to additional eligible clinicians.
+That outcome still needs a controlled eligible-supply scenario.
