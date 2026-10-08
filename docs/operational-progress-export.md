@@ -2,8 +2,9 @@
 
 ## Current local checkpoint — credential-verification provenance — 2026-10-08
 
-- Branch `feat/vetting-rubric-assessment-engine`, source commit
-  `91c44fe` (full SHA in Git), stacked on open draft PR #39. No PR was merged.
+- Branch `feat/vetting-rubric-assessment-engine`, current source/build commit
+  `9b2c96b69ab190f9ad98abc2eeef63150be63e9e`, stacked on open draft PR #39.
+  PR #40 remains draft and unmerged.
 - New scope approvals marked credential-verified require an issuer/source,
   check date, registry reference and license evidence attached to the same
   scope. Reviewer/time/evidence revision and content hash are captured in a
@@ -12,12 +13,15 @@
 - Frappe 15.121.2 isolated site `tele-tena-pr12-fresh.localhost`:
   `tests/presentation.py` 45/45 and `tests/integration.py` 24/24 passed;
   v1.29 migration and repeat migration passed; frontend lint exited 0 with
-  existing warnings. The reviewer form has not yet been captured in a browser.
+  existing warnings.
 - The preview remains `http://127.0.0.1:8017/teletena/`, built Frappe assets,
-  site `tele-tena-pr12-fresh.localhost`. Final build source SHA will be
-  recorded in the release manifest after documentation is committed and assets
-  are rebuilt. Fresh v1.29 install remains pending because the requested
-  temporary database-admin setup was not completed; existing site preserved.
+  site `tele-tena-pr12-fresh.localhost`; its release manifest records source
+  `9b2c96b69ab190f9ad98abc2eeef63150be63e9e`. The synthetic application
+  journey submitted through the UI, reviewer evidence access succeeded, and
+  the four provenance controls were rendered at 390/1440px; no scope decision
+  was recorded. Screenshots are under `docs/screenshots/vetting-rubric/`.
+  Fresh v1.29 install remains pending because the requested temporary
+  database-admin setup was not completed; existing site preserved.
 - The proposed rubric still needs Medical Lead approval; native-language review,
   Frappe 16, real registry verification, provider/device validation and the
   broader A–I operational scope remain open.
