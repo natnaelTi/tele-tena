@@ -265,8 +265,9 @@ expiry, cancellation, or completion also closes access. This does not grant
 clinical-record access. Scheduling and Billing roles are currently descriptive and do not expose
 calendar, resource, or billing capabilities. Clinic Manager may manage clinic
 memberships only. Clinic verification and affiliation never enable clinic
-calendars/resources, clinic billing, or clinic-wide patient records. Existing narrative affiliation fields are preserved and are
-not automatically converted into verified affiliations. Native DocType schema
+calendars/resources, clinic billing, or clinic-wide patient records. Existing
+narrative affiliation fields are preserved and are not automatically converted
+into verified affiliations. Native DocType schema
 is additive and synchronized by normal Frappe migration.
 
 Verified Clinic Manager and Scheduling memberships (and a verified clinic

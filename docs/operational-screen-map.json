@@ -6393,10 +6393,10 @@
       "module": "Clinic operations",
       "backend_reference": "journey.session, clinic_access.clinic_schedule_access, clinics.my_clinic_memberships",
       "required_contract": "Membership roles, calendars/resources, encounter grants, staff, billing and audit",
-      "integration_status": "A membership-scoped /clinic shell and read-only patient-consented schedule projection are implemented. Clinic calendars/resources, patient access requests, clinic management, and billing remain pending.",
+      "integration_status": "A membership-scoped /clinic shell, patient-consented schedule projection, and separate patient-authorized completed-encounter summary projection are implemented. Clinic calendars/resources, patient access requests, clinic management, and billing remain pending.",
       "prototype_route": "j01",
       "route": "/clinic",
-      "actor": "Verified clinic owner or verified active Clinic Manager/Scheduling member; Billing and non-members denied",
+      "actor": "Verified clinic owner or active Clinic Manager/Scheduling/Care Coordination member; Billing and non-members denied",
       "status": "Implementation in progress",
       "persistent_models": [
         "Tele Tena Clinic",
@@ -6416,7 +6416,7 @@
         "tele_tena.api.clinic_access.revoke_schedule_access"
       ],
       "server_permissions": "Membership-specific operations; schedule grants require manager/scheduling role; published summaries require active Care Coordination membership, patient grant, completed encounter, verified clinic and current treating-clinician affiliation. Generic DocType access denied.",
-      "workflow_transitions": "Verified invite -> active or declined membership; active -> revoked. Patient grant -> schedule projection -> revoked/expired/closed on appointment completion or cancellation.",
+      "workflow_transitions": "Verified invite → active or declined membership; active → revoked. Patient schedule grant → projection → revoked/expired/closed on appointment completion or cancellation. Patient summary grant → care-coordination summary read → revoked; previously viewed content cannot be recalled.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -6448,7 +6448,7 @@
         "implementation": "Local clinic staff route and session navigation hint; not a full clinic calendar or management product.",
         "current_local": "Production-built /teletena/ route exercised after sign-in. Membership-gated workspace navigation, invitation acceptance, schedule projection query and 320/390/768/1440 widths passed the clinic browser regression. The overview remains partial: no clinic calendar, resource management, billing or full patient workflow. Screenshots: docs/screenshots/clinic-membership/staff-workspace-*.png."
       },
-      "current_local": "Frappe 15.121.2 backend regression passes for patient-authorized encounter-scoped summary access and explicit Care Coordination membership. Browser rendering and fresh-site install for this addition remain pending."
+      "current_local": "Frappe 15.121.2: tests/presentation.py 45/45; tests/integration.py 24/24. Built-browser Care Coordination invitation/acceptance, summary empty state, membership revocation, and 320/390/768/1440 CSS px overflow check passed. Screenshots: docs/screenshots/clinic-staff-workspace/staff-workspace-390.png and staff-workspace-1440.png. Fresh-site and Frappe 16 checks pending."
     },
     {
       "id": "J02",
@@ -6570,7 +6570,7 @@
         "implementation": "Persistent Frappe membership workflow; current UI groups team and invite actions inside the clinic access portal.",
         "current_local": "Production-built browser journey verified clinic submit → human review → manager invitation → verified staff acceptance → membership-scoped /clinic navigation → manager revocation. 320/390/768/1440 widths passed overflow checks. Distinct screen composition, actual 200% zoom, and a fresh-site migration remain pending."
       },
-      "current_local": "Backend regression verifies role separation, active membership checks, denial for owner/manager/Billing, and closure after membership/affiliation revocation. Browser review of Care Coordination presentation remains pending."
+      "current_local": "Built-browser Care Coordination invitation/acceptance and membership revocation passed, including rendered clinic workspace at 320/390/768/1440 CSS px. Backend tests enforce role-specific permissions. Screenshots: docs/screenshots/clinic-staff-workspace/staff-workspace-390.png and staff-workspace-1440.png. Fresh-site and Frappe 16 checks pending."
     },
     {
       "id": "J04",
@@ -6632,7 +6632,7 @@
         "implementation": "Persistent Frappe membership workflow; current UI groups team and invite actions inside the clinic access portal.",
         "current_local": "Production-built browser journey verified clinic submit → human review → manager invitation → verified staff acceptance → membership-scoped /clinic navigation → manager revocation. 320/390/768/1440 widths passed overflow checks. Distinct screen composition, actual 200% zoom, and a fresh-site migration remain pending."
       },
-      "current_local": "Backend regression verifies role separation, active membership checks, denial for owner/manager/Billing, and closure after membership/affiliation revocation. Browser review of Care Coordination presentation remains pending."
+      "current_local": "Built-browser Care Coordination invitation/acceptance and membership revocation passed, including rendered clinic workspace at 320/390/768/1440 CSS px. Backend tests enforce role-specific permissions. Screenshots: docs/screenshots/clinic-staff-workspace/staff-workspace-390.png and staff-workspace-1440.png. Fresh-site and Frappe 16 checks pending."
     },
     {
       "id": "J05",

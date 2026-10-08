@@ -13,11 +13,15 @@
   later API reads.
 - Frappe 15.121.2 on `tele-tena-pr12-fresh.localhost`: presentation suite
   45/45 and integration suite 24/24 passed. Frontend build passed; lint exited
-  0 with existing warnings. The new screens still need built-browser review and
-  screenshot evidence. Fresh-site install and Frappe 16 compatibility for this
-  addition remain pending.
-- Review URL remains `http://127.0.0.1:8017/teletena/`; it has not yet been
-  rebuilt/reloaded from this uncommitted branch.
+  0 with existing warnings. The built Frappe browser flow verified Care Coordination invitation/acceptance,
+  role-scoped clinic workspace access, the consultation-summary empty state,
+  manager revocation, and no horizontal overflow at 320/390/768/1440 CSS px.
+  Screenshots: `docs/screenshots/clinic-staff-workspace/staff-workspace-{390,1440}.png`.
+  Fresh-site install and Frappe 16 compatibility for this addition remain pending.
+- Production assets were built for source `4e7d06dc4edeb07307ff53be4b6fefdd844878cf`,
+  deployed to the isolated local review server, and `GET /teletena/` returned 200.
+  The release manifest pins that SHA; documentation/test-only changes after the
+  build will be repackaged at the final branch head.
 
 
 ## Current local checkpoint — credential-verification provenance — 2026-10-08
