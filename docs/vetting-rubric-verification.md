@@ -43,7 +43,8 @@ the old decision did not capture these details.
 - `tests/presentation.py`: **45/45 passed**, including provenance migration
   repeatability and preservation of historical assessments, required source
   and evidence fields, same-scope license evidence, privacy, and digest-tamper
-  rejection, as well as registry migration
+  rejection, refusal of provenance without the verified flag, and rejection of
+  future check dates, as well as registry migration
   idempotency, immutable proposal, patient denial, Approver denial of approval,
   Medical Lead approval and retry, active-version selection, and definition
   digest tamper detection.

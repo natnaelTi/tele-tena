@@ -771,6 +771,24 @@ class Presentation(unittest.TestCase):
                 findings='A verified credential requires source provenance.',
                 scored_criteria=proposed_rubric_scores(first_evidence['id']))
         self.assertEqual(frappe.local.response.get('tele_tena_error'), 'credential_provenance_required')
+        source_without_verified_flag = credential_source_payload(first_evidence['id'])
+        with self.assertRaises(frappe.ValidationError):
+            vetting.review_scope_application(application['name'], 'Approved',
+                findings='Credential provenance cannot be recorded without the verified flag.',
+                credential_source=source_without_verified_flag['credential_source'],
+                credential_checked_on=source_without_verified_flag['credential_checked_on'],
+                credential_evidence=source_without_verified_flag['credential_evidence'],
+                credential_source_reference=source_without_verified_flag['credential_source_reference'])
+        self.assertEqual(frappe.local.response.get('tele_tena_error'), 'credential_verification_flag_required')
+        future_check = credential_source_payload(first_evidence['id'])
+        future_check['credential_checked_on'] = frappe.utils.add_days(frappe.utils.today(), 1)
+        with self.assertRaises(frappe.ValidationError):
+            vetting.review_scope_application(application['name'], 'Approved',
+                identity_reviewed=True, credential_verified=True, qualification_relevant=True,
+                experience_adequate=True, adult_scope_appropriate=True, interview_completed=True,
+                findings='A future credential check date must fail closed.',
+                scored_criteria=proposed_rubric_scores(first_evidence['id']), **future_check)
+        self.assertEqual(frappe.local.response.get('tele_tena_error'), 'credential_check_date_invalid')
         invalid_credential_source = credential_source_payload('foreign-license-evidence')
         with self.assertRaises(frappe.ValidationError):
             vetting.review_scope_application(application['name'], 'Approved',
