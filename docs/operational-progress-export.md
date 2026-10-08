@@ -7,8 +7,8 @@ real-patient-readiness, real-money, or market-performance claim.
 
 - Current feature branch: `feat/patient-request-offer-detail`, draft PR #31,
   dependent on draft PR #30 → #29 → #28. No merge or remote deployment.
-- Exact branch and built frontend manifest source:
-  `f9d01703a3e46edbf80fe674f3fd4753256f22b5`.
+- Current feature branch head is tracked on PR #31; the built frontend manifest
+  source is `f9d01703a3e46edbf80fe674f3fd4753256f22b5`.
 - The review URL is `http://127.0.0.1:8017/teletena/`, site
   `tele-tena-pr12-fresh.localhost`, bench
   `/home/frappe/frappe/frappe-bench`; the frontend is a built Frappe app. The

@@ -8,8 +8,8 @@ based on draft PR #30 (`feat/patient-request-detail-route`, head
 through PR #29 and #28. No PR is merged. The local review remains
 `http://127.0.0.1:8017/teletena/` on site `tele-tena-pr12-fresh.localhost` in
 the original Frappe bench's isolated review site; it is production-built, not
-Vite. Branch head and asset manifest source are
-`f9d01703a3e46edbf80fe674f3fd4753256f22b5`. Gunicorn master PID 287561 serves
+Vite. The feature branch's current head is tracked on PR #31; the packaged
+asset manifest source is `f9d01703a3e46edbf80fe674f3fd4753256f22b5`. Gunicorn master PID 287561 serves
 the current build with worker PIDs 326665 and 326666. The offer review route
 uses the owner-scoped `my_request_detail` query
 and existing atomic `respond_offer` command. The real browser route showed a
