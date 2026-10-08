@@ -163,6 +163,23 @@ def _load_rubric(version, lock=False):
     return definition
 
 
+def _credential_snapshot_from_json(value):
+    if not value:
+        return None
+    try:
+        snapshot = json.loads(value)
+        digest = snapshot.pop('snapshot_sha256')
+    except (TypeError, ValueError, KeyError, AttributeError):
+        fail('Credential verification history could not be verified.',
+             'credential_snapshot_integrity_failure')
+    canonical = json.dumps(snapshot, separators=(',', ':'), sort_keys=True)
+    if hashlib.sha256(canonical.encode()).hexdigest() != digest:
+        fail('Credential verification history could not be verified.',
+             'credential_snapshot_integrity_failure')
+    snapshot['snapshot_sha256'] = digest
+    return snapshot
+
+
 def _scored_criteria_snapshot(raw, application, rubric_version, require_all=False):
     rubric = _load_rubric(rubric_version, lock=True)
     criteria = {item['key']: item for item in rubric['scored_criteria']}
@@ -276,6 +293,10 @@ def my_scope_applications():
             item.rubric_definition = _load_rubric(item.rubric_version or current_rubric_version())
             item.scope_evidence = _scope_evidence_rows(item.name)
             item.appeals = _appeal_history(item.name)
+            verification = rows('''SELECT credential_verification_snapshot
+                FROM `tabTele Tena Vetting Assessment` WHERE name=%s''', (item.latest_assessment,)) if item.latest_assessment else []
+            item.credential_verification = _credential_snapshot_from_json(
+                verification[0].credential_verification_snapshot) if verification else None
         return result
     user = _applicant(user)
     result = rows('''SELECT a.name,a.service,s.service_label,a.status,a.reverification_of,
@@ -609,7 +630,9 @@ def review_scope_application(application, decision, identity_reviewed=False,
                              credential_verified=False, qualification_relevant=False,
                              experience_adequate=False, approach_evidence_reviewed=False,
                              adult_scope_appropriate=False, interview_completed=False,
-                             findings='', restrictions='', scored_criteria=None):
+                             findings='', restrictions='', scored_criteria=None,
+                             credential_source='', credential_checked_on='',
+                             credential_evidence='', credential_source_reference=''):
     reviewer = actor('Tele Tena Approver')
     if decision not in ('Clarification', 'Approved', 'Rejected', 'Suspended', 'Expired'):
         fail('Choose a supported review decision.')
@@ -629,6 +652,39 @@ def review_scope_application(application, decision, identity_reviewed=False,
         'approach_evidence_reviewed': approach_evidence_reviewed,
         'adult_scope_appropriate': adult_scope_appropriate, 'interview_completed': interview_completed,
     }.items()}
+    verification_snapshot = ''
+    credential_source = text(credential_source or '', 180, required=False)
+    credential_source_reference = text(credential_source_reference or '', 180, required=False)
+    if flags['credential_verified']:
+        if not credential_source or not credential_source_reference or not credential_checked_on or not credential_evidence:
+            fail('Record the verification source, check date, registry reference and license evidence before marking a credential verified.',
+                 'credential_provenance_required')
+        try:
+            checked_on = frappe.utils.getdate(credential_checked_on)
+        except (TypeError, ValueError):
+            fail('Enter a valid credential verification date.', 'credential_check_date_invalid')
+        if checked_on > frappe.utils.getdate():
+            fail('The credential verification date cannot be in the future.', 'credential_check_date_invalid')
+        evidence = rows('''SELECT name,evidence_type,revision,content_sha256
+            FROM `tabTele Tena Scope Evidence` WHERE name=%s AND scope_application=%s''',
+            (credential_evidence, doc.name))
+        if not evidence or evidence[0].evidence_type != 'License or registration':
+            fail('Choose license evidence attached to this service application.', 'credential_evidence_invalid')
+        verification_snapshot_data = {
+            'source': credential_source,
+            'checked_on': checked_on.isoformat(),
+            'source_reference': credential_source_reference,
+            'evidence': {'id': evidence[0].name, 'revision': int(evidence[0].revision),
+                         'sha256': evidence[0].content_sha256},
+            'reviewer': reviewer,
+            'recorded_at': str(frappe.utils.now_datetime()),
+        }
+        verification_snapshot_data['snapshot_sha256'] = hashlib.sha256(
+            json.dumps(verification_snapshot_data, separators=(',', ':'), sort_keys=True).encode()).hexdigest()
+        verification_snapshot = json.dumps(verification_snapshot_data, separators=(',', ':'), sort_keys=True)
+    elif credential_source or credential_source_reference or credential_checked_on or credential_evidence:
+        fail('Mark the credential verified before recording its source details.',
+             'credential_verification_flag_required')
     rubric_version = doc.rubric_version or RUBRIC_VERSION
     scoring_snapshot = _scored_criteria_snapshot(
         scored_criteria, doc.name, rubric_version, require_all=(decision == 'Approved'))
@@ -657,6 +713,7 @@ def review_scope_application(application, decision, identity_reviewed=False,
                 FROM `tabTele Tena Scope Evidence` WHERE scope_application=%s
                 ORDER BY evidence_type,revision''', (doc.name,))
         ], separators=(',', ':'), sort_keys=True),
+        'credential_verification_snapshot': verification_snapshot,
         'scored_criteria_snapshot': scoring_snapshot,
         'rubric_version': rubric_version, 'decided_at': frappe.utils.now_datetime()})
     frappe.local.tele_tena_vetting_assessment_action = True

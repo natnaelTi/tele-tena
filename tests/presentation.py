@@ -38,6 +38,7 @@ from tele_tena.patches import v1_25_legacy_refund_activity
 from tele_tena.patches import v1_26_appointment_acquisition_source
 from tele_tena.patches import v1_27_vetting_rubric_assessment
 from tele_tena.patches import v1_28_vetting_rubric_registry
+from tele_tena.patches import v1_29_credential_verification_provenance
 
 
 def proposed_rubric_scores(evidence=None):
@@ -45,6 +46,13 @@ def proposed_rubric_scores(evidence=None):
                   'evidence': [evidence] if evidence and key == 'scope_education' else []}
             for key in ('scope_education','supervised_experience','approach_training',
                         'adult_population','ethics_safeguarding','assessment_interview')}
+
+
+def credential_source_payload(evidence):
+    return {'credential_source':'Synthetic licensing registry (test fixture)',
+            'credential_checked_on':frappe.utils.today(),
+            'credential_evidence':evidence,
+            'credential_source_reference':'SYNTHETIC-REGISTRY-REF'}
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -574,6 +582,19 @@ class Presentation(unittest.TestCase):
         self.assertEqual(len(rubric['scored_criteria']), 6)
         self.assertIn('Human reviewers apply mandatory gates', rubric['decision_rule'])
 
+    def test_credential_provenance_migration_is_repeatable_and_preserves_history(self):
+        before = journey.rows('''SELECT name,scope_application,decision,rubric_version,
+                credential_verified,findings FROM `tabTele Tena Vetting Assessment` ORDER BY name''')
+        v1_29_credential_verification_provenance.execute()
+        v1_29_credential_verification_provenance.execute()
+        self.assertTrue(frappe.db.sql(
+            "SHOW COLUMNS FROM `tabTele Tena Vetting Assessment` LIKE 'credential_verification_snapshot'"))
+        after = journey.rows('''SELECT name,scope_application,decision,rubric_version,
+                credential_verified,findings FROM `tabTele Tena Vetting Assessment` ORDER BY name''')
+        self.assertEqual([tuple(row.values()) for row in after], [tuple(row.values()) for row in before])
+        self.assertTrue(all(not row.credential_verification_snapshot for row in journey.rows(
+            'SELECT credential_verification_snapshot FROM `tabTele Tena Vetting Assessment`')))
+
     def test_vetting_rubric_registry_is_immutable_and_requires_medical_lead(self):
         before = journey.rows('''SELECT version,status,definition_sha256,created_by,created_at,
                 approved_by,approved_at,approval_reason
@@ -747,21 +768,39 @@ class Presentation(unittest.TestCase):
             vetting.review_scope_application(application['name'], 'Approved',
                 identity_reviewed=True, credential_verified=True, qualification_relevant=True,
                 experience_adequate=True, adult_scope_appropriate=True, interview_completed=True,
-                findings='Missing rubric scores must fail closed.')
+                findings='A verified credential requires source provenance.',
+                scored_criteria=proposed_rubric_scores(first_evidence['id']))
+        self.assertEqual(frappe.local.response.get('tele_tena_error'), 'credential_provenance_required')
+        invalid_credential_source = credential_source_payload('foreign-license-evidence')
+        with self.assertRaises(frappe.ValidationError):
+            vetting.review_scope_application(application['name'], 'Approved',
+                identity_reviewed=True, credential_verified=True, qualification_relevant=True,
+                experience_adequate=True, adult_scope_appropriate=True, interview_completed=True,
+                findings='A credential source must cite license evidence from this scope.',
+                scored_criteria=proposed_rubric_scores(first_evidence['id']),
+                **invalid_credential_source)
+        with self.assertRaises(frappe.ValidationError):
+            vetting.review_scope_application(application['name'], 'Approved',
+                identity_reviewed=True, credential_verified=True, qualification_relevant=True,
+                experience_adequate=True, adult_scope_appropriate=True, interview_completed=True,
+                findings='Missing rubric scores must fail closed.',
+                **credential_source_payload(first_evidence['id']))
         invalid_scores = proposed_rubric_scores(first_evidence['id'])
         invalid_scores['unapproved_dimension'] = {'score': 3, 'rationale': 'Synthetic', 'evidence': []}
         with self.assertRaises(frappe.ValidationError):
             vetting.review_scope_application(application['name'], 'Approved',
                 identity_reviewed=True, credential_verified=True, qualification_relevant=True,
                 experience_adequate=True, adult_scope_appropriate=True, interview_completed=True,
-                findings='Unknown dimensions must fail closed.', scored_criteria=invalid_scores)
+                findings='Unknown dimensions must fail closed.', scored_criteria=invalid_scores,
+                **credential_source_payload(first_evidence['id']))
         invalid_evidence_scores = proposed_rubric_scores('not-this-applications-evidence')
         with self.assertRaises(frappe.ValidationError):
             vetting.review_scope_application(application['name'], 'Approved',
                 identity_reviewed=True, credential_verified=True, qualification_relevant=True,
                 experience_adequate=True, adult_scope_appropriate=True, interview_completed=True,
                 findings='Cross-application evidence references must fail closed.',
-                scored_criteria=invalid_evidence_scores)
+                scored_criteria=invalid_evidence_scores,
+                **credential_source_payload(first_evidence['id']))
         self.assertEqual(frappe.db.get_value('Tele Tena Vetting Scope Application',
             application['name'], 'status'), 'Resubmitted')
         result = vetting.review_scope_application(application['name'], 'Approved',
@@ -769,9 +808,19 @@ class Presentation(unittest.TestCase):
             experience_adequate=True, approach_evidence_reviewed=True,
             adult_scope_appropriate=True, interview_completed=True,
             findings='Synthetic reviewer assessment; test only.',
-            scored_criteria=proposed_rubric_scores(first_evidence['id']))
+            scored_criteria=proposed_rubric_scores(first_evidence['id']),
+            **credential_source_payload(first_evidence['id']))
         self.assertEqual(result['status'], 'Approved')
         self.assertTrue(journey.service_scope_is_current(email, service))
+        reviewer_view = next(item for item in vetting.my_scope_applications() if item.name == application['name'])
+        self.assertEqual(reviewer_view.credential_verification['evidence']['id'], first_evidence['id'])
+        fixtures.login('vetting')
+        applicant_view = next(item for item in vetting.my_scope_applications() if item.name == application['name'])
+        self.assertNotIn('credential_verification', applicant_view)
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            vetting.my_scope_applications()
+        fixtures.login('admin')
         assessments = journey.rows('SELECT name FROM `tabTele Tena Vetting Assessment` WHERE scope_application=%s',
                                    (application['name'],))
         self.assertEqual(len(assessments), 2)
@@ -788,6 +837,23 @@ class Presentation(unittest.TestCase):
         self.assertEqual(len(rubric_snapshot['dimensions']), 6)
         self.assertEqual(rubric_snapshot['dimensions'][0]['evidence'][0]['id'], first_evidence['id'])
         self.assertEqual(rubric_snapshot['dimensions'][0]['evidence'][0]['revision'], 1)
+        verification_snapshot=json.loads(latest_assessment.credential_verification_snapshot)
+        self.assertEqual(verification_snapshot['source'],'Synthetic licensing registry (test fixture)')
+        self.assertEqual(verification_snapshot['evidence']['id'],first_evidence['id'])
+        self.assertEqual(verification_snapshot['evidence']['revision'],1)
+        self.assertEqual(verification_snapshot['snapshot_sha256'],
+            hashlib.sha256(json.dumps({key:value for key,value in verification_snapshot.items()
+                if key!='snapshot_sha256'},separators=(',', ':'),sort_keys=True).encode()).hexdigest())
+        saved_credential_snapshot=latest_assessment.credential_verification_snapshot
+        try:
+            tampered=json.loads(saved_credential_snapshot);tampered['source']='Changed after decision'
+            frappe.db.sql('UPDATE `tabTele Tena Vetting Assessment` SET credential_verification_snapshot=%s WHERE name=%s',
+                (json.dumps(tampered,separators=(',', ':'),sort_keys=True),latest_assessment.name))
+            with self.assertRaises(frappe.ValidationError):
+                vetting.my_scope_applications()
+        finally:
+            frappe.db.sql('UPDATE `tabTele Tena Vetting Assessment` SET credential_verification_snapshot=%s WHERE name=%s',
+                (saved_credential_snapshot,latest_assessment.name))
         with self.assertRaises(frappe.PermissionError):
             assessment = frappe.get_doc('Tele Tena Vetting Assessment', result['assessment'])
             assessment.findings = 'Attempted overwrite'
@@ -904,13 +970,14 @@ class Presentation(unittest.TestCase):
         fixtures.login('renewal')
         base = vetting.save_scope_application(service, values)
         pdf = base64.b64encode(b'%PDF-1.4\nSynthetic license evidence\n%%EOF').decode()
-        vetting.upload_scope_evidence(base['name'],'License or registration','license-current.pdf',pdf)
+        base_evidence = vetting.upload_scope_evidence(base['name'],'License or registration','license-current.pdf',pdf)
         base = vetting.save_scope_application(service,values,submit=True)
         fixtures.login('admin')
         vetting.review_scope_application(base['name'],'Approved',identity_reviewed=True,
             credential_verified=True,qualification_relevant=True,experience_adequate=True,
             adult_scope_appropriate=True,interview_completed=True,findings='Synthetic approval for renewal test.',
-            scored_criteria=proposed_rubric_scores())
+            scored_criteria=proposed_rubric_scores(),
+            **credential_source_payload(base_evidence['id']))
         self.assertTrue(journey.service_scope_is_current(email,service))
 
         renewed_values = {**values, 'credential_expiry':frappe.utils.add_days(frappe.utils.today(),365),
@@ -1018,7 +1085,8 @@ class Presentation(unittest.TestCase):
                 credential_verified=True,qualification_relevant=True,experience_adequate=True,
                 adult_scope_appropriate=True,interview_completed=True,
                 findings='Expired credential must not be accepted.',
-                scored_criteria=proposed_rubric_scores())
+                scored_criteria=proposed_rubric_scores(),
+                **credential_source_payload(new_evidence['id']))
         self.assertEqual(frappe.db.get_value('Tele Tena Vetting Scope Application',renewal['name'],
             'status'),'Submitted')
         frappe.db.set_value('Tele Tena Vetting Scope Application',renewal['name'],
@@ -1026,7 +1094,8 @@ class Presentation(unittest.TestCase):
         vetting.review_scope_application(renewal['name'],'Approved',identity_reviewed=True,
             credential_verified=True,qualification_relevant=True,experience_adequate=True,
             adult_scope_appropriate=True,interview_completed=True,findings='Synthetic re-verification approved.',
-            scored_criteria=proposed_rubric_scores())
+            scored_criteria=proposed_rubric_scores(),
+            **credential_source_payload(new_evidence['id']))
         self.assertTrue(journey.service_scope_is_current(email,service))
         self.assertEqual(vetting.resolve_scope_appointment_review(review.name,'Clear',
             'Renewed synthetic credential was approved.'),{'status':'Cleared','idempotent':False})

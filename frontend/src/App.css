@@ -1912,3 +1912,8 @@ button:active {
 .rubric-version-definition p { margin: 7px 0; }
 .rubric-version-definition ul { margin: 6px 0; padding-inline-start: 22px; }
 .rubric-version-definition code { overflow-wrap: anywhere; }
+.credential-verification-inputs, .credential-verification-history { display:grid; gap:10px; margin:16px 0; padding:14px; border:1px solid var(--border-default); border-radius:14px; background:var(--surface-subtle); min-width:0; }
+.credential-verification-inputs legend { font-weight:650; }
+.credential-verification-inputs .supporting { margin:0; }
+.credential-verification-history > summary { min-height:44px; display:flex; align-items:center; cursor:pointer; font-weight:600; }
+.credential-verification-history p { overflow-wrap:anywhere; }

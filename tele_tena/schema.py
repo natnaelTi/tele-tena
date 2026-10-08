@@ -122,3 +122,5 @@ def install():
     vetting_rubric_assessment()
     from tele_tena.patches.v1_28_vetting_rubric_registry import execute as vetting_rubric_registry
     vetting_rubric_registry()
+    from tele_tena.patches.v1_29_credential_verification_provenance import execute as credential_verification_provenance
+    credential_verification_provenance()
