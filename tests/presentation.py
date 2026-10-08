@@ -1236,6 +1236,57 @@ class Presentation(unittest.TestCase):
         self.assertEqual(journey.one('SELECT state FROM tt_open_request WHERE id=%s',
                                      (immediate['id'],)).state, 'Matched')
 
+    def test_live_request_presence_is_paused_when_schedule_no_longer_fits_window(self):
+        """A retained lease must not claim Available after hours move outside its start window."""
+        from zoneinfo import ZoneInfo
+        offering = fixtures.Integration.offers['c1']
+        service = fixtures.PREFIX
+        local_day = day_offset(40, zone='Africa/Addis_Ababa')
+        local_now = datetime.combine(local_day, datetime.min.time().replace(hour=10, minute=5),
+                                     ZoneInfo('Africa/Addis_Ababa'))
+        current = local_now.astimezone(timezone.utc).replace(tzinfo=None)
+        savepoint = 'tt_presence_window_' + uuid.uuid4().hex[:14]
+        frappe.db.sql('SAVEPOINT ' + savepoint)
+        try:
+            fixtures.login('c1')
+            journey.save_profile('clinician', 'Synthetic window clinician', True, languages=['en'])
+            payload = dict(offering=offering, schedule_name='Synthetic immediate window',
+                timezone_name='Africa/Addis_Ababa', consultation_format='video',
+                confirmation_mode='automatic', minimum_notice_minutes=60, horizon_days=60,
+                buffer_before=0, buffer_after=0,
+                intervals=[{'weekday':local_day.weekday(),'start':'10:00','end':'12:00'}],
+                exceptions=[],status='Published')
+            scheduling.save_schedule(**payload)
+            with patch.object(open_requests, 'now', return_value=current), \
+                    patch.object(open_requests, 'dispatch_open_requests', return_value=0):
+                self.assertTrue(open_requests.set_request_presence(True)['ready'])
+                payload['intervals'] = [{'weekday':local_day.weekday(),'start':'11:00','end':'12:00'}]
+                scheduling.save_schedule(**payload)
+                readiness = open_requests.request_presence()
+                self.assertFalse(readiness['ready'])
+                self.assertFalse(readiness['configured'])
+                self.assertEqual(readiness['immediate_window_minutes'], 30)
+                self.assertIn('no_immediate_capacity', readiness['reasons'])
+
+                fixtures.login('p1')
+                request = open_requests.publish_request(service=service,
+                    request_text='Synthetic request for schedule-window regression.',
+                    urgency='immediate',language='en',consultation_format='video',
+                    sharing={'name':False,'history':False},
+                    retry_key='presence-window-' + secrets.token_hex(8),
+                    timezone_name='Africa/Addis_Ababa')
+                self.assertEqual(request['eligible_supply'], 0)
+                self.assertEqual(request['notified'], 0)
+                row = journey.one('SELECT state FROM tt_open_request WHERE id=%s',(request['id'],))
+                self.assertEqual(row.state, 'Open')
+                self.assertEqual(int(journey.one('SELECT COUNT(*) n FROM tt_request_recipient WHERE request_id=%s',
+                                                  (request['id'],)).n), 0)
+                fixtures.login('c1')
+                self.assertFalse(any(item.id == request['id'] for item in open_requests.clinician_requests()))
+        finally:
+            frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
+            frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
+
     def test_immediate_request_policy_is_explicit_and_site_scoped(self):
         offering = fixtures.Integration.offers['c1']
         self.make_schedule(offering=offering)
