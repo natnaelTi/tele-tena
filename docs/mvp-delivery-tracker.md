@@ -1,5 +1,24 @@
 # TeleTena delivery tracker
 
+## Current local checkpoint — appointment-scoped acquisition — 2026-10-08
+
+The active feature branch is `feat/relationship-acquisition-attribution`,
+stacked on `test/progressive-request-wave-acceptance` (draft PR #38) → PR #37 →
+PR #36. Patch v1.26 adds an appointment `acquisition_source`; a valid opaque
+clinician-share token is checked again inside the booking transaction. Direct
+booking and accepted open requests store their own source values. Existing rows
+default to `unknown`; nothing is written to patient profiles. The upgrade was
+applied to isolated site `tele-tena-pr12-fresh.localhost` after a successful
+site/database/private-files backup, under site maintenance mode, then the site
+was returned to service. The migration changed only the additive column.
+
+The focused clinician-link backend test passes, including rejection of a wrong
+token, persisted source, same-payload retry, and rejection of a changed-token
+retry. The migration repeat/preservation test passes. The complete Frappe
+presentation suite passes 42/42 and integration suite passes 24/24 on the
+isolated review site. The production-built route test and fresh-site
+installation remain pending; no remote site is changed.
+
 ## Current local checkpoint — progressive request waves — 2026-10-08
 
 The active branch is `test/progressive-request-wave-acceptance`, stacked on
@@ -462,7 +481,7 @@ test in `selfmade-phone-access-update.md`. Provider acceptance is not delivery.
 | Previous clinicians and repeat care discovery | partial | Dependent slice `feat/previous-clinicians` adds a patient-only dashboard query sourced solely from that patient's Completed appointments and currently approved/publicly bookable clinician offerings, plus profile links and loading/empty/error states. The query returns an opaque profile key and never links other patients' masked encounters. Frappe DB permission and browser verification remain pending because the disposable integration site is not provisioned. |
 | Private open patient requests and clinician offers, isolated from competing clinicians | partial | Persisted private requests/offers, bounded waves, hard eligibility, owner-scoped history, atomic acceptance and capacity revalidation are implemented. The earlier empty inbox was explained by the Review Clinician's 08:00 Addis interval being outside the immediate window at request publication. A new two-context built-browser journey now verifies the same clinician is a recipient, fetches the inbox, and sees the request card when the full session fits; the patient email is omitted. The synthetic request was cancelled, with no offer or balance change. Frappe presentation tests cover immediate starts between grid boundaries. Scheduler-backed widening, offer acceptance, and full journey to completed consultation/earnings remain pending; the under-three-minute target is not guaranteed. See `request-inbox-eligibility.md` and `request-inbox-routing-browser-verification.md`. |
 | Progressive explainable routing, service catalog and clinician vetting | partial | Additive linked native category/approach/topic/format/attribute and per-scope application/assessment DocTypes; catalog remains draft/inactive pending clinical review. Applicant drafts, reviewer assignment, clarification/resubmission, per-scope decisions, private clinician CVs and immutable per-scope private evidence revisions exist. PR #25 adds immutable per-decision reconsideration, with `Upheld` or `Reopened`; the current dependent branch adds a separate credential re-verification application linked to the previously approved scope. Credential expiry is enforced against the configured Frappe site date across service-scope eligibility; fresh private license evidence and a new human decision are required to restore expired-scope eligibility. Rejected renewal evidence does not revoke a still-valid prior credential. Backend presentation suite passes 30/30 on Frappe 15 for this stack. The appeal browser journey is captured in `docs/screenshots/vetting-appeals/`; renewal browser acceptance remains pending. Fresh empty-site v1.19, Frappe 16 migration/browser rerun, verified credential sources, proposed rubric v1.0 approval, jurisdiction-specific expiry policy, full credential/accessibility validation, affiliation verification and transparent eligibility-first ranking remain pending. Structured trust indicators exist but broader browser/metric review remains. See `scope-evidence-storage.md`, `session-experience-metric.md`, `vetting-appeals.md`, and `scope-reverification.md`. |
-| Free patient discovery/booking and bring-your-own-patient links | partial | Current demo supports direct discovery/booking; clinician referral links/acquisition attribution not built. |
+| Free patient discovery/booking and bring-your-own-patient links | partial | Direct booking and opaque clinician links already share the same authorized slot/price/privacy flow. Patch v1.26 records acquisition per appointment as `direct_booking`, `clinician_share`, or `open_request`; the clinician-link token is revalidated in the atomic booking transaction, and old appointments remain `unknown`. Backend/migration checks are in progress; production-built link booking browser verification and operational referral reporting remain pending. |
 | Automatic/manual booking confirmation, slot holds/expiry and mutual rescheduling | partial | Recurring server-generated slots, configurable automatic/manual confirmation, atomic slot/fund holds and 24-hour demonstration expiry/release are implemented and regression tested. This branch adds mutual time proposals with counterpart consent, idempotent retry, generated-slot revalidation, preserved original hold until acceptance, expiry/withdraw/decline and no financial reposting. Frappe presentation regression and the independent patient→clinician→patient packaged-browser acceptance pass. Demo proposal expiry defaults to 48 hours, configurable per site. Fresh-install and full responsive/accessibility acceptance remain pending. |
 | Global disclosure defaults, request override and exact per-request preview | implemented | Separate defaults/override, immutable booking snapshot, privacy and profile-edit regression tests. |
 | Public review identity separate from account and clinical disclosure identity | partial | No public identity or comments are collected. A patient may submit one 1–5 session-experience rating only after their own encounter is ended and finalized; clinician profiles show a rolling 365-day mean only at five or more responses. Migration/API/browser verification remains pending; free-text comments and moderation are not implemented. See `session-experience-metric.md`. |

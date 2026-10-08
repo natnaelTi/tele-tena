@@ -232,3 +232,15 @@ a draft or requests clarification; evidence is retained after submission.
 Human assessments snapshot the presented evidence references and revisions.
 No migration modifies existing resume files or application rows, and the
 change does not claim independent credential verification or malware scanning.
+
+## Appointment-scoped acquisition attribution v1.26
+
+`tt_appointment.acquisition_source` records `direct_booking`, `clinician_share`, or
+`open_request` for newly created appointment events. Clinician-share attribution
+requires the opaque offering token to validate again inside the booking
+transaction. Offer acceptance sets its source from the authorized request
+workflow. Existing appointments receive `unknown`; no source is inferred and
+no acquisition field is added to patient profiles. The value is written only
+when creating the private appointment row and is not editable through a generic
+DocType API. This records local acquisition context; it does not prove a
+commercial referral, establish a payable commission, or authorize ranking.

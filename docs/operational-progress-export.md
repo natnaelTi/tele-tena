@@ -1,5 +1,21 @@
 # TeleTena operational progress export
 
+## Current local checkpoint — appointment acquisition source — 2026-10-08
+
+- `feat/relationship-acquisition-attribution` is stacked on draft PR #38 →
+  draft PR #37 → PR #36. v1.26 records direct booking, verified clinician-link,
+  and accepted private-offer sources on each appointment. Existing history
+  remains `unknown`; patient profiles are unchanged.
+- The isolated review site was backed up (database and private files), placed in
+  maintenance mode for the site-scoped migration, migrated successfully, then
+  returned to service. It remains at
+  `http://127.0.0.1:8017/teletena/`; see `frontend/dist/release.json` for the
+  built source SHA after final packaging.
+- The Frappe presentation suite passes 42/42 and integration suite 24/24 on the
+  isolated review site. Packaged route verification and fresh-site installation
+  remain pending. No hosted installation changed; the overall A–I product
+  scope remains partial.
+
 ## Current local checkpoint — progressive request-wave regression — 2026-10-08
 
 - `test/progressive-request-wave-acceptance` is stacked on draft PR #37, which
