@@ -2,6 +2,7 @@
 import base64
 import concurrent.futures
 from copy import deepcopy
+import hashlib
 import importlib.util
 import json
 import secrets
@@ -35,6 +36,15 @@ from tele_tena.patches import v1_23_multiple_offerings
 from tele_tena.patches import v1_24_legacy_completion_activity
 from tele_tena.patches import v1_25_legacy_refund_activity
 from tele_tena.patches import v1_26_appointment_acquisition_source
+from tele_tena.patches import v1_27_vetting_rubric_assessment
+from tele_tena.patches import v1_28_vetting_rubric_registry
+
+
+def proposed_rubric_scores(evidence=None):
+    return {key: {'score': 2, 'rationale': 'Synthetic reviewer evidence note.',
+                  'evidence': [evidence] if evidence and key == 'scope_education' else []}
+            for key in ('scope_education','supervised_experience','approach_training',
+                        'adult_population','ethics_safeguarding','assessment_interview')}
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -543,6 +553,104 @@ class Presentation(unittest.TestCase):
         fixtures.login('c1')
         self.assertEqual(clinic_access.clinic_schedule_access(), [])
 
+    def test_vetting_rubric_definition_is_reviewer_scoped_and_migration_is_repeatable(self):
+        before = journey.rows('''SELECT name,scope_application,decision,rubric_version,findings
+            FROM `tabTele Tena Vetting Assessment` ORDER BY name''')
+        v1_27_vetting_rubric_assessment.execute()
+        v1_27_vetting_rubric_assessment.execute()
+        self.assertTrue(frappe.db.sql(
+            "SHOW COLUMNS FROM `tabTele Tena Vetting Assessment` LIKE 'scored_criteria_snapshot'"))
+        after = journey.rows('''SELECT name,scope_application,decision,rubric_version,findings
+            FROM `tabTele Tena Vetting Assessment` ORDER BY name''')
+        self.assertEqual([tuple(row.values()) for row in after], [tuple(row.values()) for row in before])
+
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            vetting.rubric_definition()
+        fixtures.login('admin')
+        rubric = vetting.rubric_definition()
+        self.assertEqual(rubric['version'], 'proposed-1.0')
+        self.assertEqual(rubric['status'], 'Proposed')
+        self.assertEqual(len(rubric['scored_criteria']), 6)
+        self.assertIn('Human reviewers apply mandatory gates', rubric['decision_rule'])
+
+    def test_vetting_rubric_registry_is_immutable_and_requires_medical_lead(self):
+        before = journey.rows('''SELECT version,status,definition_sha256,created_by,created_at,
+                approved_by,approved_at,approval_reason
+            FROM tt_vetting_rubric_version ORDER BY version''')
+        v1_28_vetting_rubric_registry.execute()
+        v1_28_vetting_rubric_registry.execute()
+        after = journey.rows('''SELECT version,status,definition_sha256,created_by,created_at,
+                approved_by,approved_at,approval_reason
+            FROM tt_vetting_rubric_version ORDER BY version''')
+        self.assertEqual([tuple(row.values()) for row in after], [tuple(row.values()) for row in before])
+
+        proposal = 'proposed-9.' + str(secrets.randbelow(900000) + 100000)
+        definition = {
+            'title': 'Synthetic immutable rubric proposal',
+            'approval_note': 'Synthetic test only; not a clinical standard.',
+            'decision_rule': 'Scores support human review and cannot override mandatory gates.',
+            'score_min': 0, 'score_max': 3,
+            'scored_criteria': [{'key': 'scope_evidence', 'label': 'Scope evidence'}],
+        }
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            vetting.rubric_versions()
+        with self.assertRaises(frappe.PermissionError):
+            vetting.propose_rubric_version('v7.1', definition)
+        fixtures.login('admin')
+        original_current = vetting.current_rubric_version()
+        proposed = vetting.propose_rubric_version(proposal, definition)
+        self.assertEqual(proposed['status'], 'Proposed')
+        self.assertEqual(vetting.current_rubric_version(), 'proposed-1.0')
+        with self.assertRaises(frappe.ValidationError):
+            vetting.propose_rubric_version(proposal, definition)
+        with self.assertRaises(frappe.PermissionError):
+            vetting.approve_rubric_version(proposal, 'Approver cannot approve medical rubric.')
+
+        lead = frappe.get_doc('User', fixtures.USERS['c3'])
+        from tele_tena.account_context import authorized_user_change
+        with authorized_user_change():
+            lead.add_roles('Tele Tena Medical Lead')
+        frappe.clear_cache(user=lead.name)
+        original_registry = journey.rows('''SELECT version,status,approved_by,approved_at,approval_reason
+            FROM tt_vetting_rubric_version''')
+        try:
+            fixtures.login('c3')
+            approved = vetting.approve_rubric_version(proposal, 'Synthetic medical-lead approval test.')
+            self.assertEqual(approved['status'], 'Approved')
+            self.assertTrue(vetting.approve_rubric_version(
+                proposal, 'Synthetic retry rationale.')['idempotent'])
+            self.assertEqual(vetting.current_rubric_version(), proposal)
+            with self.assertRaises(frappe.ValidationError):
+                vetting.propose_rubric_version(proposal, definition)
+        finally:
+            frappe.set_user('Administrator')
+            frappe.db.sql('DELETE FROM tt_vetting_rubric_version WHERE version=%s', (proposal,))
+            for item in original_registry:
+                frappe.db.sql('''UPDATE tt_vetting_rubric_version SET status=%s,approved_by=%s,
+                    approved_at=%s,approval_reason=%s WHERE version=%s''',
+                    (item.status,item.approved_by,item.approved_at,item.approval_reason,item.version))
+            with authorized_user_change():
+                lead.remove_roles('Tele Tena Medical Lead')
+            frappe.clear_cache(user=lead.name)
+            frappe.db.commit()
+
+        fixtures.login('admin')
+        self.assertEqual(vetting.current_rubric_version(), original_current)
+        row = journey.rows('SELECT definition_sha256 FROM tt_vetting_rubric_version WHERE version=%s',
+                           ('proposed-1.0',))[0]
+        original_digest = row.definition_sha256
+        try:
+            frappe.db.sql("UPDATE tt_vetting_rubric_version SET definition_sha256=%s WHERE version='proposed-1.0'",
+                          ('0' * 64,))
+            with self.assertRaises(frappe.ValidationError):
+                vetting.rubric_definition('proposed-1.0')
+        finally:
+            frappe.db.sql("UPDATE tt_vetting_rubric_version SET definition_sha256=%s WHERE version='proposed-1.0'",
+                          (original_digest,))
+            frappe.db.commit()
+
     def test_vetting_draft_clarification_resubmission_and_scope_decision(self):
         service = fixtures.PREFIX + '-reviewed-scope'
         fixtures.login('admin')
@@ -630,11 +738,33 @@ class Presentation(unittest.TestCase):
             'applicant_response':'Synthetic clarification response.'}, submit=True)
         self.assertEqual(resubmitted['status'], 'Resubmitted')
         fixtures.login('admin')
+        with self.assertRaises(frappe.ValidationError):
+            vetting.review_scope_application(application['name'], 'Approved',
+                identity_reviewed=True, credential_verified=True, qualification_relevant=True,
+                experience_adequate=True, adult_scope_appropriate=True, interview_completed=True,
+                findings='Missing rubric scores must fail closed.')
+        invalid_scores = proposed_rubric_scores(first_evidence['id'])
+        invalid_scores['unapproved_dimension'] = {'score': 3, 'rationale': 'Synthetic', 'evidence': []}
+        with self.assertRaises(frappe.ValidationError):
+            vetting.review_scope_application(application['name'], 'Approved',
+                identity_reviewed=True, credential_verified=True, qualification_relevant=True,
+                experience_adequate=True, adult_scope_appropriate=True, interview_completed=True,
+                findings='Unknown dimensions must fail closed.', scored_criteria=invalid_scores)
+        invalid_evidence_scores = proposed_rubric_scores('not-this-applications-evidence')
+        with self.assertRaises(frappe.ValidationError):
+            vetting.review_scope_application(application['name'], 'Approved',
+                identity_reviewed=True, credential_verified=True, qualification_relevant=True,
+                experience_adequate=True, adult_scope_appropriate=True, interview_completed=True,
+                findings='Cross-application evidence references must fail closed.',
+                scored_criteria=invalid_evidence_scores)
+        self.assertEqual(frappe.db.get_value('Tele Tena Vetting Scope Application',
+            application['name'], 'status'), 'Resubmitted')
         result = vetting.review_scope_application(application['name'], 'Approved',
             identity_reviewed=True, credential_verified=True, qualification_relevant=True,
             experience_adequate=True, approach_evidence_reviewed=True,
             adult_scope_appropriate=True, interview_completed=True,
-            findings='Synthetic reviewer assessment; test only.')
+            findings='Synthetic reviewer assessment; test only.',
+            scored_criteria=proposed_rubric_scores(first_evidence['id']))
         self.assertEqual(result['status'], 'Approved')
         self.assertTrue(journey.service_scope_is_current(email, service))
         assessments = journey.rows('SELECT name FROM `tabTele Tena Vetting Assessment` WHERE scope_application=%s',
@@ -644,9 +774,22 @@ class Presentation(unittest.TestCase):
         evidence_snapshot = json.loads(latest_assessment.scope_evidence_snapshot)
         self.assertEqual(len(evidence_snapshot), 2)
         self.assertEqual({item['revision'] for item in evidence_snapshot}, {1, 2})
+        rubric_snapshot = json.loads(latest_assessment.scored_criteria_snapshot)
+        self.assertEqual(rubric_snapshot['version'], 'proposed-1.0')
+        self.assertEqual(rubric_snapshot['status'], 'Proposed')
+        self.assertEqual(rubric_snapshot['definition_sha256'],
+            hashlib.sha256(json.dumps(rubric_snapshot['definition_snapshot'],
+                separators=(',', ':'), sort_keys=True).encode()).hexdigest())
+        self.assertEqual(len(rubric_snapshot['dimensions']), 6)
+        self.assertEqual(rubric_snapshot['dimensions'][0]['evidence'][0]['id'], first_evidence['id'])
+        self.assertEqual(rubric_snapshot['dimensions'][0]['evidence'][0]['revision'], 1)
         with self.assertRaises(frappe.PermissionError):
             assessment = frappe.get_doc('Tele Tena Vetting Assessment', result['assessment'])
             assessment.findings = 'Attempted overwrite'
+            assessment.save()
+        with self.assertRaises(frappe.PermissionError):
+            assessment = frappe.get_doc('Tele Tena Vetting Assessment', result['assessment'])
+            assessment.scored_criteria_snapshot = '{}'
             assessment.save()
 
         # A later suspension is appealable, but the appeal itself does not
@@ -761,7 +904,8 @@ class Presentation(unittest.TestCase):
         fixtures.login('admin')
         vetting.review_scope_application(base['name'],'Approved',identity_reviewed=True,
             credential_verified=True,qualification_relevant=True,experience_adequate=True,
-            adult_scope_appropriate=True,interview_completed=True,findings='Synthetic approval for renewal test.')
+            adult_scope_appropriate=True,interview_completed=True,findings='Synthetic approval for renewal test.',
+            scored_criteria=proposed_rubric_scores())
         self.assertTrue(journey.service_scope_is_current(email,service))
 
         renewed_values = {**values, 'credential_expiry':frappe.utils.add_days(frappe.utils.today(),365),
@@ -868,14 +1012,16 @@ class Presentation(unittest.TestCase):
             vetting.review_scope_application(renewal['name'],'Approved',identity_reviewed=True,
                 credential_verified=True,qualification_relevant=True,experience_adequate=True,
                 adult_scope_appropriate=True,interview_completed=True,
-                findings='Expired credential must not be accepted.')
+                findings='Expired credential must not be accepted.',
+                scored_criteria=proposed_rubric_scores())
         self.assertEqual(frappe.db.get_value('Tele Tena Vetting Scope Application',renewal['name'],
             'status'),'Submitted')
         frappe.db.set_value('Tele Tena Vetting Scope Application',renewal['name'],
             'credential_expiry',renewed_values['credential_expiry'],update_modified=False)
         vetting.review_scope_application(renewal['name'],'Approved',identity_reviewed=True,
             credential_verified=True,qualification_relevant=True,experience_adequate=True,
-            adult_scope_appropriate=True,interview_completed=True,findings='Synthetic re-verification approved.')
+            adult_scope_appropriate=True,interview_completed=True,findings='Synthetic re-verification approved.',
+            scored_criteria=proposed_rubric_scores())
         self.assertTrue(journey.service_scope_is_current(email,service))
         self.assertEqual(vetting.resolve_scope_appointment_review(review.name,'Clear',
             'Renewed synthetic credential was approved.'),{'status':'Cleared','idempotent':False})

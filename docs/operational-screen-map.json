@@ -5800,32 +5800,28 @@
       "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
       "integration_status": "Pending screen-level operational acceptance",
       "prototype_route": "i04",
-      "route": "/admin/vetting (versioned rubric editor absent; proposal only)",
+      "route": "/admin/vetting",
       "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
-      "status": "Designed",
+      "status": "Implemented, verification pending",
       "persistent_models": [
-        "Tele Tena Service",
-        "Tele Tena Service Scope",
-        "Tele Tena Vetting Rubric",
         "Tele Tena Vetting Scope Application",
         "Tele Tena Vetting Assessment",
-        "tt_audit",
-        "tt_dispute",
-        "tt_financial_reconciliation"
+        "Tele Tena Scope Evidence",
+        "tt_vetting_rubric_version",
+        "tt_audit"
       ],
       "queries": [
-        "tele_tena.api.journey.applications",
         "tele_tena.api.vetting.my_scope_applications",
-        "tele_tena.accounting.open_disputes"
+        "tele_tena.api.vetting.rubric_definition",
+        "tele_tena.api.vetting.rubric_versions"
       ],
       "commands": [
-        "tele_tena.api.journey.review",
-        "tele_tena.api.vetting.assign_scope_reviewer",
         "tele_tena.api.vetting.review_scope_application",
-        "tele_tena.accounting.resolve_earning_dispute"
+        "tele_tena.api.vetting.propose_rubric_version",
+        "tele_tena.api.vetting.approve_rubric_version"
       ],
-      "server_permissions": "Approver may inspect authorized application evidence and decide individual scopes. Vetting, financial review and patient-record access are separate grants.",
-      "workflow_transitions": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+      "server_permissions": "Approver and Medical Lead may inspect rubric definitions; only Medical Lead may approve a version. Application assessments remain private, application-scoped and human-decided. Patients and ordinary clinicians are denied.",
+      "workflow_transitions": "Immutable proposal → medical-lead approval → previous approved version superseded; each scope application pins its rubric version and each assessment snapshots definition digest, scores, rationale and same-application evidence revisions.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -5848,13 +5844,13 @@
         "ethiopic_layout": "Verify font coverage, wrapping, line height and control labels on this screen."
       },
       "dependencies": [
-        "approved rubric",
-        "independent primary-source verification and appeal policy"
+        "Medical Lead role assigned by an administrator",
+        "medical-lead approval of proposed content",
+        "independent credential source verification"
       ],
       "verification_evidence": {
-        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I04) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Persistent v1.28 registry and role; exact rubric approval authority, immutable proposals and integrity checks implemented on feat/vetting-rubric-assessment-engine.",
+        "current_local": "Frappe 15.121.2 isolated-site v1.28 migration and repeat migration passed; tests/presentation.py 44/44, tests/integration.py 24/24; production browser route verification pending."
       }
     },
     {
@@ -6141,37 +6137,28 @@
       "id": "I09",
       "family": "I",
       "title": "Rubric versions",
-      "module": "Back office",
+      "module": "Clinical governance",
       "backend_reference": "vetting, catalog and scoped reviewer APIs",
       "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
       "integration_status": "Pending screen-level operational acceptance",
       "prototype_route": "i09",
-      "route": "No rubric version manager",
-      "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
-      "status": "Designed",
+      "route": "/admin/rubrics",
+      "actor": "Tele Tena Medical Lead; Tele Tena Approver may propose but cannot approve",
+      "status": "Implemented, verification pending",
       "persistent_models": [
-        "Tele Tena Service",
-        "Tele Tena Service Scope",
-        "Tele Tena Vetting Rubric",
-        "Tele Tena Vetting Scope Application",
-        "Tele Tena Vetting Assessment",
-        "tt_audit",
-        "tt_dispute",
-        "tt_financial_reconciliation"
+        "tt_vetting_rubric_version",
+        "tt_audit"
       ],
       "queries": [
-        "tele_tena.api.journey.applications",
-        "tele_tena.api.vetting.my_scope_applications",
-        "tele_tena.accounting.open_disputes"
+        "tele_tena.api.vetting.rubric_definition",
+        "tele_tena.api.vetting.rubric_versions"
       ],
       "commands": [
-        "tele_tena.api.journey.review",
-        "tele_tena.api.vetting.assign_scope_reviewer",
-        "tele_tena.api.vetting.review_scope_application",
-        "tele_tena.accounting.resolve_earning_dispute"
+        "tele_tena.api.vetting.propose_rubric_version",
+        "tele_tena.api.vetting.approve_rubric_version"
       ],
-      "server_permissions": "Approver may inspect authorized application evidence and decide individual scopes. Vetting, financial review and patient-record access are separate grants.",
-      "workflow_transitions": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+      "server_permissions": "Dedicated route checks the Medical Lead role; backend independently enforces proposal and approval roles. No public account receives governance roles.",
+      "workflow_transitions": "Proposed immutable version → approved by medical lead with rationale; approval is retry-safe and supersedes prior active version without rewriting historical applications.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -6194,13 +6181,11 @@
         "ethiopic_layout": "Verify font coverage, wrapping, line height and control labels on this screen."
       },
       "dependencies": [
-        "approved rubric",
-        "independent primary-source verification and appeal policy"
+        "Human medical-lead content review and explicit role assignment"
       ],
       "verification_evidence": {
-        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I09) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "React management route and authenticated Frappe API use the v1.28 persistent registry.",
+        "current_local": "Backend/API/migration regression tests pass; production-built connected browser interaction remains pending."
       }
     },
     {

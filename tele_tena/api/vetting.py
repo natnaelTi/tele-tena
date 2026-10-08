@@ -36,6 +36,187 @@ def _applicant(user=None):
     return user
 
 
+def _rubric_manager():
+    user = actor()
+    roles = set(frappe.get_roles(user))
+    if not roles.intersection({'Tele Tena Approver', 'Tele Tena Medical Lead'}):
+        frappe.throw('Rubric review access required', frappe.PermissionError)
+    return user, roles
+
+
+@journey.query()
+def rubric_definition(version=None):
+    """Return the private assessment form definition to authorized reviewers."""
+    _rubric_manager()
+    return _load_rubric(version or current_rubric_version())
+
+
+@journey.query()
+def rubric_versions():
+    user, roles = _rubric_manager()
+    return {'can_propose': True, 'can_approve': 'Tele Tena Medical Lead' in roles,
+            'items': rows('''SELECT version,status,definition_sha256,created_by,created_at,
+                    approved_by,approved_at,approval_reason
+                FROM tt_vetting_rubric_version ORDER BY created_at DESC,version DESC''')}
+
+
+@journey.command
+def propose_rubric_version(version, definition):
+    reviewer, _roles = _rubric_manager()
+    if not re.fullmatch(r'(?:proposed-|v)[0-9]+\.[0-9]+', str(version or '')):
+        fail('Use a version such as proposed-1.1 or v1.1.')
+    version = text(version, 40)
+    if isinstance(definition, str):
+        try:
+            definition = json.loads(definition)
+        except (TypeError, ValueError):
+            fail('Review the rubric definition fields and try again.')
+    allowed = {'title', 'approval_note', 'scored_criteria', 'score_min', 'score_max', 'decision_rule'}
+    if not isinstance(definition, dict) or set(definition) != allowed:
+        fail('The rubric definition has unsupported or missing fields.')
+    title = text(definition.get('title'), 120)
+    approval_note = text(definition.get('approval_note'), 500)
+    decision_rule = text(definition.get('decision_rule'), 1000)
+    minimum = integer(definition.get('score_min'), 0, 0)
+    maximum = integer(definition.get('score_max'), 3, 3)
+    criteria = definition.get('scored_criteria')
+    if not isinstance(criteria, list) or not 1 <= len(criteria) <= 12:
+        fail('Add between one and twelve scored dimensions.')
+    normalized, seen = [], set()
+    for criterion in criteria:
+        if not isinstance(criterion, dict) or set(criterion) != {'key', 'label'}:
+            fail('Each dimension needs only a stable key and English label.')
+        key = criterion.get('key')
+        if not isinstance(key, str) or not re.fullmatch(r'[a-z][a-z0-9_]{1,39}', key) or key in seen:
+            fail('Dimension keys must be unique lowercase identifiers.')
+        seen.add(key)
+        normalized.append({'key': key, 'label': text(criterion.get('label'), 180)})
+    rubric = {'version': version, 'title': title, 'approval_note': approval_note,
+              'scored_criteria': normalized, 'score_min': minimum,
+              'score_max': maximum, 'decision_rule': decision_rule}
+    encoded = json.dumps(rubric, separators=(',', ':'), sort_keys=True)
+    digest = hashlib.sha256(encoded.encode()).hexdigest()
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    if rows('SELECT version FROM tt_vetting_rubric_version WHERE version=%s FOR UPDATE', (version,)):
+        fail('That rubric version already exists and cannot be replaced.', 'rubric_version_immutable')
+    now = frappe.utils.now_datetime()
+    frappe.db.sql('''INSERT INTO tt_vetting_rubric_version
+        (version,status,definition_json,definition_sha256,created_by,created_at)
+        VALUES (%s,'Proposed',%s,%s,%s,%s)''', (version, encoded, digest, reviewer, now))
+    journey.audit(reviewer, 'VettingRubricProposed', {'version': version, 'definition_sha256': digest})
+    return {'version': version, 'status': 'Proposed', 'definition_sha256': digest}
+
+
+@journey.command
+def approve_rubric_version(version, reason):
+    reviewer = actor('Tele Tena Medical Lead')
+    reason = text(reason, 1000)
+    one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    rubric = rows('''SELECT version,status,definition_json,definition_sha256
+        FROM tt_vetting_rubric_version WHERE version=%s FOR UPDATE''', (version,))
+    if not rubric:
+        frappe.throw('Rubric version unavailable', frappe.PermissionError)
+    _load_rubric(version, lock=True)
+    if rubric[0].status == 'Approved':
+        return {'version': version, 'status': 'Approved', 'idempotent': True}
+    if rubric[0].status != 'Proposed':
+        fail('Only a proposed rubric version may receive medical-lead approval.')
+    now = frappe.utils.now_datetime()
+    frappe.db.sql("UPDATE tt_vetting_rubric_version SET status='Superseded' WHERE status='Approved'")
+    frappe.db.sql('''UPDATE tt_vetting_rubric_version SET status='Approved',approved_by=%s,
+        approved_at=%s,approval_reason=%s WHERE version=%s AND status='Proposed' ''',
+        (reviewer, now, reason, version))
+    journey.audit(reviewer, 'VettingRubricApproved', {'version': version, 'definition_sha256': rubric[0].definition_sha256})
+    return {'version': version, 'status': 'Approved', 'idempotent': False}
+
+
+def current_rubric_version():
+    approved = rows('''SELECT version FROM tt_vetting_rubric_version WHERE status='Approved'
+        ORDER BY approved_at DESC,version DESC LIMIT 1''')
+    if approved:
+        return approved[0].version
+    return RUBRIC_VERSION
+
+
+def _load_rubric(version, lock=False):
+    item = rows('''SELECT version,status,definition_json,definition_sha256,
+            approved_by,approved_at,approval_reason FROM tt_vetting_rubric_version
+        WHERE version=%s''' + (' FOR UPDATE' if lock else ''), (version,))
+    if not item:
+        fail('The rubric version attached to this application is unavailable.', 'rubric_unavailable')
+    item = item[0]
+    try:
+        definition = json.loads(item.definition_json)
+    except (TypeError, ValueError):
+        fail('The stored rubric definition could not be verified.', 'rubric_integrity_failure')
+    digest = hashlib.sha256(json.dumps(definition, separators=(',', ':'), sort_keys=True).encode()).hexdigest()
+    if digest != item.definition_sha256:
+        fail('The stored rubric definition could not be verified.', 'rubric_integrity_failure')
+    definition.update({'version': item.version, 'status': item.status,
+                       'definition_sha256': item.definition_sha256,
+                       'approved_by': item.approved_by,
+                       'approved_at': str(item.approved_at or ''),
+                       'approval_reason': item.approval_reason or ''})
+    return definition
+
+
+def _scored_criteria_snapshot(raw, application, rubric_version, require_all=False):
+    rubric = _load_rubric(rubric_version, lock=True)
+    criteria = {item['key']: item for item in rubric['scored_criteria']}
+    if raw is None:
+        raw = {}
+    if isinstance(raw, str):
+        try:
+            raw = json.loads(raw or '{}')
+        except (TypeError, ValueError):
+            fail('Review the structured assessment scores and try again.')
+    if not isinstance(raw, dict) or set(raw) - criteria.keys():
+        fail('The assessment contains an unsupported rubric criterion.')
+    if require_all and set(raw) != set(criteria):
+        fail('Complete each proposed rubric dimension before recording approval.',
+             'vetting_scores_incomplete')
+
+    evidence_rows = rows('''SELECT name,evidence_type,revision,content_sha256
+        FROM `tabTele Tena Scope Evidence` WHERE scope_application=%s''', (application,))
+    evidence_by_id = {item.name: item for item in evidence_rows}
+    snapshot = []
+    for key in criteria:
+        if key not in raw:
+            continue
+        value = raw[key]
+        if not isinstance(value, dict) or set(value) - {'score', 'rationale', 'evidence'}:
+            fail('Each scored dimension needs a score, rationale and evidence references.')
+        score = value.get('score')
+        if isinstance(score, bool):
+            fail('Choose a whole-number score from 0 to 3 for each assessed dimension.')
+        score = integer(score, rubric['score_min'], rubric['score_max'])
+        rationale = text(value.get('rationale') or '', 800)
+        refs = value.get('evidence', [])
+        if not isinstance(refs, list) or len(refs) > 12 or any(not isinstance(ref, str) for ref in refs):
+            fail('Choose evidence references from this scope application only.')
+        if len(set(refs)) != len(refs) or any(ref not in evidence_by_id for ref in refs):
+            fail('An assessment evidence reference is unavailable for this application.')
+        snapshot.append({
+            'key': key,
+            'score': score,
+            'rationale': rationale,
+            'evidence': [
+                {'id': evidence_by_id[ref].name,
+                 'type': evidence_by_id[ref].evidence_type,
+                 'revision': int(evidence_by_id[ref].revision),
+                 'sha256': evidence_by_id[ref].content_sha256}
+                for ref in refs
+            ],
+        })
+    definition_snapshot = {key: value for key, value in rubric.items()
+                           if key not in ('status', 'definition_sha256', 'approved_by',
+                                          'approved_at', 'approval_reason')}
+    return json.dumps({'version': rubric['version'], 'status': rubric['status'],
+                       'definition_sha256': rubric['definition_sha256'],
+                       'definition_snapshot': definition_snapshot, 'dimensions': snapshot},
+                      separators=(',', ':'), sort_keys=True)
+
+
 def _scope_application(user, service, lock=False):
     query = '''SELECT name FROM `tabTele Tena Vetting Scope Application`
         WHERE clinician=%s AND service=%s ORDER BY creation DESC LIMIT 1''' + (' FOR UPDATE' if lock else '')
@@ -89,6 +270,7 @@ def my_scope_applications():
             ORDER BY FIELD(a.status,'Submitted','Resubmitted','Clarification','Draft'),a.submitted_at''')
         for item in result:
             item.resume_uploaded = bool(rows('SELECT 1 FROM tt_resume_evidence WHERE clinician=%s', (item.clinician,)))
+            item.rubric_definition = _load_rubric(item.rubric_version or current_rubric_version())
             item.scope_evidence = _scope_evidence_rows(item.name)
             item.appeals = _appeal_history(item.name)
         return result
@@ -405,7 +587,7 @@ def save_scope_application(service, values, submit=False, reverification_of=None
     else:
         columns = ['name','owner','creation','modified','modified_by','docstatus','idx',
                    'clinician','service','rubric_version',*values.keys()]
-        data = [name,user,now,now,user,0,0,user,service,RUBRIC_VERSION,*values.values()]
+        data = [name,user,now,now,user,0,0,user,service,current_rubric_version(),*values.values()]
         placeholders = ','.join(['%s'] * len(columns))
         frappe.local.tele_tena_reverification_action = bool(renewal_ref)
         try:
@@ -424,12 +606,12 @@ def review_scope_application(application, decision, identity_reviewed=False,
                              credential_verified=False, qualification_relevant=False,
                              experience_adequate=False, approach_evidence_reviewed=False,
                              adult_scope_appropriate=False, interview_completed=False,
-                             findings='', restrictions=''):
+                             findings='', restrictions='', scored_criteria=None):
     reviewer = actor('Tele Tena Approver')
     if decision not in ('Clarification', 'Approved', 'Rejected', 'Suspended', 'Expired'):
         fail('Choose a supported review decision.')
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
-    locked = rows('''SELECT name,clinician,service,status FROM `tabTele Tena Vetting Scope Application`
+    locked = rows('''SELECT name,clinician,service,status,rubric_version FROM `tabTele Tena Vetting Scope Application`
         WHERE name=%s FOR UPDATE''', (application,))
     if not locked:
         frappe.throw('Scope application unavailable', frappe.PermissionError)
@@ -444,6 +626,9 @@ def review_scope_application(application, decision, identity_reviewed=False,
         'approach_evidence_reviewed': approach_evidence_reviewed,
         'adult_scope_appropriate': adult_scope_appropriate, 'interview_completed': interview_completed,
     }.items()}
+    rubric_version = doc.rubric_version or RUBRIC_VERSION
+    scoring_snapshot = _scored_criteria_snapshot(
+        scored_criteria, doc.name, rubric_version, require_all=(decision == 'Approved'))
     if decision == 'Approved':
         required = ('identity_reviewed', 'credential_verified', 'qualification_relevant',
                     'adult_scope_appropriate', 'interview_completed')
@@ -469,7 +654,8 @@ def review_scope_application(application, decision, identity_reviewed=False,
                 FROM `tabTele Tena Scope Evidence` WHERE scope_application=%s
                 ORDER BY evidence_type,revision''', (doc.name,))
         ], separators=(',', ':'), sort_keys=True),
-        'rubric_version': RUBRIC_VERSION, 'decided_at': frappe.utils.now_datetime()})
+        'scored_criteria_snapshot': scoring_snapshot,
+        'rubric_version': rubric_version, 'decided_at': frappe.utils.now_datetime()})
     frappe.local.tele_tena_vetting_assessment_action = True
     try:
         assessment.insert()
@@ -489,7 +675,7 @@ def review_scope_application(application, decision, identity_reviewed=False,
         # Rejection of renewal evidence does not invalidate a different credential
         # that remains current. Explicit suspension or expiry still revokes now.
         if decision == 'Rejected' and renewal:
-            return {'status': decision, 'assessment': assessment.name, 'rubric_version': RUBRIC_VERSION}
+            return {'status': decision, 'assessment': assessment.name, 'rubric_version': rubric_version}
         scopes = rows("SELECT name FROM `tabTele Tena Service Scope` WHERE clinician=%s AND service=%s AND status='Approved' FOR UPDATE",
                       (doc.clinician, doc.service))
         for scope in scopes:
@@ -498,7 +684,7 @@ def review_scope_application(application, decision, identity_reviewed=False,
             scope_doc.save()
         if decision in ('Suspended', 'Expired'):
             flag_scope_appointments_for_review(clinician=doc.clinician, service=doc.service)
-    return {'status': decision, 'assessment': assessment.name, 'rubric_version': RUBRIC_VERSION}
+    return {'status': decision, 'assessment': assessment.name, 'rubric_version': rubric_version}
 
 
 def _scope_review_context(clinician, service):

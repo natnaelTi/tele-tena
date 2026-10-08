@@ -30,3 +30,4 @@ tele_tena.patches.v1_24_legacy_completion_activity
 tele_tena.patches.v1_25_legacy_refund_activity
 tele_tena.patches.v1_26_appointment_acquisition_source
 tele_tena.patches.v1_27_vetting_rubric_assessment
+tele_tena.patches.v1_28_vetting_rubric_registry

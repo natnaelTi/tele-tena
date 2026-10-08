@@ -120,3 +120,5 @@ def install():
     appointment_acquisition_source()
     from tele_tena.patches.v1_27_vetting_rubric_assessment import execute as vetting_rubric_assessment
     vetting_rubric_assessment()
+    from tele_tena.patches.v1_28_vetting_rubric_registry import execute as vetting_rubric_registry
+    vetting_rubric_registry()

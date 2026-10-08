@@ -583,3 +583,23 @@ acceptance. Catalog activation,
 medical-lead terminology/source approval, runtime dynamic intake validation and
 native-language review remain outstanding. See `service-catalog-data-dictionary.md`, `service-catalog-editor-verification.md`,
 and screen I08 in `operational-screen-map.json`.
+
+### Versioned human-led rubric checkpoint (2026-10-08)
+
+On `feat/vetting-rubric-assessment-engine` (dependent on the progressive
+routing/acquisition stack), v1.28 adds an append-only proposed rubric registry
+with definition digests and a distinct `Tele Tena Medical Lead` role. Reviewers
+may propose immutable versions; only a medical lead may approve. Scope
+applications pin their version and assessment records snapshot the definition,
+digest, scores, rationale and application-scoped evidence revisions. Integrity
+failure denies use. The rubric remains proposed until an actual medical lead
+review; no score grants scope approval. A site-specific backup preceded the
+additive migration on `tele-tena-pr12-fresh.localhost`; first and repeat
+migrations passed. Frappe 15 presentation tests pass **44/44** and integration
+tests **24/24**. Frontend TypeScript/Vite production build passes; lint exits 0
+with existing warnings. The production-built management route and responsive
+browser interaction still need a connected-browser check, and a clean fresh-site
+install has not been verified for v1.28. Clinical/credential authority, primary
+source verification, translation review and complete product scope remain
+external or pending. See `vetting-rubric-v1.md`, and screens I04/I09 in
+`operational-screen-map.json`.

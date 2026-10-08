@@ -1,6 +1,10 @@
 # Human-led scope vetting rubric v1 (proposed)
 
-Status: no previously agreed rubric was found in the product/architecture/backlog documents. This version is a **proposal for medical-lead approval**, not an approved credentialing standard or regulator accreditation. The system records reviewer evidence and decisions; it never autonomously verifies a professional or awards scope.
+Status: no previously agreed rubric was found in the product/architecture/backlog documents. `proposed-1.0` is now stored in an immutable version registry with a SHA-256 definition digest; the migration does not imply approval. It remains a **proposal for medical-lead approval**, not an approved credentialing standard or regulator accreditation. The system records reviewer evidence and decisions; it never autonomously verifies a professional or awards scope.
+
+Each scope application pins a rubric version. Every assessment stores that version, a digest-checked definition snapshot, dimension scores, private rationale, and references to evidence revisions scoped to that application. Proposals are append-only; reviewers with the Approver or Medical Lead role may propose, but only a user assigned the separate `Tele Tena Medical Lead` role may approve a version. Approval supersedes the prior active version without rewriting existing applications or assessment history. A proposed version is not active for new applications until a medical lead explicitly approves it. Integrity mismatch fails closed.
+
+The management route is `/teletena/admin/rubrics`. Role assignment is an administrator-controlled operational step; public signup never grants the Medical Lead role. Translation review, rubric governance assignment, and medical-lead approval are still pending. The proposed content below is not a clinical or legal policy decision.
 
 ## Mandatory gates (non-compensatory)
 
