@@ -2419,11 +2419,11 @@
       "module": "Marketplace",
       "backend_reference": "open_requests",
       "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Current packaged route and owner permissions verified on the local Frappe 15 review site.",
       "prototype_route": "d08",
       "route": "/patient/requests",
       "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_open_request",
         "tt_offer",
@@ -2476,7 +2476,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D08) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "The synthetic patient returned from the request detail route to the owner-scoped persisted request list in the current packaged browser check; see docs/patient-request-detail-verification.md. Preview: http://127.0.0.1:8017/teletena/; asset source SHA recorded in the report."
       }
     },
     {
@@ -2486,11 +2486,11 @@
       "module": "Marketplace",
       "backend_reference": "open_requests",
       "required_contract": "Bounded dispatch, private offers, atomic acceptance, cancellation and expiry",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Current packaged route and owner permissions verified on the local Frappe 15 review site.",
       "prototype_route": "d09",
       "route": "/patient/requests/:id",
       "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "tt_open_request",
         "tt_offer",
@@ -2543,7 +2543,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D09) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Owner-scoped request detail API, persisted disclosure snapshot, offer summary, reload and generic unavailable behavior passed the current packaged browser check and Frappe 15 owner-boundary regression; see docs/patient-request-detail-verification.md. Preview: http://127.0.0.1:8017/teletena/; asset source SHA recorded in the report."
       }
     },
     {
