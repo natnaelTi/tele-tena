@@ -690,7 +690,7 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     elif custom_offer_id:
         acquisition_source = 'open_request'
     else:
-        acquisition_source = 'find_care'
+        acquisition_source = 'direct_booking'
     booking_price = int(o.price)
     immediate_request = False
     if custom_offer_id:
