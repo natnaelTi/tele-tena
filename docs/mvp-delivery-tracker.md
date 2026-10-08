@@ -391,9 +391,11 @@ keys are stable, type/range/format/workflow rules are allowlisted, and private
 or sensitive fields cannot drive public filters or matching. Requesting clinical
 terminology review locks the draft; the API cannot approve terminology or
 activate a service. The old two-field create form was removed from the service-
-scope review screen. The focused Frappe regression currently passes 1/1 on the
-isolated `tele-tena-pr12-fresh.localhost`; broader backend, route/browser,
-responsiveness and Frappe 16 tests are still pending. Catalog activation,
+scope review screen. The focused Frappe regression passed 1/1 and the full Frappe 15 presentation
+suite passed 37/37 on the isolated `tele-tena-pr12-fresh.localhost`. The packaged
+reviewer journey passed create/reload/review-lock at 390/768/1440px with no
+horizontal overflow. This is not Frappe 16, fresh-install, or full inventory
+acceptance. Catalog activation,
 medical-lead terminology/source approval, runtime dynamic intake validation and
-native-language review remain outstanding. See `service-catalog-data-dictionary.md`
+native-language review remain outstanding. See `service-catalog-data-dictionary.md`, `service-catalog-editor-verification.md`,
 and screen I08 in `operational-screen-map.json`.

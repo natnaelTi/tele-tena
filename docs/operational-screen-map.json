@@ -6075,7 +6075,7 @@
       "prototype_route": "i08",
       "route": "/teletena/admin/services",
       "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
-      "status": "Implemented, verification pending",
+      "status": "Locally verified",
       "persistent_models": [
         "Tele Tena Service",
         "Tele Tena Service Scope",
@@ -6132,7 +6132,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I08) and design-handoff.md",
         "implementation": "Dedicated reviewer route /teletena/admin/services uses existing Tele Tena Service, Category, Participant Format and Service Attribute Definition DocTypes. Draft save forces inactive/vetting-required/immediate-disabled; draft locks on review request. No terminology approval or service activation is exposed.",
-        "current_local": "Backend regression pending on isolated Frappe site; browser persistence and responsive acceptance pending."
+        "current_local": "2026-10-08: `tests/presentation.py` 37/37 passed on isolated tele-tena-pr12-fresh.localhost; packaged reviewer route create/reload/typed draft/review-lock browser journey passed at 390/768/1440 with no horizontal overflow. Evidence: docs/service-catalog-editor-verification.md and docs/screenshots/service-catalog/."
       }
     },
     {

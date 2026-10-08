@@ -19,6 +19,7 @@ const words: Record<string, [string, string]> = {
   "Amharic name (provisional)": ["የአማርኛ ስም (ጊዜያዊ)", "Maqaa Afaan Amaaraa (yeroo qoratamu)"],
   "Afaan Oromo name (provisional)": ["የአፋን ኦሮሞ ስም (ጊዜያዊ)", "Maqaa Afaan Oromoo (yeroo qoratamu)"],
   "Professional description": ["የሙያ መግለጫ", "Ibsa ogummaa"],
+  "Search names and synonyms (one per line)": ["የመፈለጊያ ስሞችና ተመሳሳይ ቃላት (በአንድ መስመር አንድ)", "Maqaalee fi jechoota walfakkaatan barbaachaaf (sarara tokko keessatti tokko)"],
   "Participant structure": ["የተሳታፊ አይነት", "Gosa hirmaataa"],
   "Population restriction": ["የሚያገለግለው ዕድሜ", "Daangaa umurii"],
   "Allowed delivery formats": ["የተፈቀዱ የአቅርቦት ዘዴዎች", "Akkaataa tajaajilaa eeyyamaman"],

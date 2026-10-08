@@ -41,6 +41,7 @@ let page;
     await page.getByLabel('Service category').selectOption('counseling');
     stage = 'professional description';
     await page.getByLabel('Professional description').fill('Synthetic browser verification; not a clinical definition.');
+    await page.getByLabel('Search names and synonyms (one per line)').fill('Synthetic catalog browser check');
     stage = 'participant structure';
     await page.getByLabel('Participant structure').selectOption('individual');
     await page.getByText('Professional eligibility and workflow rules', { exact: true }).click();
