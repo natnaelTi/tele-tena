@@ -1,7 +1,7 @@
 # Adult relationship links: local verification
 
 The focused implementation is in commit
-`d46edbb9f899146dc2390143f53f73f70ef81b07` on
+`a5d4018a2024070c50745d731b0c70fac1349a3c` on
 `feat/adult-relationship-links`, based on the local clinic-calendar checkpoint
 `5c62499dd89af5b5918aa5a699cf37b1465b1325`. The dependent branch remains
 unmerged in draft PR [#43](https://github.com/natnaelTi/tele-tena/pull/43),
@@ -48,6 +48,14 @@ from the clean branch checkout after verification documentation is committed.
   links workspace, service-worker scope, and overflow checks at 390 and 1440px.
   It used the existing synthetic Review Patient account without changing
   relationships or creating invitations. No browser page errors were observed.
+- A separate two-browser Playwright journey against the built Frappe app used
+  two temporary synthetic patient accounts. It created an invitation in one
+  session, opened the fragment token in the other, completed consent and
+  acceptance, confirmed each patient saw only the other's chosen name, then
+  revoked the link and confirmed the revoked state appeared in both sessions.
+  It passed at 390px with zero page errors. The bearer token field was masked in
+  the retained screenshot; temporary accounts and credentials were cleaned up.
+  This is browser automation, not human usability testing.
 - JSON validation for `docs/operational-screen-map.json`, Python compilation,
   and `git diff --check` passed.
 
@@ -56,6 +64,10 @@ Screenshots:
 - `docs/screenshots/adult-relationship-links/invitation-guest-390.png`
 - `docs/screenshots/adult-relationship-links/patient-links-390.png`
 - `docs/screenshots/adult-relationship-links/patient-links-1440.png`
+- `docs/screenshots/adult-relationship-links/patient-invitation-created-390.png`
+- `docs/screenshots/adult-relationship-links/invitee-consent-preview-390.png`
+- `docs/screenshots/adult-relationship-links/patient-links-active-390.png`
+- `docs/screenshots/adult-relationship-links/patient-link-revoked-390.png`
 
 ## Scope and remaining verification
 
@@ -63,10 +75,10 @@ Backend tests exercise invitation creation/retry, digest-only token storage,
 separate adult attestations, patient/clinician/reviewer authorization, minimal
 preview/list responses, acceptance, decline, expiry, reciprocal deduplication,
 revocation, relinking, request limits, and the fact that a relationship link
-does not grant appointment access. The UI browser check does not yet create and
-accept an invitation through two independent browser sessions. A registration-
-enabled browser configuration, fresh-site install, tablet/narrow/200%-zoom
-checks, and native-language review remain pending.
+does not grant appointment access. The two-session browser check covers
+invitation, acceptance, alias-limited display, and revocation. Registration-
+enabled browser configuration, fresh-site install, 320/768px and 200%-zoom
+checks, scheduler execution, and native-language review remain pending.
 
 Adult confirmation is a self-attestation, not age or identity verification.
 Couples/family offerings remain unavailable. This work adds no appointment

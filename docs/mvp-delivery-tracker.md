@@ -16,11 +16,7 @@ also passed in the focused relationship test. The production build and
 artifact/privacy scan pass. A built-browser smoke test verified public
 invitation routing, policy-aware signed-out copy, patient authentication and
 the patient links page at 390 and 1440 px; screenshots are under
-`docs/screenshots/adult-relationship-links/`. It did not submit an invitation
-through the browser. The packaged release manifest identifies the exact
-source SHA served by the running preview. Fresh-site installation,
-enabled-registration browser configuration, built UI invitation acceptance,
-and 320/768/200%-zoom checks remain pending. The work is in draft PR #43,
+`docs/screenshots/adult-relationship-links/`. A two-context Playwright journey on the built app completed invitation, consent, acceptance, alias-limited visibility, and revocation; screenshots are retained. The packaged release manifest identifies the exact source SHA served by the running preview. Fresh-site installation, enabled-registration browser configuration, and 320/768/200%-zoom checks remain pending. The work is in draft PR #43,
 stacked on open PR #42 (`feat/clinic-shared-calendar`). Neither PR is merged;
 no remote site changed.
 

@@ -9305,8 +9305,8 @@
         "future participant-specific appointment, disclosure, call and note workflows"
       ],
       "verification_evidence": {
-        "backend": "Frappe 15 presentation 47/47 and integration 24/24 pass; focused admin-denial assertion and repeat v1.30 migration invocation pass. Fresh-site verification remains pending.",
-        "frontend": "Production Vite build passes. Built Frappe browser smoke covers guest invitation route, disabled-registration copy, patient sign-in/workspace, PWA scope, and overflow at 390/1440px; it does not yet create/accept an invitation in the browser."
+        "backend": "Frappe 15 presentation 47/47 and integration 24/24 pass; focused reviewer-denial assertion and repeat v1.30 migration invocation pass. Disposable fresh-site install remains pending.",
+        "frontend": "Production-built Frappe browser checks: two separate synthetic patient sessions completed invitation → authenticated consent/acceptance → alias-limited mutual link → revocation visible to both; zero page errors at 390px. Screenshots are retained in docs/screenshots/adult-relationship-links/. Registration-enabled mode, fresh install, 320/768px and 200%-zoom coverage remain pending."
       }
     }
   ]
