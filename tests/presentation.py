@@ -602,7 +602,12 @@ class Presentation(unittest.TestCase):
         original_current = vetting.current_rubric_version()
         proposed = vetting.propose_rubric_version(proposal, definition)
         self.assertEqual(proposed['status'], 'Proposed')
-        self.assertEqual(vetting.current_rubric_version(), 'proposed-1.0')
+        proposal_view = next(item for item in vetting.rubric_versions()['items']
+                             if item.version == proposal)
+        self.assertEqual(proposal_view.definition['title'], definition['title'])
+        self.assertEqual(proposal_view.definition['definition_sha256'], proposed['definition_sha256'])
+        self.assertEqual(proposal_view.definition['scored_criteria'], definition['scored_criteria'])
+        self.assertEqual(vetting.current_rubric_version(), original_current)
         with self.assertRaises(frappe.ValidationError):
             vetting.propose_rubric_version(proposal, definition)
         with self.assertRaises(frappe.PermissionError):

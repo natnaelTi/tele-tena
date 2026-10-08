@@ -1906,3 +1906,9 @@ button:active {
 @media (max-width: 600px) {
   .clinic-shared-row > button { width: 100%; }
 }
+.rubric-version-definition { margin-top: 14px; padding: 12px 14px; border: 1px solid var(--border-default); border-radius: 12px; background: var(--surface-subtle); overflow-wrap: anywhere; }
+.rubric-version-definition > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; }
+.rubric-version-definition h3, .rubric-version-definition h4 { margin: 12px 0 6px; }
+.rubric-version-definition p { margin: 7px 0; }
+.rubric-version-definition ul { margin: 6px 0; padding-inline-start: 22px; }
+.rubric-version-definition code { overflow-wrap: anywhere; }

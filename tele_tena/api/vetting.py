@@ -54,10 +54,13 @@ def rubric_definition(version=None):
 @journey.query()
 def rubric_versions():
     user, roles = _rubric_manager()
-    return {'can_propose': True, 'can_approve': 'Tele Tena Medical Lead' in roles,
-            'items': rows('''SELECT version,status,definition_sha256,created_by,created_at,
+    items = rows('''SELECT version,status,definition_sha256,created_by,created_at,
                     approved_by,approved_at,approval_reason
-                FROM tt_vetting_rubric_version ORDER BY created_at DESC,version DESC''')}
+                FROM tt_vetting_rubric_version ORDER BY created_at DESC,version DESC''')
+    for item in items:
+        item.definition = _load_rubric(item.version)
+    return {'can_propose': True, 'can_approve': 'Tele Tena Medical Lead' in roles,
+            'items': items}
 
 
 @journey.command
