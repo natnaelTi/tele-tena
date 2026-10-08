@@ -1,5 +1,20 @@
 # TeleTena delivery tracker
 
+## Current continuation — owner-scoped transaction details — 2026-10-08
+
+Branch `feat/financial-transaction-details` is a focused dependent slice from
+the current PR #31 branch. It adds persisted detail routes for patient payment
+activity and clinician earnings/payout entries. The backend derives ownership
+from the authenticated account, returns no counterparty/account identifiers,
+and uses a generic denial for foreign or unknown references. Patient legacy
+simulation rows remain explicitly distinct from balanced subledger journals.
+The production frontend build, Python compile, and new Frappe owner/privacy
+assertions pass. The broad presentation run is not clean: reconciliation tests
+leave a synthetic wallet mismatch that causes later funding assertions to fail;
+no retained user data was reconciled or removed. Built-browser route acceptance
+is still pending, so inventory item G03 remains `Implemented, verification
+pending`. See `docs/financial-activity-verification.md`.
+
 ## Current local continuation — private offer review — 2026-10-08
 
 Branch `feat/patient-request-offer-detail` is the head of draft PR #31 and is

@@ -167,7 +167,7 @@ def totals(kind, owner, buckets):
 
 
 def _event_rows(account_ids, limit=100):
-    return frappe.db.sql('''SELECT j.event_ref,j.event_type,j.created,
+    return frappe.db.sql('''SELECT j.id,j.event_ref,j.event_type,j.created,
         MAX(GREATEST(l.debit_minor,l.credit_minor)) amount
         FROM tt_journal j JOIN tt_journal_line l ON l.journal_id=j.id
         WHERE l.account_id IN %s AND j.event_type<>'Opening'

@@ -431,6 +431,7 @@ export function ClinicianEarnings() {
         {action.error && <InlineNotice tone="danger">{action.error}</InlineNotice>}{action.success && <InlineNotice tone="success">{action.success}</InlineNotice>}
       </Card>
       <section className="earnings-history-section"><h2>{w("Activity")}</h2>{history.length ? <ul className="earnings-history">{history.map(entry=><li key={entry.id}><div><strong>{w(entry.kind)}</strong><span className="supporting">{entry.at ? date(entry.at) : w("Date unavailable")}</span></div><div className="earnings-history-value"><strong>ETB {money(entry.amount)}</strong><StatusBadge>{w(entry.state === "Disputed" ? "On hold" : entry.state)}</StatusBadge></div>
+          <Link className="text-link" to={`/clinician/earnings/transactions/${encodeURIComponent(entry.id)}`}>{w("Transaction details")}</Link>
           {"gross_minor" in entry.item && <p className="supporting">{w("Gross")}: ETB {money(entry.item.gross_minor)} · {w("Fee")}: ETB {money(entry.item.fee_minor)} · {w("Net")}: ETB {money(entry.item.net_minor)}{entry.item.release_at&&entry.state==="Pending"?` · ${w("Expected release")}: ${date(entry.item.release_at)}`:""}</p>}
           {entry.state==="Disputed"&&<p className="supporting">{w("Release is paused while an authorized reviewer resolves the dispute.")}</p>}
           {entry.state==="LegacyHold"&&<p className="supporting">{w("Historical balance is preserved for authorized review.")}</p>}

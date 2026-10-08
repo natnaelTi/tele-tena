@@ -416,6 +416,7 @@ export function Booking({ offeringOverride }: { offeringOverride?: string }) {
   );
 }
 export function Payments() {
+  const { w } = useLocale();
   const wallet = useResource(journeyApi.walletActivity);
   const action = useAction();
   const [retryKey, setRetryKey] = useState(() => crypto.randomUUID());
@@ -468,7 +469,7 @@ export function Payments() {
       <p className="supporting">
         This review environment records demonstration funds and reservations. No external payment or refund is processed.
       </p>
-      {wallet.data?.activity?.length ? <section><h2>Payment activity</h2><ul className="payment-activity">{wallet.data.activity.map((item,i)=><li key={i}><span>{item.kind}</span><strong>ETB {money(item.amount)}</strong><time>{date(item.created)}</time></li>)}</ul></section>:<EmptyState title="No payment activity yet." />}
+      {wallet.data?.activity?.length ? <section><h2>Payment activity</h2><ul className="payment-activity">{wallet.data.activity.map((item,i)=><li key={item.activity_id||i}><span>{item.kind}</span><strong>ETB {money(item.amount)}</strong><time>{date(item.created)}</time>{item.activity_id&&<Link className="text-link" to={'/patient/payments/transactions/'+encodeURIComponent(item.activity_id)}>{w('Transaction details')}</Link>}</li>)}</ul></section>:<EmptyState title="No payment activity yet." />}
     </>
   );
 }

@@ -34,6 +34,7 @@ import Showcase from "./pages/Showcase";
 import { ClinicianRequestInbox, PatientOpenRequests, PatientRequestDetail, PatientRequestOfferDetail, PublicClinicianProfile } from "./pages/OpenRequests";
 import { ClinicianScopeApplications, VettingQueue } from "./pages/Vetting";
 import { ClinicianAffiliations, ClinicMembershipPortal, ClinicReview } from "./pages/Clinics";
+import FinancialActivityDetail from "./pages/FinancialActivity";
 import PWAUpdateNotice from "./components/PWAUpdateNotice";
 import "./App.css";
 export default function App() {
@@ -87,6 +88,7 @@ export default function App() {
                 <Route path="account" element={<Account />} />
                 <Route path="clinic-access" element={<ClinicMembershipPortal />} />
                 <Route path="payments" element={<Payments />} />
+                <Route path="payments/transactions/:activityId" element={<FinancialActivityDetail />} />
                 <Route
                   path="consultations/:id"
                   element={<ConsultationPage />}
@@ -113,6 +115,7 @@ export default function App() {
                 <Route path="care" element={<CareRecords />} />
                 <Route path="care/:id" element={<CareRecordDetail />} />
                 <Route path="earnings" element={<ClinicianEarnings />} />
+                <Route path="earnings/transactions/:activityId" element={<FinancialActivityDetail />} />
                 <Route path="vetting" element={<ClinicianScopeApplications />} />
                 <Route path="affiliations" element={<ClinicianAffiliations />} />
               </Route>
