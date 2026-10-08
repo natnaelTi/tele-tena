@@ -6073,9 +6073,9 @@
       "required_contract": "Evidence, independent source verification, individual scope decisions and audits",
       "integration_status": "Pending screen-level operational acceptance",
       "prototype_route": "i08",
-      "route": "No complete definition editor",
+      "route": "/teletena/admin/services",
       "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
-      "status": "Designed",
+      "status": "Locally verified",
       "persistent_models": [
         "Tele Tena Service",
         "Tele Tena Service Scope",
@@ -6087,18 +6087,22 @@
         "tt_financial_reconciliation"
       ],
       "queries": [
+        "tele_tena.api.service_catalog.definitions",
         "tele_tena.api.journey.applications",
         "tele_tena.api.vetting.my_scope_applications",
         "tele_tena.accounting.open_disputes"
       ],
       "commands": [
-        "tele_tena.api.journey.review",
+        "tele_tena.api.service_catalog.save_draft_definition",
+        "tele_tena.api.service_catalog.save_attribute_definition",
+        "tele_tena.api.service_catalog.submit_for_clinical_review",
+        "tele_tena.api.journey.review_service_scope",
         "tele_tena.api.vetting.assign_scope_reviewer",
         "tele_tena.api.vetting.review_scope_application",
         "tele_tena.accounting.resolve_earning_dispute"
       ],
       "server_permissions": "Approver may inspect authorized application evidence and decide individual scopes. Vetting, financial review and patient-record access are separate grants.",
-      "workflow_transitions": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+      "workflow_transitions": "Draft editable → typed attributes saved → terminology review requested and draft locked. Separate human terminology approval/activation is not exposed. Scope vetting decisions and financial exception resolution remain separate audited workflows.",
       "states": {
         "loading": "Show an announced progress/skeleton state; never fabricate records or response counts.",
         "empty": "Explain why no data is available and give an authorized next action; do not imply missing capabilities work.",
@@ -6121,13 +6125,14 @@
         "ethiopic_layout": "Verify font coverage, wrapping, line height and control labels on this screen."
       },
       "dependencies": [
-        "approved rubric",
-        "independent primary-source verification and appeal policy"
+        "medical-lead approval for catalog definitions",
+        "independent primary-source verification and appeal policy",
+        "runtime service-specific intake schemas remain unimplemented"
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I08) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Dedicated reviewer route /teletena/admin/services uses existing Tele Tena Service, Category, Participant Format and Service Attribute Definition DocTypes. Draft save forces inactive/vetting-required/immediate-disabled; draft locks on review request. No terminology approval or service activation is exposed.",
+        "current_local": "2026-10-08: `tests/presentation.py` 37/37 passed on isolated tele-tena-pr12-fresh.localhost; packaged reviewer route create/reload/typed draft/review-lock browser journey passed at 390/768/1440 with no horizontal overflow. Evidence: docs/service-catalog-editor-verification.md and docs/screenshots/service-catalog/."
       }
     },
     {

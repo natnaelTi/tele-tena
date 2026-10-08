@@ -28,7 +28,7 @@ import {
   Services,
 } from "./pages/Clinician";
 import Account from "./pages/Account";
-import { Applications, FinancialDisputes, Scopes } from "./pages/Admin";
+import { Applications, FinancialDisputes, Scopes, ServiceCatalog } from "./pages/Admin";
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
 import Showcase from "./pages/Showcase";
 import { ClinicianRequestInbox, PatientOpenRequests, PatientRequestDetail, PatientRequestOfferDetail, PublicClinicianProfile } from "./pages/OpenRequests";
@@ -122,6 +122,7 @@ export default function App() {
               <Route path="/admin" element={<WorkspaceLayout kind="admin" />}>
                 <Route index element={<Applications />} />
                 <Route path="scopes" element={<Scopes />} />
+                <Route path="services" element={<ServiceCatalog />} />
                 <Route path="vetting" element={<VettingQueue />} />
                 <Route path="clinics" element={<ClinicReview />} />
                 <Route path="financial-disputes" element={<FinancialDisputes />} />

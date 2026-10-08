@@ -19,6 +19,10 @@ export type PreviousClinician = {clinician_id:string;display_name:string;last_co
 export const journeyApi = {
   session: () => api<Session>('session'),
   services: () => api<Service[]>('services'),
+  serviceCatalog: () => api<any>('tele_tena.api.service_catalog.definitions'),
+  saveServiceDraft: (payload:Record<string,unknown>) => api<any>('tele_tena.api.service_catalog.save_draft_definition',{payload},true),
+  submitServiceForReview: (service:string) => api<any>('tele_tena.api.service_catalog.submit_for_clinical_review',{service},true),
+  saveServiceAttribute: (service:string,payload:Record<string,unknown>) => api<any>('tele_tena.api.service_catalog.save_attribute_definition',{service,payload},true),
   discover: (service = '') => api<Offer[]>('discover', service ? { service } : {}),
   previousClinicians: () => api<PreviousClinician[]>('previous_clinicians'),
   wallet: () => api<{ available: number; reserved: number }>('wallet'),

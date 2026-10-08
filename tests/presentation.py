@@ -29,6 +29,7 @@ from tele_tena.api import clinics
 from tele_tena.api import clinic_access
 from tele_tena.api import extensions
 from tele_tena.api import service_policy
+from tele_tena.api import service_catalog
 from tele_tena.api import financial_activity
 from tele_tena.patches import v1_23_multiple_offerings
 
@@ -2084,6 +2085,68 @@ class Presentation(unittest.TestCase):
         finally:
             frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
+
+    def test_service_catalog_edits_are_typed_draft_only_and_reviewer_scoped(self):
+        key = 'synthetic-catalog-' + secrets.token_hex(5)
+        attribute_names = []
+        fixtures.login('admin')
+        payload = {
+            'service_key': key, 'service_label': 'Synthetic counseling definition',
+            'category': 'counseling', 'description': 'Synthetic test only.',
+            'participant_structure': 'individual', 'supported_formats': 'audio\nvideo',
+            'booking_rules': 'scheduled',
+            'required_workflows': 'individual-consultation\nprivate-notes',
+            'population_restriction': 'Adults only', 'definition_version': 'test-1',
+            'catalog_source': 'Synthetic source for regression testing.',
+            'min_duration_minutes': '20', 'max_duration_minutes': '60',
+        }
+        try:
+            created = service_catalog.save_draft_definition(payload)
+            self.assertEqual(created, {'id': key, 'status': 'Draft', 'bookable': False,
+                                       'definition_version': 'test-1'})
+            self.assertEqual(frappe.db.get_value('Tele Tena Service', key,
+                                                 ['active', 'catalog_status', 'vetting_required']),
+                             (0, 'Draft', 1))
+            changed = dict(payload, service_label='Synthetic edited definition')
+            service_catalog.save_draft_definition(changed)
+            self.assertEqual(frappe.db.get_value('Tele Tena Service', key, 'service_label'),
+                             'Synthetic edited definition')
+            with self.assertRaises(frappe.ValidationError):
+                service_catalog.save_draft_definition(dict(payload, min_duration_minutes='61',
+                                                            max_duration_minutes='20'))
+
+            attribute = {'field_key':'synthetic_private_need','label_en':'Private need',
+                         'data_type':'Text','visibility':'Patient private','sensitivity':'Clinical',
+                         'matching_field':True,'filterable':False,'active':True}
+            with self.assertRaises(frappe.ValidationError):
+                service_catalog.save_attribute_definition(key, attribute)
+            attribute.update(matching_field=False, visibility='Public metadata', sensitivity='Ordinary')
+            result = service_catalog.save_attribute_definition(key, attribute)
+            self.assertEqual(result['definition_version'], 'test-1')
+            attribute_names = frappe.db.sql('''SELECT name FROM `tabTele Tena Service Attribute Definition`
+                WHERE service=%s''', (key,), pluck=True)
+            self.assertEqual(len(attribute_names), 1)
+
+            service_catalog.submit_for_clinical_review(key)
+            self.assertEqual(frappe.db.get_value('Tele Tena Service', key,
+                                                 ['clinical_review_status', 'active']),
+                             ('In review', 0))
+            with self.assertRaises(frappe.ValidationError):
+                service_catalog.save_draft_definition(changed)
+            with self.assertRaises(frappe.ValidationError):
+                service_catalog.save_attribute_definition(key, attribute)
+
+            fixtures.login('p1')
+            with self.assertRaises(frappe.PermissionError):
+                service_catalog.definitions()
+            with self.assertRaises(frappe.PermissionError):
+                service_catalog.save_draft_definition(payload)
+        finally:
+            fixtures.login('admin')
+            if attribute_names:
+                frappe.db.sql('DELETE FROM `tabTele Tena Service Attribute Definition` WHERE name IN %s',
+                              (tuple(attribute_names),))
+            frappe.db.sql('DELETE FROM `tabTele Tena Service` WHERE name=%s', (key,))
 
 
 if __name__ == '__main__':
