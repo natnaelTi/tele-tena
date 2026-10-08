@@ -10,13 +10,15 @@ assert.ok(sitePath, 'Set TELE_TENA_REVIEW_SITE_PATH to the isolated review site 
 const base = process.env.TELE_TENA_BROWSER_BASE || 'http://127.0.0.1:8017/teletena'
 const seed = JSON.parse(fs.readFileSync(`${sitePath}/private/tele_tena_review_seed.json`, 'utf8'))
 const accounts = JSON.parse(fs.readFileSync(`${sitePath}/private/tele_tena_review_accounts.json`, 'utf8'))
-const patient = seed.users.calendarpatient
-assert.ok(patient && accounts[patient], 'Synthetic calendar patient credentials are unavailable')
+const patientKey = process.env.TELE_TENA_REVIEW_PATIENT_KEY || 'calendarpatient'
+const patient = seed.users[patientKey]
+assert.ok(patient && accounts[patient], 'Synthetic patient credentials are unavailable')
 
 let stage = 'launch'
 let createdId = null
 let cancelled = false
 let page
+let createdMeta = null
 
 async function requests() {
   return page.evaluate(async () => {
@@ -57,12 +59,14 @@ async function cancelCreatedRequest() {
     await page.getByLabel('Password', { exact: true }).fill(accounts[patient])
     await page.getByRole('button', { name: 'Sign in', exact: true }).click()
     await page.waitForURL(/\/teletena\/patient(?:\/|$)/)
+    await page.getByLabel('Language / ቋንቋ / Afaan').selectOption('en')
 
     stage = 'check isolated patient has no active request'
     await page.goto(`${base}/patient/requests`)
     const before = await requests()
     assert.equal(before.some(item => item.state === 'Open'), false,
       'Refusing to publish while the synthetic patient has another open request')
+    const priorIds = before.map(item => item.id)
 
     stage = 'publish a synthetic immediate request'
     await page.getByLabel('Describe what you are looking for').fill(
@@ -72,22 +76,23 @@ async function cancelCreatedRequest() {
     await page.getByRole('button', { name: 'Publish request' }).click()
 
     stage = 'confirm persisted request and supply result'
-    await page.waitForFunction(async () => {
+    await page.waitForFunction(async oldIds => {
       const response = await fetch('/api/method/tele_tena.api.open_requests.my_requests')
       const list = (await response.json()).message || []
-      return list.some(item => item.state === 'Open')
-    })
+      return list.some(item => !oldIds.includes(item.id))
+    }, priorIds)
     const current = await requests()
-    const created = current.find(item => item.state === 'Open')
+    const created = current.find(item => !priorIds.includes(item.id))
     assert.ok(created)
     createdId = created.id
+    createdMeta = { state: created.state, urgency: created.urgency, format: created.consultation_format, eligibleSupply: created.eligible_supply }
     assert.equal(created.urgency, 'immediate')
     assert.equal(created.consultation_format, 'audio')
 
     let noSupplyGuidance = false
     if (created.eligible_supply === 0) {
       stage = 'verify no-supply explanation and alternatives'
-      await page.getByText('No clinician met every requirement when you posted.',
+      await page.getByText('No clinician met every selected requirement when you posted.',
         { exact: false }).waitFor()
       await page.getByRole('button', { name: 'Schedule for later', exact: true }).waitFor()
       await page.getByRole('link', { name: 'Browse clinicians', exact: true }).waitFor()
@@ -113,7 +118,7 @@ async function cancelCreatedRequest() {
     }))
   } catch (error) {
     try { await cancelCreatedRequest() } catch { /* preserve the original failure stage */ }
-    console.error(`FAIL: ${stage} (${error?.name || 'Error'}); request text and credentials withheld`)
+    console.error(`FAIL: ${stage} (${error?.name || 'Error'}); safe request metadata=${JSON.stringify(createdMeta)}; request text and credentials withheld`)
     process.exitCode = 1
   } finally {
     await browser.close()

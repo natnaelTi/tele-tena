@@ -2470,7 +2470,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (D08) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "On the isolated Frappe 15 site, `tests/presentation.py` passed 38/38 including persisted owner-scoped request state and a new no-capacity dispatch regression. The retained Review Patient request was matched to a different clinician; the Review Clinician had no recipient because its first Addis interval started after the immediate window. Patient zero-supply messaging and prefilled schedule-later recovery are implemented; browser verification of this path remains pending."
+        "current_local": "The real production-built `/teletena/` browser journey on the isolated Frappe 15 site published an immediate audio request through the patient UI and Frappe API, observed zero eligible clinicians from persisted request state, showed the no-supply explanation and schedule-later/browse alternatives, preserved description/service/language/format/disclosure/budget in the later-time composer, then cancelled and re-read the persisted state. Screenshot: `docs/screenshots/open-request/zero-supply-390.png`; repeatable script: `scripts/browser-open-request-zero-supply.cjs`. A later-window offer/accept browser journey routed specifically to the retained Review Clinician remains pending; native translation review is pending."
       }
     },
     {
