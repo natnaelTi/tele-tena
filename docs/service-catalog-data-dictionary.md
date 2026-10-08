@@ -57,3 +57,25 @@ Reference basis (not a local credential rule): WHO mhGAP provides evidence-based
 - [Ethiopia Ministry of Health: professional licensing requirements](https://www.moh.gov.et/Voluntary_Service_Requirement)
 
 Catalog source/reviewer/version fields are stored with each definition. Native-language patient copy and all clinical scope mappings require human review before a pilot.
+
+## Reviewer editing workflow (2026-10)
+
+The administrator workspace now has a dedicated **Service catalog** route
+(`/teletena/admin/services`). It lists the existing native service/category/
+participant-format records and edits only inactive `Draft` definitions that have
+not entered terminology review. Stable keys cannot be renamed. New drafts are
+forced inactive, vetting-required, and immediate-care-disabled by the server;
+the old two-field service-creation form has been removed from the scope-review
+screen. A reviewer can record versioned typed attribute metadata and request
+clinical terminology review. Once review starts, the draft is locked; a future
+change requires a new version rather than overwriting its reviewed history.
+
+This is not clinical approval: the current interface deliberately has no action
+to approve terminology or activate a service. The medical lead's approval,
+source verification and jurisdiction-specific professional requirements remain
+external governance gates. Attribute definitions remain metadata only; runtime
+intake capture and validation are not implemented. Sensitive/private attributes
+cannot be marked for discovery filters or matching. Couples, family, group,
+diagnostics and any non-individual workflows remain unavailable for booking.
+The page and labels have English fallback; Amharic and Afaan Oromo translation
+review is pending.

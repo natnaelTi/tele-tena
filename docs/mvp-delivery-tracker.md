@@ -381,3 +381,19 @@ packaged reviewer page is captured at
 synthetic Review Clinician data remains unchanged and still has no persisted
 care language; its service policy remains off. No successful routed offer is
 claimed.
+
+### Service-definition editor checkpoint (2026-10-08)
+
+The reviewer catalog now has its own `/teletena/admin/services` workspace and
+server commands over the existing native service and versioned-attribute
+DocTypes. Only inactive, unreviewed Draft definitions can be changed there;
+keys are stable, type/range/format/workflow rules are allowlisted, and private
+or sensitive fields cannot drive public filters or matching. Requesting clinical
+terminology review locks the draft; the API cannot approve terminology or
+activate a service. The old two-field create form was removed from the service-
+scope review screen. The focused Frappe regression currently passes 1/1 on the
+isolated `tele-tena-pr12-fresh.localhost`; broader backend, route/browser,
+responsiveness and Frappe 16 tests are still pending. Catalog activation,
+medical-lead terminology/source approval, runtime dynamic intake validation and
+native-language review remain outstanding. See `service-catalog-data-dictionary.md`
+and screen I08 in `operational-screen-map.json`.

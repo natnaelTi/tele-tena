@@ -193,6 +193,7 @@ const clinicianNav = [
 const adminNav = [
   ["/admin", "Applications", ClipboardCheck],
   ["/admin/scopes", "Service scopes", Stethoscope],
+  ["/admin/services", "Service catalog", Stethoscope],
   ["/admin/vetting", "Scope vetting", ClipboardCheck],
   ["/admin/clinics", "Clinics", Building2],
   ["/admin/financial-disputes", "Financial disputes", Wallet],

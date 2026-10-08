@@ -1876,6 +1876,22 @@ button:active {
 .scope-evidence-list li { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:10px 12px; border:1px solid var(--border-default); border-radius:12px; background:var(--surface-card); overflow-wrap:anywhere; }
 .scope-evidence-upload { display:grid; grid-template-columns:minmax(180px,1fr) minmax(220px,2fr); align-items:end; gap:12px; }
 .scope-evidence-upload input[type=file] { width:100%; min-height:44px; padding:8px; border:1px solid var(--border-default); border-radius:12px; background:var(--surface-card); color:var(--text-primary); }
+.service-catalog-workspace { display:grid; grid-template-columns:minmax(240px, .72fr) minmax(0, 1.7fr); gap:24px; align-items:start; }
+.service-catalog-list, .service-catalog-editor { min-width:0; }
+.service-catalog-list { position:sticky; top:20px; max-height:calc(100vh - 160px); overflow:auto; padding:16px; border:1px solid var(--border-default); border-radius:20px; background:var(--surface-card); }
+.service-catalog-list-header, .service-catalog-editor > header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.service-catalog-list-header h2, .service-catalog-editor > header h2 { margin:0; }
+.service-definition-choice { display:grid; gap:4px; width:100%; margin-top:10px; padding:12px; text-align:left; color:var(--text-primary); background:transparent; border:1px solid var(--border-default); border-radius:12px; cursor:pointer; }
+.service-definition-choice:hover, .service-definition-choice:focus-visible { border-color:var(--brand-primary); outline:3px solid color-mix(in srgb, var(--brand-primary) 22%, transparent); }
+.service-definition-choice.selected { background:var(--surface-subtle); border-color:var(--brand-primary); }
+.service-definition-choice span, .service-attribute-row span { color:var(--text-secondary); font-size:14px; overflow-wrap:anywhere; }
+.service-catalog-editor { display:grid; gap:18px; padding:24px; border:1px solid var(--border-default); border-radius:20px; background:var(--surface-card); }
+.service-catalog-editor fieldset { min-width:0; padding:0; border:0; }
+.service-catalog-advanced { margin:18px 0; padding:14px 16px; border:1px solid var(--border-default); border-radius:12px; }
+.service-catalog-advanced summary { min-height:44px; display:flex; align-items:center; cursor:pointer; font-weight:600; }
+.service-attribute-editor { padding-top:18px; border-top:1px solid var(--border-default); }
+.service-attribute-row { display:grid; gap:5px; padding:12px 0; border-bottom:1px solid var(--border-default); }
+@media(max-width:760px) { .service-catalog-workspace { grid-template-columns:minmax(0,1fr); } .service-catalog-list { position:static; max-height:280px; } .service-catalog-editor { padding:16px; } }
 @media (max-width:600px) { .scope-evidence-upload { grid-template-columns:1fr; } .scope-evidence-list li > button { width:100%; } }
 @media (max-width: 600px) {
   .clinic-shared-row > button { width: 100%; }
