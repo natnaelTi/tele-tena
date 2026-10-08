@@ -10,13 +10,18 @@ balances, or call access; couple/family appointments and multi-participant
 consultations remain pending. The isolated site is
 `tele-tena-pr12-fresh.localhost`. Before the additive migration, a full
 database/config/file backup completed. Patch v1.30 was applied and invoked
-twice to check idempotent table creation. Both focused relationship backend
-tests pass, as does the frontend production build. The previous full 47-test
-presentation run exposed two test defects (a fixture-name expectation and an
-overbroad substring assertion); those assertions were corrected and the two
-relationship tests pass individually. A complete rerun, browser journey,
-asset packaging, and current source/build manifest are still pending. The
-work remains uncommitted and unmerged; no remote site changed.
+twice to check idempotent table creation. Presentation tests passed 47/47 and
+integration tests passed 24/24; the additional reviewer-role denial assertion
+also passed in the focused relationship test. The production build and
+artifact/privacy scan pass. A built-browser smoke test verified public
+invitation routing, policy-aware signed-out copy, patient authentication and
+the patient links page at 390 and 1440 px; screenshots are under
+`docs/screenshots/adult-relationship-links/`. It did not submit an invitation
+through the browser. The packaged release manifest identifies the exact
+source SHA served by the running preview. Fresh-site installation,
+enabled-registration browser configuration, built UI invitation acceptance,
+and 320/768/200%-zoom checks remain pending. The work is unmerged and no
+remote site changed.
 
 ## Current local checkpoint — patient-shared clinic calendar — 2026-10-08
 

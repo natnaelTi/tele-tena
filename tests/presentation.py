@@ -2843,7 +2843,7 @@ class Presentation(unittest.TestCase):
             self.assertEqual(listing['relationships'][0]['other_name'], 'Synthetic Test')
             self.assertEqual(set(listing['relationships'][0]),
                              {'id', 'state', 'other_name', 'created_at', 'ended_at'})
-            self.assertEqual(set(listing['invitations'][0]) if listing['invitations'] else set(), set())
+            self.assertEqual(listing['invitations'], [])
             serialized = json.dumps(listing).lower()
             for private in ('example.invalid', 'synthetic private history', 'phone', 'patient@example'):
                 self.assertNotIn(private, serialized)

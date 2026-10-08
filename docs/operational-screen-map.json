@@ -9305,8 +9305,8 @@
         "future participant-specific appointment, disclosure, call and note workflows"
       ],
       "verification_evidence": {
-        "backend": "Two focused Frappe presentation tests pass on tele-tena-pr12-fresh.localhost; v1.30 migration applied and idempotent execution checked twice.",
-        "frontend": "Production Vite build passes. Built-route/browser flow and fresh-site install remain pending."
+        "backend": "Frappe 15 presentation 47/47 and integration 24/24 pass; focused admin-denial assertion and repeat v1.30 migration invocation pass. Fresh-site verification remains pending.",
+        "frontend": "Production Vite build passes. Built Frappe browser smoke covers guest invitation route, disabled-registration copy, patient sign-in/workspace, PWA scope, and overflow at 390/1440px; it does not yet create/accept an invitation in the browser."
       }
     }
   ]
