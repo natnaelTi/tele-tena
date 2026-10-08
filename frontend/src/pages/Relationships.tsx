@@ -15,7 +15,11 @@ export function RelationshipInvitationEntry() {
   const { session, loading, error: sessionError } = useSession();
   const { w } = useLocale();
   const action = useAction();
-  const [token, setToken] = useState('');
+  const [token] = useState(() => {
+    const supplied = new URLSearchParams(window.location.hash.slice(1)).get('invite') || '';
+    const passed = (location.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken || '';
+    return supplied || passed;
+  });
   const [inviter, setInviter] = useState<{inviter_name:string;expires_at:string;notice:string}|null>(null);
   const [adult, setAdult] = useState(false);
   const [decision, setDecision] = useState<'accepted'|'declined'|''>('');
@@ -25,12 +29,9 @@ export function RelationshipInvitationEntry() {
   useEffect(() => {
     if (consumedFragment.current) return;
     consumedFragment.current = true;
-    const supplied = new URLSearchParams(window.location.hash.slice(1)).get('invite') || '';
     const passed = (location.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken || '';
-    const next = supplied || passed;
     if (passed) navigate(location.pathname + location.search, {replace:true,state:null});
-    setToken(next);
-  }, [location.state]);
+  }, [location.pathname, location.search, location.state, navigate]);
 
   useEffect(() => {
     let active = true;
@@ -129,6 +130,7 @@ export default function Relationships() {
   if (!patient) return <InlineNotice tone="danger">{w('This page is for patient accounts.')}</InlineNotice>;
   return <>
     <PageTitle title={w('Shared care')} description={w('Create an optional adult relationship link. It does not share clinical records or appointments.')}/>
+    {action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
     <div className="relationship-workspace">
       <Card className="relationship-create">
         <div className="relationship-heading"><Link2 size={22}/><h2>{w('Invite an adult you trust')}</h2></div>
