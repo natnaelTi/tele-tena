@@ -29,6 +29,7 @@ from tele_tena.api import clinics
 from tele_tena.api import clinic_access
 from tele_tena.api import extensions
 from tele_tena.api import service_policy
+from tele_tena.api import financial_activity
 from tele_tena.patches import v1_23_multiple_offerings
 
 
@@ -171,6 +172,70 @@ class Presentation(unittest.TestCase):
         fixtures.login(kind)
         journey.simulated_deposit(amount, secrets.token_hex(12))
         frappe.db.commit()
+
+    def test_patient_transaction_detail_is_owner_scoped_and_hides_counter_accounts(self):
+        from tele_tena import accounting
+        self.fund_patient('p1', 900)
+        patient = fixtures.USERS['p1']
+        legacy = journey.one('''SELECT id FROM tt_ledger WHERE patient=%s AND kind='Deposit'
+            ORDER BY created DESC,id DESC LIMIT 1''', (patient,))
+        fixtures.login('p1')
+        legacy_detail = financial_activity.transaction_detail('log-' + legacy.id)
+        self.assertEqual(legacy_detail['kind'], 'Funds added')
+        self.assertEqual(int(legacy_detail['amount_minor']), 900)
+        self.assertEqual(legacy_detail['source'], 'simulation_log')
+        self.assertFalse(legacy_detail['external_transfer'])
+
+        event_ref = 'transaction-detail-' + secrets.token_hex(8)
+        accounting.post(event_ref, 'Reservation', event_ref, [
+            (accounting.account_id('patient', patient, 'available'), 125, 0),
+            (accounting.account_id('patient', patient, 'reserved'), 0, 125),
+        ], {'synthetic': True})
+        # Keep the legacy wallet projection aligned with the test posting; the
+        # public API correctly refuses future spending on a mismatched wallet.
+        frappe.db.sql('UPDATE tt_wallet SET available=available-125,reserved=reserved+125 WHERE patient=%s',
+                      (patient,))
+        journal_id = journey.one('SELECT id FROM tt_journal WHERE event_ref=%s', (event_ref,)).id
+        detail = financial_activity.transaction_detail('journal-' + journal_id)
+        self.assertEqual(int(detail['amount_minor']), 125)
+        self.assertEqual({(change['bucket'], int(change['delta_minor']))
+                          for change in detail['account_changes']},
+                         {('available', -125), ('reserved', 125)})
+        serialized = json.dumps(detail)
+        self.assertNotIn(patient, serialized)
+        self.assertNotIn(fixtures.USERS['p2'], serialized)
+        self.assertNotIn('account_id', serialized)
+        fixtures.login('p2')
+        with self.assertRaises(frappe.PermissionError):
+            financial_activity.transaction_detail('log-' + legacy.id)
+        with self.assertRaises(frappe.PermissionError):
+            financial_activity.transaction_detail('journal-' + journal_id)
+        release_ref = event_ref + '-release'
+        accounting.post(release_ref, 'ReservationRelease', release_ref, [
+            (accounting.account_id('patient', patient, 'available'), 0, 125),
+            (accounting.account_id('patient', patient, 'reserved'), 125, 0),
+        ], {'synthetic': True})
+        frappe.db.sql('UPDATE tt_wallet SET available=available+125,reserved=reserved-125 WHERE patient=%s',
+                      (patient,))
+
+    def test_clinician_payout_detail_is_private_and_never_claims_transfer(self):
+        from tele_tena import accounting
+        clinician = fixtures.USERS['c1']
+        event_ref = 'transaction-detail-opening-' + secrets.token_hex(8)
+        accounting.post(event_ref, 'TestOpening', event_ref, [
+            (accounting.account_id('', '', 'opening_control'), 5000, 0),
+            (accounting.account_id('clinician', clinician, 'earnings_available'), 0, 5000),
+        ], {'synthetic': True})
+        fixtures.login('c1')
+        payout = accounting.request_payout(1200, 'transaction-detail-' + secrets.token_hex(8))
+        detail = financial_activity.transaction_detail('payout-' + payout['id'])
+        self.assertEqual(detail['state'], 'Requested')
+        self.assertEqual(int(detail['amount_minor']), 1200)
+        self.assertFalse(detail['external_transfer'])
+        self.assertNotIn(clinician, json.dumps(detail))
+        fixtures.login('c2')
+        with self.assertRaises(frappe.PermissionError):
+            financial_activity.transaction_detail('payout-' + payout['id'])
 
     def test_structured_scope_vetting_blocks_legacy_approval_bypass(self):
         service = fixtures.PREFIX + '-vetting-scope'

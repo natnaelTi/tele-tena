@@ -1014,12 +1014,21 @@ button:active {
 .earnings-history>li>div:first-child{display:grid;gap:3px}
 .earnings-history-value{display:flex;align-items:center;gap:12px}
 .earnings-history>li>p,.earnings-history>li>.button{grid-column:1/-1;margin:0}
+.transaction-detail{max-width:760px;margin-top:20px;padding:28px}
+.transaction-detail>header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.transaction-detail h2{font-size:clamp(30px,4vw,42px);font-variant-numeric:tabular-nums;margin:12px 0 24px}
+.transaction-detail section{border-top:1px solid var(--border-default,#dfe7e9);padding-top:18px;margin-top:22px}
+.transaction-detail section h3{font-size:17px;margin:0 0 12px}
+.transaction-changes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.transaction-changes li{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--border-default,#dfe7e9)}
+.transaction-changes li:last-child{border:0}
+.transaction-changes strong{font-variant-numeric:tabular-nums;white-space:nowrap}
 .extension-panel{max-width:720px;margin:20px auto;padding:18px 20px;border:1px solid var(--border-default,#d7e2dc);border-radius:16px;background:var(--surface-card,#fff)}
 .extension-panel header{display:flex;justify-content:space-between;gap:12px;align-items:start}
 .extension-panel h2{font-size:20px;margin:0}.extension-panel header p{margin:4px 0 12px;color:var(--text-secondary,#526561)}
 .extension-offer{display:grid;gap:10px;padding:14px;border-radius:12px;background:var(--surface-subtle,#eaf2ee)}
 .extension-offer .actions{display:flex;flex-wrap:wrap;gap:8px}.extension-panel details summary{min-height:44px;display:flex;align-items:center;cursor:pointer}
-@media(max-width:800px){.schedule-config{position:static}.earnings-overview{grid-template-columns:1fr;gap:12px}.earnings-available{min-height:150px}.earnings-supporting{padding:4px 16px}.earnings-history>li{gap:8px}.earnings-history-value{align-items:flex-end;flex-direction:column;gap:4px}}
+@media(max-width:800px){.schedule-config{position:static}.earnings-overview{grid-template-columns:1fr;gap:12px}.earnings-available{min-height:150px}.earnings-supporting{padding:4px 16px}.earnings-history>li{gap:8px}.earnings-history-value{align-items:flex-end;flex-direction:column;gap:4px}.transaction-detail{padding:20px 16px}.transaction-changes li{align-items:flex-start;flex-direction:column;gap:3px}}
 @media(max-width:800px){.schedule-editor{display:flex;flex-direction:column}.schedule-week{order:1;padding:16px;width:100%}.schedule-config{order:2;position:static;padding:16px;width:100%}.schedule-week-heading{align-items:stretch;flex-direction:column}.schedule-week-heading .field{width:100%}.availability-calendar-scroll{display:none}.availability-workspace{display:block}.availability-interval-editor{position:fixed;left:12px;right:12px;top:auto;bottom:max(12px,env(safe-area-inset-bottom));z-index:75;width:auto;max-height:min(55vh,460px);overflow:auto;box-shadow:0 12px 40px #102a3335}.schedule-accessible-times{border-top:1px solid var(--border-default,#dfe7e9);padding-top:8px}.schedule-accessible-times:not([open]) .schedule-day-picker{display:none}.schedule-accessible-times[open] .schedule-day-picker{display:grid}.schedule-accessible-times[open] .schedule-day.mobile-selected{display:grid}.schedule-week .schedule-day{display:none}.schedule-week .schedule-day.mobile-selected{display:grid}.schedule-interval{display:flex;align-items:end;gap:8px;flex-wrap:wrap}.schedule-interval .field{flex:1;min-width:130px}.schedule-week-heading select{max-width:100%}.schedule-advanced:not([open])>*:not(summary){display:none}.schedule-advanced[open]{padding-block:8px}}
 @media(min-width:801px) and (max-width:1100px){.schedule-editor{grid-template-columns:250px minmax(0,1fr);gap:12px}.schedule-config,.schedule-week{padding:16px}}
 @media(min-width:801px){.schedule-day-picker{display:none}.schedule-week .schedule-day{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid var(--border-default,#dfe7e9)}.schedule-week .schedule-day h3{margin:0;padding-top:12px}.schedule-week .schedule-intervals{align-items:flex-start}.schedule-week .schedule-interval{display:flex;flex-wrap:wrap}.schedule-week .schedule-interval .field{width:145px;min-width:145px}}

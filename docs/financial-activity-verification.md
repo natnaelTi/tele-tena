@@ -1,0 +1,54 @@
+# Financial activity details verification
+
+This focused slice adds a persisted, owner-scoped detail page for patient
+payment activity and clinician earnings/payout activity. It does not change
+balances, reconcile wallets, settle earnings, or connect an external payment
+provider.
+
+Patient rows link to the legacy simulation log or the balanced demonstration
+subledger using opaque UUID-prefixed activity references. Clinician rows link
+to their own earning or payout record. The endpoint derives the caller's role
+from the authenticated Frappe session and checks ownership in SQL. A caller
+cannot select an account, owner, counterparty, or role through request data.
+Unknown and other-owner references share the same unavailable response. The
+response contains only the caller's bucket changes and a minimal related
+appointment summary where the caller is a participant. Payout details always
+state that no external transfer occurred.
+
+Legacy simulation activity remains distinct from balanced subledger journals.
+The detail screen identifies earlier legacy records and does not relabel the
+append-only log as double-entry accounting. Real custody, ERPNext accounting,
+refund settlement, and payout provider operations remain out of scope.
+
+## Verification status
+
+- `npm --prefix frontend run build`: passed after the route and page were added.
+- `npm --prefix frontend run lint`: exited successfully; it reports existing
+  repository-wide warnings, including duplicate localization keys elsewhere.
+- Bench Python `compileall` for `tele_tena` and `tests/presentation.py`: passed.
+- Focused Frappe assertions for patient log/journal owner privacy and clinician
+  payout ownership passed during the presentation run.
+- The first complete `tests/presentation.py` run caught a wallet/subledger
+  projection mismatch in the new test fixture: it posted a reservation without
+  updating the legacy wallet projection, so later spending tests correctly
+  failed closed. The fixture now moves both projections together and posts a
+  matching release. The rerun passed **36/36** on the retained isolated site.
+- Production-built browser verification passed for both owners. Patient journey:
+  password alternative on the invited-review site → Payments → persisted
+  reservation → detail → reload → generic unknown-record denial. Clinician
+  journey: Earnings → persisted released earning → detail → reload. The browser
+  used the private review account file without printing credentials. Patient
+  screenshots at 320, 390, 768 and 1440 CSS px and clinician screenshots at 390
+  and 1440 CSS px are in `docs/screenshots/financial-activity/`; automated
+  overflow checks passed at those widths. Actual browser 200% zoom remains
+  pending.
+
+The packaged preview was built from the source commit recorded in its
+`release.json` manifest and served at `http://127.0.0.1:8017/teletena/` by the
+isolated review site. The user selected
+the visible “Use email instead” path because this site intentionally has no
+SMS/email OTP delivery configured; this does not alter the authentication
+policy or imply OTP delivery works.
+
+The retained site contains synthetic review data. No patient or clinician
+records were reset or manually reconciled for this check.

@@ -1,5 +1,29 @@
 # TeleTena operational progress export
 
+## Current local checkpoint — financial transaction details — 2026-10-08
+
+- Draft PR #32, branch `feat/financial-transaction-details`, depends on PR #31
+  and targets its feature branch to preserve ancestry. It remains unmerged and
+  no hosted installation was changed.
+- The exact source commit is the value in the served `release.json` manifest;
+  this report is updated before each final packaging pass.
+- Preview: `http://127.0.0.1:8017/teletena/`, site
+  `tele-tena-pr12-fresh.localhost`, Frappe app production build (no Vite).
+  The packaged release manifest matches the source commit. Gunicorn master
+  287561 was reloaded and serves workers on the isolated review bench.
+- Patient payment activity now opens an owner-scoped persisted detail route;
+  clinician earnings/payout rows have corresponding owner-scoped routes. The
+  presentation suite passed 36/36 after correcting the new test fixture to keep
+  wallet and subledger projections aligned.
+- Built browser acceptance passed for patient reservation and clinician
+  released-earning detail routes, including reload and generic unknown-ID
+  denial. Patient screenshots at 320, 390, 768 and 1440 CSS px and clinician
+  screenshots at 390 and 1440 are in `docs/screenshots/financial-activity/`.
+  Actual 200% zoom and native-language review remain pending.
+- This is one incremental presentation slice. It does not complete the larger
+  operational design scope, enable real payments, verify provider delivery,
+  prove physical-device calls, or establish clinical/legal readiness.
+
 Sanitized local checkpoint for roadmap updates. It is not a merge, deployment,
 real-patient-readiness, real-money, or market-performance claim.
 

@@ -713,7 +713,7 @@ def wallet_summary():
     patient = actor('Tele Tena Patient')
     profile('patient')
     wallet = one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
-    legacy = rows('''SELECT l.kind,l.amount,l.created,l.reference FROM tt_ledger l
+    legacy = rows('''SELECT l.id,l.kind,l.amount,l.created,l.reference FROM tt_ledger l
         LEFT JOIN tt_journal j ON j.event_ref=l.reference
         WHERE l.patient=%s AND j.id IS NULL ORDER BY l.created DESC,l.id DESC LIMIT 50''', (patient,))
     from tele_tena.accounting import _event_rows, account_id
@@ -721,14 +721,16 @@ def wallet_summary():
         account_id('patient', patient, 'available'), account_id('patient', patient, 'reserved')])
     for item in legacy:
         item.source = 'simulation_log'
+        item.activity_id = 'log-' + item.id
         item.event_ref = item.reference
-        item.kind = {'Deposit': 'Demonstration funds added', 'Reservation': 'Appointment funds reserved',
+        item.kind = {'Deposit': 'Funds added', 'Reservation': 'Appointment funds reserved',
                      'Release': 'Appointment reservation released'}.get(item.kind, item.kind)
-    event_labels = {'Deposit': 'Demonstration funds added', 'Reservation': 'Appointment funds reserved',
+    event_labels = {'Deposit': 'Funds added', 'Reservation': 'Appointment funds reserved',
                     'ReservationRelease': 'Appointment reservation released',
                     'ConsultationFinalized': 'Consultation completed', 'EarningRefunded': 'Refund recorded'}
     for item in activity[len(legacy):]:
         item.source = 'demo_subledger'
+        item.activity_id = 'journal-' + item.id
         item.kind = event_labels.get(item.event_type, item.event_type)
     activity.sort(key=lambda item: (item.created, getattr(item, 'reference', '')), reverse=True)
     activity = activity[:50]

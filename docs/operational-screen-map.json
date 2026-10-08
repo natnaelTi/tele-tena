@@ -4670,11 +4670,11 @@
       "module": "Finance",
       "backend_reference": "demo financial subledger; real provider work pending",
       "required_contract": "Exact balanced postings, holds, disputes, release, refunds, payouts and reconciliation",
-      "integration_status": "Pending screen-level operational acceptance",
+      "integration_status": "Owner-scoped transaction details implemented; browser verification pending",
       "prototype_route": "g03",
-      "route": "/patient/payments (transaction detail incomplete)",
-      "actor": "Patient owner, clinician owner, narrowly authorized financial reviewer",
-      "status": "Designed",
+      "route": "/patient/payments/transactions/:activityId and /clinician/earnings/transactions/:activityId",
+      "actor": "Patient owner or clinician owner; financial review remains on its separately authorized admin route",
+      "status": "Implemented, verification pending",
       "persistent_models": [
         "tt_wallet",
         "tt_ledger",
@@ -4689,6 +4689,7 @@
       "queries": [
         "tele_tena.api.journey.wallet",
         "tele_tena.api.presentation.wallet_summary",
+        "tele_tena.api.financial_activity.transaction_detail",
         "tele_tena.accounting.clinician_earnings",
         "tele_tena.accounting.open_disputes"
       ],
@@ -4729,8 +4730,8 @@
       ],
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (G03) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "implementation": "Owner-scoped persisted transaction-detail API covers patient legacy log and subledger entries plus clinician earnings and payout requests. Route links are present in Payments and Earnings; cross-owner reads return a generic unavailable response.",
+        "current_local": "Frappe assertions for patient journal/log privacy and clinician payout ownership passed; tests/presentation.py passes 36/36. Built patient reservation and clinician released-earning detail routes pass reload and generic unknown-ID denial. Patient layout checked at 320/390/768/1440 and clinician at 390/1440; browser 200% zoom remains pending."
       }
     },
     {
