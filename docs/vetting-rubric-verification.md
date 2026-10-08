@@ -47,7 +47,6 @@ the old decision did not capture these details.
   idempotency, immutable proposal, patient denial, Approver denial of approval,
   Medical Lead approval and retry, active-version selection, and definition
   digest tamper detection.
-- `tests/integration.py`: **24/24 passed** on the isolated site.
 - `npm run build`: passed with the existing large LiveKit chunk warning.
 - `npm run lint`: exit 0 with existing repository warnings.
 - `tests/integration.py`: **24/24 passed** after the provenance changes.
@@ -58,6 +57,11 @@ the old decision did not capture these details.
   synthetic reviewer opened `/teletena/admin/vetting`, inspected the complete
   proposed definition and digest, and was denied the Medical Lead-only route.
   Captures at 390/768/1440px are in `docs/screenshots/vetting-rubric/`.
+- The built applicant/reviewer journey submitted a synthetic scope application,
+  let the reviewer open its private evidence, and verified all four credential
+  provenance controls at 1440 and 390 px. Screenshots are
+  `docs/screenshots/vetting-rubric/credential-source-reviewer-{1440,390}.png`.
+  The browser check did not submit a credential decision or alter a scope.
 - The new provenance inputs have localization keys in English, Amharic and
   Afaan Oromo. Native-speaker review remains pending.
 
@@ -74,10 +78,8 @@ jobs; no worker execution is claimed for this change.
   the time of this check; the existing review site was preserved.
 - No real Medical Lead has approved the proposed rubric. This is not an agreed
   or medically validated standard, an accreditation, or credential verification.
-- The new provenance inputs/history have not yet been captured in a browser
-  session. The earlier reviewer workflow was browser-checked in the existing English synthetic
-  reviewer session only. Amharic/Afaan Oromo native review and complete zoom,
-  keyboard and screen-reader acceptance remain pending.
+- Browser checks used English. Amharic/Afaan Oromo native review and complete
+  zoom, keyboard and screen-reader acceptance remain pending.
 - Frappe 16 fresh-install verification, live providers, physical-device calling,
   and the broad A–I product scope remain pending or external as recorded in the
   delivery tracker.
