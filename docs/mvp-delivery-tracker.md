@@ -15,14 +15,24 @@ offer, appointment, or financial posting. Screenshots are in
 `docs/screenshots/open-request-routed/`; the executable journey is
 `scripts/browser-open-request-routed-inbox.cjs`.
 
-PR #37 is draft and depends on PR #36. The latest production asset build,
-asset/privacy scan, and two-context browser journey passed at source
-`c2e45d87bd6a485850d2dda7310a3ecc137da384`. PR #37 CI is still running. The
-fresh-site v1.7/expanded-catalog verification requested in the broader product
-checkpoint remains pending; no fresh-site credentials or successful helper
-completion are available at this checkpoint. This verifies only the routed
-inbox slice, not offer acceptance or the full A–I scope. Live SMS, physical
-devices, and native-language review remain external validation items.
+PR #37 is draft and depends on PR #36. The production asset build,
+asset/privacy scan, and two-context browser journey passed; the newer doc-only
+checkpoint build SHA and PR #37 CI are recorded below. Fresh-site v1.7/expanded-
+catalog verification requested in the broader product checkpoint remains
+pending; no fresh-site credentials or successful helper completion are
+available at this checkpoint. This verifies only the routed inbox slice, not
+offer acceptance or the full A–I scope. Live SMS, physical devices, and
+native-language review remain external validation items.
+
+Follow-up verification on this branch: `tests/integration.py` passed 24/24 and
+`tests/presentation.py` passed 40/40 on `tele-tena-pr12-fresh.localhost`; PR #37
+CI passed both frontend Node versions (22.23.3 and 24.13.0) and Python syntax
+checks (3.12 and 3.14.2). The source/build SHA at that run was
+`0339c1483043c1e047d1e7f509b67c6bc3a3ebd1`. The active preview returned HTTP
+200 from the packaged `/teletena/` route. These backend suites include the
+continuous immediate-start boundary, request eligibility, private competing
+offers, concurrent acceptance, and payment reservation regressions; they do not
+verify the full downstream consultation and earnings journey in two browsers.
 
 ## Current local operational checkpoint — legacy finance projection — 2026-10-08
 
