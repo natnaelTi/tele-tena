@@ -570,6 +570,10 @@ def finalize_consultation(appointment, publish_summary=0):
         post(reference, 'ConsultationFinalized', reference, entries,
              {'appointment': item.id, 'simulated': True,
               'extension_ids': [extension.id for extension in extensions]})
+        # This activity row is not a second accounting posting. The balanced
+        # journal above remains authoritative and uses the same reference.
+        from tele_tena.api.journey import simulation_log
+        simulation_log(item.patient, 'Consumption', gross, reference)
         frappe.db.sql('''INSERT INTO tt_earning
             (id,appointment,patient,clinician,gross_minor,fee_minor,net_minor,policy_snapshot,
              state,completed_at,release_at,created,modified)
@@ -724,7 +728,9 @@ def wallet_summary():
         item.activity_id = 'log-' + item.id
         item.event_ref = item.reference
         item.kind = {'Deposit': 'Funds added', 'Reservation': 'Appointment funds reserved',
-                     'Release': 'Appointment reservation released'}.get(item.kind, item.kind)
+                     'Release': 'Appointment reservation released',
+                     'Consumption': 'Funds applied to consultation',
+                     'Refund': 'Refund recorded'}.get(item.kind, item.kind)
     event_labels = {'Deposit': 'Funds added', 'Reservation': 'Appointment funds reserved',
                     'ReservationRelease': 'Appointment reservation released',
                     'ConsultationFinalized': 'Consultation completed', 'EarningRefunded': 'Refund recorded'}

@@ -112,3 +112,7 @@ def install():
     immediate_service_policy()
     from tele_tena.patches.v1_23_multiple_offerings import execute as multiple_offerings
     multiple_offerings()
+    from tele_tena.patches.v1_24_legacy_completion_activity import execute as legacy_completion_activity
+    legacy_completion_activity()
+    from tele_tena.patches.v1_25_legacy_refund_activity import execute as legacy_refund_activity
+    legacy_refund_activity()

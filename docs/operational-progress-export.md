@@ -1,6 +1,44 @@
 # TeleTena operational progress export
 
-## Current local checkpoint — discovery filters and packaged preview — 2026-10-08
+## Current local checkpoint — legacy reconciliation UI — 2026-10-08
+
+- Draft PR #36 is open on `fix/legacy-wallet-projection-audit`, based on PR #35
+  head `1d2a65ecfb450d938cb36a82f74fb80e9202e961` and dependent on PR #35/#34.
+  PR #35/#34 remain open; no PR is merged and no remote site is changed.
+- Exact source/build SHA is recorded in `frontend/dist/release.json` after the
+  final packaging run.
+  Preview URL: `http://127.0.0.1:8017/teletena/`; reviewer page:
+  `/teletena/admin/financial-disputes`. Site `tele-tena-pr12-fresh.localhost`,
+  Bench `/home/frappe/frappe/frappe-bench`. Gunicorn master 287561 runs the
+  test WSGI against `apps/tele_tena`; environment binds that process to the
+  isolated site. This is the packaged Frappe app, not Vite.
+- The reviewer reconciliation queue shows 3 retained synthetic holds with
+  opaque site-secret HMAC references. Its API omits patient identifiers and
+  free-form audit reasons. Acceptance requires an authorized role and reason,
+  rechecks wallet/subledger equality under locks, and preserves history. No
+  existing case was accepted. Production-built browser coverage passed at
+  390/768/1440px with no horizontal overflow; screenshots are in
+  `docs/screenshots/financial-reconciliation/`.
+- v1.24/v1.25 were migrated after site/files backup, site scheduler pause,
+  empty pending-job check, and maintenance mode. 14 exact completion events
+  were added while preserving all 91 original `tt_ledger` rows; 3 exact refund
+  events were added while preserving all 105 prior rows. Repeat migration
+  passed. Owner audit: all 9 wallet/subledger/activity projections match, no
+  unknown event kinds, and all journals balance. Three cases remain on hold.
+- `tests/presentation.py`: 40/40. `tests/integration.py`: 24/24 on this branch's
+  earlier checkpoint. Production frontend build and asset/privacy scan pass;
+  lint exits 0 with existing warnings. PR #36 checks pass on Node 22.23.3 and
+  24.13.0 and Python syntax 3.12/3.14.2. Site scheduler is enabled and pending
+  jobs were empty; shared worker/scheduler processes predate this checkout and
+  were not restarted, so current-branch scheduled earnings/routing is not
+  claimed. Fresh-site install/browser verification still awaits the local sudo
+  setup step. Live SMS, physical-device calls and native translation review
+  remain unverified.
+- This is an incremental finance repair/reviewer-screen slice, not completion
+  of the approved A–I product scope. See `mvp-delivery-tracker.md` and
+  `legacy-wallet-projection-fix.md`.
+
+## Historical checkpoint — discovery filters and packaged preview — 2026-10-08
 
 - Draft PR #35, branch `feat/discovery-language-format-filters`, depends on
   PR #34 `fix/immediate-readiness-window`; PR #34 itself remains stacked on

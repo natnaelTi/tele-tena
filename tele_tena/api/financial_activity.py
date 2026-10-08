@@ -66,6 +66,7 @@ def _journal_detail(journal_id, user, role):
     appointment = _appointment_summary(metadata.get('appointment'), user)
     event_labels = {
         'Deposit': 'Funds added', 'Reservation': 'Appointment funds reserved',
+        'Consumption': 'Funds applied to consultation', 'Refund': 'Refund recorded',
         'ReservationRelease': 'Appointment reservation released',
         'ConsultationFinalized': 'Consultation completed',
         'EarningReleased': 'Earnings released', 'PayoutRequested': 'Payout requested',
@@ -115,7 +116,8 @@ def transaction_detail(activity_id):
             _unavailable()
         row = rows[0]
         kind = {'Deposit': 'Funds added', 'Reservation': 'Appointment funds reserved',
-                'Release': 'Appointment reservation released'}.get(row.kind, row.kind)
+                'Release': 'Appointment reservation released',
+                'Consumption': 'Funds applied to consultation', 'Refund': 'Refund recorded'}.get(row.kind, row.kind)
         return {'activity_id': 'log-' + row.id, 'kind': kind,
                 'created': row.created.isoformat() + 'Z', 'amount_minor': int(row.amount),
                 'currency': 'ETB', 'state': 'Recorded', 'account_changes': [],

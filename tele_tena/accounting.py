@@ -1,5 +1,7 @@
 """Balanced, immutable demonstration postings; never calls an external provider."""
 import json
+import hashlib
+import hmac
 import uuid
 from datetime import datetime, timezone
 
@@ -118,13 +120,23 @@ def financial_reconciliation_queue():
     reviewer = frappe.session.user
     if reviewer == 'Guest' or 'Tele Tena Approver' not in frappe.get_roles(reviewer):
         frappe.throw('Authorized financial reviewer required', frappe.PermissionError)
-    return frappe.db.sql('''SELECT id,patient,legacy_available,legacy_reserved,
+    rows = frappe.db.sql('''SELECT id,legacy_available,legacy_reserved,
         wallet_available,wallet_reserved,subledger_available,subledger_reserved,
-        event_count,unknown_event_count,boundary_event_count,status,reason,created
+        event_count,unknown_event_count,boundary_event_count,status,created
         FROM tt_financial_reconciliation ORDER BY created LIMIT 200''', as_dict=True)
+    for row in rows:
+        row.case_ref = _reconciliation_case_ref(row.pop('id'))
+    return rows
 
 
-@frappe.whitelist(methods=['POST'])
+def _reconciliation_case_ref(case_id):
+    key = (frappe.conf.get('encryption_key') or '').encode()
+    if not key:
+        frappe.throw('Financial review reference configuration unavailable', frappe.ValidationError)
+    digest = hmac.new(key, ('tele-tena:wallet-reconciliation:' + str(case_id)).encode(), hashlib.sha256).hexdigest()
+    return 'wr_' + digest
+
+
 def accept_wallet_snapshot(patient, reason):
     """Explicitly authorize the current balanced opening snapshot for forward use.
 
@@ -160,6 +172,24 @@ def accept_wallet_snapshot(patient, reason):
         decided_at=UTC_TIMESTAMP(6),modified=UTC_TIMESTAMP(6) WHERE id=%s''',
         (reviewer, reason, item.id))
     return {'status': 'SnapshotAccepted', 'historical_difference_preserved': True}
+
+
+@frappe.whitelist(methods=['POST'])
+def accept_reconciliation_case(case_ref, reason):
+    """Accept a snapshot via its opaque audit reference, without exposing patient identity."""
+    reviewer = frappe.session.user
+    if reviewer == 'Guest' or 'Tele Tena Approver' not in frappe.get_roles(reviewer):
+        frappe.throw('Authorized financial reviewer required', frappe.PermissionError)
+    rows = frappe.db.sql('''SELECT id,patient FROM tt_financial_reconciliation
+        WHERE status IN ('ReviewRequired','SnapshotAccepted')''', as_dict=True)
+    selected_patient = None
+    for row in rows:
+        if hmac.compare_digest(_reconciliation_case_ref(row.id), str(case_ref)):
+            selected_patient = row.patient
+            break
+    if not selected_patient:
+        frappe.throw('Financial reconciliation case unavailable', frappe.PermissionError)
+    return accept_wallet_snapshot(selected_patient, reason)
 
 
 def totals(kind, owner, buckets):
@@ -323,6 +353,8 @@ def resolve_earning_dispute(appointment, resolution, reason):
              [(account_id('clinician', item.clinician, 'pending'), amount, 0),
               (account_id('patient', item.patient, 'available'), 0, amount)],
              {'appointment': item.appointment, 'dispute': item.dispute_id})
+        from tele_tena.api.journey import simulation_log
+        simulation_log(item.patient, 'Refund', amount, 'earning-refund:' + item.id)
         frappe.db.sql('UPDATE tt_wallet SET available=available+%s WHERE patient=%s', (amount, item.patient))
         frappe.db.sql("UPDATE tt_earning SET state='Refunded',modified=%s WHERE id=%s", (now, item.id))
     frappe.db.sql('''UPDATE tt_dispute SET status='Resolved',resolved_by=%s,resolution=%s,

@@ -1,6 +1,65 @@
 # TeleTena delivery tracker
 
-## Current test-fixture checkpoint — 2026-10-08
+## Current local operational checkpoint — legacy finance projection — 2026-10-08
+
+The active checkout is `fix/legacy-wallet-projection-audit` at the current
+feature head (the asset manifest is rebuilt after the final commit), based on PR #35's current head
+`1d2a65ecfb450d938cb36a82f74fb80e9202e961` and dependent on PR #35/#34. The
+preview is again serving `http://127.0.0.1:8017/teletena/` from isolated site
+`tele-tena-pr12-fresh.localhost`; production asset manifest source is the
+feature commit above. Its `/teletena/` WSGI process was reloaded after building.
+
+The isolated site was backed up before v1.24 and again before v1.25. At each
+cutover its scheduler was disabled with no pending jobs and maintenance mode
+blocked web writes. The site scheduler was restored afterward; no shared worker
+or unrelated Bench service was restarted. v1.24 added 14 exact, journal-proven
+completion activity rows; comparison confirmed all 91 pre-existing rows were
+unchanged. v1.25 added 3 journal-proven refund rows; comparison confirmed all
+105 pre-existing rows were unchanged. Repeated migration and finance snapshot
+checks passed. All 9 patient wallets now match their subledger and activity
+projection; all journals balance and no unknown event kinds remain. Three
+`ReviewRequired` cases remain held pending an authorized decision; the refresh
+preserved their earlier evidence and did not auto-accept them. The Review Patient
+wallet matches.
+
+The `/admin/financial-disputes` reviewer page now also exposes the authorized
+wallet reconciliation queue, recorded balances/evidence, opaque case references,
+and a reason-required acceptance action backed by a locked server command. The
+queue does not expose patient account identifiers. This action
+authorizes continued use of an unchanged wallet/subledger snapshot; it does not
+settle or repair the historical difference. Existing held records were not
+accepted during UI verification. See `financial-reconciliation-review-ui.md`.
+
+`tests/presentation.py` passes 40/40; `tests/integration.py` passes 24/24.
+Production asset secret/scope verification passed. Built-browser review passed
+sign-in/out, deep-link reload, private consultation access, PWA scope/cache,
+offline fallback, 390/768/1440 layouts, and a controlled update prompt. That
+update test simulates a waiting worker; it is not an existing-device PWA update
+or physical-device test. Fresh-site install/browser verification remains
+pending a disposable database credential setup. The broad approved A–I product
+scope remains incomplete; this checkpoint is only the focused finance repair.
+See `legacy-wallet-projection-fix.md`.
+
+## Historical note — pre-migration legacy wallet audit — 2026-10-08
+
+The original read-only audit identified the missing legacy `Consumption`
+activity row on old consultation finalization. This note predates v1.24; use the
+current checkpoint above for migration and preview status.
+
+The owner audit traced a missing legacy `Consumption` activity row on old
+consultation finalization. A new completion/refund event is logged in the same
+transaction as its balanced subledger journal, and patch v1.24 can append only
+historical completion activity proved by the matching immutable earning and
+journal. Wallets and old events are not overwritten. Synthetic evidence shows
+four owners whose reserved difference matches finalized gross earnings; three
+other owners retain an unexplained 600-minor-unit available/reserved residual
+each and remain held. See `legacy-wallet-projection-fix.md` for the current
+migration result and verification.
+
+The whole approved screen map and batches A–I remain incomplete. This is one
+finance correction slice, not full-product acceptance.
+
+## Historical test-fixture checkpoint — before discovery-filter branch — 2026-10-08
 
 The current continuation is `fix/immediate-readiness-window` (exact source
 SHA is the current Git head; packaged preview manifest still points to the

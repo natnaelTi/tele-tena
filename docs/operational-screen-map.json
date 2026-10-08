@@ -4550,14 +4550,16 @@
         "tele_tena.api.journey.wallet",
         "tele_tena.api.presentation.wallet_summary",
         "tele_tena.accounting.clinician_earnings",
-        "tele_tena.accounting.open_disputes"
+        "tele_tena.accounting.open_disputes",
+        "tele_tena.accounting.financial_reconciliation_queue"
       ],
       "commands": [
         "tele_tena.api.journey.simulated_deposit",
         "tele_tena.accounting.request_payout",
         "tele_tena.accounting.cancel_payout",
         "tele_tena.accounting.open_earning_dispute",
-        "tele_tena.accounting.resolve_earning_dispute"
+        "tele_tena.accounting.resolve_earning_dispute",
+        "tele_tena.accounting.accept_reconciliation_case"
       ],
       "server_permissions": "Owners see only their own balances/activity/earnings; financial reviewer does not gain clinical-note access. Every posting is immutable, balanced, idempotent and transactional.",
       "workflow_transitions": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
@@ -4590,7 +4592,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (G01) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Frappe 15 presentation suite includes Approver denial, reasoned snapshot acceptance, idempotency, opaque case references without patient account identifiers, and historical-difference preservation. The reviewer screen is implemented at /admin/financial-disputes; production-built browser rendering and no-email-leak assertion are verified in docs/financial-reconciliation-review-ui.md. Retained demo cases were displayed but not accepted. Amharic/Afaan Oromo remain provisional."
       }
     },
     {

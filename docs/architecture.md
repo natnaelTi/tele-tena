@@ -145,9 +145,29 @@ for each patient; it records exact opening-boundary and unknown-event cases but
 never adjusts any source. A `ReviewRequired` owner is blocked from further
 patient-fund mutations. Only an explicitly authorized reviewer can accept the
 unchanged current snapshot with a reason, and only if wallet and subledger agree.
-That audited choice preserves the unresolved historical difference; it does not
-claim to reconstruct missing history or create a balancing entry. All future
-financial records remain on the existing subledger path.
+The audited choice never adjusts a wallet or clears history. When later migration
+evidence proves a specifically omitted event, the projection fields refresh and
+the earlier audit snapshot is retained in private audit history; the hold still
+requires explicit review. Unexplained differences are never reconstructed or
+balanced by inference. All future financial records remain on the existing
+subledger path.
+
+The v1.24 financial activity correction addresses a historical omission: old
+consultation finalization posted a balanced completion journal and consumed the
+patient reservation but did not append the corresponding `Consumption` row to
+`tt_ledger`. The patch appends that activity row only when the completed earning,
+`ConsultationFinalized` journal, and patient-reserved debit agree exactly. This is
+an additive correction to the simulation activity log, not a journal, balance
+adjustment, or reconstruction from appointment state. It leaves unrelated
+projection mismatches held for explicit review. New completion/refund paths
+write matching activity events atomically with their authoritative subledger
+postings.
+
+Patch v1.25 applies the same evidence gate to missing historical refund activity:
+it requires a `Refunded` earning, an `EarningRefunded` journal, the exact patient
+available credit and clinician pending debit, and a matching net amount before
+appending one legacy `Refund` row. It does not change either account balance or
+the original journal.
 
 ## Clinic operational memberships
 
