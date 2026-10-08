@@ -1,0 +1,50 @@
+/* Approved extracted A01/welcome. Scoped to the operational landing component. */
+.landing-page { background: white; }
+.landing-hero { max-width: 1280px; margin: auto; padding: 32px 40px 64px; }
+.landing-intro { max-width: 760px; margin-bottom: 26px; }
+.landing-intro .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .12em; }
+.landing-intro h1 { font-size: clamp(40px,4.8vw,58px); line-height: 1.03; letter-spacing: -.05em; margin: 18px 0; font-weight: 700; }
+.landing-intro > p:last-child { font-size: 19px; max-width: 660px; }
+.landing-entries { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 20px; }
+.landing-entries > section { min-width: 0; padding: 26px; border-radius: 24px; border: 1px solid #dbe7e9; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.landing-patient { background: #eef8f8; }
+.landing-clinician { background: white; }
+.landing-role { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #176570; }
+.landing-entries h2 { font-size: 32px; line-height: 1.08; letter-spacing: -.04em; margin: 0; font-weight: 700; }
+.landing-entries p { line-height: 1.6; margin: 0; }
+.landing-search { width: 100%; min-width: 0; display: grid; gap: 12px; }
+.landing-search label { font-size: 14px; font-weight: 600; }
+.landing-search > div { display: flex; align-items: center; gap: 10px; background: white; padding: 12px 16px; border: 1px solid #bbcfd2; border-radius: 12px; }
+.landing-search input { border: 0; border-radius: 0; background: transparent; min-width: 0; flex: 1; padding: 6px; min-height: 36px; }
+.landing-chips { display: flex; gap: 8px; flex-wrap: wrap; max-width: 100%; }
+.landing-chips button { color: var(--ink); border: 1px solid #bdcdd1; border-radius: 22px; padding: 9px 14px; background: transparent; font-size: 14px; min-height: 44px; }
+.landing-chips button:hover, .landing-chips button[aria-pressed=true] { background: #17383e; color: white; border-color: #17383e; }
+.landing-entries .text-link { font-size: 14px; min-height: 44px; white-space: normal; }
+.landing-entries .landing-signup { margin-top: -10px; }
+.landing-note { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: #455d65; }
+.landing-note svg { margin-top: 3px; }
+.landing-practice { width: 100%; padding: 20px; border: 1px solid #d5e1e5; border-radius: 16px; background: #f6f9fa; display: grid; gap: 18px; }
+.landing-preview-heading { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
+.landing-preview-heading span { color: #176570; background: #eaf5f5; border-radius: 20px; padding: 4px 10px; font-size: 14px; }
+.landing-practice h3 { font-size: 16px; margin: 0; letter-spacing: 0; }
+.landing-practice p { font-size: 15px; color: #455d65; margin: 8px 0 14px; }
+.landing-practice .button { font-size: 14px; }
+.landing-principles { margin: 0; background:var(--canvas); display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 40px; padding: 40px max(40px, calc((100% - 1244px) / 2)); }
+.landing-principles h3 { font-size: 18px; margin: 16px 0 8px; }
+.landing-principles p { font-size: 15px; }
+@media (max-width:700px) {
+  .landing-hero { padding: 34px 20px; }
+  .landing-entries { grid-template-columns: minmax(0,1fr); }
+  .landing-entries > section { padding: 24px; }
+  .landing-entries h2 { font-size: 30px; }
+  .landing-intro > p:last-child { font-size: 17px; }
+  .landing-principles { grid-template-columns: 1fr; padding: 24px 20px; gap: 16px; }
+}
+
+.reference-public-header { min-height:80px; padding:16px 40px; background:white; }
+.reference-public-footer { padding:25px 40px; border-top:1px solid var(--border); background:white; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px; }
+.reference-public-footer p { margin:0; font-size:14px; }
+.reference-public-header .brand img { object-fit:contain; border-radius:8px; }
+.reference-public-header .button { min-height:40px; font-size:14px; padding:8px 14px; }
+@media(max-width:900px) { .reference-public-header nav > a:not(.button) { display:none; } }
+@media(max-width:700px) { .reference-public-header { padding:16px 20px; gap:12px; } .reference-public-header nav { gap:8px; } .reference-public-header .language-select { max-width:100px; } .reference-public-footer { padding:25px 20px; } }

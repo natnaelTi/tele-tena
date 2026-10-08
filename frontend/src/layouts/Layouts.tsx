@@ -121,9 +121,10 @@ export function PublicLayout() {
   return (
     <>
       <DemoBar />
-      <header className="public-header container">
+      <header className="public-header reference-public-header">
         <Brand />
         <nav aria-label="Main navigation">
+          <Link to="/patient/discovery">{w("Find care")}</Link>
           <a href={(import.meta.env.PROD ? "/teletena/" : "/") + "#how-it-works"}>{w("How it works")}</a>
           <Link to="/for-clinicians">{w("For clinicians")}</Link>
           <LanguageSelect />
@@ -133,9 +134,9 @@ export function PublicLayout() {
         </nav>
       </header>
       <Outlet />
-      <footer className="public-footer container">
+      <footer className="public-footer reference-public-footer">
         <Brand />
-        <p>A little more space for you.</p>
+        <p>{w("Personal care, connected. Adults 18+ · Not an emergency service.")}</p>
         <Link to="/sign-in">{w("Find care")}</Link>
         <TranslationNote />
       </footer>

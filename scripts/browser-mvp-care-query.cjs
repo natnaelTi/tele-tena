@@ -27,7 +27,7 @@ let stage='launch';
   }
   stage='landing care intent';await page.goto(app+'/');
   await page.getByLabel('What would you like support with?',{exact:true}).fill(query);
-  await page.locator('.patient-care-entry').getByRole('button',{name:'Find care',exact:true}).click();
+  await page.locator('.landing-patient').getByRole('button',{name:'Find my care',exact:true}).click();
   await page.waitForURL(/\/sign-in\?/);
   stage='existing patient authentication';await passwordLogin();
   await page.waitForURL(/\/patient\/discovery$/);

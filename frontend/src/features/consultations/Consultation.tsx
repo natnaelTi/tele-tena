@@ -334,7 +334,7 @@ export default function Consultation({
             />
             {t("audioOnly")}
           </label>
-          <button
+          <button className="button"
             disabled={busy || !info?.can_join}
             onClick={() => void checkDevices()}
           >
@@ -350,13 +350,13 @@ export default function Consultation({
               aria-label={t("localPreview")}
             />
           )}
-          <button
+          <button className="button"
             disabled={busy || !checked || !info?.can_join}
             onClick={() => void join()}
           >
             {t("joinCall")}
           </button>
-          <button type="button" disabled={busy} onClick={() => void refresh()}>
+          <button className="button secondary" type="button" disabled={busy} onClick={() => void refresh()}>
             {t("refreshCall")}
           </button>
         </>
