@@ -606,3 +606,25 @@ fresh-site install has not been verified for v1.28. Clinical/credential authorit
 source verification, translation review and complete product scope remain
 external or pending. See `vetting-rubric-v1.md`, and screens I04/I09 in
 `operational-screen-map.json`.
+
+
+## Patient-authorized clinic summary access — 2026-10-08
+
+A new dependent slice on the vetting-rubric branch separates the earlier
+scheduling-only grant from a patient-controlled grant for published summaries
+of one completed encounter. `Care Coordination` is a distinct clinic membership
+role; clinic ownership, management, billing, scheduling, affiliation or general
+administrator access do not reveal clinical records. Reads recheck active
+membership, verified clinic and treating-clinician affiliation, active grant,
+completed appointment and currently published summary revisions. Direct DocType
+reads remain denied. Patient revocation closes subsequent reads and preserves
+the audit history.
+
+On Frappe 15.121.2, `tests/presentation.py` passes 45/45 and
+`tests/integration.py` 24/24 after this addition. The presentation regression
+checks patient ownership/consent, idempotent grant, published-summary-only
+projection, private-note exclusion, manager/Billing denial, Care Coordination
+access, membership/affiliation revocation, and patient revoke. Frontend TypeScript
+production build passed; lint exited 0 with existing warnings. Rendered-browser
+verification of the new consent and clinic workspace screens and clean fresh-site
+installation are still pending. The feature branch is not merged or deployed.

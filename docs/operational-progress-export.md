@@ -1,5 +1,25 @@
 # TeleTena operational progress export
 
+## Current local checkpoint — patient-authorized clinic summary access — 2026-10-08
+
+- Branch `feat/clinic-shared-summary-grants`, based on the vetting-rubric
+  checkpoint. The clinic summary access slice is uncommitted at this export
+  point; no merge or deployment occurred.
+- Adds a purpose-specific patient grant for published summaries of a single
+  completed encounter. Only active Care Coordination clinic members can read;
+  clinic owner/manager, Billing, Scheduling, administrators, and generic
+  DocType access do not grant it. Verified clinic and treating-clinician
+  affiliation are rechecked. Revocation preserves the audit record and stops
+  later API reads.
+- Frappe 15.121.2 on `tele-tena-pr12-fresh.localhost`: presentation suite
+  45/45 and integration suite 24/24 passed. Frontend build passed; lint exited
+  0 with existing warnings. The new screens still need built-browser review and
+  screenshot evidence. Fresh-site install and Frappe 16 compatibility for this
+  addition remain pending.
+- Review URL remains `http://127.0.0.1:8017/teletena/`; it has not yet been
+  rebuilt/reloaded from this uncommitted branch.
+
+
 ## Current local checkpoint — credential-verification provenance — 2026-10-08
 
 - Branch `feat/vetting-rubric-assessment-engine`, current source/build commit

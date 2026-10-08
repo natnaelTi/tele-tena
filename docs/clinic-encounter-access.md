@@ -1,39 +1,62 @@
-# Clinic encounter access — initial scheduling-only slice
+# Patient-authorized clinic encounter access
 
-## Purpose and boundary
+## Purpose-specific grants
 
-Clinic membership, clinic verification, and clinician affiliation do not reveal
-appointments or clinical records. This slice lets a patient explicitly share
-one confirmed appointment's scheduling details with one verified clinic to
-which the treating clinician has a separately verified affiliation.
+Clinic membership, clinic verification and clinician affiliation never expose
+patient information by themselves. Two separately consented purposes are
+supported; granting one does not imply the other.
 
-The grant is **scheduling coordination only**. It exposes service label,
-scheduled time/timezone, delivery format, booked duration, appointment status,
-and the patient identity permitted by that booking's disclosure snapshot.
-It never exposes account email/phone, request narrative, saved history, private
-notes, patient-shared summaries, feedback, balances, or other encounters.
+**Scheduling coordination** shares one future confirmed appointment's service,
+time/timezone, delivery format, booked duration, status and the identity label
+already permitted by the booking disclosure snapshot. It does not expose notes,
+summaries, request text, saved history, feedback, balances or other encounters.
+Active Clinic Manager and Scheduling memberships, plus the verified clinic
+owner's operational workspace, may read these minimized details. Billing and
+Care Coordination roles do not receive scheduling access through this grant.
+Access ends after the appointment is no longer actively booked, the seven-day
+post-session window expires, the patient revokes, or clinic verification is
+removed.
 
-Only active Clinic Manager and Scheduling memberships may read a grant. Billing
-membership has no appointment access. The clinic owner is treated as a manager
-for this operational query. Revoking membership immediately removes access;
-revoking the patient grant or changing the appointment out of its active booked
-state also removes access. The patient may revoke at any time. A grant expires
-seven days after the scheduled end and cannot be renewed for a cancelled or
-completed appointment.
+**Patient-shared summary** shares only summaries that the treating clinician
+explicitly published for one completed encounter. Before sharing, the patient
+selects a verified clinic and consents to sharing all patient-visible summary
+revisions for that encounter. This includes later revisions the clinician
+chooses to publish while the grant remains active. It excludes private notes,
+unpublished drafts, request text, profile history, contact information,
+feedback, balances and other encounters. The UI explains that revocation stops
+future access but cannot undo prior viewing.
+
+Only an active **Care Coordination** membership at the selected clinic can read
+these summaries. Clinic Manager, Scheduling, Billing, clinic ownership and
+clinician affiliation do not imply summary access. Care Coordination is an
+operational role; it is not clinician credential verification, service-scope
+approval or authorization to practice. A member may access only the summaries
+the patient shared for that clinic and encounter while the clinic, treating
+clinician's clinic affiliation and membership remain active/verified.
+
+The API returns the encounter-scoped identity label from the immutable booking
+disclosure snapshot, service/date, published summary text, revision and
+publication time. It never returns an account email/phone, raw disclosure JSON,
+private clinician note or arbitrary appointment lookup capability. The patient
+may revoke either grant at any time; grant history is retained, and a later
+profile edit does not change earlier encounter identity.
 
 ## Workflow and acceptance
 
-1. The patient opens their own confirmed appointment and sees only verified
-   clinics with a currently verified affiliation for its treating clinician.
-2. The patient chooses a clinic and confirms the scheduling-only disclosure.
-3. The server records an immutable grant event with grantor, appointment,
-   clinic, creation time, expiry and status. Repeating an active identical
-   grant is idempotent.
-4. Active clinic managers/schedulers can view only the granted appointment's
-   minimized scheduling summary. Guessed appointment/grant identifiers, other
-   clinics, Billing membership, ordinary clinician affiliation and generic
-   DocType APIs are denied.
-5. The patient revokes access. Repeating the same revoke is idempotent.
+1. For scheduling, the patient chooses a clinic with a current verified
+   affiliation for the treating clinician and confirms the narrow disclosure.
+2. For summaries, the patient can choose a clinic only after the encounter is
+   completed and at least one summary is published. The consent explicitly
+   identifies the purpose and ongoing revision scope.
+3. Each grant is an immutable purpose-specific record. Identical active retries
+   are idempotent; revocation is actor/time/reason audited and idempotent.
+4. Purpose-built endpoints enforce appointment ownership, clinic verification,
+   current clinician affiliation and exact active membership role. Generic
+   DocType reads/writes do not enumerate or mutate grants.
+5. Scheduling access is read-only and expires. Summary access is read-only and
+   remains until patient revocation or a relevant clinic, affiliation or
+   membership state is no longer eligible.
 
-No clinic staff can confirm, cancel, reschedule, join, or document the
-consultation in this initial slice. Those are separate authorized workflows.
+Automated tests use synthetic consultations and text only. Native Amharic and
+Afaan Oromo translations remain provisional, and local demonstration consent
+wording is not a jurisdiction-specific legal/privacy review.
