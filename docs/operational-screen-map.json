@@ -3594,7 +3594,7 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending successful eligible-offer journey. On source/build b627c8ba7518acb3a923e03607e9ea0317e99ccd, the authenticated synthetic clinician readiness query returns language_required and immediate_policy_required; its inbox is correctly not offered a request. The actual UI exposes setup links and paused state. This is not a routing pass; profile/service policy were not edited."
+        "current_local": "Frappe 15 presentation suite on source branch feat/request-inbox-eligibility-refresh passed 33/33. The immediate-request regression verifies that after bounded delivery, inbox reads hide the private request if the clinician loses the exact requested language, fresh presence lease, service policy, current approval/scope, or a feasible full-duration start; recipient audit rows remain unchanged. The authenticated retained Review Clinician readiness query currently returns language_required and immediate_policy_required, so this fixture is not eligible for immediate requests. A successful real two-sided offer/accept journey and reviewer-enabled synthetic eligibility browser run remain pending; no synthetic account or service policy was edited."
       }
     },
     {
