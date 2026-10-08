@@ -19,7 +19,7 @@ assert SITE and SITE.endswith('.localhost') and SITE.startswith(('tele-tena-', '
 os.chdir(BENCH / 'sites')
 
 
-def snapshot(include_legacy_activity=True):
+def snapshot(include_legacy_activity=True, include_reconciliation=True):
     frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
     frappe.connect()
     result = {}
@@ -27,6 +27,8 @@ def snapshot(include_legacy_activity=True):
     for table in (*TABLES, *PHONE_AUTH_TABLES, *PRESENTATION_TABLES, *FINANCIAL_TABLES,
                   'financial_reconciliation', 'session_feedback', 'consultation', 'contact_identity', 'onboarding'):
         if table == 'ledger' and not include_legacy_activity:
+            continue
+        if table == 'financial_reconciliation' and not include_reconciliation:
             continue
         records = (frappe.db.sql(f'SELECT * FROM tt_{table}', as_dict=True)
                    if f'tt_{table}' in existing_tables else [])
@@ -36,11 +38,13 @@ def snapshot(include_legacy_activity=True):
     return result
 
 
-before = snapshot(include_legacy_activity=False)
+before = snapshot(include_legacy_activity=False, include_reconciliation=False)
 frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
 frappe.connect()
 legacy_before = {row.id: tuple(row) for row in frappe.db.sql(
     'SELECT id,patient,kind,amount,reference,created FROM tt_ledger', as_dict=True)}
+reconciliation_before = {row.id: dict(row) for row in frappe.db.sql(
+    'SELECT * FROM tt_financial_reconciliation', as_dict=True)}
 scope_before = sorted(tuple(row) for row in frappe.db.sql('''SELECT name,clinician,service,status,
     creation,modified FROM `tabTele Tena Service Scope`'''))
 frappe.destroy()
@@ -48,7 +52,8 @@ for attempt in (1, 2):
     with open(f'/tmp/tele-tena-pr2-migrate-{attempt}.log', 'w') as output:
         status = subprocess.run(['bench', '--site', SITE, 'migrate', '--skip-search-index'], cwd=BENCH, stdout=output, stderr=subprocess.STDOUT)
     assert status.returncode == 0, f'Migration {attempt} failed; inspect local migration log'
-    assert snapshot(include_legacy_activity=False) == before, 'Migration changed existing non-ledger records'
+    assert snapshot(include_legacy_activity=False, include_reconciliation=False) == before, \
+        'Migration changed existing non-ledger records outside the documented audit refresh'
     frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
     frappe.connect()
     current_ledger = {row.id: tuple(row) for row in frappe.db.sql(
@@ -57,20 +62,49 @@ for attempt in (1, 2):
         'Migration modified or removed an existing simulation activity event'
     added = [row for row_id, row in current_ledger.items() if row_id not in legacy_before]
     for _, patient, kind, amount, reference, created in added:
-        assert kind == 'Consumption' and reference.startswith('completion:'), \
-            'Migration appended an unexpected legacy activity event'
-        evidence = frappe.db.sql('''SELECT j.event_type,j.created,e.gross_minor,e.patient
-            FROM tt_journal j JOIN tt_earning e ON j.event_ref=CONCAT('completion:',e.appointment)
-            WHERE j.event_ref=%s''', (reference,), as_dict=True)
-        assert evidence and evidence[0].event_type == 'ConsultationFinalized' and \
-            evidence[0].patient == patient and int(evidence[0].gross_minor) == int(amount), \
-            'Backfilled activity lacks matching immutable completion evidence'
+        if kind == 'Consumption' and reference.startswith('completion:'):
+            evidence = frappe.db.sql('''SELECT j.event_type,j.created,e.gross_minor,e.patient
+                FROM tt_journal j JOIN tt_earning e ON j.event_ref=CONCAT('completion:',e.appointment)
+                WHERE j.event_ref=%s''', (reference,), as_dict=True)
+            valid = (evidence and evidence[0].event_type == 'ConsultationFinalized' and
+                     evidence[0].patient == patient and int(evidence[0].gross_minor) == int(amount))
+        elif kind == 'Refund' and reference.startswith('earning-refund:'):
+            evidence = frappe.db.sql('''SELECT j.event_type,j.created,e.net_minor,e.patient
+                FROM tt_journal j JOIN tt_earning e ON j.event_ref=CONCAT('earning-refund:',e.id)
+                WHERE j.event_ref=%s''', (reference,), as_dict=True)
+            valid = (evidence and evidence[0].event_type == 'EarningRefunded' and
+                     evidence[0].patient == patient and int(evidence[0].net_minor) == int(amount))
+        else:
+            valid = False
+        assert valid and evidence[0].created == created, \
+            'Migration appended activity without matching immutable financial evidence'
     missing = frappe.db.sql('''SELECT COUNT(*) FROM tt_earning e
         JOIN tt_journal j ON j.event_ref=CONCAT('completion:',e.appointment)
         LEFT JOIN tt_ledger l ON l.reference=j.event_ref
         WHERE e.completed_at IS NOT NULL AND j.event_type='ConsultationFinalized'
           AND l.id IS NULL''')[0][0]
     assert int(missing) == 0, 'A journal-proven completion is still missing its activity event'
+    missing_refunds = frappe.db.sql('''SELECT COUNT(*) FROM tt_earning e
+        JOIN tt_journal j ON j.event_ref=CONCAT('earning-refund:',e.id)
+        LEFT JOIN tt_ledger l ON l.reference=j.event_ref
+        WHERE e.state='Refunded' AND j.event_type='EarningRefunded' AND l.id IS NULL''')[0][0]
+    assert int(missing_refunds) == 0, 'A journal-proven refund is still missing its activity event'
+    current_reconciliation = {row.id: dict(row) for row in frappe.db.sql(
+        'SELECT * FROM tt_financial_reconciliation', as_dict=True)}
+    for audit_id, old in reconciliation_before.items():
+        current = current_reconciliation.get(audit_id)
+        assert current, 'Migration removed a previous financial reconciliation case'
+        for field in ('id','patient','status','reviewed_by','decision','decision_reason','decided_at','created'):
+            assert current[field] == old[field], 'Migration overwrote reconciliation status/history'
+        projection_fields = ('legacy_available','legacy_reserved','wallet_available','wallet_reserved',
+                             'subledger_available','subledger_reserved','event_count',
+                             'unknown_event_count','boundary_event_count')
+        changed = any(current[field] != old[field] for field in projection_fields)
+        if changed:
+            reason = json.loads(current['reason'] or '{}')
+            history = reason.get('audit_history', [])
+            assert any(item.get('reason') == old['reason'] for item in history), \
+                'Refreshed reconciliation projection did not preserve its prior evidence'
     frappe.destroy()
 frappe.init(site=SITE, sites_path=str(BENCH / 'sites'))
 frappe.connect()
@@ -78,7 +112,8 @@ for patch in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adopt
               'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state',
               'v1_5_contact_onboarding', 'v1_6_presentation_release', 'v1_7_demo_subledger',
               'v1_8_legacy_event_reconciliation', 'v1_13_financial_reconciliation_audit',
-              'v1_14_session_feedback', 'v1_24_legacy_completion_activity'):
+              'v1_14_session_feedback', 'v1_24_legacy_completion_activity',
+              'v1_25_legacy_refund_activity'):
     assert frappe.db.exists('Patch Log', {'patch': 'tele_tena.patches.' + patch})
 for table in ('tt_phone_identity', 'tt_otp_challenge', 'tt_otp_rate_limit', 'tt_otp_gate',
               *(f'tt_{name}' for name in PRESENTATION_TABLES),

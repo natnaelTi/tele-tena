@@ -189,9 +189,11 @@ wallet/subledger projection, recording unknown events and exact snapshot-boundar
 ambiguity without rewriting existing events. v1.24 records a missing historical
 `Consumption` activity entry only when an immutable `ConsultationFinalized`
 journal, patient reserved debit, and earning agree on appointment and amount; it
-does not change balances, earnings, appointments, or journals. New completions
-and supported dispute refunds append their activity events atomically with the
-subledger posting. Unexplained mismatches remain held until an authorized,
+does not change balances, earnings, appointments, or journals. v1.25 applies the
+same exact-evidence rule to a missing historical `Refund` activity event, using
+the `EarningRefunded` journal, patient available credit, clinician pending debit,
+and refunded earning amount. New completions and supported dispute refunds
+append their activity events atomically with the subledger posting. Unexplained mismatches remain held until an authorized,
 reasoned decision accepts the unchanged current snapshot; the historical
 difference remains visible. Unknown event kinds and conflicting evidence stop
 for review. A deployment cutover stops all old web and background writers before

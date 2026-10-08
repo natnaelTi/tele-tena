@@ -160,6 +160,12 @@ projection mismatches held for explicit review. New completion/refund paths
 write matching activity events atomically with their authoritative subledger
 postings.
 
+Patch v1.25 applies the same evidence gate to missing historical refund activity:
+it requires a `Refunded` earning, an `EarningRefunded` journal, the exact patient
+available credit and clinician pending debit, and a matching net amount before
+appending one legacy `Refund` row. It does not change either account balance or
+the original journal.
+
 ## Clinic operational memberships
 
 `Tele Tena Clinic Membership` is an additive native DocType. Its state machine

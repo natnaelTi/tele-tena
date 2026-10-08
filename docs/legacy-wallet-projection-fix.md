@@ -8,7 +8,9 @@ event from the append-only `tt_ledger` simulation activity log. The v1.13 owner
 audit projects only recorded activity events, so a finalized consultation could
 appear to leave funds reserved in the legacy projection even when the wallet and
 subledger agreed. This is an activity-log omission, not evidence that the wallet
-or balanced journal should be adjusted.
+or balanced journal should be adjusted. A follow-up audit found a second gap:
+three owners each have a refunded 600-minor-unit earning with an immutable
+refund journal and wallet credit but no corresponding legacy `Refund` activity.
 
 Future finalization now appends one `Consumption` event using the same
 `completion:<appointment>` reference inside the transaction that posts the
@@ -25,7 +27,10 @@ completion reference. Existing activity rows, wallets, appointments, earnings,
 and journals remain unchanged. Conflicting evidence aborts migration. The patch
 then reruns the owner audit; existing `ReviewRequired` decisions are not silently
 cleared. An authorized reviewer must explicitly accept an unchanged balanced
-snapshot with a reason before that owner can transact again.
+snapshot with a reason before that owner can transact again. Patch v1.25 applies
+the same evidence gate to historical refunds, matching the `EarningRefunded`
+journal, patient available credit, clinician pending debit, and earning net
+amount before appending one `Refund` event.
 
 ## Local evidence and migration result
 
@@ -34,8 +39,8 @@ the Review Patient wallet matched its known activity and subledger. Among eight
 other synthetic wallets, four discrepancies matched the gross amount of
 finalized earnings and are consistent with the missing completion activity
 described above. Three additional owners each had a residual 600 minor-unit
-available/reserved category difference after that explanation; those remain
-unexplained and held. No records were deleted or adjusted during that audit.
+available/reserved category difference after that explanation; no records were
+deleted or adjusted during that audit.
 
 Before migration, the isolated preview site and private files were backed up
 with Bench at 2026-10-08 11:39 local time. Its site-scoped scheduler was
@@ -52,8 +57,11 @@ checks passed without adding more events; wallet and subledger balances,
 earnings, and balanced journals remained unchanged on repeat. Owner-level
 read-only reconciliation after migration found all 9/9 wallets
 equal their subledger accounts, 0 unbalanced journals, and 6/9 owners whose
-legacy activity projection also matches. The other 3 owners have no unknown
-event kinds but retain their unexplained historical category differences and
+legacy activity projection also matches. Each of the other three is short 600
+minor units in the legacy available projection, exactly equal to its refunded
+earning; the reserved bucket matches. This is an evidenced missing refund event,
+not an arbitrary balance adjustment. Since v1.24 is already applied, v1.25 is a
+separate patch. Until it is backed up, migrated and audited, those three owners
 remain `ReviewRequired`. The existing Review Patient wallet matches.
 
 `tests/presentation.py` passes 40/40, including a synthetic backfill test for
@@ -66,8 +74,7 @@ setup. This is not proof that the remaining owner discrepancies are resolved.
 
 ## Remaining financial gates
 
-- Compare the pre-migration backup with the migrated site to independently
-  verify every pre-existing event and obligation is retained.
-- Keep the three unexplained 600-minor-unit cases held; do not infer a correction.
-- Verify on a new disposable site and repeat migration after v1.24.
+- Apply v1.25 under a fresh backup; verify the three refund cases align without
+  changing wallets or journals, and repeat migration.
+- Verify on a new disposable site after v1.25.
 - Clinician payouts remain simulated reservations, not external transfers.

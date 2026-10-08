@@ -27,3 +27,4 @@ tele_tena.patches.v1_21_scope_review_history
 tele_tena.patches.v1_22_immediate_service_policy
 tele_tena.patches.v1_23_multiple_offerings
 tele_tena.patches.v1_24_legacy_completion_activity
+tele_tena.patches.v1_25_legacy_refund_activity

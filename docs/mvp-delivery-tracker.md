@@ -16,8 +16,11 @@ worker or unrelated Bench service was restarted. The patch added 14 exact,
 journal-proven completion activity rows. The pre-migration backup comparison
 confirmed 91 original activity rows were unchanged. Repeated migration and
 finance snapshot checks passed. All 9 patient wallets match subledger balances,
-all journals balance, 6 of 9 owners' legacy projections match, and 3 owners with
-unexplained category differences remain held. The Review Patient wallet matches.
+all journals balance, and 6 of 9 owners' legacy projections match. The other 3
+have journal-proven 600-minor-unit refund events absent from the legacy activity
+log; v1.25 is being added to backfill those without changing wallets or journals.
+They remain held until migrated, audited, and explicitly accepted. The Review
+Patient wallet matches.
 
 `tests/presentation.py` passes 40/40; `tests/integration.py` passes 24/24.
 Production asset secret/scope verification passed. Built-browser review passed

@@ -19,8 +19,10 @@
   against the pre-migration database backup confirmed all 91 prior `tt_ledger`
   rows unchanged and no unproven rows added. Repeat migration and finance
   snapshot checks passed. All 9 wallet/subledger pairs match; journals are
-  balanced. Six owners also match the legacy activity projection. Three retain
-  unexplained differences and remain held.
+  balanced. Six owners also match the legacy activity projection. Three have
+  evidence-backed missing 600-minor-unit refund activity. Patch v1.25 adds a
+  journal-verified backfill while preserving their existing review holds; it is
+  not yet applied to the retained site.
 - `tests/presentation.py`: 40/40; `tests/integration.py`: 24/24. Production
   build, asset/privacy scan, browser package, and controlled PWA update-prompt
   checks passed. The update prompt used a controlled fake waiting worker, not an

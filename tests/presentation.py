@@ -33,6 +33,7 @@ from tele_tena.api import service_catalog
 from tele_tena.api import financial_activity
 from tele_tena.patches import v1_23_multiple_offerings
 from tele_tena.patches import v1_24_legacy_completion_activity
+from tele_tena.patches import v1_25_legacy_refund_activity
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -2179,12 +2180,14 @@ class Presentation(unittest.TestCase):
                 [(reserved, 500, 0), (accounting.account_id('clinician', fixtures.USERS['c1'], 'pending'), 0, 500)],
                 {'synthetic': True})
             frappe.db.sql('UPDATE tt_wallet SET reserved=0 WHERE patient=%s', (patient,))
+            earning_id = str(uuid.uuid4())
             frappe.db.sql('''INSERT INTO tt_earning
                 (id,appointment,patient,clinician,gross_minor,fee_minor,net_minor,policy_snapshot,
                  state,completed_at,release_at,created,modified)
                 VALUES (%s,%s,%s,%s,500,0,500,'{}','Pending',%s,%s,%s,%s)''',
-                (str(uuid.uuid4()), appointment, patient, fixtures.USERS['c1'], now,
+                (earning_id, appointment, patient, fixtures.USERS['c1'], now,
                  now + timedelta(hours=1), now, now))
+            self.assertFalse(audit_wallet(patient)['matches'])
             self.assertEqual(v1_24_legacy_completion_activity.backfill_completion_activity(patient), 1)
             self.assertEqual(v1_24_legacy_completion_activity.backfill_completion_activity(patient), 0)
             activity = journey.one('''SELECT patient,kind,amount,reference,created FROM tt_ledger
@@ -2197,8 +2200,32 @@ class Presentation(unittest.TestCase):
             result = audit_wallet(patient)
             self.assertTrue(result['matches'], result)
             wallet = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
-            accounting.check_wallet_projection(patient, wallet)
             self.assertEqual((int(wallet.available), int(wallet.reserved)), (0, 0))
+            refund_ref = 'earning-refund:' + earning_id
+            accounting.post(refund_ref, 'EarningRefunded', refund_ref,
+                [(accounting.account_id('clinician', fixtures.USERS['c1'], 'pending'), 500, 0),
+                 (accounting.account_id('patient', patient, 'available'), 0, 500)], {'synthetic': True})
+            frappe.db.sql("UPDATE tt_earning SET state='Refunded' WHERE id=%s", (earning_id,))
+            frappe.db.sql('UPDATE tt_wallet SET available=available+500 WHERE patient=%s', (patient,))
+            self.assertEqual(v1_25_legacy_refund_activity.backfill_refund_activity(patient), 1)
+            self.assertEqual(v1_25_legacy_refund_activity.backfill_refund_activity(patient), 0)
+            refund = journey.one('''SELECT patient,kind,amount,reference,created FROM tt_ledger
+                WHERE reference=%s''', (refund_ref,))
+            self.assertEqual((refund.patient, refund.kind, int(refund.amount)), (patient, 'Refund', 500))
+            refund_journal = journey.one('SELECT created FROM tt_journal WHERE event_ref=%s', (refund_ref,))
+            self.assertEqual(refund.created, refund_journal.created)
+            self.assertTrue(audit_wallet(patient)['matches'])
+            wallet = journey.one('SELECT available,reserved FROM tt_wallet WHERE patient=%s', (patient,))
+            self.assertEqual((int(wallet.available), int(wallet.reserved)), (500, 0))
+            case = journey.one('''SELECT status,legacy_available,legacy_reserved,wallet_available,
+                wallet_reserved,reason FROM tt_financial_reconciliation WHERE patient=%s''', (patient,))
+            self.assertEqual(case.status, 'ReviewRequired')
+            self.assertEqual((int(case.legacy_available), int(case.legacy_reserved),
+                              int(case.wallet_available), int(case.wallet_reserved)), (500, 0, 500, 0))
+            self.assertGreaterEqual(len(json.loads(case.reason)['audit_history']), 1)
+            fixtures.login('admin')
+            accounting.accept_wallet_snapshot(patient, 'Synthetic reconciliation after evidence-backed activity backfill')
+            accounting.check_wallet_projection(patient, wallet)
         finally:
             frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
