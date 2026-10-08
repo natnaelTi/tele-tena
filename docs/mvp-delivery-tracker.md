@@ -1,5 +1,29 @@
 # TeleTena delivery tracker
 
+## Current local checkpoint — rendered immediate-request inbox — 2026-10-08
+
+The active continuation is `fix/open-request-visible-inbox`, based on the
+current PR #36 head (`fix/legacy-wallet-projection-audit`). Its focused change
+adds a two-browser acceptance check for the clinician's rendered inbox, in
+addition to persisted recipient/fetch events. On the built preview at
+`http://127.0.0.1:8017/teletena/` (isolated site
+`tele-tena-pr12-fresh.localhost`), the patient published an immediate request,
+one eligible clinician was recorded, the inbox API and rendered card contained
+the request, and the patient's account email was absent. The test cancelled
+its synthetic request and restored clinician presence without creating an
+offer, appointment, or financial posting. Screenshots are in
+`docs/screenshots/open-request-routed/`; the executable journey is
+`scripts/browser-open-request-routed-inbox.cjs`.
+
+PR #37 is draft and depends on PR #36. The latest production asset build,
+asset/privacy scan, and two-context browser journey passed at source
+`c2e45d87bd6a485850d2dda7310a3ecc137da384`. PR #37 CI is still running. The
+fresh-site v1.7/expanded-catalog verification requested in the broader product
+checkpoint remains pending; no fresh-site credentials or successful helper
+completion are available at this checkpoint. This verifies only the routed
+inbox slice, not offer acceptance or the full A–I scope. Live SMS, physical
+devices, and native-language review remain external validation items.
+
 ## Current local operational checkpoint — legacy finance projection — 2026-10-08
 
 The active checkout is `fix/legacy-wallet-projection-audit` at the current
