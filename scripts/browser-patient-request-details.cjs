@@ -38,7 +38,9 @@ let checkpoint = 'launch';
       return result.message;
     });
     if (!Array.isArray(requests) || requests.length === 0) throw new Error('The synthetic patient has no persisted request for this journey.');
-    const request = requests.find(item => item.state === 'Matched' || item.offers?.length) || requests[0];
+    const request = requests.find(item => item.state === 'Open' && item.offers?.some(offer => offer.state === 'Active' && new Date(offer.valid_until).getTime() > Date.now()))
+      || requests.find(item => item.offers?.length)
+      || requests[0];
     if (!request.request_text || !request.id) throw new Error('The selected persisted request is incomplete.');
 
     checkpoint = 'open direct request route';
@@ -70,6 +72,7 @@ let checkpoint = 'launch';
     await page.getByRole('link', { name: /Back to requests/ }).click();
     await page.getByRole('heading', { name: 'Your requests', exact: true }).waitFor();
     checkpoint = 'open request from persisted list';
+    await page.waitForFunction(id => document.querySelector('[data-request-id="' + CSS.escape(id) + '"]') || document.querySelector('details.request-history'), request.id);
     const listCard = page.locator('.request-card[data-request-id="' + request.id.replaceAll('"', '') + '"]');
     if (!(await listCard.isVisible())) {
       const history = page.locator('details.request-history');
@@ -93,6 +96,9 @@ let checkpoint = 'launch';
       await page.getByRole('heading', { name: 'Review offer details', exact: true }).waitFor();
       await page.getByText(offer.clinician_name, { exact: true }).waitFor();
       await page.getByText(offer.specialty, { exact: true }).waitFor();
+      if (request.state === 'Open' && offer.state === 'Active' && new Date(offer.valid_until).getTime() > Date.now()) {
+        await page.getByRole('button', { name: 'Accept offer', exact: true }).waitFor();
+      }
       for (const value of Object.values(request.disclosure_snapshot || {})) {
         await page.getByText(value, { exact: true }).waitFor();
       }
