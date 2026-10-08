@@ -33,7 +33,9 @@ authorization, HMAC-reference privacy, idempotency, and mismatch checks pass in
 
 The preview at `http://127.0.0.1:8017/teletena/admin/financial-disputes` uses
 the isolated `tele-tena-pr12-fresh.localhost` site. Backend checkout is
-`fix/legacy-wallet-projection-audit` at `f975952d53ca2390b91d708b148890b851ac893f`;
-the matching production asset bundle was built from that exact SHA. The isolated
-Gunicorn preview was HUP-reloaded after the final backend build. Shared Bench
+`fix/legacy-wallet-projection-audit`; the backend behavior was last changed at
+`f975952d53ca2390b91d708b148890b851ac893f`. The exact built-asset source SHA is
+recorded in `frontend/dist/release.json` and `tele_tena/public/review/release.json`
+after the final packaging run. The isolated Gunicorn preview was HUP-reloaded
+after the final backend build. Shared Bench
 workers and scheduler were not restarted for this UI-only change.
