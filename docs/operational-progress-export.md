@@ -3,7 +3,32 @@
 Sanitized local checkpoint for roadmap updates. It is not a merge, deployment,
 real-patient-readiness, real-money, or market-performance claim.
 
-## Current source and preview — 2026-10-07
+## Current source and preview — 2026-10-08
+
+- Current branch: `feat/patient-request-detail-route`, head
+  `29d267de5f510799f44db9506d91b4412a519a23`; draft PR #30 targets the open
+  PR #29 branch `feat/request-inbox-eligibility-refresh`, which depends on #28.
+  No merge or remote deployment occurred.
+- Preview URL `http://127.0.0.1:8017/teletena/`, site
+  `tele-tena-pr12-fresh.localhost`, Bench
+  `/home/frappe/frappe/frappe-bench`. The packaged production app is served by
+  Gunicorn at loopback, not Vite. Asset manifest source is
+  `662d5ec6ae869a568a0105285cd36ad23a03315f`; backend request-detail code was
+  introduced at `1a9eeeaa9a83808e4725150aa9e6bdae64354832`. The identified
+  master is PID 287561 with two workers. No migrations, reseeding or changes to
+  `erp.localhost` or Selfmade were made for this route slice.
+- Patient request detail was verified against the persisted synthetic request:
+  Frappe presentation suite 34/34; browser sign-in, direct route, reload,
+  return to list, list-link navigation and generic unknown-ID state passed.
+  Responsive checks passed at 320/390/768/1440 CSS px; Amharic and Afaan Oromo
+  headings rendered. Screenshots are in `docs/screenshots/request-details/`.
+  PR #30 CI passed on Node 22.23.3/24.13.0 and Python syntax 3.12/3.14.2.
+- Bench scheduler and a shared worker are running, but scheduled earnings
+  release and progressive routing-wave execution remain unverified for this
+  checkout; no claim is made that a worker has processed either job. The
+  retained synthetic review site was not reseeded.
+
+## Historical source and preview — 2026-10-07
 
 - Current branch: `feat/mutual-rescheduling`, draft PR #22 against
   `feat/clinic-staff-workspace` (PR #21); no merge or remote deployment.

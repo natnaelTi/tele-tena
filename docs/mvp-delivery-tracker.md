@@ -1,5 +1,32 @@
 # TeleTena delivery tracker
 
+## Current local continuation — patient request detail — 2026-10-08
+
+The current branch is `feat/patient-request-detail-route` at
+`29d267de5f510799f44db9506d91b4412a519a23`. Draft PR #30 targets PR #29's
+`feat/request-inbox-eligibility-refresh` branch; #29 is draft and depends on
+PR #28. Do not merge this stack independently. The production-built preview is
+`http://127.0.0.1:8017/teletena/`, site `tele-tena-pr12-fresh.localhost`, in
+`/home/frappe/frappe/frappe-bench`; it is not Vite. Its asset manifest records
+frontend source `662d5ec6ae869a568a0105285cd36ad23a03315f`. Backend request
+detail code is present from `1a9eeeaa9a83808e4725150aa9e6bdae64354832` and
+unchanged since that API addition. The preview is served by Gunicorn master
+PID 287561 and its two worker children 323887/323888; the service is bound to
+127.0.0.1:8017. No migration, reseed or source change to another bench/site was
+performed for this slice.
+
+The patient-owned request detail screen and list/dashboard links are
+implemented. Frappe 15 `tests/presentation.py` passed 34/34. The packaged
+browser journey passed sign-in, detail route, reload, return to list and list
+link navigation, then generic unavailable behavior for an unknown ID. Layout
+overflow checks passed at 320/390/768/1440 CSS px, and Amharic/Afaan Oromo
+headings rendered. Screenshots and details are in
+[`patient-request-detail-verification.md`](patient-request-detail-verification.md).
+PR #30 CI passed on Node 22.23.3/24.13.0 and Python syntax 3.12/3.14.2.
+The worktree is clean. This route slice does not verify SMS delivery, physical
+devices, native-language quality, pilot match performance, earnings release,
+or the remainder of approved batches A–I.
+
 ## Current local continuation — immediate request reproduction — 2026-10-08
 
 The integrated preview is `http://127.0.0.1:8017/teletena/` on

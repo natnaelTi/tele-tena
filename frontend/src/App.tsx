@@ -31,7 +31,7 @@ import Account from "./pages/Account";
 import { Applications, FinancialDisputes, Scopes } from "./pages/Admin";
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
 import Showcase from "./pages/Showcase";
-import { ClinicianRequestInbox, PatientOpenRequests, PublicClinicianProfile } from "./pages/OpenRequests";
+import { ClinicianRequestInbox, PatientOpenRequests, PatientRequestDetail, PublicClinicianProfile } from "./pages/OpenRequests";
 import { ClinicianScopeApplications, VettingQueue } from "./pages/Vetting";
 import { ClinicianAffiliations, ClinicMembershipPortal, ClinicReview } from "./pages/Clinics";
 import PWAUpdateNotice from "./components/PWAUpdateNotice";
@@ -78,6 +78,7 @@ export default function App() {
                 <Route index element={<PatientHome />} />
                 <Route path="discovery" element={<Discovery />} />
                 <Route path="requests" element={<PatientOpenRequests />} />
+                <Route path="requests/:requestId" element={<PatientRequestDetail />} />
                 <Route path="clinicians/:clinicianId" element={<PublicClinicianProfile />} />
                 <Route path="book/:offering" element={<Booking />} />
                 <Route path="book-link/:token" element={<BookingLink />} />
