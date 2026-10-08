@@ -271,7 +271,7 @@ export function ServiceCatalog() {
         <div className="service-catalog-list-header"><h2>{w("Definitions")}</h2><Button variant="secondary" onClick={startNew}>{w("New draft")}</Button></div>
         {definitions.map((item:any)=><button type="button" key={item.id} aria-current={selected===item.id?"true":undefined}
           className={`service-definition-choice${selected===item.id?" selected":""}`} onClick={()=>choose(item.id)}>
-          <strong>{item.service_label||item.service_key}</strong><span>{w(item.catalog_status)} · {item.definition_version||w("Version unavailable")}</span>
+          <strong>{item.service_label||item.service_key}</strong><span>{item.service_key}</span><span>{w(item.catalog_status)} · {item.definition_version||w("Version unavailable")}</span>
           <span>{w(item.clinical_review_status||"Not reviewed")}</span>
         </button>)}
         {!definitions.length&&<EmptyState title={w("No service definitions yet.")}/>}
