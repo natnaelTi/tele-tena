@@ -32,3 +32,4 @@ tele_tena.patches.v1_26_appointment_acquisition_source
 tele_tena.patches.v1_27_vetting_rubric_assessment
 tele_tena.patches.v1_28_vetting_rubric_registry
 tele_tena.patches.v1_29_credential_verification_provenance
+tele_tena.patches.v1_30_adult_relationship_links

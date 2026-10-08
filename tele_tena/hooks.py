@@ -13,7 +13,8 @@ scheduler_events = {
     "cron": {"*/5 * * * *": ["tele_tena.accounting.release_eligible_earnings"],
         "* * * * *": ["tele_tena.api.open_requests.expire_requests", "tele_tena.api.extensions.expire_extensions",
                        "tele_tena.api.vetting.flag_scope_appointments_for_review"],
-        "0 * * * *": ["tele_tena.api.presentation.expire_reschedule_proposals"]},
+        "0 * * * *": ["tele_tena.api.presentation.expire_reschedule_proposals",
+                       "tele_tena.api.relationships.expire_relationship_invitations"]},
 }
 
 # A dedicated namespace only; no catch-all routing or changes to other sites.

@@ -1,5 +1,25 @@
 # TeleTena delivery tracker
 
+## Current local checkpoint — optional adult relationship links — 2026-10-08
+
+The active worktree is `feat/adult-relationship-links`, based on the local
+`feat/clinic-shared-calendar` checkpoint at `5c62499`. It adds a patient-only,
+mutually consented adult relationship link. The link shares only each party's
+chosen display name and grants no appointments, clinical history, notes,
+balances, or call access; couple/family appointments and multi-participant
+consultations remain pending. The isolated site is
+`tele-tena-pr12-fresh.localhost`. Before the additive migration, a full
+database/config/file backup completed. Patch v1.30 was applied and invoked
+twice to check idempotent table creation. Presentation tests passed 47/47 and
+integration tests passed 24/24; the additional reviewer-role denial assertion
+also passed in the focused relationship test. The production build and
+artifact/privacy scan pass. A built-browser smoke test verified public
+invitation routing, policy-aware signed-out copy, patient authentication and
+the patient links page at 390 and 1440 px; screenshots are under
+`docs/screenshots/adult-relationship-links/`. A two-context Playwright journey on the built app completed invitation, consent, acceptance, alias-limited visibility, and revocation; screenshots are retained. The packaged release manifest identifies the exact source SHA served by the running preview. Fresh-site installation, enabled-registration browser configuration, and 320/768/200%-zoom checks remain pending. The work is in draft PR #43,
+stacked on open PR #42 (`feat/clinic-shared-calendar`). Neither PR is merged;
+no remote site changed.
+
 ## Current local checkpoint — patient-shared clinic calendar — 2026-10-08
 
 The active branch is `feat/clinic-shared-calendar`, in draft PR #42, stacked on

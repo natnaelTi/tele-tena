@@ -28,6 +28,7 @@ from tele_tena.api import vetting
 from tele_tena.api import trust
 from tele_tena.api import clinics
 from tele_tena.api import clinic_access
+from tele_tena.api import relationships
 from tele_tena.api import extensions
 from tele_tena.api import service_policy
 from tele_tena.api import service_catalog
@@ -2784,6 +2785,162 @@ class Presentation(unittest.TestCase):
                 frappe.db.sql('DELETE FROM `tabTele Tena Service Attribute Definition` WHERE name IN %s',
                               (tuple(attribute_names),))
             frappe.db.sql('DELETE FROM `tabTele Tena Service` WHERE name=%s', (key,))
+
+    def test_adult_relationship_invites_require_mutual_consent_and_grant_no_records(self):
+        invitation_ids = []
+        relationship_ids = []
+        p1, p2 = fixtures.USERS['p1'], fixtures.USERS['p2']
+        try:
+            fixtures.login('p1')
+            with self.assertRaises(frappe.ValidationError):
+                relationships.create_relationship_invitation(0, 'adult-link-invalid-attestation')
+            original = relationships.create_relationship_invitation(1, 'adult-link-same-key')
+            invitation_ids.append(original['invitation_id'])
+            replay = relationships.create_relationship_invitation(1, 'adult-link-same-key')
+            self.assertEqual(replay['invitation_id'], original['invitation_id'])
+            self.assertEqual(replay['token'], original['token'])
+            self.assertTrue(replay['reissued'])
+            stored = journey.one('''SELECT token_digest,state FROM tt_relationship_invitation WHERE id=%s''',
+                                 (original['invitation_id'],))
+            self.assertNotEqual(stored.token_digest, original['token'])
+            self.assertEqual(stored.state, 'Pending')
+
+            with self.assertRaises(frappe.ValidationError):
+                relationships.preview_relationship_invitation(original['token'])
+            fixtures.login('c1')
+            with self.assertRaises(frappe.PermissionError):
+                relationships.preview_relationship_invitation(original['token'])
+            with self.assertRaises(frappe.PermissionError):
+                relationships.my_relationships()
+            fixtures.login('admin')
+            with self.assertRaises(frappe.PermissionError):
+                relationships.preview_relationship_invitation(original['token'])
+            with self.assertRaises(frappe.PermissionError):
+                relationships.my_relationships()
+
+            fixtures.login('p2')
+            invitation_consent = journey.one('''SELECT inviter,inviter_adult_attested_at
+                FROM tt_relationship_invitation WHERE id=%s''', (original['invitation_id'],))
+            preview = relationships.preview_relationship_invitation(original['token'])
+            self.assertEqual(preview['inviter_name'], 'Synthetic Test')
+            self.assertEqual(preview['notice'], 'A relationship link shares no appointments, records, or notes.')
+            self.assertNotIn('inviter', preview)
+            self.assertNotIn('email', json.dumps(preview).lower())
+            with self.assertRaises(frappe.ValidationError):
+                relationships.respond_to_relationship_invitation(original['token'], 'accept', 0)
+            accepted = relationships.respond_to_relationship_invitation(original['token'], 'accept', 1)
+            relationship_ids.append(accepted['relationship_id'])
+            self.assertEqual(accepted['state'], 'Active')
+            self.assertFalse(accepted['idempotent'])
+            consent = journey.one('''SELECT participant_a,consent_a_at,consent_b_at
+                FROM tt_relationship_link WHERE id=%s''', (accepted['relationship_id'],))
+            inviter_attestation_field = 'consent_a_at' if consent.participant_a == invitation_consent.inviter else 'consent_b_at'
+            self.assertEqual(getattr(consent, inviter_attestation_field), invitation_consent.inviter_adult_attested_at)
+            self.assertTrue(relationships.respond_to_relationship_invitation(
+                original['token'], 'accept', 1)['idempotent'])
+            listing = relationships.my_relationships()
+            self.assertEqual(len([row for row in listing['relationships'] if row['state'] == 'Active']), 1)
+            self.assertEqual(listing['relationships'][0]['other_name'], 'Synthetic Test')
+            self.assertEqual(set(listing['relationships'][0]),
+                             {'id', 'state', 'other_name', 'created_at', 'ended_at'})
+            self.assertEqual(listing['invitations'], [])
+            serialized = json.dumps(listing).lower()
+            for private in ('example.invalid', 'synthetic private history', 'phone', 'patient@example'):
+                self.assertNotIn(private, serialized)
+
+            # A simultaneous reciprocal invitation cannot produce a second
+            # active link after the first acceptance has committed.
+            fixtures.login('p2')
+            reciprocal = relationships.create_relationship_invitation(1, 'adult-link-reciprocal')
+            invitation_ids.append(reciprocal['invitation_id'])
+            fixtures.login('p1')
+            duplicate = relationships.respond_to_relationship_invitation(reciprocal['token'], 'accept', 1)
+            self.assertEqual(duplicate['relationship_id'], accepted['relationship_id'])
+            self.assertTrue(duplicate['idempotent'])
+            self.assertEqual(journey.one("SELECT COUNT(*) amount FROM tt_relationship_link WHERE state='Active'").amount, 1)
+
+            # The private link never authorizes appointment lookup or turns
+            # the other patient into a record recipient.
+            fixtures.login('p2')
+            with self.assertRaises(frappe.PermissionError):
+                presentation.appointment_detail('unrelated-relationship-appointment')
+            self.assertEqual(journey.rows('''SELECT id FROM tt_appointment
+                WHERE patient=%s AND clinician=%s''', (p2, p1)), [])
+
+            fixtures.login('p2')
+            revoked = relationships.revoke_relationship(accepted['relationship_id'])
+            self.assertFalse(revoked['idempotent'])
+            self.assertTrue(relationships.revoke_relationship(accepted['relationship_id'])['idempotent'])
+            fixtures.login('p1')
+            self.assertEqual(relationships.my_relationships()['relationships'][0]['state'], 'Revoked')
+
+            # A later, separately consented link is possible and preserves the
+            # prior revoked row and event history.
+            fixtures.login('p2')
+            relink = relationships.create_relationship_invitation(1, 'adult-link-relink')
+            invitation_ids.append(relink['invitation_id'])
+            fixtures.login('p1')
+            relinked = relationships.respond_to_relationship_invitation(relink['token'], 'accept', 1)
+            relationship_ids.append(relinked['relationship_id'])
+            self.assertNotEqual(relinked['relationship_id'], accepted['relationship_id'])
+            self.assertEqual(journey.one("SELECT COUNT(*) amount FROM tt_relationship_link WHERE state='Active'").amount, 1)
+            self.assertGreaterEqual(journey.one('''SELECT COUNT(*) amount FROM tt_relationship_event
+                WHERE subject_type='Relationship' AND subject_id=%s''',
+                (accepted['relationship_id'],)).amount, 2)
+        finally:
+            fixtures.login('admin')
+            subject_ids = tuple(invitation_ids + relationship_ids)
+            if subject_ids:
+                frappe.db.sql('DELETE FROM tt_relationship_event WHERE subject_id IN %s', (subject_ids,))
+            if relationship_ids:
+                frappe.db.sql('DELETE FROM tt_relationship_link WHERE id IN %s', (tuple(relationship_ids),))
+            if invitation_ids:
+                frappe.db.sql('DELETE FROM tt_relationship_invitation WHERE id IN %s', (tuple(invitation_ids),))
+            frappe.db.commit()
+
+    def test_adult_relationship_decline_expiry_and_rate_limit(self):
+        invitation_ids = []
+        p1, p2 = fixtures.USERS['p1'], fixtures.USERS['p2']
+        try:
+            fixtures.login('p1')
+            declined = relationships.create_relationship_invitation(1, 'adult-link-decline')
+            invitation_ids.append(declined['invitation_id'])
+            fixtures.login('p2')
+            self.assertEqual(relationships.respond_to_relationship_invitation(
+                declined['token'], 'decline', 0)['state'], 'Declined')
+            with self.assertRaises(frappe.ValidationError):
+                relationships.respond_to_relationship_invitation(declined['token'], 'accept', 1)
+
+            fixtures.login('p1')
+            expired = relationships.create_relationship_invitation(1, 'adult-link-expire')
+            invitation_ids.append(expired['invitation_id'])
+            frappe.db.sql('UPDATE tt_relationship_invitation SET expires_at=DATE_SUB(UTC_TIMESTAMP(6),INTERVAL 1 SECOND) WHERE id=%s',
+                          (expired['invitation_id'],))
+            with self.assertRaises(frappe.ValidationError):
+                relationships.preview_relationship_invitation(expired['token'])
+            relationships.expire_relationship_invitations()
+            self.assertEqual(journey.one('SELECT state FROM tt_relationship_invitation WHERE id=%s',
+                                         (expired['invitation_id'],)).state, 'Expired')
+
+            pending_ids = []
+            # Declined and expired invitations count toward the daily create
+            # cap too; cancelling cannot be used to evade abuse controls.
+            for number in range(3):
+                invitation = relationships.create_relationship_invitation(1, f'adult-link-limit-{number}')
+                pending_ids.append(invitation['invitation_id'])
+            invitation_ids.extend(pending_ids)
+            with self.assertRaises(frappe.ValidationError):
+                relationships.create_relationship_invitation(1, 'adult-link-limit-over')
+            for invitation_id in pending_ids:
+                relationships.revoke_relationship_invitation(invitation_id)
+        finally:
+            fixtures.login('admin')
+            if invitation_ids:
+                ids = tuple(invitation_ids)
+                frappe.db.sql('DELETE FROM tt_relationship_event WHERE subject_type=%s AND subject_id IN %s',
+                              ('Invitation', ids))
+                frappe.db.sql('DELETE FROM tt_relationship_invitation WHERE id IN %s', (ids,))
+            frappe.db.commit()
 
 
 if __name__ == '__main__':
