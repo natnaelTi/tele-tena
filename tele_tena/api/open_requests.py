@@ -473,6 +473,9 @@ def clinician_profile(clinician_id):
 def clinician_requests():
     clinician = actor('Tele Tena Clinician')
     profile('clinician')
+    application = one('SELECT status FROM tt_application WHERE user=%s', (clinician,))
+    if not application or application.status != 'Approved':
+        return []
     result = rows('''SELECT r.id,r.service _routing_service,r.urgency,r.language,r.consultation_format,r.request_text,
         r.disclosure_snapshot,r.max_price_minor,r.earliest_start,r.latest_start,r.timezone,
         r.expires_at,r.patient _routing_patient,s.service_label category,rr.notified_at,rr.wave,own.id own_offer_id,
@@ -487,6 +490,15 @@ def clinician_requests():
         if not journey.service_scope_is_current(clinician, req._routing_service):
             continue
         if req.urgency == 'immediate':
+            # A recipient row records that a bounded notification was enqueued;
+            # it is not a permanent grant to view the patient's disclosure.
+            # Revalidate the live gates whenever the inbox is fetched.
+            if req.language not in clinician_languages(clinician):
+                continue
+            present = rows('''SELECT clinician FROM tt_clinician_request_presence
+                WHERE clinician=%s AND ready=1 AND expires_at>UTC_TIMESTAMP(6)''', (clinician,))
+            if not present:
+                continue
             service = one('''SELECT immediate_care_enabled,catalog_status FROM `tabTele Tena Service`
                 WHERE name=%s AND active=1''', (req._routing_service,))
             if not immediate_service_enabled(service):
@@ -511,6 +523,8 @@ def clinician_requests():
                     req.suggested_start = feasible.isoformat(timespec='seconds') + 'Z'
                     req.suggested_timezone = schedule.timezone
                     break
+            if not req.suggested_start:
+                continue
         for field in ('earliest_start','latest_start','expires_at','notified_at','own_offer_start','own_offer_until'):
             if req.get(field):
                 req[field] = req[field].isoformat() + 'Z'

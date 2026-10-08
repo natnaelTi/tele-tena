@@ -20,6 +20,10 @@ let checkpoint = 'launch'
   try {
     const actualContext = await browser.newContext()
     const actualPage = await actualContext.newPage()
+    await actualPage.route('**/api/method/tele_tena.api.open_requests.request_presence**', route =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+        message: { ready: false, configured: false, reasons: ['language_required', 'immediate_policy_required', 'no_immediate_capacity'] },
+      }) }))
     checkpoint = 'real clinician sign-in page'
     await actualPage.goto(app + '/sign-in')
     checkpoint = 'select email sign-in'
@@ -36,8 +40,9 @@ let checkpoint = 'launch'
     checkpoint = 'wait for live readiness reasons'
     await actualPage.screenshot({ path: '/tmp/tele-tena-presentation-review/request-readiness/live-state.png', fullPage: true })
     await actualPage.getByRole('link', { name: 'Add a care language', exact: true }).waitFor()
-    checkpoint = 'wait for immediate policy setup link'
-    await actualPage.getByRole('link', { name: 'Ask a reviewer to enable immediate requests for a service', exact: true }).waitFor()
+    checkpoint = 'show reviewer-controlled service policy guidance'
+    await actualPage.getByText('A reviewer must enable immediate requests for this service. Service-scope approval alone does not enable this. This does not guarantee a request or match.', { exact: true }).waitFor()
+    assert.equal(await actualPage.getByRole('link', { name: 'Ask a reviewer to enable immediate requests for a service', exact: true }).count(), 0)
     assert.equal(await actualPage.getByRole('button', { name: 'Go available', exact: true }).isDisabled(), true)
     assert.equal(await actualPage.getByText('Requests paused', { exact: true }).count(), 1)
     await actualPage.setViewportSize({ width: 320, height: 900 })
@@ -61,9 +66,9 @@ let checkpoint = 'launch'
     const screenshots = '/tmp/tele-tena-presentation-review/request-readiness'
     fs.mkdirSync(screenshots, { recursive: true })
     const translations = {
-      en: ['Add a care language', 'Ask a reviewer to enable immediate requests for a service'],
-      am: ['የእንክብካቤ ቋንቋ ያክሉ', 'ገምጋሚውን ለአገልግሎት ፈጣን ጥያቄዎችን እንዲያነቃ ይጠይቁ'],
-      om: ['Afaan tajaajilaa dabali', 'Gamaaggamaa tajaajilaaf gaaffii ariifataa akka banu gaafadhu'],
+      en: ['Add a care language', 'Review availability'],
+      am: ['የእንክብካቤ ቋንቋ ያክሉ', 'የሚገኙበትን ጊዜ ይመልከቱ'],
+      om: ['Afaan tajaajilaa dabali', 'Yeroo argamuu ilaali'],
     }
     for (const [locale, labels] of Object.entries(translations)) {
       checkpoint = `readiness copy ${locale}`
@@ -92,6 +97,28 @@ let checkpoint = 'launch'
     }
     await actualContext.close()
 
+    const capacityContext = await browser.newContext()
+    const capacityPage = await capacityContext.newPage()
+    checkpoint = 'capacity-specific readiness sign-in'
+    await capacityPage.route('**/api/method/tele_tena.api.open_requests.request_presence**', route =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+        message: { ready: false, configured: false, reasons: ['no_immediate_capacity'] },
+      }) }))
+    await capacityPage.goto(app + '/sign-in')
+    await capacityPage.getByRole('button', { name: 'Use email instead' }).click()
+    await capacityPage.getByLabel('Email', { exact: true }).fill(account)
+    await capacityPage.getByLabel('Password', { exact: true }).fill(credentials[account])
+    await capacityPage.getByRole('button', { name: 'Sign in', exact: true }).click()
+    await capacityPage.waitForURL(/\/teletena\/clinician(?:\/|$)/)
+    checkpoint = 'specific no-capacity guidance'
+    await capacityPage.getByText('No complete session fits the next 30 minutes', { exact: true }).waitFor()
+    assert.equal(await capacityPage.getByRole('button', { name: 'Go available', exact: true }).isDisabled(), true)
+    const reviewAvailability = capacityPage.getByRole('link', { name: 'Review availability', exact: true })
+    await reviewAvailability.waitFor()
+    await reviewAvailability.click()
+    await capacityPage.waitForURL('**/teletena/clinician/availability')
+    await capacityContext.close()
+
     const context = await browser.newContext()
     const page = await context.newPage()
     checkpoint = 'controlled failure sign-in'
@@ -117,7 +144,7 @@ let checkpoint = 'launch'
     await alert.waitFor()
     assert.equal(await page.getByText('Connection interrupted; request availability may expire.').count(), 0)
     assert.equal(await page.getByText('Operation unavailable').count(), 0)
-    console.log('PASS: real seeded clinician sees both unmet setup requirements and cannot appear available; authenticated validation failure is not mislabeled as a connection outage')
+    console.log('PASS: clinician sees language, reviewer-policy and capacity constraints; capacity points to availability, and authenticated validation failure is not mislabeled as a connection outage')
     await context.close()
   } finally {
     await browser.close()

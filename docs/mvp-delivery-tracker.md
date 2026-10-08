@@ -1,5 +1,54 @@
 # TeleTena delivery tracker
 
+## Current local continuation — immediate request reproduction — 2026-10-08
+
+The integrated preview is `http://127.0.0.1:8017/teletena/` on
+`tele-tena-pr12-fresh.localhost`, served from `/home/frappe/frappe/frappe-bench`
+as a production-built Frappe application. Current branch HEAD is
+`31260d6b2c55faab604787e25c6ce894ac21af7e` (documentation and evidence only).
+The backend Python implementation loaded by the preview is unchanged from
+`9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e`. The readiness UI fix was authored
+in `3a532274c184792ce6a93365b826617acb2a5f5b`; the packaged frontend manifest
+identifies build source `75ef08be1a726b5515584771668a3120b3dc2500`. The
+identified preview Gunicorn master was reloaded after that build. This is not a
+Vite preview.
+
+The persisted synthetic Review Clinician setup did not initially meet the
+immediate-request rules: no care language was saved, the reviewer-controlled
+immediate policy for the legacy review service was off, and the recurring
+schedule began at 08:00 Addis time while the reproduction ran at 03:17. After
+these were configured through their authorized application workflows and a
+temporary date-specific interval was added, a separate patient session
+published an immediate request, the clinician received it and submitted a
+published-price offer, and the patient accepted. Exactly one appointment and
+one ETB 600 reservation were created. The temporary availability override was
+removed without changing the original recurrence or the booked appointment.
+The clinician workspace now names `no_immediate_capacity` explicitly and links
+directly to the availability editor; an authenticated built-browser regression
+checks this state in English, Amharic, and Afaan Oromo at responsive widths.
+Detailed evidence and screenshots are in
+[`vetting-routing-verification.md`](vetting-routing-verification.md).
+
+At this head, the packaged clinician readiness browser regression passes and
+the Frappe 15 `tests/presentation.py` suite passes 33/33. GitHub checks on PR
+#29 pass for Node 22.23.3 and 24.13.0 plus Python syntax on 3.12 and 3.14.2.
+The disposable registration-browser check did not complete on this head: its
+named site already exists, and the harness correctly refuses to overwrite it.
+The retained site's repeat migration and data fingerprint check passed on the
+preceding schema-bearing checkout; a new unique-site installation with both
+registration configurations is still required. See the current verification
+section in `vetting-routing-verification.md`.
+
+Before schema work on the already-existing isolated
+`tele-tena-clinic-access-fresh.localhost`, a full database/config/file backup
+was completed. Repeat migration passed twice on the current checkout and
+`tests/presentation.py` passed 33/33. The installer correctly refused to
+overwrite this existing site, so a fresh installation at this exact head is
+still pending. The site-level scheduler flag is enabled and bench-wide
+`frappe schedule`/worker processes are running; isolated scheduled-wave and
+earnings-release execution is not verified. Broader scope A–I remains
+incomplete; see the status matrix and historical checkpoints below.
+
 ## Current continuation — scope credential lifecycle — 2026-10-08
 
 Active branch `feat/scope-reverification` is a dependent follow-up to the
@@ -228,8 +277,8 @@ needed for clean financial cutover verification.
 | Approved area | Current status | Evidence / remaining work |
 |---|---|---|
 | Extracted design, React design system, all 142 screens | partial | Existing React flows remain authoritative and the visual tokens now begin moving toward the extracted Inter/blue–teal reference. Screen-level map covers 142 concepts. Most routes still need direct visual and connected interaction review; prototype-only states are not accepted. |
-| Clinician vetting and service catalog | partial | Native per-scope applications/decisions exist. New `feat/scope-evidence` adds applicant-owned PDF evidence revisions per scope, authenticated owner/reviewer download, and immutable evidence references on assessment; `tests/presentation.py` passes 27/27 on the retained Frappe 15 site, including invalid/post-submit/unauthorized access and revision snapshot cases. Frappe 15 repeat migration passed on a backed-up isolated site. Rendered browser acceptance and fresh-from-empty installation for v1.16 remain pending. The proposed rubric v1.0 needs medical-lead approval; independent credential/source verification, affiliation verification, license expiry/reverification/appeals and approved clinical terminology review remain. |
-| Open requests, private offers and progressive routing | partial | Persisted request/offer state, hard eligibility, presence leases, bounded waves, owned paginated history, atomic offer acceptance and progress metrics are implemented. `tests/presentation.py` passed 27/27, including immediate continuous-capacity and site-scoped immediate-policy checks. The existing synthetic clinician returns `language_required` and `immediate_policy_required`, so delivery correctly remains blocked until care languages are saved and an authorized reviewer enables the service policy. The built-app shell shows those reasons and disables availability; the network/validation failure distinction passed a focused authenticated browser fault-injection check. On source/build `b627c8ba7518acb3a923e03607e9ea0317e99ccd`, responsive browser checks at 320/390/768/1440px in en/am/om found no horizontal overflow; role-aware mobile navigation and Escape focus restoration passed. The review site's scheduler is now enabled; scheduled request expiry ran through the shared bench worker and expired two overdue synthetic open requests. No due earnings existed, so release remains unverified. I did not edit the clinician account or service policy. A successful routed offer, financial release, routing privacy/abuse audits and pilot evidence remain pending. The under-three-minute target is not guaranteed. |
+| Clinician vetting and service catalog | partial | Native per-scope applications/decisions exist. Applicant-owned private PDF revisions and immutable assessment evidence references, credential expiry/reverification and reconsideration are implemented. Frappe 15 `tests/presentation.py` passes 33/33 on the current worktree, but this is not fresh-install or Frappe 16 evidence. The proposed rubric v1.0 needs medical-lead approval; independent credential/source verification, affiliation verification, renewal browser acceptance and approved clinical terminology review remain. |
+| Open requests, private offers and progressive routing | partial | Persisted request/offer state, hard eligibility, presence leases, bounded waves, owned paginated history, atomic offer acceptance and progress metrics are implemented. Frappe 15 `tests/presentation.py` passes 33/33. Inbox reads now revalidate approval, exact language, current scope, service policy, fresh immediate-presence lease and feasible full-duration time; recipient audit rows remain when eligibility changes. The retained synthetic Review Clinician readiness API currently returns `language_required` and `immediate_policy_required`; this account is not an eligible immediate responder. No account or service setting was altered to force a match. This is distinct from the clinician’s “Available for requests” control. A fresh two-sided offer journey, scheduler-backed wave widening on this branch, routing privacy/abuse audit and pilot performance remain pending. The under-three-minute target is not guaranteed. See `request-inbox-eligibility.md` and `vetting-routing-verification.md`. |
 | Owner-level legacy financial reconciliation | implementation in progress | New v1.13 migration records legacy-event, wallet-snapshot, subledger and exact opening-boundary differences without changing existing records. Mismatched owners are held until an authorized reasoned snapshot decision. Fresh/upgrade/repeat tests on a disposable site remain pending. |
 | Extensions and dispute/refund policy | pending | No prefunded explicit extension workflow. Refunds/disputes after release or payout state remain gated for authorized operations; no negative balance or history edits are allowed. |
 | Clinic operations and record grants | partial | Verified clinic registration/affiliation and limited memberships are implemented. A verified invite/Manager/Scheduling member can reach `/clinic`; a browser flow verified clinic application → reviewer decision → manager invitation → exact verified-contact acceptance → staff workspace navigation → reasoned revocation at 320/390/768/1440px. A patient can grant one verified clinic scheduling-only access to a future booked encounter; the built `/teletena/` journey persisted and revoked that grant across reload. The 24-case presentation suite verifies idempotency, minimized fields, patient and clinic role boundaries, and membership revocation. Fresh-site installation is still pending. Clinic calendars/resources, clinic billing, dedicated team screens, broader staff operations, and clinical-record access grants are not implemented; membership alone grants none. See `clinic-encounter-access.md` and the current sections of `presentation-readiness-verification.md`. |

@@ -1,7 +1,121 @@
 # Vetting, catalog, and routing verification
 
-Status: local dependent feature work on `feat/vetting-catalog-routing`; not
-merged or deployed. This report separates observed failure causes from broader
+## Current packaged-preview reproduction — 2026-10-08
+
+This section supersedes the older preview/site references below for the current
+request-discovery reproduction. The backend Python implementation used during
+the journey is the unchanged code tree from
+`9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e` on
+`feat/request-inbox-eligibility-refresh`. The readiness UI fix was authored in
+`3a532274c184792ce6a93365b826617acb2a5f5b`, and `release.json` reports packaged
+frontend build source `75ef08be1a726b5515584771668a3120b3dc2500`. Current branch
+head is `471b15524ba7b6ef61495da3cf0f932c5a714cc9`, which adds only verification
+docs and screenshots after the product build. The review URL was
+`http://127.0.0.1:8017/teletena/`, served by the production-built Frappe route
+on site `tele-tena-pr12-fresh.localhost` in `/home/frappe/frappe/frappe-bench`.
+The app was not served by Vite.
+
+### Persisted eligibility findings
+
+Before changing synthetic test configuration, the saved `Review Clinician`
+profile had no care languages, the `Review conversation` immediate-care policy
+was disabled, and the published `Africa/Addis_Ababa` schedule began at 08:00 on
+each weekday. At the observed local time (03:17 EAT), the schedule had no
+conflict-free 30-minute start in the next 30 minutes. The presence API returned
+`no_immediate_capacity`; the saved presence was not live. The patient fixture
+had no prior open request at that point. Thus approval, offering and weekly
+availability by themselves did not meet the immediate-request eligibility
+rules. The persisted state did not support the earlier assumption that all
+request requirements were active. The exact initial empty-inbox state cannot
+be reconstructed from an unrecorded earlier browser attempt, but the current
+server-side blockers were directly observed rather than inferred from the
+availability toggle.
+
+Through the built application only, the synthetic clinician saved English as
+a care language, and the reviewer enabled immediate requests for the legacy
+review service with a recorded synthetic-only reason. A temporary date-only
+replacement interval from 03:30–04:30 EAT was added alongside the existing
+08:00–20:00 date interval. Presence then became live with an expiry. A separate
+patient browser published a synthetic immediate request while the clinician
+session was reachable. The clinician inbox returned that request with a
+server-suggested 03:30 EAT start; the clinician submitted an offer at the
+published ETB 600 price; the patient reviewed the disclosure and accepted.
+Persisted results were one Matched request, one Booked appointment and one
+accepted offer. The patient's synthetic wallet moved from ETB 3,151 available /
+ETB 1,849 reserved to ETB 2,551 available / ETB 2,449 reserved. The amount was
+reserved once. The temporary date exceptions were then removed through the
+availability UI; the original daily 08:00–20:00 recurrence remains, and the
+accepted appointment remains Booked. No historical data was reset.
+
+The review-service immediate policy and clinician English language are still
+saved synthetic fixture configuration. Presence is lease-based and expires
+when the clinician session stops renewing it. The schedule was restored to its
+original recurring hours; therefore it does not currently offer an immediate
+start outside those hours. The accepted appointment is preserved even though
+the temporary interval was removed, as required for schedule edits.
+
+Screenshots from the actual packaged UI are in
+[`docs/screenshots/request-inbox/current/`](screenshots/request-inbox/current/):
+the patient's matched request at 390 px and the clinician's accepted offer
+history at 1440 px. They use synthetic copy and accounts.
+
+### Compatibility-site migration and tests
+
+The named disposable site `tele-tena-clinic-access-fresh.localhost` already
+existed from a prior fresh-install attempt. The fresh-install harness refused
+to overwrite it. Before touching its schema, a full database, config, public-
+file and private-file backup was made under that site's private backups. A
+site-scoped repeat migration then completed successfully on this branch, and
+`tests/presentation.py` passed **33/33** against that site. A second migration
+also completed successfully. This is repeat-migration evidence on a retained
+isolated site, not a new fresh-install run at the current branch head. The prior
+site's synthetic records were preserved. The original `erp.localhost` and
+Selfmade were not migrated or changed.
+
+The main bench scheduler flag is enabled, with its `frappe schedule` and worker
+processes running. These are bench-wide processes, not a dedicated queue for
+the isolated site. This check did not establish execution of a scheduled
+routing wave or earnings-release job. No unrelated process was restarted.
+
+GitHub checks for the current PR head `025fa5ff862f363574c47febd9c2340bb4694246`
+passed: frontend on Node 22.23.3 and 24.13.0, plus Python syntax on 3.12 and
+3.14.2. This documentation-only commit did not alter application code.
+
+### Capacity-state copy follow-up — source `75ef08be1a726b5515584771668a3120b3dc2500`
+
+The clinician shell now says “No complete session fits the next 30 minutes”
+when that exact server reason is present and links directly to Availability.
+“Go available” remains disabled until the server allows presence. This replaces
+the generic “Complete setup” message in the capacity-only state; no matching or
+availability checks were loosened. The Amharic and Afaan Oromo action labels
+are provisional and still need human review.
+
+`scripts/browser-request-availability-error.cjs` passed against the packaged
+`/teletena/` application. It authenticated a real synthetic clinician while
+injecting controlled readiness responses for language/policy/capacity states,
+verified the capacity-specific copy and route, checked keyboard/mobile
+navigation and width overflow at 320/390/768/1440 px in all three locales, and
+confirmed authenticated validation errors are not called connection errors.
+This script is a UI-state test; the real API capacity response was separately
+observed as `ready=false, reasons=[no_immediate_capacity]` for the saved review
+clinician, and the rendered real-state screenshot is
+[`clinician-paused-no-capacity-1440.png`](screenshots/request-inbox/current/clinician-paused-no-capacity-1440.png).
+The production asset build was rebuilt at `75ef08be1a726b5515584771668a3120b3dc2500`
+and the identified preview Gunicorn master was HUP-reloaded; `/teletena/`
+returned HTTP 200. `npm run lint` and `npm run build` passed before the package
+build, with existing lint warnings and the existing large-bundle advisory.
+
+Current evidence proves that a properly configured synthetic clinician can
+receive, offer and match an immediate request in the production-built preview.
+It does not prove the three-minute pilot target, a new fresh install at this
+head, worker-isolated scheduled waves, live SMS, hosted LiveKit behavior,
+physical-device calls, native translation approval, or completion of the
+broader approved A–I scope. Those remain separate acceptance items.
+
+Historical report context (earlier `feat/vetting-catalog-routing` checkpoint;
+not the current branch): the entries below preserve earlier failure analysis
+and test results. The packaged-preview reproduction above is the latest
+observation. This report separates observed failure causes from broader
 requirements that remain incomplete.
 
 ## Reproduced inbox failure
@@ -292,3 +406,51 @@ check. Capture: `docs/screenshots/immediate-policy/reviewer-services-1440.png`.
 - Scheduler: enabled for this review site; `bench doctor` reports one worker
   online and `show-pending-jobs` reported no pending jobs at this check. This
   does not prove a future request or earnings job has executed.
+
+### Current request-readiness verification (PR #29, 2026-10-08)
+
+The current branch is `feat/request-inbox-eligibility-refresh` at
+`31260d6b2c55faab604787e25c6ce894ac21af7e`. The running loopback Gunicorn
+preview returned HTTP 200 at the same `/teletena/` URL above. The packaged
+asset manifest identifies frontend source `75ef08be1a726b5515584771668a3120b3dc2500`;
+the UI behavior fix is `3a532274c184792ce6a93365b826617acb2a5f5b`. Backend
+Python files in this slice are unchanged from `9385fe6d4301d8ec3ad8fa8b483223fc86ecb52e`.
+This is the packaged Frappe app, not a Vite server.
+
+Checks actually run at this head:
+
+- `tests/presentation.py`: **33/33 passed** against the retained synthetic
+  Frappe 15 site. This covers calendar/DST, permissions, offer acceptance,
+  immediate continuous-time starts, financial invariants, and regressions.
+- `scripts/browser-request-availability-error.cjs`: passed against the
+  packaged app. It verifies clinician language, reviewer-policy and capacity
+  readiness explanations, their navigation target, translated responsive
+  layouts at 320/390/768/1440 CSS px, and distinguishes authenticated validation
+  errors from connection failures.
+- GitHub PR #29 checks: all **8 jobs passed** on head `31260d6`, including
+  frontend on Node 22.23.3 and 24.13.0 and Python syntax on 3.12 and 3.14.2.
+- `curl` to the preview returned HTTP 200. The production release manifest
+  matches source `75ef08b` and contains hashes for the built JS/CSS, fonts,
+  service worker, manifest and local brand assets.
+- The disposable browser-install harness did not pass at this head. Its target
+  `tele-tena-clinic-access-fresh.localhost` already exists, and the safe harness
+  refused to overwrite it. No data was deleted or reseeded. A fresh install at
+  this exact head and both invited/enabled registration browser journeys remain
+  unverified. The earlier failed `bench run-tests` command invoked ERPNext's
+  generic setup hook without a country and stopped before executing tests;
+  backup/current inspection showed no changed setup flags, user count or
+  company records. It is not counted as a passing test.
+
+The earlier actual two-session immediate-request journey remains valid evidence:
+request publication → eligible inbox → private offer → patient acceptance →
+one appointment and one ETB 600 reservation. The current UI also states the
+precise `no_immediate_capacity` reason with an availability link. It does not
+claim the clinician is ready outside configured hours. Exact earlier fixture
+and financial values are documented above; no accounts, services, balances or
+appointments were reset for this follow-up.
+
+The review site's scheduler flag is enabled and the bench-wide scheduler and
+worker are running. They share the bench queue; isolated routing-wave and
+earnings-release job execution remain unverified. Live SMS, hosted LiveKit
+revocation, physical-device testing, and human translation approval also remain
+external or pending checks. The full approved A–I scope is not complete.

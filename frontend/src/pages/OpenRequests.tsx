@@ -120,7 +120,6 @@ export function ClinicianRequestInbox(){
       {!offers.data.items.some(item=>offerView==='Active'?item.state==='Active':item.state!=='Active')&&<EmptyState title={offerView==='Active'?'No active offers on this page.':'No closed offers on this page.'}>Quotes stay private. Accepted and closed outcomes remain in your history.</EmptyState>}
       <div className="actions"><Button variant="secondary" disabled={offerPage===0} onClick={()=>setOfferPage(Math.max(0,offerPage-1))}>Previous offers</Button><span>Page {offerPage+1}</span><Button variant="secondary" disabled={!offers.data.has_more} onClick={()=>setOfferPage(offerPage+1)}>More offers</Button></div>
     </>}{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}</section>
-    <Link className="text-link" to="/clinician/account">Set your care languages</Link>
   </>;
 }
 
