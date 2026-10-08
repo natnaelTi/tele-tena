@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 export function useResource<T>(load: () => Promise<T>) {
   const [data, setData] = useState<T | null>(null);
-  const [error, setError] = useState(false);
+  const [errorDetail, setErrorDetail] = useState<unknown>(null);
   const refresh = useCallback(async () => {
-    setError(false);
+    setErrorDetail(null);
     try {
       setData(await load());
-    } catch {
-      setError(true);
+    } catch (error) {
+      setErrorDetail(error);
     }
   }, [load]);
   useEffect(() => {
@@ -16,15 +16,15 @@ export function useResource<T>(load: () => Promise<T>) {
       .then((value) => {
         if (active) {
           setData(value);
-          setError(false);
+          setErrorDetail(null);
         }
       })
-      .catch(() => {
-        if (active) setError(true);
+      .catch((error) => {
+        if (active) setErrorDetail(error);
       });
     return () => {
       active = false;
     };
   }, [load]);
-  return { data, error, refresh };
+  return { data, error: errorDetail !== null, errorDetail, refresh };
 }

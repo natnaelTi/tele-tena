@@ -937,6 +937,29 @@ class Presentation(unittest.TestCase):
             frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
 
+    def test_patient_request_detail_is_owner_scoped_and_returns_persisted_snapshot(self):
+        fixtures.login('p1')
+        key = 'request-detail-' + secrets.token_hex(8)
+        start = (datetime.now(timezone.utc) + timedelta(days=3)).isoformat()
+        published = open_requests.publish_request(
+            service=fixtures.PREFIX, request_text='Synthetic request detail only.',
+            urgency='scheduled', language='en', consultation_format='audio',
+            sharing={'name': False, 'history': False}, retry_key=key,
+            timezone_name='Africa/Addis_Ababa', earliest_start=start, latest_start=start)
+        detail = open_requests.my_request_detail(published['id'])
+        self.assertEqual(detail.id, published['id'])
+        self.assertEqual(detail.request_text, 'Synthetic request detail only.')
+        self.assertEqual(detail.disclosure_snapshot, {'request': 'Synthetic request detail only.'})
+        self.assertEqual(detail.offers, [])
+        fixtures.login('p2')
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.my_request_detail(published['id'])
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.my_request_detail('00000000-0000-0000-0000-000000000000')
+        fixtures.login('c1')
+        with self.assertRaises(frappe.PermissionError):
+            open_requests.my_request_detail(published['id'])
+
     def test_private_request_competing_offers_insufficient_funds_and_atomic_match(self):
         offering1 = fixtures.Integration.offers['c1']
         offering2 = fixtures.Integration.offers['c2']

@@ -386,25 +386,45 @@ def my_requests():
         r.first_notice_at,r.first_offer_at,r.matched_at
         FROM tt_open_request r JOIN `tabTele Tena Service` s ON s.name=r.service
         WHERE r.patient=%s ORDER BY r.published_at DESC LIMIT 30''', (patient.user,))
-    for req in requests:
-        offers = rows('''SELECT o.id,o.start,o.duration_minutes,o.consultation_format,o.price_minor,o.timezone,
-            o.price_source,o.state,o.valid_until,p.display_name clinician_name,p.public_id clinician_id,
-            s.service_label specialty
-            FROM tt_request_offer o JOIN tt_profile p ON p.user=o.clinician
-            JOIN tt_offering off ON off.id=o.offering
-            JOIN `tabTele Tena Service` s ON s.name=off.service WHERE o.request_id=%s
-            ORDER BY o.created_at DESC''', (req.id,))
-        for offer in offers:
-            offer.start = offer.start.isoformat() + 'Z'
-            offer.valid_until = offer.valid_until.isoformat() + 'Z'
-        req.offers = offers
-        req.published_at = req.published_at.isoformat() + 'Z'
-        req.expires_at = req.expires_at.isoformat() + 'Z'
-        for field in ('earliest_start','latest_start','first_notice_at','first_offer_at','matched_at'):
-            if req.get(field):
-                req[field] = req[field].isoformat() + 'Z'
-        req.disclosure_snapshot = json.loads(req.disclosure_snapshot)
-    return requests
+    return [_serialize_patient_request(req) for req in requests]
+
+
+def _serialize_patient_request(req):
+    offers = rows('''SELECT o.id,o.start,o.duration_minutes,o.consultation_format,o.price_minor,o.timezone,
+        o.price_source,o.state,o.valid_until,p.display_name clinician_name,p.public_id clinician_id,
+        s.service_label specialty
+        FROM tt_request_offer o JOIN tt_profile p ON p.user=o.clinician
+        JOIN tt_offering off ON off.id=o.offering
+        JOIN `tabTele Tena Service` s ON s.name=off.service WHERE o.request_id=%s
+        ORDER BY o.created_at DESC''', (req.id,))
+    for offer in offers:
+        offer.start = offer.start.isoformat() + 'Z'
+        offer.valid_until = offer.valid_until.isoformat() + 'Z'
+    req.offers = offers
+    req.published_at = req.published_at.isoformat() + 'Z'
+    req.expires_at = req.expires_at.isoformat() + 'Z'
+    for field in ('earliest_start','latest_start','first_notice_at','first_offer_at','matched_at'):
+        if req.get(field):
+            req[field] = req[field].isoformat() + 'Z'
+    req.disclosure_snapshot = json.loads(req.disclosure_snapshot)
+    return req
+
+
+@query()
+def my_request_detail(request_id):
+    """Return one request only to its patient; unknown and foreign IDs are identical."""
+    patient = profile('patient')
+    if not isinstance(request_id, str) or len(request_id) > 64:
+        fail('Request unavailable.', 'request_unavailable')
+    request = rows('''SELECT r.id,r.state,r.urgency,r.service,s.service_label AS category,
+        r.language,r.consultation_format,r.request_text,r.disclosure_snapshot,r.max_price_minor,r.current_wave,
+        r.earliest_start,r.latest_start,r.timezone,r.published_at,r.expires_at,r.appointment,
+        r.first_notice_at,r.first_offer_at,r.matched_at
+        FROM tt_open_request r JOIN `tabTele Tena Service` s ON s.name=r.service
+        WHERE r.id=%s AND r.patient=%s LIMIT 1''', (request_id, patient.user))
+    if not request:
+        fail('Request unavailable.', 'request_unavailable')
+    return _serialize_patient_request(request[0])
 
 
 @query()
