@@ -38,6 +38,10 @@ fields and is safe to repeat.
   verifies that the final command includes the opaque token. It deliberately
   aborts that command before persistence; the backend suite verifies persisted
   source behavior. This is a browser integration check, not a second booking.
+  One immediate post-reload attempt timed out waiting for the initial sign-in
+  field. A direct browser probe then rendered the sign-in screen without page
+  errors, and the complete browser flow passed on retry; retain this as a
+  transient browser-startup observation rather than hiding it.
 - Clean fresh-site installation remains pending.
 - The migration was applied only to isolated
   `tele-tena-pr12-fresh.localhost`, after a database and private-files backup,
