@@ -70,12 +70,15 @@ let checkpoint = 'launch';
     await page.getByRole('link', { name: /Back to requests/ }).click();
     await page.getByRole('heading', { name: 'Your requests', exact: true }).waitFor();
     checkpoint = 'open request from persisted list';
-    const listCard = page.locator('.request-card').filter({ hasText: request.request_text }).first();
+    const listCard = page.locator('.request-card[data-request-id="' + request.id.replaceAll('"', '') + '"]');
     if (!(await listCard.isVisible())) {
       const history = page.locator('details.request-history');
       if (await history.count()) await history.locator('summary').click();
     }
-    if (await listCard.count() === 0) throw new Error('The request is not present on the patient list page.');
+    if (await listCard.count() === 0) {
+      const counts = await page.evaluate(() => ({ cards: document.querySelectorAll('.request-card').length, history: document.querySelectorAll('details.request-history').length }));
+      throw new Error('The request is not present on the patient list page (cards=' + counts.cards + ', history=' + counts.history + ').');
+    }
     if (await listCard.getByRole('link', { name: 'Open request details', exact: true }).count() === 0) {
       throw new Error('The matched request card has no details link.');
     }
