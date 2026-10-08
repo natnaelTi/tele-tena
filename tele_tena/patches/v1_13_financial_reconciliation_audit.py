@@ -17,6 +17,15 @@ def _legacy_projection(patient):
         elif event.kind == 'Release':
             reserved -= amount
             available += amount
+        elif event.kind == 'Consumption':
+            # Explicit completion activity: reserved patient funds were applied
+            # to the finalized consultation. The balanced journal remains the
+            # authoritative subledger posting.
+            reserved -= amount
+        elif event.kind == 'Refund':
+            # A resolved demo dispute may return clinician earnings to the
+            # patient's available wallet. It does not recreate a reservation.
+            available += amount
         else:
             unknown.append(event.id)
     return available, reserved, events, unknown

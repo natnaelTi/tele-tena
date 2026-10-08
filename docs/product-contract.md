@@ -184,14 +184,19 @@ delivery tracker is authoritative for pending scope.
 
 The versioned v1.8 reconciliation imports known legacy deposit, reservation and
 release events created after each v1.7 wallet opening snapshot into balanced,
-idempotent journals. v1.13 audits each owner against both the original activity
-log and wallet/subledger projection, recording unknown events and exact snapshot
-boundary ambiguity without rewriting records. A mismatched owner is held until
-an authorized, reasoned decision accepts the unchanged wallet snapshot for
-future demo operations; the historical mismatch remains visible. Unknown legacy
-event kinds stop for review. A deployment cutover stops all old web and
-background writers before migration, then verifies owner-by-owner wallet and
-subledger equality or records an explicit hold before starting matching code.
+idempotent journals. v1.13 audits each owner against the activity log and
+wallet/subledger projection, recording unknown events and exact snapshot-boundary
+ambiguity without rewriting existing events. v1.24 records a missing historical
+`Consumption` activity entry only when an immutable `ConsultationFinalized`
+journal, patient reserved debit, and earning agree on appointment and amount; it
+does not change balances, earnings, appointments, or journals. New completions
+and supported dispute refunds append their activity events atomically with the
+subledger posting. Unexplained mismatches remain held until an authorized,
+reasoned decision accepts the unchanged current snapshot; the historical
+difference remains visible. Unknown event kinds and conflicting evidence stop
+for review. A deployment cutover stops all old web and background writers before
+migration, then verifies owner-by-owner wallet and subledger equality or records
+an explicit hold before starting matching code.
 # Returning care and previous clinicians
 
 The patient workspace may offer a returning-care shortcut only for clinicians

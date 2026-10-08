@@ -1,5 +1,29 @@
 # TeleTena delivery tracker
 
+## Continuation checkpoint — legacy wallet projection audit — 2026-10-08
+
+Current focused branch: `fix/legacy-wallet-projection-audit`, based on the
+current open PR #35 head (`1d2a65ecfb450d938cb36a82f74fb80e9202e961`), which
+depends on PR #34. The active local WSGI preview remains
+`http://127.0.0.1:8017/teletena/` on isolated site
+`tele-tena-pr12-fresh.localhost`; its last built asset manifest predates this
+finance patch. Do not review until the package is rebuilt and the matching
+backend process is reloaded.
+
+The owner audit traced a missing legacy `Consumption` activity row on old
+consultation finalization. A new completion/refund event is logged in the same
+transaction as its balanced subledger journal, and patch v1.24 can append only
+historical completion activity proved by the matching immutable earning and
+journal. Wallets and old events are not overwritten. Synthetic evidence shows
+four owners whose reserved difference matches finalized gross earnings; three
+other owners retain an unexplained 600-minor-unit available/reserved residual
+each and remain held. The new backfill test and full Frappe presentation suite
+passed 40/40. Fresh install and applying v1.24 to a backed-up retained preview
+are pending. Details: `legacy-wallet-projection-fix.md`.
+
+The whole approved screen map and batches A–I remain incomplete. This is one
+finance correction slice, not full-product acceptance.
+
 ## Current test-fixture checkpoint — 2026-10-08
 
 The current continuation is `fix/immediate-readiness-window` (exact source

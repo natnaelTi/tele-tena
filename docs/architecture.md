@@ -149,6 +149,17 @@ That audited choice preserves the unresolved historical difference; it does not
 claim to reconstruct missing history or create a balancing entry. All future
 financial records remain on the existing subledger path.
 
+The v1.24 financial activity correction addresses a historical omission: old
+consultation finalization posted a balanced completion journal and consumed the
+patient reservation but did not append the corresponding `Consumption` row to
+`tt_ledger`. The patch appends that activity row only when the completed earning,
+`ConsultationFinalized` journal, and patient-reserved debit agree exactly. This is
+an additive correction to the simulation activity log, not a journal, balance
+adjustment, or reconstruction from appointment state. It leaves unrelated
+projection mismatches held for explicit review. New completion/refund paths
+write matching activity events atomically with their authoritative subledger
+postings.
+
 ## Clinic operational memberships
 
 `Tele Tena Clinic Membership` is an additive native DocType. Its state machine

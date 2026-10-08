@@ -323,6 +323,8 @@ def resolve_earning_dispute(appointment, resolution, reason):
              [(account_id('clinician', item.clinician, 'pending'), amount, 0),
               (account_id('patient', item.patient, 'available'), 0, amount)],
              {'appointment': item.appointment, 'dispute': item.dispute_id})
+        from tele_tena.api.journey import simulation_log
+        simulation_log(item.patient, 'Refund', amount, 'earning-refund:' + item.id)
         frappe.db.sql('UPDATE tt_wallet SET available=available+%s WHERE patient=%s', (amount, item.patient))
         frappe.db.sql("UPDATE tt_earning SET state='Refunded',modified=%s WHERE id=%s", (now, item.id))
     frappe.db.sql('''UPDATE tt_dispute SET status='Resolved',resolved_by=%s,resolution=%s,
