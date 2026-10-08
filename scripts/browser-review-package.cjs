@@ -20,9 +20,9 @@ let checkpoint='launch';
   checkpoint='guest direct route and sign-in redirect';await page.goto(app+'/patient/appointments');
   await page.waitForURL(/\/teletena\/sign-in(?:\?.*)?$/);
   // Invited review sites now show password entry directly when neither OTP
-  // delivery provider is enabled. Both account and logout checks remain real.
-  // Wait for site policy to settle before interacting; the initial phone UI
-  // may be replaced automatically when the capability response arrives.
+  // delivery provider is enabled. Phone entry remains the default, so choose
+  // the explicit email alternative before checking password access.
+  await page.getByRole('button',{name:'Use email instead',exact:true}).click();
   await page.getByLabel('Email',{exact:true}).waitFor();
   await page.getByLabel('Password',{exact:true}).waitFor();
   assert.equal(await page.getByLabel('Phone number',{exact:true}).count(),0);

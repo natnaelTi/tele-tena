@@ -11,9 +11,12 @@ isolated `tele-tena-pr12-fresh.localhost` site. `tests/presentation.py` passes
 enabled-registration configuration for its SMS/signup cases because the
 retained site correctly has phone access disabled; mocked delivery was used,
 and no site flags or live provider settings changed. See
-`vetting-routing-verification.md` for the correction and the outstanding
-fresh-install browser run. The wide A–I scope remains partial/pending as shown
-in the screen-level map; this verification fix does not change those statuses.
+`vetting-routing-verification.md` for the correction and fresh-install status.
+The packaged browser suite passed guest deep-link redirect, password access,
+consultation reload, responsive widths, PWA scope/cache, offline fallback and
+the explicit update interaction. Invited-review browser policy also passed.
+The wide A–I scope remains partial/pending as shown in the screen-level map;
+this verification fix does not change those statuses.
 
 ## Current local continuation — immediate request readiness diagnosis — 2026-10-08
 

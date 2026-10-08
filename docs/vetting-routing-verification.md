@@ -23,6 +23,19 @@ production-built preview remains
 `tele-tena-pr12-fresh.localhost`; frontend source SHA remains
 `5c1a976175f23029f8ee63efc3eaeee5a3383466` because this change is test-only.
 
+The first packaged-browser run exposed a stale test expectation: invited-review
+sign-in intentionally starts on the phone screen and requires choosing “Use
+email instead” before email/password fields render. The test had expected the
+email fields immediately. `scripts/browser-review-package.cjs` now follows the
+actual supported interaction; the built Frappe journey then passed guest
+deep-link redirect, password sign-in/sign-out, consultation detail refresh,
+390/768/1440 viewport checks, PWA scope/public-only cache checks and offline
+fallback. `scripts/browser-invited-review.cjs` passed separately, confirming
+phone OTP and both registrations remain disabled while reviewer password
+access is available. The controlled waiting-worker test in
+`scripts/browser-pwa-update.cjs` also passed against the packaged preview.
+These checks exercise the installed app, not Vite.
+
 Fresh installation with the redesigned enabled-registration browser journey
 is still pending at this exact branch head. The previous disposable site
 `tele-tena-clinic-access-fresh.localhost` is retained and the harness correctly
