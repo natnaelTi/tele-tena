@@ -29,6 +29,7 @@ const words: Record<string, [string, string]> = {
   "Refund recorded": ["ተመላሽ ተመዝግቧል", "Deebiin galmaa'eera"],
   "Recorded": ["ተመዝግቧል", "Galmaa'eera"],
   "No external transfer was made.": ["ወደ ውጭ ገንዘብ አልተላከም።", "Maallaqni gara alaatti hin ergamne."],
+  "Released at": ["የተለቀቀበት ጊዜ", "Yeroo gadhiifame"],
   "Offering title": ["የአገልግሎት ስም", "Maqaa tajaajilaa"],
   "Offering description": ["የአገልግሎት መግለጫ", "Ibsa tajaajilaa"],
   "Edit offering": ["አገልግሎት አርትዕ", "Tajaajila gulaali"],

@@ -40,7 +40,7 @@ let checkpoint = 'launch';
     await page.reload();
     await page.getByRole('heading', { name: 'Transaction details' }).waitFor();
     fs.mkdirSync('docs/screenshots/financial-activity', { recursive: true });
-    for (const width of [390, 768, 1440]) {
+    for (const width of [320, 390, 768, 1440]) {
       await page.setViewportSize({ width, height: 960 });
       await page.evaluate(() => document.fonts.ready);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
@@ -49,7 +49,29 @@ let checkpoint = 'launch';
     checkpoint = 'unknown activity privacy response';
     await page.goto(app + '/patient/payments/transactions/00000000-0000-4000-8000-000000000000');
     await page.getByText('Transaction unavailable.').waitFor();
-    console.log('PASS: production-built patient transaction detail, reload, responsive widths, and generic unknown-record denial');
+    checkpoint = 'clinician-owned earnings detail';
+    await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await page.waitForURL(/\/teletena\/sign-in(?:\?.*)?$/);
+    if (await page.getByRole('button', { name: 'Use email instead' }).count()) {
+      await page.getByRole('button', { name: 'Use email instead' }).click();
+    }
+    await page.getByLabel('Email', { exact: true }).fill(seed.users.clinician);
+    await page.getByLabel('Password', { exact: true }).fill(passwords[seed.users.clinician]);
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await page.getByRole('button', { name: 'Sign out', exact: true }).waitFor();
+    await page.goto(app + '/clinician/earnings');
+    const earningLink = page.locator('a[href*="/clinician/earnings/transactions/"]').first();
+    await earningLink.waitFor({ timeout: 12000 });
+    await page.goto(origin + await earningLink.getAttribute('href'));
+    await page.getByRole('heading', { name: 'Transaction details' }).waitFor();
+    await page.reload();
+    await page.getByRole('heading', { name: 'Transaction details' }).waitFor();
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: 960 });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
+      await page.screenshot({ path: `docs/screenshots/financial-activity/clinician-transaction-${width}.png`, fullPage: true });
+    }
+    console.log('PASS: production-built patient and clinician transaction detail, reload, responsive widths, and generic unknown-record denial');
   } finally {
     await browser.close();
   }

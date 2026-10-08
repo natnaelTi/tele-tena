@@ -55,7 +55,7 @@ export default function FinancialActivityDetail() {
           <div><dt>{w('Gross')}</dt><dd>ETB {money(item.gross_minor)}</dd></div>
           <div><dt>{w('Fee')}</dt><dd>ETB {money(item.fee_minor || 0)}</dd></div>
           <div><dt>{w('Net')}</dt><dd>ETB {money(item.net_minor || 0)}</dd></div>
-          {item.release_at && <div><dt>{w('Expected release')}</dt><dd>{date(item.release_at)}</dd></div>}
+          {item.release_at && <div><dt>{w(item.state === 'Released' ? 'Released at' : 'Expected release')}</dt><dd>{date(item.release_at)}</dd></div>}
         </dl>}
         {item.account_changes?.length ? <section><h3>{w('Balance changes')}</h3><ul className="transaction-changes">{item.account_changes.map(change=><li key={change.bucket}><span>{label(change.bucket)}</span><strong>{change.delta_minor > 0 ? '+' : '−'}ETB {money(Math.abs(change.delta_minor))}</strong></li>)}</ul></section> : null}
         {item.appointment && <section><h3>{w('Related appointment')}</h3><p>{item.appointment.service_label} · {date(item.appointment.start)} · {item.appointment.minutes} {w('minutes')}</p><StatusBadge>{w(item.appointment.state)}</StatusBadge><p><Link className="text-link" to={`/${role}/consultations/${item.appointment.id}`}>{w('View appointment')}</Link></p></section>}
