@@ -30,7 +30,9 @@
 .landing-practice p { font-size: 15px; color: #455d65; margin: 8px 0 14px; }
 .landing-practice .button { font-size: 14px; }
 .landing-principles { margin: 0; background:var(--canvas); display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 40px; padding: 40px max(40px, calc((100% - 1244px) / 2)); }
-.landing-principles h3 { font-size: 18px; margin: 16px 0 8px; }
+.landing-principles > div { display:flex; align-items:flex-start; gap:16px; }
+.landing-principles svg { color:var(--brand); margin-top:3px; }
+.landing-principles h3 { font-size:16px; margin:0 0 8px; }
 .landing-principles p { font-size: 15px; }
 @media (max-width:700px) {
   .landing-hero { padding: 34px 20px; }
@@ -41,10 +43,16 @@
   .landing-principles { grid-template-columns: 1fr; padding: 24px 20px; gap: 16px; }
 }
 
-.reference-public-header { min-height:80px; padding:16px 40px; background:white; }
+.public-header.reference-public-header { min-height:80px; padding:16px 40px; background:white; justify-content:flex-start; }
+.reference-public-header nav { margin-left:24px; }
 .reference-public-footer { padding:25px 40px; border-top:1px solid var(--border); background:white; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px; }
 .reference-public-footer p { margin:0; font-size:14px; }
 .reference-public-header .brand img { object-fit:contain; border-radius:8px; }
 .reference-public-header .button { min-height:40px; font-size:14px; padding:8px 14px; }
 @media(max-width:900px) { .reference-public-header nav > a:not(.button) { display:none; } }
-@media(max-width:700px) { .reference-public-header { padding:16px 20px; gap:12px; } .reference-public-header nav { gap:8px; } .reference-public-header .language-select { max-width:100px; } .reference-public-footer { padding:25px 20px; } }
+@media(max-width:700px) { .public-header.reference-public-header { padding:16px 20px; gap:12px; justify-content:space-between; } .reference-public-header nav { gap:8px; } .reference-public-header .language-select { max-width:100px; } .reference-public-footer { padding:25px 20px; } }
+
+.landing-entries > section > p:not(.landing-note) { color:var(--ink); }
+.auth-registration { display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:24px; font-size:14px; }
+.auth-registration p { width:100%; margin:0; }
+.auth-registration a { min-height:44px; display:inline-flex; align-items:center; }

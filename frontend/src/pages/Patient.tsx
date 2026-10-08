@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowRight, Search } from "lucide-react";
+import { BookingCalendar } from "../components/BookingCalendar";
 import { pendingCareQuery, rememberCareQuery } from "../care-intent";
 import { api } from "../api";
 import { journeyApi } from "../journey-api";
@@ -306,15 +307,16 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
   const { session } = useSession();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState("");
+  const [calendarFrom, setCalendarFrom] = useState("");
   const [displayZone, setDisplayZone] = useState("Africa/Addis_Ababa");
   const load = useCallback(async () => {
     const all = await journeyApi.discover();
     const today = new Intl.DateTimeFormat("en-CA", { timeZone: displayZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     return {
       offer: all.find((o) => o.id === offering),
-      calendar: await journeyApi.calendar(offering || "", selectedDate || today, displayZone),
+      calendar: await journeyApi.calendar(offering || "", calendarFrom || today, displayZone),
     };
-  }, [offering, selectedDate, displayZone]);
+  }, [offering, calendarFrom, displayZone]);
   const { data, error, refresh } = useResource(load);
   const action = useAction();
   const [step, setStep] = useState(0);
@@ -360,13 +362,9 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
           <>
             <p>Choose an open appointment time. Session length: <strong>{data.calendar.duration} minutes</strong>. Times use your selected timezone.</p>
             <Select label="Show times in timezone" value={displayZone} onChange={e=>{setDisplayZone(e.target.value);setStart("");setSelectedDate("");}}><option value="Africa/Addis_Ababa">Addis Ababa (EAT)</option><option value="UTC">UTC</option><option value="Africa/Nairobi">Nairobi (EAT)</option></Select>
-            <div className="booking-dates" aria-label="Available dates">
-              {data.calendar.days.filter(d=>d.slots.length).map(d=><button type="button" key={d.date} className={selectedDate===d.date?"date-chip selected":"date-chip"} onClick={()=>{setSelectedDate(d.date);setStart("");}}><strong>{new Date(d.date+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",timeZone:displayZone})}</strong><span>{d.date}</span></button>)}
-            </div>
-            {data.calendar.days.filter(d=>d.slots.length).length===0&&<InlineNotice>No open times are available in this booking window.</InlineNotice>}
-            <div className="booking-times" role="group" aria-label="Available times">
-              {(data.calendar.days.find(d=>d.date===(selectedDate||data.calendar.days.find(x=>x.slots.length)?.date))?.slots||[]).map(slot=><Button key={slot.start} variant={start===slot.start?"primary":"secondary"} onClick={()=>setStart(slot.start)}>{slot.local_time}</Button>)}
-            </div>
+            <BookingCalendar days={data.calendar.days} fromDate={calendarFrom || data.calendar.days[0]?.date || new Date().toISOString().slice(0,10)} selectedDate={selectedDate} selectedStart={start} duration={offer.minutes}
+              onMonth={date => { setCalendarFrom(date); setSelectedDate(""); setStart(""); }}
+              onDate={date => { setSelectedDate(date); setStart(""); }} onStart={setStart} />
             {start&&<p className="supporting">Selected: {new Date(start).toLocaleString(undefined,{dateStyle:"full",timeStyle:"short",timeZone:displayZone})} · {displayZone}</p>}
             <Button disabled={!start} onClick={() => setStep(1)}>
               Continue

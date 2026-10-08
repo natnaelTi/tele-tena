@@ -47,7 +47,7 @@ export default function Homepage() {
             <div className="landing-chips" aria-label={w("Explore clinician tools")}>{(Object.keys(tools) as (keyof typeof tools)[]).map(value => <button key={value} type="button" aria-pressed={tool === value} onClick={() => setTool(value)}>{w(value)}</button>)}</div>
             <div role="region" aria-live="polite" aria-label={w("Practice preview")}><h3>{w(preview[0])}</h3><p>{w(preview[1])}</p><Link className="button secondary" to={preview[3]}>{w(preview[2])}<ArrowRight size={16} /></Link></div>
           </div>
-          <Link className="button full" to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}<ArrowRight size={18} /></Link>
+          <Link className="button" to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}<ArrowRight size={18} /></Link>
           <Link className="text-link" to="/clinician">{w("Already approved? Explore your workspace")}<ArrowRight size={16} /></Link>
           <p className="landing-note"><ShieldCheck size={16} />{w("Credentials and each service scope are reviewed before publication.")}</p>
         </section>
@@ -56,7 +56,7 @@ export default function Homepage() {
     <section className="landing-principles" id="how-it-works" aria-label={w("How it works")}>
       {[[CalendarDays, "Clear choices", "See the session fee, length and available times before you book."], [ShieldCheck, "Your disclosure, your choice", "Preview exactly what you share with your clinician."], [MessageCircle, "A real conversation", "Join a private voice or video consultation at your agreed time."]].map(([Icon, title, copy]) => {
         const Mark = Icon as typeof CalendarDays;
-        return <div key={String(title)}><Mark size={24} /><h3>{w(String(title))}</h3><p>{w(String(copy))}</p></div>;
+        return <div key={String(title)}><Mark size={27} /><section><h3>{w(String(title))}</h3><p>{w(String(copy))}</p></section></div>;
       })}
     </section>
   </main>;

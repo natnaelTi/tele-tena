@@ -1,6 +1,18 @@
 // Provisional translations; layout checks do not substitute for native review.
 export const landingTranslations: Record<string, [string, string]> = {
   "MENTAL HEALTH & RELATIONSHIP CARE · ETHIOPIA": ["የአእምሮ ጤና እና የግንኙነት እንክብካቤ · ኢትዮጵያ", "KUNUUNSA FAYYAA SAMMUU FI WALITTI DHUFEENYAA · ITOOPHIYAA"],
+  "What’s your number?": ["ስልክ ቁጥርዎ ስንት ነው?", "Lakkoofsi bilbilaa kee maali?"],
+  "We’ll send a code to sign you in or get you started.": ["እንዲገቡ ወይም እንዲጀምሩ ኮድ እንልካለን።", "Akka galtu ykn jalqabdu koodii siif ergina."],
+  "Email codes are unavailable on this site. Choose password sign-in if you already have an account.": ["በዚህ ጣቢያ የኢሜይል ኮዶች አይገኙም። መለያ ካለዎት በይለፍ ቃል መግባትን ይምረጡ።", "Koodiin imeelii marsariitii kana irratti hin jiru. Herrega yoo qabda ta'e jecha iccitiitiin seenuu filadhu."],
+  "New registration is unavailable on this site. Existing invited users can still sign in.": ["በዚህ ጣቢያ አዲስ ምዝገባ አይገኝም። ነባር የተጋበዙ ተጠቃሚዎች መግባት ይችላሉ።", "Galmeen haaraan marsariitii kana irratti hin jiru. Fayyadamtoonni affeeraman seenuu danda'u."],
+  "New to TeleTena?": ["ለTeleTena አዲስ ነዎት?", "TeleTenaaf haaraadha?"],
+  "Choose an available date": ["የሚገኝ ቀን ይምረጡ", "Guyyaa banaa filadhu"],
+  "Previous month": ["ያለፈው ወር", "Ji'a darbe"],
+  "Next month": ["ቀጣይ ወር", "Ji'a itti aanu"],
+  "Only dates with available sessions can be selected.": ["ቀጠሮ የሚገኝባቸው ቀናት ብቻ ሊመረጡ ይችላሉ።", "Guyyoota marii qaban qofa filachuun danda'ama."],
+  "No open times are available in this booking window.": ["በዚህ የቀጠሮ ጊዜ ውስጥ ክፍት ሰዓቶች የሉም።", "Yeroo beellamaa kana keessatti sa'aatiin banaa hin jiru."],
+  "minutes": ["ደቂቃዎች", "daqiiqaa"],
+  "Available times": ["የሚገኙ ሰዓቶች", "Sa'aatii jiru"],
   "Find support.": ["ድጋፍ ያግኙ።", "Deeggarsa argadhu."],
   "Make time for care.": ["ለእንክብካቤ ጊዜ ይመድቡ።", "Kunuunsaaf yeroo ramadi."],
   "Private voice and video consultations with approved mental health and counseling professionals.": ["ከተፈቀደላቸው የአእምሮ ጤና እና የምክር ባለሙያዎች ጋር የግል የድምፅ እና የቪዲዮ ምክክሮች።", "Ogeessota fayyaa sammuu fi gorsaa hayyamaman waliin marii dhuunfaa sagalee fi viidiyoo."],
