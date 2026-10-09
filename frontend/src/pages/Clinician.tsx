@@ -367,6 +367,8 @@ type EarningsView = {
 };
 
 export function ClinicianEarnings() {
+  const completedSessions=useResource(journeyApi.appointments);
+  const [activityFilter,setActivityFilter]=useState<"All activity"|"Pending"|"Payouts">("All activity");
   const { w } = useLocale();
   const load = useCallback(() => api<EarningsView>("tele_tena.accounting.clinician_earnings"), []);
   const resource = useResource(load);
@@ -390,6 +392,7 @@ export function ClinicianEarnings() {
     ...resource.data.earnings.map(item => ({ kind: "Consultation earnings", id: `earning-${item.id}`, at: item.completed_at, amount: item.net_minor, state: item.state, item })),
     ...resource.data.payouts.map(item => ({ kind: "Payout request", id: `payout-${item.id}`, at: item.created, amount: item.amount_minor, state: item.state, item })),
   ].sort((a,b) => String(b.at||"").localeCompare(String(a.at||""))) : [];
+  const shownHistory=history.filter(entry=>activityFilter==="All activity"||(activityFilter==="Payouts"?entry.kind==="Payout request":["Pending","Disputed","LegacyHold"].includes(entry.state)));
   return <>
     <PageTitle title={w("Earnings")} description={w("See what is pending, available, and reserved for payout requests.")} />
     {resource.error ? <InlineNotice tone="danger">Earnings could not be loaded. <Button onClick={() => void resource.refresh()}>Try again</Button></InlineNotice> : !resource.data ? <Skeleton /> : <>
@@ -398,6 +401,8 @@ export function ClinicianEarnings() {
         <dl className="earnings-supporting">
           <div><dt>{w("Pending")}</dt><dd>ETB {money(resource.data.balances.pending)}</dd><p className="supporting">{w("Held until the saved review window ends or a dispute is resolved.")}</p></div>
           <div><dt>{w("Payout requested")}</dt><dd>ETB {money(resource.data.balances.payout_reserved)}</dd><p className="supporting">{w("Reserved for open requests")}</p></div>
+          <div><dt>{w("Open payout requests")}</dt><dd>{resource.data.payouts.filter(item=>item.state==='Requested').length}</dd><p className="supporting">{w("Awaiting a recorded processing decision")}</p></div>
+          <div><dt>{w("Completed sessions")}</dt><dd>{completedSessions.data?.filter(item=>item.state==='Completed').length??"—"}</dd><p className="supporting">{w(completedSessions.error?"Unavailable":"Explicitly finalized · all time")}</p></div>
         </dl>
       </div>
       <Dialog open={payoutOpen} onOpenChange={open=>{if(!action.busy)setPayoutOpen(open);}} title={w("Request a payout")} description={w("Reserve part of your available earnings.")}>
@@ -408,13 +413,13 @@ export function ClinicianEarnings() {
       </Dialog>
       {action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
       <ol className="earnings-stages" aria-label={w("Earnings lifecycle")}>{[["Reserved","At booking"],["Pending","After finalization"],["Available","After the review window"],["Payout requested","Reserved for your request"]].map(([label,description],index)=><li key={label}><span aria-hidden="true">{index+1}</span><strong>{w(label)}</strong><p>{w(description)}</p></li>)}</ol>
-      <section className="earnings-history-section"><h2>{w("Activity")}</h2>{history.length ? <ul className="earnings-history">{history.map(entry=><li key={entry.id}><div><strong>{w(entry.kind)}</strong><span className="supporting">{entry.at ? date(entry.at) : w("Date unavailable")}</span></div><div className="earnings-history-value"><strong>ETB {money(entry.amount)}</strong><StatusBadge>{w(entry.state === "Disputed" ? "On hold" : entry.state)}</StatusBadge></div>
+      <section className="earnings-history-section"><h2>{w("Recent activity")}</h2><div className="earnings-activity-tabs" role="group" aria-label={w("Activity filter")}>{(["All activity","Pending","Payouts"] as const).map(filter=><Button key={filter} variant="quiet" aria-pressed={activityFilter===filter} onClick={()=>setActivityFilter(filter)}>{w(filter)}</Button>)}</div>{shownHistory.length ? <><div className="table-scroll earnings-activity-table"><table><thead><tr>{["Activity","Status","Expected availability","Amount"].map(label=><th key={label}>{w(label)}</th>)}</tr></thead><tbody>{shownHistory.map(entry=><tr key={entry.id}><td><Link to={`/clinician/earnings/transactions/${encodeURIComponent(entry.id)}`}>{w(entry.kind)}</Link><p className="supporting">{entry.at?date(entry.at):w("Date unavailable")}</p></td><td><StatusBadge>{w(entry.state==='Disputed'?'On hold':entry.state==='Released'?'Available':entry.state)}</StatusBadge></td><td>{"release_at" in entry.item&&entry.state==='Pending'&&entry.item.release_at?date(entry.item.release_at):w(entry.state==='Disputed'?'On hold':entry.state==='LegacyHold'?'Review required':'Not applicable')}{"amount_minor" in entry.item&&entry.state==='Requested'&&<Button variant="quiet" loading={action.busy} onClick={()=>void action.run(async()=>{await api("tele_tena.accounting.cancel_payout",{payout:entry.item.id,reason:cancelReason},true);await resource.refresh();},w("Payout request cancelled; the reservation was released."))}>{w("Cancel request")}</Button>}</td><td><strong>ETB {money(entry.amount)}</strong></td></tr>)}</tbody></table></div><ul className="earnings-history earnings-activity-cards">{shownHistory.map(entry=><li key={entry.id}><div><strong>{w(entry.kind)}</strong><span className="supporting">{entry.at ? date(entry.at) : w("Date unavailable")}</span></div><div className="earnings-history-value"><strong>ETB {money(entry.amount)}</strong><StatusBadge>{w(entry.state === "Disputed" ? "On hold" : entry.state)}</StatusBadge></div>
           <Link className="text-link" to={`/clinician/earnings/transactions/${encodeURIComponent(entry.id)}`}>{w("Transaction details")}</Link>
           {"gross_minor" in entry.item && <p className="supporting">{w("Gross")}: ETB {money(entry.item.gross_minor)} · {w("Fee")}: ETB {money(entry.item.fee_minor)} · {w("Net")}: ETB {money(entry.item.net_minor)}{entry.item.release_at&&entry.state==="Pending"?` · ${w("Expected release")}: ${date(entry.item.release_at)}`:""}</p>}
           {entry.state==="Disputed"&&<p className="supporting">{w("Release is paused while an authorized reviewer resolves the dispute.")}</p>}
           {entry.state==="LegacyHold"&&<p className="supporting">{w("Historical balance is preserved for authorized review.")}</p>}
           {"amount_minor" in entry.item&&entry.state==="Requested"&&<Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await api("tele_tena.accounting.cancel_payout",{payout:entry.item.id,reason:cancelReason},true);await resource.refresh();},w("Payout request cancelled; the reservation was released."))}>{w("Cancel request")}</Button>}
-        </li>)}</ul> : <EmptyState title={w("No earnings or payout activity yet.")} />}</section>
+        </li>)}</ul></> : <EmptyState title={w(history.length?"No activity in this view.":"No earnings or payout activity yet.")} />}</section>
     </>}
   </>;
 }

@@ -20,7 +20,7 @@
 .reference-workspace .earnings-available > p:first-child,.reference-workspace .earnings-available .supporting { color:#bad0d9; }
 .reference-workspace .earnings-available h2 { font-size:48px; margin:18px 0; }
 .reference-workspace .earnings-available .button { width:max-content; max-width:100%; margin-top:16px; background:white; color:var(--ink); }
-.reference-workspace .earnings-supporting { display:grid; grid-template-columns:1fr 1fr; padding:0; gap:16px; margin:0; }
+.reference-workspace .earnings-supporting { display:grid; grid-template-columns:1fr 1fr; padding:0; gap:16px; margin:0; border:0; background:transparent; }
 .reference-workspace .earnings-supporting > div { background:var(--surface); border:0; border-radius:16px; padding:24px; }
 .reference-workspace .earnings-supporting dd { font-size:28px; margin:20px 0 8px; }
 .earnings-stages { padding:20px 0; list-style:none; display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--border); border-radius:12px; margin:24px 0 32px; }
@@ -31,6 +31,17 @@
 .earnings-stages p { color:var(--muted); font-size:14px; margin:4px 0 0; }
 @media(max-width:800px) { .reference-workspace .earnings-overview { grid-template-columns:1fr; } .reference-workspace .earnings-available h2 { font-size:36px; } .earnings-stages { grid-template-columns:1fr 1fr; gap:20px 0; } .earnings-stages li:nth-child(2) { border:0; } }
 @media(max-width:390px) { .reference-workspace .earnings-supporting { grid-template-columns:1fr; } }
+.earnings-activity-tabs { display:flex; gap:12px; border-bottom:1px solid var(--border); margin:24px 0; }
+.earnings-activity-tabs .button { border-radius:0; padding:12px 0; border-bottom:3px solid transparent; color:var(--muted); }
+.earnings-activity-tabs .button[aria-pressed=true] { color:var(--ink); border-bottom-color:var(--ink); }
+.earnings-activity-table table { border:0; font-size:14px; }
+.earnings-activity-table th { background:var(--surface); font-weight:500; }
+.earnings-activity-table td { padding:24px 14px; }
+.earnings-activity-table td:last-child { text-align:right; }
+.earnings-activity-table td a { font-weight:600; }
+.earnings-activity-table .supporting { margin:6px 0 0; }
+.earnings-activity-cards { display:none; }
+@media(max-width:800px) { .earnings-activity-table { display:none; } .earnings-activity-cards { display:block; } }
 .care-directory-table table { font-size:14px; }
 .care-directory-table td { padding:20px 16px; }
 .care-record-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr); gap:24px; align-items:start; }
