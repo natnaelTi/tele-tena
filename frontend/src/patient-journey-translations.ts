@@ -1,5 +1,16 @@
 /** Provisional interface translations; native review is a release activation gate. */
 export const patientJourneyTranslations: Record<string, [string, string]> = {
+  "Amend consultation notes": ["የውይይት ማስታወሻዎችን ያስተካክሉ", "Yaadannoo marii fooyyessi"],
+  "This creates a new revision. Previously shared content remains in the sharing history.": ["ይህ አዲስ ክለሳ ይፈጥራል። ከዚህ በፊት የተጋራ ይዘት በማጋሪያ ታሪክ ይቀራል።", "Kun fooyyaʼinsa haaraa uuma. Qabiyyeen duraan qoodame seenaa qoodinsa keessatti hafa."],
+  "No consultation note was entered.": ["የውይይት ማስታወሻ አልተጻፈም።", "Yaadannoon marii hin galfamne."],
+  "Sharing history": ["የማጋሪያ ታሪክ", "Seenaa qoodinsaa"],
+  "Previously shared content may already have been seen.": ["ከዚህ በፊት የተጋራ ይዘት አስቀድሞ ታይቶ ሊሆን ይችላል።", "Qabiyyeen duraan qoodame dursee ilaalamee jiraachuu dandaʼa."],
+  "Shared with the patient": ["ከታካሚው ጋር ተጋርቷል", "Dhukkubsataa waliin qoodame"],
+  "Patient summary": ["የታካሚ ማጠቃለያ", "Cuunfaa dhukkubsataa"],
+  "Only you can see this": ["ይህን ማየት የሚችሉት እርስዎ ብቻ ነዎት", "Kana arguu kan dandaʼu si qofa"],
+  "Revision": ["ክለሳ", "Fooyyaʼinsa"],
+  "Shared summary": ["የተጋራ ማጠቃለያ", "Cuunfaa qoodame"],
+
   "Appointment details": ["የቀጠሮ ዝርዝሮች", "Balʼina beellamaa"],
   "Your conversation": ["የእርስዎ ውይይት", "Marii kee"],
   "Disclosure used at booking": ["ቀጠሮ ሲያዝ የተጋራ መረጃ", "Odeeffannoo yeroo beellamaa qoodame"],

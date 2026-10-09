@@ -21,3 +21,11 @@
 .recorded-call-timing, .consultation-secondary-action { border:1px solid var(--border-default); border-radius:16px; padding:8px 20px; background:var(--surface-card); min-width:0; }
 .recorded-call-timing > summary, .consultation-secondary-action > summary { padding:12px 0; min-height:44px; cursor:pointer; font-weight:600; }
 @media(max-width:800px) { .consultation-page .consultation-detail-grid { grid-template-columns:minmax(0,1fr); } .conversation-overview, .encounter-disclosure, .consultation-preparation { padding:20px; } .conversation-participant { gap:16px; } .conversation-avatar { width:72px; height:80px; font-size:30px; } .conversation-participant h3 { font-size:20px; } .encounter-facts { grid-template-columns:minmax(90px,.7fr) minmax(0,1.3fr); } }
+
+.finalized-note-document, .shared-summary-document { border-radius:16px; padding:26px; }
+.finalized-note-document .prewrap, .shared-summary-document .prewrap { font-size:16px; line-height:1.75; overflow-wrap:anywhere; }
+.finalized-note-document > .visibility-label { margin-left:0; margin-bottom:16px; }
+.finalized-note-document > h3 { margin-top:28px; }
+.finalized-note-document details { padding:12px 0; margin-bottom:16px; border-block:1px solid var(--border); }
+.finalized-note-document summary { min-height:44px; cursor:pointer; font-weight:600; }
+@media(max-width:800px) { .finalized-note-document, .shared-summary-document { padding:20px; } }
