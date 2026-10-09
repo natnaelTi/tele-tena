@@ -716,3 +716,15 @@ are in [the current verification report](mvp-journey-verification-2026-10-09.md)
 Visual acceptance, couples, enabled-registration onboarding, presentation dataset,
 scheduler/cutover, fresh/upgrade reconciliation and current hosted-call release
 checks remain open. No handover acceptance, merge or remote deployment.
+
+### Documentation continuation — 9 October 2026
+
+Packaged source `a05ed13d53b690939343bc5e1a18ade5b178e54e`, same isolated 8017 preview.
+E02/E11/E13 now have paired comparison notes and real persisted documentation
+journey evidence. Posting-derived reservation display, finalized document visibility,
+unsaved summary preview, revision amendment and cross-appointment draft isolation
+are corrected. See the active journey report for actual tests and shared-fixture
+test failures. All 99 MVP reference routes have rendered structural mappings; this
+is not 99 application acceptance passes. Couples, private-note sharing, clean
+presentation data, current scheduler/financial/fresh-install and hosted-call release
+checks remain gates. No merge, remote deployment or real-money activation.

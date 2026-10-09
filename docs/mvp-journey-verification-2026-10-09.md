@@ -8,7 +8,7 @@ keeps visual fidelity and functional journey acceptance independent.
 
 - Branch `feat/mvp-release-handover`, draft PR #44, dependent on draft PR #43.
   The preserved `1e8d161468eb8d3563f1b5743982722c749bbcbf` ancestor remains included.
-- Packaged application source **`0c69dfc2e665deba7208ea39839c766a001a91e6`**.
+- Packaged application source **`a05ed13d53b690939343bc5e1a18ade5b178e54e`**.
   Subsequent evidence/documentation commits do not change its application code.
 - **http://127.0.0.1:8017/teletena/**; site
   `tele-tena-pr12-fresh.localhost`; bench `/home/frappe/frappe/frappe-bench`.
@@ -29,7 +29,7 @@ keeps visual fidelity and functional journey acceptance independent.
 | Home / discovery / preview / profile / service / booking | Search-led dashboard, real wallet, scoped cards and preview, tailored service page, generated monthly calendar | Real password sign-in, popup close/Escape/focus return, profile→service→calendar, selection/Back; actual booking and matching available/reserved delta | Public biography/verified expertise (not private application text), registration-enabled onboarding and coherent presentation dataset |
 | Disclosure / price review | Server-produced preview; separate consultation/payment panels; actual available balance and shortfall; funding in new tab retains form; mobile paired facts | Live API preview, review totals, Back retains narrative/time; no mocked success | Explicit insufficient-funds browser recovery on this new review, automatic-confirmation browser capture and manual-confirmation acceptance/expiry lifecycle |
 | Patient requests / private offers | Three-step composer, focus-managed reviews, persisted progress/offer workspace, state-driven icons; no three-minute no-offer message when a valid offer exists | Real retained scheduled request→tailored offer→accept→one appointment/reservation→detail/history handoff; concurrency/private-offer regressions | Immediate/routing-worker/reconnect/expiry full current browser acceptance and all reference states |
-| Appointments / documentation | One dominant status, role-specific notes/summary explanation, no elapsed-time completion; cancellation and finalization dialogs | Pure grouping/status regressions and private-note/encounter backend regression | Full current call/End/documentation/feedback journey and all detail-screen visual comparisons |
+| Appointments / documentation | E02 conversation/disclosure/preparation composition; E11 private note and summary panels with finalization beside them; E13 clinician document/patient summaries, persisted revisions and amendment; posting-derived reservation status | Actual owned-fixture Frappe browser preview→draft/reload→finalize→patient summary→amendment; reviewer denial, delayed route isolation and exactly one completion journal/earning. Paired 390/768/1440 captures inspected | Full current hosted call/End/feedback/release chain; optional private-note sharing; presentation dataset; remaining language/zoom/recipient states |
 | Clinician Today / earnings | Actual metrics, upcoming/action priorities, readiness, available/pending/payout composition, real activity filters/table/mobile cards, exact-money payout dialog | Real authenticated responsive pages, activity filters and zero-payout validation; no invented totals | Scheduled-release/cutover/reconciliation release gate and payout browser lifecycle |
 | Care records | Table/card route agreement; encounter timeline, original disclosure, explicit private-note boundaries | Real browser directory→record; equal-name patient separation and authorization regression | Remaining filter/date/sort and shared-summary visual states |
 | Administrator | Distinct I01 overview, I02 named queue, I03 review dialog; real counts, evidence download action, separate scope authorization | Reviewer real sign-in, queue/review/Escape focus return; responsive captures | Full vetting/scope/resume lifecycle, remaining operational queues and role tours |
@@ -184,6 +184,88 @@ one true appointment state rather than simultaneously showing illustrative confi
 and manual-confirmation examples. These specific operational exceptions require
 review; **none is marked visually accepted**. 200% F09 and H02 resume-error captures
 are additional state evidence, not paired reference acceptance.
+
+## Continuation checkpoint: appointment details and documentation
+
+Focused application commits: `3270280` (financial display), `b914087` (E02),
+`d3a44e9` (undefined semantic-token aliases), `1ec716a` (finalized note view),
+`3b9a010` (unsaved preview/E11), `4b9ffc0` (compact readiness/composition),
+`2ddb33c` (appointment-isolated drafts), and `d608dc7` (status-specific headings).
+`a05ed13` includes the rendered-reference mapping and is the packaged build.
+No schema migrations or retained-data repairs were performed.
+
+Observed and corrected:
+
+- A Completed label had incorrectly implied reservation consumption. The query
+  now uses immutable Reservation/ReservationRelease/ConsultationFinalized postings
+  and identifies LegacyHold as Review required. Read-only detail queries leave
+  balances and posting counts unchanged; no historical funds are settled.
+- Undefined semantic CSS variables removed avatar backgrounds, field dividers and
+  supporting colors. All nine aliases now resolve to the extracted reference palette.
+- Finalized private notes were returned to authorized clinicians but disappeared
+  from the UI. The document and explicit amendment action are restored. Patient
+  APIs continue to omit private notes; published summary history remains visible.
+- Preview before saving the first draft previously required a nonexistent revision.
+  Entered summaries can now be previewed in a focus-managed dialog without saving
+  or publishing. Ended-call and clinician ownership checks remain enforced.
+- Appointment-keyed component state prevents old disclosure/note/form/loading state
+  crossing to another consultation during a reused route or delayed response.
+- E11 now starts with the two note panels and a finalization panel. E13 puts the
+  shared/authorized documents before disclosure; follow-up is a real booking link.
+  Expandable readiness avoids repeating the full setup warning on every clinician
+  screen. Presence heartbeat, expiry, restrictions and failure messages are preserved.
+
+Actual checks in this continuation:
+
+1. `tests/presentation.py Presentation.test_reservation_display_uses_postings_not_completed_status`
+   passed, including a fixture with Completed status and a still-reserved LegacyHold.
+2. `Presentation.test_02_manual_hold_confirm_cancel_and_expiry_release_once`
+   and `Presentation.test_04_notes_privacy_revision_completion_and_encounter_scope`
+   each passed with their own fixture invocation. The notes test additionally checks
+   unsaved preview, no revision write and patient denial. A combined three-method
+   invocation **failed two tests** because class-shared committed fixtures carried
+   an extra reservation/completed encounter into later absolute-count assertions.
+   Their assertions were not weakened. This combined-harness isolation issue is
+   documented; the full suite is not reported as passed in this continuation.
+3. `scripts/check_mvp_notes_browser.py`, using bench Python and the explicit isolated
+   site: actual password sessions, draft/reload, preview without write, finalization,
+   private omission, patient published summary, amendment/reload/history, reviewer
+   denial and delayed cross-appointment state isolation passed. After amendment,
+   the database has exactly one completion journal and one earning for the owned
+   fixture. The harness cleans its random fixture accounts/records and mode-600
+   credentials. **Ended call was a synthetic state fixture, not hosted End proof.**
+4. Actual retained care/request/detail browser: table/card route agreement, matched
+   request→appointment handoff and paired E02 390/768/1440 captures passed.
+5. Patient Home→discovery→preview/Escape/focus return→profile→service→calendar→sharing
+   Back passed after the shared token correction; no booking was submitted in this
+   read-only rerun. Owner offerings/editor and paginated own offer/detail/appointment
+   handoff passed on that checkpoint; no clinical/financial mutations.
+6. Explicit PWA update passed `4b9ffc0`→`2ddb33c`: existing controlled browser kept
+   its old application until Refresh to update, then loaded the new actual packaged
+   bundle. No API/private cache paths. Not physical-device installation proof.
+7. Production locked build passed; lint exits 0 with existing warnings, and chunks
+   over 500 kB remain a build warning. Private asset scan passed with zero exact
+   credential matches. No current Frappe 16, fresh installation, migration,
+   scheduler release, live SMS, physical-media or native-translation pass is inferred.
+8. `browser-consultation-status.cjs` passed on the earlier composition checkpoint.
+   It mocks only Ended/documentation response state and is **UI-only evidence**;
+   the owned-fixture browser check above is the actual backend documentation evidence.
+
+Paired evidence: `docs/screenshots/mvp-connected-journeys/E02-*`, `E11-*`, and
+`E13-{reference,patient-application,clinician-application}-*` at 390/768/1440.
+Comparison notes: column proportions, note/document hierarchy, actual reference
+40px/32px headings, typography, dividers, icon surfaces and action placement were
+inspected. Demo ribbon, authenticated navigation, anonymous initials, join-window
+restrictions, booked-vs-connected timing and amendment/history are operational
+extensions. Reference portraits/credentials/49-minute duration and prices were not
+invented. E11's optional private-note sharing remains a missing feature, not a
+nonfunctional checkbox. Diagnostic fixture wording remains a presentation-content
+gap. No screen is called visually accepted or handover-ready.
+
+All **99 MVP reference routes** were rendered at 1440×1000 for exact headings,
+fields, actions and structure. The matrix now identifies flagship `app.js` and
+later `request-experience.js` overrides instead of hashing empty `forms` entries.
+This is reference mapping, not 99 operational/visual application passes.
 
 ## Release gates still open
 

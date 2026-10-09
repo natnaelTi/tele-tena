@@ -13569,6 +13569,6 @@
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
     "evidence": "All MVP routes rendered locally at 1440×1000; actual headings/actions/layout recorded, including flagship and later request-experience overrides. Not application acceptance.",
-    "application_build": "2ddb33c25e65831c12a3c1fa54dd4c0dcd94c329"
+    "application_build": "a05ed13d53b690939343bc5e1a18ade5b178e54e"
   }
 }
