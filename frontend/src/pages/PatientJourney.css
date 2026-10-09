@@ -4,15 +4,14 @@
 .patient-dashboard-primary,.discovery-primary { min-width:0; }
 .patient-home-hero { background:var(--ink); color:white; padding:40px; border-radius:24px; margin-bottom:24px; }
 .patient-home-hero p { color:#cfdee2; }
-.patient-home-hero .button { background:white; color:var(--ink); }
 .patient-home-search { margin:0 0 24px; }
 .patient-home-hero h2 { font-size:44px; line-height:1.12; letter-spacing:-1.5px; max-width:500px; }
 .patient-home-hero .care-search { padding:0; background:transparent; border:0; margin:24px 0 0; }
 .patient-home-hero .care-search h2 { font-size:20px; letter-spacing:0; }
-.patient-home-hero .care-search form { display:flex; align-items:stretch; gap:8px; }
+.patient-home-hero .care-search form { display:flex; flex-direction:row; align-items:stretch; gap:8px; }
 .patient-home-hero .care-search .field { flex:1; min-width:0; margin:0; }
 .patient-home-hero .care-search label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
-.patient-home-hero .care-search .button { flex:0 0 48px; padding:12px; }
+.patient-home-hero .care-search .button { flex:0 0 48px; width:48px; padding:12px; }
 .home-appointment-row { display:flex; align-items:center; gap:16px; padding:12px 0 24px; border-bottom:1px solid var(--border); }
 .home-appointment-row > div { flex:1; min-width:0; }
 .home-appointment-row h3 { font-size:16px; margin:0 0 6px; }

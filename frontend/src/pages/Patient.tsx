@@ -68,7 +68,7 @@ export function PatientHome() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <Button type="submit" aria-label={w("Find care")}><Search size={20}/></Button>
+          <Button type="submit" variant="secondary" aria-label={w("Find care")}><Search size={20}/></Button>
         </form>
       </section></section>
       <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
