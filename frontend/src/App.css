@@ -1067,7 +1067,7 @@ button { color: inherit; background: transparent; }
   left: 50%;
   transform: translate(-50%, -50%);
   width: calc(100% - 32px);
-  max-width: 560px;
+  max-width: var(--dialog-width, 560px);
   max-height: 85svh;
   overflow-y: auto;
   background: white;
@@ -1075,6 +1075,7 @@ button { color: inherit; background: transparent; }
   padding: 32px;
   box-shadow: 0 16px 64px #102a3320;
 }
+.dialog-wide { --dialog-width: 960px; }
 .dialog h2 {
   padding-right: 32px;
 }

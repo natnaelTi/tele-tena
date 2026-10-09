@@ -242,6 +242,7 @@ export function Dialog({
   description,
   children,
   drawer = false,
+  size = "default",
   className = "",
 }: {
   open: boolean;
@@ -250,6 +251,7 @@ export function Dialog({
   description: string;
   children: ReactNode;
   drawer?: boolean;
+  size?: "default" | "wide";
   className?: string;
 }) {
   const returnFocus = useRef<HTMLElement | null>(null);
@@ -258,7 +260,7 @@ export function Dialog({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="dialog-overlay" />
         <DialogPrimitive.Content
-          className={`${drawer ? "dialog drawer" : "dialog"} ${className}`}
+          className={`${drawer ? "dialog drawer" : "dialog"} ${size === "wide" ? "dialog-wide" : ""} ${className}`}
           onOpenAutoFocus={() => { returnFocus.current = document.activeElement as HTMLElement; }}
           onCloseAutoFocus={event => {
             if (returnFocus.current?.isConnected) {

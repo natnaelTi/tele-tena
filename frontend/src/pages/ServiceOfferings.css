@@ -6,7 +6,6 @@
 .offering-scope-help { padding:26px; margin-top:24px; background:white; border:1px solid var(--border); border-radius:16px; }
 .offering-scope-help h2 { font-size:22px; }
 .offering-scope-help .text-link { margin-right:24px; }
-.offering-editor-dialog { max-width:960px; width:calc(100vw - 32px); }
 .offering-editor-layout { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(250px,1fr); gap:32px; margin-top:24px; }
 .offering-editor-layout aside { padding:24px; background:var(--surface-subtle); border-radius:16px; align-self:start; }
 .offering-editor-layout aside h2 { font-size:24px; overflow-wrap:anywhere; }
