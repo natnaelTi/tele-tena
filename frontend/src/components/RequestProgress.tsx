@@ -1,4 +1,5 @@
 import { useLocale } from '../hooks/useLocale';
+import { Check, Search, MessageSquare, CircleX } from 'lucide-react';
 
 type Props = {state:string;hasOffer?:boolean;wave?:number;clinician?:boolean;immediate?:boolean;eligibleSupply?:number|null};
 
@@ -16,9 +17,11 @@ export function RequestProgress({state,hasOffer=false,wave=1,clinician=false,imm
   const description=confirmed?'Open the appointment to review the agreed details and join window.':closed?
     'This outcome is retained in your history.':clinician?'No appointment is confirmed until the patient accepts. Your quote is private.':
     immediate&&eligibleSupply===0?'Matching continues without changing your requirements.':
+    hasOffer?'Review the clinician’s proposal. A booking is confirmed only after you accept.':
     'We aim to connect you within three minutes. Availability and your choice may take longer.';
+  const Icon=confirmed?Check:closed?CircleX:clinician?MessageSquare:Search;
   return <section className={`request-progress ${closed?'settled':''}`} aria-label="Request progress">
-    <span className="request-beacon" aria-hidden="true"><span/><span/><span/>{confirmed?'✓':clinician?'↗':'…'}</span>
+    <span className="request-beacon" aria-hidden="true"><span/><span/><span/><Icon size={26}/></span>
     <div><div className="request-progress-words" aria-hidden="true">{words.map((word,i)=><span key={word} style={{animationDelay:`${i*4}s`,animationDuration:`${words.length*4}s`}}>{w(word)}</span>)}</div>
       <strong className="sr-only">{w(words[0])}</strong><p>{w(description)}</p></div>
   </section>;

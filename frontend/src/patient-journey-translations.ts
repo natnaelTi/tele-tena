@@ -94,4 +94,10 @@ export const patientJourneyTranslations: Record<string, [string, string]> = {
   "Review each service authorization separately": ["የእያንዳንዱን አገልግሎት ፈቃድ በተለየ ይገምግሙ", "Hayyama tajaajila tokkoon tokkoon addaan gamaaggami"],
   "Review definitions and operational requirements": ["ትርጓሜዎችንና የአሠራር መስፈርቶችን ይገምግሙ", "Hiikaa fi ulaagaalee hojii gamaaggami"],
   "Affiliation is separate from clinical approval": ["የክሊኒክ ትስስር ከክሊኒካዊ ፈቃድ የተለየ ነው", "Hidhanni kilinikaa hayyama yaalaa irraa adda"],
+  "Review the clinician’s proposal. A booking is confirmed only after you accept.": ["የባለሙያውን ሐሳብ ይገምግሙ። ቀጠሮ የሚረጋገጠው ከተቀበሉ በኋላ ብቻ ነው።", "Yaada ogeessaa ilaali. Beellamni erga fudhattee booda qofa mirkanaaʼa."],
+  "What happens next": ["ቀጥሎ ምን ይከሰታል", "Itti aansuun maal taʼa"],
+  "Eligible clinicians review only your chosen disclosure.": ["ብቁ ባለሙያዎች የመረጡትን መጋራት ብቻ ይገምግማሉ።", "Ogeessonni ulaagaa guutan qoodinsa filatte qofa ilaalu."],
+  "Compare private times and prices before choosing.": ["ከመምረጥዎ በፊት የግል ሰዓቶችንና ዋጋዎችን ያወዳድሩ።", "Filachuu dura yeroo fi gatii dhuunfaa wal bira qabi."],
+  "An appointment is confirmed only after acceptance and funds reservation.": ["ቀጠሮው የሚረጋገጠው ከመቀበልና ገንዘብ ከመያዝ በኋላ ብቻ ነው።", "Beellamni fudhatamuu fi maallaqa qabamuu booda qofa mirkanaaʼa."],
+  "Review your disclosure snapshot": ["የተጋራውን መረጃ ይገምግሙ", "Qoodinsa galmaaʼe kee ilaali"],
 };

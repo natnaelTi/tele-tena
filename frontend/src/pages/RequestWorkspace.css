@@ -1,0 +1,14 @@
+/* D04/D05/D09: progress and private offers beside disclosure context. */
+.request-detail-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr); gap:24px; align-items:start; }
+.request-detail-layout > .request-detail-card { grid-column:1; margin:0; padding:26px; border-radius:16px; }
+.request-detail-layout > .open-request-list { grid-column:1; max-width:none; width:100%; margin:0; }
+.request-detail-layout .request-offer { padding:24px; border:1px solid var(--border); border-radius:16px; background:white; margin:16px 0; }
+.request-detail-aside { grid-column:2; grid-row:1/span 2; display:grid; gap:24px; }
+.request-detail-aside > section { padding:26px; border:1px solid var(--border); border-radius:16px; background:white; }
+.request-detail-aside h2 { font-size:22px; }
+.request-detail-aside ol { padding-left:22px; color:var(--muted); }
+.request-detail-aside li { padding:8px 0; }
+.request-detail-aside summary { min-height:44px; display:flex; align-items:center; cursor:pointer; color:var(--brand); font-weight:600; }
+.request-detail-aside .disclosure-preview { margin-top:12px; }
+.request-beacon > svg { z-index:1; }
+@media(max-width:800px) { .request-detail-layout { grid-template-columns:1fr; } .request-detail-aside { grid-column:1; grid-row:auto; } .request-detail-layout > .request-detail-card,.request-detail-aside > section { padding:20px; } }
