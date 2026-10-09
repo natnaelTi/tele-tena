@@ -30,3 +30,26 @@ export function appointmentsForView(appointments: Appointment[], view: Appointme
       (item.call_state === 'Open' || Date.parse(item.end) >= now);
   });
 }
+
+/** Completed/cancelled reference views group real history by booked local month.
+ * Different years stay separate; no clock calculation changes a lifecycle. */
+export function appointmentDisplayGroups(appointments: Appointment[], view: AppointmentView, clinician: boolean, now: number, locale: string) {
+  if (view !== 'completed' && view !== 'cancelled') return appointmentGroups(appointments, clinician, now);
+  const months = new Map<string, Appointment[]>();
+  for (const item of [...appointments].sort((a,b)=>Date.parse(b.start)-Date.parse(a.start))) {
+    let label = 'Past';
+    const instant = new Date(item.start);
+    if (Number.isFinite(instant.getTime())) {
+      try {
+        label = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: item.timezone || 'UTC' }).format(instant);
+      } catch {
+        // Historical invalid timezone cannot hide an otherwise authorized row.
+        label = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(instant);
+      }
+    }
+    const group = months.get(label) || [];
+    group.push(item);
+    months.set(label, group);
+  }
+  return [...months.entries()];
+}
