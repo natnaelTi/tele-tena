@@ -25,7 +25,7 @@
         "reference_hash": "#welcome",
         "reference_url": "http://127.0.0.1:8044/?embed=1#welcome",
         "product_route": "/",
-        "actor": "public / signed-out",
+        "actor": "Guest; authenticated account after contact verification",
         "states": [
           "populated",
           "empty",
@@ -67,7 +67,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.A01",
+          "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Unverified → CodePending → ContactVerified → OnboardingDraft → PatientProfile or ClinicianApplicationDraft; clinician scope approval remains manual.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Homepage.tsx",
+          "frontend/src/pages/SignIn.tsx"
+        ]
       }
     },
     {
@@ -89,7 +104,7 @@
         "reference_hash": "#a02",
         "reference_url": "http://127.0.0.1:8044/?embed=1#a02",
         "product_route": "/#how-it-works (section destination requires route verification)",
-        "actor": "public / signed-out",
+        "actor": "Guest; authenticated account after contact verification",
         "states": [
           "populated",
           "empty",
@@ -121,7 +136,49 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.A02",
+          "source_sha256": "d01d3a941d2d78e7ef08a6675da543da0bd9fd9b637470f6bc2c26cdf0c6927b",
+          "composition_classes": [
+            "eyebrow",
+            "x-grid",
+            "x-hero",
+            "x-hero-art x-steps",
+            "x-page"
+          ],
+          "sections": [
+            "Your privacy, visible",
+            "Know the price",
+            "Stay connected"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "C02",
+            "label": "Find your care"
+          },
+          {
+            "target_reference_id": "H03",
+            "label": "Explore sharing controls"
+          },
+          {
+            "target_reference_id": "C08",
+            "label": "See a booking review"
+          },
+          {
+            "target_reference_id": "E13",
+            "label": "See a care record"
+          }
+        ],
+        "expected_next_states": "Unverified → CodePending → ContactVerified → OnboardingDraft → PatientProfile or ClinicianApplicationDraft; clinician scope approval remains manual.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Homepage.tsx",
+          "frontend/src/pages/SignIn.tsx"
+        ]
       }
     },
     {
@@ -143,7 +200,7 @@
         "reference_hash": "#a03",
         "reference_url": "http://127.0.0.1:8044/?embed=1#a03",
         "product_route": "/for-clinicians",
-        "actor": "public / signed-out",
+        "actor": "Guest; authenticated account after contact verification",
         "states": [
           "populated",
           "empty",
@@ -175,7 +232,38 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.A03",
+          "source_sha256": "124b36de0668c12a97679a2b3cff4a98313fbb492644a292e8081499cad20b1e",
+          "composition_classes": [
+            "eyebrow",
+            "muted",
+            "x-grid",
+            "x-hero",
+            "x-hero-art",
+            "x-page"
+          ],
+          "sections": [
+            "Set your rhythm",
+            "Build credible trust",
+            "Know your earnings"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "B06",
+            "label": "Apply as a clinician"
+          }
+        ],
+        "expected_next_states": "Unverified → CodePending → ContactVerified → OnboardingDraft → PatientProfile or ClinicianApplicationDraft; clinician scope approval remains manual.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Homepage.tsx",
+          "frontend/src/pages/SignIn.tsx"
+        ]
       }
     },
     {
@@ -198,7 +286,7 @@
         "reference_hash": "#a04",
         "reference_url": "http://127.0.0.1:8044/?embed=1#a04",
         "product_route": "/sign-in",
-        "actor": "public / signed-out",
+        "actor": "Guest; authenticated account after contact verification",
         "states": [
           "populated",
           "empty",
@@ -240,7 +328,36 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.A04",
+          "source_sha256": "b599012db3e6d3e847725d0cd9a1f8c33c2931f20db074dc738b3194d3a072f2",
+          "composition_classes": [
+            "muted",
+            "muted small",
+            "x-actions",
+            "x-auth"
+          ],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "A05",
+            "label": "Continue"
+          },
+          {
+            "target_reference_id": "A06",
+            "label": "Use email instead"
+          }
+        ],
+        "expected_next_states": "Unverified → CodePending → ContactVerified → OnboardingDraft → PatientProfile or ClinicianApplicationDraft; clinician scope approval remains manual.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Homepage.tsx",
+          "frontend/src/pages/SignIn.tsx"
+        ]
       }
     },
     {
@@ -262,7 +379,7 @@
         "reference_hash": "#a05",
         "reference_url": "http://127.0.0.1:8044/?embed=1#a05",
         "product_route": "/sign-in (OTP step)",
-        "actor": "public / signed-out",
+        "actor": "Guest; authenticated account after contact verification",
         "states": [
           "populated",
           "empty",
@@ -294,7 +411,35 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.A05",
+          "source_sha256": "72a615bd164d39699cf55769fa9b380c56d37ed1fc593a85ca0d1eb6721b7442",
+          "composition_classes": [
+            "muted",
+            "x-auth",
+            "x-field"
+          ],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "A07",
+            "label": "Verify code"
+          },
+          {
+            "target_reference_id": "A04",
+            "label": "Change number"
+          }
+        ],
+        "expected_next_states": "Unverified → CodePending → ContactVerified → OnboardingDraft → PatientProfile or ClinicianApplicationDraft; clinician scope approval remains manual.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Homepage.tsx",
+          "frontend/src/pages/SignIn.tsx"
+        ]
       }
     },
     {
@@ -317,7 +462,7 @@
         "reference_hash": "#a06",
         "reference_url": "http://127.0.0.1:8044/?embed=1#a06",
         "product_route": "/sign-in (email method)",
-        "actor": "public / signed-out",
+        "actor": "Guest; authenticated account after contact verification",
         "states": [
           "populated",
           "empty",
@@ -359,7 +504,39 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.A06",
+          "source_sha256": "50d70dca5fe0834a77acacf0f041647d4e3904c6d79580e13270ded51e6747c8",
+          "composition_classes": [
+            "muted",
+            "x-auth",
+            "x-link"
+          ],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "A05",
+            "label": "Send email code"
+          },
+          {
+            "target_reference_id": "C01",
+            "label": "Sign in"
+          },
+          {
+            "target_reference_id": "A04",
+            "label": "Use phone instead"
+          }
+        ],
+        "expected_next_states": "Unverified → CodePending → ContactVerified → OnboardingDraft → PatientProfile or ClinicianApplicationDraft; clinician scope approval remains manual.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Homepage.tsx",
+          "frontend/src/pages/SignIn.tsx"
+        ]
       }
     },
     {
@@ -381,7 +558,7 @@
         "reference_hash": "#a07",
         "reference_url": "http://127.0.0.1:8044/?embed=1#a07",
         "product_route": "/onboarding (account-choice screen is absent; role intent starts at clinician entry)",
-        "actor": "public / signed-out",
+        "actor": "Guest; authenticated account after contact verification",
         "states": [
           "populated",
           "empty",
@@ -413,7 +590,33 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.A07",
+          "source_sha256": "ee0f48471fb07d041ca31b287069a3a4465e71e6c4f4710ee0ce24eb98ce65df",
+          "composition_classes": [
+            "x-grid two"
+          ],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "B01",
+            "label": "Continue as a patient"
+          },
+          {
+            "target_reference_id": "B06",
+            "label": "Apply as a clinician"
+          }
+        ],
+        "expected_next_states": "Unverified → CodePending → ContactVerified → OnboardingDraft → PatientProfile or ClinicianApplicationDraft; clinician scope approval remains manual.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Homepage.tsx",
+          "frontend/src/pages/SignIn.tsx"
+        ]
       }
     },
     {
@@ -435,7 +638,7 @@
         "reference_hash": "#b01",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b01",
         "product_route": "/onboarding",
-        "actor": "patient / clinician onboarding",
+        "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
         "states": [
           "populated",
           "empty",
@@ -467,7 +670,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B01",
+          "source_sha256": "6de94d47ea85b0aa96c1891030727951450c274aa048ca97fc7fbd3718de7c27",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -489,7 +707,7 @@
         "reference_hash": "#b02",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b02",
         "product_route": "/onboarding",
-        "actor": "patient / clinician onboarding",
+        "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
         "states": [
           "populated",
           "empty",
@@ -521,7 +739,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B02",
+          "source_sha256": "97082e0e14ea68f86ae4b51813f7dac0873429ba025e486e1a1788b0396ac6b8",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -543,7 +776,7 @@
         "reference_hash": "#b03",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b03",
         "product_route": "/onboarding",
-        "actor": "patient / clinician onboarding",
+        "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
         "states": [
           "populated",
           "empty",
@@ -575,7 +808,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B03",
+          "source_sha256": "de82745da4f2b96d505e4ad7eda5904049bd12c1dd65eea02cf43f85dfbd191a",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -597,7 +845,7 @@
         "reference_hash": "#b04",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b04",
         "product_route": "/onboarding",
-        "actor": "patient / clinician onboarding",
+        "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
         "states": [
           "populated",
           "empty",
@@ -629,7 +877,27 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B04",
+          "source_sha256": "8ad00c1363db2190403c1f776b2dd28ca1b09de8b5a69cb739801ceaf546f354",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "B05",
+            "label": "Skip for now"
+          }
+        ],
+        "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -651,7 +919,7 @@
         "reference_hash": "#b05",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b05",
         "product_route": "/onboarding",
-        "actor": "patient / clinician onboarding",
+        "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
         "states": [
           "populated",
           "empty",
@@ -683,7 +951,30 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B05",
+          "source_sha256": "cc8b9ebc5c5f0339846e4f99995ce5629f0b4c18a306f9e719704de429258b23",
+          "composition_classes": [
+            "x-hero",
+            "x-hero-art"
+          ],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "C02",
+            "label": "Find care"
+          }
+        ],
+        "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -705,7 +996,7 @@
         "reference_hash": "#b06",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b06",
         "product_route": "/onboarding?intent=clinician",
-        "actor": "patient / clinician onboarding",
+        "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
         "states": [
           "populated",
           "empty",
@@ -737,7 +1028,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B06",
+          "source_sha256": "34caae469c7db179939d2a27b966d85b87861e53e4d39c9464e3b74879693e5b",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -760,7 +1066,7 @@
         "reference_hash": "#b07",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b07",
         "product_route": "/clinician/vetting",
-        "actor": "patient / clinician onboarding",
+        "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
         "states": [
           "populated",
           "empty",
@@ -792,7 +1098,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B07",
+          "source_sha256": "805420affbf088f19c076046a83659d07bd795050cfcd550a7d0a75d75da22ca",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -814,7 +1135,7 @@
         "reference_hash": "#b08",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b08",
         "product_route": "/clinician/affiliations; /clinician/clinic-access; /patient/clinic-access",
-        "actor": "patient / clinician onboarding",
+        "actor": "Clinician/clinic submitter or active Clinic Manager; invited account with exact verified email; authorized clinic reviewer for registration and affiliation decisions",
         "states": [
           "populated",
           "empty",
@@ -846,7 +1167,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B08",
+          "source_sha256": "692a5dd86c33218b14ec47e6d59b30c91cf0c4c0768a30c2e62631126dda92c1",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Invited → Active | Declined | Revoked; Active → Revoked. Terminal states cannot be reopened. Owner/active Clinic Manager invites and revokes; verified invitee accepts/declines. Retry of same invitation, acceptance, or revocation is idempotent. Patient may grant one scheduling-only share to a verified affiliated clinic; grant → Revoked by patient or access closes on membership removal, expiry, cancellation or completion. Repeated grant/revoke is idempotent.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -869,7 +1205,7 @@
         "reference_hash": "#b09",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b09",
         "product_route": "/clinician/vetting",
-        "actor": "patient / clinician onboarding",
+        "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
         "states": [
           "populated",
           "empty",
@@ -901,7 +1237,25 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B09",
+          "source_sha256": "6b62adeb6c61bd242a104c1c780d20a837ba210403e3cf7b96582bd13173fd3e",
+          "composition_classes": [
+            "x-check-list",
+            "x-toolbar"
+          ],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Draft/Clarification → append immutable evidence revision → submission/resubmission → reviewer sees evidence → decision snapshot records evidence IDs/revisions/digests; no applicant mutation after submission.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -924,7 +1278,7 @@
         "reference_hash": "#b10",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b10",
         "product_route": "/clinician/vetting",
-        "actor": "patient / clinician onboarding",
+        "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
         "states": [
           "populated",
           "empty",
@@ -956,7 +1310,25 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B10",
+          "source_sha256": "e379c00946d2bdd6af2fef2450f51cc1f0ded5e20c0412ab09d061f090d57123",
+          "composition_classes": [],
+          "sections": [
+            "Professional details",
+            "Requested scopes"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Draft/Clarification → append immutable evidence revision → submission/resubmission → reviewer sees evidence → decision snapshot records evidence IDs/revisions/digests; no applicant mutation after submission.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -979,7 +1351,7 @@
         "reference_hash": "#b11",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b11",
         "product_route": "/clinician/vetting",
-        "actor": "patient / clinician onboarding",
+        "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
         "states": [
           "populated",
           "empty",
@@ -1011,7 +1383,32 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B11",
+          "source_sha256": "98665e322d21ff03cbd9aa485c26f9e9f2a19774400c02d33a02c545fa78c47a",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Review progress",
+            "Service decisions"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "B12",
+            "label": "Set up approved services"
+          }
+        ],
+        "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -1033,7 +1430,7 @@
         "reference_hash": "#b12",
         "reference_url": "http://127.0.0.1:8044/?embed=1#b12",
         "product_route": "/clinician/services",
-        "actor": "patient / clinician onboarding",
+        "actor": "Patient applicant, clinician applicant, authorized vetting reviewer",
         "states": [
           "populated",
           "empty",
@@ -1065,7 +1462,32 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.B12",
+          "source_sha256": "1e5525f5915e0a5ea47e0590a7a0eec1ee21ede39c40728ac232efafaa64218a",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Your launch checklist",
+            "What approval means"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "B11",
+            "label": "View your application"
+          }
+        ],
+        "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Onboarding.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -1088,7 +1510,7 @@
         "reference_hash": "#c01",
         "reference_url": "http://127.0.0.1:8044/?embed=1#c01",
         "product_route": "/patient",
-        "actor": "patient",
+        "actor": "Patient; approved clinician data is public only within approved profile fields",
         "states": [
           "populated",
           "empty",
@@ -1105,7 +1527,7 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
+        "correction_status": "Reference composition correction implemented; comparison pending",
         "reference_screenshots": [],
         "implementation_screenshots": [],
         "comparison_notes": [],
@@ -1120,7 +1542,49 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "Real built-app Home→discovery→preview→full profile→service→calendar→disclosure→Back passed on 7917152; no booking submitted.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.C01",
+          "source_sha256": "83c06abcff70b2350369b7e30fedb5c00e59fa95be8b61d43ea84bbf6e4f9c6c",
+          "composition_classes": [
+            "x-cols",
+            "x-hero",
+            "x-stat",
+            "x-wallet"
+          ],
+          "sections": [
+            "Your next conversation",
+            "People you know",
+            "Your care record"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "C02",
+            "label": "Find care"
+          },
+          {
+            "target_reference_id": "E05",
+            "label": "Check devices"
+          },
+          {
+            "target_reference_id": "E01",
+            "label": "All appointments"
+          },
+          {
+            "target_reference_id": "G01",
+            "label": "View wallet"
+          }
+        ],
+        "expected_next_states": "Patient completed appointment → patient-scoped previous-clinician query → current public clinician profile → optional discovery/booking through existing APIs.",
+        "functional_status": "Connected selection journey passed; final booking, reload and broader state acceptance pending",
+        "functional_failures": "Historical automated-test content remains; exact visual comparison and full transactional browser booking pending.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/OpenRequests.tsx",
+          "frontend/src/components/Domain.tsx"
+        ]
       }
     },
     {
@@ -1143,7 +1607,7 @@
         "reference_hash": "#care",
         "reference_url": "http://127.0.0.1:8044/?embed=1#care",
         "product_route": "/patient/discovery",
-        "actor": "patient",
+        "actor": "Patient; approved clinician data is public only within approved profile fields",
         "states": [
           "populated",
           "empty",
@@ -1160,7 +1624,7 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
+        "correction_status": "Reference composition correction implemented; comparison pending",
         "reference_screenshots": [],
         "implementation_screenshots": [],
         "comparison_notes": [],
@@ -1175,7 +1639,49 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "Real built-app Home→discovery→preview→full profile→service→calendar→disclosure→Back passed on 7917152; no booking submitted.",
+        "expected_layout": {
+          "reference_source": "app.js#care",
+          "source_sha256": "ba8f6d17f1867658c189a111ef1558eb04a34a2b0cfc6f61d38eefefaa4ca6b1",
+          "composition_classes": [
+            "aside-sticky",
+            "badge-icon",
+            "btn",
+            "dark-panel",
+            "end-icon",
+            "eyebrow",
+            "filter-chip",
+            "filter-chip active",
+            "filters",
+            "grow",
+            "icon-btn",
+            "label",
+            "layout-aside",
+            "muted",
+            "no-offers",
+            "page-heading",
+            "privacy-foot",
+            "recent-panel",
+            "request-shortcut",
+            "results-heading",
+            "row",
+            "search-box",
+            "small",
+            "sr-only",
+            "subtle"
+          ],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
+        "functional_status": "Connected selection journey passed; final booking, reload and broader state acceptance pending",
+        "functional_failures": "Historical automated-test content remains; exact visual comparison and full transactional browser booking pending.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/OpenRequests.tsx",
+          "frontend/src/components/Domain.tsx"
+        ]
       }
     },
     {
@@ -1197,7 +1703,7 @@
         "reference_hash": "#c03",
         "reference_url": "http://127.0.0.1:8044/?embed=1#c03",
         "product_route": "/patient/discovery",
-        "actor": "patient",
+        "actor": "Patient; approved clinician data is public only within approved profile fields",
         "states": [
           "populated",
           "empty",
@@ -1229,7 +1735,27 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.C03",
+          "source_sha256": "44e4153d7114be3e050103b43bde457c296c1a09926f37afc3d96a8c2af31e39",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Refine your care"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/OpenRequests.tsx",
+          "frontend/src/components/Domain.tsx"
+        ]
       }
     },
     {
@@ -1251,7 +1777,7 @@
         "reference_hash": "#c04",
         "reference_url": "http://127.0.0.1:8044/?embed=1#c04",
         "product_route": "/patient/clinicians/:clinicianId",
-        "actor": "patient",
+        "actor": "Patient; approved clinician data is public only within approved profile fields",
         "states": [
           "populated",
           "empty",
@@ -1268,7 +1794,7 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
+        "correction_status": "Reference composition correction implemented; comparison pending",
         "reference_screenshots": [],
         "implementation_screenshots": [],
         "comparison_notes": [],
@@ -1283,13 +1809,46 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "Real built-app Home→discovery→preview→full profile→service→calendar→disclosure→Back passed on 7917152; no booking submitted.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.C04",
+          "source_sha256": "980418e0108a65d186a26b75e9f3c008cb7b2b26faafcbb2b33ee18edc85a692",
+          "composition_classes": [
+            "muted",
+            "x-actions",
+            "x-cols",
+            "x-price",
+            "x-rating"
+          ],
+          "sections": [
+            "A practical, supportive space",
+            "Expertise & approach",
+            "Patient experience",
+            "Book a conversation",
+            "Trust, made clearer"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "C05",
+            "label": "View consultation"
+          }
+        ],
+        "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
+        "functional_status": "Connected selection journey passed; final booking, reload and broader state acceptance pending",
+        "functional_failures": "Historical automated-test content remains; exact visual comparison and full transactional browser booking pending.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/OpenRequests.tsx",
+          "frontend/src/components/Domain.tsx"
+        ]
       }
     },
     {
       "id": "C05",
       "title": "About this consultation",
-      "route": "/patient/book/:offering",
+      "route": "/patient/services/:offering",
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implemented, verification pending",
@@ -1304,8 +1863,8 @@
         "reference_screen": "C05",
         "reference_hash": "#c05",
         "reference_url": "http://127.0.0.1:8044/?embed=1#c05",
-        "product_route": "/patient/book/:offering",
-        "actor": "patient",
+        "product_route": "/patient/services/:offering",
+        "actor": "Patient; approved clinician data is public only within approved profile fields",
         "states": [
           "populated",
           "empty",
@@ -1322,7 +1881,7 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
+        "correction_status": "Reference composition correction implemented; comparison pending",
         "reference_screenshots": [],
         "implementation_screenshots": [],
         "comparison_notes": [],
@@ -1337,7 +1896,32 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "Real built-app Home→discovery→preview→full profile→service→calendar→disclosure→Back passed on 7917152; no booking submitted.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.C05",
+          "source_sha256": "9fa95f647433099f08b04d9f1d0df9a7a1e463f76a374baf5d4d9309ed058e01",
+          "composition_classes": [
+            "muted small",
+            "x-cols"
+          ],
+          "sections": [
+            "Individual counseling",
+            "Before you book"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "C06",
+            "label": "Choose a time"
+          }
+        ],
+        "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
+        "functional_status": "Connected selection journey passed; final booking, reload and broader state acceptance pending",
+        "functional_failures": "Historical automated-test content remains; exact visual comparison and full transactional browser booking pending.",
+        "implementation_files": [
+          "frontend/src/pages/ServiceDetails.tsx"
+        ]
       }
     },
     {
@@ -1359,7 +1943,7 @@
         "reference_hash": "#c06",
         "reference_url": "http://127.0.0.1:8044/?embed=1#c06",
         "product_route": "/patient/book/:offering",
-        "actor": "patient",
+        "actor": "Patient; approved clinician data is public only within approved profile fields",
         "states": [
           "populated",
           "empty",
@@ -1376,7 +1960,7 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implemented correction; visual acceptance pending",
+        "correction_status": "Reference composition correction implemented; comparison pending",
         "reference_screenshots": [
           "docs/screenshots/mvp-design-fidelity/C06-reference-390.png",
           "docs/screenshots/mvp-design-fidelity/C06-reference-768.png",
@@ -1401,7 +1985,28 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "Real built-app Home→discovery→preview→full profile→service→calendar→disclosure→Back passed on 7917152; no booking submitted.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.C06",
+          "source_sha256": "fae59f893aa4b61039324c9ec7091c022756190e316f05cd1ef1069ebcbac1d1",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "C07",
+            "label": "Continue with selected time"
+          }
+        ],
+        "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
+        "functional_status": "Connected selection journey passed; final booking, reload and broader state acceptance pending",
+        "functional_failures": "Historical automated-test content remains; exact visual comparison and full transactional browser booking pending.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/OpenRequests.tsx",
+          "frontend/src/components/Domain.tsx"
+        ]
       }
     },
     {
@@ -1423,7 +2028,7 @@
         "reference_hash": "#c07",
         "reference_url": "http://127.0.0.1:8044/?embed=1#c07",
         "product_route": "/patient/book/:offering (disclosure step)",
-        "actor": "patient",
+        "actor": "Patient; approved clinician data is public only within approved profile fields",
         "states": [
           "populated",
           "empty",
@@ -1455,7 +2060,25 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.C07",
+          "source_sha256": "9fe44f0361ac885a86808f465b4dd2e044e29fa4f9f65a5cbef2265110746627",
+          "composition_classes": [],
+          "sections": [
+            "Your disclosure preview"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/OpenRequests.tsx",
+          "frontend/src/components/Domain.tsx"
+        ]
       }
     },
     {
@@ -1477,7 +2100,7 @@
         "reference_hash": "#c08",
         "reference_url": "http://127.0.0.1:8044/?embed=1#c08",
         "product_route": "/patient/book/:offering (review step)",
-        "actor": "patient",
+        "actor": "Patient; approved clinician data is public only within approved profile fields",
         "states": [
           "populated",
           "empty",
@@ -1509,7 +2132,33 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.C08",
+          "source_sha256": "f7241a43574c75f6e3015e90e7a59bb476c4c866b0f4d58d589512f4866ac8ab",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Your consultation",
+            "Payment summary"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "C09",
+            "label": "Confirm appointment"
+          }
+        ],
+        "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/OpenRequests.tsx",
+          "frontend/src/components/Domain.tsx"
+        ]
       }
     },
     {
@@ -1531,7 +2180,7 @@
         "reference_hash": "#c09",
         "reference_url": "http://127.0.0.1:8044/?embed=1#c09",
         "product_route": "/patient/appointments",
-        "actor": "patient",
+        "actor": "Patient; approved clinician data is public only within approved profile fields",
         "states": [
           "populated",
           "empty",
@@ -1563,7 +2212,32 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.C09",
+          "source_sha256": "0ef120b5d361db3f3dcedd3c561a8f79990fdbb113e682094039c54d3c425d66",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "If confirmation is manual"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E02",
+            "label": "View appointment"
+          }
+        ],
+        "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/OpenRequests.tsx",
+          "frontend/src/components/Domain.tsx"
+        ]
       }
     },
     {
@@ -1585,7 +2259,7 @@
         "reference_hash": "#d01",
         "reference_url": "http://127.0.0.1:8044/?embed=1#d01",
         "product_route": "/patient/requests/new (composer step)",
-        "actor": "patient",
+        "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
         "states": [
           "populated",
           "empty",
@@ -1617,7 +2291,21 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.D01",
+          "source_sha256": "4c35135f87677e5fa181272873ecae8a780fd46db583e010d447ad481bab3bb7",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Request Open → Matched/Cancelled/Expired; Offer Active → Accepted/Declined/Withdrawn/Expired/Superseded; match acceptance atomically creates one appointment and one reservation.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -1639,7 +2327,7 @@
         "reference_hash": "#d02",
         "reference_url": "http://127.0.0.1:8044/?embed=1#d02",
         "product_route": "/patient/requests/new (care mode step)",
-        "actor": "patient",
+        "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
         "states": [
           "populated",
           "empty",
@@ -1671,7 +2359,21 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.D02",
+          "source_sha256": "2d1dfb7b486015ea8c41a3f05b2061ba70b7deb4512d557c514df948b9d99869",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Request Open → Matched/Cancelled/Expired; Offer Active → Accepted/Declined/Withdrawn/Expired/Superseded; match acceptance atomically creates one appointment and one reservation.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -1693,7 +2395,7 @@
         "reference_hash": "#d03",
         "reference_url": "http://127.0.0.1:8044/?embed=1#d03",
         "product_route": "/patient/requests/new (preview step)",
-        "actor": "patient",
+        "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
         "states": [
           "populated",
           "empty",
@@ -1725,7 +2427,24 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.D03",
+          "source_sha256": "85c2c817bc8114e7699916c21791023224347d92a337206f831a8b0c28ce1080",
+          "composition_classes": [],
+          "sections": [
+            "Your request",
+            "What clinicians see"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Request Open → Matched/Cancelled/Expired; Offer Active → Accepted/Declined/Withdrawn/Expired/Superseded; match acceptance atomically creates one appointment and one reservation.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -1747,7 +2466,7 @@
         "reference_hash": "#d04",
         "reference_url": "http://127.0.0.1:8044/?embed=1#d04",
         "product_route": "/patient/requests/:id (live progress is polling; realtime delivery is incomplete)",
-        "actor": "patient",
+        "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
         "states": [
           "populated",
           "empty",
@@ -1779,7 +2498,36 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.D04",
+          "source_sha256": "c8b907ec9fed4c4dc5764dbf46cde095a5ae24fd5b15968dca47c41a8961a919",
+          "composition_classes": [
+            "x-cols",
+            "x-empty",
+            "x-meter"
+          ],
+          "sections": [
+            "You’re in control"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "D05",
+            "label": "View arriving offers"
+          },
+          {
+            "target_reference_id": "D07",
+            "label": "Explore alternatives"
+          }
+        ],
+        "expected_next_states": "Request Open → Matched/Cancelled/Expired; Offer Active → Accepted/Declined/Withdrawn/Expired/Superseded; match acceptance atomically creates one appointment and one reservation.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -1801,7 +2549,7 @@
         "reference_hash": "#requests",
         "reference_url": "http://127.0.0.1:8044/?embed=1#requests",
         "product_route": "/patient/requests/:id",
-        "actor": "patient",
+        "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
         "states": [
           "populated",
           "empty",
@@ -1833,7 +2581,21 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.D05",
+          "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Request Open → Matched/Cancelled/Expired; Offer Active → Accepted/Declined/Withdrawn/Expired/Superseded; match acceptance atomically creates one appointment and one reservation.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -1855,7 +2617,7 @@
         "reference_hash": "#d06",
         "reference_url": "http://127.0.0.1:8044/?embed=1#d06",
         "product_route": "/patient/requests/:requestId/offers/:offerId",
-        "actor": "patient",
+        "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
         "states": [
           "populated",
           "empty",
@@ -1887,7 +2649,35 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.D06",
+          "source_sha256": "d69e08c16802ec342cab08710af423ed043173f3ec2409724f35fddd0eb5d77b",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Hana’s offer",
+            "Reserve your appointment"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "C09",
+            "label": "Accept and book"
+          },
+          {
+            "target_reference_id": "G02",
+            "label": "Add funds instead"
+          }
+        ],
+        "expected_next_states": "Patient can inspect only an offer belonging to their own request. Acceptance uses respond_offer, which revalidates request/offer, availability, price, disclosure and funds and atomically confirms one appointment and reservation.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -1909,7 +2699,7 @@
         "reference_hash": "#d07",
         "reference_url": "http://127.0.0.1:8044/?embed=1#d07",
         "product_route": "/patient/discovery",
-        "actor": "patient",
+        "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
         "states": [
           "populated",
           "empty",
@@ -1941,7 +2731,41 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.D07",
+          "source_sha256": "1bcae6da9004d7f575bc73320b882ad534a2e370ba53ef79e7a2a980437e94de",
+          "composition_classes": [
+            "x-empty",
+            "x-grid"
+          ],
+          "sections": [
+            "Choose a later time",
+            "Browse availability",
+            "Keep your request open"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "D02",
+            "label": "Change timing"
+          },
+          {
+            "target_reference_id": "C03",
+            "label": "Browse clinicians"
+          },
+          {
+            "target_reference_id": "D08",
+            "label": "View my request"
+          }
+        ],
+        "expected_next_states": "Request Open → Matched/Cancelled/Expired; Offer Active → Accepted/Declined/Withdrawn/Expired/Superseded; match acceptance atomically creates one appointment and one reservation.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -1963,7 +2787,7 @@
         "reference_hash": "#d08",
         "reference_url": "http://127.0.0.1:8044/?embed=1#d08",
         "product_route": "/patient/requests",
-        "actor": "patient",
+        "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
         "states": [
           "populated",
           "empty",
@@ -1995,7 +2819,38 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.D08",
+          "source_sha256": "f6bd4534a57f983d61b4b560bbe3544d60290a491051b99daa67cddc6a2a8fa4",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "D05",
+            "label": "Compare offers"
+          },
+          {
+            "target_reference_id": "E13",
+            "label": "View record"
+          },
+          {
+            "target_reference_id": "D02",
+            "label": "Try again"
+          },
+          {
+            "target_reference_id": "D01",
+            "label": "New request"
+          }
+        ],
+        "expected_next_states": "Request Open → Matched/Cancelled/Expired; Offer Active → Accepted/Declined/Withdrawn/Expired/Superseded; match acceptance atomically creates one appointment and one reservation.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -2017,7 +2872,7 @@
         "reference_hash": "#d09",
         "reference_url": "http://127.0.0.1:8044/?embed=1#d09",
         "product_route": "/patient/requests/:id",
-        "actor": "patient",
+        "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
         "states": [
           "populated",
           "empty",
@@ -2049,7 +2904,21 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.D09",
+          "source_sha256": "ea41869adcc59c2541c506320a5c956ce5729e42dba927bfb02fbd062c2d8bba",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Request Open → Matched/Cancelled/Expired; Offer Active → Accepted/Declined/Withdrawn/Expired/Superseded; match acceptance atomically creates one appointment and one reservation.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -2071,7 +2940,7 @@
         "reference_hash": "#e01",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e01",
         "product_route": "/patient/appointments or /clinician/appointments",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2103,7 +2972,30 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E01",
+          "source_sha256": "71de340e854344647630cb90a7df0496525e0f3318be0482737f0d65527469d7",
+          "composition_classes": [
+            "active",
+            "x-tabs"
+          ],
+          "sections": [
+            "Today",
+            "Waiting for confirmation",
+            "September",
+            "September"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2125,7 +3017,7 @@
         "reference_hash": "#e02",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e02",
         "product_route": "/patient/consultations/:id or /clinician/consultations/:id",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2157,7 +3049,41 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E02",
+          "source_sha256": "e94d78b515db9c193d9aa8fd1b4e0717962546d5d3e3915128986c3d7f853be2",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Your conversation",
+            "Disclosure used at booking",
+            "Before you join"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E05",
+            "label": "Check devices"
+          },
+          {
+            "target_reference_id": "E03",
+            "label": "Reschedule"
+          },
+          {
+            "target_reference_id": "E04",
+            "label": "Cancel"
+          }
+        ],
+        "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2181,7 +3107,7 @@
         "reference_hash": "#e03",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e03",
         "product_route": "/patient/consultations/:id and /clinician/consultations/:id (appointment detail; reschedule proposal panel)",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2213,7 +3139,29 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E03",
+          "source_sha256": "569cea575fc05b6205b2de96258066b4931361c181116dead1e1f85a6f2e1a6d",
+          "composition_classes": [],
+          "sections": [
+            "Choose a proposed time"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E02",
+            "label": "Keep current time"
+          }
+        ],
+        "expected_next_states": "Booked future appointment with no consultation room → one Pending proposal; proposer may Withdraw, counterpart may Accept/Decline, timeout → Expired, cancellation or successful move supersedes pending proposals. Accept atomically updates the existing appointment in place; original slot, price, policy and disclosure remain unchanged until acceptance. A stale target slot resolves Unavailable and leaves the original booking intact.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2235,7 +3183,7 @@
         "reference_hash": "#e04",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e04",
         "product_route": "/patient/consultations/:id (pre-start cancellation only)",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2267,7 +3215,24 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E04",
+          "source_sha256": "dea4d434bc639de1f7b36418588b749d8e32beeff01cbaf5a4f0b9dfac8a52e3",
+          "composition_classes": [],
+          "sections": [
+            "Cancellation preview"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2289,7 +3254,7 @@
         "reference_hash": "#e05",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e05",
         "product_route": "/consultation/:id/room (preflight)",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2321,7 +3286,34 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E05",
+          "source_sha256": "250449e774bdedb475c86a097f6853be7e69db153cefca567a7336a310c7fcd1",
+          "composition_classes": [
+            "initials",
+            "label",
+            "x-call-person",
+            "x-cols"
+          ],
+          "sections": [
+            "Ready when you are"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E06",
+            "label": "Enter waiting room"
+          }
+        ],
+        "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2343,7 +3335,7 @@
         "reference_hash": "#e06",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e06",
         "product_route": "/consultation/:id/room (waiting state)",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2375,7 +3367,36 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E06",
+          "source_sha256": "2fe243fee9029eb89dfdefac922a43ef60d43afa1adf12512debd80fd65c4f55",
+          "composition_classes": [
+            "x-cols",
+            "x-empty"
+          ],
+          "sections": [
+            "Shared with Hana"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E07",
+            "label": "Preview joined session"
+          },
+          {
+            "target_reference_id": "C07",
+            "label": "Review disclosure"
+          }
+        ],
+        "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2397,7 +3418,7 @@
         "reference_hash": "#room",
         "reference_url": "http://127.0.0.1:8044/?embed=1#room",
         "product_route": "/consultation/:id/room",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2429,7 +3450,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E07",
+          "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2451,7 +3487,7 @@
         "reference_hash": "#e08",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e08",
         "product_route": "/consultation/:id/room (audio-only mode)",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2483,7 +3519,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E08",
+          "source_sha256": "a91362d6475a887f573175d6241e25340cc59509180c5ea927fe00d665b61b7a",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2505,7 +3556,7 @@
         "reference_hash": "#e09",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e09",
         "product_route": "/consultation/:id/room (reconnection state)",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2537,7 +3588,40 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E09",
+          "source_sha256": "7d12483263e3cd4ca4e86f3738c045572c445f4dc7d4ba2bb923726760f15d0c",
+          "composition_classes": [
+            "x-cols",
+            "x-empty"
+          ],
+          "sections": [
+            "Your time & payment"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E08",
+            "label": "Continue with audio"
+          },
+          {
+            "target_reference_id": "E07",
+            "label": "Try video again"
+          },
+          {
+            "target_reference_id": "E10",
+            "label": "See extension options"
+          }
+        ],
+        "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2558,7 +3642,7 @@
         "reference_hash": "#e10",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e10",
         "product_route": "/consultation/:id/room (extension panel while call is open)",
-        "actor": "appointment participant",
+        "actor": "Booked appointment patient and clinician only",
         "states": [
           "populated",
           "empty",
@@ -2590,7 +3674,33 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E10",
+          "source_sha256": "653e9027420334b8b4f1406d74f62881f236cb9995595cd5d24b569291c27c91",
+          "composition_classes": [],
+          "sections": [
+            "Extension offer"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E08",
+            "label": "Finish at scheduled time"
+          },
+          {
+            "target_reference_id": "G02",
+            "label": "Add funds"
+          }
+        ],
+        "expected_next_states": "Proposed → Accepted/Declined/Withdrawn/Expired; Accepted → Started/Released; Started → Settled only at explicit consultation finalization.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2612,7 +3722,7 @@
         "reference_hash": "#e11",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e11",
         "product_route": "/clinician/consultations/:id (post-call notes)",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2644,7 +3754,37 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E11",
+          "source_sha256": "bc0c6484ebd65762b2ddd244859cba4b3c595a82b6680ad5cc10515b8d5ac8cc",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Consultation note",
+            "Patient summary",
+            "Finalize encounter"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E13",
+            "label": "Finalize consultation"
+          },
+          {
+            "target_reference_id": "E14",
+            "label": "Plan a follow-up"
+          }
+        ],
+        "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2662,7 +3802,7 @@
         "reference_hash": "#e12",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e12",
         "product_route": "/patient/consultations/:appointment (feedback section)",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2694,7 +3834,24 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E12",
+          "source_sha256": "94a87aebd09fb43f5ae72a20fddf42c77813f839b5954e4560dcdaaa568c9224",
+          "composition_classes": [
+            "x-stars"
+          ],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Completed + ended + finalized encounter → one immutable patient experience rating (1–5); same-value retries are idempotent and changed resubmissions are rejected.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2716,7 +3873,7 @@
         "reference_hash": "#e13",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e13",
         "product_route": "/patient/consultations/:id or /clinician/consultations/:id",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2748,7 +3905,48 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E13",
+          "source_sha256": "bb116c2887fbd7f5c6e5e4e01d6d7cb32737daf9eca5ac96140bae09deda0728",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Consultation overview",
+            "Shared summary",
+            "Disclosure at this encounter",
+            "Continue your care",
+            "Private notes",
+            "Payment"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E14",
+            "label": "Book follow-up"
+          },
+          {
+            "target_reference_id": "E12",
+            "label": "Leave feedback"
+          },
+          {
+            "target_reference_id": "E11",
+            "label": "Review clinician note layout"
+          },
+          {
+            "target_reference_id": "G03",
+            "label": "View transaction"
+          }
+        ],
+        "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2770,7 +3968,7 @@
         "reference_hash": "#e14",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e14",
         "product_route": "Same-clinician follow-up booking route",
-        "actor": "appointment participant",
+        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
         "states": [
           "populated",
           "empty",
@@ -2802,7 +4000,33 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.E14",
+          "source_sha256": "99de9f6f469a840c694be4b720a1f60252d79d8e791a6fff47fdc1ce018aa44b",
+          "composition_classes": [],
+          "sections": [
+            "Suggested follow-up"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "C07",
+            "label": "Continue to privacy review"
+          },
+          {
+            "target_reference_id": "C02",
+            "label": "Choose another clinician"
+          }
+        ],
+        "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx"
+        ]
       }
     },
     {
@@ -2824,7 +4048,7 @@
         "reference_hash": "#f01",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f01",
         "product_route": "/clinician",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -2856,7 +4080,41 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F01",
+          "source_sha256": "b00e90cbf9989a3120cdeb7eb00320fd61372cd3de2d0b760251d33ec1182b96",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Up next",
+            "Quick actions",
+            "Practice readiness"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "F02",
+            "label": "View open requests"
+          },
+          {
+            "target_reference_id": "F05",
+            "label": "Edit availability"
+          },
+          {
+            "target_reference_id": "F10",
+            "label": "Your patients"
+          }
+        ],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -2878,7 +4136,7 @@
         "reference_hash": "#f02",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f02",
         "product_route": "/clinician/requests",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -2910,7 +4168,35 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F02",
+          "source_sha256": "e18b466db2a23e8eb4105af62fdf0a8547ce9c520c1712281690f3f9d6e7d57a",
+          "composition_classes": [
+            "btn",
+            "muted",
+            "row between wrap"
+          ],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "F03",
+            "label": "View request"
+          },
+          {
+            "target_reference_id": "F03",
+            "label": "View request"
+          }
+        ],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -2932,7 +4218,7 @@
         "reference_hash": "#f03",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f03",
         "product_route": "/clinician/requests",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -2964,7 +4250,33 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F03",
+          "source_sha256": "8860ccc447ac4cf14de099d602cd11a4385839d5d05317ebc60011d6a4244ea2",
+          "composition_classes": [
+            "muted small",
+            "x-cols"
+          ],
+          "sections": [
+            "Selam · alias",
+            "Your offer"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "F04",
+            "label": "Send private offer"
+          }
+        ],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -2986,7 +4298,7 @@
         "reference_hash": "#f04",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f04",
         "product_route": "/clinician/requests (offers/history)",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3018,7 +4330,35 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F04",
+          "source_sha256": "5a6d58d15a1f2f18fb20eca3f59246a9344432bc77749745a863b1e0204a9c69",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "F03",
+            "label": "View offer"
+          },
+          {
+            "target_reference_id": "E02",
+            "label": "View appointment"
+          },
+          {
+            "target_reference_id": "F02",
+            "label": "Find new requests"
+          }
+        ],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3040,7 +4380,7 @@
         "reference_hash": "#availability",
         "reference_url": "http://127.0.0.1:8044/?embed=1#availability",
         "product_route": "/clinician/availability",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3072,7 +4412,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F05",
+          "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3094,7 +4449,7 @@
         "reference_hash": "#f06",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f06",
         "product_route": "/clinician/availability",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3126,7 +4481,36 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F06",
+          "source_sha256": "3ea018ea01f6c45307b7be6665b6d8fcb347662f166aa2398d2875e29ea272a4",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Schedule details",
+            "Your booking link"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "F05",
+            "label": "Edit recurring hours"
+          },
+          {
+            "target_reference_id": "C06",
+            "label": "Preview booking"
+          }
+        ],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3148,7 +4532,7 @@
         "reference_hash": "#f07",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f07",
         "product_route": "/clinician/availability (exceptions)",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3180,7 +4564,28 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F07",
+          "source_sha256": "2af6d23ca21c20a93b6e33cf310e94e04ec08fdd7aecdb460685ff331f3f6bcc",
+          "composition_classes": [
+            "x-cols",
+            "x-grid two"
+          ],
+          "sections": [
+            "Add a date exception",
+            "Upcoming exceptions"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3202,7 +4607,7 @@
         "reference_hash": "#f08",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f08",
         "product_route": "/clinician/services",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3234,7 +4639,37 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F08",
+          "source_sha256": "645f1cc38f2021a8bf7d0ba303cfdd8ede555092e03d90ec5ccf32da65d72568",
+          "composition_classes": [],
+          "sections": [
+            "Additional scope"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "F09",
+            "label": "Edit"
+          },
+          {
+            "target_reference_id": "F09",
+            "label": "Finish setup"
+          },
+          {
+            "target_reference_id": "F09",
+            "label": "Create offering"
+          }
+        ],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3256,7 +4691,7 @@
         "reference_hash": "#f09",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f09",
         "product_route": "/clinician/services",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3288,7 +4723,32 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F09",
+          "source_sha256": "9250fd7b5c2785dfcd7e767b592da65e708f75d69071b2f700a7dd01cbb82f51",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Offering details",
+            "Patient preview"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "F05",
+            "label": "Set availability"
+          }
+        ],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3310,7 +4770,7 @@
         "reference_hash": "#f10",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f10",
         "product_route": "/clinician/care",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3342,7 +4802,35 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F10",
+          "source_sha256": "c2076d0f222b612974d46b8a61c6ab03ba12e201d2dffa5aa0ee0e4c9d4d98b2",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "F11",
+            "label": "Open record"
+          },
+          {
+            "target_reference_id": "F11",
+            "label": "Open record"
+          },
+          {
+            "target_reference_id": "F11",
+            "label": "Open record"
+          }
+        ],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3364,7 +4852,7 @@
         "reference_hash": "#f11",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f11",
         "product_route": "/clinician/care/:id",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3396,7 +4884,33 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F11",
+          "source_sha256": "e8ee473bc66997321d8432eb562d30b35c746f78e814e597f2075d89079e1b0c",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Care timeline",
+            "Patient disclosure",
+            "Practice relationship"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E13",
+            "label": "Open consultation record"
+          }
+        ],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3414,7 +4928,7 @@
         "reference_hash": "#f12",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f12",
         "product_route": "/patient/clinicians/:opaque_clinician_id (public trust summary)",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3446,7 +4960,35 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F12",
+          "source_sha256": "14958409e9cedfedef9007c3b869b3419c1c604809ae696a3dcc4c52b3cf311b",
+          "composition_classes": [
+            "x-grid",
+            "x-stat"
+          ],
+          "sections": [
+            "Credentials",
+            "Patient experience",
+            "Booking reliability",
+            "How your profile is presented"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "B11",
+            "label": "View scope decisions"
+          }
+        ],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3468,7 +5010,7 @@
         "reference_hash": "#f13",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f13",
         "product_route": "/clinician/requests (own offer card; standalone detail route absent)",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3500,7 +5042,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F13",
+          "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3522,7 +5079,7 @@
         "reference_hash": "#f14",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f14",
         "product_route": "/clinician/requests (paginated own history)",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3554,7 +5111,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F14",
+          "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3576,7 +5148,7 @@
         "reference_hash": "#f15",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f15",
         "product_route": "/clinician/consultations/:id",
-        "actor": "clinician",
+        "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
           "empty",
@@ -3608,7 +5180,22 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.F15",
+          "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/OpenRequests.tsx"
+        ]
       }
     },
     {
@@ -3630,7 +5217,7 @@
         "reference_hash": "#g01",
         "reference_url": "http://127.0.0.1:8044/?embed=1#g01",
         "product_route": "/patient/payments or /clinician/earnings",
-        "actor": "clinician",
+        "actor": "Patient owner, clinician owner, narrowly authorized financial reviewer",
         "states": [
           "populated",
           "empty",
@@ -3662,7 +5249,40 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.G01",
+          "source_sha256": "102ec25bb8c129ad0a4c7242aaf0349c9c556cbfd3fcf54edcaf105a80f26562",
+          "composition_classes": [
+            "divider",
+            "muted",
+            "x-cols",
+            "x-stat",
+            "x-wallet"
+          ],
+          "sections": [
+            "Recent activity"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "G02",
+            "label": "Add funds"
+          },
+          {
+            "target_reference_id": "G04",
+            "label": "Request refund"
+          }
+        ],
+        "expected_next_states": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/FinancialActivity.tsx"
+        ]
       }
     },
     {
@@ -3684,7 +5304,7 @@
         "reference_hash": "#g02",
         "reference_url": "http://127.0.0.1:8044/?embed=1#g02",
         "product_route": "/patient/payments (demo funding guarded by site policy)",
-        "actor": "clinician",
+        "actor": "Patient owner, clinician owner, narrowly authorized financial reviewer",
         "states": [
           "populated",
           "empty",
@@ -3716,7 +5336,25 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.G02",
+          "source_sha256": "f45f5bb1d84dd2f9caf5583f9d8360cd365e3d7f70c2f50952aade7c5abc655d",
+          "composition_classes": [],
+          "sections": [
+            "Top-up preview"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/FinancialActivity.tsx"
+        ]
       }
     },
     {
@@ -3738,7 +5376,7 @@
         "reference_hash": "#g03",
         "reference_url": "http://127.0.0.1:8044/?embed=1#g03",
         "product_route": "/patient/payments/transactions/:activityId and /clinician/earnings/transactions/:activityId",
-        "actor": "clinician",
+        "actor": "Patient owner or clinician owner; financial review remains on its separately authorized admin route",
         "states": [
           "populated",
           "empty",
@@ -3770,7 +5408,37 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.G03",
+          "source_sha256": "91c54932470bcf5bf8ff17139c833759e0dd060e44ab0b65d3fa086925cd6275",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "ETB 800 reserved",
+            "Where the funds go"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E02",
+            "label": "View appointment"
+          },
+          {
+            "target_reference_id": "G08",
+            "label": "Raise a concern"
+          }
+        ],
+        "expected_next_states": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/FinancialActivity.tsx"
+        ]
       }
     },
     {
@@ -3792,7 +5460,7 @@
         "reference_hash": "#g04",
         "reference_url": "http://127.0.0.1:8044/?embed=1#g04",
         "product_route": "No general refund request route",
-        "actor": "clinician",
+        "actor": "Patient owner, clinician owner, narrowly authorized financial reviewer",
         "states": [
           "populated",
           "empty",
@@ -3824,7 +5492,25 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.G04",
+          "source_sha256": "a2c0b472b46fc4d28ba94c65eed649c00e6c1c12c98808b6b54d1ad189960c94",
+          "composition_classes": [],
+          "sections": [
+            "Refund review"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/FinancialActivity.tsx"
+        ]
       }
     },
     {
@@ -3846,7 +5532,7 @@
         "reference_hash": "#earnings",
         "reference_url": "http://127.0.0.1:8044/?embed=1#earnings",
         "product_route": "/clinician/earnings",
-        "actor": "clinician",
+        "actor": "Patient owner, clinician owner, narrowly authorized financial reviewer",
         "states": [
           "populated",
           "empty",
@@ -3878,7 +5564,23 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.G05",
+          "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/FinancialActivity.tsx"
+        ]
       }
     },
     {
@@ -3900,7 +5602,7 @@
         "reference_hash": "#g06",
         "reference_url": "http://127.0.0.1:8044/?embed=1#g06",
         "product_route": "/clinician/earnings",
-        "actor": "clinician",
+        "actor": "Patient owner, clinician owner, narrowly authorized financial reviewer",
         "states": [
           "populated",
           "empty",
@@ -3932,7 +5634,28 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.G06",
+          "source_sha256": "5cf3e8a28bc85fbe4270577ea8c98b0e5703a82eeafd3139820f38b85e8354ff",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Your earnings",
+            "Release timeline"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/FinancialActivity.tsx"
+        ]
       }
     },
     {
@@ -3954,7 +5677,7 @@
         "reference_hash": "#g07",
         "reference_url": "http://127.0.0.1:8044/?embed=1#g07",
         "product_route": "/clinician/earnings",
-        "actor": "clinician",
+        "actor": "Patient owner, clinician owner, narrowly authorized financial reviewer",
         "states": [
           "populated",
           "empty",
@@ -3986,7 +5709,25 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.G07",
+          "source_sha256": "0146c32ef15aebbebded34f191e0d3c6a68c524081bfe464e12996af1efd51b5",
+          "composition_classes": [],
+          "sections": [
+            "Payout preview"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/FinancialActivity.tsx"
+        ]
       }
     },
     {
@@ -4008,7 +5749,7 @@
         "reference_hash": "#g08",
         "reference_url": "http://127.0.0.1:8044/?embed=1#g08",
         "product_route": "/admin/financial-disputes",
-        "actor": "clinician",
+        "actor": "Patient owner, clinician owner, narrowly authorized financial reviewer",
         "states": [
           "populated",
           "empty",
@@ -4040,7 +5781,28 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.G08",
+          "source_sha256": "d1af78de6970e80264dea42444f0dc5c5a63f4573f4f09ee9acee8276b34eef5",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Payment concern",
+            "What happens next"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/Clinician.tsx",
+          "frontend/src/pages/FinancialActivity.tsx"
+        ]
       }
     },
     {
@@ -4062,7 +5824,7 @@
         "reference_hash": "#h01",
         "reference_url": "http://127.0.0.1:8044/?embed=1#h01",
         "product_route": "/patient/account or /clinician/account",
-        "actor": "authenticated account",
+        "actor": "Signed-in account owner; account type controls editable fields",
         "states": [
           "populated",
           "empty",
@@ -4094,7 +5856,35 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.H01",
+          "source_sha256": "d7bd7ca29f7a048d15821a5c3bc309eb6e632e3231dfe134bcef8be882278f13",
+          "composition_classes": [
+            "x-cols",
+            "x-stat",
+            "x-wallet"
+          ],
+          "sections": [
+            "Personal details",
+            "Your settings",
+            "People in your care"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "G01",
+            "label": "View wallet"
+          }
+        ],
+        "expected_next_states": "Profile/Preferences saved independently; privacy defaults are not mutated by booking overrides; tour dismissed/completed state is versioned.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Account.tsx",
+          "frontend/src/components/WorkspaceTour.tsx"
+        ]
       }
     },
     {
@@ -4116,7 +5906,7 @@
         "reference_hash": "#h02",
         "reference_url": "http://127.0.0.1:8044/?embed=1#h02",
         "product_route": "/clinician/account",
-        "actor": "authenticated account",
+        "actor": "Signed-in account owner; account type controls editable fields",
         "states": [
           "populated",
           "empty",
@@ -4148,7 +5938,28 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.H02",
+          "source_sha256": "d9805b0b279885598383a2246093dc0e9f7b3921c0795ee496e19c40c59418a6",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Public profile",
+            "Practice settings",
+            "Affiliations"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Profile/Preferences saved independently; privacy defaults are not mutated by booking overrides; tour dismissed/completed state is versioned.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Account.tsx",
+          "frontend/src/components/WorkspaceTour.tsx"
+        ]
       }
     },
     {
@@ -4170,7 +5981,7 @@
         "reference_hash": "#h03",
         "reference_url": "http://127.0.0.1:8044/?embed=1#h03",
         "product_route": "/patient/account (privacy)",
-        "actor": "authenticated account",
+        "actor": "Signed-in account owner; account type controls editable fields",
         "states": [
           "populated",
           "empty",
@@ -4202,7 +6013,27 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.H03",
+          "source_sha256": "78c4975f8de0708e25c581a15dbc960ff808d5e608eb853a3b893eb28c578d4b",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Default disclosure",
+            "A preview of your defaults"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Profile/Preferences saved independently; privacy defaults are not mutated by booking overrides; tour dismissed/completed state is versioned.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Account.tsx",
+          "frontend/src/components/WorkspaceTour.tsx"
+        ]
       }
     },
     {
@@ -4224,7 +6055,7 @@
         "reference_hash": "#h04",
         "reference_url": "http://127.0.0.1:8044/?embed=1#h04",
         "product_route": "/patient/account (preferences)",
-        "actor": "authenticated account",
+        "actor": "Signed-in account owner; account type controls editable fields",
         "states": [
           "populated",
           "empty",
@@ -4256,7 +6087,29 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.H04",
+          "source_sha256": "6898c86d3f7bca2a8237d34bd118b90b06fed5219b37740e119a222a907be391",
+          "composition_classes": [
+            "muted small",
+            "x-grid two"
+          ],
+          "sections": [
+            "Language & time",
+            "Notifications",
+            "Accessibility"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Profile/Preferences saved independently; privacy defaults are not mutated by booking overrides; tour dismissed/completed state is versioned.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Account.tsx",
+          "frontend/src/components/WorkspaceTour.tsx"
+        ]
       }
     },
     {
@@ -4440,7 +6293,7 @@
         "reference_hash": "#h08",
         "reference_url": "http://127.0.0.1:8044/?embed=1#h08",
         "product_route": "Help & tours entry in workspace",
-        "actor": "authenticated account",
+        "actor": "Signed-in account owner; account type controls editable fields",
         "states": [
           "populated",
           "empty",
@@ -4472,7 +6325,36 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.H08",
+          "source_sha256": "6080bfb2ec7cd9168ed2be58a186e9ad524ba6fa392f3abfe0fdc5df5a769d26",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Choose a walkthrough",
+            "Patient tour · 1 of 4"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "C02",
+            "label": "Start walkthrough"
+          },
+          {
+            "target_reference_id": "C01",
+            "label": "Skip tour"
+          }
+        ],
+        "expected_next_states": "Profile/Preferences saved independently; privacy defaults are not mutated by booking overrides; tour dismissed/completed state is versioned.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Account.tsx",
+          "frontend/src/components/WorkspaceTour.tsx"
+        ]
       }
     },
     {
@@ -4494,7 +6376,7 @@
         "reference_hash": "#i01",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i01",
         "product_route": "/admin (review workspace); /admin/clinics (clinic and affiliation review)",
-        "actor": "reviewer / administrator",
+        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
           "empty",
@@ -4526,7 +6408,27 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.I01",
+          "source_sha256": "05cffb98fdebd015c10470f773dfc0d9d1f5f088102101b8d2dfba36a157d067",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Needs your review",
+            "Operations"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -4548,7 +6450,7 @@
         "reference_hash": "#i02",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i02",
         "product_route": "/admin",
-        "actor": "reviewer / administrator",
+        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
           "empty",
@@ -4580,7 +6482,35 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.I02",
+          "source_sha256": "128239a8fb5f2f378ef1076a056f1ca339ad1f8ffd03390bb332515ae4a38ffa",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "I03",
+            "label": "Review"
+          },
+          {
+            "target_reference_id": "I03",
+            "label": "Review"
+          },
+          {
+            "target_reference_id": "I03",
+            "label": "View"
+          }
+        ],
+        "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -4602,7 +6532,7 @@
         "reference_hash": "#i03",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i03",
         "product_route": "/admin (application review)",
-        "actor": "reviewer / administrator",
+        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
           "empty",
@@ -4634,7 +6564,37 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.I03",
+          "source_sha256": "86b6eb311ceb15b057cbab68f5053aad1819bb84fbbce0c43968ec6eb4a04835",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Professional profile",
+            "Private documents",
+            "Review actions"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "I04",
+            "label": "Open vetting rubric"
+          },
+          {
+            "target_reference_id": "I05",
+            "label": "Review service scopes"
+          }
+        ],
+        "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -4655,7 +6615,7 @@
         "reference_hash": "#i04",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i04",
         "product_route": "/admin/vetting",
-        "actor": "reviewer / administrator",
+        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
           "empty",
@@ -4687,7 +6647,30 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.I04",
+          "source_sha256": "d7ead97643d5cadb968c89ee11a49b0545130dc820b0cac159f81b0add75568b",
+          "composition_classes": [],
+          "sections": [
+            "Eligibility gates",
+            "Scoring anchors"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "I05",
+            "label": "Continue to scope decisions"
+          }
+        ],
+        "expected_next_states": "Immutable proposal → explicit Medical Lead approval → prior version superseded; applications pin the rubric version; each human scope decision snapshots definition and scoped evidence. Marking a credential verified requires source/date/reference/license evidence and records an immutable provenance snapshot; clarification/resubmission produces a later assessment without rewriting history.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -4710,7 +6693,7 @@
         "reference_hash": "#i05",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i05",
         "product_route": "/admin/scopes and /admin/vetting",
-        "actor": "reviewer / administrator",
+        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
           "empty",
@@ -4742,7 +6725,27 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.I05",
+          "source_sha256": "9420779cf5d35c5728a8fbf40ea4d8289dd8c333e169be31cc36aff7690f6124",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "B11",
+            "label": "Preview applicant view"
+          }
+        ],
+        "expected_next_states": "Draft/Clarification → append immutable evidence revision → submission/resubmission → reviewer sees evidence → decision snapshot records evidence IDs/revisions/digests; no applicant mutation after submission.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -4764,7 +6767,7 @@
         "reference_hash": "#i06",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i06",
         "product_route": "/clinician/vetting; /admin/vetting",
-        "actor": "reviewer / administrator",
+        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
           "empty",
@@ -4796,7 +6799,27 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.I06",
+          "source_sha256": "bae0a477c616c01057f034e10a5ed029ffb3eed24d867f62872092a749e50433",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "I03",
+            "label": "Review"
+          }
+        ],
+        "expected_next_states": "Assessment Rejected/Suspended/Expired → Appeal Submitted → Upheld (decision preserved) or Reopened → Clarification → Resubmitted → new full scope assessment; appeals are immutable and never grant practice.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -4818,7 +6841,7 @@
         "reference_hash": "#i07",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i07",
         "product_route": "/admin/scopes (limited catalog)",
-        "actor": "reviewer / administrator",
+        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
           "empty",
@@ -4850,7 +6873,27 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.I07",
+          "source_sha256": "d9bf1a12290f18a337421d63e64efe4357224528f7c91de0eb040fe02c59f34c",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "I08",
+            "label": "Add service definition"
+          }
+        ],
+        "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -4872,7 +6915,7 @@
         "reference_hash": "#i08",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i08",
         "product_route": "/teletena/admin/services",
-        "actor": "reviewer / administrator",
+        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
           "empty",
@@ -4904,7 +6947,27 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.I08",
+          "source_sha256": "640d19400d6d5c5301db1cf1cc3ae2d38e6dd852c72ced0c4190cf5aa209cd32",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Core definition",
+            "Required attributes"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Draft editable → typed attributes saved → terminology review requested and draft locked. Separate human terminology approval/activation is not exposed. Scope vetting decisions and financial exception resolution remain separate audited workflows.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -4925,7 +6988,7 @@
         "reference_hash": "#i09",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i09",
         "product_route": "/admin/rubrics",
-        "actor": "reviewer / administrator",
+        "actor": "Tele Tena Medical Lead; Tele Tena Approver may propose but cannot approve",
         "states": [
           "populated",
           "empty",
@@ -4957,7 +7020,33 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.I09",
+          "source_sha256": "0f21e9c361443fdbf156744e03aed82c6658a26e31c561f8597e30de6c1520da",
+          "composition_classes": [],
+          "sections": [
+            "Versioning rules"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "I04",
+            "label": "View rubric"
+          },
+          {
+            "target_reference_id": "I04",
+            "label": "Edit draft"
+          }
+        ],
+        "expected_next_states": "Proposed immutable version → approved by medical lead with rationale; approval is retry-safe and supersedes prior active version without rewriting historical applications.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -4979,7 +7068,7 @@
         "reference_hash": "#i10",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i10",
         "product_route": "No full routing operations page",
-        "actor": "reviewer / administrator",
+        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
           "empty",
@@ -5011,7 +7100,24 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.I10",
+          "source_sha256": "ecb027283b5ccf89cfdc33c5a17b3a36b78f96d4653cbd75d6b140f63b8681b3",
+          "composition_classes": [],
+          "sections": [
+            "Routing boundaries"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -5033,7 +7139,7 @@
         "reference_hash": "#i11",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i11",
         "product_route": "/admin/financial-disputes (limited)",
-        "actor": "reviewer / administrator",
+        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
           "empty",
@@ -5065,7 +7171,35 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.I11",
+          "source_sha256": "a725adaeaa3b4fc73319b43b1b6a405cf60604eb52889ddbc92cf0d54adbf0c9",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "G06",
+            "label": "Inspect"
+          },
+          {
+            "target_reference_id": "G07",
+            "label": "Inspect"
+          },
+          {
+            "target_reference_id": "G08",
+            "label": "Inspect"
+          }
+        ],
+        "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ]
       }
     },
     {
@@ -5681,7 +7815,7 @@
         "reference_hash": "#j11",
         "reference_url": "http://127.0.0.1:8044/?embed=1#j11",
         "product_route": "/clinician/affiliations (initial clinic registration; broader clinic setup pending)",
-        "actor": "post-handover actor",
+        "actor": "Clinic owner/admin and explicitly invited staff",
         "states": [
           "populated",
           "empty",
@@ -5713,7 +7847,26 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.J11",
+          "source_sha256": "edd46648fac17fe7913c6aaef3b0ed7f5acbc44cca5d26033c525b004ad5d9a3",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Clinic details",
+            "Next steps"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Clinic: Draft → Submitted → Verified/Rejected; Verified → Suspended; rejected owner resubmits with a linked correction. Affiliation: Submitted → Verified/Clarification/Rejected; Clarification → Submitted; Verified → Revoked.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Clinics.tsx"
+        ]
       }
     },
     {
@@ -7301,7 +9454,7 @@
         "reference_hash": "#n01",
         "reference_url": "http://127.0.0.1:8044/?embed=1#n01",
         "product_route": "/n01 (not implemented)",
-        "actor": "adult participant",
+        "actor": "Each participating adult individually; treating clinician",
         "states": [
           "populated",
           "empty",
@@ -7333,7 +9486,40 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.N01",
+          "source_sha256": "40c292c63dac56ffc0e7e5130be6d66dedf15bf591218e7973a067b40b525546",
+          "composition_classes": [
+            "x-grid"
+          ],
+          "sections": [
+            "Couples counseling",
+            "Premarital counseling",
+            "Family counseling"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "N02",
+            "label": "Invite your partner"
+          },
+          {
+            "target_reference_id": "N02",
+            "label": "Start together"
+          },
+          {
+            "target_reference_id": "N02",
+            "label": "Invite an adult"
+          }
+        ],
+        "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Relationships.tsx"
+        ]
       }
     },
     {
@@ -7355,7 +9541,7 @@
         "reference_hash": "#n02",
         "reference_url": "http://127.0.0.1:8044/?embed=1#n02",
         "product_route": "/n02 (not implemented)",
-        "actor": "adult participant",
+        "actor": "Each participating adult individually; treating clinician",
         "states": [
           "populated",
           "empty",
@@ -7387,7 +9573,21 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.N02",
+          "source_sha256": "417ba941e65dfb957bbb15e6b3a6ae0dbd85ecc44a681efd46daf6a87d258814",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Relationships.tsx"
+        ]
       }
     },
     {
@@ -7409,7 +9609,7 @@
         "reference_hash": "#n03",
         "reference_url": "http://127.0.0.1:8044/?embed=1#n03",
         "product_route": "/n03 (not implemented)",
-        "actor": "adult participant",
+        "actor": "Each participating adult individually; treating clinician",
         "states": [
           "populated",
           "empty",
@@ -7441,7 +9641,28 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.N03",
+          "source_sha256": "fc2e9f67e71aab194cf20c33d34e194e4106055815f2f8959ed1ae7b4fa2678f",
+          "composition_classes": [],
+          "sections": [
+            "Your choice"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "N04",
+            "label": "Accept invitation"
+          }
+        ],
+        "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Relationships.tsx"
+        ]
       }
     },
     {
@@ -7463,7 +9684,7 @@
         "reference_hash": "#n04",
         "reference_url": "http://127.0.0.1:8044/?embed=1#n04",
         "product_route": "/n04 (not implemented)",
-        "actor": "adult participant",
+        "actor": "Each participating adult individually; treating clinician",
         "states": [
           "populated",
           "empty",
@@ -7495,7 +9716,21 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.N04",
+          "source_sha256": "f7e6b7fbded6cdef862ce45dfa9d1296350c511983662c7406a8bde186826674",
+          "composition_classes": [],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Relationships.tsx"
+        ]
       }
     },
     {
@@ -7517,7 +9752,7 @@
         "reference_hash": "#n05",
         "reference_url": "http://127.0.0.1:8044/?embed=1#n05",
         "product_route": "/n05 (not implemented)",
-        "actor": "adult participant",
+        "actor": "Each participating adult individually; treating clinician",
         "states": [
           "populated",
           "empty",
@@ -7549,7 +9784,31 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.N05",
+          "source_sha256": "d89c2c9b8cb53e39c572bd855c8e5093eb4d6600481d3a60560f7c8daf135ffd",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Participants",
+            "Session & payment"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "N06",
+            "label": "Preview shared session"
+          }
+        ],
+        "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Relationships.tsx"
+        ]
       }
     },
     {
@@ -7571,7 +9830,7 @@
         "reference_hash": "#n06",
         "reference_url": "http://127.0.0.1:8044/?embed=1#n06",
         "product_route": "/n06 (not implemented)",
-        "actor": "adult participant",
+        "actor": "Each participating adult individually; treating clinician",
         "states": [
           "populated",
           "empty",
@@ -7603,7 +9862,29 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.N06",
+          "source_sha256": "f27e09dffde9c1af06762d572e4c62a04aa5a9b628b7d084073e042f6609f79b",
+          "composition_classes": [
+            "end",
+            "initials",
+            "label",
+            "x-call-bar",
+            "x-call-person",
+            "x-call-stack",
+            "x-split-call"
+          ],
+          "sections": [],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [],
+        "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Relationships.tsx"
+        ]
       }
     },
     {
@@ -7625,7 +9906,7 @@
         "reference_hash": "#n07",
         "reference_url": "http://127.0.0.1:8044/?embed=1#n07",
         "product_route": "/n07 (not implemented)",
-        "actor": "adult participant",
+        "actor": "Each participating adult individually; treating clinician",
         "states": [
           "populated",
           "empty",
@@ -7657,7 +9938,33 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.N07",
+          "source_sha256": "cb7077b19839ca1bda3d59f08097f143509393a555d3536f902c15b0f69f794d",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Private clinical note",
+            "Shared session summary",
+            "Individual follow-up",
+            "Before finalizing"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "N08",
+            "label": "Preview shared record"
+          }
+        ],
+        "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Relationships.tsx"
+        ]
       }
     },
     {
@@ -7679,7 +9986,7 @@
         "reference_hash": "#n08",
         "reference_url": "http://127.0.0.1:8044/?embed=1#n08",
         "product_route": "/n08 (not implemented)",
-        "actor": "adult participant",
+        "actor": "Each participating adult individually; treating clinician",
         "states": [
           "populated",
           "empty",
@@ -7711,7 +10018,31 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "expected_layout": {
+          "reference_source": "inventory.js#forms.N08",
+          "source_sha256": "91df6f7ef2d92dae9c3403bb8147a03f2893c4172b2a6cc10e37e18b8e31e42b",
+          "composition_classes": [
+            "x-cols"
+          ],
+          "sections": [
+            "Shared summary",
+            "Your privacy"
+          ],
+          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
+        },
+        "expected_actions": [
+          {
+            "target_reference_id": "E14",
+            "label": "Plan another session"
+          }
+        ],
+        "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
+        "functional_status": "Pending current complete journey acceptance",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Relationships.tsx"
+        ]
       }
     }
   ],
