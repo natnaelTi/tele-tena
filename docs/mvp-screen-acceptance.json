@@ -4246,7 +4246,7 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Reference heading and compact horizontally scrollable tabs ported; identity projection corrected; state-aware filters preserve history",
+        "correction_status": "Reference heading/tabs and booked-local-month/year history ported; selected view remains visible on mobile resize/reload; current state grouping preserved",
         "reference_screenshots": [
           "docs/screenshots/mvp-connected-journeys/E01-upcoming-reference-390.png",
           "docs/screenshots/mvp-connected-journeys/E01-upcoming-reference-768.png",
@@ -4282,7 +4282,7 @@
           "om": "Layout pending; native review required"
         },
         "functional_verification": [
-          "scripts/check_mvp_notes_browser.py passed on packaged 3b02709: real cancellation, one release posting; Completed→detail→Back/reload keeps view; private and published notes remain authorized.",
+          "scripts/check_mvp_notes_browser.py passed on packaged 0eb22ef: real cancellation, one release posting; Completed→detail→Back/reload keeps view; private and published notes remain authorized.",
           "tests/appointment-groups.mjs passed; elapsed bookings never become completed."
         ],
         "expected_layout": {
@@ -4322,7 +4322,7 @@
           "tele_tena/api/journey.py"
         ],
         "visual_status": "Compared; remaining differences",
-        "evidence_source": "3b02709d77d39a4e70e963e8519f75fa74794a0e",
+        "evidence_source": "0eb22ef4e0c988cebabe869b75b042f040bf677f",
         "expected_reference_actions": [
           {
             "label": "S",
@@ -13660,7 +13660,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
-  "current_packaged_source": "3b02709d77d39a4e70e963e8519f75fa74794a0e",
+  "current_packaged_source": "0eb22ef4e0c988cebabe869b75b042f040bf677f",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,

@@ -8,7 +8,7 @@ keeps visual fidelity and functional journey acceptance independent.
 
 - Branch `feat/mvp-release-handover`, draft PR #44, dependent on draft PR #43.
   The preserved `1e8d161468eb8d3563f1b5743982722c749bbcbf` ancestor remains included.
-- Packaged application source **`3b02709d77d39a4e70e963e8519f75fa74794a0e`**.
+- Packaged application source **`0eb22ef4e0c988cebabe869b75b042f040bf677f`**.
   Account browser evidence below was captured at `7aa1ea9`; the latest appointment/documentation browser evidence uses this packaged source. Subsequent evidence/documentation commits do not change its application code.
 - **http://127.0.0.1:8017/teletena/**; site
   `tele-tena-pr12-fresh.localhost`; bench `/home/frappe/frappe/frappe-bench`.
@@ -45,7 +45,7 @@ historical evidence, not an assertion that the entire MVP has passed.
   200% (1440 outer width, 720 CSS width, DPR2), paired application/reference.
   The abort-on-save check is controlled transport failure, not proof of a real
   server outage. Profile/defaults/preferences values were checked in MariaDB.
-- `scripts/check_mvp_notes_browser.py` passed against packaged `9988610`, then `3b02709` after adding local month/year history grouping.
+- `scripts/check_mvp_notes_browser.py` passed against packaged `9988610`, then `3b02709` after adding local month/year history grouping, and `0eb22ef` after correcting selected-tab visibility on resize/reload.
   Real owned accounts and backend operations, appointment cancellation,
   persisted notes/publication/amendment, patient and reviewer authorization,
   delayed route isolation, 390/768/1440 paired appointment views.
@@ -56,10 +56,10 @@ historical evidence, not an assertion that the entire MVP has passed.
   every clinician name to fall back to “Your clinician”. Cancellation actor
   IDs are retained privately, not returned to unrelated participants.
 - Asset/hash/PWA scope scanner passed for `9988610` and `3b02709`, including exact-value scan against four privately stored reviewer passwords; no match. No provider values were configured on this site.
-- Locked production build `scripts/build_review.py` passed for `9988610` and `3b02709`.
+- Locked production build `scripts/build_review.py` passed for `9988610`, `3b02709` and `0eb22ef`.
   Lint exits 0 with existing warnings; build retains >500KB chunk warning.
   These are not visual acceptance.
-- Real supported PWA waiting/update flow passed **3bf96b1 → dfe9a2b**, then **9988610 → 3b02709**:
+- Real supported PWA waiting/update flow passed **3bf96b1 → dfe9a2b**, then **9988610 → 3b02709** and **3b02709 → 0eb22ef**:
   old application remained until explicit Refresh; new public bundle loaded;
   no private/API cache paths. Not rerun as a physical-device check or claimed
   as device-level uninterrupted calling or installation.
@@ -105,11 +105,11 @@ release gates. Original journals/records have not been rewritten for this fix.
 ### Paired comparisons and current review steps
 
 Evidence: `docs/screenshots/mvp-connected-journeys/H01–H04-*` (source `7aa1ea9`)
-and `E01-{upcoming,completed,cancelled}-*` (source `3b02709`). Desktop pairs were
+and `E01-{upcoming,completed,cancelled}-*` (source `0eb22ef`). Desktop and mobile pairs were
 visually inspected. H01 now follows reference columns, wallet and settings rows;
 missing city/verified contact fields and incomplete shared-care workflow remain
 explicit differences. E01 follows reference heading/tabs; additional operational
-views, fuller facts, tour invitation and generic Upcoming date grouping still differs.
+views, fuller facts, tour invitation and generic Upcoming date grouping still differs. A real 390px comparison exposed an off-screen selected tab; the strip now reveals the selected view horizontally without moving page scroll/focus. The capture harness verifies visibility at each width.
 **Neither area is declared visually accepted.** No universal pixel-match score.
 
 Open **http://127.0.0.1:8017/teletena/** with existing private reviewer credentials.
