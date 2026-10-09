@@ -1,3 +1,4 @@
+import { AddFundsDialog } from "../components/AddFundsDialog";
 import { appointmentGroups } from "../appointment-groups";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -6,7 +7,6 @@ import "./PatientJourney.css";
 import { WalletSummary } from "../components/WalletSummary";
 import { BookingCalendar } from "../components/BookingCalendar";
 import { pendingCareQuery, rememberCareQuery, discoveryFilters, rememberDiscoveryFilters } from "../care-intent";
-import { api } from "../api";
 import { journeyApi } from "../journey-api";
 import type { Disclosure, Offer } from "../journey-api";
 import {
@@ -21,7 +21,6 @@ import {
 } from "../components/Domain";
 import {
   Button,
-  Card,
   Checkbox,
   EmptyState,
   InlineNotice,
@@ -484,58 +483,25 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
 export function Payments() {
   const { w } = useLocale();
   const wallet = useResource(journeyApi.walletActivity);
-  const action = useAction();
-  const [retryKey, setRetryKey] = useState(() => crypto.randomUUID());
+  const [fundsOpen, setFundsOpen] = useState(false);
   return (
     <>
       <PageTitle
         title="Payments"
         description="Your available balance, reservations and payment activity."
       />
-      {wallet.data && (
-        <div className="balance-grid">
-          <Card>
-            <p>Available balance</p>
-            <h2>ETB {money(wallet.data.available)}</h2>
-          </Card>
-          <Card>
-            <p>Reserved for appointments</p>
-            <h2>ETB {money(wallet.data.reserved)}</h2>
-          </Card>
-        </div>
-      )}
+      <div className="patient-payments-layout"><section>
+      {wallet.data && <section className="reference-wallet"><span>{w("Available to spend")}</span><strong>ETB {money(wallet.data.available)}</strong><p>{w("Reserved for appointments")} · ETB {money(wallet.data.reserved)}</p><Button variant="secondary" onClick={() => setFundsOpen(true)}>{w("Add funds")}</Button></section>}
       {wallet.error && (
         <InlineNotice tone="danger">
           Balance unavailable.{" "}
           <Button onClick={() => void wallet.refresh()}>Retry</Button>
         </InlineNotice>
       )}
-      {action.error && (
-        <InlineNotice tone="danger">{action.error}</InlineNotice>
-      )}
-      <Button
-        loading={action.busy}
-        onClick={() =>
-          void action.run(async () => {
-            await api(
-              "simulated_deposit",
-              { amount: 10000, retry_key: retryKey },
-              true,
-            );
-            setRetryKey(crypto.randomUUID());
-            await wallet.refresh();
-          }, "ETB 100 added to your balance.")
-        }
-      >
-        Add funds · ETB 100
-      </Button>
-      {action.success && (
-        <InlineNotice tone="success">{action.success}</InlineNotice>
-      )}
-      <p className="supporting">
-        This review environment records demonstration funds and reservations. No external payment or refund is processed.
-      </p>
+      <AddFundsDialog open={fundsOpen} close={() => setFundsOpen(false)} refresh={wallet.refresh} />
+      </section><section className="patient-dashboard-panel">
       {wallet.data?.activity?.length ? <section><h2>Payment activity</h2><ul className="payment-activity">{wallet.data.activity.map((item,i)=><li key={item.activity_id||i}><span>{item.kind}</span><strong>ETB {money(item.amount)}</strong><time>{date(item.created)}</time>{item.activity_id&&<Link className="text-link" to={'/patient/payments/transactions/'+encodeURIComponent(item.activity_id)}>{w('Transaction details')}</Link>}</li>)}</ul></section>:<EmptyState title="No payment activity yet." />}
+      </section></div>
     </>
   );
 }
