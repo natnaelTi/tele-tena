@@ -27,6 +27,13 @@ let stage='launch';
   async function capture(page,context,id,variant){
     for(const width of[390,768,1440]){
       await page.setViewportSize({width,height:1000});await page.evaluate(()=>document.fonts.ready);
+      if(id==='E01')await page.waitForFunction(()=>{
+        const strip=document.querySelector('.appointment-view-switch');
+        const selected=strip?.querySelector('[aria-pressed="true"]');
+        if(!strip||!selected)return false;
+        const bounds=strip.getBoundingClientRect(),target=selected.getBoundingClientRect();
+        return target.left>=bounds.left-1&&target.right<=bounds.right+1;
+      });
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
       await page.screenshot({path:path.join(output,`${id}-${variant}-${width}.png`),fullPage:true});
       const ref=await context.newPage();await ref.setViewportSize({width,height:1000});
