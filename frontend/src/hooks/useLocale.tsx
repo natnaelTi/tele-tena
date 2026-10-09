@@ -9,6 +9,7 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  "Eligible clinicians can propose a time within your requested window.": ["ብቁ ባለሙያዎች በጠየቁት ጊዜ ውስጥ ቀጠሮ ሊያቀርቡ ይችላሉ።", "Ogeeyyiin ulaagaa guutan yeroo ati gaafatte keessatti yeroo siif dhiheessuu danda’u."],
   "CARE THAT FITS YOU": ["ለእርስዎ የሚስማማ እንክብካቤ", "Kunuunsa siif malu"],
   "available services": ["ያሉ አገልግሎቶች", "tajaajiloota jiran"],
   "Sort services": ["አገልግሎቶችን ደርድር", "Tajaajiloota tartiibessi"],

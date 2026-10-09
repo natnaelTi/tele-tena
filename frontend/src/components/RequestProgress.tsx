@@ -18,7 +18,8 @@ export function RequestProgress({state,hasOffer=false,wave=1,clinician=false,imm
     'This outcome is retained in your history.':clinician?'No appointment is confirmed until the patient accepts. Your quote is private.':
     immediate&&eligibleSupply===0?'Matching continues without changing your requirements.':
     hasOffer?'Review the clinician’s proposal. A booking is confirmed only after you accept.':
-    'We aim to connect you within three minutes. Availability and your choice may take longer.';
+    immediate?'We aim to connect you within three minutes. Availability and your choice may take longer.':
+    'Eligible clinicians can propose a time within your requested window.';
   const Icon=confirmed?Check:closed?CircleX:clinician?MessageSquare:Search;
   return <section className={`request-progress ${closed?'settled':''}`} aria-label="Request progress">
     <span className="request-beacon" aria-hidden="true"><span/><span/><span/><Icon size={26}/></span>
