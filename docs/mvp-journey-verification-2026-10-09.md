@@ -8,7 +8,7 @@ keeps visual fidelity and functional journey acceptance independent.
 
 - Branch `feat/mvp-release-handover`, draft PR #44, dependent on draft PR #43.
   The preserved `1e8d161468eb8d3563f1b5743982722c749bbcbf` ancestor remains included.
-- Packaged application source **`a05ed13d53b690939343bc5e1a18ade5b178e54e`**.
+- Packaged application source **`53d7ec383670775829e7d5f8ec4c69571cebd708`**.
   Subsequent evidence/documentation commits do not change its application code.
 - **http://127.0.0.1:8017/teletena/**; site
   `tele-tena-pr12-fresh.localhost`; bench `/home/frappe/frappe/frappe-bench`.
@@ -19,7 +19,9 @@ keeps visual fidelity and functional journey acceptance independent.
 - Reference `/home/frappe/teletena-design-reference`, rendered read-only on 8044.
   Actual 142-screen inventory and source remain authoritative.
 - Existing data, credentials, historical records and source ancestry preserved.
-  No migrations, balance repairs, fixture reseeding, merges or remote deployment.
+  Additive note-sharing v1.31/v1.32 migrations were applied only to this isolated
+  review site after backup; preservation checks are below. No balance repairs,
+  retained fixture reseeding, merges or remote deployment.
   Intentional earlier browser deposits/bookings/requests/offers remain recorded.
 
 ## Implemented and verified slices
@@ -29,7 +31,7 @@ keeps visual fidelity and functional journey acceptance independent.
 | Home / discovery / preview / profile / service / booking | Search-led dashboard, real wallet, scoped cards and preview, tailored service page, generated monthly calendar | Real password sign-in, popup close/Escape/focus return, profile→service→calendar, selection/Back; actual booking and matching available/reserved delta | Public biography/verified expertise (not private application text), registration-enabled onboarding and coherent presentation dataset |
 | Disclosure / price review | Server-produced preview; separate consultation/payment panels; actual available balance and shortfall; funding in new tab retains form; mobile paired facts | Live API preview, review totals, Back retains narrative/time; no mocked success | Explicit insufficient-funds browser recovery on this new review, automatic-confirmation browser capture and manual-confirmation acceptance/expiry lifecycle |
 | Patient requests / private offers | Three-step composer, focus-managed reviews, persisted progress/offer workspace, state-driven icons; no three-minute no-offer message when a valid offer exists | Real retained scheduled request→tailored offer→accept→one appointment/reservation→detail/history handoff; concurrency/private-offer regressions | Immediate/routing-worker/reconnect/expiry full current browser acceptance and all reference states |
-| Appointments / documentation | E02 conversation/disclosure/preparation composition; E11 private note and summary panels with finalization beside them; E13 clinician document/patient summaries, persisted revisions and amendment; posting-derived reservation status | Actual owned-fixture Frappe browser preview→draft/reload→finalize→patient summary→amendment; reviewer denial, delayed route isolation and exactly one completion journal/earning. Paired 390/768/1440 captures inspected | Full current hosted call/End/feedback/release chain; optional private-note sharing; presentation dataset; remaining language/zoom/recipient states |
+| Appointments / documentation | E02 conversation/disclosure/preparation composition; E11 private note and summary panels with finalization beside them; E13 clinician document/patient summaries, persisted revisions and amendment; posting-derived reservation status | Actual owned-fixture Frappe browser preview→draft/reload→finalize→patient summary→amendment; reviewer denial, delayed route isolation and exactly one completion journal/earning. Paired 390/768/1440 captures inspected | Full current hosted call/End/feedback/release chain; presentation dataset; remaining language/zoom/couples recipient states |
 | Clinician Today / earnings | Actual metrics, upcoming/action priorities, readiness, available/pending/payout composition, real activity filters/table/mobile cards, exact-money payout dialog | Real authenticated responsive pages, activity filters and zero-payout validation; no invented totals | Scheduled-release/cutover/reconciliation release gate and payout browser lifecycle |
 | Care records | Table/card route agreement; encounter timeline, original disclosure, explicit private-note boundaries | Real browser directory→record; equal-name patient separation and authorization regression | Remaining filter/date/sort and shared-summary visual states |
 | Administrator | Distinct I01 overview, I02 named queue, I03 review dialog; real counts, evidence download action, separate scope authorization | Reviewer real sign-in, queue/review/Escape focus return; responsive captures | Full vetting/scope/resume lifecycle, remaining operational queues and role tours |
@@ -191,7 +193,7 @@ Focused application commits: `3270280` (financial display), `b914087` (E02),
 `d3a44e9` (undefined semantic-token aliases), `1ec716a` (finalized note view),
 `3b9a010` (unsaved preview/E11), `4b9ffc0` (compact readiness/composition),
 `2ddb33c` (appointment-isolated drafts), and `d608dc7` (status-specific headings).
-`a05ed13` includes the rendered-reference mapping and is the packaged build.
+`a05ed13` included the rendered-reference mapping and was that checkpoint’s packaged build. It is superseded by the sharing checkpoint below.
 No schema migrations or retained-data repairs were performed.
 
 Observed and corrected:
@@ -258,14 +260,64 @@ Comparison notes: column proportions, note/document hierarchy, actual reference
 inspected. Demo ribbon, authenticated navigation, anonymous initials, join-window
 restrictions, booked-vs-connected timing and amendment/history are operational
 extensions. Reference portraits/credentials/49-minute duration and prices were not
-invented. E11's optional private-note sharing remains a missing feature, not a
-nonfunctional checkbox. Diagnostic fixture wording remains a presentation-content
+invented. E11's optional note-sharing gap at this earlier checkpoint is closed
+by the explicitly verified sharing checkpoint below. Diagnostic fixture wording remains a presentation-content
 gap. No screen is called visually accepted or handover-ready.
 
 All **99 MVP reference routes** were rendered at 1440×1000 for exact headings,
 fields, actions and structure. The matrix now identifies flagship `app.js` and
 later `request-experience.js` overrides instead of hashing empty `forms` entries.
 This is reference mapping, not 99 operational/visual application passes.
+
+## Latest sharing checkpoint — source 53d7ec3
+
+Reference E11's explicit **Share this note with the patient** control is now
+operational. v1.31 adds revision-specific publication, default 0 for every old
+note. v1.32 stores draft intent separately, also default 0. A selected draft is
+never a published note. Finalization requires the treating clinician and explicit
+publication; patient APIs return only the published text in
+`shared_consultation_notes`, never the `private_note` or draft-intent fields.
+Summary publication is independent. Sharing history labels what was shared.
+Later private amendments do not retract or overwrite previously shared revisions.
+Clinic affiliation, vetting roles and optional partner links grant no note access.
+See `consultation-note-sharing.md` for the boundary and migration details.
+
+Verification actually performed:
+
+- Full pre-migration database/config/public/private-file backup succeeded at
+  `private/backups/20261009_170359-*` on the isolated site. A separate extra
+  row-snapshot command then failed because its working directory was wrong;
+  the shell nevertheless launched migration. This ordering error is recorded,
+  not presented as a successful pre-snapshot. The prior full backup remained intact.
+- Post-migration protected export `20261009_170754-*` was compared with that
+  pre-migration backup using parsed SQL-row hashes. **All original rows across
+  ten note/appointment/financial tables matched** after excluding only the newly
+  default-zero column. No record values were printed. No balancing or row edits.
+- A correct private row snapshot then covered repeat migration and the additive
+  draft-choice patch. All original note, appointment and owner financial rows
+  were unchanged; historical publication/intent stayed 0. Both patches were
+  executed twice without resetting populated data. Fresh installation is pending.
+- `Presentation.test_explicit_note_sharing_preserves_private_revisions_and_money`
+  passed: private first revision, unexposed selected draft, explicit note-only
+  publication, invalid flag rejection, later private amendment, prior sharing
+  retained, patient/other-clinician/reviewer denial, repeat patch and one financial
+  completion/earning. `Presentation.test_04_notes_privacy_revision_completion_and_encounter_scope`
+  passed again independently with the new columns.
+- `scripts/check_mvp_notes_browser.py` passed on packaged **53d7ec3**: actual
+  checkbox/save/reload, selected-draft patient omission, publication and later
+  private amendment, in addition to preview/draft/finalization/amendment/route
+  isolation. Owned random fixtures and temporary credentials were cleaned up.
+  Ended call remains a synthetic fixture; hosted End/media is not inferred.
+- Production package/build and lint (existing warnings) passed; private asset
+  scan found zero exact credentials. An intermediate compile failed on duplicate
+  shared error-message keys; the keys were corrected before the passing build.
+  No current Frappe 16/fresh-site/provider/device/native review pass is inferred.
+
+Updated paired E11/E13 captures at 390/768/1440 are in the same evidence directory.
+The checkbox now matches the reference interaction. Measured connected time is
+still truthfully unavailable, and portraits/reference credentials/fees are not
+fabricated. Clean presentation content, complete visual/localization/zoom states
+and couples recipient workflows remain release gates. No visual acceptance claim.
 
 ## Release gates still open
 

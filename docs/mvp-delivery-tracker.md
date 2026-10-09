@@ -725,6 +725,14 @@ journey evidence. Posting-derived reservation display, finalized document visibi
 unsaved summary preview, revision amendment and cross-appointment draft isolation
 are corrected. See the active journey report for actual tests and shared-fixture
 test failures. All 99 MVP reference routes have rendered structural mappings; this
-is not 99 application acceptance passes. Couples, private-note sharing, clean
+is not 99 application acceptance passes. At that checkpoint: couples, private-note sharing, clean
 presentation data, current scheduler/financial/fresh-install and hosted-call release
 checks remain gates. No merge, remote deployment or real-money activation.
+
+Latest continuation: explicit single-patient consultation-note publication is now
+implemented and locally verified at packaged source `53d7ec3`. Draft sharing intent
+and actual publication are separate; old notes remain private and later amendments
+preserve sharing history. Isolated-site backup/export and repeated migration checks
+preserve clinical/appointment and financial rows. Fresh install and full couples
+recipient/call acceptance remain pending. See the active report; earlier pending
+private-note-sharing statements are superseded.

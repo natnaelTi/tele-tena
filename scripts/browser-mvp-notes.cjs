@@ -115,5 +115,5 @@ let stage='launch';
   stage='reviewer denial';const reviewer=await session('admin');
   const denied=await reviewer.page.evaluate(async id=>{const r=await fetch('/api/method/tele_tena.api.presentation.appointment_detail?appointment='+encodeURIComponent(id),{cache:'no-store'});return r.status;},fixture.appointment);
   assert.ok([403,417].includes(denied));
-  console.log('PASS: persisted draft/reload, finalized clinician document, patient-only published summaries, immutable amendment/sharing history and reviewer denial; 390/768/1440 pairs. Ended call was a synthetic fixture, not media/End proof.');
+  console.log('PASS: persisted draft/reload, finalized clinician document, patient-only published summaries, explicit note publication, saved sharing choice, later private amendments, route isolation and reviewer denial; 390/768/1440 pairs. Ended call was a synthetic fixture, not media/End proof.');
 }catch(error){console.error('FAIL: '+stage+' '+error.name+'; private details withheld');process.exitCode=1;}finally{await browser.close();}})();

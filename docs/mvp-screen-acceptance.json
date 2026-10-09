@@ -4394,7 +4394,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Actual Frappe browser notes harness on 2ddb33c: unsaved preview, draft/reload, finalization, patient API omission, immutable amendment, one completion posting/earning, reviewer denial and delayed route isolation. Ended call is an owned synthetic fixture, not LiveKit verification.",
+        "functional_verification": "Actual Frappe browser notes harness on 2ddb33c: unsaved preview, draft/reload, finalization, patient API omission, immutable amendment, one completion posting/earning, reviewer denial and delayed route isolation. Ended call is an owned synthetic fixture, not LiveKit verification. Sharing checkpoint 53d7ec3: persisted draft intent, no draft publication, explicit revision publication, later private amendment and shared-history preservation; isolated migration and original-row backup comparison passed.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.E02",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -4436,7 +4436,7 @@
         ],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
         "functional_status": "Focused persisted detail/documentation journey locally verified; complete call/lifecycle acceptance pending",
-        "functional_failures": "Current hosted call→End and scheduled earning-release chain still require acceptance; optional private-note sharing remains unsupported and is not presented as working.",
+        "functional_failures": "Full current hosted call/lifecycle and scheduler release, coherent presentation dataset and couples participant/recipient workflows remain pending. Explicit single-patient note sharing is now locally verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/components/ConsultationDetails.tsx",
@@ -5450,7 +5450,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Separate clinical note/summary panels with finalization beside them. Compact expandable presence/setup control; preview dialog, saved revision workflow and sharing history are operational additions. Private-note sharing checkbox is intentionally absent because it is not implemented; remains a scope gap.",
+        "current_differences": "Reference separate note/summary panels and explicit sharing checkbox ported. Saved sharing choice, preview/finalization, immutable sharing and amendment history use real persisted APIs. Measured call duration is unavailable rather than fabricated. Demo ribbon, compact readiness and historical test names remain; language/zoom/couples recipient states and presentation content pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -5483,7 +5483,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Actual Frappe browser notes harness on 2ddb33c: unsaved preview, draft/reload, finalization, patient API omission, immutable amendment, one completion posting/earning, reviewer denial and delayed route isolation. Ended call is an owned synthetic fixture, not LiveKit verification.",
+        "functional_verification": "Actual Frappe browser notes harness on 2ddb33c: unsaved preview, draft/reload, finalization, patient API omission, immutable amendment, one completion posting/earning, reviewer denial and delayed route isolation. Ended call is an owned synthetic fixture, not LiveKit verification. Sharing checkpoint 53d7ec3: persisted draft intent, no draft publication, explicit revision publication, later private amendment and shared-history preservation; isolated migration and original-row backup comparison passed.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.E11",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -5524,7 +5524,7 @@
         ],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
         "functional_status": "Focused persisted detail/documentation journey locally verified; complete call/lifecycle acceptance pending",
-        "functional_failures": "Current hosted call→End and scheduled earning-release chain still require acceptance; optional private-note sharing remains unsupported and is not presented as working.",
+        "functional_failures": "Full current hosted call/lifecycle and scheduler release, coherent presentation dataset and couples participant/recipient workflows remain pending. Explicit single-patient note sharing is now locally verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/components/ConsultationDetails.tsx",
@@ -5708,7 +5708,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Actual Frappe browser notes harness on 2ddb33c: unsaved preview, draft/reload, finalization, patient API omission, immutable amendment, one completion posting/earning, reviewer denial and delayed route isolation. Ended call is an owned synthetic fixture, not LiveKit verification.",
+        "functional_verification": "Actual Frappe browser notes harness on 2ddb33c: unsaved preview, draft/reload, finalization, patient API omission, immutable amendment, one completion posting/earning, reviewer denial and delayed route isolation. Ended call is an owned synthetic fixture, not LiveKit verification. Sharing checkpoint 53d7ec3: persisted draft intent, no draft publication, explicit revision publication, later private amendment and shared-history preservation; isolated migration and original-row backup comparison passed.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.E13",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -5761,7 +5761,7 @@
         ],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
         "functional_status": "Focused persisted detail/documentation journey locally verified; complete call/lifecycle acceptance pending",
-        "functional_failures": "Current hosted call→End and scheduled earning-release chain still require acceptance; optional private-note sharing remains unsupported and is not presented as working.",
+        "functional_failures": "Full current hosted call/lifecycle and scheduler release, coherent presentation dataset and couples participant/recipient workflows remain pending. Explicit single-patient note sharing is now locally verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/components/ConsultationDetails.tsx",
@@ -13569,6 +13569,11 @@
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
     "evidence": "All MVP routes rendered locally at 1440×1000; actual headings/actions/layout recorded, including flagship and later request-experience overrides. Not application acceptance.",
-    "application_build": "a05ed13d53b690939343bc5e1a18ade5b178e54e"
+    "application_build": "53d7ec383670775829e7d5f8ec4c69571cebd708"
+  },
+  "note_sharing_checkpoint": {
+    "application_build": "53d7ec383670775829e7d5f8ec4c69571cebd708",
+    "migration": "v1.31 publication and v1.32 separate draft intent; existing notes remain private; isolated-site preservation/repeat passed; fresh install pending",
+    "evidence": "docs/mvp-journey-verification-2026-10-09.md#latest-sharing-checkpoint--source-53d7ec3"
   }
 }
