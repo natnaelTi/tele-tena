@@ -89,7 +89,8 @@ let stage='launch';
     requestStarted();const response=await route.fetch();await held;await route.fulfill({response});
   });
   await page.evaluate(id=>{history.pushState({},'', '/teletena/clinician/consultations/'+id);dispatchEvent(new PopStateEvent('popstate'));},fixture.second_appointment);
-  await Promise.race([started,new Promise((_,reject)=>setTimeout(()=>reject(Error("Bounded appointment request wait")),15000))]);
+  let deadline;
+  try { await Promise.race([started,new Promise((_,reject)=>{deadline=setTimeout(()=>reject(Error("Bounded appointment request wait")),15000);})]); } finally {clearTimeout(deadline);}
   assert.equal(await page.locator('.note-editor').count(),0);
   assert.ok(!(await page.locator('main').last().innerText()).includes('Unsaved private content belongs only to the first encounter.'));
   releaseResponse();await page.locator('.conversation-overview').waitFor();
