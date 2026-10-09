@@ -1527,10 +1527,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Reference composition correction implemented; comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C01-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C01-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/C01-reference-zoom200.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C01-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C01-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/C01-application-am-390.png",
+          "docs/screenshots/mvp-connected-journeys/C01-application-om-390.png",
+          "docs/screenshots/mvp-connected-journeys/C01-application-zoom200.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -1542,7 +1552,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Real built-app Home→discovery→preview→full profile→service→calendar→disclosure→Back passed on 7917152; no booking submitted.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.C01",
           "source_sha256": "83c06abcff70b2350369b7e30fedb5c00e59fa95be8b61d43ea84bbf6e4f9c6c",
@@ -1578,13 +1588,15 @@
           }
         ],
         "expected_next_states": "Patient completed appointment → patient-scoped previous-clinician query → current public clinician profile → optional discovery/booking through existing APIs.",
-        "functional_status": "Connected selection journey passed; final booking, reload and broader state acceptance pending",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Historical automated-test content remains; exact visual comparison and full transactional browser booking pending.",
         "implementation_files": [
           "frontend/src/pages/Patient.tsx",
           "frontend/src/pages/OpenRequests.tsx",
           "frontend/src/components/Domain.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -1624,10 +1636,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Reference composition correction implemented; comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C02-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C02-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/C02-reference-zoom200.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C02-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C02-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/C02-application-am-390.png",
+          "docs/screenshots/mvp-connected-journeys/C02-application-om-390.png",
+          "docs/screenshots/mvp-connected-journeys/C02-application-zoom200.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -1639,7 +1661,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Real built-app Home→discovery→preview→full profile→service→calendar→disclosure→Back passed on 7917152; no booking submitted.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "app.js#care",
           "source_sha256": "ba8f6d17f1867658c189a111ef1558eb04a34a2b0cfc6f61d38eefefaa4ca6b1",
@@ -1675,13 +1697,15 @@
         },
         "expected_actions": [],
         "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
-        "functional_status": "Connected selection journey passed; final booking, reload and broader state acceptance pending",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Historical automated-test content remains; exact visual comparison and full transactional browser booking pending.",
         "implementation_files": [
           "frontend/src/pages/Patient.tsx",
           "frontend/src/pages/OpenRequests.tsx",
           "frontend/src/components/Domain.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -1794,10 +1818,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Reference composition correction implemented; comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C04-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C04-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C04-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C04-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -1809,7 +1839,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Real built-app Home→discovery→preview→full profile→service→calendar→disclosure→Back passed on 7917152; no booking submitted.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.C04",
           "source_sha256": "980418e0108a65d186a26b75e9f3c008cb7b2b26faafcbb2b33ee18edc85a692",
@@ -1836,13 +1866,15 @@
           }
         ],
         "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
-        "functional_status": "Connected selection journey passed; final booking, reload and broader state acceptance pending",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Historical automated-test content remains; exact visual comparison and full transactional browser booking pending.",
         "implementation_files": [
           "frontend/src/pages/Patient.tsx",
           "frontend/src/pages/OpenRequests.tsx",
           "frontend/src/components/Domain.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -1881,10 +1913,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Reference composition correction implemented; comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C05-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C05-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C05-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C05-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -1896,7 +1934,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Real built-app Home→discovery→preview→full profile→service→calendar→disclosure→Back passed on 7917152; no booking submitted.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.C05",
           "source_sha256": "9fa95f647433099f08b04d9f1d0df9a7a1e463f76a374baf5d4d9309ed058e01",
@@ -1917,11 +1955,13 @@
           }
         ],
         "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
-        "functional_status": "Connected selection journey passed; final booking, reload and broader state acceptance pending",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Historical automated-test content remains; exact visual comparison and full transactional browser booking pending.",
         "implementation_files": [
           "frontend/src/pages/ServiceDetails.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -1960,20 +2000,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Reference composition correction implemented; comparison pending",
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
         "reference_screenshots": [
-          "docs/screenshots/mvp-design-fidelity/C06-reference-390.png",
-          "docs/screenshots/mvp-design-fidelity/C06-reference-768.png",
-          "docs/screenshots/mvp-design-fidelity/C06-reference-1440.png"
+          "docs/screenshots/mvp-connected-journeys/C06-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C06-reference-390.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-design-fidelity/C06-application-390.png",
-          "docs/screenshots/mvp-design-fidelity/C06-application-768.png",
-          "docs/screenshots/mvp-design-fidelity/C06-application-1440.png"
+          "docs/screenshots/mvp-connected-journeys/C06-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C06-application-390.png"
         ],
-        "comparison_notes": [
-          "See docs/mvp-design-fidelity-verification.md; current differences remain release gates."
-        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -1985,7 +2021,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Real built-app Home→discovery→preview→full profile→service→calendar→disclosure→Back passed on 7917152; no booking submitted.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.C06",
           "source_sha256": "fae59f893aa4b61039324c9ec7091c022756190e316f05cd1ef1069ebcbac1d1",
@@ -2000,13 +2036,15 @@
           }
         ],
         "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
-        "functional_status": "Connected selection journey passed; final booking, reload and broader state acceptance pending",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Historical automated-test content remains; exact visual comparison and full transactional browser booking pending.",
         "implementation_files": [
           "frontend/src/pages/Patient.tsx",
           "frontend/src/pages/OpenRequests.tsx",
           "frontend/src/components/Domain.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -2045,10 +2083,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C07-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C07-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C07-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C07-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -2060,7 +2104,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.C07",
           "source_sha256": "9fe44f0361ac885a86808f465b4dd2e044e29fa4f9f65a5cbef2265110746627",
@@ -2072,13 +2116,17 @@
         },
         "expected_actions": [],
         "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Patient.tsx",
           "frontend/src/pages/OpenRequests.tsx",
-          "frontend/src/components/Domain.tsx"
-        ]
+          "frontend/src/components/Domain.tsx",
+          "frontend/src/components/BookingReview.tsx",
+          "frontend/src/components/BookingReview.css"
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -2117,10 +2165,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C08-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C08-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C08-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/C08-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -2132,7 +2186,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.C08",
           "source_sha256": "f7241a43574c75f6e3015e90e7a59bb476c4c866b0f4d58d589512f4866ac8ab",
@@ -2152,13 +2206,17 @@
           }
         ],
         "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Patient.tsx",
           "frontend/src/pages/OpenRequests.tsx",
-          "frontend/src/components/Domain.tsx"
-        ]
+          "frontend/src/components/Domain.tsx",
+          "frontend/src/components/BookingReview.tsx",
+          "frontend/src/components/BookingReview.css"
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -2649,7 +2707,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.D06",
           "source_sha256": "d69e08c16802ec342cab08710af423ed043173f3ec2409724f35fddd0eb5d77b",
@@ -2673,7 +2731,7 @@
           }
         ],
         "expected_next_states": "Patient can inspect only an offer belonging to their own request. Acceptance uses respond_offer, which revalidates request/offer, availability, price, disclosure and funds and atomically confirms one appointment and reservation.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/OpenRequests.tsx"
@@ -2889,10 +2947,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/D09-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/D09-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/D09-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/D09-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -2904,7 +2968,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.D09",
           "source_sha256": "ea41869adcc59c2541c506320a5c956ce5729e42dba927bfb02fbd062c2d8bba",
@@ -2914,11 +2978,13 @@
         },
         "expected_actions": [],
         "expected_next_states": "Request Open → Matched/Cancelled/Expired; Offer Active → Accepted/Declined/Withdrawn/Expired/Superseded; match acceptance atomically creates one appointment and one reservation.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/OpenRequests.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -2957,10 +3023,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/E01-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/E01-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/E01-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/E01-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -2995,7 +3067,9 @@
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/features/consultations/Consultation.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -4065,10 +4139,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F01-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/F01-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F01-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/F01-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -4114,7 +4194,9 @@
         "implementation_files": [
           "frontend/src/pages/Clinician.tsx",
           "frontend/src/pages/OpenRequests.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -4250,7 +4332,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.F03",
           "source_sha256": "8860ccc447ac4cf14de099d602cd11a4385839d5d05317ebc60011d6a4244ea2",
@@ -4271,7 +4353,7 @@
           }
         ],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Clinician.tsx",
@@ -4787,10 +4869,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F10-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/F10-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F10-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/F10-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -4802,7 +4890,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.F10",
           "source_sha256": "c2076d0f222b612974d46b8a61c6ab03ba12e201d2dffa5aa0ee0e4c9d4d98b2",
@@ -4825,12 +4913,14 @@
           }
         ],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Clinician.tsx",
           "frontend/src/pages/OpenRequests.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -4861,7 +4951,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Encounter timeline and private-note/disclosure expansion connected; source disclosure/practice-relation aside still incomplete. Equal names never link different patients.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -4869,10 +4959,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F11-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/F11-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F11-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/F11-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -4884,7 +4980,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.F11",
           "source_sha256": "e8ee473bc66997321d8432eb562d30b35c746f78e814e597f2075d89079e1b0c",
@@ -4905,12 +5001,14 @@
           }
         ],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Clinician.tsx",
           "frontend/src/pages/OpenRequests.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -5180,7 +5278,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.F15",
           "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -5190,7 +5288,7 @@
         },
         "expected_actions": [],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Clinician.tsx",
@@ -5234,10 +5332,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/G01-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/G01-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/G01-reference-zoom200.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/G01-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/G01-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/G01-application-am-390.png",
+          "docs/screenshots/mvp-connected-journeys/G01-application-om-390.png",
+          "docs/screenshots/mvp-connected-journeys/G01-application-zoom200.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -5249,7 +5357,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.G01",
           "source_sha256": "102ec25bb8c129ad0a4c7242aaf0349c9c556cbfd3fcf54edcaf105a80f26562",
@@ -5276,13 +5384,15 @@
           }
         ],
         "expected_next_states": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Patient.tsx",
           "frontend/src/pages/Clinician.tsx",
           "frontend/src/pages/FinancialActivity.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -5541,7 +5651,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Real pending/reserved/open-request/finalized counts replace unsupported external-paid values. Activity tabs/table/mobile cards connected; current synthetic status coverage and complete comparison pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -5549,10 +5659,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/G05-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/G05-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/G05-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/G05-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -5564,7 +5680,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.G05",
           "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -5574,13 +5690,15 @@
         },
         "expected_actions": [],
         "expected_next_states": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Patient.tsx",
           "frontend/src/pages/Clinician.tsx",
           "frontend/src/pages/FinancialActivity.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -5841,10 +5959,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/H01-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/H01-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/H01-reference-zoom200.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/H01-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/H01-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/H01-application-am-390.png",
+          "docs/screenshots/mvp-connected-journeys/H01-application-om-390.png",
+          "docs/screenshots/mvp-connected-journeys/H01-application-zoom200.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -5856,7 +5984,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.H01",
           "source_sha256": "d7bd7ca29f7a048d15821a5c3bc309eb6e632e3231dfe134bcef8be882278f13",
@@ -5879,12 +6007,14 @@
           }
         ],
         "expected_next_states": "Profile/Preferences saved independently; privacy defaults are not mutated by booking overrides; tour dismissed/completed state is versioned.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Account.tsx",
           "frontend/src/components/WorkspaceTour.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -6360,7 +6490,7 @@
     {
       "id": "I01",
       "title": "Review workspace",
-      "route": "/admin (review workspace); /admin/clinics (clinic and affiliation review)",
+      "route": "/admin",
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implementation in progress",
@@ -6375,80 +6505,6 @@
         "reference_screen": "I01",
         "reference_hash": "#i01",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i01",
-        "product_route": "/admin (review workspace); /admin/clinics (clinic and affiliation review)",
-        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
-        "states": [
-          "populated",
-          "empty",
-          "loading",
-          "validation",
-          "service failure",
-          "permission denied"
-        ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
-        "shared_components": [
-          "Brand",
-          "Button / fields",
-          "navigation / layout",
-          "notices / status",
-          "dialogs"
-        ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
-        "viewports": [
-          390,
-          768,
-          1440
-        ],
-        "zoom_200_percent": "Not verified",
-        "languages": {
-          "en": "Comparison pending",
-          "am": "Layout pending; native review required",
-          "om": "Layout pending; native review required"
-        },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
-        "expected_layout": {
-          "reference_source": "inventory.js#forms.I01",
-          "source_sha256": "05cffb98fdebd015c10470f773dfc0d9d1f5f088102101b8d2dfba36a157d067",
-          "composition_classes": [
-            "x-cols"
-          ],
-          "sections": [
-            "Needs your review",
-            "Operations"
-          ],
-          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
-        },
-        "expected_actions": [],
-        "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
-        "implementation_files": [
-          "frontend/src/pages/Admin.tsx",
-          "frontend/src/pages/Vetting.tsx"
-        ]
-      }
-    },
-    {
-      "id": "I02",
-      "title": "Clinician applications",
-      "route": "/admin",
-      "release_disposition": "MVP",
-      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
-      "inherited_status": "Implemented, verification pending",
-      "release_acceptance": "Pending current release-specific verification",
-      "requirements_source": "docs/operational-screen-map.json#I02",
-      "verification_evidence": {
-        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I02) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Built /teletena/ browser journey on source/build e227fde07dee02e7845c5103c05fb3e2051f8ad2 verified synthetic applicant appeal submission, reviewer reopen, applicant reload/resume, private synthetic PDF evidence upload, and resubmission. Screenshots: docs/screenshots/vetting-appeals/populated-applicant-390.png and populated-resubmitted-390.png. Final ordinary approval after resubmission was backend-tested; browser script stopped at an ambiguous duplicate Decision label locator before that optional action. Empty-site v1.18, native-language review, external credential checks and broader screen acceptance remain pending. The current dependent slice adds a separate renewal application from an approved scope; the applicant UI is implemented, with production-built browser acceptance and Frappe 16/fresh-site migration verification pending."
-      },
-      "visual_acceptance": {
-        "reference_screen": "I02",
-        "reference_hash": "#i02",
-        "reference_url": "http://127.0.0.1:8044/?embed=1#i02",
         "product_route": "/admin",
         "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
@@ -6467,10 +6523,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/I01-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/I01-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/I01-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/I01-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -6482,56 +6544,39 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
-        "expected_layout": {
-          "reference_source": "inventory.js#forms.I02",
-          "source_sha256": "128239a8fb5f2f378ef1076a056f1ca339ad1f8ffd03390bb332515ae4a38ffa",
-          "composition_classes": [],
-          "sections": [],
-          "note": "Exact screen-specific composition from extracted source; flagship render overrides take precedence."
-        },
-        "expected_actions": [
-          {
-            "target_reference_id": "I03",
-            "label": "Review"
-          },
-          {
-            "target_reference_id": "I03",
-            "label": "Review"
-          },
-          {
-            "target_reference_id": "I03",
-            "label": "View"
-          }
-        ],
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
+        "expected_layout": "Distinct review overview: actual metrics, needs-review primary panel and operational links.",
+        "expected_actions": [],
         "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Admin.tsx",
           "frontend/src/pages/Vetting.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
-      "id": "I03",
-      "title": "Application review",
-      "route": "/admin (application review)",
+      "id": "I02",
+      "title": "Clinician applications",
+      "route": "/admin/applications",
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implemented, verification pending",
       "release_acceptance": "Pending current release-specific verification",
-      "requirements_source": "docs/operational-screen-map.json#I03",
+      "requirements_source": "docs/operational-screen-map.json#I02",
       "verification_evidence": {
-        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I03) and design-handoff.md",
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Built /teletena/ browser journey on source/build e227fde07dee02e7845c5103c05fb3e2051f8ad2 verified the synthetic reviewer reopening a scope appeal; screenshot: docs/screenshots/vetting-appeals/populated-reviewer-1440.png. Applicant resubmission with new private evidence then passed after reload. The follow-up ordinary approval UI locator was ambiguous and not counted as a browser pass. Backend transition and permission regressions pass 29/29 on Frappe 15 and 16. Full reviewer workspace, empty-site install, policy approval and credential verification remain pending. Renewal submissions carry a prior-application link and require fresh private license evidence. Reviewer UI identifies renewals; human approval and expired-date rejection are backend-tested, with production-built renewal-browser acceptance and Frappe 16/fresh-site checks pending."
+        "current_local": "Built /teletena/ browser journey on source/build e227fde07dee02e7845c5103c05fb3e2051f8ad2 verified synthetic applicant appeal submission, reviewer reopen, applicant reload/resume, private synthetic PDF evidence upload, and resubmission. Screenshots: docs/screenshots/vetting-appeals/populated-applicant-390.png and populated-resubmitted-390.png. Final ordinary approval after resubmission was backend-tested; browser script stopped at an ambiguous duplicate Decision label locator before that optional action. Empty-site v1.18, native-language review, external credential checks and broader screen acceptance remain pending. The current dependent slice adds a separate renewal application from an approved scope; the applicant UI is implemented, with production-built browser acceptance and Frappe 16/fresh-site migration verification pending."
       },
       "visual_acceptance": {
-        "reference_screen": "I03",
-        "reference_hash": "#i03",
-        "reference_url": "http://127.0.0.1:8044/?embed=1#i03",
-        "product_route": "/admin (application review)",
+        "reference_screen": "I02",
+        "reference_hash": "#i02",
+        "reference_url": "http://127.0.0.1:8044/?embed=1#i02",
+        "product_route": "/admin/applications",
         "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
@@ -6549,10 +6594,16 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/I02-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/I02-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/I02-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/I02-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
           390,
           768,
@@ -6564,7 +6615,91 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
+        "expected_layout": "Named, filtered application queue with desktop table and mobile cards.",
+        "expected_actions": [
+          {
+            "target_reference_id": "I03",
+            "label": "Review"
+          },
+          {
+            "target_reference_id": "I03",
+            "label": "Review"
+          },
+          {
+            "target_reference_id": "I03",
+            "label": "View"
+          }
+        ],
+        "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
+        "functional_status": "Locally verified slice; other release states pending",
+        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "implementation_files": [
+          "frontend/src/pages/Admin.tsx",
+          "frontend/src/pages/Vetting.tsx"
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
+      }
+    },
+    {
+      "id": "I03",
+      "title": "Application review",
+      "route": "/admin/applications (review dialog); /admin/vetting (full scope evidence review)",
+      "release_disposition": "MVP",
+      "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
+      "inherited_status": "Implemented, verification pending",
+      "release_acceptance": "Pending current release-specific verification",
+      "requirements_source": "docs/operational-screen-map.json#I03",
+      "verification_evidence": {
+        "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I03) and design-handoff.md",
+        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
+        "current_local": "Built /teletena/ browser journey on source/build e227fde07dee02e7845c5103c05fb3e2051f8ad2 verified the synthetic reviewer reopening a scope appeal; screenshot: docs/screenshots/vetting-appeals/populated-reviewer-1440.png. Applicant resubmission with new private evidence then passed after reload. The follow-up ordinary approval UI locator was ambiguous and not counted as a browser pass. Backend transition and permission regressions pass 29/29 on Frappe 15 and 16. Full reviewer workspace, empty-site install, policy approval and credential verification remain pending. Renewal submissions carry a prior-application link and require fresh private license evidence. Reviewer UI identifies renewals; human approval and expired-date rejection are backend-tested, with production-built renewal-browser acceptance and Frappe 16/fresh-site checks pending."
+      },
+      "visual_acceptance": {
+        "reference_screen": "I03",
+        "reference_hash": "#i03",
+        "reference_url": "http://127.0.0.1:8044/?embed=1#i03",
+        "product_route": "/admin/applications (review dialog); /admin/vetting (full scope evidence review)",
+        "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
+        "states": [
+          "populated",
+          "empty",
+          "loading",
+          "validation",
+          "service failure",
+          "permission denied"
+        ],
+        "current_differences": "Compact application review dialog is operational adaptation; complete I03 scope/evidence composition remains pending.",
+        "shared_components": [
+          "Brand",
+          "Button / fields",
+          "navigation / layout",
+          "notices / status",
+          "dialogs"
+        ],
+        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/I03-dialog-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/I03-dialog-reference-390.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/I03-dialog-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/I03-dialog-application-390.png"
+        ],
+        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
+        "viewports": [
+          390,
+          768,
+          1440
+        ],
+        "zoom_200_percent": "Not verified",
+        "languages": {
+          "en": "Comparison pending",
+          "am": "Layout pending; native review required",
+          "om": "Layout pending; native review required"
+        },
+        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.I03",
           "source_sha256": "86b6eb311ceb15b057cbab68f5053aad1819bb84fbbce0c43968ec6eb4a04835",
@@ -6589,12 +6724,14 @@
           }
         ],
         "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified slice; other release states pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Admin.tsx",
           "frontend/src/pages/Vetting.tsx"
-        ]
+        ],
+        "visual_status": "Comparison recorded; not accepted",
+        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
       }
     },
     {
@@ -10117,5 +10254,7 @@
       "design-handoff.md": "febbe0f24820d175411a8eeee06a35a807f566c7161b59bca0c979ea3c1d34dc"
     },
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
-  }
+  },
+  "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
+  "current_packaged_source": "263becaa6b608c805539f487632992b58480b033"
 }

@@ -1,5 +1,7 @@
 # MVP release verification — current bounded release
 
+> Historical checkpoint. Current source, checks and open gates: [9 October journey verification](mvp-journey-verification-2026-10-09.md).
+
 Active design correction evidence: [mvp-design-fidelity-verification.md](mvp-design-fidelity-verification.md). The historical care-query batch below is not visual acceptance.
 
 This is the current release acceptance record. Older per-slice reports remain

@@ -1,5 +1,7 @@
 # MVP design fidelity — active correction, not release acceptance
 
+> Historical checkpoint. Current source, checks and open gates: [9 October journey verification](mvp-journey-verification-2026-10-09.md).
+
 The user rejected the current visual implementation. This report records the
 first correction checkpoint, not completion of the landing-to-booking slice or
 MVP. Older reports do not supersede this gate.
