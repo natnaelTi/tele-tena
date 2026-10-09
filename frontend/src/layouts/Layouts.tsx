@@ -206,6 +206,12 @@ const clinicianNav = [
   ["/clinician/earnings", "Earnings", Wallet],
   ["/clinician/account", "Account", Settings2],
 ] as const;
+// Applicants can continue profile/review work, without approved-only workspace links.
+const applicantNav = [
+  ["/clinician", "Your application", Home],
+  ["/clinician/vetting", "Professional review", ClipboardCheck],
+  ["/clinician/account", "Account", Settings2],
+] as const;
 const adminNav = [
   ["/admin", "Overview", Home],
   ["/admin/applications", "Applications", ClipboardCheck],
@@ -238,7 +244,7 @@ export function WorkspaceLayout({
     kind === "patient"
       ? patientNav
       : kind === "clinician"
-        ? clinicianNav
+        ? session?.roles.includes("Tele Tena Clinician") ? clinicianNav : applicantNav
         : kind === "clinic"
           ? session?.clinic_schedule_workspace ? clinicNav : clinicHomeNav
           : adminNav;
@@ -246,7 +252,9 @@ export function WorkspaceLayout({
     ? [...roleItems, ["/clinic", "Clinic workspace", Building2] as const]
     : roleItems;
   const mobilePrimaryRoutes = kind === "clinician"
-    ? ["/clinician", "/clinician/requests", "/clinician/availability"]
+    ? session?.roles.includes("Tele Tena Clinician")
+      ? ["/clinician", "/clinician/requests", "/clinician/availability"]
+      : ["/clinician", "/clinician/vetting", "/clinician/account"]
     : kind === "patient"
       ? ["/patient", "/patient/discovery", "/patient/appointments"]
       : kind === "admin"

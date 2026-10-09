@@ -56,6 +56,8 @@ let stage = "launch";
         .waitFor();
       await page.getByText("Pending", { exact: true }).waitFor();
       assert.equal(await page.locator(".practice-metrics").count(), 0);
+      assert.equal(await page.getByRole("link", { name: "Availability", exact: true }).count(), 0);
+      assert.equal(await page.getByRole("link", { name: "Requests", exact: true }).count(), 0);
       assert.equal(
         await page
           .getByText("Appointments couldn’t be loaded.", { exact: true })
