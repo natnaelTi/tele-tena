@@ -1,5 +1,6 @@
 /** Provisional interface translations; native review is a release activation gate. */
 export const patientJourneyTranslations: Record<string, [string, string]> = {
+  "Your appointments": ["የእርስዎ ቀጠሮዎች", "Beellamoota kee"],
   "Upcoming": ["ቀጣይ", "Kan dhufu"],
   "Completed": ["የተጠናቀቀ", "Xumurame"],
   "Cancelled": ["የተሰረዘ", "Haqame"],

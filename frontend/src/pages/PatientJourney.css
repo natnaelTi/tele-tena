@@ -89,10 +89,11 @@
 .public-profile-booking .button { width:100%; }
 .public-profile-booking .text-link { justify-self:start; }
 /* E01 reference x-tabs/x-item: one readable identity and compact right-hand state. */
-.appointment-view-switch { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; }
-.appointment-view-switch button { min-height: 44px; padding: 10px 16px; border: 1px solid var(--border); border-radius: 22px; background: white; color: var(--ink); }
+.appointment-view-switch { display: flex; gap: 6px; overflow-x: auto; border-bottom: 1px solid var(--border); margin: 0 0 24px; padding-bottom: 8px; }
+.appointment-view-switch button { flex-shrink: 0; min-height: 44px; padding: 12px 18px; border: 0; border-radius: 9px; background: transparent; color: var(--ink); font-size: 14px; white-space: nowrap; }
 .appointment-view-switch button[aria-pressed="true"] { color: white; background: var(--ink); border-color: var(--ink); }
 .appointment-view-switch button span { margin-inline-start: 6px; }
+.appointment-view-switch button:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
 .reference-workspace .appointment-status-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
 .reference-workspace .appointment-status-actions .button { width: auto; }
 .reference-workspace .appointment-status-actions > p { text-align: end; }
