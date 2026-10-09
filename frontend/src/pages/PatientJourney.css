@@ -78,3 +78,13 @@
 .reference-workspace .appointment-card p { font-size:14px; margin:4px 0; }
 .reference-workspace .appointment-card .appointment-icon { width:44px; height:44px; border-radius:12px; }
 @media(max-width:600px) { .reference-workspace .appointment-groups > section { padding:20px; } }
+
+.public-profile-aside { display:grid; gap:24px; }
+.public-profile-booking { padding:26px; background:white; border:1px solid var(--border); border-radius:16px; display:grid; gap:18px; }
+.public-profile-booking h2 { font-size:24px; margin:0; }
+.public-profile-booking p { margin:0; }
+.public-profile-price { font-size:34px; font-weight:700; letter-spacing:-1px; }
+.public-profile-price span { font-size:14px; font-weight:400; color:var(--muted); letter-spacing:0; }
+.public-profile-booking .summary-list { margin:0; }
+.public-profile-booking .button { width:100%; }
+.public-profile-booking .text-link { justify-self:start; }

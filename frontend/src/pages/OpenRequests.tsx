@@ -243,12 +243,15 @@ export function PublicClinicianProfile(){
   const {clinicianId=''}=useParams();
   const load=useCallback(()=>journeyApi.publicClinician(clinicianId),[clinicianId]);
   const resource=useResource(load);
-  if(resource.error)return <InlineNotice tone="danger">This clinician profile is unavailable or no longer approved.</InlineNotice>;
+  const [selectedService,setSelectedService]=useState('');
+  const bookingService=resource.data?.services.find((item:any)=>item.offering===selectedService)||resource.data?.services[0];
+  if(resource.error)return <InlineNotice tone="danger">{w("This clinician profile is unavailable or no longer approved.")} <Button variant="secondary" onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice>;
   if(!resource.data)return <Skeleton/>;
   return <>
     <PageTitle eyebrow="CLINICIAN PROFILE" title={resource.data.display_name} description="Approved services and published appointment options." />
     <div className="public-profile-layout"><section className="public-profile-main"><section className="public-profile-identity"><div className="avatar large" aria-hidden="true">{resource.data.display_name.slice(0,1)}</div><div><h2>{resource.data.display_name}</h2><p>{resource.data.approval_meaning}</p></div></section>
-    <section className="patient-dashboard-panel"><h2>{w("Approved services")}</h2>{resource.data.services.length?resource.data.services.map((service:any)=><article className="public-profile-service" key={service.offering}><div><h3>{service.label}</h3>{service.description&&<p>{service.description}</p>}<p className="supporting">{service.minutes} {w("minutes")} · {w(service.consultation_format==='audio'?'Audio':'Video')} · ETB {money(service.price)}</p></div><Link className="button secondary" to={'/patient/services/'+service.offering}>{w('View service')}</Link></article>):<EmptyState title={w("No published service times are available yet.")} />}</section></section><aside>
+    <section className="patient-dashboard-panel"><h2>{w("Approved services")}</h2>{resource.data.services.length?resource.data.services.map((service:any)=><article className="public-profile-service" key={service.offering}><div><h3>{service.label}</h3>{service.description&&<p>{service.description}</p>}<p className="supporting">{service.minutes} {w("minutes")} · {w(service.consultation_format==='audio'?'Audio':'Video')} · ETB {money(service.price)}</p></div><Link className="button secondary" to={'/patient/services/'+service.offering}>{w('View service')}</Link></article>):<EmptyState title={w("No published service times are available yet.")} />}</section><section className="patient-dashboard-panel"><h2>{t("sessionExperienceMetric")}</h2><p>{resource.data.trust_indicators.session_experience.average===null?t(resource.data.trust_indicators.session_experience.status==="new"?"sessionExperienceNew":"sessionExperienceMore"):resource.data.trust_indicators.session_experience.average+' / 5'} · {resource.data.trust_indicators.session_experience.sample_count} {t("evidenceCount")}</p><p className="supporting">{t("sessionExperienceExplainer")}</p></section></section><aside className="public-profile-aside">
+    {bookingService&&<section className="public-profile-booking"><h2>{w("Book a conversation")}</h2>{resource.data.services.length>1?<Select label={w("Choose a service")} value={bookingService.offering} onChange={event=>setSelectedService(event.target.value)}>{resource.data.services.map((service:any)=><option key={service.offering} value={service.offering}>{service.label}</option>)}</Select>:<p>{bookingService.label}</p>}<p className="public-profile-price">ETB {money(bookingService.price)}<span> / {bookingService.minutes} {w("minutes")}</span></p><dl className="summary-list"><dt>{w("Format")}</dt><dd>{w(bookingService.consultation_format==='audio'?'Audio':'Video')}</dd><dt>{w("Timezone")}</dt><dd>{bookingService.timezone}</dd></dl><Link className="button primary" to={'/patient/book/'+bookingService.offering}>{w("Choose a time")}</Link><Link className="text-link" to={'/patient/services/'+bookingService.offering}>{w("View service")}</Link></section>}
     <section className="trust-indicators" aria-labelledby="trust-indicators-title"><h2 id="trust-indicators-title">{t("trustIndicators")}</h2><dl>
       <div><dt>{t("professionalReview")}</dt><dd>{t("manuallyReviewedScopes")}</dd></div>
       <div><dt>{t("responseBehavior")}</dt><dd>{resource.data.trust_indicators.responsiveness.rate_percent===null
@@ -257,10 +260,7 @@ export function PublicClinicianProfile(){
       <div><dt>{t("reliability")}</dt><dd>{resource.data.trust_indicators.reliability.rate_percent===null
         ? resource.data.trust_indicators.reliability.status==="new"?t("noAppointmentHistory"): <>{t("trustInsufficientData")} · {resource.data.trust_indicators.reliability.sample_count} {t("completedAndCancelledSessions")}</>
         : <>{resource.data.trust_indicators.reliability.rate_percent}% · {resource.data.trust_indicators.reliability.clinician_cancelled_count}/{resource.data.trust_indicators.reliability.sample_count} {t("clinicianCancellations")}</>}</dd></div>
-      <div><dt>{t("sessionExperienceMetric")}</dt><dd>{resource.data.trust_indicators.session_experience.average===null
-        ? <>{t(resource.data.trust_indicators.session_experience.status==="new"?"sessionExperienceNew":"sessionExperienceMore")} · {resource.data.trust_indicators.session_experience.sample_count} {t("evidenceCount")}</>
-        : <>{resource.data.trust_indicators.session_experience.average} / 5 · {resource.data.trust_indicators.session_experience.sample_count} {t("evidenceCount")}</>}</dd></div>
-    </dl><p className="supporting">{t("sessionExperienceExplainer")}</p></section>
+    </dl></section>
     </aside></div>
   </>;
 }

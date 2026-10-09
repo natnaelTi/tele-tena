@@ -134,4 +134,5 @@ export const patientJourneyTranslations: Record<string, [string, string]> = {
   "This appointment could not be loaded. Check your access and try again.": ["ቀጠሮው አልተጫነም። ፈቃድዎን ያረጋግጡና እንደገና ይሞክሩ።", "Beellamni hin feʼamne. Hayyama kee ilaaliitii irra deebiʼi yaali."],
   "Your consultation is in Appointments. Open its details for the join window and device check.": ["ምክክርዎ በቀጠሮዎች ውስጥ ነው። የመግቢያ ጊዜንና የመሣሪያ ሙከራን ለማየት ዝርዝሩን ይክፈቱ።", "Marii kee Beellamoota keessatti argatta. Yeroo itti seentuufi qorannoo meeshaa ilaaluuf balʼina isaa bani."],
   "Your time and funds are reserved while the clinician responds. If the request expires or is declined, the reservation is released.": ["ባለሙያው ምላሽ እስኪሰጥ ጊዜዎና ገንዘብዎ ተይዟል። ጥያቄው ካለፈ ወይም ከተከለከለ ይለቀቃል።", "Ogeessi hanga deebisutti yeroonfi maallaqni kee qabameera. Gaaffiin yoo yeroo darbe ykn didame, qabamni ni gadhiifama."],
+  "Book a conversation": ["ለምክክር ቀጠሮ ይያዙ", "Marii beellami"],
 };
