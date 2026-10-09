@@ -1,6 +1,6 @@
 import "./RequestWorkspace.css";
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { journeyApi } from '../journey-api';
 import type { Disclosure } from '../journey-api';
 import { PageTitle, money } from '../components/Domain';
@@ -32,6 +32,7 @@ function usePolling<T>(loader:()=>Promise<T>, delay=5000) {
 
 export function PatientOpenRequests(){
   const {w}=useLocale();
+  const navigate=useNavigate();
   const location=useLocation();
   const requestDraft=(location.state as {requestDraft?:{request_text?:string;service?:string;service_label?:string;language?:string;format?:'audio'|'video'}}|null)?.requestDraft;
   const {session}=useSession();
@@ -72,7 +73,8 @@ export function PatientOpenRequests(){
       ?`${w('No eligible clinician can start within')} ${publication.start_window_minutes||30} ${w('minutes. You can keep waiting, schedule for later, or browse clinicians. Your requirements will not change automatically.')}`
       :publication?.eligible_supply===0?w('Your request is saved, but no clinicians currently meet every selected requirement. Keep waiting or browse available clinicians.')
       :w('Your request is saved. We’ll show offers here when eligible clinicians respond. An enqueued notice does not confirm that it was seen.'));
-    setNarrative('');setComposerStep(0);setPreview(null);setRequestKey(freshRequestKey());await requestResource.refresh();
+    setNarrative('');setComposerStep(0);setPreview(null);setRequestKey(freshRequestKey());
+    navigate('/patient/requests/'+encodeURIComponent(publication.id));
   });
   const requests=requestResource.data||[];
   const prepareForLater=(req:PatientRequest)=>{
@@ -141,6 +143,7 @@ export function PatientRequestDetail(){
         <RequestProgress state={live?'Open':request.state==='Open'?'Expired':request.state} hasOffer={validOffers.length>0} wave={request.current_wave} immediate={request.urgency==='immediate'} eligibleSupply={request.eligible_supply}/>
         <section className="request-published-summary"><h2>{w('Your request')}</h2><p className="prewrap">{request.request_text}</p><dl className="request-summary-facts"><div><dt>{w('Service')}</dt><dd>{request.category}</dd></div><div><dt>{w('Language')}</dt><dd>{({en:'English',am:'አማርኛ',om:'Afaan Oromo'} as Record<string,string>)[request.language]||w('Unavailable')}</dd></div><div><dt>{w('Session format')}</dt><dd>{w(request.consultation_format==='audio'?'Audio':'Video')}</dd></div>{request.urgency==='scheduled'&&request.earliest_start&&request.latest_start&&<div><dt>{w('Requested time window')}</dt><dd>{new Date(request.earliest_start).toLocaleString(undefined,{timeZone:request.timezone})} – {new Date(request.latest_start).toLocaleString(undefined,{timeZone:request.timezone})}<br/>{request.timezone}</dd></div>}{request.max_price_minor!==null&&<div><dt>{w('Maximum total price')}</dt><dd>ETB {money(request.max_price_minor)}</dd></div>}<div><dt>{w('Published')}</dt><dd>{new Date(request.published_at).toLocaleString(undefined,{timeZone:request.timezone})}<br/>{request.timezone}</dd></div><div><dt>{w('Closes')}</dt><dd>{new Date(request.expires_at).toLocaleString(undefined,{timeZone:request.timezone})}<br/>{request.timezone}</dd></div></dl></section>
         {request.appointment&&<Link className="button primary" to={'/patient/consultations/'+request.appointment}>{w('View appointment')}</Link>}
+        {live&&request.eligible_supply===0&&<InlineNotice>{w('Your request is saved, but no clinicians currently meet every selected requirement. Keep waiting or browse available clinicians.')}</InlineNotice>}
         {live&&<p className="supporting">{w('Waiting for eligible clinicians')} · {w('No request requirements are broadened automatically.')}</p>}{live&&request.urgency==='immediate'&&validOffers.length===0&&Date.now()-new Date(request.published_at).getTime()>180000&&<InlineNotice>{w('No offer has arrived within three minutes. You can continue waiting, schedule for later, or browse clinicians.')}</InlineNotice>}
 
         {live&&<div className="actions">{(request.current_wave||1)<3&&<Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.findMoreOptions(request.id);await detail.refresh();})}>{w('Find more options')}</Button>}<Button variant="quiet" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.cancelRequest(request.id);await detail.refresh();},w('Request cancelled'))}>{w('Cancel request')}</Button></div>}
