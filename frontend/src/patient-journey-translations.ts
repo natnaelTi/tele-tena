@@ -1,5 +1,22 @@
 /** Provisional interface translations; native review is a release activation gate. */
 export const patientJourneyTranslations: Record<string, [string, string]> = {
+  "Appointment details": ["የቀጠሮ ዝርዝሮች", "Balʼina beellamaa"],
+  "Your conversation": ["የእርስዎ ውይይት", "Marii kee"],
+  "Disclosure used at booking": ["ቀጠሮ ሲያዝ የተጋራ መረጃ", "Odeeffannoo yeroo beellamaa qoodame"],
+  "Applies to": ["የሚመለከተው", "Kan ilaallatu"],
+  "This encounter only": ["ይህን ውይይት ብቻ", "Marii kana qofa"],
+  "Before you join": ["ከመቀላቀልዎ በፊት", "Osoo hin seeniin dura"],
+  "Find a private space": ["የግል ቦታ ይፈልጉ", "Bakka dhuunfaa barbaadi"],
+  "Use headphones if possible.": ["ከተቻለ የጆሮ ማዳመጫ ይጠቀሙ።", "Yoo dandaʼame samaa fayyadami."],
+  "Check your connection": ["ግንኙነትዎን ያረጋግጡ", "Walqunnamtii kee ilaali"],
+  "Audio-only is available if video is unstable.": ["ቪዲዮው ካልተረጋጋ በድምፅ ብቻ መቀጠል ይቻላል።", "Viidiyoon yoo hin tasgabboofne sagalee qofaan itti fufi."],
+  "Your notes": ["የእርስዎ ማስታወሻዎች", "Yaadannoo kee"],
+  "Shared summaries appear here after completion.": ["ከውይይቱ መጠናቀቅ በኋላ የተጋሩ ማጠቃለያዎች እዚህ ይታያሉ።", "Marii erga xumuramee booda cuunfaan qoodame asitti mulʼata."],
+  "Call activity": ["የጥሪ እንቅስቃሴ", "Sochii bilbilaa"],
+  "Booked duration is not measured connected time.": ["የተያዘው የቆይታ ጊዜ የተለካ የግንኙነት ጊዜ አይደለም።", "Yeroon beellamaa yeroo walqunnamtii safarame miti."],
+  "Session status": ["የውይይት ሁኔታ", "Haala marii"],
+  "Not shared": ["አልተጋራም", "Hin qoodamne"],
+
   "A little space": ["ትንሽ ቦታ", "Bakka xiqqoo"],
   "for yourself.": ["ለራስዎ።", "ofii keetiif."],
   "Approved services": ["የተፈቀዱ አገልግሎቶች", "Tajaajiloota eeyyamaman"],

@@ -1,0 +1,23 @@
+/* E02 reference: conversation and disclosure in the primary column. */
+.consultation-page .consultation-summary { margin:24px 0 30px; }
+.consultation-page .consultation-detail-grid { grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); }
+.conversation-overview, .encounter-disclosure, .consultation-preparation { padding:26px; border-radius:16px; }
+.conversation-overview > h2, .encounter-disclosure > h2, .consultation-preparation > h2 { margin:0 0 24px; font-size:24px; }
+.conversation-participant { display:flex; align-items:center; gap:24px; margin-bottom:28px; min-width:0; }
+.conversation-avatar { display:grid; place-items:center; flex:none; width:104px; height:112px; border-radius:20px; background:var(--surface-subtle); color:var(--text-primary); font-size:38px; font-weight:600; }
+.conversation-participant h3 { margin:0 0 8px; font-size:22px; }
+.conversation-participant p { margin:6px 0; color:var(--text-secondary); overflow-wrap:anywhere; }
+.encounter-facts { display:grid; grid-template-columns:minmax(100px,.7fr) minmax(0,1.3fr); margin:0 0 18px; }
+.encounter-facts dt, .encounter-facts dd { padding:15px 0; border-bottom:1px solid var(--border-default); margin:0; line-height:1.5; overflow-wrap:anywhere; }
+.encounter-facts dt { padding-right:16px; color:var(--text-secondary); }
+.encounter-facts dd { text-align:right; color:var(--text-primary); font-weight:600; }
+.conversation-overview > .button { width:auto; justify-self:start; }
+.conversation-overview .reschedule-panel { box-shadow:none; padding:16px 0 0; margin-top:16px; border:0; border-top:1px solid var(--border-default); border-radius:0; }
+.preparation-row { display:flex; gap:16px; align-items:flex-start; padding:20px 0; border-bottom:1px solid var(--border-default); }
+.preparation-row:last-child { border-bottom:0; padding-bottom:0; }
+.preparation-row > span { display:grid; place-items:center; flex:none; width:44px; height:44px; border-radius:12px; background:var(--surface-subtle); color:var(--brand-primary); }
+.preparation-row h3 { margin:0 0 6px; font-size:16px; }
+.preparation-row p { margin:0; color:var(--text-secondary); font-size:14px; line-height:1.6; }
+.recorded-call-timing, .consultation-secondary-action { border:1px solid var(--border-default); border-radius:16px; padding:8px 20px; background:var(--surface-card); min-width:0; }
+.recorded-call-timing > summary, .consultation-secondary-action > summary { padding:12px 0; min-height:44px; cursor:pointer; font-weight:600; }
+@media(max-width:800px) { .consultation-page .consultation-detail-grid { grid-template-columns:minmax(0,1fr); } .conversation-overview, .encounter-disclosure, .consultation-preparation { padding:20px; } .conversation-participant { gap:16px; } .conversation-avatar { width:72px; height:80px; font-size:30px; } .conversation-participant h3 { font-size:20px; } .encounter-facts { grid-template-columns:minmax(90px,.7fr) minmax(0,1.3fr); } }
