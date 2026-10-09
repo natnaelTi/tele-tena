@@ -35,5 +35,5 @@
 @media(max-width:800px) { .reference-workspace-main.workspace-wide { padding-inline:20px; } }
 
 .reference-workspace-main > .page-title h1 { font-size:40px; line-height:1.12; letter-spacing:-1.6px; }
-@media(min-width:801px) { .reference-workspace-main { position:relative; } .reference-workspace-main > .tour-replay { position:absolute; top:8px; right:36px; margin:0; } }
+@media(min-width:801px) { .reference-workspace-main { position:relative; } .reference-workspace-main > .tour-replay { position:absolute; top:8px; bottom:auto; right:36px; margin:0; } }
 @media(max-width:800px) { .reference-workspace-main > .page-title h1 { font-size:32px; } }
