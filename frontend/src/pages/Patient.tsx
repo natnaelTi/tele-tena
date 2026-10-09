@@ -356,7 +356,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
     return <EmptyState title="This service is no longer available." />;
   const offer: Offer = data.offer;
   return (
-    <div className={step === 1 ? "booking-sharing-flow" : "reference-booking"}>
+    <div className={step === 1 ? "booking-sharing-flow" : "reference-booking"} data-tour-unsaved={Boolean(start||request)||undefined}>
       <section className="guided-content">
         <Link className="text-link" to="/patient/discovery">
           Back to Find care

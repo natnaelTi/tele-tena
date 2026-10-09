@@ -111,4 +111,13 @@ export const patientJourneyTranslations: Record<string, [string, string]> = {
   "Review required": ["ግምገማ ያስፈልጋል", "Gamaaggama barbaada"],
   "Not applicable": ["አይመለከትም", "Kan hin ilaallanne"],
   "No activity in this view.": ["በዚህ እይታ ላይ እንቅስቃሴ የለም።", "Ilaalcha kana keessatti sochiin hin jiru."],
+  "Keep your professional profile and evidence up to date.": ["ሙያዊ መገለጫዎንና ማስረጃዎን ያዘምኑ።", "Ibsa ogummaa fi ragaa kee yeroo isaa eegsiisi."],
+  "Review status": ["የግምገማ ሁኔታ", "Haala gamaaggamaa"],
+  "See the current decision and any clarification requested by your reviewer.": ["የአሁኑን ውሳኔና ገምጋሚዎ የጠየቁትን ማብራሪያ ይመልከቱ።", "Murtii ammaa fi ibsa gamaaggamaan gaafate ilaali."],
+  "Requested scopes": ["የተጠየቁ የሙያ ወሰኖች", "Daangaa hayyamaa gaafatame"],
+  "Each service needs its own human approval before publication.": ["እያንዳንዱ አገልግሎት ከመታተሙ በፊት በሰው ፈቃድ ይፈልጋል።", "Tajaajilli hundi maxxanfamuu dura hayyama namaa adda isaa barbaada."],
+  "Private evidence": ["የግል ማስረጃ", "Ragaa dhuunfaa"],
+  "Only you and authorized reviewers can access your submitted evidence.": ["እርስዎና የተፈቀደላቸው ገምጋሚዎች ብቻ የቀረበውን ማስረጃ ያያሉ።", "Siifi gamaaggamtoonni hayyamaman qofti ragaa dhiyeessite arguu dandaʼu."],
+  "Approval first": ["መጀመሪያ ፈቃድ", "Hayyama dursee"],
+  "Services and patient requests become available only after the required approvals.": ["አገልግሎቶችና የታካሚ ጥያቄዎች አስፈላጊው ፈቃድ ከተሰጠ በኋላ ብቻ ይገኛሉ።", "Tajaajiloonni fi gaaffiin dhukkubsataa hayyama barbaachisu booda qofa argamu."],
 };

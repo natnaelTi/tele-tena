@@ -258,6 +258,7 @@ export function WorkspaceLayout({
     "/patient/appointments": "patient-appointments", "/patient/account": "patient-account",
     "/clinician": "clinician-today", "/clinician/availability": "clinician-availability",
     "/clinician/appointments": "clinician-appointments", "/clinician/care": "clinician-care",
+    "/clinician/account": "clinician-account", "/clinician/vetting": "clinician-professional-review",
     "/admin": "reviewer-overview", "/admin/applications": "reviewer-applications", "/admin/scopes": "reviewer-scopes",
   };
   const renderNavLink = (item: (typeof items)[number], closeMore = false) => {
