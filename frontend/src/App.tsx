@@ -9,6 +9,7 @@ import {
   WorkspaceLayout,
 } from "./layouts/Layouts";
 import Homepage, { ClinicianInvitation } from "./pages/Homepage";
+import BookingConfirmation from "./pages/BookingConfirmation";
 import SignIn from "./pages/SignIn";
 import Onboarding from "./pages/Onboarding";
 import {
@@ -92,6 +93,7 @@ export default function App() {
                 <Route path="services/:offering" element={<ServiceDetails />} />
                 <Route path="book/:offering" element={<Booking />} />
                 <Route path="book-link/:token" element={<BookingLink />} />
+                <Route path="booked/:id" element={<BookingConfirmation />} />
                 <Route path="appointments" element={<Appointments />} />
                 <Route path="account" element={<Account />} />
                 <Route path="relationships" element={<Relationships />} />

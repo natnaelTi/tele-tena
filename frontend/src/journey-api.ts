@@ -75,7 +75,7 @@ export const journeyApi = {
   simulatedDeposit: (retryKey: string) => api('simulated_deposit', { amount: 10000, retry_key: retryKey }, true),
   preview: (requestText: string, sharing: Sharing) =>
     api<{ disclosure: Disclosure }>('preview', { request_text: requestText, sharing }, true),
-  book: (data: Record<string, unknown>) => api('book', data, true),
+  book: (data: Record<string, unknown>) => api<{id:string}>('book', data, true),
   publishRequest: (data: Record<string, unknown>) => api<any>('tele_tena.api.open_requests.publish_request', data, true),
   myRequests: () => api<any[]>('tele_tena.api.open_requests.my_requests'),
   myRequestDetail: (request_id: string) => api<any>('tele_tena.api.open_requests.my_request_detail', {request_id}),

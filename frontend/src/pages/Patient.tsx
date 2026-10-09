@@ -459,12 +459,12 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
                       ? submission.key
                       : crypto.randomUUID();
                   setSubmission({ key, fingerprint });
-                  await journeyApi.book({
+                  const booked = await journeyApi.book({
                     ...payload,
                     ...(bookingLinkToken ? { booking_link_token: bookingLinkToken } : {}),
                     retry_key: key,
                   });
-                  navigate("/patient/appointments");
+                  navigate("/patient/booked/"+booked.id);
                 }, "")
               }/>
         )}

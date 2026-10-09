@@ -26,3 +26,13 @@ export function RequestProgress({state,hasOffer=false,wave=1,clinician=false,imm
       <strong className="sr-only">{w(words[0])}</strong><p>{w(description)}</p></div>
   </section>;
 }
+
+/** Stages advance only from persisted offer/appointment facts, never a timer. */
+export function RequestStageRail({state,hasOffer=false}:{state:string;hasOffer?:boolean}) {
+  const {w}=useLocale();
+  const step=state==='Matched'?3:state==='Open'?(hasOffer?2:1):0;
+  const closed=!['Open','Matched'].includes(state);
+  return <ol className="request-stage-rail" aria-label={w('Request progress')}>
+    {['Request posted','Clinicians responding','Your choice','Appointment'].map((label,index)=><li key={label} className={!closed?(index<step?'done':index===step?'current':''):undefined} aria-current={!closed&&index===step?'step':undefined}><span aria-hidden="true">{!closed&&index<step?<Check size={16}/>:index+1}</span>{w(label)}</li>)}
+  </ol>;
+}

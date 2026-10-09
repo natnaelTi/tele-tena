@@ -1,0 +1,7 @@
+.booking-confirmation-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(260px,1fr); gap:24px; align-items:start; }
+.booking-confirmation-main,.booking-confirmation-next { padding:28px; border:1px solid var(--border); border-radius:16px; background:white; }
+.booking-confirmation-symbol { display:grid; place-items:center; width:64px; height:64px; border-radius:16px; background:var(--surface-subtle); color:var(--brand); margin-bottom:20px; }
+.booking-confirmation-main h2,.booking-confirmation-next h2 { font-size:24px; }
+.booking-confirmation-main .summary-list { margin:24px 0; }
+.booking-confirmation-next { background:var(--surface-subtle); }
+@media(max-width:800px) { .booking-confirmation-layout { grid-template-columns:1fr; } .booking-confirmation-main,.booking-confirmation-next { padding:22px; } }
