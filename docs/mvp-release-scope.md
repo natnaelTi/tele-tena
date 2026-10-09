@@ -24,7 +24,7 @@ The 142-screen reference remains preserved; it is not the release completion tar
 
 The original source/preservation checkpoint above is historical. Current review URL
 still http://127.0.0.1:8017/teletena/, now on a **separate clean presentation site**
-`teletena-mvp-presentation.localhost`, packaged `c9c25cd87d1e5a6342aedcf0858379e04fbda433`.
+`teletena-mvp-presentation.localhost`, packaged `c3e1ff1263eaec2851a1817a1bf54c90f894a40c`.
 The old fixture site remains retained. Scope does not change. See the current journey
 report and existing screen matrix for per-state evidence and remaining release blockers.
 

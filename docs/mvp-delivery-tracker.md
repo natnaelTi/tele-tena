@@ -2,7 +2,7 @@
 
 ## Active MVP correction — 2026-10-10
 
-Current built source `c9c25cd87d1e5a6342aedcf0858379e04fbda433`, preview
+Current built source `c3e1ff1263eaec2851a1817a1bf54c90f894a40c`, preview
 http://127.0.0.1:8017/teletena/ on the separate
 `teletena-mvp-presentation.localhost`. The old fixture site is retained.
 [One current report](mvp-journey-verification-2026-10-09.md) records actual checks,

@@ -9,7 +9,7 @@ The existing `mvp-screen-acceptance.json` remains the sole screen acceptance mat
 - Branch `feat/mvp-release-handover`; [draft PR #44](https://github.com/natnaelTi/tele-tena/pull/44)
   depends on open PR #43 (`feat/adult-relationship-links`). Ancestor
   `1e8d161468eb8d3563f1b5743982722c749bbcbf` remains included.
-- **Built application source `c9c25cd87d1e5a6342aedcf0858379e04fbda433`**;
+- **Built application source `c3e1ff1263eaec2851a1817a1bf54c90f894a40c`**;
   later evidence/report commits do not change application code. The packaged
   `tele_tena/public/review/release.json` records this source and asset hashes.
 - **http://127.0.0.1:8017/teletena/** now serves **`teletena-mvp-presentation.localhost`**,
@@ -71,6 +71,24 @@ for screenshots. Complete populated consultation summaries/earnings/clinic scena
 | Layout / zoom | At `904c746`, C02 Amharic and Oromo 390px layout captures; actual Chrome tab zoom 200% (outer1440/CSS720/DPR2), paired reference. Not native-language approval or all-route zoom acceptance |
 | Other workspaces | At `ddfe210`, patient/clinician/reviewer real authenticated queries and paired 390/1440 captures; individual actions and visual acceptance are separate |
 | Build/privacy | Locked production packaging, TypeScript and frontend lint pass; existing lint warnings and >500KB chunk warning remain. Generated public assets checked for all four presentation passwords: none found. No unchanged broad financial suite rerun claimed |
+
+## Applicant landing correction — current build
+
+Newly registered/pending clinicians previously reached the approved-clinician
+Today dashboard and triggered a denied appointment query, showing misleading
+“Unavailable” errors. `1d23e4f` now displays actual application review status and
+working professional-review/account links, and skips approved-only queries.
+`c3e1ff1` limits applicant navigation to application, professional review and account.
+No clinician privilege, service authorization or backend permission was changed.
+
+`scripts/browser-presentation-applicant.cjs` **passed on the current packaged build**:
+Pending state, profile navigation/reload, no Requests/Availability links or approved
+metrics at 390/768/1440; direct appointment API remains **403**. No role or funds
+mutation. Paired B11 captures extend the reference's review panels for a pending-only
+application; the reference's illustrative approved/clarification history is not copied
+into actual records. Rejected/resubmitted and all review actions still need full
+current acceptance. Earlier registration screenshot is historical and visibly shows
+this now-corrected landing defect; it is retained as diagnosis, not current acceptance.
 
 ## Paired comparison and remaining differences
 

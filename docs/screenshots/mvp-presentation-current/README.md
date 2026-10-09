@@ -26,3 +26,10 @@ Same viewport and English unless explicitly labeled. Dynamic fictional values,
 truthful empty states, the demonstration ribbon, and unavailable verified facts
 must not be replaced with the reference's illustrative outcomes or credentials.
 See the existing screen matrix and current journey report for comparison notes.
+
+- B11 pending-only pairs: `c3e1ff1`, 390/768/1440. Actual Pending application,
+  permitted profile/review navigation; approved-only metrics/links absent and direct
+  appointment API denied. Reference's sample already-approved scope/history is not
+  equivalent data and is explicitly not fabricated. Full rejected/clarification states
+  remain pending. Historical `journey-registration-clinician-app.png` demonstrates the
+  original post-signup dashboard defect, now corrected; it is not a current pass.
