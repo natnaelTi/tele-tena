@@ -2517,6 +2517,65 @@ class Presentation(unittest.TestCase):
         self.assertEqual(after.start, original.start)
         self.assertEqual(after.timezone, 'Africa/Addis_Ababa')
 
+    def test_explicit_note_sharing_preserves_private_revisions_and_money(self):
+        self.fund_patient('p1', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        booked = self.book_slot(offering, self.slots(offering, day)[0], 'explicit-note-sharing')
+        appointment = booked['id']
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql("""INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended_by,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,%s,1)""",
+            (appointment, secrets.token_hex(16), secrets.token_hex(32), secrets.token_hex(24),
+             secrets.token_hex(24), now, fixtures.USERS['c1'], now))
+        frappe.db.commit()
+        fixtures.login('c1')
+        presentation.save_note_draft(appointment, 'First private fictional note', '')
+        presentation.finalize_consultation(appointment, 0)
+        fixtures.login('p1')
+        first = presentation.appointment_detail(appointment)
+        self.assertEqual(first['shared_consultation_notes'], [])
+        self.assertNotIn('private_note', first)
+        self.assertNotIn('First private fictional note', str(first))
+        wallet_after_completion = journey.wallet()
+        fixtures.login('c1')
+        presentation.save_note_draft(appointment, 'Explicitly shared fictional note', '', 1)
+        own = presentation.appointment_detail(appointment)
+        self.assertTrue(own['private_note']['note_share_selected'])
+        self.assertFalse(own['private_note']['note_published'])
+        fixtures.login('p1')
+        self.assertEqual(presentation.appointment_detail(appointment)['shared_consultation_notes'], [])
+        fixtures.login('c1')
+        with self.assertRaises(frappe.ValidationError):
+            presentation.finalize_consultation(appointment, 0, 'yes')
+        presentation.finalize_consultation(appointment, 0, 1)
+        fixtures.login('p1')
+        published = presentation.appointment_detail(appointment)
+        self.assertEqual([r['text'] for r in published['shared_consultation_notes']],
+                         ['Explicitly shared fictional note'])
+        self.assertNotIn('private_note', published)
+        self.assertNotIn('First private fictional note', str(published))
+        fixtures.login('c1')
+        presentation.save_note_draft(appointment, 'Later private fictional amendment', '', 0)
+        presentation.finalize_consultation(appointment, 0, 0)
+        from tele_tena.patches.v1_31_explicit_note_sharing import execute as note_patch
+        from tele_tena.patches.v1_32_note_sharing_draft_choice import execute as choice_patch
+        note_patch(); choice_patch(); note_patch(); choice_patch()
+        fixtures.login('p1')
+        final = presentation.appointment_detail(appointment)
+        self.assertEqual(final['shared_consultation_notes'], published['shared_consultation_notes'])
+        self.assertNotIn('Later private fictional amendment', str(final))
+        self.assertEqual(journey.wallet(), wallet_after_completion)
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s',
+                                     ('completion:' + appointment,)).n, 1)
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_earning WHERE appointment=%s',
+                                     (appointment,)).n, 1)
+        for other in ('p2', 'c2', 'admin'):
+            fixtures.login(other)
+            with self.assertRaises(frappe.PermissionError):
+                presentation.appointment_detail(appointment)
+
     def test_reservation_display_uses_postings_not_completed_status(self):
         self.fund_patient('p1', 3000)
         day, _, _ = self.make_schedule(mode='automatic')
