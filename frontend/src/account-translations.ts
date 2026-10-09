@@ -1,5 +1,9 @@
 /** Provisional account copy. Native Amharic/Afaan Oromo review remains required. */
 export const accountTranslations: Record<string, [string, string]> = {
+  "Defaults and encounter-level control": ["ነባሪ ምርጫዎችና ለእያንዳንዱ ውይይት ቁጥጥር", "Filannoo duraa fi to'annoo marii"],
+  "Language and appointment timezone": ["ቋንቋና የቀጠሮ ሰዓት ክልል", "Afaanii fi naannoo sa'aatii beellamaa"],
+  "Sign-in methods": ["የመግቢያ ዘዴዎች", "Maloota seensaa"],
+  "Profile, languages and evidence": ["መገለጫ፣ ቋንቋዎችና ማስረጃዎች", "Ibsa, afaanotaa fi ragaa"],
   "Public profile": ["የሕዝብ መገለጫ", "Ibsa uummataa"],
   "Affiliations": ["ግንኙነቶች", "Walitti hidhamiinsa"],
   "Manage clinic affiliations": ["የክሊኒክ ግንኙነቶችን ያስተዳድሩ", "Walitti hidhamiinsa kilinikaa bulchi"],

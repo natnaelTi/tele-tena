@@ -51,3 +51,8 @@
   .settings-defaults-list { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .settings-defaults-list dd { margin-bottom: 12px; }
 }
+.account-sections .settings-section > .button { width: auto; }
+.account-sections .settings-link-row > span strong { display: block; color: var(--brand); text-decoration: underline; }
+.account-sections .settings-link-row > span small { display: block; margin-top: 4px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.account-sections .settings-link-row > svg:first-child { width: 44px; height: 44px; padding: 11px; border-radius: 12px; background: var(--subtle); }
+.account-sections .settings-link-row > svg:last-child { width: 18px; height: 18px; padding: 0; border-radius: 0; background: transparent; }
