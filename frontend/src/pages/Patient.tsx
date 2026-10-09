@@ -13,7 +13,6 @@ import { journeyApi } from "../journey-api";
 import type { Disclosure, Offer } from "../journey-api";
 import {
   AppointmentCard,
-  BookingSummary,
   ClinicianCard,
   DisclosurePreview,
   PageTitle,
@@ -357,7 +356,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
     return <EmptyState title="This service is no longer available." />;
   const offer: Offer = data.offer;
   return (
-    <div className={step === 1 ? "booking-layout" : "reference-booking"}>
+    <div className={step === 1 ? "booking-sharing-flow" : "reference-booking"}>
       <section className="guided-content">
         <Link className="text-link" to="/patient/discovery">
           Back to Find care
@@ -479,7 +478,6 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
           </Button>
         )}
       </section>
-      {step === 1 && <BookingSummary offer={offer} start={start} displayTimezone={displayZone} />}
     </div>
   );
 }
