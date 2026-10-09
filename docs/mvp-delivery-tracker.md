@@ -704,3 +704,15 @@ calendar fields without appointment or grant identifiers. No migration is
 needed.
 
 The focused `Presentation.test_patient_clinic_grant_is_scheduling_only_revocable_and_membership_scoped` regression passed on `tele-tena-pr12-fresh.localhost` after adding week filtering, privacy shape, timezone validation, and role-denial assertions. Current branch `feat/clinic-shared-calendar` builds to source `deac339f353b3c5ca1e9042cebbe609cc789d0a4`; the built `/teletena/` browser journey passed, and full Frappe 15 suites passed (45 presentation, 24 integration). Browser coverage includes owner route/API, empty state, week navigation, timezone validation, 320/390/768/1440 widths and patient API denial. The current browser fixture has no shared appointment in its week; populated response privacy and role matrix are covered by backend tests. Screenshot evidence is in `docs/screenshots/clinic-shared-calendar/`. Frontend build passes with the existing large LiveKit bundle warning. Fresh-site/Frappe 16 checks remain pending. The route covers shared appointment viewing only; it is not clinic resource or booking management.
+
+
+### 9 October — continued connected MVP correction
+
+Current packaged source `0c69dfc2e665deba7208ea39839c766a001a91e6` on PR #44.
+Added persisted confirmed/pending booking handoff, request stages, profile booking
+panel, own approved-scope offering editor, private offer outcome routes and tour
+entries. Actual browser and focused backend results, discrepancies and screenshots
+are in [the current verification report](mvp-journey-verification-2026-10-09.md).
+Visual acceptance, couples, enabled-registration onboarding, presentation dataset,
+scheduler/cutover, fresh/upgrade reconciliation and current hosted-call release
+checks remain open. No handover acceptance, merge or remote deployment.

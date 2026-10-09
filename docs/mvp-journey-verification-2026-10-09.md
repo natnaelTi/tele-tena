@@ -8,7 +8,7 @@ keeps visual fidelity and functional journey acceptance independent.
 
 - Branch `feat/mvp-release-handover`, draft PR #44, dependent on draft PR #43.
   The preserved `1e8d161468eb8d3563f1b5743982722c749bbcbf` ancestor remains included.
-- Packaged application source **`263becaa6b608c805539f487632992b58480b033`**.
+- Packaged application source **`0c69dfc2e665deba7208ea39839c766a001a91e6`**.
   Subsequent evidence/documentation commits do not change its application code.
 - **http://127.0.0.1:8017/teletena/**; site
   `tele-tena-pr12-fresh.localhost`; bench `/home/frappe/frappe/frappe-bench`.
@@ -26,8 +26,8 @@ keeps visual fidelity and functional journey acceptance independent.
 
 | Area | Implemented | Verification | Remaining |
 |---|---|---|---|
-| Home / discovery / preview / profile / service / booking | Search-led dashboard, real wallet, scoped cards and preview, tailored service page, generated monthly calendar | Real password sign-in, popup close/Escape/focus return, profile→service→calendar, selection/Back; actual booking and matching available/reserved delta | Full profile biography/verified expertise presentation, registration-enabled onboarding and coherent presentation dataset |
-| Disclosure / price review | Server-produced preview; separate consultation/payment panels; actual available balance and shortfall; funding in new tab retains form; mobile paired facts | Live API preview, review totals, Back retains narrative/time; no mocked success | Explicit insufficient-funds browser recovery on this new review, manual-confirmation review presentation, C09 dedicated confirmation composition |
+| Home / discovery / preview / profile / service / booking | Search-led dashboard, real wallet, scoped cards and preview, tailored service page, generated monthly calendar | Real password sign-in, popup close/Escape/focus return, profile→service→calendar, selection/Back; actual booking and matching available/reserved delta | Public biography/verified expertise (not private application text), registration-enabled onboarding and coherent presentation dataset |
+| Disclosure / price review | Server-produced preview; separate consultation/payment panels; actual available balance and shortfall; funding in new tab retains form; mobile paired facts | Live API preview, review totals, Back retains narrative/time; no mocked success | Explicit insufficient-funds browser recovery on this new review, automatic-confirmation browser capture and manual-confirmation acceptance/expiry lifecycle |
 | Patient requests / private offers | Three-step composer, focus-managed reviews, persisted progress/offer workspace, state-driven icons; no three-minute no-offer message when a valid offer exists | Real retained scheduled request→tailored offer→accept→one appointment/reservation→detail/history handoff; concurrency/private-offer regressions | Immediate/routing-worker/reconnect/expiry full current browser acceptance and all reference states |
 | Appointments / documentation | One dominant status, role-specific notes/summary explanation, no elapsed-time completion; cancellation and finalization dialogs | Pure grouping/status regressions and private-note/encounter backend regression | Full current call/End/documentation/feedback journey and all detail-screen visual comparisons |
 | Clinician Today / earnings | Actual metrics, upcoming/action priorities, readiness, available/pending/payout composition, real activity filters/table/mobile cards, exact-money payout dialog | Real authenticated responsive pages, activity filters and zero-payout validation; no invented totals | Scheduled-release/cutover/reconciliation release gate and payout browser lifecycle |
@@ -53,6 +53,46 @@ keeps visual fidelity and functional journey acceptance independent.
    the patient key **only on the server**, without returning that key. Undisclosed
    encounters remain separate; elapsed Booked records do not become future care.
 
+## Latest connected correction checkpoint
+
+- C04 now has a selected published-service booking panel (actual fee, duration,
+  format and timezone) and a separate session-experience section. The actual
+  preview→profile→service→calendar→disclosure/Back browser journey passed again
+  at `0178881`. No private application statement was exposed as a public biography.
+- C09 `/patient/booked/:id` loads the authorized persisted appointment after
+  booking and refresh. It distinguishes Confirmed from Pending confirmation;
+  it shows the actual reservation, sharing identity and response deadline.
+  The retained clinician uses manual confirmation. Two initial post-submit
+  browser assertions incorrectly expected automatic confirmation, after successful
+  HTTP 200 submissions. Those appointments remain intact. Corrected state-aware
+  assertions passed pending confirmation, refresh, three-width captures, detail
+  handoff and matching available/reserved deltas at `af1bbd0`. This is not proof
+  that the pending appointment was subsequently confirmed or its job expired.
+- D09 now has the reference's four-stage rail and a separate persisted request
+  narrative/facts panel. Stages derive from request/offer state, not elapsed time.
+  Matched reference state was prepared only in the static reference; application
+  API responses were never mocked.
+- F08 offering table/mobile cards and F09 focused editor use server-projected
+  **own current approved scopes**. General application approval cannot widen
+  authorization. Revoked scopes leave historical offerings visible but unavailable
+  for publication. Fixed saved durations, including 50 minutes, remain editable.
+  Format/confirmation rules come from actual schedules; unsupported reference
+  controls were not presented as functional offering settings.
+- F04/F14 `/clinician/offers` and F13 `/clinician/offers/:offerId` separate private
+  outcomes from the inbox. Server pagination/filtering and guessed-ID ownership
+  enforcement remain authoritative. Accepted details link to the authorized
+  consultation. New patient/clinician tour steps introduce requests and offers.
+- Resume errors now stay inline. Oversized PDF browser validation resets only the
+  file input and made no upload request; backend private-evidence/tour regression
+  passed. The first browser selector was ambiguous between an overview shortcut
+  and account tab; scoping it to Account settings corrected the test.
+- Rendered F09 exposed another shared CSS collision: `.dialog` capped the intended
+  editor at 560px. Reusable `size="wide"` with a custom-property base width fixes
+  that cause. At `0c69dfc`, the browser asserts desktop width >=900px, saved
+  duration, scope immutability, preview, focus return and invalid price preserving
+  input with **no publication mutation**. Genuine 200% zoom (720 CSS px/DPR2) and
+  320px editor checks passed; save/cancel remained reachable.
+
 ## Checks actually run
 
 - Actual MariaDB/Frappe `tests/presentation.py` methods (all passed):
@@ -63,7 +103,12 @@ keeps visual fidelity and functional journey acceptance independent.
   `test_private_request_competing_offers_insufficient_funds_and_atomic_match`,
   `test_two_patients_cannot_claim_one_offer_slot_concurrently`,
   `test_care_records_do_not_link_different_patients_with_equal_names`,
-  `test_04_notes_privacy_revision_completion_and_encounter_scope`.
+  `test_04_notes_privacy_revision_completion_and_encounter_scope`,
+  `test_05_private_resume_scope_application_evidence_and_tour_preferences`,
+  `test_practice_only_lists_own_current_approved_scopes`.
+  The tailored-scope/inbox method was rerun with own-offer detail, another-clinician
+  and patient denial assertions. Initial new test failures (wrong publish keyword
+  and missing `re` import) were corrected before these passes.
   Tests use owned synthetic fixtures; suppressed fixture enqueue is not job proof.
 - `tests/appointment-groups.mjs`, `appointment-status.mjs`, `care-search.mjs`: pass.
 - Source `263beca`: actual earnings All/Pending/Payout filters, zero-payout field validation without reservation, tour replay retaining selected booking time/route, and no tour controls on consultation pages passed in a focused browser check. Dismissal preference was persisted; no financial mutation.
@@ -83,6 +128,11 @@ keeps visual fidelity and functional journey acceptance independent.
   loaded Noto Sans Ethiopic. This is not native-language approval.
 - PWA: controlled existing browser stayed on `73f7a08` until explicit Refresh,
   then loaded `1442da8`. No automatic reload or sensitive-path cache observed.
+
+Read-only regression helpers now in the repository:
+`browser-mvp-offerings.cjs` and `browser-mvp-offer-history.cjs`, guarded to the
+isolated review site and private credential files. Both passed actual backend
+journeys; neither prints credential material or publishes an offering.
 
 ## Paired comparison evidence
 
@@ -122,8 +172,18 @@ detail are distinct mappings.
 D09 reference was recaptured in its own in-memory **Matched** state to compare with
 the retained matched application request. Only the reference state was prepared;
 application responses were not intercepted. The comparison exposes a missing
-four-stage rail and separate request narrative/facts panel, now recorded for correction.
+four-stage rail and separate request narrative/facts panel, corrected at `af1bbd0`.
 The reference role-switching demonstration panel is deliberately not a patient control.
+
+Additional comparisons: F08 follows the reference table/primary create action;
+F09 is a two-column editor/preview in a focus-managed dialog rather than a separate
+prototype page. The screenshot caught and corrected its width collision. Unsupported
+format/extension-policy inputs remain absent, not decorative. F13/F14 show only actual
+own accepted/closed outcomes, not the reference's invented sample rows. C09 renders
+one true appointment state rather than simultaneously showing illustrative confirmed
+and manual-confirmation examples. These specific operational exceptions require
+review; **none is marked visually accepted**. 200% F09 and H02 resume-error captures
+are additional state evidence, not paired reference acceptance.
 
 ## Release gates still open
 
@@ -152,7 +212,7 @@ The reference role-switching demonstration panel is deliberately not a patient c
    Select a real calendar slot, type fictional support text, preview disclosure,
    review actual funds. Back preserves input; confirming creates a real reservation.
 3. My requests→guided private request; clinician Requests→eligible inbox→Make an
-   offer. Patient review/accept creates one appointment; clinician History links it.
+   offer. Patient review/accept creates one appointment; clinician More→Your offers→History→View offer→Open consultation details links it.
 4. Clinician Today→Care records→Table/Cards→record, then Earnings. Current provider
    transfers are disabled; payout requests are demonstration reservations.
 5. Reviewer Overview→Applications→Review; scope decisions remain separate. Tour

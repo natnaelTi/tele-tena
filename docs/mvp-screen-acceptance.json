@@ -1810,7 +1810,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Actual published-service selection, booking sidebar, separate session-experience facts. Public biography/verified expertise and coherent presentation content remain incomplete.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -1818,14 +1818,14 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "correction_status": "Comparison recorded; visual acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/C04-reference-1440.png",
-          "docs/screenshots/mvp-connected-journeys/C04-reference-390.png"
+          "docs/screenshots/mvp-connected-journeys/C04-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/C04-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/C04-application-1440.png",
-          "docs/screenshots/mvp-connected-journeys/C04-application-390.png"
+          "docs/screenshots/mvp-connected-journeys/C04-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/C04-application-1440.png"
         ],
         "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
@@ -1839,7 +1839,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
+        "functional_verification": "docs/mvp-journey-verification-2026-10-09.md; exact source annotations per check",
         "expected_layout": {
           "reference_source": "inventory.js#forms.C04",
           "source_sha256": "980418e0108a65d186a26b75e9f3c008cb7b2b26faafcbb2b33ee18edc85a692",
@@ -1866,12 +1866,11 @@
           }
         ],
         "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
-        "functional_status": "Locally verified slice; other release states pending",
-        "functional_failures": "Historical automated-test content remains; exact visual comparison and full transactional browser booking pending.",
+        "functional_status": "Verified specified persisted slice; full journey/state acceptance pending",
+        "functional_failures": "Actual published-service selection, booking sidebar, separate session-experience facts. Public biography/verified expertise and coherent presentation content remain incomplete.",
         "implementation_files": [
-          "frontend/src/pages/Patient.tsx",
           "frontend/src/pages/OpenRequests.tsx",
-          "frontend/src/components/Domain.tsx"
+          "frontend/src/pages/PatientJourney.css"
         ],
         "visual_status": "Comparison recorded; not accepted",
         "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
@@ -2237,7 +2236,7 @@
         "reference_screen": "C09",
         "reference_hash": "#c09",
         "reference_url": "http://127.0.0.1:8044/?embed=1#c09",
-        "product_route": "/patient/appointments",
+        "product_route": "/patient/booked/:id",
         "actor": "Patient; approved clinician data is public only within approved profile fields",
         "states": [
           "populated",
@@ -2247,7 +2246,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "One actual confirmed/pending state rather than simultaneous prototype examples. Manual response deadline and reservation are persisted. Automatic-confirmation capture/acceptance lifecycle still pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -2255,9 +2254,15 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
+        "correction_status": "Comparison recorded; visual acceptance pending",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C09-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/C09-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/C09-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/C09-application-1440.png"
+        ],
         "comparison_notes": [],
         "viewports": [
           390,
@@ -2270,7 +2275,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "docs/mvp-journey-verification-2026-10-09.md; exact source annotations per check",
         "expected_layout": {
           "reference_source": "inventory.js#forms.C09",
           "source_sha256": "0ef120b5d361db3f3dcedd3c561a8f79990fdbb113e682094039c54d3c425d66",
@@ -2289,12 +2294,11 @@
           }
         ],
         "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Verified specified persisted slice; full journey/state acceptance pending",
+        "functional_failures": "One actual confirmed/pending state rather than simultaneous prototype examples. Manual response deadline and reservation are persisted. Automatic-confirmation capture/acceptance lifecycle still pending.",
         "implementation_files": [
-          "frontend/src/pages/Patient.tsx",
-          "frontend/src/pages/OpenRequests.tsx",
-          "frontend/src/components/Domain.tsx"
+          "frontend/src/pages/BookingConfirmation.tsx",
+          "frontend/src/pages/BookingConfirmation.css"
         ]
       }
     },
@@ -2929,7 +2933,7 @@
         "reference_screen": "D09",
         "reference_hash": "#d09",
         "reference_url": "http://127.0.0.1:8044/?embed=1#d09",
-        "product_route": "/patient/requests/:id",
+        "product_route": "/patient/requests/:requestId",
         "actor": "Requesting patient, eligible clinician, scoped operations reviewer",
         "states": [
           "populated",
@@ -2939,7 +2943,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Four persisted progress stages and request narrative/facts panel; operational disclosures and no prototype role-switch controls. Remaining immediate/no-response/mobile/reconnect states pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -2947,14 +2951,14 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "correction_status": "Comparison recorded; visual acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/D09-reference-1440.png",
-          "docs/screenshots/mvp-connected-journeys/D09-reference-390.png"
+          "docs/screenshots/mvp-connected-journeys/D09-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/D09-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/D09-application-1440.png",
-          "docs/screenshots/mvp-connected-journeys/D09-application-390.png"
+          "docs/screenshots/mvp-connected-journeys/D09-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/D09-application-1440.png"
         ],
         "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
@@ -2968,7 +2972,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
+        "functional_verification": "docs/mvp-journey-verification-2026-10-09.md; exact source annotations per check",
         "expected_layout": {
           "reference_source": "inventory.js#forms.D09",
           "source_sha256": "ea41869adcc59c2541c506320a5c956ce5729e42dba927bfb02fbd062c2d8bba",
@@ -2978,10 +2982,11 @@
         },
         "expected_actions": [],
         "expected_next_states": "Request Open → Matched/Cancelled/Expired; Offer Active → Accepted/Declined/Withdrawn/Expired/Superseded; match acceptance atomically creates one appointment and one reservation.",
-        "functional_status": "Locally verified slice; other release states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Verified specified persisted slice; full journey/state acceptance pending",
+        "functional_failures": "Four persisted progress stages and request narrative/facts panel; operational disclosures and no prototype role-switch controls. Remaining immediate/no-response/mobile/reconnect states pending.",
         "implementation_files": [
-          "frontend/src/pages/OpenRequests.tsx"
+          "frontend/src/pages/OpenRequests.tsx",
+          "frontend/src/components/RequestProgress.tsx"
         ],
         "visual_status": "Comparison recorded; not accepted",
         "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings)."
@@ -4379,7 +4384,7 @@
         "reference_screen": "F04",
         "reference_hash": "#f04",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f04",
-        "product_route": "/clinician/requests (offers/history)",
+        "product_route": "/clinician/offers",
         "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
@@ -4389,7 +4394,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Dedicated server-paginated own Active/History views; no invented response rows. Active populated/withdrawal visuals still pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -4397,7 +4402,7 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
+        "correction_status": "Implemented correction; comparison pending",
         "reference_screenshots": [],
         "implementation_screenshots": [],
         "comparison_notes": [],
@@ -4412,7 +4417,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "docs/mvp-journey-verification-2026-10-09.md; exact source annotations per check",
         "expected_layout": {
           "reference_source": "inventory.js#forms.F04",
           "source_sha256": "5a6d58d15a1f2f18fb20eca3f59246a9344432bc77749745a863b1e0204a9c69",
@@ -4435,11 +4440,10 @@
           }
         ],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "History/detail handoff verified; Active populated/empty state browser coverage pending",
+        "functional_failures": "Dedicated server-paginated own Active/History views; no invented response rows. Active populated/withdrawal visuals still pending.",
         "implementation_files": [
-          "frontend/src/pages/Clinician.tsx",
-          "frontend/src/pages/OpenRequests.tsx"
+          "frontend/src/pages/ClinicianOffers.tsx"
         ]
       }
     },
@@ -4698,7 +4702,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Reference table and mobile cards with actual approved scopes/publication status; retained fixture names not presentation acceptance.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -4706,9 +4710,15 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
+        "correction_status": "Comparison recorded; visual acceptance pending",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F08-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/F08-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F08-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/F08-application-1440.png"
+        ],
         "comparison_notes": [],
         "viewports": [
           390,
@@ -4721,7 +4731,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "docs/mvp-journey-verification-2026-10-09.md; exact source annotations per check",
         "expected_layout": {
           "reference_source": "inventory.js#forms.F08",
           "source_sha256": "645f1cc38f2021a8bf7d0ba303cfdd8ede555092e03d90ec5ccf32da65d72568",
@@ -4746,11 +4756,11 @@
           }
         ],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Verified specified persisted slice; full journey/state acceptance pending",
+        "functional_failures": "Reference table and mobile cards with actual approved scopes/publication status; retained fixture names not presentation acceptance.",
         "implementation_files": [
-          "frontend/src/pages/Clinician.tsx",
-          "frontend/src/pages/OpenRequests.tsx"
+          "frontend/src/pages/ServiceOfferings.tsx",
+          "tele_tena/api/journey.py"
         ]
       }
     },
@@ -4772,7 +4782,7 @@
         "reference_screen": "F09",
         "reference_hash": "#f09",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f09",
-        "product_route": "/clinician/services",
+        "product_route": "/clinician/services (offering editor dialog)",
         "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
@@ -4782,7 +4792,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Reference two-column editor/preview in wide focus-managed dialog. Format/policy comes from real scheduling, no decorative unsupported inputs.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -4790,22 +4800,28 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
+        "correction_status": "Comparison recorded; visual acceptance pending",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F09-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/F09-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F09-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/F09-application-1440.png"
+        ],
         "comparison_notes": [],
         "viewports": [
           390,
           768,
           1440
         ],
-        "zoom_200_percent": "Not verified",
+        "zoom_200_percent": "Real browser 200% and 320px dialog controls verified at 0c69dfc; paired visual acceptance pending",
         "languages": {
           "en": "Comparison pending",
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "docs/mvp-journey-verification-2026-10-09.md; exact source annotations per check",
         "expected_layout": {
           "reference_source": "inventory.js#forms.F09",
           "source_sha256": "9250fd7b5c2785dfcd7e767b592da65e708f75d69071b2f700a7dd01cbb82f51",
@@ -4825,11 +4841,11 @@
           }
         ],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Verified specified persisted slice; full journey/state acceptance pending",
+        "functional_failures": "Reference two-column editor/preview in wide focus-managed dialog. Format/policy comes from real scheduling, no decorative unsupported inputs.",
         "implementation_files": [
-          "frontend/src/pages/Clinician.tsx",
-          "frontend/src/pages/OpenRequests.tsx"
+          "frontend/src/pages/ServiceOfferings.tsx",
+          "frontend/src/components/ui.tsx"
         ]
       }
     },
@@ -5107,7 +5123,7 @@
         "reference_screen": "F13",
         "reference_hash": "#f13",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f13",
-        "product_route": "/clinician/requests (own offer card; standalone detail route absent)",
+        "product_route": "/clinician/offers/:offerId",
         "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
@@ -5117,7 +5133,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Private persisted own quote facts, terminal state and accepted consultation handoff. Other clinician guessed ID and patient direct query denied. Active withdrawal lifecycle pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -5125,9 +5141,15 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
+        "correction_status": "Comparison recorded; visual acceptance pending",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F13-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/F13-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F13-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/F13-application-1440.png"
+        ],
         "comparison_notes": [],
         "viewports": [
           390,
@@ -5140,7 +5162,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "docs/mvp-journey-verification-2026-10-09.md; exact source annotations per check",
         "expected_layout": {
           "reference_source": "inventory.js#forms.F13",
           "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -5150,11 +5172,11 @@
         },
         "expected_actions": [],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Verified specified persisted slice; full journey/state acceptance pending",
+        "functional_failures": "Private persisted own quote facts, terminal state and accepted consultation handoff. Other clinician guessed ID and patient direct query denied. Active withdrawal lifecycle pending.",
         "implementation_files": [
-          "frontend/src/pages/Clinician.tsx",
-          "frontend/src/pages/OpenRequests.tsx"
+          "frontend/src/pages/ClinicianOffers.tsx",
+          "tele_tena/api/open_requests.py"
         ]
       }
     },
@@ -5176,7 +5198,7 @@
         "reference_screen": "F14",
         "reference_hash": "#f14",
         "reference_url": "http://127.0.0.1:8044/?embed=1#f14",
-        "product_route": "/clinician/requests (paginated own history)",
+        "product_route": "/clinician/offers?view=history",
         "actor": "Clinician; patients see approved public profile and offering data",
         "states": [
           "populated",
@@ -5186,7 +5208,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Own closed/accepted history table/mobile cards; illustrative prototype rows not copied. Large-page navigation and remaining outcomes pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -5194,9 +5216,15 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
+        "correction_status": "Comparison recorded; visual acceptance pending",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F14-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/F14-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/F14-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/F14-application-1440.png"
+        ],
         "comparison_notes": [],
         "viewports": [
           390,
@@ -5209,7 +5237,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "docs/mvp-journey-verification-2026-10-09.md; exact source annotations per check",
         "expected_layout": {
           "reference_source": "inventory.js#forms.F14",
           "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -5219,11 +5247,11 @@
         },
         "expected_actions": [],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Verified specified persisted slice; full journey/state acceptance pending",
+        "functional_failures": "Own closed/accepted history table/mobile cards; illustrative prototype rows not copied. Large-page navigation and remaining outcomes pending.",
         "implementation_files": [
-          "frontend/src/pages/Clinician.tsx",
-          "frontend/src/pages/OpenRequests.tsx"
+          "frontend/src/pages/ClinicianOffers.tsx",
+          "tele_tena/api/open_requests.py"
         ]
       }
     },
@@ -10256,5 +10284,5 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
-  "current_packaged_source": "263becaa6b608c805539f487632992b58480b033"
+  "current_packaged_source": "0c69dfc2e665deba7208ea39839c766a001a91e6"
 }
