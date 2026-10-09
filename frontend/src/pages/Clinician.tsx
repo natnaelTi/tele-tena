@@ -1,3 +1,4 @@
+import { appointmentStatus } from "../appointment-status";
 import { appointmentGroups } from "../appointment-groups";
 import { useSession } from "../hooks/useSession";
 import "./ClinicianWorkspace.css";
@@ -419,6 +420,7 @@ export function ClinicianEarnings() {
 }
 
 export function CareRecords() {
+  const {w}=useLocale();
   const [search,setSearch]=useState(""); const [service,setService]=useState(""); const [status,setStatus]=useState(""); const [page,setPage]=useState(1); const [view,setView]=useState<"table"|"cards">("table");
   const services=useResource(journeyApi.services);
   const load=useCallback(()=>journeyApi.careDirectory({search,service,status,page,page_size:20}),[search,service,status,page]);
@@ -429,7 +431,7 @@ export function CareRecords() {
         title="Care records"
         description="Encounter-based records show only information shared for each appointment."
       />
-      <div className="care-filters"><TextField label="Search visible patient name or alias" value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} /><Select label="Service" value={service} onChange={e=>setService(e.target.value)}><option value="">All services</option>{services.data?.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}</Select><Select label="Status" value={status} onChange={e=>setStatus(e.target.value)}><option value="">All statuses</option>{["Booked","PendingConfirmation","Completed","Cancelled","Expired","NoShow"].map(s=><option key={s} value={s}>{s}</option>)}</Select><div className="view-toggle"><Button variant={view==="table"?"primary":"secondary"} onClick={()=>setView("table")}>Table</Button><Button variant={view==="cards"?"primary":"secondary"} onClick={()=>setView("cards")}>Cards</Button></div></div>
+      <div className="care-filters"><TextField label="Search visible patient name or alias" value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} /><Select label="Service" value={service} onChange={e=>setService(e.target.value)}><option value="">All services</option>{services.data?.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}</Select><Select label="Status" value={status} onChange={e=>setStatus(e.target.value)}><option value="">All statuses</option>{["Booked","PendingConfirmation","Completed","Cancelled","Expired","NoShow"].map(s=><option key={s} value={s}>{w(({Booked:"Confirmed",PendingConfirmation:"Needs confirmation",NoShow:"No-show recorded"} as Record<string,string>)[s]||s)}</option>)}</Select><div className="view-toggle"><Button variant={view==="table"?"primary":"secondary"} onClick={()=>setView("table")}>Table</Button><Button variant={view==="cards"?"primary":"secondary"} onClick={()=>setView("cards")}>Cards</Button></div></div>
       {appointments.error ? (
         <InlineNotice tone="danger">
           Records could not be loaded.{" "}
@@ -438,7 +440,7 @@ export function CareRecords() {
       ) : !appointments.data ? (
         <Skeleton />
       ) : appointments.data?.rows.length ? (
-        <>{view==="table"?<div className="table-scroll"><table><thead><tr><th>Patient</th><th>Last consultation</th><th>Next appointment</th><th>Care status</th><th>Action</th></tr></thead><tbody>{appointments.data.rows.map((item:any)=><tr key={item.id}><td>{item.patient_label}</td><td>{item.last_consultation?date(item.last_consultation):"No completed consultation"}</td><td>{item.next_appointment?date(item.next_appointment):"None scheduled"}</td><td>{item.state}</td><td><Link className="text-link" to={`/clinician/care/${item.id}`}>View record</Link></td></tr>)}</tbody></table></div>:<div className="offering-grid">{appointments.data.rows.map((item:any)=><Card key={item.id}><h2>{item.patient_label}</h2><p>Last consultation: {item.last_consultation?date(item.last_consultation):"None yet"}</p><p>Next appointment: {item.next_appointment?date(item.next_appointment):"None scheduled"}</p><p>{item.state}</p><Link className="button secondary" to={`/clinician/care/${item.id}`}>View record</Link></Card>)}</div>}<div className="actions"><Button variant="secondary" disabled={page<=1} onClick={()=>setPage(page-1)}>Previous</Button><span>Page {page} of {appointments.data.pages||1} · {appointments.data.total} patients/encounters</span><Button variant="secondary" disabled={page>=(appointments.data.pages||1)} onClick={()=>setPage(page+1)}>Next</Button></div></>
+        <>{view==="table"?<div className="table-scroll care-directory-table"><table><thead><tr><th>Patient</th><th>Last consultation</th><th>Next appointment</th><th>Care status</th><th>Action</th></tr></thead><tbody>{appointments.data.rows.map((item:any)=><tr key={item.id}><td>{item.patient_label}</td><td>{item.last_consultation?date(item.last_consultation):"No completed consultation"}</td><td>{item.next_appointment?date(item.next_appointment):"None scheduled"}</td><td><StatusBadge>{w(appointmentStatus(item,true).label)}</StatusBadge></td><td><Link className="text-link" to={`/clinician/care/${item.id}`}>View record</Link></td></tr>)}</tbody></table></div>:<div className="offering-grid">{appointments.data.rows.map((item:any)=><Card key={item.id}><h2>{item.patient_label}</h2><p>Last consultation: {item.last_consultation?date(item.last_consultation):"None yet"}</p><p>Next appointment: {item.next_appointment?date(item.next_appointment):"None scheduled"}</p><StatusBadge>{w(appointmentStatus(item,true).label)}</StatusBadge><Link className="button secondary" to={`/clinician/care/${item.id}`}>View record</Link></Card>)}</div>}<div className="actions"><Button variant="secondary" disabled={page<=1} onClick={()=>setPage(page-1)}>Previous</Button><span>Page {page} of {appointments.data.pages||1} · {appointments.data.total} patients/encounters</span><Button variant="secondary" disabled={page>=(appointments.data.pages||1)} onClick={()=>setPage(page+1)}>Next</Button></div></>
       ) : (
         <EmptyState title="No matching care records." />
       )}
@@ -446,4 +448,23 @@ export function CareRecords() {
   );
 }
 
-export function CareRecordDetail(){const {id=""}=useParams();const load=useCallback(()=>journeyApi.carePatientRecord(id),[id]);const record=useResource(load);if(record.error)return <InlineNotice tone="danger">This care record is unavailable to your account.</InlineNotice>;if(!record.data)return <Skeleton/>;return <><PageTitle title={record.data.patient_label} description="Only appointments where this clinician participated and the patient chose to share this name are grouped. Private encounters remain separate." action={<Link className="button secondary" to="/clinician/care">Back to care records</Link>}/>{record.data.encounters.map((item:any)=><Card key={item.id}><h2>{item.service}</h2><p>{date(item.start)} · {item.timezone||"Timezone unavailable"} · {item.booked_minutes} booked minutes</p><p>Status: {item.status} · Documentation: {item.documentation_state}</p><DisclosurePreview disclosure={item.disclosure}/>{item.private_note&&<section><h3>Private clinician note · only you</h3><p className="prewrap">{item.private_note.text}</p>{item.private_note.patient_summary&&<><h3>Patient summary draft</h3><p className="prewrap">{item.private_note.patient_summary}</p></>}</section>}<Link className="button secondary" to={`/clinician/consultations/${item.id}`}>Open consultation</Link></Card>)}</>}
+export function CareRecordDetail() {
+  const {w}=useLocale();
+  const {id=""}=useParams();
+  const load=useCallback(()=>journeyApi.carePatientRecord(id),[id]);
+  const record=useResource(load);
+  if(record.error)return <InlineNotice tone="danger">{w("This care record is unavailable to your account.")}</InlineNotice>;
+  if(!record.data)return <Skeleton/>;
+  return <><PageTitle title={record.data.patient_label} description={w("Authorized encounters only")} action={<Link className="button secondary" to="/clinician/care">{w("Back to care records")}</Link>}/>
+    <div className="care-record-layout"><section className="practice-panel"><h2>{w("Care timeline")}</h2>
+      {record.data.encounters.map((item:any)=>{const status=appointmentStatus(item,true);return <article className="care-encounter" key={item.id}>
+        <header><div><time>{date(item.start,item.timezone)}</time><h3>{item.service}</h3></div><StatusBadge tone={status.tone}>{w(status.label)}</StatusBadge></header>
+        {status.detail&&<p className="supporting">{w(status.detail)}</p>}
+        <p className="supporting">{item.booked_minutes} {w("booked minutes")} · {item.timezone||w("Timezone unavailable")}</p>
+        <details><summary>{w("Disclosure at this encounter")}</summary><DisclosurePreview disclosure={item.disclosure}/></details>
+        {item.private_note&&<details className="care-private-note"><summary>{w("Private clinician note · only you")}</summary><p className="prewrap">{item.private_note.text}</p>{item.private_note.patient_summary&&<><h4>{w("Patient summary draft")}</h4><p className="prewrap">{item.private_note.patient_summary}</p></>}</details>}
+        <Link className="button secondary" to={`/clinician/consultations/${item.id}`}>{w("Open consultation")}</Link>
+      </article>;})}
+    </section><aside className="practice-panel"><h2>{w("Sharing boundaries")}</h2><p>{w("Each consultation keeps its original disclosure. Private encounters stay separate; later profile changes do not reveal earlier information.")}</p><p>{w("Clinic affiliation does not grant access to this record.")}</p></aside></div>
+  </>;
+}
