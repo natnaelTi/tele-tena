@@ -45,7 +45,7 @@ export function ClinicianToday() {
   const current=useResource(practice);
   const earnings=useResource(useCallback(()=>approved?api<EarningsView>("tele_tena.accounting.clinician_earnings"):Promise.resolve(null),[approved]));
   const inbox=useResource(useCallback(()=>approved?journeyApi.clinicianRequests():Promise.resolve(null),[approved]));
-  const groups=appointmentGroups(appointments.data||[],true,now);
+  const groups=appointmentGroups(appointments.data||[],true,now).filter(([label])=>label!=="Past");
   const day=new Date(now).toLocaleDateString(undefined,{timeZone:timezone});
   const today=appointments.data?.filter(item=>new Date(item.start).toLocaleDateString(undefined,{timeZone:timezone})===day);
   return <>

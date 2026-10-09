@@ -18,6 +18,31 @@ import {
 import { useAction } from "../hooks/useAction";
 import { useResource } from "../hooks/useResource";
 import { useLocale } from "../hooks/useLocale";
+import { Link } from "react-router-dom";
+import { ClipboardCheck, Layers, ShieldCheck, Building2, ArrowRight } from "lucide-react";
+export function AdminOverview() {
+  const {w}=useLocale();
+  const applications=useResource(journeyApi.applications);
+  const pending=applications.data?.filter(item=>item.status==='Pending');
+  return <>
+    <PageTitle title={w("Review workspace")} description={w("Focus on the decisions that need a person.")}/>
+    {applications.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void applications.refresh()}>{w("Retry")}</Button></InlineNotice>:!applications.data?<Skeleton/>:<>
+      <div className="review-overview-metrics">{[
+        [w("Applications"),applications.data.length,w("Submitted professional applications")],
+        [w("Awaiting decision"),pending?.length??0,w("Manual application review")],
+        [w("Evidence ready"),pending?.filter(item=>item.evidence_complete).length??0,w("Received evidence still requires verification")],
+      ].map(([label,count,detail])=><section key={label}><span>{label}</span><strong>{count}</strong><p>{detail}</p></section>)}</div>
+      <div className="review-overview-layout"><section className="review-overview-panel"><h2>{w("Needs your review")}</h2>
+        {pending?.length?pending.slice(0,5).map(item=><Link className="review-overview-row" key={item.user} to="/admin/applications"><ClipboardCheck size={24}/><div><strong>{item.display_name||w("Clinician application")}</strong><p>{item.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p></div><StatusBadge>{w(item.evidence_complete?"Ready for review":"Needs evidence")}</StatusBadge></Link>):<EmptyState title={w("No applications awaiting a decision.")}/>}
+        <Link className="text-link" to="/admin/applications">{w("View all applications")} <ArrowRight size={16}/></Link>
+      </section><section className="review-overview-panel"><h2>{w("Operations")}</h2>{[
+        ["/admin/scopes",w("Service scopes"),w("Review each service authorization separately"),ShieldCheck],
+        ["/admin/services",w("Service catalog"),w("Review definitions and operational requirements"),Layers],
+        ["/admin/clinics",w("Clinic affiliations"),w("Affiliation is separate from clinical approval"),Building2],
+      ].map(([route,title,detail,Icon])=>{const RowIcon=Icon as typeof ShieldCheck;return <Link className="review-overview-row" to={route as string} key={route as string}><RowIcon size={24}/><div><strong>{title as string}</strong><p>{detail as string}</p></div></Link>;})}</section></div>
+    </>}
+  </>;
+}
 export function Applications() {
   const {w}=useLocale();
   const resource=useResource(journeyApi.applications);

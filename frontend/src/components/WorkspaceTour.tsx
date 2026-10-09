@@ -23,10 +23,10 @@ const routes:Record<string,{id:string;steps:TourStep[]}>={
     {title:"Care records",text:"Open only the encounters you treated. Clinic affiliation does not grant access.",path:"/clinician/care",target:"clinician-care"},
   ]},
   approver:{id:"reviewer-applications",steps:[
-    {title:"Application queue",text:"Review clinician names, application status and requested services.",path:"/admin",target:"reviewer-applications"},
-    {title:"Find a clinician",text:"Use the professional display name as the primary identifier.",path:"/admin",target:"reviewer-applications"},
-    {title:"Review evidence",text:"Open submitted resume evidence and assess it before deciding.",path:"/admin",target:"reviewer-applications"},
-    {title:"Make an application decision",text:"Approval is manual and does not automatically approve requested services.",path:"/admin",target:"reviewer-applications"},
+    {title:"Application queue",text:"Review clinician names, application status and requested services.",path:"/admin/applications",target:"reviewer-applications"},
+    {title:"Find a clinician",text:"Use the professional display name as the primary identifier.",path:"/admin/applications",target:"reviewer-applications"},
+    {title:"Review evidence",text:"Open submitted resume evidence and assess it before deciding.",path:"/admin/applications",target:"reviewer-applications"},
+    {title:"Make an application decision",text:"Approval is manual and does not automatically approve requested services.",path:"/admin/applications",target:"reviewer-applications"},
     {title:"Service scopes",text:"Approve each requested service separately. This does not grant access to care records.",path:"/admin/scopes",target:"reviewer-scopes"},
   ]},
   applicant:{id:"clinician-onboarding",steps:[

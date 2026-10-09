@@ -206,7 +206,8 @@ const clinicianNav = [
   ["/clinician/account", "Account", Settings2],
 ] as const;
 const adminNav = [
-  ["/admin", "Applications", ClipboardCheck],
+  ["/admin", "Overview", Home],
+  ["/admin/applications", "Applications", ClipboardCheck],
   ["/admin/scopes", "Service scopes", Stethoscope],
   ["/admin/services", "Service catalog", Stethoscope],
   ["/admin/vetting", "Scope vetting", ClipboardCheck],
@@ -248,7 +249,7 @@ export function WorkspaceLayout({
     : kind === "patient"
       ? ["/patient", "/patient/discovery", "/patient/appointments"]
       : kind === "admin"
-        ? ["/admin", "/admin/scopes", "/admin/exceptions"]
+        ? ["/admin", "/admin/applications", "/admin/scopes"]
         : ["/clinic"];
   const mobilePrimary = items.filter(([to]) => mobilePrimaryRoutes.includes(to));
   const mobileMore = items.filter(([to]) => !mobilePrimaryRoutes.includes(to));
@@ -257,7 +258,7 @@ export function WorkspaceLayout({
     "/patient/appointments": "patient-appointments", "/patient/account": "patient-account",
     "/clinician": "clinician-today", "/clinician/availability": "clinician-availability",
     "/clinician/appointments": "clinician-appointments", "/clinician/care": "clinician-care",
-    "/admin": "reviewer-applications", "/admin/scopes": "reviewer-scopes",
+    "/admin": "reviewer-overview", "/admin/applications": "reviewer-applications", "/admin/scopes": "reviewer-scopes",
   };
   const renderNavLink = (item: (typeof items)[number], closeMore = false) => {
     const [to, label, Icon] = item;
