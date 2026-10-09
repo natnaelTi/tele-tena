@@ -9,6 +9,11 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  "CARE THAT FITS YOU": ["ለእርስዎ የሚስማማ እንክብካቤ", "Kunuunsa siif malu"],
+  "available services": ["ያሉ አገልግሎቶች", "tajaajiloota jiran"],
+  "Sort services": ["አገልግሎቶችን ደርድር", "Tajaajiloota tartiibessi"],
+  "Best fit": ["የበለጠ ተስማሚ", "Kan caalaatti siif malu"],
+  "Lowest price": ["ዝቅተኛ ዋጋ", "Gatii gadi aanaa"],
   ...landingTranslations,
   ...patientJourneyTranslations,
   ...accountTranslations,

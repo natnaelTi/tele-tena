@@ -68,6 +68,12 @@ def _setup(private):
                 b'%PDF-1.4\nFictional presentation applicant. No real qualifications or license verified.\n%%EOF').decode())
             journey.apply('Fictional presentation application. Evidence and service eligibility require a human review; no actual professional credentials are claimed.',
                           ['presentation-individual-counseling', 'presentation-stress-support'])
+            # Profile creation uses the legacy owner command; the completed seed
+            # leaves applicants unprivileged until the human review transition.
+            frappe.set_user('Administrator')
+            doc = frappe.get_doc('User', users[key])
+            doc.remove_roles('Tele Tena Clinician')
+            doc.add_roles('Tele Tena Applicant')
     frappe.set_user(users['patient'])
     journey.simulated_deposit(100000, VERSION + ':opening-funds')
     frappe.db.commit()

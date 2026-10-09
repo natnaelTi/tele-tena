@@ -25,6 +25,12 @@
 .discovery-filters label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
 .discovery-results-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px; }
 .discovery-results-heading p { margin:0; font-size:14px; }
+.discovery-results-heading .field { margin:0; }
+.discovery-results-heading label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+.discovery-results-heading select { border:0; width:auto; font-size:14px; color:var(--muted); padding:8px 28px 8px 8px; }
+.discovery-request-icon { display:inline-flex; padding:12px; background:#ffffff12; border-radius:12px; margin-bottom:24px; }
+.discovery-privacy { display:flex; align-items:flex-start; gap:12px; margin-top:24px; }
+.discovery-privacy svg,.request-entry > svg { flex-shrink:0; }
 .discovery-request-aside { background:var(--ink); border-radius:18px; color:white; padding:28px; }
 .discovery-request-aside p { color:#d6e4e8; }
 .discovery-request-aside h2 { font-size:28px; }

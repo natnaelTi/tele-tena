@@ -4,7 +4,7 @@ import { BookingReview } from "../components/BookingReview";
 import { appointmentDisplayGroups, appointmentsForView, type AppointmentView } from "../appointment-groups";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight, Search, MessageCircle, Sparkles, LockKeyhole } from "lucide-react";
 import "./PatientJourney.css";
 import { WalletSummary } from "../components/WalletSummary";
 import { BookingCalendar } from "../components/BookingCalendar";
@@ -18,7 +18,6 @@ import {
   PageTitle,
   date,
   money,
-  timezone,
 } from "../components/Domain";
 import {
   Button,
@@ -74,7 +73,7 @@ export function PatientHome() {
           </Button>
         </form>
       </section></section>
-      <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Share what support you’re looking for and compare private offers from eligible clinicians.")}</p></div><Link className="button secondary" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
+      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Share what support you’re looking for and compare private offers from eligible clinicians.")}</p></div><Link className="button secondary" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
       {!!requests.data?.some((item:any)=>item.state==='Open')&&<section className="active-request-summary"><div className="section-line"><h2>Active care requests</h2><Link to="/patient/requests">Review requests and offers <ArrowRight size={16}/></Link></div>{requests.data.filter((item:any)=>item.state==='Open').slice(0,3).map((item:any)=><Link className="active-request-row" key={item.id} to={'/patient/requests/'+encodeURIComponent(item.id)}><span>{item.urgency==='immediate'?'As soon as possible':'Schedule for later'} · {item.category}</span><strong>{item.offers.filter((offer:any)=>offer.state==='Active').length} new offers</strong></Link>)}</section>}
       <section className="patient-dashboard-panel">
       <div className="section-line">
@@ -145,6 +144,7 @@ export function Discovery() {
   const offers = useResource(journeyApi.discover);
   const services = useResource(journeyApi.services);
   const [category, setCategory] = useState(discoveryFilters().category);
+  const [sort, setSort] = useState("relevance");
   const [languageFilter, setLanguageFilter] = useState(discoveryFilters().language);
   const [formatFilter, setFormatFilter] = useState(discoveryFilters().format);
   const [availabilityFilter, setAvailabilityFilter] = useState(discoveryFilters().availability);
@@ -199,18 +199,18 @@ export function Discovery() {
       (!formatFilter || offer.consultation_format === formatFilter) &&
       (availabilityFilter !== "next14" || !!availableOfferIds?.has(offer.id)) &&
       relevance(offer)>0,
-  )?.sort((a,b)=>relevance(b)-relevance(a));
+  )?.sort((a,b)=>sort === "price" ? a.price-b.price || relevance(b)-relevance(a) : relevance(b)-relevance(a));
   const requestDraft={request_text:query,service_label:category,language:languageFilter||undefined,format:formatFilter||undefined};
   return (
     <>
       <PageTitle
-        eyebrow="FIND CARE"
+        eyebrow={w("CARE THAT FITS YOU")}
         title={w("What’s on your mind?")}
         description={w("You don’t need the right words. Start with what you’re feeling.")}
       />
       <div className="discovery-layout"><section className="discovery-primary">
       <form className="discovery-search" onSubmit={event => { event.preventDefault(); rememberCareQuery(query); }}><Search size={20} /><label className="sr-only" htmlFor="discovery-care-query">Clinician or service</label><input id="discovery-care-query" placeholder={w("Search available care")} value={query} onChange={event => setQuery(event.target.value)} /><Button type="submit">{w("Search")}</Button></form>
-      <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft}}>{w("Post a request")} <ArrowRight size={16} /></Link></section>
+      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft}}>{w("Post a request")} <ArrowRight size={16} /></Link></section>
       <div className="discovery-filters">
         <Select
           label="Service"
@@ -233,9 +233,7 @@ export function Discovery() {
         </Select>
       </div>
 
-      <p className="supporting">
-        {w("Filter approved services by care language, format and currently open times.")} · {w("Times shown in")} {timezone}.
-      </p>
+      {!!offers.data && !availabilityBusy && <div className="discovery-results-heading"><p>{shown?.length || 0} {w("available services")}</p><Select label={w("Sort services")} value={sort} onChange={event=>setSort(event.target.value)}><option value="relevance">{w("Best fit")}</option><option value="price">{w("Lowest price")}</option></Select></div>}
       {availabilityError&&<InlineNotice tone="danger">{w("Available times could not be checked. Clear this filter or try again.")}</InlineNotice>}
       {offers.error ? (
         <InlineNotice tone="danger">
@@ -261,7 +259,7 @@ export function Discovery() {
         </EmptyState>
       )}
       <p className="supporting">{w("Matching helps you find a professional. It is not a diagnosis.")}</p>
-      </section><aside className="discovery-aside"><section className="discovery-request-aside"><h2>{w("Someone to talk to. A choice that’s yours.")}</h2><p>{w("Tell us what you need. Available clinicians can respond with a session time and a clear fee.")}</p><Link className="button" to="/patient/requests" state={{requestDraft}}>{w("Post a private request")}</Link><p className="supporting">{w("Your request is only shown to eligible clinicians.")}</p></section><p className="supporting">{w("Your name and personal details stay private until you choose to share them.")}</p></aside></div>
+      </section><aside className="discovery-aside"><section className="discovery-request-aside"><span className="discovery-request-icon" aria-hidden="true"><MessageCircle size={24}/></span><h2>{w("Someone to talk to. A choice that’s yours.")}</h2><p>{w("Tell us what you need. Available clinicians can respond with a session time and a clear fee.")}</p><Link className="button" to="/patient/requests" state={{requestDraft}}>{w("Post a private request")}</Link><p className="supporting">{w("Your request is only shown to eligible clinicians.")}</p></section><p className="discovery-privacy supporting"><LockKeyhole size={18} aria-hidden="true"/>{w("Your name and personal details stay private until you choose to share them.")}</p></aside></div>
     </>
   );
 }
