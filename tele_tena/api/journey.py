@@ -808,9 +808,11 @@ def appointments():
     result = rows(f'''SELECT a.id,a.start,a.end,a.state,a.price,a.minutes,a.service_label,a.disclosure,a.choices,
         a.timezone,a.consultation_format,a.confirmation_mode,a.expires_at,a.confirmed_at,
         a.cancelled_by,a.cancelled_at,a.cancel_reason,a.policy_snapshot,
-        c.state AS call_state,c.ended AS call_ended,n.status AS documentation_state
+        c.state AS call_state,c.ended AS call_ended,n.status AS documentation_state,
+        provider.display_name AS clinician_display_name
         FROM tt_appointment a LEFT JOIN tt_consultation c ON c.appointment=a.id
         LEFT JOIN tt_consultation_note n ON n.appointment=a.id
+        LEFT JOIN tt_profile provider ON provider.user=a.clinician AND provider.kind='clinician'
         WHERE a.{field}=%s ORDER BY a.start''', (user,))
     for appointment in result:
         appointment.start, appointment.end = iso(appointment.start), iso(appointment.end)
@@ -825,10 +827,9 @@ def appointments():
         appointment.expires_at = iso(appointment.expires_at) if appointment.expires_at else None
         appointment.confirmed_at = iso(appointment.confirmed_at) if appointment.confirmed_at else None
         appointment.policy_snapshot = json.loads(appointment.policy_snapshot) if appointment.policy_snapshot else None
+        clinician_name = appointment.pop('clinician_display_name', None)
         if p.kind == 'patient':
-            identity = rows('SELECT display_name FROM tt_profile WHERE user=%s AND kind=%s',
-                            (appointment.clinician, 'clinician'))
-            appointment.display_identity = identity[0].display_name if identity else 'Your clinician'
+            appointment.display_identity = clinician_name or 'Your clinician'
         else:
             appointment.display_identity = appointment.disclosure.get('name') or 'Private patient'
     return result
