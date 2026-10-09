@@ -155,6 +155,36 @@ class Presentation(unittest.TestCase):
         fixtures.login('admin')
         journey.review_service_scope(fixtures.USERS['c1'], fixtures.PREFIX, 'Approved')
 
+    def test_practice_only_lists_own_current_approved_scopes(self):
+        fixtures.login('admin')
+        own = fixtures.PREFIX + '-practice-own'
+        foreign = fixtures.PREFIX + '-practice-other'
+        unapproved = fixtures.PREFIX + '-practice-unapproved'
+        for service in (own, foreign, unapproved):
+            journey.save_service(service, 'Synthetic practice scope')
+        journey.review_service_scope(fixtures.USERS['c1'], own, 'Approved')
+        journey.review_service_scope(fixtures.USERS['c2'], foreign, 'Approved')
+        fixtures.login('c1')
+        approved = [item.id for item in journey.practice()['approved_services']]
+        self.assertIn(own, approved)
+        self.assertNotIn(foreign, approved)
+        self.assertNotIn(unapproved, approved)
+        created = journey.publish(own, 4500, 50, title='Synthetic fifty-minute session',
+                                  retry_key='practice-' + secrets.token_hex(10))
+        self.assertEqual(next(item.minutes for item in journey.practice()['offerings']
+                              if item.id == created['offering']), 50)
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], own, 'Revoked')
+        fixtures.login('c1')
+        self.assertNotIn(own, [item.id for item in journey.practice()['approved_services']])
+        self.assertIn(created['offering'], [item.id for item in journey.practice()['offerings']])
+        with self.assertRaises(frappe.ValidationError):
+            journey.publish(own, 4500, 50, title='Synthetic fifty-minute session',
+                            offering_id=created['offering'])
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            journey.practice()
+
     def test_public_profile_uses_tailored_offerings_and_rechecks_revoked_scope(self):
         fixtures.login('admin')
         service = fixtures.PREFIX + '-profile-scope'

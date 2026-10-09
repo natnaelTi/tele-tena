@@ -850,6 +850,14 @@ def practice():
     available = rows('SELECT start,end FROM tt_availability WHERE clinician=%s AND end>UTC_TIMESTAMP() ORDER BY start', (user,))
     from tele_tena.api.scheduling import schedules as clinician_schedules
     schedule_rows = clinician_schedules() if 'Tele Tena Clinician' in frappe.get_roles(user) else []
+    approved_services = []
+    if 'Tele Tena Clinician' in frappe.get_roles(user) and applications and applications[0].status == 'Approved':
+        approved_services = [item for item in rows('''SELECT s.name AS id,s.service_label AS label
+            FROM `tabTele Tena Service` s
+            JOIN `tabTele Tena Service Scope` scope ON scope.service=s.name
+            WHERE scope.clinician=%s AND scope.status='Approved' ORDER BY s.service_label''', (user,))
+            if service_scope_is_current(user, item.id)]
     return {'application': applications[0] if applications else None, 'offerings': offerings,
+            'approved_services': approved_services,
             'availability': [{'start': iso(row.start), 'end': iso(row.end)} for row in available],
             'schedules': schedule_rows}
