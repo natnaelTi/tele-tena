@@ -20,6 +20,14 @@ The 142-screen reference remains preserved; it is not the release completion tar
 - Current schema/records, credentials, extended foundations and source branches
   are preserved. This scope change does not run migrations or seed records.
 
+## Active preview correction — 2026-10-10
+
+The original source/preservation checkpoint above is historical. Current review URL
+still http://127.0.0.1:8017/teletena/, now on a **separate clean presentation site**
+`teletena-mvp-presentation.localhost`, packaged `c9c25cd87d1e5a6342aedcf0858379e04fbda433`.
+The old fixture site remains retained. Scope does not change. See the current journey
+report and existing screen matrix for per-state evidence and remaining release blockers.
+
 ## Agreed release capabilities and acceptance
 
 The separate [screen matrix](mvp-screen-acceptance.json) records every inventory

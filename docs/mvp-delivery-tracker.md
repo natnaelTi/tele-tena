@@ -1,8 +1,17 @@
 # TeleTena delivery tracker
 
-## Active MVP correction — 2026-10-09
+## Active MVP correction — 2026-10-10
 
-See [current source/build, actual checks and remaining gates](mvp-journey-verification-2026-10-09.md). Patient discovery/booking and retained private-offer acceptance have actual backend browser evidence. Care records now separate equal names across different patients. Reference-specific overview, queue, sharing/payment and earnings compositions are corrected. Full visual acceptance, coherent presentation data, couples, registration-enabled browser acceptance, current hosted calls, job cutover/reconciliation and fresh installation remain open. Earlier entries below are historical evidence for their recorded commits, not a current release pass.
+Current built source `c9c25cd87d1e5a6342aedcf0858379e04fbda433`, preview
+http://127.0.0.1:8017/teletena/ on the separate
+`teletena-mvp-presentation.localhost`. The old fixture site is retained.
+[One current report](mvp-journey-verification-2026-10-09.md) records actual checks,
+paired evidence and remaining gates. Dedicated clean installation and repeat setup,
+real reviewer→publication→direct booking and private offer acceptance, local controlled
+registration transport, and patient/clinician read-only 390/768/1440 journeys passed.
+Complete visual acceptance, couples, continuous jobs, full owner-level legacy upgrade,
+current hosted calls and final integrated release checks remain open. No merge or remote
+change. Older entries below are historical for their named source/site, not current passes.
 
 ## Current release priority — MVP handover — 2026-10-08
 

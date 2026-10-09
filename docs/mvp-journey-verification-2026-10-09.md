@@ -1,10 +1,130 @@
+# Current MVP journey correction — 10 October 2026
+
+**Active checkpoint; PR #44 remains draft. Not full visual acceptance or handover readiness.**
+The runtime below supersedes every earlier site/build/process reference in this report.
+The existing `mvp-screen-acceptance.json` remains the sole screen acceptance matrix.
+
+## Current source and working preview
+
+- Branch `feat/mvp-release-handover`; [draft PR #44](https://github.com/natnaelTi/tele-tena/pull/44)
+  depends on open PR #43 (`feat/adult-relationship-links`). Ancestor
+  `1e8d161468eb8d3563f1b5743982722c749bbcbf` remains included.
+- **Built application source `c9c25cd87d1e5a6342aedcf0858379e04fbda433`**;
+  later evidence/report commits do not change application code. The packaged
+  `tele_tena/public/review/release.json` records this source and asset hashes.
+- **http://127.0.0.1:8017/teletena/** now serves **`teletena-mvp-presentation.localhost`**,
+  bench `/home/frappe/frappe/frappe-bench`, app `apps/tele_tena`. Production React,
+  same-origin Frappe APIs; no Vite server. HTTP 200 checked after packaging.
+- Dedicated Gunicorn master 453370 (pidfile `/tmp/teletena-mvp-presentation-web.pid`),
+  two workers 455068/455069; process cwd `sites`, Python path app checkout above,
+  observed `TELE_TENA_TEST_SITE=teletena-mvp-presentation.localhost`.
+  Old preview master 392014 was stopped only after the new site passed its initial
+  journey. The retained `tele-tena-pr12-fresh.localhost` records and credentials,
+  `erp.localhost`, unrelated workers and Selfmade were not reset or migrated for this switch.
+- Observed local Frappe 15.121.2 / ERPNext 15.121.6, Python 3.12.3, Node 22.23.3.
+  These checks are **not** an exact current Frappe 16 rerun.
+- New presentation site's **scheduler is disabled; no dedicated continuous worker/
+  scheduler acceptance run has passed**. Unrelated existing services were left alone.
+- Normal preview remains intentionally **invited-review**: phone OTP and both public
+  registration flags disabled. Phone-first entry remains visible with an accurate
+  unavailable state. Email code delivery is unavailable; explicit password sign-in works.
+  Enabled-registration was tested separately with a loopback-only transport and then disabled.
+
+## Presentation data and account access
+
+`tele_tena.presentation_data.setup` is an explicitly invoked, exact-site-bound CLI
+command, not an installation hook or public endpoint. It creates fictional Selam
+Bekele (patient), Hana Tesfaye and Dawit Alemu (applicants), and Mekdes Abebe
+(demonstration vetting reviewer), practical Individual counseling / Stress and anxiety
+support services, private fictional PDF evidence and an idempotent opening ETB1,000.
+Prices are centralized illustrative values, not Ethiopian market-rate claims.
+Scope approval is **not** performed by the seed. The ordinary reviewer browser
+approved Hana's application and Individual counseling scope for the demonstration;
+that is not medical-lead credential verification. Dawit remains Pending with no
+clinician privilege. Catalog definitions remain Legacy test / Not reviewed internally;
+no finalized clinical taxonomy or verified qualifications/ratings are fabricated.
+
+Private mode-600 account file (never commit or paste its contents):
+`/home/frappe/frappe/frappe-bench/sites/teletena-mvp-presentation.localhost/private/tele_tena_presentation_accounts.json`.
+Patient: `patient.presentation@example.invalid`; clinician: `clinician.presentation@example.invalid`;
+reviewer: `reviewer.presentation@example.invalid`. Select **Use email instead → Use password instead**.
+The earlier review-account file belongs to the retained old site and is not this preview's credentials.
+
+Two actual bookings are retained: one direct calendar booking and one private offer
+acceptance, each ETB300. Patient currently ETB400 available / ETB600 reserved.
+Repeat setup after those bookings preserves exact owner wallets, schedules, applications,
+appointments, legacy events, accounts and journal lines; no duplicate seed or reset.
+A cancelled no-supply request and interrupted registration records are retained, not deleted
+for screenshots. Complete populated consultation summaries/earnings/clinic scenarios remain pending.
+
+## Actual checks in this checkpoint
+
+| Check | Actual result and boundary |
+|---|---|
+| Fresh site | `scripts/check_fresh_install.py`, retained dedicated named site: Frappe/ERPNext/TeleTena install, schema/repeat migration checks passed; original site fingerprints preserved. Temporary localhost DB administrator and mode-600 credential removed. This is not full legacy-upgrade reconciliation acceptance |
+| Publication chain | Real reviewer application + scope actions; approved clinician offering/schedule commands; patient calendar/disclosure/confirmation/detail/reload; one ETB300 reservation. Earlier harness selector/route mistakes were corrected without repeating the successful booking |
+| Private request chain | Separate patient/clinician sessions: scheduled request → authorized inbox → offer → patient receives offer without manual refresh → confirmation → appointment → own accepted offer history; one further ETB300 reservation. Competing clinicians and immediate routing-wave acceptance still need current full coverage |
+| No-supply publication | At `ed81ac3`, mobile guided publication opens saved progress automatically, reload preserves it, truthful no-eligible-supply notice, cancel leaves wallet unchanged. No claim of an offer or match where supply is absent |
+| Registration | Real backend random OTP with `scripts/presentation_otp_test_wsgi.py` at bounded loopback 8028: wrong-code rejection, patient adult/consent/privacy onboarding, clinician intent, interrupted step recovery, private resume and application submission passed. Applicant has no approved clinician role. Test server stopped, captured codes deleted, public registration flags restored disabled. Expired-code/resend/returning-phone and full abuse/concurrency browser gates remain open; no live SMS/email |
+| Patient read-only journey | `scripts/browser-presentation-patient.cjs` at `ffa2392`: real invited password sign-in; Home → discovery → preview/full profile → authoritative calendar selection → disclosure review/back; focus returns after Escape, selected-date hover readable, inputs preserved, no bookings/funds mutated. Paired 390/768/1440 captures |
+| Clinician/details | `scripts/browser-presentation-overview.cjs` at `c9c25cd`: compact F01 rows; keyboard link → loaded participant detail; 390/768/1440, reload; compact time-change action opens authoritative slots, selects and cancels without submitting. Exact patient wallet/clinician earnings queries unchanged |
+| Layout / zoom | At `904c746`, C02 Amharic and Oromo 390px layout captures; actual Chrome tab zoom 200% (outer1440/CSS720/DPR2), paired reference. Not native-language approval or all-route zoom acceptance |
+| Other workspaces | At `ddfe210`, patient/clinician/reviewer real authenticated queries and paired 390/1440 captures; individual actions and visual acceptance are separate |
+| Build/privacy | Locked production packaging, TypeScript and frontend lint pass; existing lint warnings and >500KB chunk warning remain. Generated public assets checked for all four presentation passwords: none found. No unchanged broad financial suite rerun claimed |
+
+## Paired comparison and remaining differences
+
+Evidence: [paired screenshots and capture sources](screenshots/mvp-presentation-current/README.md).
+Reference is rendered read-only from the supplied 142-screen source on 8044.
+
+| Reference | Implemented correction / observed comparison | Remaining acceptance |
+|---|---|---|
+| C01 Home | Compact dark care hero, readable one-row search action, genuine next-session row and wallet composition; mobile global icon inheritance corrected | Mobile Help & tours adds height; no completed care history yet; global demo/language/privacy operations legitimately add elements absent from prototype |
+| C02 / popup | Shared grid spacing and hidden-label collision fixed; pill filters, search/private-request entry, description and readable card/preview facts; Escape focus return | Extra supported availability filter; one genuinely approved clinician; initials/no unverified portrait or invented review numbers. All empty/failure states and final composition acceptance pending |
+| C04 | Reference heading “Meet your clinician”; approved offering context and truthful trust information | Professional public biography/approach/verified affiliation and corresponding persisted profile depth still incomplete; do not invent credentials |
+| C06/C08 | Actual available month/dates/times, timezone, selected-day contrast and disclosure/price review; Back retains input | Dedicated operational booking route differs from prototype wizard; remaining mobile/zoom/composition comparisons pending |
+| D01/D03/D04/D05 | Guided privacy publication, dedicated saved progress, scheduled-care explanation separated from immediate three-minute target, actual private offers/acceptance | Full paired populated offers/progress and error/expiry/funding-recovery visual acceptance still pending |
+| E02 | Actual loaded two-column appointment facts/preparation/snapshot; compact time-change action rather than always-expanded panel | Ribbon/header offset, truthful initials rather than fictional verified portrait, operational timeline/financial details add height; completed/ended/cancelled comparisons remain pending |
+| F01 | Correct “Your day at a glance” / “Up next”; compact icon/time/authorized identity/status rows instead of full detail cards | Presence ribbon and first-visit tour add height; readiness links/verified credential-renewal state differ from prototype; real zero earnings and counts preserved |
+| H01/F08/F14/H02/I01/I02/I05 | Current fictional data replaces older test-purpose presentation content; pairs retained for audit | Account city/contact editing, richer professional settings, complete evidence/admin and all role states still require functional and visual acceptance |
+
+**Release blockers:** working two-adult couples (relationship links alone are insufficient),
+complete MVP screen/state fidelity and missing profile/journey behavior, continuous
+site-bound routing/earnings jobs, representative owner-level legacy reconciliation/
+cutover and final installation/migration acceptance, current hosted LiveKit End/token
+revocation regression, final integrated permissions/OTP/notes/evidence release checks.
+Existing financial/appointment/privacy/PWA work is preserved, not declared reverified
+from these UI captures. No merge or deployment. External live delivery, physical-device
+calling, native translations and medical-lead catalog approval remain separate gates.
+
+## Short current walkthrough
+
+1. Use the private account file and the exact preview above. Patient Home → Find care →
+   Hana's preview → full profile → Choose a time → calendar → disclosure → price review.
+   Confirm only if intentionally creating another demonstration booking; existing bookings
+   can be reviewed from Appointments without consuming more funds.
+2. Patient Post a request → scheduled window → privacy preview → publish. It opens saved
+   progress; posting is free. Hana Requests receives only eligible authorized requests,
+   chooses an offering/time and sends a private quote. Patient accepts only after exact
+   price/sharing review; Hana Your offers → History links to accepted consultation.
+3. Clinician Today → compact consultation row; Availability → existing published calendar;
+   Services shows its actual approved offering. Do not assume immediate readiness from
+   a published working interval alone; presence and applicable policy remain enforced.
+4. Reviewer Applications / Service scopes show names and actual decisions. Reviewer
+   privileges do not grant clinical notes. Do not treat a fictional demonstration approval
+   as a verified professional credential.
+
+---
+
+# Historical evidence below — superseded runtime, retained findings
+
 # Current MVP journey correction — 9 October 2026
 
 **Active checkpoint; not visual acceptance or handover readiness.** This report
 supersedes the runtime identity in older checkpoint reports. The screen matrix
 keeps visual fidelity and functional journey acceptance independent.
 
-## Source and preview
+## Historical runtime — 9 October (superseded)
 
 - Branch `feat/mvp-release-handover`, draft PR #44, dependent on draft PR #43.
   The preserved `1e8d161468eb8d3563f1b5743982722c749bbcbf` ancestor remains included.
@@ -24,9 +144,9 @@ keeps visual fidelity and functional journey acceptance independent.
   retained fixture reseeding, merges or remote deployment.
   Intentional earlier browser deposits/bookings/requests/offers remain recorded.
 
-## Current account / appointment / native-worker checkpoint
+## Historical account / appointment / native-worker checkpoint
 
-This section is the current checkpoint; earlier per-commit findings below are
+This section records its earlier checkpoint; per-commit findings below are
 historical evidence, not an assertion that the entire MVP has passed.
 
 | Reference | Implemented and actual checks | Remaining fidelity / journey gaps |
