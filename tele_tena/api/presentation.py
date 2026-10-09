@@ -624,35 +624,41 @@ def care_directory(search='', service='', status='', from_date='', to_date='', p
         where.append("JSON_UNQUOTE(JSON_EXTRACT(a.disclosure,'$.name')) LIKE %s")
         params.append('%' + search.replace('%', '\\%').replace('_', '\\_') + '%')
     sql_where = ' AND '.join(where)
-    found = rows('''SELECT a.id,a.start,a.end,a.state,a.service_label,a.disclosure,a.timezone,a.minutes,
+    found = rows('''SELECT a.id,a.patient,a.start,a.end,a.state,a.service_label,a.disclosure,a.timezone,a.minutes,
         a.price,c.state call_state,n.status documentation_state
         FROM tt_appointment a LEFT JOIN tt_consultation c ON c.appointment=a.id
         LEFT JOIN tt_consultation_note n ON n.appointment=a.id WHERE ''' + sql_where +
         ' ORDER BY a.start DESC,a.id', tuple(params))
     groups = {}
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
     for item in found:
         disclosure = json.loads(item.disclosure)
         name = disclosure.get('name')
-        key = 'shared:' + name if name else 'encounter:' + item.id
+        # Equal disclosed names never establish that two people are one patient.
+        # The account key stays server-side and never enters the directory response.
+        key = ('shared', item.patient, name) if name else ('encounter', item.id)
         group = groups.setdefault(key, {'id': item.id, 'patient_label': name or 'Private patient',
                                         'encounters': [], 'last_consultation': None,
                                         'next_appointment': None, 'service_label': item.service_label,
                                         'state': item.state, 'disclosure': disclosure,
-                                        'start': item.start, 'timezone': item.timezone})
+                                        'start': item.start, 'end': item.end, 'timezone': item.timezone,
+                                        'call_state': item.call_state, 'documentation_state': item.documentation_state})
         group['encounters'].append(item.id)
-        if item.start < datetime.now(timezone.utc).replace(tzinfo=None) and (
+        if item.start < now and (
                 item.state == 'Completed' or item.call_state == 'Ended'):
             if not group['last_consultation'] or item.start > group['last_consultation']:
                 group['last_consultation'] = item.start
-        elif item.state in ('Booked', 'PendingConfirmation') and (
+        elif item.start >= now and item.state in ('Booked', 'PendingConfirmation') and (
                 not group['next_appointment'] or item.start < group['next_appointment']):
             group['next_appointment'] = item.start
         if item.start > group['start']:
             group.update(id=item.id, service_label=item.service_label, state=item.state,
-                         disclosure=disclosure, start=item.start, timezone=item.timezone)
+                         disclosure=disclosure, start=item.start, end=item.end, timezone=item.timezone,
+                         call_state=item.call_state, documentation_state=item.documentation_state)
     found = list(groups.values())
     for item in found:
         item['start'] = iso(item['start'])
+        item['end'] = iso(item['end'])
         item['last_consultation'] = iso(item['last_consultation']) if item['last_consultation'] else None
         item['next_appointment'] = iso(item['next_appointment']) if item['next_appointment'] else None
         item['encounter_count'] = len(item['encounters'])
@@ -670,9 +676,9 @@ def care_patient_record(appointment):
     disclosure = json.loads(item.disclosure)
     shared_name = disclosure.get('name')
     if shared_name:
-        matches = rows('''SELECT id FROM tt_appointment WHERE clinician=%s
+        matches = rows('''SELECT id FROM tt_appointment WHERE clinician=%s AND patient=%s
             AND JSON_UNQUOTE(JSON_EXTRACT(disclosure,'$.name'))=%s ORDER BY start DESC''',
-            (clinician, shared_name))
+            (clinician, item.patient, shared_name))
     else:
         matches = [{'id': item.id}]
     return {'patient_label': shared_name or 'Private patient',

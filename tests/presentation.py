@@ -2475,6 +2475,39 @@ class Presentation(unittest.TestCase):
         self.assertEqual(after.start, original.start)
         self.assertEqual(after.timezone, 'Africa/Addis_Ababa')
 
+    def test_care_records_do_not_link_different_patients_with_equal_names(self):
+        self.fund_patient('p1', 3000)
+        self.fund_patient('p2', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        for who in ('p1', 'p2'):
+            fixtures.login(who)
+            journey.save_profile('patient', 'Same fictional preferred name', 1)
+        first = self.book_slot(offering, self.slots(offering, day)[0],
+                               'same-name-first', share_name=True)
+        second = self.book_slot(offering, self.slots(offering, day, who='p2')[-1],
+                                'same-name-second', share_name=True, who='p2')
+        fixtures.login('c1')
+        directory = presentation.care_directory(search='Same fictional preferred name')
+        self.assertEqual(len(directory['rows']), 2)
+        for row in directory['rows']:
+            self.assertEqual(row['encounter_count'], 1)
+            self.assertNotIn('patient', row)
+        self.assertEqual([row['id'] for row in presentation.care_patient_record(first['id'])['encounters']], [first['id']])
+        self.assertEqual([row['id'] for row in presentation.care_patient_record(second['id'])['encounters']], [second['id']])
+        # An owned synthetic legacy record has no recorded outcome; it is not future care.
+        frappe.db.sql('UPDATE tt_appointment SET start=%s,end=%s WHERE id=%s',
+                      (datetime.now(timezone.utc).replace(tzinfo=None)-timedelta(days=2),
+                       datetime.now(timezone.utc).replace(tzinfo=None)-timedelta(days=2)+timedelta(minutes=30),
+                       first['id']))
+        past = next(row for row in presentation.care_directory()['rows'] if row['id'] == first['id'])
+        self.assertIsNone(past['next_appointment'])
+        self.assertIsNone(past['last_consultation'])
+        self.assertEqual(past['state'], 'Booked')
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            presentation.care_patient_record(first['id'])
+
     def test_04_notes_privacy_revision_completion_and_encounter_scope(self):
         self.fund_patient('p1', 3000)
         day, _, _ = self.make_schedule(mode='automatic')
