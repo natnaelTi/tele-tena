@@ -4232,7 +4232,13 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": [
+          "Real operational Awaiting confirmation and All appointments views extend the three-tab reference; do not hide ended or historical records.",
+          "Rows retain explicit scheduled date, timezone, booked duration, actual fee and consultation action; denser reference condenses these.",
+          "Current generic Upcoming/Past section labels differ from reference Today/month groupings.",
+          "First-visit tour invitation remains in document flow and adds vertical space; demonstration ribbon remains.",
+          "Owned test screenshot names/services are automated fixtures, not accepted presentation content."
+        ],
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -4240,14 +4246,28 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "correction_status": "Reference heading and compact horizontally scrollable tabs ported; identity projection corrected; state-aware filters preserve history",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/E01-reference-1440.png",
-          "docs/screenshots/mvp-connected-journeys/E01-reference-390.png"
+          "docs/screenshots/mvp-connected-journeys/E01-upcoming-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/E01-upcoming-reference-768.png",
+          "docs/screenshots/mvp-connected-journeys/E01-upcoming-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/E01-completed-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/E01-completed-reference-768.png",
+          "docs/screenshots/mvp-connected-journeys/E01-completed-reference-1440.png",
+          "docs/screenshots/mvp-connected-journeys/E01-cancelled-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/E01-cancelled-reference-768.png",
+          "docs/screenshots/mvp-connected-journeys/E01-cancelled-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/E01-application-1440.png",
-          "docs/screenshots/mvp-connected-journeys/E01-application-390.png"
+          "docs/screenshots/mvp-connected-journeys/E01-upcoming-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/E01-upcoming-application-768.png",
+          "docs/screenshots/mvp-connected-journeys/E01-upcoming-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/E01-completed-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/E01-completed-application-768.png",
+          "docs/screenshots/mvp-connected-journeys/E01-completed-application-1440.png",
+          "docs/screenshots/mvp-connected-journeys/E01-cancelled-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/E01-cancelled-application-768.png",
+          "docs/screenshots/mvp-connected-journeys/E01-cancelled-application-1440.png"
         ],
         "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
         "viewports": [
@@ -4261,7 +4281,10 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": [
+          "scripts/check_mvp_notes_browser.py passed on packaged 9988610: real cancellation, one release posting; Completed→detail→Back/reload keeps view; private and published notes remain authorized.",
+          "tests/appointment-groups.mjs passed; elapsed bookings never become completed."
+        ],
         "expected_layout": {
           "reference_source": "inventory.js#forms.E01",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -4289,14 +4312,17 @@
         },
         "expected_actions": [],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified owned-fixture appointment views, detail/back/reload and cancellation; full reschedule/manual confirmation/call pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
-          "frontend/src/pages/ConsultationPage.tsx",
-          "frontend/src/features/consultations/Consultation.tsx"
+          "frontend/src/pages/Patient.tsx",
+          "frontend/src/pages/PatientJourney.css",
+          "frontend/src/components/Domain.tsx",
+          "frontend/src/appointment-groups.ts",
+          "tele_tena/api/journey.py"
         ],
-        "visual_status": "Comparison recorded; not accepted",
-        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings).",
+        "visual_status": "Compared; remaining differences",
+        "evidence_source": "99886108d0cc9335749e3b4e19f75223e7f40852",
         "expected_reference_actions": [
           {
             "label": "S",
@@ -8548,7 +8574,11 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": [
+          "City and verified contact editing remain absent; do not fabricate functional fields.",
+          "Reference shared sessions is currently an optional relationship link, not working couples consultations.",
+          "Actual zero balances differ from fictional reference amounts. Persistent demo ribbon and role-specific shell remain."
+        ],
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -8556,32 +8586,37 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "correction_status": "Reference composition ported; comparison recorded; remaining fields/states not accepted",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/H01-reference-1440.png",
           "docs/screenshots/mvp-connected-journeys/H01-reference-390.png",
-          "docs/screenshots/mvp-connected-journeys/H01-reference-zoom200.png"
+          "docs/screenshots/mvp-connected-journeys/H01-reference-768.png",
+          "docs/screenshots/mvp-connected-journeys/H01-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/H01-application-1440.png",
           "docs/screenshots/mvp-connected-journeys/H01-application-390.png",
-          "docs/screenshots/mvp-connected-journeys/H01-application-am-390.png",
-          "docs/screenshots/mvp-connected-journeys/H01-application-om-390.png",
-          "docs/screenshots/mvp-connected-journeys/H01-application-zoom200.png"
+          "docs/screenshots/mvp-connected-journeys/H01-application-768.png",
+          "docs/screenshots/mvp-connected-journeys/H01-application-1440.png"
         ],
-        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
+        "comparison_notes": [
+          "City and verified contact editing remain absent; do not fabricate functional fields.",
+          "Reference shared sessions is currently an optional relationship link, not working couples consultations.",
+          "Actual zero balances differ from fictional reference amounts. Persistent demo ribbon and role-specific shell remain."
+        ],
         "viewports": [
           390,
           768,
           1440
         ],
-        "zoom_200_percent": "Not verified",
+        "zoom_200_percent": "Real Chromium tab zoom verified at 1440 outer / 720 CSS px / DPR2, paired reference/application; not CSS zoom or physical-device test.",
         "languages": {
           "en": "Comparison pending",
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
+        "functional_verification": [
+          "scripts/check_mvp_account_browser.py: real authenticated backend saves and reloads; account-state persistence checked in MariaDB.",
+          "Native associated validation and abort-on-save preserve draft; retry checked. Fault injection is not proof of real outage recovery."
+        ],
         "expected_layout": {
           "reference_source": "inventory.js#forms.H01",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -8617,14 +8652,15 @@
           }
         ],
         "expected_next_states": "Profile/Preferences saved independently; privacy defaults are not mutated by booking overrides; tour dismissed/completed state is versioned.",
-        "functional_status": "Locally verified slice; other release states pending",
+        "functional_status": "Locally verified profile/defaults/preferences slice; remaining capabilities pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Account.tsx",
-          "frontend/src/components/WorkspaceTour.tsx"
+          "frontend/src/pages/Account.css",
+          "frontend/src/account-translations.ts"
         ],
-        "visual_status": "Comparison recorded; not accepted",
-        "evidence_source": "80143b5 (panels); 236caf3 (care/request); 8f65e84 (zoom/language); 263beca (earnings).",
+        "visual_status": "Compared; remaining differences",
+        "evidence_source": "7aa1ea939c94530f4ea7061051efd58239e416a0",
         "expected_reference_actions": [
           {
             "label": "S",
@@ -8685,7 +8721,10 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": [
+          "Reference portrait/public introduction and fuller professional editing remain incomplete.",
+          "Actual professional name, multiple care languages, private PDF resume and practice/affiliation links are connected. No fabricated credentials."
+        ],
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -8693,10 +8732,21 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Reference composition ported; comparison recorded; remaining fields/states not accepted",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/H02-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/H02-reference-768.png",
+          "docs/screenshots/mvp-connected-journeys/H02-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/H02-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/H02-application-768.png",
+          "docs/screenshots/mvp-connected-journeys/H02-application-1440.png"
+        ],
+        "comparison_notes": [
+          "Reference portrait/public introduction and fuller professional editing remain incomplete.",
+          "Actual professional name, multiple care languages, private PDF resume and practice/affiliation links are connected. No fabricated credentials."
+        ],
         "viewports": [
           390,
           768,
@@ -8708,7 +8758,10 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": [
+          "scripts/check_mvp_account_browser.py: real authenticated backend saves and reloads; account-state persistence checked in MariaDB.",
+          "Native associated validation and abort-on-save preserve draft; retry checked. Fault injection is not proof of real outage recovery."
+        ],
         "expected_layout": {
           "reference_source": "inventory.js#forms.H02",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -8740,11 +8793,12 @@
         },
         "expected_actions": [],
         "expected_next_states": "Profile/Preferences saved independently; privacy defaults are not mutated by booking overrides; tour dismissed/completed state is versioned.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified profile/defaults/preferences slice; remaining capabilities pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Account.tsx",
-          "frontend/src/components/WorkspaceTour.tsx"
+          "frontend/src/pages/Account.css",
+          "frontend/src/account-translations.ts"
         ],
         "expected_reference_actions": [
           {
@@ -8771,7 +8825,9 @@
             "label": "Bole Care Clinic",
             "hash": "#b08"
           }
-        ]
+        ],
+        "visual_status": "Compared; remaining differences",
+        "evidence_source": "7aa1ea939c94530f4ea7061051efd58239e416a0"
       }
     },
     {
@@ -8802,7 +8858,10 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": [
+          "Reference age/name disclosure options exceed current name/history defaults; current preview accurately reflects supported sharing.",
+          "Account navigation remains an operational extension of the isolated reference page."
+        ],
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -8810,10 +8869,21 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Reference composition ported; comparison recorded; remaining fields/states not accepted",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/H03-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/H03-reference-768.png",
+          "docs/screenshots/mvp-connected-journeys/H03-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/H03-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/H03-application-768.png",
+          "docs/screenshots/mvp-connected-journeys/H03-application-1440.png"
+        ],
+        "comparison_notes": [
+          "Reference age/name disclosure options exceed current name/history defaults; current preview accurately reflects supported sharing.",
+          "Account navigation remains an operational extension of the isolated reference page."
+        ],
         "viewports": [
           390,
           768,
@@ -8825,7 +8895,10 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": [
+          "scripts/check_mvp_account_browser.py: real authenticated backend saves and reloads; account-state persistence checked in MariaDB.",
+          "Native associated validation and abort-on-save preserve draft; retry checked. Fault injection is not proof of real outage recovery."
+        ],
         "expected_layout": {
           "reference_source": "inventory.js#forms.H03",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -8856,11 +8929,12 @@
         },
         "expected_actions": [],
         "expected_next_states": "Profile/Preferences saved independently; privacy defaults are not mutated by booking overrides; tour dismissed/completed state is versioned.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified profile/defaults/preferences slice; remaining capabilities pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Account.tsx",
-          "frontend/src/components/WorkspaceTour.tsx"
+          "frontend/src/pages/Account.css",
+          "frontend/src/account-translations.ts"
         ],
         "expected_reference_actions": [
           {
@@ -8871,7 +8945,9 @@
             "label": "Save privacy defaults",
             "hash": null
           }
-        ]
+        ],
+        "visual_status": "Compared; remaining differences",
+        "evidence_source": "7aa1ea939c94530f4ea7061051efd58239e416a0"
       }
     },
     {
@@ -8902,7 +8978,10 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": [
+          "Only language/timezone are persisted here; reference notification/accessibility preferences are not implemented.",
+          "Amharic/Oromo layouts captured, translations provisional, not native-language accepted."
+        ],
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -8910,10 +8989,21 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Reference composition ported; comparison recorded; remaining fields/states not accepted",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/H04-reference-390.png",
+          "docs/screenshots/mvp-connected-journeys/H04-reference-768.png",
+          "docs/screenshots/mvp-connected-journeys/H04-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-connected-journeys/H04-application-390.png",
+          "docs/screenshots/mvp-connected-journeys/H04-application-768.png",
+          "docs/screenshots/mvp-connected-journeys/H04-application-1440.png"
+        ],
+        "comparison_notes": [
+          "Only language/timezone are persisted here; reference notification/accessibility preferences are not implemented.",
+          "Amharic/Oromo layouts captured, translations provisional, not native-language accepted."
+        ],
         "viewports": [
           390,
           768,
@@ -8925,7 +9015,10 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": [
+          "scripts/check_mvp_account_browser.py: real authenticated backend saves and reloads; account-state persistence checked in MariaDB.",
+          "Native associated validation and abort-on-save preserve draft; retry checked. Fault injection is not proof of real outage recovery."
+        ],
         "expected_layout": {
           "reference_source": "inventory.js#forms.H04",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -8961,11 +9054,12 @@
         },
         "expected_actions": [],
         "expected_next_states": "Profile/Preferences saved independently; privacy defaults are not mutated by booking overrides; tour dismissed/completed state is versioned.",
-        "functional_status": "Pending current complete journey acceptance",
+        "functional_status": "Locally verified profile/defaults/preferences slice; remaining capabilities pending",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Account.tsx",
-          "frontend/src/components/WorkspaceTour.tsx"
+          "frontend/src/pages/Account.css",
+          "frontend/src/account-translations.ts"
         ],
         "expected_reference_actions": [
           {
@@ -8976,7 +9070,9 @@
             "label": "Save preferences",
             "hash": null
           }
-        ]
+        ],
+        "visual_status": "Compared; remaining differences",
+        "evidence_source": "7aa1ea939c94530f4ea7061051efd58239e416a0"
       }
     },
     {
@@ -13564,7 +13660,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
-  "current_packaged_source": "0c69dfc2e665deba7208ea39839c766a001a91e6",
+  "current_packaged_source": "99886108d0cc9335749e3b4e19f75223e7f40852",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -13575,5 +13671,15 @@
     "application_build": "53d7ec383670775829e7d5f8ec4c69571cebd708",
     "migration": "v1.31 publication and v1.32 separate draft intent; existing notes remain private; isolated-site preservation/repeat passed; fresh install pending",
     "evidence": "docs/mvp-journey-verification-2026-10-09.md#latest-sharing-checkpoint--source-53d7ec3"
+  },
+  "account_checkpoint": {
+    "source": "7aa1ea939c94530f4ea7061051efd58239e416a0",
+    "visual_acceptance": "Compared; not owner accepted",
+    "functional_acceptance": "Owned MariaDB/browser profile, privacy and preference slice passed; error/retry and actual 200% zoom passed. Not full registration/contact/couples acceptance."
+  },
+  "native_release_checkpoint": {
+    "source": "40579e7",
+    "evidence": "scripts/check_mvp_earnings_worker.py",
+    "status": "Native forced scheduled-job dispatch and separate RQ worker verified twice; disputed earnings held; payout idempotent; 12 retained-table fingerprints equal. Continuous scheduler disabled, not verified."
   }
 }

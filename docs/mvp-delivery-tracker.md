@@ -736,3 +736,7 @@ preserve sharing history. Isolated-site backup/export and repeated migration che
 preserve clinical/appointment and financial rows. Fresh install and full couples
 recipient/call acceptance remain pending. See the active report; earlier pending
 private-note-sharing statements are superseded.
+
+## Current 9 October account / appointment / worker checkpoint
+
+Active source/evidence: [current journey verification](mvp-journey-verification-2026-10-09.md); packaged frontend `9988610`, draft PR #44 preserving PR #43. H01–H04 account/privacy/reference composition and real saves/errors, E01 status views/detail navigation/cancellation, and E02/E11/E13 note permissions/publication passed their focused owned browser checks. Paired comparisons retain explicit differences; visual acceptance is not complete. Native installed earnings job executed twice in a dedicated RQ worker, one release, dispute held, one payout reservation. Twelve retained-table pre/post fingerprints matched. Continuous scheduler remains disabled; forced dispatch is not daemon acceptance. Inherited test cleanup's global projection recalculation is removed; regression preserves unrelated discrepancies. Fresh/legacy cutover, couples, registration, hosted call, whole-MVP fidelity and coherent presentation data remain release gates.

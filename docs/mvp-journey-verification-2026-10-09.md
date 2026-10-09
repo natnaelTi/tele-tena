@@ -8,8 +8,8 @@ keeps visual fidelity and functional journey acceptance independent.
 
 - Branch `feat/mvp-release-handover`, draft PR #44, dependent on draft PR #43.
   The preserved `1e8d161468eb8d3563f1b5743982722c749bbcbf` ancestor remains included.
-- Packaged application source **`53d7ec383670775829e7d5f8ec4c69571cebd708`**.
-  Subsequent evidence/documentation commits do not change its application code.
+- Packaged application source **`99886108d0cc9335749e3b4e19f75223e7f40852`**.
+  Account browser evidence below was captured at `7aa1ea9`; the latest appointment/documentation browser evidence uses this packaged source. Subsequent evidence/documentation commits do not change its application code.
 - **http://127.0.0.1:8017/teletena/**; site
   `tele-tena-pr12-fresh.localhost`; bench `/home/frappe/frappe/frappe-bench`.
 - Gunicorn master 392014, two site-bound loopback workers; working directory
@@ -18,13 +18,118 @@ keeps visual fidelity and functional journey acceptance independent.
   records the source and asset hashes. Preview HTTP 200 was checked.
 - Reference `/home/frappe/teletena-design-reference`, rendered read-only on 8044.
   Actual 142-screen inventory and source remain authoritative.
-- Existing data, credentials, historical records and source ancestry preserved.
+- Credentials and source ancestry preserved. Earlier fixture cleanup had a broad projection recalculation: the audit and narrow replacement are documented below; blanket historical financial-preservation claims are not established by those earlier runs.
   Additive note-sharing v1.31/v1.32 migrations were applied only to this isolated
   review site after backup; preservation checks are below. No balance repairs,
   retained fixture reseeding, merges or remote deployment.
   Intentional earlier browser deposits/bookings/requests/offers remain recorded.
 
-## Implemented and verified slices
+## Current account / appointment / native-worker checkpoint
+
+This section is the current checkpoint; earlier per-commit findings below are
+historical evidence, not an assertion that the entire MVP has passed.
+
+| Reference | Implemented and actual checks | Remaining fidelity / journey gaps |
+|---|---|---|
+| H01 account overview | Reference two-column personal/settings + dedicated wallet layout. Profile form Enter/save/reload, associated required-name errors, draft retention on aborted save, successful retry; MariaDB values checked | City/contact editing and working shared sessions missing; optional relationship link is not couples acceptance. Actual zero wallet differs from fictional reference amount |
+| H02 clinician account | Public name/care languages/private PDF resume and practice/affiliation routes | Reference portrait/introduction and richer profile editing still incomplete; no invented credentials |
+| H03 privacy | Global defaults and local disclosure preview; save/reload; no repeated wallet on tab | Reference age/alias controls exceed current name/history model; request override must remain independent |
+| H04 preferences | Associated language/timezone selects; persisted UTC; Amharic/Oromo mobile captures | Notification/accessibility preferences absent; native language approval pending |
+| E01 appointments | Reference tab geometry/title, correct public clinician name, status-based filters, view context across detail/Back/reload. Actual pre-start cancellation creates one release | Reference date/month grouping, remaining state/mobile/zoom coverage and coherent presentation content pending |
+| E02/E11/E13 | Current owned browser rechecks draft/reload, finalization, explicit note sharing, patient summaries, private amendment/history, route isolation, reviewer denial; one earning/completion posting | Owned Ended fixture is not actual media/End/revocation proof; couples recipients and live call chain pending |
+
+### Exact current checks
+
+- `scripts/check_mvp_account_browser.py` passed against packaged `7aa1ea9`.
+  390/768/1440 paired H01–H04 screenshots. Real Chromium **tab zoom** at
+  200% (1440 outer width, 720 CSS width, DPR2), paired application/reference.
+  The abort-on-save check is controlled transport failure, not proof of a real
+  server outage. Profile/defaults/preferences values were checked in MariaDB.
+- `scripts/check_mvp_notes_browser.py` passed against packaged `9988610`.
+  Real owned accounts and backend operations, appointment cancellation,
+  persisted notes/publication/amendment, patient and reviewer authorization,
+  delayed route isolation, 390/768/1440 paired appointment views.
+- `tests/appointment-groups.mjs` passed: no inferred completion, distinct
+  clinician documentation tasks, terminal precedence, state-based views.
+- `test_appointment_list_cancellation_actor_does_not_unmask_patient`
+  passed at `ed28dc2` after reproducing a missing SELECT projection causing
+  every clinician name to fall back to “Your clinician”. Cancellation actor
+  IDs are retained privately, not returned to unrelated participants.
+- Asset/hash/PWA scope scanner passed for `9988610`, including exact-value scan against four privately stored reviewer passwords; no match. No provider values were configured on this site.
+- Locked production build `scripts/build_review.py` passed for `9988610`.
+  Lint exits 0 with existing warnings; build retains >500KB chunk warning.
+  These are not visual acceptance.
+- Real supported PWA waiting/update flow passed **3bf96b1 → dfe9a2b**:
+  old application remained until explicit Refresh; new public bundle loaded;
+  no private/API cache paths. Not rerun as a physical-device check or claimed
+  as the specific `9988610` transition.
+
+### Native worker and preservation evidence
+
+`check_mvp_earnings_worker.py` passed at the `40579e7` checkpoint. Supported
+booking/finalization APIs created owned earnings with zero/one-minute policy
+snapshots in test-process memory only. The configured site policy, clock and
+retained records were not changed. The test waited through the real one-minute
+recorded release time, dispatched the installed `Scheduled Job Type` using
+`enqueue(force=True)`, and executed it in a separate native RQ worker restricted
+to a unique queue. Two executions produced **one** release journal; an open
+dispute held the other earning after its release boundary. A repeated payout
+request returned the same reservation; no external transfer occurred.
+
+The site's continuous scheduler is **disabled**. Shared worker/scheduler
+processes were not restarted, used or drained. This proves native forced
+dispatch and RQ execution, **not** a continuous cron tick or complete old-process
+cutover. Native Scheduled Job logs/last-execution retain execution evidence.
+The private owned queue/job was removed after completion.
+
+A test-harness audit found that inherited `Integration.tearDownClass` globally
+recomputed **all** financial account projections after fixture removal. This
+could conceal unrelated discrepancies. It has been replaced with subtraction
+of only the exact removed fixture journals' signed deltas under account locks.
+Unrelated owner values and pre-existing shared-control offsets are left intact.
+`check_fixture_financial_preservation.py` passes a rollback-only MariaDB
+regression with deliberately inconsistent **test-only** debit/credit/foreign
+accounts and retry cleanup. No persisted balance repair was made.
+
+The native worker run now compares exact pre/post row fingerprints for all
+12 financial/encounter tables (accounts, journals/lines, wallets/log, earnings,
+payouts, disputes, reconciliation, appointments, notes/revisions): **all matched**
+after owned cleanup. This is present-run preservation; it cannot retroactively
+prove that earlier global-cleanup runs never changed an inconsistent projection.
+Full legacy/opening-boundary reconciliation and fresh-site acceptance remain
+release gates. Original journals/records have not been rewritten for this fix.
+
+### Paired comparisons and current review steps
+
+Evidence: `docs/screenshots/mvp-connected-journeys/H01–H04-*` (source `7aa1ea9`)
+and `E01-{upcoming,completed,cancelled}-*` (source `9988610`). Desktop pairs were
+visually inspected. H01 now follows reference columns, wallet and settings rows;
+missing city/verified contact fields and incomplete shared-care workflow remain
+explicit differences. E01 follows reference heading/tabs; additional operational
+views, fuller facts, tour invitation and generic date grouping still differ.
+**Neither area is declared visually accepted.** No universal pixel-match score.
+
+Open **http://127.0.0.1:8017/teletena/** with existing private reviewer credentials.
+Use email → explicitly selected Password on this intentional invited-review site.
+Patient: Account → Privacy / Language & timezone; Appointments → view → consultation
+→ Back. Clinician: Account → professional details/private resume; Appointments →
+ended consultation → draft/preview/publication. Admin review access remains separate
+from private care records. Owned browser fixture credentials are temporary and
+removed; these tests do not seed a coherent retained presentation dataset.
+
+### Remaining release blockers
+
+All-MVP paired fidelity/state coverage; direct registration in a separate enabled
+policy with real backend controlled transport; coherent additive presentation
+content; working two-adult couples participant/consent/call/note authorization;
+current hosted LiveKit original/refreshed-token End regression; continuous
+site-scoped routing/release and safe old-writer cutover; current fresh install /
+representative owner-level legacy upgrade/repeat reconciliation. The preview
+stays invited-only. Live SMS/SMTP receipt, physical-device media/PWA, native
+translation and clinical taxonomy/rubric review remain external validation gaps.
+No merges, financial repairs or Selfmade changes in this checkpoint.
+
+## Earlier implemented and verified slices
 
 | Area | Implemented | Verification | Remaining |
 |---|---|---|---|
