@@ -1,6 +1,7 @@
 """Private, bounded open-request delivery and patient-only offer acceptance."""
 import hashlib
 import json
+import re
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -581,7 +582,7 @@ def clinician_requests():
 
 
 @query()
-def clinician_offers(page=0, view=None):
+def clinician_offers(page=0, view=None, offer_id=None):
     """Own quotes and outcomes, including closed requests, with bounded paging.
 
     No request narrative, patient account identity, competitor quote, or new
@@ -596,6 +597,10 @@ def clinician_offers(page=0, view=None):
         fail('Choose an offer view.', 'request_offer_view_invalid')
     active_condition = "(o.state='Active' AND r.state='Open' AND o.valid_until>UTC_TIMESTAMP(6) AND r.expires_at>UTC_TIMESTAMP(6))"
     view_filter = '' if view is None else ' AND ' + (active_condition if view == 'Active' else 'NOT ' + active_condition)
+    if offer_id is not None and (not isinstance(offer_id, str) or not re.fullmatch(r'[a-f0-9-]{36}', offer_id)):
+        fail('Offer unavailable.', 'request_offer_unavailable')
+    own_filter = ' AND o.id=%s' if offer_id else ''
+    parameters = (clinician, clinician) + ((offer_id,) if offer_id else ()) + (page_number * 50,)
     offers = rows('''SELECT o.id,o.start,o.duration_minutes,o.consultation_format,
         o.price_minor,o.price_source,o.state,o.valid_until,o.created_at,o.timezone,
         r.state AS request_state,r.expires_at AS request_expires_at,r.disclosure_snapshot,s.service_label AS category,
@@ -604,8 +609,10 @@ def clinician_offers(page=0, view=None):
         JOIN tt_offering off ON off.id=o.offering
         JOIN `tabTele Tena Service` s ON s.name=off.service
         LEFT JOIN tt_appointment a ON a.id=o.appointment AND a.clinician=%s
-        WHERE o.clinician=%s''' + view_filter + ''' ORDER BY o.created_at DESC,o.id DESC
-        LIMIT 51 OFFSET %s''', (clinician, clinician, page_number * 50))
+        WHERE o.clinician=%s''' + view_filter + own_filter + ''' ORDER BY o.created_at DESC,o.id DESC
+        LIMIT 51 OFFSET %s''', parameters)
+    if offer_id and not offers:
+        fail('Offer unavailable.', 'request_offer_unavailable')
     has_more = len(offers) > 50
     result = []
     current_time = now()

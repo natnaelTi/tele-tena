@@ -196,6 +196,7 @@ const clinicianNav = [
   ["/clinician", "Today", Home],
   ["/clinician/appointments", "Appointments", CalendarDays],
   ["/clinician/requests", "Requests", ClipboardCheck],
+  ["/clinician/offers", "Your offers", ClipboardCheck],
   ["/clinician/availability", "Availability", Clock3],
   ["/clinician/services", "Services & pricing", Stethoscope],
   ["/clinician/vetting", "Professional review", ClipboardCheck],

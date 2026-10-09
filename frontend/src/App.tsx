@@ -10,6 +10,7 @@ import {
 } from "./layouts/Layouts";
 import Homepage, { ClinicianInvitation } from "./pages/Homepage";
 import BookingConfirmation from "./pages/BookingConfirmation";
+import {ClinicianOffers,ClinicianOfferDetail} from "./pages/ClinicianOffers";
 import SignIn from "./pages/SignIn";
 import Onboarding from "./pages/Onboarding";
 import {
@@ -123,6 +124,8 @@ export default function App() {
                   element={<ConsultationPage />}
                 />
                 <Route path="requests" element={<ClinicianRequestInbox />} />
+                <Route path="offers" element={<ClinicianOffers />} />
+                <Route path="offers/:offerId" element={<ClinicianOfferDetail />} />
                 <Route path="care" element={<CareRecords />} />
                 <Route path="care/:id" element={<CareRecordDetail />} />
                 <Route path="earnings" element={<ClinicianEarnings />} />

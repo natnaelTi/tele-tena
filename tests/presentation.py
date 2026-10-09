@@ -141,6 +141,18 @@ class Presentation(unittest.TestCase):
         self.assertNotIn(fixtures.USERS['p1'], json.dumps(visible))
         submitted = open_requests.submit_offer(request['id'], tailored, slot['start'])
         self.assertEqual(submitted['state'], 'Active')
+        own_detail = open_requests.clinician_offers(offer_id=submitted['id'])['items']
+        self.assertEqual(len(own_detail), 1)
+        self.assertEqual(own_detail[0].id, submitted['id'])
+        self.assertNotIn('request_text', own_detail[0])
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(own_detail, default=str))
+        fixtures.login('c2')
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.clinician_offers(offer_id=submitted['id'])
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            open_requests.clinician_offers(offer_id=submitted['id'])
+        fixtures.login('c1')
         self.assertTrue(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='Active')['items']))
         self.assertFalse(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='History')['items']))
         with self.assertRaises(frappe.ValidationError):
