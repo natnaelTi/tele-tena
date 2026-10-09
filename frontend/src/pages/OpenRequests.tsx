@@ -223,7 +223,8 @@ export function PublicClinicianProfile(){
   if(!resource.data)return <Skeleton/>;
   return <>
     <PageTitle eyebrow="CLINICIAN PROFILE" title={resource.data.display_name} description="Approved services and published appointment options." />
-    <InlineNotice>{resource.data.approval_meaning}</InlineNotice>
+    <div className="public-profile-layout"><section className="public-profile-main"><section className="public-profile-identity"><div className="avatar large" aria-hidden="true">{resource.data.display_name.slice(0,1)}</div><div><h2>{resource.data.display_name}</h2><p>{resource.data.approval_meaning}</p></div></section>
+    <section className="patient-dashboard-panel"><h2>{w("Approved services")}</h2>{resource.data.services.length?resource.data.services.map((service:any)=><article className="public-profile-service" key={service.offering}><div><h3>{service.label}</h3>{service.description&&<p>{service.description}</p>}<p className="supporting">{service.minutes} {w("minutes")} · {w(service.consultation_format==='audio'?'Audio':'Video')} · ETB {money(service.price)}</p></div><Link className="button secondary" to={'/patient/services/'+service.offering}>{w('View service')}</Link></article>):<EmptyState title={w("No published service times are available yet.")} />}</section></section><aside>
     <section className="trust-indicators" aria-labelledby="trust-indicators-title"><h2 id="trust-indicators-title">{t("trustIndicators")}</h2><dl>
       <div><dt>{t("professionalReview")}</dt><dd>{t("manuallyReviewedScopes")}</dd></div>
       <div><dt>{t("responseBehavior")}</dt><dd>{resource.data.trust_indicators.responsiveness.rate_percent===null
@@ -236,6 +237,6 @@ export function PublicClinicianProfile(){
         ? <>{t(resource.data.trust_indicators.session_experience.status==="new"?"sessionExperienceNew":"sessionExperienceMore")} · {resource.data.trust_indicators.session_experience.sample_count} {t("evidenceCount")}</>
         : <>{resource.data.trust_indicators.session_experience.average} / 5 · {resource.data.trust_indicators.session_experience.sample_count} {t("evidenceCount")}</>}</dd></div>
     </dl><p className="supporting">{t("sessionExperienceExplainer")}</p></section>
-    {resource.data.services.length?resource.data.services.map((service:any)=><article className="request-card" key={service.offering}><header><strong>{service.label}</strong><span>{t("approvedScope")}</span></header><p>{service.minutes} minutes · {service.consultation_format} · ETB {money(service.price)} · {service.timezone}</p><Link className="button secondary" to={'/patient/services/'+service.offering}>{w('View service')}</Link></article>):<EmptyState title="No published service times are available yet." />}
+    </aside></div>
   </>;
 }

@@ -44,7 +44,7 @@ export function IconButton({
     <Button
       {...props}
       variant="quiet"
-      className="icon-button"
+      className={`icon-button ${props.className || ""}`}
       aria-label={label}
       title={label}
     >

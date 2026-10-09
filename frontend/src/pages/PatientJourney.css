@@ -1,8 +1,12 @@
 /* Distinct approved C01 dashboard and C02 search-led workspace compositions. */
-.patient-dashboard-layout,.discovery-layout { display:grid; grid-template-columns:minmax(0,1fr) 322px; gap:36px; align-items:start; }
+.patient-dashboard-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr); gap:24px; align-items:start; }
+.discovery-layout { display:grid; grid-template-columns:minmax(0,1fr) 322px; gap:36px; align-items:start; }
 .patient-dashboard-primary,.discovery-primary { min-width:0; }
-.patient-home-hero { background:#eaf5f5; padding:32px; border-radius:20px; margin-bottom:24px; }
-.patient-home-hero h2 { font-size:40px; line-height:1.12; letter-spacing:-1.5px; max-width:500px; }
+.patient-home-hero { background:var(--ink); color:white; padding:40px; border-radius:24px; margin-bottom:24px; }
+.patient-home-hero p { color:#cfdee2; }
+.patient-home-hero .button { background:white; color:var(--ink); }
+.patient-home-search { margin:0 0 24px; }
+.patient-home-hero h2 { font-size:44px; line-height:1.12; letter-spacing:-1.5px; max-width:500px; }
 .patient-home-hero .care-search { padding:0; background:transparent; border:0; margin:24px 0 0; }
 .patient-home-hero .care-search h2 { font-size:20px; letter-spacing:0; }
 .patient-dashboard-panel { border:1px solid var(--border); background:white; border-radius:16px; padding:24px; margin-bottom:24px; }
@@ -45,3 +49,15 @@
 
 .patient-payments-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:32px; align-items:start; }
 @media(max-width:800px) { .patient-payments-layout { grid-template-columns:1fr; gap:24px; } }
+
+.public-profile-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr); gap:24px; align-items:start; }
+.public-profile-identity { display:flex; gap:24px; align-items:center; margin-bottom:32px; }
+.public-profile-identity .avatar { width:96px; height:96px; font-size:36px; }
+.public-profile-identity h2 { font-size:32px; margin-bottom:12px; }
+.public-profile-service { padding:20px 0; border-bottom:1px solid var(--border); display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; align-items:start; }
+.public-profile-service:last-child { border:0; padding-bottom:0; }
+.public-profile-service h3 { font-size:20px; margin:0 0 8px; }
+.public-profile-service > div { flex:1 1 220px; }
+.public-profile-layout .trust-indicators { margin:0; border-radius:16px; background:white; padding:26px; }
+.public-profile-layout .trust-indicators dl { grid-template-columns:1fr; gap:20px; }
+@media(max-width:800px) { .public-profile-layout { grid-template-columns:1fr; } .public-profile-identity { gap:16px; } .public-profile-identity h2 { font-size:24px; } .public-profile-identity .avatar { width:64px; height:64px; font-size:24px; } }
