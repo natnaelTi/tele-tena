@@ -1,3 +1,6 @@
+import { appointmentGroups } from "../appointment-groups";
+import { useSession } from "../hooks/useSession";
+import "./ClinicianWorkspace.css";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
@@ -13,6 +16,7 @@ import {
 import {
   Button,
   Card,
+  Dialog,
   EmptyState,
   InlineNotice,
   Select,
@@ -31,61 +35,30 @@ type Practice = {
 };
 const practice = () => api<Practice>("practice");
 export function ClinicianToday() {
-  const [now] = useState(() => Date.now());
-  const appointments = useResource(journeyApi.appointments);
-  const current = useResource(practice);
-  return (
-    <>
-      <PageTitle
-        eyebrow="YOUR PRACTICE"
-        title="Today"
-        description={`Make space for the conversations ahead. Times in ${timezone}.`}
-        action={
-          <Link className="button secondary" to="/clinician/availability">
-            Manage availability
-          </Link>
-        }
-      />
-      {current.data && current.data.application?.status !== "Approved" && (
-        <InlineNotice>
-          Your application status:{" "}
-          {current.data?.application?.status || "Loading"}. Manual approval and
-          service-scope approval are required before accepting bookings.
-        </InlineNotice>
-      )}
-      {appointments.error ? (
-        <InlineNotice tone="danger">
-          Appointments couldn’t be loaded.{" "}
-          <Button onClick={() => void appointments.refresh()}>Retry</Button>
-        </InlineNotice>
-      ) : !appointments.data ? (
-        <Skeleton />
-      ) : appointments.data.length ? (
-        <div className="appointment-groups">{([
-          ["Needs action",appointments.data.filter(a=>a.state==="PendingConfirmation"||(a.call_state==="Ended"&&a.documentation_state!=="Finalized"))],
-          ["In progress",appointments.data.filter(a=>a.call_state==="Open")],
-          ["Upcoming",appointments.data.filter(a=>a.state==="Booked"&&a.call_state!=="Open"&&new Date(a.start).getTime()>=now)],
-          ["Past",appointments.data.filter(a=>["Completed","Cancelled","Expired","NoShow"].includes(a.state)||(a.call_state==="Ended"&&a.documentation_state==="Finalized")||(a.state==="Booked"&&a.call_state!=="Ended"&&new Date(a.end).getTime()<now))],
-        ] as [string,NonNullable<typeof appointments.data>][]).filter(([,items])=>items.length).map(([label,items])=><section key={label}><h2>{label}</h2><div className="stack">{items.map(a=><AppointmentCard key={a.id} appointment={a} base="/clinician" />)}</div></section>)}</div>
-      ) : (
-        <EmptyState title="Your next conversation will appear here.">
-          Review your services and availability so patients can find a suitable
-          time.
-        </EmptyState>
-      )}
-      <div className="quick-links">
-        <Link to="/clinician/requests"><h3>Requests</h3><p>Choose when you are ready to respond to eligible private requests.</p></Link>
-        <Link to="/clinician/services">
-          <h3>Services & pricing</h3>
-          <p>Manage published sessions and clear prices.</p>
-        </Link>
-        <Link to="/clinician/care">
-          <h3>Care records</h3>
-          <p>See only the information shared for each appointment.</p>
-        </Link>
-      </div>
-    </>
-  );
+  const {w}=useLocale();
+  const {session}=useSession();
+  const approved=!!session?.roles.includes("Tele Tena Clinician");
+  const [now,setNow]=useState(()=>Date.now());
+  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),60000);return()=>clearInterval(timer);},[]);
+  const appointments=useResource(journeyApi.appointments);
+  const current=useResource(practice);
+  const earnings=useResource(useCallback(()=>approved?api<EarningsView>("tele_tena.accounting.clinician_earnings"):Promise.resolve(null),[approved]));
+  const inbox=useResource(useCallback(()=>approved?journeyApi.clinicianRequests():Promise.resolve(null),[approved]));
+  const groups=appointmentGroups(appointments.data||[],true,now);
+  const day=new Date(now).toLocaleDateString(undefined,{timeZone:timezone});
+  const today=appointments.data?.filter(item=>new Date(item.start).toLocaleDateString(undefined,{timeZone:timezone})===day);
+  return <>
+    <PageTitle title={w("Today")} description={`${new Date(now).toLocaleDateString(undefined,{dateStyle:"full"})} · ${timezone}`} action={<Link className="button secondary" to="/clinician/availability">{w("Manage availability")}</Link>}/>
+    <div className="practice-metrics">
+      <section><span>{w("Today’s sessions")}</span><strong>{appointments.error?w("Unavailable"):today?.length??"—"}</strong><p>{w("Appointments on your calendar")}</p></section>
+      <section><span>{w("Open requests")}</span><strong>{inbox.error?w("Unavailable"):inbox.data?.length??"—"}</strong><Link to="/clinician/requests">{w("View eligible requests")}</Link></section>
+      <section><span>{w("Available earnings")}</span><strong>{earnings.data?`ETB ${money(earnings.data.balances.earnings_available)}`:earnings.error?w("Unavailable"):"—"}</strong><Link to="/clinician/earnings">{w("View earnings")}</Link></section>
+    </div>
+    <div className="clinician-today-layout"><section>
+      {appointments.error?<InlineNotice tone="danger">{w("Appointments couldn’t be loaded.")} <Button onClick={()=>void appointments.refresh()}>{w("Retry")}</Button></InlineNotice>:!appointments.data?<Skeleton/>:groups.length?<div className="appointment-groups">{groups.map(([label,items])=><section key={label}><h2>{w(label)}</h2><div className="stack">{items.slice(0,5).map(item=><AppointmentCard key={item.id} appointment={item} base="/clinician"/>)}</div>{items.length>5&&<Link className="text-link" to="/clinician/appointments">{w("View all appointments")}</Link>}</section>)}</div>:<EmptyState title={w("Your next conversation will appear here.")}>{w("Review your services and availability so patients can find a suitable time.")}</EmptyState>}
+      <section className="practice-panel"><h2>{w("Quick actions")}</h2><div className="actions"><Link className="button" to="/clinician/requests">{w("View open requests")}</Link><Link className="button secondary" to="/clinician/availability">{w("Edit availability")}</Link><Link className="button secondary" to="/clinician/care">{w("Care records")}</Link></div></section>
+    </section><aside className="practice-panel"><h2>{w("Practice readiness")}</h2>{current.error?<InlineNotice tone="danger">{w("Practice details unavailable.")}</InlineNotice>:!current.data?<Skeleton/>:<dl className="practice-readiness"><div><dt>{w("Application")}</dt><dd>{w(current.data.application?.status||"Not submitted")}</dd><Link to="/clinician/vetting">{w("Professional review")}</Link></div><div><dt>{w("Services & pricing")}</dt><dd>{current.data.offerings.length} {w("published offerings")}</dd><Link to="/clinician/services">{w("Manage services")}</Link></div><div><dt>{w("Availability")}</dt><dd>{current.data.schedules?.filter(item=>item.status==='Published').length??0} {w("published schedules")}</dd><Link to="/clinician/availability">{w("Manage availability")}</Link></div></dl>}</aside></div>
+  </>;
 }
 export function Availability() {
   const {w,locale}=useLocale();
@@ -398,6 +371,8 @@ export function ClinicianEarnings() {
   const resource = useResource(load);
   const action = useAction();
   const [amount, setAmount] = useState("");
+  const [payoutOpen,setPayoutOpen]=useState(false);
+  const [amountError,setAmountError]=useState("");
   const [retryKey, setRetryKey] = useState(() => crypto.randomUUID());
   const cancelReason = "Changed plans";
   async function request() {
@@ -406,6 +381,7 @@ export function ClinicianEarnings() {
     const minor = (BigInt(whole) * 100n + BigInt(fraction.padEnd(2, "0"))).toString();
     await api("tele_tena.accounting.request_payout", { amount_minor: minor, idempotency_key: retryKey }, true);
     setAmount("");
+    setPayoutOpen(false);
     setRetryKey(crypto.randomUUID());
     await resource.refresh();
   }
@@ -417,19 +393,20 @@ export function ClinicianEarnings() {
     <PageTitle title={w("Earnings")} description={w("See what is pending, available, and reserved for payout requests.")} />
     {resource.error ? <InlineNotice tone="danger">Earnings could not be loaded. <Button onClick={() => void resource.refresh()}>Try again</Button></InlineNotice> : !resource.data ? <Skeleton /> : <>
       <div className="earnings-overview">
-        <Card className="earnings-available"><p>{w("Available")}</p><h2>ETB {money(resource.data.balances.earnings_available)}</h2><p className="supporting">{w("Available to request")}</p></Card>
+        <Card className="earnings-available"><p>{w("Available earnings")}</p><h2>ETB {money(resource.data.balances.earnings_available)}</h2><p className="supporting">{w("Available to request")}</p><Button variant="secondary" disabled={resource.data.balances.earnings_available<=0} onClick={()=>setPayoutOpen(true)}>{w("Request payout")}</Button></Card>
         <dl className="earnings-supporting">
           <div><dt>{w("Pending")}</dt><dd>ETB {money(resource.data.balances.pending)}</dd><p className="supporting">{w("Held until the saved review window ends or a dispute is resolved.")}</p></div>
           <div><dt>{w("Payout requested")}</dt><dd>ETB {money(resource.data.balances.payout_reserved)}</dd><p className="supporting">{w("Reserved for open requests")}</p></div>
         </dl>
       </div>
-      <Card className="payout-request"><h2>{w("Request a payout")}</h2>
-        {resource.data.balances.earnings_available > 0 ? <><p>{w("This request reserves the amount. It does not send money outside this demonstration.")}</p>
-          <TextField label={w("Amount (ETB)")} inputMode="decimal" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" />
-          <Button loading={action.busy} disabled={action.busy || !amount} onClick={() => void action.run(request, w("Payout request saved. No external transfer was made."))}>{w("Request payout")}</Button></>
-          : <p className="supporting">{w("No earnings are available to request yet.")}</p>}
-        {action.error && <InlineNotice tone="danger">{action.error}</InlineNotice>}{action.success && <InlineNotice tone="success">{action.success}</InlineNotice>}
-      </Card>
+      <Dialog open={payoutOpen} onOpenChange={open=>{if(!action.busy)setPayoutOpen(open);}} title={w("Request a payout")} description={w("Reserve part of your available earnings.")}>
+        <p>{w("Available earnings")}: ETB {money(resource.data.balances.earnings_available)}</p><p>{w("This request reserves the amount. It does not send money outside this demonstration.")}</p>
+        <TextField label={w("Amount (ETB)")} inputMode="decimal" value={amount} error={amountError} onChange={event=>{setAmount(event.target.value);setAmountError("");setRetryKey(crypto.randomUUID());}} placeholder="0.00" />
+        <div className="actions"><Button variant="secondary" disabled={action.busy} onClick={()=>setPayoutOpen(false)}>{w("Cancel")}</Button><Button loading={action.busy} onClick={()=>{if(!/^\d{1,7}(\.\d{1,2})?$/.test(amount)){setAmountError(w("Enter a positive amount with at most two decimal places."));return;}const [whole,fraction=""]=amount.split(".");const minor=BigInt(whole)*100n+BigInt(fraction.padEnd(2,"0"));if(minor<1n||minor>BigInt(resource.data!.balances.earnings_available)){setAmountError(w("Choose an amount within your available earnings."));return;}void action.run(request,w("Payout request saved. No external transfer was made."));}}>{w("Request payout")}</Button></div>
+        {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
+      </Dialog>
+      {action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
+      <ol className="earnings-stages" aria-label={w("Earnings lifecycle")}>{[["Reserved","At booking"],["Pending","After finalization"],["Available","After the review window"],["Payout requested","Reserved for your request"]].map(([label,description],index)=><li key={label}><span aria-hidden="true">{index+1}</span><strong>{w(label)}</strong><p>{w(description)}</p></li>)}</ol>
       <section className="earnings-history-section"><h2>{w("Activity")}</h2>{history.length ? <ul className="earnings-history">{history.map(entry=><li key={entry.id}><div><strong>{w(entry.kind)}</strong><span className="supporting">{entry.at ? date(entry.at) : w("Date unavailable")}</span></div><div className="earnings-history-value"><strong>ETB {money(entry.amount)}</strong><StatusBadge>{w(entry.state === "Disputed" ? "On hold" : entry.state)}</StatusBadge></div>
           <Link className="text-link" to={`/clinician/earnings/transactions/${encodeURIComponent(entry.id)}`}>{w("Transaction details")}</Link>
           {"gross_minor" in entry.item && <p className="supporting">{w("Gross")}: ETB {money(entry.item.gross_minor)} · {w("Fee")}: ETB {money(entry.item.fee_minor)} · {w("Net")}: ETB {money(entry.item.net_minor)}{entry.item.release_at&&entry.state==="Pending"?` · ${w("Expected release")}: ${date(entry.item.release_at)}`:""}</p>}

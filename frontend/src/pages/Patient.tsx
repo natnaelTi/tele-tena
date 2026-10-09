@@ -49,9 +49,9 @@ export function PatientHome() {
         description={`${w("Welcome")}, ${session?.profile?.display_name || w("there")}.`}
       />
       <div className="patient-dashboard-layout"><section className="patient-dashboard-primary">
-      <section className="patient-home-hero"><h2>{w("A little space")}<br />{w("for yourself.")}</h2><p>{w("Find the right support for today.")}</p><Link className="button secondary" to="/patient/discovery">{w("Find care")}</Link></section>
+      <section className="patient-home-hero"><h2>{w("A little space")}<br />{w("for yourself.")}</h2><p>{w("Find the right support for today.")}</p>
       <section className="care-search patient-home-search">
-        <h2>What would you like help with?</h2>
+        <h3 className="sr-only">{w("What would you like help with?")}</h3>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -70,7 +70,7 @@ export function PatientHome() {
             Find care
           </Button>
         </form>
-      </section>
+      </section></section>
       <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Share what support you’re looking for and compare private offers from eligible clinicians.")}</p></div><Link className="button secondary" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
       {!!requests.data?.some((item:any)=>item.state==='Open')&&<section className="active-request-summary"><div className="section-line"><h2>Active care requests</h2><Link to="/patient/requests">Review requests and offers <ArrowRight size={16}/></Link></div>{requests.data.filter((item:any)=>item.state==='Open').slice(0,3).map((item:any)=><Link className="active-request-row" key={item.id} to={'/patient/requests/'+encodeURIComponent(item.id)}><span>{item.urgency==='immediate'?'As soon as possible':'Schedule for later'} · {item.category}</span><strong>{item.offers.filter((offer:any)=>offer.state==='Active').length} new offers</strong></Link>)}</section>}
       <section className="patient-dashboard-panel">

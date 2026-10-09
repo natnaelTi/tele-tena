@@ -33,3 +33,7 @@
 @media(max-width:800px) { .product-desktop-nav { display:none; } .product-header { padding:14px 20px; min-height:72px; gap:12px; } .product-user { gap:0; } .product-user select { max-width:120px; } .reference-workspace-main { padding:28px 20px 110px; } .product-mobile-nav { display:flex; justify-content:space-around; position:fixed; bottom:0; inset-inline:0; background:white; border-top:1px solid var(--border); padding:8px 8px max(8px,env(safe-area-inset-bottom)); z-index:40; } .product-mobile-nav a,.product-mobile-nav .button { display:flex; flex-direction:column; gap:4px; align-items:center; justify-content:center; min-height:56px; padding:4px 8px; color:var(--muted); font-size:14px; text-decoration:none; font-weight:500; } .product-mobile-nav a.active { color:var(--brand); } .reference-clinician-card .card-actions { flex-wrap:wrap; padding:14px 16px; } .reference-clinician-card .clinician-body { padding:20px 16px; gap:13px; } .clinician-preview-dialog { padding:24px 20px; } }
 
 @media(max-width:800px) { .reference-workspace-main.workspace-wide { padding-inline:20px; } }
+
+.reference-workspace-main > .page-title h1 { font-size:40px; line-height:1.12; letter-spacing:-1.6px; }
+@media(min-width:801px) { .reference-workspace-main { position:relative; } .reference-workspace-main > .tour-replay { position:absolute; top:8px; right:36px; margin:0; } }
+@media(max-width:800px) { .reference-workspace-main > .page-title h1 { font-size:32px; } }

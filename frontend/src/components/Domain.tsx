@@ -1,3 +1,4 @@
+import { appointmentStatus } from "../appointment-status";
 import { useRef, useState } from "react";
 import { ClinicianPreview } from "./ClinicianPreview";
 import { useLocale } from "../hooks/useLocale";
@@ -63,18 +64,16 @@ export function AppointmentCard({
   appointment: Appointment;
   base: string;
 }) {
-  const elapsed = new Date(appointment.end).getTime() < Date.now();
-  const clinician = base.startsWith("/clinician");
-  const stateLabel = appointment.state === "Completed" ? "Completed" : appointment.call_state === "Open" ? "In progress" : appointment.call_state === "Ended" ? "Call ended" : appointment.state === "Booked" ? elapsed ? "Past · outcome not recorded" : "Upcoming" : appointment.state === "PendingConfirmation" ? "Needs confirmation" : appointment.state;
+  const {w}=useLocale();
+  const presentation=appointmentStatus(appointment,base.startsWith("/clinician"));
   return (
     <Card className="appointment-card">
       <div className="appointment-icon">
         <CalendarDays size={24} />
       </div>
       <div className="appointment-details">
-        <StatusBadge tone={appointment.state === "Cancelled" || appointment.state === "Expired" ? "danger" : appointment.state === "PendingConfirmation" ? "warning" : appointment.state === "Completed" ? "success" : "neutral"}>{stateLabel}</StatusBadge>
-        {appointment.call_state === "Ended" && appointment.state === "Completed" && <StatusBadge tone="neutral">Call ended</StatusBadge>}
-        {appointment.call_state === "Ended" && appointment.documentation_state !== "Finalized" && <StatusBadge tone={clinician?"warning":"neutral"}>{clinician?"Notes pending":"Summary being prepared"}</StatusBadge>}
+        <StatusBadge tone={presentation.tone}>{w(presentation.label)}</StatusBadge>
+        {presentation.detail&&<p className="supporting">{w(presentation.detail)}</p>}
         <h3>{appointment.service_label}</h3>
         <p>
           {date(appointment.start,appointment.timezone)} · {appointment.minutes} booked minutes
@@ -87,7 +86,7 @@ export function AppointmentCard({
         className="button secondary"
         to={`${base}/consultations/${appointment.id}`}
       >
-        View consultation
+        {w("View consultation")}
         <ArrowRight size={18} />
       </Link>
     </Card>
