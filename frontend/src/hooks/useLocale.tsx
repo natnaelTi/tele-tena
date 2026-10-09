@@ -9,6 +9,8 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  "Your day at a glance": ["ቀንዎን በአጭሩ", "Guyyaa kee gabaabinaan"],
+  "Up next": ["ቀጥሎ ያለው", "Kan itti aanu"],
   "Meet your clinician": ["ባለሙያዎን ይተዋወቁ", "Ogeessa kee wajjin wal bari"],
   "available service": ["ያለ አገልግሎት", "tajaajila jiru"],
   "Post for free and compare private offers.": ["በነጻ ይለጥፉ እና የግል ቅናሾችን ያወዳድሩ።", "Bilisa maxxansi, yaadota dhuunfaa wal bira qabi."],

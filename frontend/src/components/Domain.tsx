@@ -72,6 +72,25 @@ export function HomeAppointmentPreview({ appointment }: { appointment: Appointme
     <div className="home-appointment-actions"><Link className="button primary" to={href}>{w("View appointment")}</Link><Link className="button secondary" to="/patient/appointments">{w("All appointments")}</Link></div>
   </div>;
 }
+/** F01 compact schedule row, using the same authorized snapshot/status as details. */
+export function ScheduleAppointmentRow({ appointment }: { appointment: Appointment }) {
+  const { w, locale } = useLocale();
+  const status = appointmentStatus(appointment, true);
+  const instant = new Date(appointment.start);
+  const time = new Intl.DateTimeFormat(locale, {
+    hour: "2-digit", minute: "2-digit", timeZone: appointment.timezone || timezone,
+  }).format(instant);
+  return <div className="schedule-appointment-row">
+    <span className="schedule-appointment-icon" aria-hidden="true">{appointment.call_state === "Ended" ? <FileText size={20}/> : appointment.consultation_format === "audio" ? <Headphones size={20}/> : <Video size={20}/>}</span>
+    <div className="schedule-appointment-copy">
+      <Link to={"/clinician/consultations/" + appointment.id}>{time} · {appointment.display_identity || w("Private patient")}</Link>
+      <p>{appointment.service_label} · {w(appointment.consultation_format === "audio" ? "Audio" : "Video")}</p>
+      <p><time dateTime={appointment.start}>{new Intl.DateTimeFormat(locale, {month:"short",day:"numeric",timeZone:appointment.timezone || timezone}).format(instant)}</time> · {appointment.timezone || timezone}</p>
+      {status.detail && <p>{w(status.detail)}</p>}
+    </div>
+    <StatusBadge tone={status.tone}>{w(status.label)}</StatusBadge>
+  </div>;
+}
 export function AppointmentCard({
   appointment,
   base,

@@ -7,7 +7,7 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
 import { journeyApi } from "../journey-api";
 import {
-  AppointmentCard,
+  ScheduleAppointmentRow,
   DisclosurePreview,
   PageTitle,
   date,
@@ -49,14 +49,14 @@ export function ClinicianToday() {
   const day=new Date(now).toLocaleDateString(undefined,{timeZone:timezone});
   const today=appointments.data?.filter(item=>new Date(item.start).toLocaleDateString(undefined,{timeZone:timezone})===day);
   return <>
-    <PageTitle title={w("Today")} description={`${new Date(now).toLocaleDateString(undefined,{dateStyle:"full"})} · ${timezone}`} action={<Link className="button secondary" to="/clinician/availability">{w("Manage availability")}</Link>}/>
+    <PageTitle title={w("Your day at a glance")} description={`${new Date(now).toLocaleDateString(undefined,{dateStyle:"full"})} · ${timezone}`} action={<Link className="button secondary" to="/clinician/availability">{w("Manage availability")}</Link>}/>
     <div className="practice-metrics">
       <section><span>{w("Today’s sessions")}</span><strong>{appointments.error?w("Unavailable"):today?.length??"—"}</strong><p>{w("Appointments on your calendar")}</p></section>
       <section><span>{w("Open requests")}</span><strong>{inbox.error?w("Unavailable"):inbox.data?.length??"—"}</strong><Link to="/clinician/requests">{w("View eligible requests")}</Link></section>
       <section><span>{w("Available earnings")}</span><strong>{earnings.data?`ETB ${money(earnings.data.balances.earnings_available)}`:earnings.error?w("Unavailable"):"—"}</strong><Link to="/clinician/earnings">{w("View earnings")}</Link></section>
     </div>
     <div className="clinician-today-layout"><section>
-      {appointments.error?<InlineNotice tone="danger">{w("Appointments couldn’t be loaded.")} <Button onClick={()=>void appointments.refresh()}>{w("Retry")}</Button></InlineNotice>:!appointments.data?<Skeleton/>:groups.length?<div className="appointment-groups">{groups.map(([label,items])=><section key={label}><h2>{w(label)}</h2><div className="stack">{items.slice(0,5).map(item=><AppointmentCard key={item.id} appointment={item} base="/clinician"/>)}</div>{items.length>5&&<Link className="text-link" to="/clinician/appointments">{w("View all appointments")}</Link>}</section>)}</div>:<EmptyState title={w("Your next conversation will appear here.")}>{w("Review your services and availability so patients can find a suitable time.")}</EmptyState>}
+      {appointments.error?<InlineNotice tone="danger">{w("Appointments couldn’t be loaded.")} <Button onClick={()=>void appointments.refresh()}>{w("Retry")}</Button></InlineNotice>:!appointments.data?<Skeleton/>:groups.length?<div className="appointment-groups">{groups.map(([label,items])=><section key={label}><h2>{w(label === "Upcoming" ? "Up next" : label)}</h2><div>{items.slice(0,5).map(item=><ScheduleAppointmentRow key={item.id} appointment={item}/>)}</div>{items.length>5&&<Link className="text-link" to="/clinician/appointments">{w("View all appointments")}</Link>}</section>)}</div>:<EmptyState title={w("Your next conversation will appear here.")}>{w("Review your services and availability so patients can find a suitable time.")}</EmptyState>}
       <section className="practice-panel"><h2>{w("Quick actions")}</h2><div className="actions"><Link className="button" to="/clinician/requests">{w("View open requests")}</Link><Link className="button secondary" to="/clinician/availability">{w("Edit availability")}</Link><Link className="button secondary" to="/clinician/care">{w("Care records")}</Link></div></section>
     </section><aside className="practice-panel"><h2>{w("Practice readiness")}</h2>{current.error?<InlineNotice tone="danger">{w("Practice details unavailable.")}</InlineNotice>:!current.data?<Skeleton/>:<dl className="practice-readiness"><div><dt>{w("Application")}</dt><dd>{w(current.data.application?.status||"Not submitted")}</dd><Link to="/clinician/vetting">{w("Professional review")}</Link></div><div><dt>{w("Services & pricing")}</dt><dd>{current.data.offerings.length} {w("saved offerings")}</dd><Link to="/clinician/services">{w("Manage services")}</Link></div><div><dt>{w("Availability")}</dt><dd>{current.data.schedules?.filter(item=>item.status==='Published').length??0} {w("published schedules")}</dd><Link to="/clinician/availability">{w("Manage availability")}</Link></div></dl>}</aside></div>
   </>;
