@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { journeyApi } from '../journey-api';
 import type { Disclosure } from '../journey-api';
 import { PageTitle, money } from '../components/Domain';
-import { Button, Checkbox, EmptyState, InlineNotice, Select, Skeleton, TextField } from '../components/ui';
+import { Button, Checkbox, EmptyState, InlineNotice, Select, Skeleton, TextField, Dialog } from '../components/ui';
 import { useSession } from '../hooks/useSession';
 import { useLocale } from '../hooks/useLocale';
 import { useAction } from '../hooks/useAction';
@@ -51,6 +51,17 @@ export function PatientOpenRequests(){
   const [requestKey,setRequestKey]=useState(()=>{try{return sessionStorage.getItem('teletena-open-request-retry')||freshRequestKey()}catch{return crypto.randomUUID()}});
   const [showFallback,setShowFallback]=useState<Record<string,boolean>>({});
   const [publicationMessage,setPublicationMessage]=useState('');
+  const [composerStep,setComposerStep]=useState(0);
+  const [composerErrors,setComposerErrors]=useState<Record<string,string>>({});
+  const [preview,setPreview]=useState<Disclosure|null>(null);
+  const continueComposer=()=>{
+    const errors:Record<string,string>={};
+    if(composerStep===0&&!narrative.trim())errors.narrative=w('Describe the support you’re looking for.');
+    if(composerStep===1){if(!service)errors.service=w('Choose a service.');if(maxPrice){try{etbToMinor(maxPrice)}catch{errors.price=w('Enter a positive price with at most two decimal places.');}}if(urgency==='scheduled'){const start=new Date(earliest).getTime(),end=new Date(latest).getTime();if(!Number.isFinite(start))errors.earliest=w('Choose an earliest time.');if(!Number.isFinite(end))errors.latest=w('Choose a latest time.');if(Number.isFinite(start)&&Number.isFinite(end)&&end<=start)errors.latest=w('The latest time must be after the earliest time.');}}
+    setComposerErrors(errors);if(Object.keys(errors).length)return;
+    if(composerStep===1)void action.run(async()=>{const result=await journeyApi.preview(narrative,sharing);setPreview(result.disclosure);setComposerStep(2);});else setComposerStep(1);
+  };
+  const updateSharing=(next:typeof sharing)=>{setSharing(next);setPreview(null);void action.run(async()=>{const result=await journeyApi.preview(narrative,next);setPreview(result.disclosure);});};
   useEffect(()=>{if(!service&&requestDraft?.service_label&&services.data){const match=services.data.find(item=>item.label===requestDraft.service_label);if(match)setService(match.id);}},[requestDraft?.service_label,service,services.data]);
   const publish=()=>void action.run(async()=>{
     if(!service||!narrative.trim())throw new Error('Add a service and a short description first.');
@@ -60,7 +71,7 @@ export function PatientOpenRequests(){
       ?`${w('No eligible clinician can start within')} ${publication.start_window_minutes||30} ${w('minutes. You can keep waiting, schedule for later, or browse clinicians. Your requirements will not change automatically.')}`
       :publication?.eligible_supply===0?w('Your request is saved, but no clinicians currently meet every selected requirement. Keep waiting or browse available clinicians.')
       :w('Your request is saved. We’ll show offers here when eligible clinicians respond. An enqueued notice does not confirm that it was seen.'));
-    setNarrative('');setRequestKey(freshRequestKey());await requestResource.refresh();
+    setNarrative('');setComposerStep(0);setPreview(null);setRequestKey(freshRequestKey());await requestResource.refresh();
   });
   const requests=requestResource.data||[];
   const prepareForLater=(req:PatientRequest)=>{
@@ -68,7 +79,7 @@ export function PatientOpenRequests(){
     setFormat(req.consultation_format as 'video'|'audio');setUrgency('scheduled');
     setSharing({name:Object.hasOwn(req.disclosure_snapshot,'name'),history:Object.hasOwn(req.disclosure_snapshot,'history')});
     setMaxPrice(req.max_price_minor===null?'':(req.max_price_minor/100).toFixed(2));setEarliest('');setLatest('');
-    document.getElementById('request-composer')?.scrollIntoView({behavior:'smooth'});
+    setComposerStep(1);document.getElementById('request-composer')?.scrollIntoView({behavior:'smooth'});
   };
   const isLiveRequest=(request:PatientRequest)=>request.state==='Open'&&new Date(request.expires_at).getTime()>Date.now();
   const liveRequests=requests.filter(isLiveRequest);
@@ -79,9 +90,13 @@ export function PatientOpenRequests(){
   return <>
     <PageTitle title={w('Open a care request')} description="Describe what you’re looking for. Eligible clinicians can respond privately." />
     <InlineNotice>{w('Open requests are not an emergency response service.')} The clinicians who receive your request can read the words you enter; avoid names and details that identify you.</InlineNotice>
-    <section className="open-request-composer" id="request-composer">
+    <section className="open-request-composer request-guided-composer" id="request-composer" data-tour-unsaved={!!narrative.trim()}>
+      <p className="supporting">{w("Step")} {composerStep+1} / 3</p><ol className="request-step-progress" aria-label={w("Request steps")}>{[w("Describe"),w("Preferences"),w("Privacy")].map((label,index)=><li key={label} aria-current={composerStep===index?"step":undefined} className={index<=composerStep?"complete":""}>{label}</li>)}</ol>
+      {composerStep===0&&<>
       <h2>{w('What would you like help with?')}</h2>
       <label className="field">Describe what you are looking for<textarea rows={4} maxLength={2000} value={narrative} onChange={e=>setNarrative(e.target.value)} placeholder="A few words about the support you’re seeking" /></label>
+      {composerErrors.narrative&&<InlineNotice tone="danger">{composerErrors.narrative}</InlineNotice>}</>}
+      {composerStep===1&&<>
       <Select label={w('Suggested service category')} value={service} onChange={e=>setService(e.target.value)}><option value="">Choose a service</option>{services.data?.map((x:Service)=><option key={x.id} value={x.id}>{x.label}</option>)}</Select>
       <div className="open-request-grid">
         <Select label={w('When would you like care?')} value={urgency} onChange={e=>setUrgency(e.target.value as typeof urgency)}><option value="immediate">{w('As soon as possible')}</option><option value="scheduled">{w('Schedule for later')}</option></Select>
@@ -90,12 +105,15 @@ export function PatientOpenRequests(){
         <TextField label="Maximum total price (ETB, optional)" inputMode="decimal" value={maxPrice} onChange={e=>setMaxPrice(e.target.value)} />
       </div>
       {urgency==='scheduled'&&<div className="open-request-grid"><TextField label="Earliest time" type="datetime-local" value={earliest} onChange={e=>setEarliest(e.target.value)} /><TextField label="Latest time" type="datetime-local" value={latest} onChange={e=>setLatest(e.target.value)} /></div>}
-      <fieldset className="open-request-sharing"><legend>{w('What clinicians will see')}</legend><p>{narrative.trim()||'Your request description will appear here.'}</p><Checkbox label={w('Include my preferred name')} checked={sharing.name} onChange={e=>setSharing({...sharing,name:e.target.checked})}/><Checkbox label={w('Include my saved history')} checked={sharing.history} onChange={e=>setSharing({...sharing,history:e.target.checked})}/><p className="supporting">These choices start from your privacy defaults. Your request text is visible to its recipients even when your name is not shared.</p></fieldset>
-      <Button loading={action.busy} onClick={publish}>{w('Publish request')}</Button>
+      {Object.values(composerErrors).map(error=><InlineNotice key={error} tone="danger">{error}</InlineNotice>)}</>}
+      {composerStep===2&&<>
+      <fieldset className="open-request-sharing"><legend>{w('What clinicians will see')}</legend><p>{narrative.trim()||'Your request description will appear here.'}</p><Checkbox label={w('Include my preferred name')} checked={sharing.name} disabled={action.busy} onChange={e=>updateSharing({...sharing,name:e.target.checked})}/><Checkbox label={w('Include my saved history')} checked={sharing.history} disabled={action.busy} onChange={e=>updateSharing({...sharing,history:e.target.checked})}/><p className="supporting">These choices start from your privacy defaults. Your request text is visible to its recipients even when your name is not shared.</p></fieldset>
+      {preview?<div className="disclosure-preview">{Object.entries(preview).map(([key,value])=><p key={key}>{value}</p>)}</div>:<Skeleton/>}</>}
+      <div className="actions">{composerStep>0&&<Button variant="secondary" disabled={action.busy} onClick={()=>setComposerStep(composerStep-1)}>{w('Back')}</Button>}{composerStep<2?<Button loading={action.busy} onClick={continueComposer}>{w(composerStep===0?'Continue':'Review privacy')}</Button>:<Button loading={action.busy} disabled={!preview} onClick={publish}>{w('Publish request')}</Button>}</div>
       {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}{publicationMessage&&<InlineNotice tone="success">{publicationMessage}</InlineNotice>}
     </section>
     <section className="open-request-list"><h2>Your requests</h2>{requestResource.error?<InlineNotice tone="danger">Requests could not be loaded. <Button onClick={()=>void requestResource.refresh()}>Retry</Button></InlineNotice>:!requestResource.data?<Skeleton/>:requests.length?<>{liveRequests.length?liveRequests.map(renderRequest):<EmptyState title="No open requests yet.">If you want clinicians to respond with times, you can post a private request here.</EmptyState>}{historyRequests.length>0&&<details className="request-history"><summary>{w('Previous requests')} ({historyRequests.length})</summary>{historyRequests.map(renderRequest)}</details>}</>:<EmptyState title="No open requests yet.">If you want clinicians to respond with times, you can post a private request here.</EmptyState>}</section>
-    {selectedDisclosure&&<div className="request-confirm-overlay" role="presentation"><section className="request-confirm" role="dialog" aria-modal="true" aria-labelledby="request-confirm-title"><h2 id="request-confirm-title">Review this offer</h2><p><strong>{selectedDisclosure.offer.clinician_name}</strong> · {selectedDisclosure.offer.specialty}</p><p>{new Date(selectedDisclosure.offer.start).toLocaleString(undefined,{timeZone:selectedDisclosure.offer.timezone})} · {selectedDisclosure.offer.duration_minutes} minutes · {selectedDisclosure.offer.consultation_format} · {selectedDisclosure.offer.timezone}</p><p><strong>Total price: ETB {money(selectedDisclosure.offer.price_minor)}</strong></p><h3>What will be shared</h3><div className="disclosure-preview">{Object.values(selectedDisclosure.request.disclosure_snapshot).map((value,i)=><p key={i}>{value}</p>)}</div><p className="supporting">Accepting confirms this appointment and reserves the amount from your balance. If your balance is short, add funds and return to the offer while it remains available.</p><div className="dialog-actions"><Button loading={action.busy} onClick={()=>void action.run(async()=>{const attempt=crypto.randomUUID();try{await journeyApi.respondOffer(selectedDisclosure.request.id,selectedDisclosure.offer.id,'accept',undefined,selectedDisclosure.request.disclosure_snapshot);}catch(error){await journeyApi.recordOfferAcceptFailure(selectedDisclosure.request.id,selectedDisclosure.offer.id,attempt,(error as any)?.code||'other_supported_failure').catch(()=>undefined);throw error;}setSelectedDisclosure(null);await requestResource.refresh();})}>Accept offer</Button><Button variant="secondary" onClick={()=>setSelectedDisclosure(null)}>Back</Button><Link to="/patient/payments" className="text-link">Add funds</Link></div>{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}</section></div>}
+    {selectedDisclosure&&<Dialog open onOpenChange={open=>{if(!open&&!action.busy)setSelectedDisclosure(null);}} title={w("Review this offer")} description={w("Check the time, price and sharing choices before accepting.")}><p><strong>{selectedDisclosure.offer.clinician_name}</strong> · {selectedDisclosure.offer.specialty}</p><p>{new Date(selectedDisclosure.offer.start).toLocaleString(undefined,{timeZone:selectedDisclosure.offer.timezone})} · {selectedDisclosure.offer.duration_minutes} minutes · {selectedDisclosure.offer.consultation_format} · {selectedDisclosure.offer.timezone}</p><p><strong>Total price: ETB {money(selectedDisclosure.offer.price_minor)}</strong></p><h3>What will be shared</h3><div className="disclosure-preview">{Object.values(selectedDisclosure.request.disclosure_snapshot).map((value,i)=><p key={i}>{value}</p>)}</div><p className="supporting">Accepting confirms this appointment and reserves the amount from your balance. If your balance is short, add funds and return to the offer while it remains available.</p><div className="dialog-actions"><Button loading={action.busy} onClick={()=>void action.run(async()=>{const attempt=crypto.randomUUID();try{await journeyApi.respondOffer(selectedDisclosure.request.id,selectedDisclosure.offer.id,'accept',undefined,selectedDisclosure.request.disclosure_snapshot);}catch(error){await journeyApi.recordOfferAcceptFailure(selectedDisclosure.request.id,selectedDisclosure.offer.id,attempt,(error as any)?.code||'other_supported_failure').catch(()=>undefined);throw error;}setSelectedDisclosure(null);await requestResource.refresh();})}>Accept offer</Button><Button variant="secondary" onClick={()=>setSelectedDisclosure(null)}>Back</Button><Link to="/patient/payments" className="text-link">Add funds</Link></div>{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}</Dialog>}
   </>;
 }
 
@@ -131,7 +149,7 @@ export function PatientRequestDetail(){
         {offer.state==='Active'&&live&&<div className="actions"><Button variant="secondary" onClick={()=>setSelectedOffer(offer)}>{w('Review and accept')}</Button><Button variant="quiet" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondOffer(request.id,offer.id,'decline');await detail.refresh();})}>{w('Decline')}</Button></div>}
       </article>):<EmptyState title={w('No offers yet')}>{live?w('We will show eligible clinician offers here.'):w('This request has no available offers.')}</EmptyState>}</section>
       {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
-      {selectedOffer&&<div className="request-confirm-overlay" role="presentation"><section className="request-confirm" role="dialog" aria-modal="true" aria-labelledby="request-detail-confirm-title"><h2 id="request-detail-confirm-title">{w('Review this offer')}</h2><p><strong>{selectedOffer.clinician_name}</strong> · {selectedOffer.specialty}</p><p>{new Date(selectedOffer.start).toLocaleString(undefined,{timeZone:selectedOffer.timezone})} · {selectedOffer.duration_minutes} {w('minutes')} · {selectedOffer.consultation_format} · {selectedOffer.timezone}</p><p><strong>{w('Total price')}: ETB {money(selectedOffer.price_minor)}</strong></p><h3>{w('What you’ll share')}</h3><div className="disclosure-preview">{Object.values(request.disclosure_snapshot).map((value,index)=><p key={index}>{value}</p>)}</div><p className="supporting">{w('Accepting confirms this appointment and reserves the amount from your balance.')}</p><div className="dialog-actions"><Button loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondOffer(request.id,selectedOffer.id,'accept',undefined,request.disclosure_snapshot);setSelectedOffer(null);await detail.refresh();})}>{w('Accept offer')}</Button><Button variant="secondary" onClick={()=>setSelectedOffer(null)}>{w('Back')}</Button><Link to="/patient/payments" className="text-link">{w('Add funds')}</Link></div></section></div>}
+      {selectedOffer&&<Dialog open onOpenChange={open=>{if(!open&&!action.busy)setSelectedOffer(null);}} title={w("Review this offer")} description={w("Check the time, price and sharing choices before accepting.")}><p><strong>{selectedOffer.clinician_name}</strong> · {selectedOffer.specialty}</p><p>{new Date(selectedOffer.start).toLocaleString(undefined,{timeZone:selectedOffer.timezone})} · {selectedOffer.duration_minutes} {w('minutes')} · {selectedOffer.consultation_format} · {selectedOffer.timezone}</p><p><strong>{w('Total price')}: ETB {money(selectedOffer.price_minor)}</strong></p><h3>{w('What you’ll share')}</h3><div className="disclosure-preview">{Object.values(request.disclosure_snapshot).map((value,index)=><p key={index}>{value}</p>)}</div><p className="supporting">{w('Accepting confirms this appointment and reserves the amount from your balance.')}</p><div className="dialog-actions"><Button loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondOffer(request.id,selectedOffer.id,'accept',undefined,request.disclosure_snapshot);setSelectedOffer(null);await detail.refresh();})}>{w('Accept offer')}</Button><Button variant="secondary" onClick={()=>setSelectedOffer(null)}>{w('Back')}</Button><Link to="/patient/payments" className="text-link">{w('Add funds')}</Link></div>{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}</Dialog>}
     </>}
   </>;
 }

@@ -61,3 +61,9 @@
 .public-profile-layout .trust-indicators { margin:0; border-radius:16px; background:white; padding:26px; }
 .public-profile-layout .trust-indicators dl { grid-template-columns:1fr; gap:20px; }
 @media(max-width:800px) { .public-profile-layout { grid-template-columns:1fr; } .public-profile-identity { gap:16px; } .public-profile-identity h2 { font-size:24px; } .public-profile-identity .avatar { width:64px; height:64px; font-size:24px; } }
+
+.reference-workspace .request-guided-composer { max-width:620px; margin:32px auto; padding:28px; border:1px solid var(--border); border-radius:16px; background:white; }
+.request-step-progress { list-style:none; padding:0; display:flex; gap:8px; margin:12px 0 28px; }
+.request-step-progress li { flex:1; border-top:4px solid var(--border); padding-top:10px; font-size:14px; color:var(--muted); }
+.request-step-progress li.complete { border-color:var(--brand); color:var(--ink); }
+@media(max-width:600px) { .reference-workspace .request-guided-composer { padding:20px; } }

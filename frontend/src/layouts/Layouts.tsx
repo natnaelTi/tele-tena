@@ -187,6 +187,7 @@ const patientNav = [
   ["/patient", "Home", Home],
   ["/patient/discovery", "Find care", Search],
   ["/patient/appointments", "Appointments", CalendarDays],
+  ["/patient/requests", "My requests", ClipboardCheck],
   ["/patient/account", "Account", Settings2],
   ["/patient/clinic-access", "Clinic access", Building2],
   ["/patient/relationships", "Shared care", HeartHandshake],
