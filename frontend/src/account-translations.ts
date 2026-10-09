@@ -1,5 +1,7 @@
 /** Provisional account copy. Native Amharic/Afaan Oromo review remains required. */
 export const accountTranslations: Record<string, [string, string]> = {
+  "Enter your professional name.": ["የሙያ ስምዎን ያስገቡ።", "Maqaa ogummaa kee galchi."],
+  "Enter a preferred name or alias.": ["የመረጡትን ስም ወይም ቅጽል ስም ያስገቡ።", "Maqaa filatame ykn maqaa masoo galchi."],
   "Defaults and encounter-level control": ["ነባሪ ምርጫዎችና ለእያንዳንዱ ውይይት ቁጥጥር", "Filannoo duraa fi to'annoo marii"],
   "Language and appointment timezone": ["ቋንቋና የቀጠሮ ሰዓት ክልል", "Afaanii fi naannoo sa'aatii beellamaa"],
   "Sign-in methods": ["የመግቢያ ዘዴዎች", "Maloota seensaa"],
