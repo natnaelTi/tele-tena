@@ -31,6 +31,17 @@
   --danger: #b33339;
   --information: #275e77;
   --focus: #116c99;
+  /* Semantic names used by connected feature components share the reference
+     palette. Undefined aliases previously removed borders and backgrounds. */
+  --brand-primary: var(--brand);
+  --text-primary: var(--ink);
+  --text-secondary: var(--muted);
+  --surface-card: var(--card);
+  --surface: var(--card);
+  --surface-subtle: var(--subtle);
+  --tint: var(--subtle);
+  --border-default: var(--border);
+  --focus-ring: var(--focus);
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
