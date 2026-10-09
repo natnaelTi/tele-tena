@@ -1,3 +1,4 @@
+import { careSearchScore } from "../care-search";
 import { AddFundsDialog } from "../components/AddFundsDialog";
 import { appointmentGroups } from "../appointment-groups";
 import { useCallback, useEffect, useState } from "react";
@@ -189,16 +190,15 @@ export function Discovery() {
   }, [availabilityFilter, offers.data]);
   useEffect(() => { rememberDiscoveryFilters({ category, language: languageFilter, format: formatFilter, availability: availabilityFilter }); }, [category, languageFilter, formatFilter, availabilityFilter]);
   const availabilityBusy = availabilityFilter === "next14" && !!offers.data && !availableOfferIds && !availabilityError;
+  const relevance=(offer:Offer)=>{const definition=services.data?.find(item=>item.label===offer.service_category);return careSearchScore(query,[offer.display_name,offer.label,offer.service_category||"",offer.description||"",definition?.synonyms||"",definition?.service_label_am||"",definition?.service_label_om||""]);};
   const shown = offers.data?.filter(
     (offer) =>
       (!category || offer.service_category === category) &&
       (!languageFilter || offer.care_languages?.includes(languageFilter as "en"|"am"|"om")) &&
       (!formatFilter || offer.consultation_format === formatFilter) &&
       (availabilityFilter !== "next14" || !!availableOfferIds?.has(offer.id)) &&
-      `${offer.display_name} ${offer.label} ${offer.service_category || ""}`
-        .toLowerCase()
-        .includes(query.toLowerCase()),
-  );
+      relevance(offer)>0,
+  )?.sort((a,b)=>relevance(b)-relevance(a));
   const requestDraft={request_text:query,service_label:category,language:languageFilter||undefined,format:formatFilter||undefined};
   return (
     <>

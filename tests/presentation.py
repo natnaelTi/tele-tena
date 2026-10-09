@@ -99,6 +99,18 @@ class Presentation(unittest.TestCase):
     def setUp(self):
         fixtures.login('admin')
 
+    def test_discovery_search_metadata_is_catalog_only(self):
+        fixtures.login('p1')
+        result = journey.services()
+        item = next(row for row in result if row.id == fixtures.PREFIX)
+        self.assertEqual(set(item), {'id', 'label', 'description', 'synonyms',
+                                     'service_label_am', 'service_label_om'})
+        for field in ('professional_categories', 'credentials', 'patient', 'user', 'email'):
+            self.assertNotIn(field, item)
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            journey.services()
+
     def test_request_inbox_selects_tailored_offerings_by_scope_not_label(self):
         day = day_offset(14)
         fixtures.login('c1')

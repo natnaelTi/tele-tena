@@ -417,7 +417,7 @@ def services():
     actor()
     from tele_tena.review import enabled as review_enabled
     legacy_allowed = int(review_enabled() or frappe.local.site == 'erp.localhost')
-    return rows('''SELECT name AS id,service_label AS label FROM `tabTele Tena Service`
+    return rows('''SELECT name AS id,service_label AS label,description,service_label_am,service_label_om,synonyms FROM `tabTele Tena Service`
         WHERE active=1 AND (catalog_status='Active' OR (catalog_status='Legacy test' AND %s=1))
         ORDER BY service_label''', (legacy_allowed,))
 

@@ -4,7 +4,7 @@ import { clearCareQuery } from './care-intent'
 type Sharing = { name: boolean; history: boolean }
 export type Profile = { kind: 'patient' | 'clinician'; display_name: string; history: string; share_name: boolean; share_history: boolean; languages?: string }
 export type Session = { user: string; roles: string[]; profile: Profile | null; csrf_token: string; simulation: boolean; clinic_workspace?: boolean; clinic_schedule_workspace?: boolean }
-export type Service = { id: string; label: string }
+export type Service = { id: string; label: string; description?:string; synonyms?:string; service_label_am?:string; service_label_om?:string }
 export type Offer = { id: string; clinician_id:string; display_name: string; label: string; description?: string; service_category?: string; price: number; minutes: number; care_languages?: ('en'|'am'|'om')[]; schedule_id?: string | null; schedule_timezone?: string | null; consultation_format?: 'video' | 'audio' }
 export type Application = { user: string; display_name: string; statement: string; status: 'Pending' | 'Approved' | 'Rejected'; requested_services?: string[]; requested_service_labels?:string[]; resume_uploaded?: boolean; resume_size?: number; submission_date_available?: boolean; submitted_at?: string | null; evidence_complete?: boolean; verified_contacts?: {channel: string; contact: string; verified_at: string}[] }
 export type Disclosure = { request: string; name?: string; history?: string }
