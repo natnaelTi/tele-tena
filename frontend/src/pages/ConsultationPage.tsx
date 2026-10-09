@@ -131,6 +131,11 @@ function ReschedulePanel({appointment,refresh}:{appointment:any;refresh:()=>Prom
     if(!selected||!retryKey)return;
     await action.run(async()=>{await journeyApi.proposeReschedule(appointment.id,selected,retryKey);setSelected("");setRetryKey("");await refresh();},"");
   };
+  // E02 keeps booking actions compact until a time change is requested.
+  // Existing proposals remain visible; this only changes presentation, not holds.
+  if (!current && !expanded) return appointment.can_propose_reschedule
+    ? <Button variant="secondary" onClick={()=>{setExpanded(true);void calendar.refresh();}}>{w('Request a new time')}</Button>
+    : null;
   return <Card className="reschedule-panel">
     <h2>{w('Request a new time')}</h2>
     <p>{w('The original appointment stays reserved until both of you agree.')}</p>
