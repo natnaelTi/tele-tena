@@ -38,7 +38,7 @@ const base = process.env.TELE_TENA_BROWSER_BASE || 'http://127.0.0.1:8017/telete
     });
     const appointment = seed.appointment;
     await page.goto(base + '/clinician/consultations/' + appointment);
-    await page.getByRole('heading', { name: 'Consultation notes', exact: true }).waitFor();
+    await page.getByRole('heading', { name: 'Consultation note', exact: true }).waitFor();
     const state = await page.locator('.consultation-summary .status-pill').innerText();
     const endedLabels = await page.getByText('Call ended', { exact: true }).count();
     const completedLabels = await page.getByText('Notes pending', { exact: true }).count();

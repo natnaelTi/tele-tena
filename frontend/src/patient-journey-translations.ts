@@ -1,5 +1,9 @@
 /** Provisional interface translations; native review is a release activation gate. */
 export const patientJourneyTranslations: Record<string, [string, string]> = {
+  "Finish the consultation": ["ውይይቱን ያጠናቅቁ", "Marii xumuri"],
+  "Consultation record": ["የውይይት መዝገብ", "Galmee marii"],
+  "Consultation note": ["የውይይት ማስታወሻ", "Yaadannoo marii"],
+  "The call has ended. Review your notes and finalize the encounter.": ["ጥሪው አብቅቷል። ማስታወሻዎችዎን ይገምግሙና ውይይቱን ያጠናቅቁ።", "Bilbilli xumurameera. Yaadannoo kee ilaalii marii xumuri."],
   "Continue your care": ["እንክብካቤዎን ይቀጥሉ", "Kunuunsa kee itti fufi"],
   "Private consultation note": ["የግል የውይይት ማስታወሻ", "Yaadannoo marii dhuunfaa"],
   "For patient sharing, with your approval": ["በእርስዎ ፈቃድ ለታካሚው ለማጋራት", "Eeyyama keetiin dhukkubsataaf qooduuf"],

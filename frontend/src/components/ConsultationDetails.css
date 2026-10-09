@@ -32,12 +32,15 @@
 
 .consultation-page .note-editor { padding:0; background:transparent; border:0; border-radius:0; gap:20px; }
 .consultation-page .note-editor > h2 { margin:0; font-size:22px; }
-.consultation-page .note-editor > .field { padding:26px; border:1px solid var(--border); border-radius:16px; background:var(--card); margin:0; }
+.consultation-page .note-editor > .note-document-panel { padding:26px; border:1px solid var(--border); border-radius:16px; background:var(--card); margin:0; }
 .documentation-actions .actions { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; }
 .documentation-actions > p { color:var(--muted); }
-@media(max-width:800px) { .consultation-page .note-editor > .field { padding:20px; } }
+@media(max-width:800px) { .consultation-page .note-editor > .note-document-panel { padding:20px; } }
 
 .consultation-page .consultation-summary h1 { font-size:40px; line-height:1.12; letter-spacing:-1.6px; font-weight:720; margin-bottom:14px; }
 .consultation-detail-footer { margin-top:40px; padding-top:20px; border-top:1px solid var(--border); }
 .consultation-detail-footer a { display:inline-flex; align-items:center; min-height:44px; }
 @media(max-width:600px) { .consultation-page .consultation-summary h1 { font-size:32px; letter-spacing:-1.1px; } }
+
+.note-document-panel > h2 { margin:0 0 20px; font-size:22px; }
+.note-document-panel > .field { margin:0; }
