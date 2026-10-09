@@ -5,7 +5,9 @@ import { useLocale } from "../hooks/useLocale";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  CalendarDays,
+  Video,
+  Headphones,
+  FileText,
   ShieldCheck,
 } from "lucide-react";
 import { Button, Card, StatusBadge } from "./ui";
@@ -66,31 +68,11 @@ export function AppointmentCard({
 }) {
   const {w}=useLocale();
   const presentation=appointmentStatus(appointment,base.startsWith("/clinician"));
-  return (
-    <Card className="appointment-card">
-      <div className="appointment-icon">
-        <CalendarDays size={24} />
-      </div>
-      <div className="appointment-details">
-        <StatusBadge tone={presentation.tone}>{w(presentation.label)}</StatusBadge>
-        {presentation.detail&&<p className="supporting">{w(presentation.detail)}</p>}
-        <h3>{appointment.service_label}</h3>
-        <p>
-          {date(appointment.start,appointment.timezone)} · {appointment.minutes} booked minutes
-        </p>
-        <p className="supporting">
-          {(appointment.timezone || timezone)} · ETB {money(appointment.price)}
-        </p>
-      </div>
-      <Link
-        className="button secondary"
-        to={`${base}/consultations/${appointment.id}`}
-      >
-        {w("View consultation")}
-        <ArrowRight size={18} />
-      </Link>
-    </Card>
-  );
+  return <Card className="appointment-card">
+    <div className="appointment-icon" aria-hidden="true">{appointment.state === "Completed" ? <FileText size={22}/> : appointment.consultation_format === "audio" ? <Headphones size={22}/> : <Video size={22}/>}</div>
+    <div className="appointment-details"><h3>{appointment.display_identity || appointment.service_label}</h3><p>{appointment.service_label} · {w(appointment.consultation_format === "audio" ? "Audio" : "Video")}</p><p className="supporting">{date(appointment.start,appointment.timezone)} · {appointment.minutes} {w("booked minutes")}</p><p className="supporting">{appointment.timezone || timezone} · ETB {money(appointment.price)}</p></div>
+    <div className="appointment-status-actions"><StatusBadge tone={presentation.tone}>{w(presentation.label)}</StatusBadge>{presentation.detail && <p className="supporting">{w(presentation.detail)}</p>}<Link className="button secondary" to={`${base}/consultations/${appointment.id}`}>{w("View consultation")}<ArrowRight size={18}/></Link></div>
+  </Card>;
 }
 export function DisclosurePreview({ disclosure }: { disclosure: Disclosure }) {
   return (

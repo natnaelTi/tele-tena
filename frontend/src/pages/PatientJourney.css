@@ -88,3 +88,21 @@
 .public-profile-booking .summary-list { margin:0; }
 .public-profile-booking .button { width:100%; }
 .public-profile-booking .text-link { justify-self:start; }
+/* E01 reference x-tabs/x-item: one readable identity and compact right-hand state. */
+.appointment-view-switch { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; }
+.appointment-view-switch button { min-height: 44px; padding: 10px 16px; border: 1px solid var(--border); border-radius: 22px; background: white; color: var(--ink); }
+.appointment-view-switch button[aria-pressed="true"] { color: white; background: var(--ink); border-color: var(--ink); }
+.appointment-view-switch button span { margin-inline-start: 6px; }
+.reference-workspace .appointment-status-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
+.reference-workspace .appointment-status-actions .button { width: auto; }
+.reference-workspace .appointment-status-actions > p { text-align: end; }
+.reference-workspace .appointment-card .appointment-icon { display: grid; place-items: center; padding: 10px; flex: 0 0 auto; }
+.reference-workspace .appointment-card h3 { margin: 0 0 6px; }
+@media(max-width: 650px) {
+  .reference-workspace .appointment-card { flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+  .reference-workspace .appointment-card .appointment-details { flex-basis: calc(100% - 56px); }
+  .reference-workspace .appointment-status-actions { width: 100%; align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+  .reference-workspace .appointment-status-actions .button { margin-inline-start: auto; }
+  .reference-workspace .appointment-status-actions > p { text-align: start; flex-basis: 100%; order: 3; }
+}
+@media(max-width: 380px) { .reference-workspace .appointment-status-actions .button { width: 100%; margin: 0; } }

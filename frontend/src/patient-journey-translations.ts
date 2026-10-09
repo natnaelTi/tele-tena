@@ -1,5 +1,22 @@
 /** Provisional interface translations; native review is a release activation gate. */
 export const patientJourneyTranslations: Record<string, [string, string]> = {
+  "Upcoming": ["ቀጣይ", "Kan dhufu"],
+  "Completed": ["የተጠናቀቀ", "Xumurame"],
+  "Cancelled": ["የተሰረዘ", "Haqame"],
+  "Past": ["ያለፉ", "Kan darban"],
+  "Needs action": ["እርምጃ ይፈልጋል", "Tarkaanfii barbaada"],
+  "In progress": ["በሂደት ላይ", "Adeemsa keessa"],
+  "Awaiting confirmation": ["ማረጋገጫ እየጠበቀ", "Mirkaneessa eeggachaa"],
+  "All appointments": ["ሁሉም ቀጠሮዎች", "Beellamoota hunda"],
+  "View all appointments": ["ሁሉንም ቀጠሮዎች ይመልከቱ", "Beellamoota hunda ilaali"],
+  "Appointment views": ["የቀጠሮ እይታዎች", "Ilaalcha beellamaa"],
+  "No appointments in this view.": ["በዚህ እይታ ቀጠሮ የለም።", "Ilaalcha kana keessatti beellamni hin jiru."],
+  "No appointments yet.": ["ገና ቀጠሮ የለም።", "Ammaaf beellamni hin jiru."],
+  "Choose another view to find your conversations.": ["ውይይቶችዎን ለማግኘት ሌላ እይታ ይምረጡ።", "Mariilee kee argachuuf ilaalcha biraa filadhu."],
+  "Booked sessions will appear here.": ["የተያዙ ውይይቶች እዚህ ይታያሉ።", "Mariileen beellamaman asitti mul'atu."],
+  "Upcoming care and past conversations, clearly separated.": ["ቀጣይ እንክብካቤና ያለፉ ውይይቶች በግልጽ ተለይተዋል።", "Kunuunsi dhufuu fi mariileen darban ifatti adda baafamaniiru."],
+  "Appointments couldn’t be loaded.": ["ቀጠሮዎች አልተጫኑም።", "Beellamoota fe'uun hin danda'amne."],
+
   "Share this note with the patient": ["ይህን ማስታወሻ ከታካሚው ጋር ያጋሩ", "Yaadannoo kana dhukkubsataa waliin qoodi"],
   "This note will be included in the patient-visible preview and published when you finalize.": ["ይህ ማስታወሻ ለታካሚው በሚታየው ቅድመ እይታ ይካተታል፤ ሲያጠናቅቁም ይታተማል።", "Yaadannoon kun ilaalcha duraa dhukkubsataa keessatti hammatama; yeroo xumurtu maxxanfama."],
   "Private to the treating clinician unless you choose to share.": ["ለማጋራት ካልመረጡ በስተቀር ለእርስዎ ብቻ የግል ነው።", "Qooduuf yoo hin filanne ogeessa yaalaa qofaaf dhuunfaa dha."],

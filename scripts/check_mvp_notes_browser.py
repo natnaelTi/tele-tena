@@ -19,6 +19,7 @@ try:
     offering=m.fixtures.Integration.offers['c1']
     booked=test.book_slot(offering,test.slots(offering,day)[0],'owned-note-browser')
     second=test.book_slot(offering,test.slots(offering,day)[-1],'owned-note-second')
+    cancellation=test.book_slot(offering,test.slots(offering,day)[0],'owned-note-cancellation')
     now=datetime.now(timezone.utc).replace(tzinfo=None)
     m.frappe.db.sql('''INSERT INTO tt_consultation
         (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended_by,ended,room_closed)
@@ -26,7 +27,7 @@ try:
         (booked['id'],secrets.token_hex(16),secrets.token_hex(32),secrets.token_hex(24),secrets.token_hex(24),now,m.fixtures.USERS['c1'],now))
     m.frappe.db.commit()
     fd,file=tempfile.mkstemp(prefix='tt-owned-notes-',suffix='.json');f=Path(file)
-    with os.fdopen(fd,'w') as stream:json.dump({'site':m.fixtures.SITE,'users':m.fixtures.USERS,'password':m.fixtures.PASSWORD,'appointment':booked['id'],'second_appointment':second['id']},stream)
+    with os.fdopen(fd,'w') as stream:json.dump({'site':m.fixtures.SITE,'users':m.fixtures.USERS,'password':m.fixtures.PASSWORD,'appointment':booked['id'],'second_appointment':second['id'],'cancellation_appointment':cancellation['id']},stream)
     env={**os.environ,'NODE_PATH':'/tmp/tele-tena-browser/node_modules','TELE_TENA_NOTES_FIXTURE':str(f)}
     result=subprocess.run(['node',str(app/'scripts/browser-mvp-notes.cjs')],env=env,timeout=180)
     m.frappe.db.rollback()
@@ -34,6 +35,8 @@ try:
     journal=m.frappe.db.sql('SELECT COUNT(*) FROM tt_journal WHERE event_ref=%s',('completion:'+booked['id'],))[0][0]
     earning=m.frappe.db.sql('SELECT COUNT(*) FROM tt_earning WHERE appointment=%s',(booked['id'],))[0][0]
     assert journal==1 and earning==1, 'Amendment must not duplicate financial completion'
+    assert m.frappe.db.sql('SELECT state FROM tt_appointment WHERE id=%s',(cancellation['id'],))[0][0]=='Cancelled'
+    assert m.frappe.db.sql('SELECT COUNT(*) FROM tt_journal WHERE event_ref=%s',('release:'+cancellation['id'],))[0][0]==1
     print('PASS: one completion journal and one earning after amendment; owned fixtures removed by harness.')
 finally:
     if f:f.unlink(missing_ok=True)
