@@ -1,3 +1,4 @@
+import { appointmentGroups } from "../appointment-groups";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowRight, Search } from "lucide-react";
@@ -195,7 +196,7 @@ export function Discovery() {
       (!category || offer.service_category === category) &&
       (!languageFilter || offer.care_languages?.includes(languageFilter as "en"|"am"|"om")) &&
       (!formatFilter || offer.consultation_format === formatFilter) &&
-      (availabilityFilter !== "next14" || !availableOfferIds || availableOfferIds.has(offer.id)) &&
+      (availabilityFilter !== "next14" || !!availableOfferIds?.has(offer.id)) &&
       `${offer.display_name} ${offer.label} ${offer.service_category || ""}`
         .toLowerCase()
         .includes(query.toLowerCase()),
@@ -244,6 +245,8 @@ export function Discovery() {
         </InlineNotice>
       ) : !offers.data ? (
         <Skeleton />
+      ) : availabilityError ? (
+        <InlineNotice tone="danger">{w("Available times could not be checked. Clear this filter or try again.")} <Button variant="secondary" onClick={() => { setAvailabilityFilter(""); setAvailableOfferIds(null); setAvailabilityError(false); }}>{w("Clear availability filter")}</Button></InlineNotice>
       ) : availabilityBusy ? (
         <p role="status" className="supporting">{w("Checking open times in the next 14 days…")}</p>
       ) : shown?.length ? (
@@ -266,6 +269,8 @@ export function Discovery() {
 export function Appointments({ base = "/patient" }: { base?: string }) {
   const resource = useResource(journeyApi.appointments);
   const clinician=base==="/clinician";
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 60000); return () => clearInterval(timer); }, []);
   return (
     <>
       <PageTitle
@@ -280,12 +285,7 @@ export function Appointments({ base = "/patient" }: { base?: string }) {
       ) : !resource.data ? (
         <Skeleton />
       ) : resource.data.length ? (
-        <div className="appointment-groups">{([
-          ["Needs action", resource.data.filter(a=>a.state==="PendingConfirmation" || (clinician && a.call_state==="Ended" && a.documentation_state!=="Finalized"))],
-          ["In progress", resource.data.filter(a=>a.call_state==="Open")],
-          ["Upcoming", resource.data.filter(a=>a.state==="Booked" && a.call_state!=="Open" && a.call_state!=="Ended" && new Date(a.start).getTime()>=Date.now())],
-          ["Past", resource.data.filter(a=>["Completed","Cancelled","Expired","NoShow"].includes(a.state) || a.call_state==="Ended" || (a.state==="Booked" && new Date(a.end).getTime()<Date.now()))],
-        ] as [string,typeof resource.data][]).filter(([,rows])=>rows.length).map(([title,rows])=><section key={title}><h2>{title}</h2><div className="stack">{rows.map(a=><AppointmentCard key={a.id} appointment={a} base={base} />)}</div></section>)}</div>
+        <div className="appointment-groups">{appointmentGroups(resource.data, clinician, now).map(([title,rows])=><section key={title}><h2>{title}</h2><div className="stack">{rows.map(a=><AppointmentCard key={a.id} appointment={a} base={base} />)}</div></section>)}</div>
       ) : (
         <EmptyState title="No appointments yet.">
           Booked sessions will appear here.
