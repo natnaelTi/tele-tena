@@ -99,6 +99,32 @@ class Presentation(unittest.TestCase):
     def setUp(self):
         fixtures.login('admin')
 
+    def test_appointment_list_cancellation_actor_does_not_unmask_patient(self):
+        self.fund_patient('p1', 1000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        booked = self.book_slot(offering, self.slots(offering, day)[0], share_name=False)
+        fixtures.login('p1')
+        presentation.cancel_appointment(booked['id'], 'Plans changed')
+        own = next(row for row in journey.appointments() if row.id == booked['id'])
+        self.assertEqual(own.cancelled_by, 'You')
+        fixtures.login('c1')
+        visible = next(row for row in journey.appointments() if row.id == booked['id'])
+        self.assertEqual(visible.cancelled_by, 'Patient')
+        self.assertEqual(visible.display_identity, 'Private patient')
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(visible, default=str))
+        self.assertNotIn('patient', visible)
+        # Preserve the original actor for authorized internal auditing.
+        saved = journey.one('SELECT cancelled_by FROM tt_appointment WHERE id=%s', (booked['id'],))
+        self.assertEqual(saved.cancelled_by, fixtures.USERS['p1'])
+        fixtures.login('c2')
+        self.assertFalse(any(row.id == booked['id'] for row in journey.appointments()))
+        fixtures.login('p2')
+        self.assertFalse(any(row.id == booked['id'] for row in journey.appointments()))
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            journey.appointments()
+
     def test_discovery_search_metadata_is_catalog_only(self):
         fixtures.login('p1')
         result = journey.services()

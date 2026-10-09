@@ -816,6 +816,10 @@ def appointments():
         appointment.start, appointment.end = iso(appointment.start), iso(appointment.end)
         appointment.disclosure = json.loads(appointment.disclosure)
         appointment.choices = json.loads(appointment.choices)
+        # Cancellation attribution must not reveal an otherwise masked account.
+        # Keep the raw actor only in the private auditable appointment record.
+        appointment.cancelled_by = ('You' if appointment.cancelled_by == user else
+            'Care team' if p.kind == 'patient' else 'Patient') if appointment.cancelled_by else None
         appointment.cancelled_at = iso(appointment.cancelled_at) if appointment.cancelled_at else None
         appointment.call_ended = iso(appointment.call_ended) if appointment.call_ended else None
         appointment.expires_at = iso(appointment.expires_at) if appointment.expires_at else None
