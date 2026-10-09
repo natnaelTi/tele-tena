@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { patientJourneyTranslations } from "../patient-journey-translations";
 import { landingTranslations } from "../landing-translations";
 import { locales } from "../i18n";
 import type { Key } from "../i18n";
@@ -8,6 +9,7 @@ import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
   ...landingTranslations,
+  ...patientJourneyTranslations,
   "Shared care": ["የጋራ እንክብካቤ", "Kunuunsa waliin"],
   "Create an optional adult relationship link. It does not share clinical records or appointments.": ["አማራጭ የጎልማሶች ግንኙነት አገናኝ ይፍጠሩ። የሕክምና መዝገቦችን ወይም ቀጠሮዎችን አያጋራም።", "Walitti hidhamiinsa filannoo namoota ga'eessotaaf uumi. Galmee yaalaa ykn beellama hin qoodu."],
   "Invite an adult you trust": ["የሚያምኑትን ጎልማሳ ይጋብዙ", "Nama ga'eessa amanattu affeeri"],
