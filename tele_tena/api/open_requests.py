@@ -453,13 +453,17 @@ def clinician_profile(clinician_id):
     if not clinician:
         fail('Clinician profile unavailable', 'clinician_profile_unavailable')
     clinician = clinician[0]
-    services = rows('''SELECT o.id offering,s.service_label label,o.price,o.minutes,schedule.consultation_format,
+    services = rows('''SELECT o.id offering,o.service,COALESCE(NULLIF(o.title,''),s.service_label) label,
+        o.description,s.service_label service_category,o.price,o.minutes,schedule.consultation_format,
         schedule.timezone FROM tt_offering o
         JOIN `tabTele Tena Service Scope` scope ON scope.clinician=o.clinician
             AND scope.service=o.service AND scope.status='Approved'
         JOIN `tabTele Tena Service` s ON s.name=o.service AND s.active=1
         JOIN tt_schedule schedule ON schedule.offering=o.id AND schedule.status='Published'
         WHERE o.clinician=%s AND o.active=1 ORDER BY s.service_label''', (clinician.user,))
+    services = [item for item in services if journey.service_scope_is_current(clinician.user, item.service)]
+    for item in services:
+        item.pop('service', None)
     from tele_tena.trust_metrics import (
         summarize_clinician_cancellations,
         summarize_response_behavior,

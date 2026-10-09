@@ -99,6 +99,29 @@ class Presentation(unittest.TestCase):
     def setUp(self):
         fixtures.login('admin')
 
+    def test_public_profile_uses_tailored_offerings_and_rechecks_revoked_scope(self):
+        fixtures.login('admin')
+        service = fixtures.PREFIX + '-profile-scope'
+        journey.save_service(service, 'Synthetic profile parent scope')
+        journey.review_service_scope(fixtures.USERS['c1'], service, 'Approved')
+        fixtures.login('c1')
+        created = journey.publish(service, 4200, 30, title='Synthetic tailored profile session',
+                                  description='Synthetic public description', retry_key='profile-' + secrets.token_hex(10))
+        start = (datetime.now(timezone.utc) + timedelta(days=2)).replace(hour=9, minute=0, second=0, microsecond=0)
+        scheduling.save_schedule(**schedule_payload(created['offering'], start.date()))
+        fixtures.login('p1')
+        discovered = next(item for item in journey.discover(service) if item.id == created['offering'])
+        result = open_requests.clinician_profile(discovered.clinician_id)
+        selected = next(item for item in result['services'] if item.offering == created['offering'])
+        self.assertEqual(selected.label, 'Synthetic tailored profile session')
+        self.assertEqual(selected.description, 'Synthetic public description')
+        self.assertNotIn('service', selected)
+        self.assertNotIn(fixtures.USERS['c1'], json.dumps(result, default=str))
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], service, 'Revoked')
+        fixtures.login('p1')
+        self.assertNotIn(created['offering'], [item.offering for item in open_requests.clinician_profile(discovered.clinician_id)['services']])
+
     def test_clinician_can_publish_multiple_retry_safe_offerings_within_one_scope(self):
         service = fixtures.PREFIX
         keys = ['offering-multi-' + secrets.token_hex(10), 'offering-multi-' + secrets.token_hex(10)]
