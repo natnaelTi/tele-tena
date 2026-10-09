@@ -135,4 +135,10 @@ export const patientJourneyTranslations: Record<string, [string, string]> = {
   "Your consultation is in Appointments. Open its details for the join window and device check.": ["ምክክርዎ በቀጠሮዎች ውስጥ ነው። የመግቢያ ጊዜንና የመሣሪያ ሙከራን ለማየት ዝርዝሩን ይክፈቱ።", "Marii kee Beellamoota keessatti argatta. Yeroo itti seentuufi qorannoo meeshaa ilaaluuf balʼina isaa bani."],
   "Your time and funds are reserved while the clinician responds. If the request expires or is declined, the reservation is released.": ["ባለሙያው ምላሽ እስኪሰጥ ጊዜዎና ገንዘብዎ ተይዟል። ጥያቄው ካለፈ ወይም ከተከለከለ ይለቀቃል።", "Ogeessi hanga deebisutti yeroonfi maallaqni kee qabameera. Gaaffiin yoo yeroo darbe ykn didame, qabamni ni gadhiifama."],
   "Book a conversation": ["ለምክክር ቀጠሮ ይያዙ", "Marii beellami"],
+  "Resume status could not be loaded. Try opening this section again.": ["የማስረጃ ሁኔታ አልተጫነም። ክፍሉን እንደገና ይክፈቱ።", "Haalli CV hin feʼamne. Kutaa kana irra deebiʼii bani."],
+  "Resume securely stored for authorized review.": ["ማስረጃው ለተፈቀደ ግምገማ በደህና ተቀምጧል።", "CV gamaaggama hayyamameef nageenyaan kuufameera."],
+  "Choose a PDF no larger than 5 MB.": ["ከ5 ሜባ ያልበለጠ PDF ይምረጡ።", "PDF 5 MB hin caalle filadhu."],
+  "Resume upload failed. Check that this is a PDF no larger than 5 MB.": ["ማስረጃው አልተላከም። ከ5 ሜባ ያልበለጠ PDF መሆኑን ያረጋግጡ።", "CV olkaaʼuun hin milkoofne. PDF 5 MB hin caalle taʼuu isaa ilaali."],
+  "This resume could not be removed. Submitted evidence is retained for review.": ["ማስረጃው ሊወገድ አልቻለም። የቀረበ ማስረጃ ለግምገማ ይቀመጣል።", "CV kun haqamuu hin dandeenye. Ragaan dhiyaate gamaaggamaaf tursiifama."],
+  "Resume removed.": ["ማስረጃው ተወግዷል።", "CV haqameera."],
 };
