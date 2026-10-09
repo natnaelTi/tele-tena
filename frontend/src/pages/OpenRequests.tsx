@@ -236,6 +236,6 @@ export function PublicClinicianProfile(){
         ? <>{t(resource.data.trust_indicators.session_experience.status==="new"?"sessionExperienceNew":"sessionExperienceMore")} · {resource.data.trust_indicators.session_experience.sample_count} {t("evidenceCount")}</>
         : <>{resource.data.trust_indicators.session_experience.average} / 5 · {resource.data.trust_indicators.session_experience.sample_count} {t("evidenceCount")}</>}</dd></div>
     </dl><p className="supporting">{t("sessionExperienceExplainer")}</p></section>
-    {resource.data.services.length?resource.data.services.map((service:any)=><article className="request-card" key={service.offering}><header><strong>{service.label}</strong><span>{t("approvedScope")}</span></header><p>{service.minutes} minutes · {service.consultation_format} · ETB {money(service.price)} · {service.timezone}</p><Link className="button secondary" to={'/patient/book/'+service.offering}>{w('Choose a time')}</Link></article>):<EmptyState title="No published service times are available yet." />}
+    {resource.data.services.length?resource.data.services.map((service:any)=><article className="request-card" key={service.offering}><header><strong>{service.label}</strong><span>{t("approvedScope")}</span></header><p>{service.minutes} minutes · {service.consultation_format} · ETB {money(service.price)} · {service.timezone}</p><Link className="button secondary" to={'/patient/services/'+service.offering}>{w('View service')}</Link></article>):<EmptyState title="No published service times are available yet." />}
   </>;
 }

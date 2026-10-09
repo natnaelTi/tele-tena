@@ -28,6 +28,7 @@ import {
   PendingFeature,
   Services,
 } from "./pages/Clinician";
+import ServiceDetails from "./pages/ServiceDetails";
 import Account from "./pages/Account";
 import { Applications, FinancialDisputes, Scopes, ServiceCatalog } from "./pages/Admin";
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
@@ -88,6 +89,7 @@ export default function App() {
                 <Route path="requests/:requestId" element={<PatientRequestDetail />} />
                 <Route path="requests/:requestId/offers/:offerId" element={<PatientRequestOfferDetail />} />
                 <Route path="clinicians/:clinicianId" element={<PublicClinicianProfile />} />
+                <Route path="services/:offering" element={<ServiceDetails />} />
                 <Route path="book/:offering" element={<Booking />} />
                 <Route path="book-link/:token" element={<BookingLink />} />
                 <Route path="appointments" element={<Appointments />} />

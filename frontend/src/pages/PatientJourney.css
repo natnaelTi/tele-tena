@@ -1,0 +1,44 @@
+/* Distinct approved C01 dashboard and C02 search-led workspace compositions. */
+.patient-dashboard-layout,.discovery-layout { display:grid; grid-template-columns:minmax(0,1fr) 322px; gap:36px; align-items:start; }
+.patient-dashboard-primary,.discovery-primary { min-width:0; }
+.patient-home-hero { background:#eaf5f5; padding:32px; border-radius:20px; margin-bottom:24px; }
+.patient-home-hero h2 { font-size:40px; line-height:1.12; letter-spacing:-1.5px; max-width:500px; }
+.patient-home-hero .care-search { padding:0; background:transparent; border:0; margin:24px 0 0; }
+.patient-home-hero .care-search h2 { font-size:20px; letter-spacing:0; }
+.patient-dashboard-panel { border:1px solid var(--border); background:white; border-radius:16px; padding:24px; margin-bottom:24px; }
+.patient-dashboard-panel .section-line { margin-top:0; }
+.reference-wallet { background:#102a33; color:white; padding:28px; border-radius:18px; display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
+.reference-wallet strong { font-size:36px; letter-spacing:-1.3px; line-height:1.2; overflow-wrap:anywhere; }
+.reference-wallet p { color:#d6e4e8; font-size:14px; margin:0 0 8px; }
+.reference-wallet .button { width:100%; }
+.patient-dashboard-aside { display:grid; gap:24px; }
+.discovery-search { display:flex; align-items:center; gap:14px; border:1px solid #bdcbd0; padding:8px 8px 8px 18px; border-radius:12px; background:white; }
+.discovery-search input { border:0; padding:8px; min-width:0; flex:1; }
+.discovery-filters { display:flex; flex-wrap:wrap; gap:12px; margin:24px 0; }
+.discovery-filters .field { flex:1 1 140px; margin:0; }
+.discovery-filters label { font-size:14px; }
+.discovery-results-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px; }
+.discovery-results-heading p { margin:0; font-size:14px; }
+.discovery-request-aside { background:var(--ink); border-radius:18px; color:white; padding:28px; }
+.discovery-request-aside p { color:#d6e4e8; }
+.discovery-request-aside h2 { font-size:28px; }
+.discovery-request-aside .button { background:white; color:var(--ink); width:100%; }
+.reference-workspace .request-entry { display:flex; align-items:center; gap:16px; background:#eaf5f5; padding:18px 20px; border-radius:12px; margin:16px 0; }
+.reference-workspace .request-entry h2 { font-size:16px; margin:0 0 4px; }
+.reference-workspace .request-entry p { font-size:14px; margin:0; }
+.reference-workspace .request-entry > a { flex-shrink:0; margin-left:auto; min-height:44px; display:flex; align-items:center; }
+@media(max-width:1000px) { .patient-dashboard-layout,.discovery-layout { grid-template-columns:minmax(0,1fr) 280px; gap:24px; } }
+@media(max-width:800px) { .patient-dashboard-layout,.discovery-layout { grid-template-columns:1fr; gap:24px; } .patient-home-hero { padding:24px; } .patient-home-hero h2 { font-size:32px; } .patient-dashboard-panel { padding:20px; } .discovery-search { flex-wrap:wrap; } .discovery-search input { width:calc(100% - 40px); } .discovery-search .button { width:100%; } .reference-workspace .request-entry { flex-wrap:wrap; } .reference-workspace .request-entry > a { margin-left:0; } }
+
+.reference-booking .guided-content { max-width:none; width:100%; }
+.booking-selection-panel { border:1px solid var(--border); border-radius:16px; padding:26px; background:white; }
+.booking-selection-heading { display:flex; align-items:center; gap:24px; margin-bottom:28px; }
+.booking-selection-heading h2 { font-size:24px; margin:8px 0; }
+.booking-selection-heading p { margin:0; }
+.booking-selection-heading .avatar { width:88px; height:88px; font-size:32px; }
+.booking-selection-panel > .field { max-width:300px; }
+.booking-selection-panel .booking-calendar { border:0; padding:0; margin-bottom:0; }
+@media(max-width:600px) { .booking-selection-panel { padding:20px; } .booking-selection-heading { gap:16px; } .booking-selection-heading .avatar { width:56px; height:56px; font-size:24px; } }
+
+.service-details-layout { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr); gap:32px; align-items:start; }
+@media(max-width:800px) { .service-details-layout { grid-template-columns:1fr; } }

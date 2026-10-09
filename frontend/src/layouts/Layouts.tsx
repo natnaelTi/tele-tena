@@ -1,3 +1,4 @@
+import "./ProductShell.css";
 import { Link, Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -277,6 +278,14 @@ export function WorkspaceLayout({
     );
   if (kind !== "admin" && kind !== "clinic" && session?.profile?.kind !== kind)
     return <Navigate to="/onboarding" replace />;
+  if (kind === "patient" || kind === "clinician") return <div className="reference-workspace">
+    <DemoBar />
+    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}<Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button></nav><div className="product-user"><LanguageSelect /><span>{session?.profile?.display_name}</span><Button variant="quiet" aria-label={w("Sign out")} title={w("Sign out")} onClick={() => void journeyApi.logout().then(refresh).catch(() => undefined)}><LogOut size={20} /></Button></div></header>
+    {kind === "clinician" && session?.roles.includes("Tele Tena Clinician") && <ClinicianRequestAvailability />}
+    <main className="reference-workspace-main" id="main-content"><WorkspaceTour role={kind} /><Outlet /></main>
+    <nav className="product-mobile-nav" aria-label={w("Mobile workspace")}>{mobilePrimary.map(item => renderNavLink(item))}<Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} /><span>{w("More")}</span></Button></nav>
+    <Dialog open={moreOpen} onOpenChange={open => { setMoreOpen(open); if (!open) requestAnimationFrame(() => moreTrigger.current?.focus()); }} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer><nav className="workspace-more-links" aria-label={w("Additional workspace links")}>{mobileMore.map(item => renderNavLink(item, true))}</nav><TranslationNote /></Dialog>
+  </div>;
   return (
     <div className="workspace">
       <aside className="sidebar">
@@ -327,7 +336,7 @@ export function WorkspaceLayout({
           </span>
           <LanguageSelect />
         </header>
-        {kind === "clinician" && session?.roles.includes("Tele Tena Clinician") && <ClinicianRequestAvailability />}
+
         {kind !== "clinic" && <WorkspaceTour role={kind} />}
         <main className="workspace-main" id="main-content">
           <Outlet />

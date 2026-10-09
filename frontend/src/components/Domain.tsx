@@ -1,12 +1,13 @@
+import { useRef, useState } from "react";
+import { ClinicianPreview } from "./ClinicianPreview";
+import { useLocale } from "../hooks/useLocale";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
   CalendarDays,
-  CheckCircle2,
-  Clock3,
   ShieldCheck,
 } from "lucide-react";
-import { Card, StatusBadge } from "./ui";
+import { Button, Card, StatusBadge } from "./ui";
 import type { Appointment, Disclosure, Offer } from "../journey-api";
 export const money = (minor: number) =>
   `${Math.floor(minor / 100)}.${String(minor % 100).padStart(2, "0")}`;
@@ -40,38 +41,20 @@ export function PageTitle({
   );
 }
 export function ClinicianCard({ offer }: { offer: Offer }) {
-  return (
-    <Card className="clinician-card">
-      <div className="clinician-identity">
-        <div className="avatar">
-          {offer.display_name.slice(0, 1).toUpperCase()}
-        </div>
-        <div>
-          <h3>{offer.display_name}</h3>
-          <Link className="text-link" to={'/patient/clinicians/'+offer.clinician_id}>View profile</Link>
-          <span className="verified">
-            <CheckCircle2 size={16} />
-            Approved for this service
-          </span>
-        </div>
-      </div>
-      <h4>{offer.label}</h4>
-      <p className="supporting">
-        <Clock3 size={16} />
-        {offer.minutes} minutes · Online consultation
-      </p>
-      <div className="card-bottom">
-        <div>
-          <strong>ETB {money(offer.price)}</strong>
-            <span className="supporting">per session</span>
-        </div>
-        <Link className="button secondary" to={"/patient/book/" + offer.id}>
-          Choose a time
-          <ArrowRight size={18} />
-        </Link>
-      </div>
+  const { w } = useLocale();
+  const [preview, setPreview] = useState(false);
+  const trigger = useRef<HTMLButtonElement | null>(null);
+  return <>
+    <Card className="clinician-card reference-clinician-card">
+      <div className="clinician-body"><div className="avatar" aria-hidden="true">{offer.display_name.slice(0, 1).toUpperCase()}</div><div className="clinician-card-copy">
+        <h3>{offer.display_name}</h3><p>{offer.label}</p>
+        <span className="verified"><ShieldCheck size={16} />{w("Approved for this service")}</span>
+        <div className="clinician-facts"><span>{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Care language not listed")}</span><span>{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')}</span></div>
+      </div></div>
+      <div className="card-actions"><div><strong>ETB {money(offer.price)}</strong><small>{offer.minutes} {w("minutes")} · {w("per session")}</small></div><div className="actions"><Button variant="quiet" onClick={event => { trigger.current = event.currentTarget; setPreview(true); }}>{w("View profile")}</Button><Link className="button" to={"/patient/book/" + offer.id}>{w("Choose a time")}</Link></div></div>
     </Card>
-  );
+    {preview && <ClinicianPreview offer={offer} close={() => { setPreview(false); requestAnimationFrame(() => trigger.current?.focus()); }} />}
+  </>;
 }
 export function AppointmentCard({
   appointment,
@@ -136,9 +119,11 @@ export function DisclosurePreview({ disclosure }: { disclosure: Disclosure }) {
 export function BookingSummary({
   offer,
   start,
+  displayTimezone,
 }: {
   offer: Offer;
   start?: string;
+  displayTimezone?: string;
 }) {
   return (
     <aside className="booking-summary">
@@ -156,9 +141,9 @@ export function BookingSummary({
           <>
             <dt>Time</dt>
             <dd>
-              {date(new Date(start).toISOString(), offer.schedule_timezone || timezone)}
+              {date(new Date(start).toISOString(), displayTimezone || offer.schedule_timezone || timezone)}
               <br />
-              {timezone}
+              {displayTimezone || offer.schedule_timezone || timezone}
             </dd>
           </>
         )}

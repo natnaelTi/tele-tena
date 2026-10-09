@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowRight, Search } from "lucide-react";
+import "./PatientJourney.css";
+import { WalletSummary } from "../components/WalletSummary";
 import { BookingCalendar } from "../components/BookingCalendar";
-import { pendingCareQuery, rememberCareQuery } from "../care-intent";
+import { pendingCareQuery, rememberCareQuery, discoveryFilters, rememberDiscoveryFilters } from "../care-intent";
 import { api } from "../api";
 import { journeyApi } from "../journey-api";
 import type { Disclosure, Offer } from "../journey-api";
@@ -43,10 +45,11 @@ export function PatientHome() {
   return (
     <>
       <PageTitle
-        eyebrow="YOUR SPACE FOR CARE"
-        title={`Welcome, ${session?.profile?.display_name || "there"}.`}
-        description="You don’t have to figure everything out at once."
+        title={w("Your care, in one place.")}
+        description={`${w("Welcome")}, ${session?.profile?.display_name || w("there")}.`}
       />
+      <div className="patient-dashboard-layout"><section className="patient-dashboard-primary">
+      <section className="patient-home-hero"><h2>{w("A little space for yourself.")}</h2><p>{w("Find the right support for today.")}</p>
       <section className="care-search">
         <h2>What would you like help with?</h2>
         <form
@@ -68,9 +71,10 @@ export function PatientHome() {
           </Button>
         </form>
       </section>
+      </section>
       <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Share what support you’re looking for and compare private offers from eligible clinicians.")}</p></div><Link className="button secondary" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
       {!!requests.data?.some((item:any)=>item.state==='Open')&&<section className="active-request-summary"><div className="section-line"><h2>Active care requests</h2><Link to="/patient/requests">Review requests and offers <ArrowRight size={16}/></Link></div>{requests.data.filter((item:any)=>item.state==='Open').slice(0,3).map((item:any)=><Link className="active-request-row" key={item.id} to={'/patient/requests/'+encodeURIComponent(item.id)}><span>{item.urgency==='immediate'?'As soon as possible':'Schedule for later'} · {item.category}</span><strong>{item.offers.filter((offer:any)=>offer.state==='Active').length} new offers</strong></Link>)}</section>}
-      {wallet.data&&<Link to="/patient/payments" className="balance-summary"><span>Balance</span><strong>ETB {money(wallet.data.available)}</strong><small>Available · ETB {money(wallet.data.reserved)} reserved</small></Link>}
+      <section className="patient-dashboard-panel">
       <div className="section-line">
         <h2>Your next appointment</h2>
         <Link to="/patient/appointments">
@@ -104,6 +108,7 @@ export function PatientHome() {
           When you book a session, its details will appear here.
         </EmptyState>
       )}
+      </section><section className="patient-dashboard-panel">
       <div className="section-line">
         <h2>{w("People you’ve spoken with")}</h2>
         <Link to="/patient/appointments">{w("Appointments")} <ArrowRight size={16} /></Link>
@@ -128,6 +133,7 @@ export function PatientHome() {
       ) : (
         <p className="supporting">{w("Clinicians you have completed a consultation with will appear here when they have current approved services available.")}</p>
       )}
+      </section></section><aside className="patient-dashboard-aside">{wallet.data ? <WalletSummary available={wallet.data.available} reserved={wallet.data.reserved} /> : wallet.error ? <InlineNotice tone="danger">{w("Balance unavailable.")} <Button variant="secondary" onClick={() => void wallet.refresh()}>{w("Try again")}</Button></InlineNotice> : <Skeleton />}<section className="patient-dashboard-panel"><h2>{w("Your care record")}</h2><p>{w("Shared summaries are available inside your completed consultations.")}</p><Link className="text-link" to="/patient/appointments">{w("View appointments")} <ArrowRight size={16} /></Link></section></aside></div>
     </>
   );
 }
@@ -137,10 +143,10 @@ export function Discovery() {
   const { w } = useLocale();
   const offers = useResource(journeyApi.discover);
   const services = useResource(journeyApi.services);
-  const [category, setCategory] = useState("");
-  const [languageFilter, setLanguageFilter] = useState("");
-  const [formatFilter, setFormatFilter] = useState("");
-  const [availabilityFilter, setAvailabilityFilter] = useState("");
+  const [category, setCategory] = useState(discoveryFilters().category);
+  const [languageFilter, setLanguageFilter] = useState(discoveryFilters().language);
+  const [formatFilter, setFormatFilter] = useState(discoveryFilters().format);
+  const [availabilityFilter, setAvailabilityFilter] = useState(discoveryFilters().availability);
   const [availableOfferIds, setAvailableOfferIds] = useState<Set<string> | null>(null);
   const [availabilityError, setAvailabilityError] = useState(false);
   const [query, setQuery] = useState(
@@ -182,6 +188,7 @@ export function Discovery() {
     void checkAvailability();
     return () => { active = false; };
   }, [availabilityFilter, offers.data]);
+  useEffect(() => { rememberDiscoveryFilters({ category, language: languageFilter, format: formatFilter, availability: availabilityFilter }); }, [category, languageFilter, formatFilter, availabilityFilter]);
   const availabilityBusy = availabilityFilter === "next14" && !!offers.data && !availableOfferIds && !availabilityError;
   const shown = offers.data?.filter(
     (offer) =>
@@ -198,16 +205,13 @@ export function Discovery() {
     <>
       <PageTitle
         eyebrow="FIND CARE"
-        title="Find the right conversation for you."
-        description="Choose an approved service, a clear price and a time that works."
+        title={w("What’s on your mind?")}
+        description={w("You don’t need the right words. Start with what you’re feeling.")}
       />
-      <div className="filter-row">
-        <TextField
-          label="Clinician or service"
-          placeholder="Search available care"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+      <div className="discovery-layout"><section className="discovery-primary">
+      <form className="discovery-search" onSubmit={event => { event.preventDefault(); rememberCareQuery(query); }}><Search size={20} /><label className="sr-only" htmlFor="discovery-care-query">Clinician or service</label><input id="discovery-care-query" placeholder={w("Search available care")} value={query} onChange={event => setQuery(event.target.value)} /><Button type="submit">{w("Search")}</Button></form>
+      <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft}}>{w("Post a request")} <ArrowRight size={16} /></Link></section>
+      <div className="discovery-filters">
         <Select
           label="Service"
           value={category}
@@ -228,7 +232,7 @@ export function Discovery() {
           <option value="">{w("Any date")}</option><option value="next14">{w("Open times in the next 14 days")}</option>
         </Select>
       </div>
-      <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link to="/patient/requests" state={{requestDraft}}>{w("Post a request")}</Link></section>
+
       <p className="supporting">
         {w("Filter approved services by care language, format and currently open times.")} · {w("Times shown in")} {timezone}.
       </p>
@@ -254,10 +258,8 @@ export function Discovery() {
           available. <Link to="/patient/requests" state={{requestDraft}}>Post a private request</Link> without relaxing your preferences.
         </EmptyState>
       )}
-      <p className="verification-note">
-        “Approved for this service” means the application and service scope have
-        been manually approved. This demo uses synthetic clinician details.
-      </p>
+      <p className="supporting">{w("Matching helps you find a professional. It is not a diagnosis.")}</p>
+      </section><aside className="discovery-aside"><section className="discovery-request-aside"><h2>{w("Someone to talk to. A choice that’s yours.")}</h2><p>{w("Tell us what you need. Available clinicians can respond with a session time and a clear fee.")}</p><Link className="button" to="/patient/requests" state={{requestDraft}}>{w("Post a private request")}</Link><p className="supporting">{w("Your request is only shown to eligible clinicians.")}</p></section><p className="supporting">{w("Your name and personal details stay private until you choose to share them.")}</p></aside></div>
     </>
   );
 }
@@ -302,6 +304,7 @@ export function BookingLink() {
 }
 
 export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverride?: string; bookingLinkToken?: string }) {
+  const { w } = useLocale();
   const route = useParams();
   const offering = offeringOverride || route.offering;
   const { session } = useSession();
@@ -342,7 +345,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
     return <EmptyState title="This service is no longer available." />;
   const offer: Offer = data.offer;
   return (
-    <div className="booking-layout">
+    <div className={step === 0 ? "reference-booking" : "booking-layout"}>
       <section className="guided-content">
         <Link className="text-link" to="/patient/discovery">
           Back to Find care
@@ -360,11 +363,12 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
         )}
         {step === 0 && (
           <>
-            <p>Choose an open appointment time. Session length: <strong>{data.calendar.duration} minutes</strong>. Times use your selected timezone.</p>
+            <section className="booking-selection-panel"><div className="booking-selection-heading"><div className="avatar" aria-hidden="true">{offer.display_name.slice(0,1)}</div><div><span className="verified">{w("Approved for this service")}</span><h2>{offer.display_name}</h2><p>{offer.label} · {offer.minutes} {w("minutes")} · ETB {money(offer.price)}</p></div></div>
             <Select label="Show times in timezone" value={displayZone} onChange={e=>{setDisplayZone(e.target.value);setStart("");setSelectedDate("");}}><option value="Africa/Addis_Ababa">Addis Ababa (EAT)</option><option value="UTC">UTC</option><option value="Africa/Nairobi">Nairobi (EAT)</option></Select>
             <BookingCalendar days={data.calendar.days} fromDate={calendarFrom || data.calendar.days[0]?.date || new Date().toISOString().slice(0,10)} selectedDate={selectedDate} selectedStart={start} duration={offer.minutes}
               onMonth={date => { setCalendarFrom(date); setSelectedDate(""); setStart(""); }}
               onDate={date => { setSelectedDate(date); setStart(""); }} onStart={setStart} />
+            </section>
             {start&&<p className="supporting">Selected: {new Date(start).toLocaleString(undefined,{dateStyle:"full",timeStyle:"short",timeZone:displayZone})} · {displayZone}</p>}
             <Button disabled={!start} onClick={() => setStep(1)}>
               Continue
@@ -473,7 +477,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
           </Button>
         )}
       </section>
-      <BookingSummary offer={offer} start={start} />
+      {step > 0 && <BookingSummary offer={offer} start={start} displayTimezone={displayZone} />}
     </div>
   );
 }

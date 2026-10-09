@@ -242,6 +242,7 @@ export function Dialog({
   description,
   children,
   drawer = false,
+  className = "",
 }: {
   open: boolean;
   onOpenChange: (value: boolean) => void;
@@ -249,13 +250,14 @@ export function Dialog({
   description: string;
   children: ReactNode;
   drawer?: boolean;
+  className?: string;
 }) {
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="dialog-overlay" />
         <DialogPrimitive.Content
-          className={drawer ? "dialog drawer" : "dialog"}
+          className={`${drawer ? "dialog drawer" : "dialog"} ${className}`}
         >
           <DialogPrimitive.Title>{title}</DialogPrimitive.Title>
           <DialogPrimitive.Description>
