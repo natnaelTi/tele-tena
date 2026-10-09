@@ -10,6 +10,7 @@ const routes:Record<string,{id:string;steps:TourStep[]}>={
   patient:{id:"patient-home",steps:[
     {title:"Find care",text:"Search and filter available clinician services.",path:"/patient/discovery",target:"patient-discovery"},
     {title:"Choose a time",text:"Pick an open slot, review what you’ll share and confirm the price.",path:"/patient/discovery",target:"patient-discovery"},
+    {title:"Private requests",text:"Post what you need, compare private offers and choose before funds are reserved.",path:"/patient/requests",target:"patient-private-requests"},
     {title:"Appointments",text:"Review upcoming sessions, requests and past consultations.",path:"/patient/appointments",target:"patient-appointments"},
     {title:"Consultations",text:"Join when the appointment is available and read published summaries.",path:"/patient/appointments",target:"patient-appointments"},
     {title:"Balance and privacy",text:"Review your balance, activity and sharing defaults in Account.",path:"/patient/account",target:"patient-account"},
@@ -18,6 +19,7 @@ const routes:Record<string,{id:string;steps:TourStep[]}>={
     {title:"Your practice",text:"Check upcoming sessions and actions for today.",path:"/clinician",target:"clinician-today"},
     {title:"Profile and resume",text:"Complete your professional profile and upload evidence for review. Approval is manual.",path:"/clinician/account",target:"clinician-account"},
     {title:"Services and schedule",text:"Publish approved services, then set a timezone-based weekly schedule.",path:"/clinician/availability",target:"clinician-availability"},
+    {title:"Private offers",text:"Review your own quotes and outcomes. Accepted offers link to their consultation.",path:"/clinician/offers",target:"clinician-offers"},
     {title:"Appointments and calls",text:"Open an appointment to see its state and join the authorized room.",path:"/clinician/appointments",target:"clinician-appointments"},
     {title:"Consultation notes",text:"After ending a call, save a private note and choose whether to publish a summary.",path:"/clinician/appointments",target:"clinician-appointments"},
     {title:"Care records",text:"Open only the encounters you treated. Clinic affiliation does not grant access.",path:"/clinician/care",target:"clinician-care"},

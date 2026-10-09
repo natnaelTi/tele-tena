@@ -180,4 +180,7 @@ export const patientJourneyTranslations: Record<string, [string, string]> = {
   "Withdraw this offer?": ["ይህን ምላሽ ይመልሱ?", "Yaada gatii kana deebiftaa?"],
   "The patient will no longer be able to accept this quote.": ["ታካሚው ይህን ዋጋ መቀበል አይችልም።", "Dhukkubsataan gatii kana fudhachuu hin dandaʼu."],
   "Keep offer": ["ምላሹን ያቆዩ", "Yaada gatii tursiisi"],
+  "Post what you need, compare private offers and choose before funds are reserved.": ["ፍላጎትዎን ያትሙ፣ የግል ምላሾችን ያነጻጽሩና ገንዘብ ከመያዙ በፊት ይምረጡ።", "Waan barbaaddu maxxansi, yaada gatii dhuunfaa wal bira qabiitii maallaqni qabamuu dura filadhu."],
+  "Private offers": ["የግል ምላሾች", "Yaada gatii dhuunfaa"],
+  "Review your own quotes and outcomes. Accepted offers link to their consultation.": ["የራስዎን ዋጋዎችና ውጤቶች ይመልከቱ። የተቀበሉ ምላሾች ወደ ምክክር ያገናኛሉ።", "Gatii keefi buʼaa ilaali. Yaadni fudhatame gara mariitti geessa."],
 };

@@ -91,7 +91,7 @@ export function PatientOpenRequests(){
   return <>
     <PageTitle title={w('Open a care request')} description="Describe what you’re looking for. Eligible clinicians can respond privately." />
     <InlineNotice>{w('Open requests are not an emergency response service.')} The clinicians who receive your request can read the words you enter; avoid names and details that identify you.</InlineNotice>
-    <section className="open-request-composer request-guided-composer" id="request-composer" data-tour-unsaved={!!narrative.trim()}>
+    <section className="open-request-composer request-guided-composer" id="request-composer" data-tour="patient-private-requests" data-tour-unsaved={!!narrative.trim()}>
       <p className="supporting">{w("Step")} {composerStep+1} / 3</p><ol className="request-step-progress" aria-label={w("Request steps")}>{[w("Describe"),w("Preferences"),w("Privacy")].map((label,index)=><li key={label} aria-current={composerStep===index?"step":undefined} className={index<=composerStep?"complete":""}>{label}</li>)}</ol>
       {composerStep===0&&<>
       <h2>{w('What would you like help with?')}</h2>
