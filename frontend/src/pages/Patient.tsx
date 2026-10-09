@@ -1,5 +1,6 @@
 import { careSearchScore } from "../care-search";
 import { AddFundsDialog } from "../components/AddFundsDialog";
+import { BookingReview } from "../components/BookingReview";
 import { appointmentGroups } from "../appointment-groups";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -43,6 +44,8 @@ export function PatientHome() {
   const previousClinicians = useResource(journeyApi.previousClinicians);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const upcoming = appointments.data?.filter(a => a.state === "Booked" && a.call_state !== "Ended" && new Date(a.end).getTime() > now)
+    .sort((a,b) => new Date(a.start).getTime() - new Date(b.start).getTime());
   return (
     <>
       <PageTitle
@@ -88,11 +91,10 @@ export function PatientHome() {
         </InlineNotice>
       ) : !appointments.data ? (
         <Skeleton />
-      ) : appointments.data.filter((a) => a.state==="Booked" && a.call_state!=="Ended" && new Date(a.end).getTime() > now)
-          .length ? (
+      ) : upcoming?.length ? (
         <AppointmentCard
           appointment={
-            appointments.data.filter((a) => a.state==="Booked" && a.call_state!=="Ended" && new Date(a.end).getTime() > now)[0]
+            upcoming[0]
           }
           base="/patient"
         />
@@ -328,6 +330,18 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
     history: !!session?.profile?.share_history,
   });
   const [preview, setPreview] = useState<Disclosure | null>(null);
+  const [previewError,setPreviewError]=useState(false);
+  const wallet=useResource(journeyApi.wallet);
+  useEffect(()=>{
+    if(step!==1||!request.trim()) return;
+    let active=true;
+    setPreviewError(false);
+    const timer=setTimeout(()=>{
+      void journeyApi.preview(request,sharing).then(result=>{if(active)setPreview(result.disclosure);})
+        .catch(()=>{if(active)setPreviewError(true);});
+    },300);
+    return()=>{active=false;clearTimeout(timer);};
+  },[request,sharing,step]);
   const [submission, setSubmission] = useState<{
     key: string;
     fingerprint: string;
@@ -343,7 +357,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
     return <EmptyState title="This service is no longer available." />;
   const offer: Offer = data.offer;
   return (
-    <div className={step === 0 ? "reference-booking" : "booking-layout"}>
+    <div className={step === 1 ? "booking-layout" : "reference-booking"}>
       <section className="guided-content">
         <Link className="text-link" to="/patient/discovery">
           Back to Find care
@@ -374,7 +388,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
           </>
         )}
         {step === 1 && (
-          <>
+          <section className="booking-sharing-panel">
             <label className="field">
               What would you like to talk about?
               <textarea
@@ -388,8 +402,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
               />
             </label>
             <p className="supporting">
-              Include only what helps this conversation. Use synthetic
-              information in this demo.
+              Include only what helps this conversation. Identifying details you type will be visible to your clinician.
             </p>
             <Checkbox
               label="Share my preferred name"
@@ -411,6 +424,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
               These choices apply to this booking. Your profile defaults stay
               the same.
             </p>
+            {request.trim()&&(previewError?<InlineNotice tone="danger">{w("The disclosure preview could not be loaded. Try Preview and continue again.")}</InlineNotice>:preview?<DisclosurePreview disclosure={preview}/>:<Skeleton/>)}
             <Button
               loading={action.busy}
               disabled={!request.trim()}
@@ -424,17 +438,11 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
             >
               Preview and continue
             </Button>
-          </>
+          </section>
         )}
         {step === 2 && preview && (
-          <>
-            <DisclosurePreview disclosure={preview} />
-            <p>
-              ETB {money(offer.price)} will be reserved from your balance. Under this demonstration policy, cancelling before the session starts releases the full reservation.
-            </p>
-            <Button
-              loading={action.busy}
-              onClick={() =>
+          <BookingReview offer={offer} start={start} zone={displayZone} format={data.calendar.format} disclosure={preview} balance={wallet.data} balanceError={Boolean(wallet.error)} onRetry={()=>void wallet.refresh()} busy={action.busy}
+              onConfirm={() =>
                 void action.run(async () => {
                   const payload = {
                     offering: offer.id,
@@ -459,11 +467,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
                   });
                   navigate("/patient/appointments");
                 }, "")
-              }
-            >
-              Confirm session · ETB {money(offer.price)}
-            </Button>
-          </>
+              }/>
         )}
         {step > 0 && (
           <Button
@@ -475,7 +479,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
           </Button>
         )}
       </section>
-      {step > 0 && <BookingSummary offer={offer} start={start} displayTimezone={displayZone} />}
+      {step === 1 && <BookingSummary offer={offer} start={start} displayTimezone={displayZone} />}
     </div>
   );
 }
