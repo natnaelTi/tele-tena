@@ -8,7 +8,7 @@ keeps visual fidelity and functional journey acceptance independent.
 
 - Branch `feat/mvp-release-handover`, draft PR #44, dependent on draft PR #43.
   The preserved `1e8d161468eb8d3563f1b5743982722c749bbcbf` ancestor remains included.
-- Packaged application source **`99886108d0cc9335749e3b4e19f75223e7f40852`**.
+- Packaged application source **`3b02709d77d39a4e70e963e8519f75fa74794a0e`**.
   Account browser evidence below was captured at `7aa1ea9`; the latest appointment/documentation browser evidence uses this packaged source. Subsequent evidence/documentation commits do not change its application code.
 - **http://127.0.0.1:8017/teletena/**; site
   `tele-tena-pr12-fresh.localhost`; bench `/home/frappe/frappe/frappe-bench`.
@@ -35,7 +35,7 @@ historical evidence, not an assertion that the entire MVP has passed.
 | H02 clinician account | Public name/care languages/private PDF resume and practice/affiliation routes | Reference portrait/introduction and richer profile editing still incomplete; no invented credentials |
 | H03 privacy | Global defaults and local disclosure preview; save/reload; no repeated wallet on tab | Reference age/alias controls exceed current name/history model; request override must remain independent |
 | H04 preferences | Associated language/timezone selects; persisted UTC; Amharic/Oromo mobile captures | Notification/accessibility preferences absent; native language approval pending |
-| E01 appointments | Reference tab geometry/title, correct public clinician name, status-based filters, view context across detail/Back/reload. Actual pre-start cancellation creates one release | Reference date/month grouping, remaining state/mobile/zoom coverage and coherent presentation content pending |
+| E01 appointments | Reference tab geometry/title, booked-local-month/year history, correct public clinician name, status-based filters, view context across detail/Back/reload. Actual pre-start cancellation creates one release | Upcoming date grouping, remaining state/mobile/zoom coverage and coherent presentation content pending |
 | E02/E11/E13 | Current owned browser rechecks draft/reload, finalization, explicit note sharing, patient summaries, private amendment/history, route isolation, reviewer denial; one earning/completion posting | Owned Ended fixture is not actual media/End/revocation proof; couples recipients and live call chain pending |
 
 ### Exact current checks
@@ -45,7 +45,7 @@ historical evidence, not an assertion that the entire MVP has passed.
   200% (1440 outer width, 720 CSS width, DPR2), paired application/reference.
   The abort-on-save check is controlled transport failure, not proof of a real
   server outage. Profile/defaults/preferences values were checked in MariaDB.
-- `scripts/check_mvp_notes_browser.py` passed against packaged `9988610`.
+- `scripts/check_mvp_notes_browser.py` passed against packaged `9988610`, then `3b02709` after adding local month/year history grouping.
   Real owned accounts and backend operations, appointment cancellation,
   persisted notes/publication/amendment, patient and reviewer authorization,
   delayed route isolation, 390/768/1440 paired appointment views.
@@ -55,14 +55,17 @@ historical evidence, not an assertion that the entire MVP has passed.
   passed at `ed28dc2` after reproducing a missing SELECT projection causing
   every clinician name to fall back to “Your clinician”. Cancellation actor
   IDs are retained privately, not returned to unrelated participants.
-- Asset/hash/PWA scope scanner passed for `9988610`, including exact-value scan against four privately stored reviewer passwords; no match. No provider values were configured on this site.
-- Locked production build `scripts/build_review.py` passed for `9988610`.
+- Asset/hash/PWA scope scanner passed for `9988610` and `3b02709`, including exact-value scan against four privately stored reviewer passwords; no match. No provider values were configured on this site.
+- Locked production build `scripts/build_review.py` passed for `9988610` and `3b02709`.
   Lint exits 0 with existing warnings; build retains >500KB chunk warning.
   These are not visual acceptance.
-- Real supported PWA waiting/update flow passed **3bf96b1 → dfe9a2b**:
+- Real supported PWA waiting/update flow passed **3bf96b1 → dfe9a2b**, then **9988610 → 3b02709**:
   old application remained until explicit Refresh; new public bundle loaded;
   no private/API cache paths. Not rerun as a physical-device check or claimed
-  as the specific `9988610` transition.
+  as device-level uninterrupted calling or installation.
+
+- Four current `tests/integration.py` methods passed (7.639 seconds): patient phone signup HMAC/single-use/privilege bounds, clinician signup requiring manual approval, guest CSRF/wrong-code durable attempts, concurrent attempt/verification atomicity. Enabled flags and provider transport/login establishment are patched in-process; real persisted backend rules are exercised, but this is not complete HTTP registration-browser acceptance. Preview site policy remains invited-only.
+- `scripts/browser-authentication-flow.cjs` passed: real retained patient/clinician password sign-in and disabled phone fallback. Its enabled OTP/error interaction branches mock frontend responses; they are UI evidence only, not registration completion or delivery proof.
 
 ### Native worker and preservation evidence
 
@@ -102,11 +105,11 @@ release gates. Original journals/records have not been rewritten for this fix.
 ### Paired comparisons and current review steps
 
 Evidence: `docs/screenshots/mvp-connected-journeys/H01–H04-*` (source `7aa1ea9`)
-and `E01-{upcoming,completed,cancelled}-*` (source `9988610`). Desktop pairs were
+and `E01-{upcoming,completed,cancelled}-*` (source `3b02709`). Desktop pairs were
 visually inspected. H01 now follows reference columns, wallet and settings rows;
 missing city/verified contact fields and incomplete shared-care workflow remain
 explicit differences. E01 follows reference heading/tabs; additional operational
-views, fuller facts, tour invitation and generic date grouping still differ.
+views, fuller facts, tour invitation and generic Upcoming date grouping still differs.
 **Neither area is declared visually accepted.** No universal pixel-match score.
 
 Open **http://127.0.0.1:8017/teletena/** with existing private reviewer credentials.

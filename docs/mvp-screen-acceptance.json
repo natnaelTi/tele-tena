@@ -4235,7 +4235,7 @@
         "current_differences": [
           "Real operational Awaiting confirmation and All appointments views extend the three-tab reference; do not hide ended or historical records.",
           "Rows retain explicit scheduled date, timezone, booked duration, actual fee and consultation action; denser reference condenses these.",
-          "Current generic Upcoming/Past section labels differ from reference Today/month groupings.",
+          "Completed/cancelled now group by booked local month/year; Upcoming still uses a generic grouping rather than reference Today/date headings.",
           "First-visit tour invitation remains in document flow and adds vertical space; demonstration ribbon remains.",
           "Owned test screenshot names/services are automated fixtures, not accepted presentation content."
         ],
@@ -4282,7 +4282,7 @@
           "om": "Layout pending; native review required"
         },
         "functional_verification": [
-          "scripts/check_mvp_notes_browser.py passed on packaged 9988610: real cancellation, one release posting; Completed→detail→Back/reload keeps view; private and published notes remain authorized.",
+          "scripts/check_mvp_notes_browser.py passed on packaged 3b02709: real cancellation, one release posting; Completed→detail→Back/reload keeps view; private and published notes remain authorized.",
           "tests/appointment-groups.mjs passed; elapsed bookings never become completed."
         ],
         "expected_layout": {
@@ -4322,7 +4322,7 @@
           "tele_tena/api/journey.py"
         ],
         "visual_status": "Compared; remaining differences",
-        "evidence_source": "99886108d0cc9335749e3b4e19f75223e7f40852",
+        "evidence_source": "3b02709d77d39a4e70e963e8519f75fa74794a0e",
         "expected_reference_actions": [
           {
             "label": "S",
@@ -13660,7 +13660,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
-  "current_packaged_source": "99886108d0cc9335749e3b4e19f75223e7f40852",
+  "current_packaged_source": "3b02709d77d39a4e70e963e8519f75fa74794a0e",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
