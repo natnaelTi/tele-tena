@@ -515,12 +515,22 @@ def preview_patient_summary(appointment, summary=None):
     item, _, role = _authorized(appointment)
     if role != 'clinician' or item.clinician != clinician:
         frappe.throw('Consultation record unavailable', frappe.PermissionError)
-    note = one('SELECT current_revision,status FROM tt_consultation_note WHERE appointment=%s', (item.id,))
-    revision = one('''SELECT revision,patient_summary FROM tt_note_revision
-        WHERE appointment=%s AND revision=%s''', (item.id, note.current_revision))
-    visible = text(summary, 6000, required=False) if summary is not None else revision.patient_summary
-    return {'revision': revision.revision, 'summary': visible,
-            'note_status': note.status, 'preview_only': True}
+    call = rows('SELECT state FROM tt_consultation WHERE appointment=%s', (item.id,))
+    if not call or call[0].state != 'Ended' or item.state not in ('Booked', 'Completed'):
+        fail('End the consultation before documenting it', 'documentation_not_ready')
+    notes = rows('SELECT current_revision,status FROM tt_consultation_note WHERE appointment=%s', (item.id,))
+    note = notes[0] if notes else None
+    # Preview entered content without silently saving a draft or publishing it.
+    # The first preview must work before a note revision exists.
+    if summary is not None:
+        visible = text(summary, 6000, required=False)
+    elif note:
+        visible = one('''SELECT patient_summary FROM tt_note_revision
+            WHERE appointment=%s AND revision=%s''', (item.id, note.current_revision)).patient_summary
+    else:
+        visible = ''
+    return {'revision': note.current_revision if note else 0, 'summary': visible,
+            'note_status': note.status if note else 'None', 'preview_only': True}
 
 
 @command

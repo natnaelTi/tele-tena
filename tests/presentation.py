@@ -2607,6 +2607,16 @@ class Presentation(unittest.TestCase):
              secrets.token_hex(24), now, clinician, now))
         frappe.db.commit()
         fixtures.login('c1')
+        preview = presentation.preview_patient_summary(appointment, 'Unsaved patient-visible preview')
+        self.assertEqual(preview['summary'], 'Unsaved patient-visible preview')
+        self.assertEqual(preview['revision'], 0)
+        self.assertTrue(preview['preview_only'])
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_note_revision WHERE appointment=%s',
+                                    (appointment,)).n, 0)
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            presentation.preview_patient_summary(appointment, 'Unauthorized preview')
+        fixtures.login('c1')
         presentation.save_note_draft(appointment, 'Private synthetic observation', 'Helpful next steps')
         detail = presentation.appointment_detail(appointment)
         self.assertEqual(detail['documentation_state'], 'Draft')

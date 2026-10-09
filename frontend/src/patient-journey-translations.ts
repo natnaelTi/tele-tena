@@ -1,5 +1,16 @@
 /** Provisional interface translations; native review is a release activation gate. */
 export const patientJourneyTranslations: Record<string, [string, string]> = {
+  "Private consultation note": ["የግል የውይይት ማስታወሻ", "Yaadannoo marii dhuunfaa"],
+  "For patient sharing, with your approval": ["በእርስዎ ፈቃድ ለታካሚው ለማጋራት", "Eeyyama keetiin dhukkubsataaf qooduuf"],
+  "Patient summary / next steps": ["የታካሚ ማጠቃለያ / ቀጣይ እርምጃዎች", "Cuunfaa dhukkubsataa / tarkaanfii itti aanu"],
+  "Preview patient summary": ["የታካሚውን ማጠቃለያ አስቀድመው ይመልከቱ", "Cuunfaa dhukkubsataa dursee ilaali"],
+  "Patient-visible preview": ["ለታካሚው የሚታይ ቅድመ እይታ", "Ilaalcha duraa dhukkubsataan argu"],
+
+  "Finalize encounter": ["ውይይቱን ያጠናቅቁ", "Marii xumuri"],
+  "Review the private note and patient summary before finalizing.": ["ከማጠናቀቅዎ በፊት የግል ማስታወሻውንና የታካሚ ማጠቃለያውን ይገምግሙ።", "Xumuruu dura yaadannoo dhuunfaa fi cuunfaa dhukkubsataa ilaali."],
+  "Amendment draft": ["የማሻሻያ ረቂቅ", "Wixinee fooyyaʼinsaa"],
+  "Documentation": ["ሰነድ", "Galmeessa"],
+  "This is a preview. Nothing is published until you finalize and choose to share.": ["ይህ ቅድመ እይታ ነው። እስኪያጠናቅቁና ለማጋራት እስኪመርጡ ድረስ ምንም አይታተምም።", "Kun ilaalcha duraa dha. Hanga xumurtee qooduuf filattutti homtuu hin maxxanfamu."],
   "Amend consultation notes": ["የውይይት ማስታወሻዎችን ያስተካክሉ", "Yaadannoo marii fooyyessi"],
   "This creates a new revision. Previously shared content remains in the sharing history.": ["ይህ አዲስ ክለሳ ይፈጥራል። ከዚህ በፊት የተጋራ ይዘት በማጋሪያ ታሪክ ይቀራል።", "Kun fooyyaʼinsa haaraa uuma. Qabiyyeen duraan qoodame seenaa qoodinsa keessatti hafa."],
   "No consultation note was entered.": ["የውይይት ማስታወሻ አልተጻፈም።", "Yaadannoon marii hin galfamne."],

@@ -348,7 +348,7 @@ const words: Record<string, [string, string]> = {
   "Why are you prepared to provide this service?": ["Tajaajila kana kennuuf maaliif qophaa'aa dha?", "Tajaajila kana kennuuf maaliif qophaa'aa dha?"],
   "My application is limited to adult care.": ["Iyyannoon koo kunuunsa nama guddaa qofaaf daangeffameera.", "Iyyannoon koo kunuunsa nama guddaa qofaaf daangeffameera."],
   "I practice independently (optional).": ["Of danda'ee hojjedha (filannoo).", "Of danda'ee hojjedha (filannoo)."],
-  "Save draft": ["Wixinee olkaa'i", "Wixinee olkaa'i"],
+  "Save draft": ["ረቂቁን ያስቀምጡ", "Wixinee olkaa'i"],
   "Submit for review": ["Gamaaggamaaf ergi", "Gamaaggamaaf ergi"],
   "Your applications": ["Iyyannoowwan kee", "Iyyannoowwan kee"],
   "Restrictions:": ["Daangaa:", "Daangaa:"],
