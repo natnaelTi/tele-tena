@@ -3,7 +3,7 @@ import { AddFundsDialog } from "../components/AddFundsDialog";
 import { BookingReview } from "../components/BookingReview";
 import { appointmentGroups, appointmentsForView, type AppointmentView } from "../appointment-groups";
 import { useCallback, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowRight, Search } from "lucide-react";
 import "./PatientJourney.css";
 import { WalletSummary } from "../components/WalletSummary";
@@ -269,7 +269,10 @@ export function Appointments({ base = "/patient" }: { base?: string }) {
   const {w} = useLocale();
   const resource = useResource(journeyApi.appointments);
   const clinician=base==="/clinician";
-  const [view,setView]=useState<AppointmentView>("upcoming");
+  const [search,setSearch]=useSearchParams();
+  const candidate=search.get("view");
+  const view:AppointmentView = ["all","upcoming","attention","completed","cancelled"].includes(candidate||"") ? candidate as AppointmentView : "upcoming";
+  const setView=(next:AppointmentView)=>{const params=new URLSearchParams(search);params.set("view",next);setSearch(params,{replace:true});};
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 60000); return () => clearInterval(timer); }, []);
   const views: [AppointmentView,string][] = [["upcoming","Upcoming"],["attention",clinician?"Needs action":"Awaiting confirmation"],["completed","Completed"],["cancelled","Cancelled"],["all","All appointments"]];
@@ -277,7 +280,7 @@ export function Appointments({ base = "/patient" }: { base?: string }) {
   return <><PageTitle title={w("Appointments")} description={w("Upcoming care and past conversations, clearly separated.")} />
     {resource.error ? <InlineNotice tone="danger">{w("Appointments couldn’t be loaded.")} <Button onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice> : !resource.data ? <Skeleton/> : <>
       <nav className="appointment-view-switch" aria-label={w("Appointment views")}>{views.map(([value,label])=><button type="button" key={value} aria-pressed={view===value} onClick={()=>setView(value)}>{w(label)} <span>{appointmentsForView(resource.data!,value,clinician,now).length}</span></button>)}</nav>
-      {visible.length ? <div className="appointment-groups">{appointmentGroups(visible,clinician,now).map(([title,rows])=><section key={title}><h2>{w(!clinician&&title==="Needs action"?"Awaiting confirmation":title)}</h2><div className="stack">{rows.map(a=><AppointmentCard key={a.id} appointment={a} base={base}/>)}</div></section>)}</div> : <EmptyState title={w(resource.data.length?"No appointments in this view.":"No appointments yet.")}><p>{w(resource.data.length?"Choose another view to find your conversations.":"Booked sessions will appear here.")}</p>{view!=="all"&&resource.data.length>0&&<Button variant="secondary" onClick={()=>setView("all")}>{w("View all appointments")}</Button>}{!clinician&&resource.data.length===0&&<Link className="button secondary" to="/patient/discovery">{w("Find care")}</Link>}</EmptyState>}
+      {visible.length ? <div className="appointment-groups">{appointmentGroups(visible,clinician,now).map(([title,rows])=><section key={title}><h2>{w(!clinician&&title==="Needs action"?"Awaiting confirmation":title)}</h2><div className="stack">{rows.map(a=><AppointmentCard key={a.id} appointment={a} base={base} view={view}/>)}</div></section>)}</div> : <EmptyState title={w(resource.data.length?"No appointments in this view.":"No appointments yet.")}><p>{w(resource.data.length?"Choose another view to find your conversations.":"Booked sessions will appear here.")}</p>{view!=="all"&&resource.data.length>0&&<Button variant="secondary" onClick={()=>setView("all")}>{w("View all appointments")}</Button>}{!clinician&&resource.data.length===0&&<Link className="button secondary" to="/patient/discovery">{w("Find care")}</Link>}</EmptyState>}
     </>}
   </>;
 }

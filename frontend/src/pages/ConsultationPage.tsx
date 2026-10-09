@@ -1,6 +1,6 @@
 import { ConversationFacts, DisclosureSnapshot, PreparationPanel, RecordedCallTiming } from "../components/ConsultationDetails";
 import { appointmentStatus } from "../appointment-status";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { useResource } from "../hooks/useResource";
 import { useSession } from "../hooks/useSession";
@@ -21,6 +21,9 @@ export default function ConsultationPage() {
 
 function ConsultationDetail({appointmentId:id}:{appointmentId:string}) {
   const { session } = useSession();
+  const location=useLocation();
+  const returnView=location.state?.appointmentView;
+  const appointmentQuery=["all","upcoming","attention","completed","cancelled"].includes(returnView)?"?view="+returnView:"";
   const { t, w } = useLocale();
   const base = session?.profile?.kind === "clinician" ? "/clinician" : "/patient";
   const loadDetail = useCallback(() => journeyApi.appointmentDetail(id), [id]);
@@ -83,7 +86,7 @@ function ConsultationDetail({appointmentId:id}:{appointmentId:string}) {
       {!clinician&&item.status==="Completed"&&item.patient_summary_revisions?.length>0&&<PatientClinicSummarySharing appointment={id}/>}
       {documenting&&<details className="consultation-secondary-action"><summary>{w("Disclosure used at booking")}</summary><DisclosureSnapshot disclosure={item.disclosure}/></details>}
     </main><aside>{!clinician&&item.status==="Completed"&&<Card><h2>{w("Continue your care")}</h2><Link className="button primary" to={`/patient/book/${item.offering}`}>{w("Book a follow-up")}</Link></Card>}{documenting&&<Card className="documentation-actions"><h2>{w("Finalize encounter")}</h2><p>{w("Review the private note and patient summary before finalizing.")}</p><dl className="encounter-facts"><dt>{w("Patient")}</dt><dd>{item.patient_identity}</dd><dt>{w("Call state")}</dt><dd>{w("Call ended")}</dd><dt>{w("Documentation")}</dt><dd>{w(amending?"Amendment draft":"Notes pending")}</dd></dl>{documentationActions}</Card>}{documenting&&<details className="consultation-secondary-action"><summary>{w("Appointment details")}</summary>{conversationPanel}</details>}{item.status!=="Cancelled"&&item.status!=="Expired"&&item.status!=="Declined"&&item.status!=="Completed"&&!callEnded&&<PreparationPanel/>}<RecordedCallTiming item={item}/><Card><h2>{w("Timeline")}</h2><ol className="consultation-timeline">{item.timeline.map((event:any,index:number)=><li key={index}><strong>{w(event.event)}</strong><span>{date(event.at,item.timezone)} · {event.actor}</span>{event.reason&&<p>{event.reason}</p>}</li>)}</ol></Card></aside></div>
-    <footer className="consultation-detail-footer"><Link className="text-link" to={base+"/appointments"}>{w("Back to appointments")}</Link></footer>
+    <footer className="consultation-detail-footer"><Link className="text-link" to={base+"/appointments"+appointmentQuery}>{w("Back to appointments")}</Link></footer>
   </div>;
 }
 
