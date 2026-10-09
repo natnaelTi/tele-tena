@@ -33,3 +33,5 @@ tele_tena.patches.v1_27_vetting_rubric_assessment
 tele_tena.patches.v1_28_vetting_rubric_registry
 tele_tena.patches.v1_29_credential_verification_provenance
 tele_tena.patches.v1_30_adult_relationship_links
+tele_tena.patches.v1_31_explicit_note_sharing
+tele_tena.patches.v1_32_note_sharing_draft_choice

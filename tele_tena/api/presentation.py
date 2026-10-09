@@ -454,6 +454,12 @@ def appointment_detail(appointment):
         # Critically, this SELECT never reads private_note.
         revisions = rows('''SELECT revision,patient_summary,created FROM tt_note_revision
             WHERE appointment=%s AND summary_published=1 ORDER BY revision''', (item.id,))
+        # Only explicitly published revision text crosses the patient boundary.
+        shared_notes = rows('''SELECT revision,private_note AS shared_text,created FROM tt_note_revision
+            WHERE appointment=%s AND note_published=1 ORDER BY revision''', (item.id,))
+        selected['shared_consultation_notes'] = [
+            {'revision': r.revision, 'text': r.shared_text, 'published_at': iso(r.created)}
+            for r in shared_notes]
         selected['patient_summary_revisions'] = [
             {'revision': r.revision, 'summary': r.patient_summary, 'published_at': iso(r.created)}
             for r in revisions]
@@ -461,7 +467,7 @@ def appointment_detail(appointment):
         selected['patient_identity'] = disclosure.get('name') or 'Private patient'
         selected['sharing_snapshot'] = disclosure
         if note:
-            current = rows('''SELECT revision,private_note,patient_summary,summary_published,author,created
+            current = rows('''SELECT revision,private_note,patient_summary,summary_published,note_published,note_share_selected,author,created
                 FROM tt_note_revision WHERE appointment=%s AND revision=%s''',
                 (item.id, note[0].current_revision))
             if current:
@@ -470,18 +476,24 @@ def appointment_detail(appointment):
                     'text': current[0].private_note,
                     'patient_summary': current[0].patient_summary,
                     'summary_published': bool(current[0].summary_published),
+                    'note_published': bool(current[0].note_published),
+                    'note_share_selected': bool(current[0].note_share_selected),
                     'author': 'You' if current[0].author == user else 'Treating clinician',
                 }
         selected['prior_shared_revisions'] = [
-            {'revision': r.revision, 'published_at': iso(r.created)}
-            for r in rows('''SELECT revision,created FROM tt_note_revision
-                WHERE appointment=%s AND summary_published=1 ORDER BY revision''', (item.id,))]
+            {'revision': r.revision, 'published_at': iso(r.created),
+             'note_published': bool(r.note_published), 'summary_published': bool(r.summary_published)}
+            for r in rows('''SELECT revision,created,note_published,summary_published FROM tt_note_revision
+                WHERE appointment=%s AND (summary_published=1 OR note_published=1) ORDER BY revision''', (item.id,))]
     return selected
 
 
 @frappe.whitelist(methods=['POST'])
-def save_note_draft(appointment, private_note, patient_summary):
+def save_note_draft(appointment, private_note, patient_summary, share_note=0):
     clinician = actor('Tele Tena Clinician')
+    if share_note not in (True, False, 0, 1, '0', '1'):
+        fail('Choose whether to share the consultation note')
+    share_selected = share_note in (True, 1, '1')
     private_note = text(private_note, 12000, required=False)
     patient_summary = text(patient_summary, 6000, required=False)
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
@@ -496,9 +508,9 @@ def save_note_draft(appointment, private_note, patient_summary):
     revision = (int(existing[0].current_revision) if existing else 0) + 1
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_note_revision
-        (id,appointment,clinician,revision,private_note,patient_summary,summary_published,author,created)
-        VALUES (%s,%s,%s,%s,%s,%s,0,%s,%s)''',
-        (str(uuid.uuid4()), item.id, clinician, revision, private_note, patient_summary, clinician, now))
+        (id,appointment,clinician,revision,private_note,patient_summary,summary_published,note_share_selected,author,created)
+        VALUES (%s,%s,%s,%s,%s,%s,0,%s,%s,%s)''',
+        (str(uuid.uuid4()), item.id, clinician, revision, private_note, patient_summary, int(share_selected), clinician, now))
     if existing:
         frappe.db.sql("UPDATE tt_consultation_note SET status='Draft',current_revision=%s,modified=%s WHERE appointment=%s",
                       (revision, now, item.id))
@@ -534,9 +546,12 @@ def preview_patient_summary(appointment, summary=None):
 
 
 @command
-def finalize_consultation(appointment, publish_summary=0):
+def finalize_consultation(appointment, publish_summary=0, publish_note=0):
     clinician = actor('Tele Tena Clinician')
     publish = publish_summary in (True, 1, '1')
+    share_note = publish_note in (True, 1, '1')
+    if publish_note not in (True, False, 0, 1, '0', '1'):
+        fail('Choose whether to publish the consultation note')
     if publish_summary not in (True, False, 0, 1, '0', '1'):
         fail('Choose whether to publish the patient summary')
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
@@ -553,15 +568,17 @@ def finalize_consultation(appointment, publish_summary=0):
         fail('Save a documentation draft after ending the call', 'documentation_not_ready')
     current = one('''SELECT * FROM tt_note_revision WHERE appointment=%s AND revision=%s''',
                   (item.id, note.current_revision))
+    if share_note and not current.private_note.strip():
+        fail('Add a consultation note before publishing it', 'note_required')
     if publish and not current.patient_summary.strip():
         fail('Add a patient summary before publishing it', 'summary_required')
     finalized_revision = int(note.current_revision) + 1
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_note_revision
-        (id,appointment,clinician,revision,private_note,patient_summary,summary_published,author,created)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+        (id,appointment,clinician,revision,private_note,patient_summary,summary_published,note_published,note_share_selected,author,created)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
         (str(uuid.uuid4()), item.id, clinician, finalized_revision, current.private_note,
-         current.patient_summary, int(publish), clinician, now))
+         current.patient_summary, int(publish), int(share_note), int(share_note), clinician, now))
     frappe.db.sql("UPDATE tt_consultation_note SET status='Finalized',current_revision=%s,modified=%s WHERE appointment=%s",
                   (finalized_revision, now, item.id))
     if item.state != 'Completed':
@@ -615,7 +632,7 @@ def finalize_consultation(appointment, publish_summary=0):
         _event(item.id, 'Completed', clinician)
     _event(item.id, 'DocumentationFinalized', clinician)
     return {'status': 'Finalized', 'revision': finalized_revision,
-            'patient_summary_published': publish}
+            'patient_summary_published': publish, 'consultation_note_published': share_note}
 
 
 @query()

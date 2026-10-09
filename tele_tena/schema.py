@@ -126,3 +126,7 @@ def install():
     credential_verification_provenance()
     from tele_tena.patches.v1_30_adult_relationship_links import execute as adult_relationship_links
     adult_relationship_links()
+    from tele_tena.patches.v1_31_explicit_note_sharing import execute as explicit_note_sharing
+    explicit_note_sharing()
+    from tele_tena.patches.v1_32_note_sharing_draft_choice import execute as note_sharing_draft_choice
+    note_sharing_draft_choice()
