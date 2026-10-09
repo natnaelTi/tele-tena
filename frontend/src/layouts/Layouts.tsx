@@ -224,6 +224,7 @@ export function WorkspaceLayout({
 }: {
   kind: "patient" | "clinician" | "admin" | "clinic";
 }) {
+  const location = useLocation();
   const { session, refresh } = useSession();
   const { w } = useLocale();
   const [moreOpen, setMoreOpen] = useState(false);
