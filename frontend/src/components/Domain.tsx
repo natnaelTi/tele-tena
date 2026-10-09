@@ -10,6 +10,7 @@ import {
   Headphones,
   FileText,
   ShieldCheck,
+  Languages,
 } from "lucide-react";
 import { Button, Card, StatusBadge } from "./ui";
 import type { Appointment, Disclosure, Offer } from "../journey-api";
@@ -53,7 +54,8 @@ export function ClinicianCard({ offer }: { offer: Offer }) {
       <div className="clinician-body"><div className="avatar" aria-hidden="true">{offer.display_name.slice(0, 1).toUpperCase()}</div><div className="clinician-card-copy">
         <h3>{offer.display_name}</h3><p>{offer.label}</p>
         <span className="verified"><ShieldCheck size={16} />{w("Approved for this service")}</span>
-        <div className="clinician-facts"><span>{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Care language not listed")}</span><span>{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')}</span></div>
+        {offer.description && <p className="clinician-description">{offer.description}</p>}
+        <div className="clinician-facts"><span><Languages size={16} aria-hidden="true" />{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Care language not listed")}</span><span>{offer.consultation_format === 'audio' ? <Headphones size={16} aria-hidden="true" /> : <Video size={16} aria-hidden="true" />}{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')}</span></div>
       </div></div>
       <div className="card-actions"><div><strong>ETB {money(offer.price)}</strong><small>{offer.minutes} {w("minutes")} · {w("per session")}</small></div><div className="actions"><Button variant="quiet" onClick={event => { trigger.current = event.currentTarget; setPreview(true); }}>{w("View profile")}</Button><Link className="button" to={"/patient/book/" + offer.id}>{w("Choose a time")}</Link></div></div>
     </Card>
