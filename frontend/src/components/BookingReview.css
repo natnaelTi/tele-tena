@@ -4,9 +4,9 @@
 .booking-review-clinician { display:flex; gap:16px; align-items:center; margin-bottom:24px; }
 .booking-review-clinician h3 { margin:0 0 4px; font-size:20px; }
 .booking-review-clinician p { margin:0; color:var(--muted); }
-.booking-review-panel .summary-list { column-gap:16px; row-gap:0; margin-bottom:24px; font-size:16px; }
+.booking-review-panel .summary-list { grid-template-columns:minmax(0,1fr) minmax(0,1.4fr); column-gap:16px; row-gap:0; margin-bottom:24px; font-size:16px; }
 .booking-review-panel .summary-list dt,.booking-review-panel .summary-list dd { padding:16px 0; border-bottom:1px solid var(--border); }
-.booking-review-panel .summary-list dd { text-align:right; font-weight:600; }
+.booking-review-panel .summary-list dd { text-align:right; font-weight:600; margin:0; }
 .booking-review-panel > .button { margin-top:24px; width:100%; }
 .booking-review-disclosure summary { min-height:44px; display:flex; align-items:center; cursor:pointer; font-weight:600; color:var(--brand); }
 .booking-review-disclosure summary::before { content:'+'; margin-right:10px; }
