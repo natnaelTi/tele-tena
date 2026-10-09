@@ -13,6 +13,7 @@ import { journeyApi } from "../journey-api";
 import type { Disclosure, Offer } from "../journey-api";
 import {
   AppointmentCard,
+  HomeAppointmentPreview,
   ClinicianCard,
   DisclosurePreview,
   PageTitle,
@@ -67,13 +68,10 @@ export function PatientHome() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <Button type="submit">
-            <Search size={20} />
-            Find care
-          </Button>
+          <Button type="submit" aria-label={w("Find care")}><Search size={20}/></Button>
         </form>
       </section></section>
-      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Share what support you’re looking for and compare private offers from eligible clinicians.")}</p></div><Link className="button secondary" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
+      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
       {!!requests.data?.some((item:any)=>item.state==='Open')&&<section className="active-request-summary"><div className="section-line"><h2>Active care requests</h2><Link to="/patient/requests">Review requests and offers <ArrowRight size={16}/></Link></div>{requests.data.filter((item:any)=>item.state==='Open').slice(0,3).map((item:any)=><Link className="active-request-row" key={item.id} to={'/patient/requests/'+encodeURIComponent(item.id)}><span>{item.urgency==='immediate'?'As soon as possible':'Schedule for later'} · {item.category}</span><strong>{item.offers.filter((offer:any)=>offer.state==='Active').length} new offers</strong></Link>)}</section>}
       <section className="patient-dashboard-panel">
       <div className="section-line">
@@ -90,12 +88,7 @@ export function PatientHome() {
       ) : !appointments.data ? (
         <Skeleton />
       ) : upcoming?.length ? (
-        <AppointmentCard
-          appointment={
-            upcoming[0]
-          }
-          base="/patient"
-        />
+        <HomeAppointmentPreview appointment={upcoming[0]} />
       ) : (
         <EmptyState
           title="A conversation starts with a choice."

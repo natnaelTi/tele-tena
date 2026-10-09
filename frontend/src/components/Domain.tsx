@@ -62,6 +62,16 @@ export function ClinicianCard({ offer }: { offer: Offer }) {
     {preview && <ClinicianPreview offer={offer} close={() => { setPreview(false); requestAnimationFrame(() => trigger.current?.focus()); }} />}
   </>;
 }
+/** Compact C01 upcoming-session row; status remains server-derived. */
+export function HomeAppointmentPreview({ appointment }: { appointment: Appointment }) {
+  const { w } = useLocale();
+  const status = appointmentStatus(appointment, false);
+  const href = "/patient/consultations/" + appointment.id;
+  return <div className="home-appointment-preview">
+    <div className="home-appointment-row"><span className="appointment-icon" aria-hidden="true">{appointment.consultation_format === "audio" ? <Headphones size={22}/> : <Video size={22}/>}</span><div><h3><Link to={href}>{appointment.display_identity || appointment.service_label}</Link></h3><p>{date(appointment.start, appointment.timezone)} · {w(appointment.consultation_format === "audio" ? "Audio" : "Video")}</p></div><StatusBadge tone={status.tone}>{w(status.label)}</StatusBadge></div>
+    <div className="home-appointment-actions"><Link className="button primary" to={href}>{w("View appointment")}</Link><Link className="button secondary" to="/patient/appointments">{w("All appointments")}</Link></div>
+  </div>;
+}
 export function AppointmentCard({
   appointment,
   base,
