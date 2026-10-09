@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, useRef } from "react";
 import type {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
@@ -252,12 +252,20 @@ export function Dialog({
   drawer?: boolean;
   className?: string;
 }) {
+  const returnFocus = useRef<HTMLElement | null>(null);
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="dialog-overlay" />
         <DialogPrimitive.Content
           className={`${drawer ? "dialog drawer" : "dialog"} ${className}`}
+          onOpenAutoFocus={() => { returnFocus.current = document.activeElement as HTMLElement; }}
+          onCloseAutoFocus={event => {
+            if (returnFocus.current?.isConnected) {
+              event.preventDefault();
+              returnFocus.current.focus();
+            }
+          }}
         >
           <DialogPrimitive.Title>{title}</DialogPrimitive.Title>
           <DialogPrimitive.Description>

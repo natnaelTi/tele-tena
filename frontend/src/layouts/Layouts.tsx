@@ -227,6 +227,9 @@ export function WorkspaceLayout({
   const { session, refresh } = useSession();
   const { w } = useLocale();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [signoutBusy,setSignoutBusy]=useState(false);
+  const [signoutError,setSignoutError]=useState("");
+  const signout=async()=>{if(signoutBusy)return;setSignoutBusy(true);setSignoutError("");try{await journeyApi.logout();await refresh();}catch{setSignoutError(w("We could not sign you out. Try again."));}finally{setSignoutBusy(false);}};
   const moreTrigger = useRef<HTMLButtonElement | null>(null);
   const roleItems =
     kind === "patient"
@@ -281,7 +284,8 @@ export function WorkspaceLayout({
     return <Navigate to="/onboarding" replace />;
   if (kind === "patient" || kind === "clinician") return <div className="reference-workspace">
     <DemoBar />
-    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}<Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button></nav><div className="product-user"><LanguageSelect /><span>{session?.profile?.display_name}</span><Button variant="quiet" aria-label={w("Sign out")} title={w("Sign out")} onClick={() => void journeyApi.logout().then(refresh).catch(() => undefined)}><LogOut size={20} /></Button></div></header>
+    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}<Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button></nav><div className="product-user"><LanguageSelect /><span>{session?.profile?.display_name}</span><Button variant="quiet" aria-label={w("Sign out")} title={w("Sign out")} loading={signoutBusy} onClick={()=>void signout()}><LogOut size={20} /></Button></div></header>
+    {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
     {kind === "clinician" && session?.roles.includes("Tele Tena Clinician") && <ClinicianRequestAvailability />}
     <main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') ? 'workspace-wide' : ''}`} id="main-content"><WorkspaceTour role={kind} /><Outlet /></main>
     <nav className="product-mobile-nav" aria-label={w("Mobile workspace")}>{mobilePrimary.map(item => renderNavLink(item))}<Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} /><span>{w("More")}</span></Button></nav>
@@ -313,12 +317,8 @@ export function WorkspaceLayout({
           <TranslationNote />
           <Button
             variant="quiet"
-            onClick={() =>
-              void journeyApi
-                .logout()
-                .then(refresh)
-                .catch(() => undefined)
-            }
+            loading={signoutBusy}
+            onClick={()=>void signout()}
           >
             <LogOut size={20} />
             {w("Sign out")}
@@ -338,6 +338,7 @@ export function WorkspaceLayout({
           <LanguageSelect />
         </header>
 
+        {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
         {kind !== "clinic" && <WorkspaceTour role={kind} />}
         <main className="workspace-main" id="main-content">
           <Outlet />

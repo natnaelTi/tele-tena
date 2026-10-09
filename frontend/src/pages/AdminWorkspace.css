@@ -1,0 +1,10 @@
+.review-queue-filters { display:grid; grid-template-columns:minmax(0,2fr) minmax(180px,1fr); gap:16px; margin:24px 0; }
+.review-queue-table table { font-size:14px; }
+.review-queue-table th { color:var(--muted); background:var(--surface); }
+.review-queue-table td { padding:20px 14px; }
+.review-queue-cards { display:none; }
+.application-review-dialog { max-width:640px; }
+.application-review-dialog h3 { margin-top:24px; }
+.review-policy-details { padding:16px 20px; border:1px solid var(--border); border-radius:12px; margin-bottom:24px; }
+.review-policy-details > summary { min-height:44px; display:flex; align-items:center; cursor:pointer; font-weight:600; }
+@media(max-width:700px) { .review-queue-table { display:none; } .review-queue-cards { display:grid; gap:16px; } .review-queue-cards header { display:flex; justify-content:space-between; gap:16px; } .review-queue-cards h2 { font-size:20px; } .review-queue-filters { grid-template-columns:1fr; } }
