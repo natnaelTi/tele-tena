@@ -226,7 +226,7 @@ export function Discovery() {
         </Select>
       </div>
 
-      {!!offers.data && !availabilityBusy && <div className="discovery-results-heading"><p>{shown?.length || 0} {w("available services")}</p><Select label={w("Sort services")} value={sort} onChange={event=>setSort(event.target.value)}><option value="relevance">{w("Best fit")}</option><option value="price">{w("Lowest price")}</option></Select></div>}
+      {!!offers.data && !availabilityBusy && <div className="discovery-results-heading"><p>{shown?.length || 0} {w(shown?.length === 1 ? "available service" : "available services")}</p><Select label={w("Sort services")} value={sort} onChange={event=>setSort(event.target.value)}><option value="relevance">{w("Best fit")}</option><option value="price">{w("Lowest price")}</option></Select></div>}
       {availabilityError&&<InlineNotice tone="danger">{w("Available times could not be checked. Clear this filter or try again.")}</InlineNotice>}
       {offers.error ? (
         <InlineNotice tone="danger">
