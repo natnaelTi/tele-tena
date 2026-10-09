@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { ApiError } from "../api";
 const messages: Record<string, string> = {
+  note_required: "Enter a consultation note or turn off note sharing.",
+  summary_required: "Enter a patient summary before publishing.",
+  documentation_not_ready: "End the consultation before saving or finalizing notes.",
+  session_required: "Your session expired. Sign in again before continuing.",
+  permission_denied: "You do not have permission to make this change.",
   adult_required: "Confirm that you are 18 or older before continuing.",
   relationship_retry_changed: "This invitation submission changed. Start a new invitation.",
   relationship_invitation_rate_limited: "You have reached the invitation limit. Try again later.",
@@ -73,7 +78,7 @@ export function useAction() {
         : e instanceof ApiError && e.status >= 500
           ? "The service is temporarily unavailable. Your changes are still here; try saving again."
           : e instanceof ApiError && e.status === 417
-            ? "The schedule could not be saved. Review the time fields and schedule requirements."
+            ? "Some details need your attention. Review your inputs and try again."
             : "We couldn’t save this change. Check your connection and inputs, then try again.");
     } finally {
       setBusy(false);

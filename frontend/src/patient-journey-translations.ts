@@ -1,5 +1,12 @@
 /** Provisional interface translations; native review is a release activation gate. */
 export const patientJourneyTranslations: Record<string, [string, string]> = {
+  "Share this note with the patient": ["ይህን ማስታወሻ ከታካሚው ጋር ያጋሩ", "Yaadannoo kana dhukkubsataa waliin qoodi"],
+  "This note will be included in the patient-visible preview and published when you finalize.": ["ይህ ማስታወሻ ለታካሚው በሚታየው ቅድመ እይታ ይካተታል፤ ሲያጠናቅቁም ይታተማል።", "Yaadannoon kun ilaalcha duraa dhukkubsataa keessatti hammatama; yeroo xumurtu maxxanfama."],
+  "Private to the treating clinician unless you choose to share.": ["ለማጋራት ካልመረጡ በስተቀር ለእርስዎ ብቻ የግል ነው።", "Qooduuf yoo hin filanne ogeessa yaalaa qofaaf dhuunfaa dha."],
+  "Consultation note shared with the patient": ["ከታካሚው ጋር የሚጋራ የውይይት ማስታወሻ", "Yaadannoo marii dhukkubsataa waliin qoodamu"],
+  "Shared consultation note": ["የተጋራ የውይይት ማስታወሻ", "Yaadannoo marii qoodame"],
+  "Only the note and summary shown here will be shared. Finalization records pending earnings; it does not release an external payment.": ["እዚህ የሚታየው ማስታወሻና ማጠቃለያ ብቻ ይጋራሉ። ማጠናቀቅ የሚጠብቅ ገቢ ይመዘግባል፤ እውነተኛ ክፍያ አይለቅም።", "Yaadannoo fi cuunfaa asitti mulʼatan qofa qoodamu. Xumuruun galii eeggataa galmeessa; kaffaltii alaa hin gadi lakkisu."],
+
   "Finish the consultation": ["ውይይቱን ያጠናቅቁ", "Marii xumuri"],
   "Consultation record": ["የውይይት መዝገብ", "Galmee marii"],
   "Consultation note": ["የውይይት ማስታወሻ", "Yaadannoo marii"],
