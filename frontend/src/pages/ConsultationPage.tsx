@@ -14,6 +14,12 @@ import { useLocale } from "../hooks/useLocale";
 
 export default function ConsultationPage() {
   const { id = "" } = useParams();
+  // Never carry a clinical draft, disclosure, modal or late resource result
+  // into a different appointment when the router reuses this route.
+  return <ConsultationDetail key={id} appointmentId={id}/>;
+}
+
+function ConsultationDetail({appointmentId:id}:{appointmentId:string}) {
   const { session } = useSession();
   const { t, w } = useLocale();
   const base = session?.profile?.kind === "clinician" ? "/clinician" : "/patient";
