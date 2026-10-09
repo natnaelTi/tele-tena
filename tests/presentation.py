@@ -2517,6 +2517,34 @@ class Presentation(unittest.TestCase):
         self.assertEqual(after.start, original.start)
         self.assertEqual(after.timezone, 'Africa/Addis_Ababa')
 
+    def test_reservation_display_uses_postings_not_completed_status(self):
+        self.fund_patient('p1', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        booked = self.book_slot(offering, self.slots(offering, day)[0], 'held-display')
+        fixtures.login('p1')
+        before = journey.wallet()
+        journals = frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0]
+        self.assertEqual(presentation.appointment_detail(booked['id'])['reservation_state'], 'Reserved')
+        # This owned fixture represents the historical Completed-but-held case.
+        # The query must not fabricate a financial consumption from its label.
+        frappe.db.sql("UPDATE tt_appointment SET state='Completed' WHERE id=%s", (booked['id'],))
+        self.assertEqual(presentation.appointment_detail(booked['id'])['reservation_state'], 'Reserved')
+        record = journey.one('SELECT price FROM tt_appointment WHERE id=%s', (booked['id'],))
+        frappe.db.sql("""INSERT INTO tt_earning
+            (id,appointment,patient,clinician,gross_minor,fee_minor,net_minor,policy_snapshot,state,created,modified)
+            VALUES (%s,%s,%s,%s,%s,0,%s,'{}','LegacyHold',UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))""",
+            (str(uuid.uuid4()), booked['id'], fixtures.USERS['p1'], fixtures.USERS['c1'],
+             record.price, record.price))
+        detail = presentation.appointment_detail(booked['id'])
+        self.assertEqual(detail['financial_state'], 'LegacyHold')
+        self.assertEqual(detail['reservation_state'], 'Review required')
+        self.assertEqual(journey.wallet(), before)
+        self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0], journals)
+        fixtures.login('p2')
+        with self.assertRaises(frappe.PermissionError):
+            presentation.appointment_detail(booked['id'])
+
     def test_care_records_do_not_link_different_patients_with_equal_names(self):
         self.fund_patient('p1', 3000)
         self.fund_patient('p2', 3000)

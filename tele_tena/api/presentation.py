@@ -421,6 +421,23 @@ def appointment_detail(appointment):
         selected['dispute_release_at'] = iso(earning[0].release_at) if earning[0].release_at else None
         selected['can_open_financial_dispute'] = (role == 'patient' and earning[0].state == 'Pending' and
             earning[0].release_at and earning[0].release_at > datetime.now(timezone.utc).replace(tzinfo=None))
+    # Appointment status is not proof of consumption. Legacy completed records
+    # may still hold funds; only immutable postings establish this display state.
+    postings = rows('SELECT event_type FROM tt_journal WHERE event_ref IN (%s,%s,%s)',
+                    ('booking:' + item.id, 'release:' + item.id, 'completion:' + item.id))
+    kinds = {entry.event_type for entry in postings}
+    if earning and earning[0].state == 'LegacyHold':
+        selected['reservation_state'] = 'Review required'
+    elif 'ReservationRelease' in kinds and 'ConsultationFinalized' in kinds:
+        selected['reservation_state'] = 'Review required'
+    elif 'ReservationRelease' in kinds:
+        selected['reservation_state'] = 'Released'
+    elif 'ConsultationFinalized' in kinds:
+        selected['reservation_state'] = 'Consumed'
+    elif 'Reservation' in kinds:
+        selected['reservation_state'] = 'Reserved'
+    else:
+        selected['reservation_state'] = 'Unavailable'
     if role == 'patient':
         clinician = one('SELECT display_name FROM tt_profile WHERE user=%s AND kind=%s',
                         (item.clinician, 'clinician'))
