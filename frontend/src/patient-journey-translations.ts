@@ -1,5 +1,6 @@
 /** Provisional interface translations; native review is a release activation gate. */
 export const patientJourneyTranslations: Record<string, [string, string]> = {
+  "Continue your care": ["እንክብካቤዎን ይቀጥሉ", "Kunuunsa kee itti fufi"],
   "Private consultation note": ["የግል የውይይት ማስታወሻ", "Yaadannoo marii dhuunfaa"],
   "For patient sharing, with your approval": ["በእርስዎ ፈቃድ ለታካሚው ለማጋራት", "Eeyyama keetiin dhukkubsataaf qooduuf"],
   "Patient summary / next steps": ["የታካሚ ማጠቃለያ / ቀጣይ እርምጃዎች", "Cuunfaa dhukkubsataa / tarkaanfii itti aanu"],

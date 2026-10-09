@@ -108,11 +108,11 @@ function ClinicianRequestAvailability() {
     ? `${w("No full session can start within")} ${data.immediate_window_minutes || 30} ${w("minutes. Your published hours can still be used for scheduled requests.")}`
     : "Complete setup before receiving requests.";
   return <section className="request-presence-shell" aria-label={w("Request availability")}>
-    <div><strong>{w(data?.ready ? "Available for requests" : "Requests paused")}</strong>
-      <span>{w(failureMessage || (data?.ready ? "Ready status expires if this session disconnects." : pausedMessage))}</span>
+    <details className="request-presence-details" open={failureMessage?true:undefined}><summary><strong>{w(failureMessage || (data?.ready ? "Available for requests" : "Requests paused"))}</strong>{!data?.ready&&!failureMessage&&<span>{w("Setup needed")}</span>}</summary><div>
+      <span>{w(data?.ready ? "Ready status expires if this session disconnects." : pausedMessage)}</span>
       {data?.reasons?.includes("immediate_policy_required") && <span>{w("A reviewer must enable immediate requests for this service. Service-scope approval alone does not enable this. This does not guarantee a request or match.")}</span>}
       {!!data?.reasons?.length && <nav className="request-readiness-actions" aria-label={w("Setup needed")}>{data.reasons.filter((reason: string)=>reason!=="immediate_policy_required").map((reason: string) => {const item=guidance[reason];return item?<Link key={reason} to={item.to}>{w(item.label)}</Link>:<span key={reason}>{w("Complete setup before receiving requests.")}</span>;})}</nav>}
-    </div>
+    </div></details>
     <Button className="compact-button" variant={data?.ready ? "secondary" : "primary"} loading={busy} disabled={!data?.configured && !data?.ready} onClick={() => void toggle()}>{w(data?.ready ? "Pause" : "Go available")}</Button>
     {failureMessage && <InlineNotice tone="danger">{w(failureMessage)}</InlineNotice>}
   </section>;

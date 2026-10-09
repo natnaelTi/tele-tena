@@ -37,3 +37,12 @@
 .reference-workspace-main > .page-title h1 { font-size:40px; line-height:1.12; letter-spacing:-1.6px; }
 @media(min-width:801px) { .reference-workspace-main { position:relative; } .reference-workspace-main > .tour-replay { position:absolute; top:8px; bottom:auto; right:36px; margin:0; } }
 @media(max-width:800px) { .reference-workspace-main > .page-title h1 { font-size:32px; } }
+
+/* Request presence stays in the shell without a repeated setup banner. */
+.request-presence-shell { align-items:flex-start; padding:4px 14px; gap:12px; }
+.request-presence-details { flex:1; min-width:0; }
+.request-presence-details > summary { cursor:pointer; min-height:44px; padding:10px 0; font-size:14px; }
+.request-presence-details > summary > span { margin-inline-start:12px; font-weight:400; }
+.request-presence-details > div { display:grid; gap:8px; padding:4px 0 12px; }
+.request-presence-shell .compact-button { min-height:44px; margin-top:2px; }
+.request-presence-shell > .notice { margin:0; }

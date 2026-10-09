@@ -38,12 +38,12 @@ const base = process.env.TELE_TENA_BROWSER_BASE || 'http://127.0.0.1:8017/telete
     });
     const appointment = seed.appointment;
     await page.goto(base + '/clinician/consultations/' + appointment);
-    await page.getByRole('heading', { name: 'Consultation notes' }).waitFor();
-    const state = await page.locator('.summary-list dd').first().innerText();
+    await page.getByRole('heading', { name: 'Consultation notes', exact: true }).waitFor();
+    const state = await page.locator('.consultation-summary .status-pill').innerText();
     const endedLabels = await page.getByText('Call ended', { exact: true }).count();
-    const completedLabels = await page.getByText('Completion pending', { exact: true }).count();
+    const completedLabels = await page.getByText('Notes pending', { exact: true }).count();
     const bookedLabels = await page.getByText('Booked', { exact: true }).count();
-    if (state !== 'Completion pending' || completedLabels !== 1 || bookedLabels !== 0)
+    if (state !== 'Call ended' || completedLabels !== 1 || bookedLabels !== 0)
       throw new Error(`unexpected lifecycle presentation: state=${state}; pending=${completedLabels}; ended=${endedLabels}; booked=${bookedLabels}`);
 
     const screenshotDir = '/tmp/tele-tena-presentation-review';
