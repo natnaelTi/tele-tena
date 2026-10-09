@@ -5,7 +5,7 @@ import { useSession } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
 import { api } from "../api";
 import { date, money } from "../components/Domain";
-import { Button, Card, Checkbox, InlineNotice, Select, Skeleton } from "../components/ui";
+import { Button, Card, Checkbox, Dialog, InlineNotice, Select, Skeleton } from "../components/ui";
 import { useAction } from "../hooks/useAction";
 import Consultation from "../features/consultations/Consultation";
 import { useLocale } from "../hooks/useLocale";
@@ -25,6 +25,8 @@ export default function ConsultationPage() {
   const [privateNote, setPrivateNote] = useState<string|null>(null);
   const [summary, setSummary] = useState<string|null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
   const [disputeReason, setDisputeReason] = useState("");
   const [feedbackRating, setFeedbackRating] = useState<number|null>(null);
   const action = useAction();
@@ -48,7 +50,7 @@ export default function ConsultationPage() {
       {!clinician&&callEnded&&item.documentation_state!=="Finalized"&&<InlineNotice>Summary being prepared. You’ll see it here if your clinician chooses to share one.</InlineNotice>}
       {canOpenRoom&&!callEnded&&<Card className="join-card"><h2>{item.call_state==="Open"?"Your consultation is ready":"Join your consultation"}</h2><p>Use the pre-call device check before joining. Booked duration is {item.booked_minutes} minutes.</p><Link className="button primary" to={`/consultation/${item.id}/room`}>Join consultation</Link></Card>}
       {clinician&&item.can_respond&&<div className="actions"><Button loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondToRequest(id,"confirm");await detail.refresh();},"Appointment confirmed.")}>Confirm request</Button><Button variant="danger" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondToRequest(id,"decline");await detail.refresh();},"Request declined and reservation released.")}>Decline request</Button></div>}
-      {item.can_cancel&&<Button variant="secondary" onClick={()=>{const reason=window.prompt("Reason for cancellation (optional)");if(reason!==null)void action.run(async()=>{await journeyApi.cancelAppointment(id,reason);await detail.refresh();},"Appointment cancelled. Reservation release recorded.");}}>Cancel appointment</Button>}
+      {item.can_cancel&&<><Button variant="secondary" onClick={() => setCancelOpen(true)}>{w("Cancel appointment")}</Button><Dialog open={cancelOpen} onOpenChange={setCancelOpen} title={w("Cancel this appointment?")} description={w("Review your decision before cancelling. The saved booking policy determines the financial outcome.")}><label className="field">{w("Reason for cancellation (optional)")}<textarea rows={3} maxLength={1000} value={cancelReason} onChange={event => setCancelReason(event.target.value)} /></label>{action.error && <InlineNotice tone="danger">{action.error}</InlineNotice>}<div className="actions"><Button variant="secondary" disabled={action.busy} onClick={() => setCancelOpen(false)}>{w("Keep appointment")}</Button><Button variant="danger" loading={action.busy} onClick={() => void action.run(async () => { await journeyApi.cancelAppointment(id, cancelReason); setCancelOpen(false); setCancelReason(""); await detail.refresh(); }, w("Appointment cancelled. Reservation release recorded."))}>{w("Confirm cancellation")}</Button></div></Dialog></>}
       {item.status === "Booked" && <ReschedulePanel appointment={item} refresh={detail.refresh} />}
       {item.status==="Cancelled"&&<Card><h2>Cancellation</h2><p>Cancelled by {item.cancellation.actor} · {item.cancellation.at?date(item.cancellation.at):"time unavailable"}</p>{item.cancellation.reason&&<p>Reason: {item.cancellation.reason}</p>}<p>Reserved balance released under the accepted demonstration policy.</p></Card>}
       {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}{action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}

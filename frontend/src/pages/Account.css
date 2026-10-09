@@ -1,0 +1,9 @@
+/* H01 overview and focused H02–H04 editors. No repeated wallet on every setting. */
+.reference-workspace .account-overview { display:grid; grid-template-columns:minmax(0,1fr) 322px; gap:36px; max-width:1244px; }
+.reference-workspace .account-overview .settings-section { border:1px solid var(--border); border-radius:16px; padding:24px; margin:0 0 24px; max-width:none; background:white; }
+.settings-link-row { display:flex; align-items:center; justify-content:space-between; width:100%; padding:16px 0; min-height:56px; border:0; border-bottom:1px solid var(--border); color:var(--ink); font-size:16px; text-align:left; }
+.settings-link-row:hover { color:var(--brand); background:var(--subtle); }
+.reference-workspace .account-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:24px 0; }
+.reference-workspace .account-tabs button { min-height:44px; padding:10px 16px; border:1px solid var(--border); border-radius:22px; color:var(--ink); background:white; font-size:14px; }
+.reference-workspace .account-tabs button.selected { color:white; background:var(--ink); border-color:var(--ink); }
+@media(max-width:800px) { .reference-workspace .account-overview { grid-template-columns:1fr; gap:24px; } }
