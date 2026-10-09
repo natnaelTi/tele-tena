@@ -41,13 +41,19 @@ export function ClinicianToday() {
   const approved=!!session?.roles.includes("Tele Tena Clinician");
   const [now,setNow]=useState(()=>Date.now());
   useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),60000);return()=>clearInterval(timer);},[]);
-  const appointments=useResource(journeyApi.appointments);
+  const appointments=useResource(useCallback(()=>approved?journeyApi.appointments():Promise.resolve([]),[approved]));
   const current=useResource(practice);
   const earnings=useResource(useCallback(()=>approved?api<EarningsView>("tele_tena.accounting.clinician_earnings"):Promise.resolve(null),[approved]));
   const inbox=useResource(useCallback(()=>approved?journeyApi.clinicianRequests():Promise.resolve(null),[approved]));
   const groups=appointmentGroups(appointments.data||[],true,now).filter(([label])=>label!=="Past");
   const day=new Date(now).toLocaleDateString(undefined,{timeZone:timezone});
   const today=appointments.data?.filter(item=>new Date(item.start).toLocaleDateString(undefined,{timeZone:timezone})===day);
+  if (!approved) return <>
+    <PageTitle title={w("Your application")} description={w("Complete your professional profile and upload evidence for review. Approval is manual.")}/>
+    <div className="clinician-today-layout"><section className="practice-panel"><h2>{w("Review progress")}</h2>
+      {current.error?<InlineNotice tone="danger">{w("Practice details unavailable.")} <Button variant="secondary" onClick={()=>void current.refresh()}>{w("Retry")}</Button></InlineNotice>:!current.data?<Skeleton/>:<><p>{w("Current status")}</p><StatusBadge tone={current.data.application?.status === "Rejected" ? "danger" : "warning"}>{w(current.data.application?.status || "Not submitted")}</StatusBadge><p>{w("Approval and each service scope are reviewed by an administrator. Resume files are private application evidence; upload does not verify credentials.")}</p><Link className="button primary" to="/clinician/vetting">{w("Professional review")}</Link></>}
+    </section><aside className="practice-panel"><h2>{w("Professional profile")}</h2><p>{w("Complete your professional profile and upload evidence for review. Approval is manual.")}</p><Link className="button secondary" to="/clinician/account">{w("Your account")}</Link></aside></div>
+  </>;
   return <>
     <PageTitle title={w("Your day at a glance")} description={`${new Date(now).toLocaleDateString(undefined,{dateStyle:"full"})} · ${timezone}`} action={<Link className="button secondary" to="/clinician/availability">{w("Manage availability")}</Link>}/>
     <div className="practice-metrics">
