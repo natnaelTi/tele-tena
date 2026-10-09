@@ -540,6 +540,14 @@ def clinician_requests():
             if not immediate_service_enabled(service):
                 continue
         req.disclosure_snapshot = json.loads(req.disclosure_snapshot)
+        # Offering titles are clinician-owned copy, not authorization keys.
+        # Return only this clinician's currently published offerings within
+        # the exact request scope/format; submission still revalidates the slot.
+        req.eligible_offering_ids = [item.id for item in rows('''
+            SELECT o.id FROM tt_offering o JOIN tt_schedule schedule ON schedule.offering=o.id
+            WHERE o.clinician=%s AND o.service=%s AND o.active=1
+                AND schedule.status='Published' AND schedule.consultation_format=%s
+            ORDER BY o.id''', (clinician, req._routing_service, req.consultation_format))]
         req.suggested_start = None
         if req.urgency == 'immediate':
             offerings = rows('''SELECT o.id FROM tt_offering o
@@ -573,7 +581,7 @@ def clinician_requests():
 
 
 @query()
-def clinician_offers(page=0):
+def clinician_offers(page=0, view=None):
     """Own quotes and outcomes, including closed requests, with bounded paging.
 
     No request narrative, patient account identity, competitor quote, or new
@@ -584,20 +592,27 @@ def clinician_offers(page=0):
     clinician = actor('Tele Tena Clinician')
     profile('clinician')
     page_number = integer(page, 0, 10000)
+    if view not in (None, 'Active', 'History'):
+        fail('Choose an offer view.', 'request_offer_view_invalid')
+    active_condition = "(o.state='Active' AND r.state='Open' AND o.valid_until>UTC_TIMESTAMP(6) AND r.expires_at>UTC_TIMESTAMP(6))"
+    view_filter = '' if view is None else ' AND ' + (active_condition if view == 'Active' else 'NOT ' + active_condition)
     offers = rows('''SELECT o.id,o.start,o.duration_minutes,o.consultation_format,
         o.price_minor,o.price_source,o.state,o.valid_until,o.created_at,o.timezone,
-        r.state AS request_state,r.disclosure_snapshot,s.service_label AS category,
+        r.state AS request_state,r.expires_at AS request_expires_at,r.disclosure_snapshot,s.service_label AS category,
         a.id AS appointment
         FROM tt_request_offer o JOIN tt_open_request r ON r.id=o.request_id
         JOIN tt_offering off ON off.id=o.offering
         JOIN `tabTele Tena Service` s ON s.name=off.service
         LEFT JOIN tt_appointment a ON a.id=o.appointment AND a.clinician=%s
-        WHERE o.clinician=%s ORDER BY o.created_at DESC,o.id DESC
+        WHERE o.clinician=%s''' + view_filter + ''' ORDER BY o.created_at DESC,o.id DESC
         LIMIT 51 OFFSET %s''', (clinician, clinician, page_number * 50))
     has_more = len(offers) > 50
     result = []
     current_time = now()
     for offer in offers[:50]:
+        if offer.request_state == "Open" and offer.request_expires_at <= current_time:
+            offer.request_state = "Expired"
+        del offer["request_expires_at"]
         offer.state = effective_offer_state(offer.state, offer.request_state,
                                              offer.valid_until, current_time)
         offer.patient_label = offer_patient_label(json.loads(offer.disclosure_snapshot))

@@ -99,6 +99,50 @@ class Presentation(unittest.TestCase):
     def setUp(self):
         fixtures.login('admin')
 
+    def test_request_inbox_selects_tailored_offerings_by_scope_not_label(self):
+        day = day_offset(14)
+        fixtures.login('c1')
+        journey.save_profile('clinician', 'Synthetic scope-authorized clinician', 1, languages=['en'])
+        tailored = journey.publish(fixtures.PREFIX, 4900, 30,
+                                  title='Synthetic tailored session distinct from parent',
+                                  retry_key='tailored-inbox-' + secrets.token_hex(8))['offering']
+        scheduling.save_schedule(**schedule_payload(tailored, day, mode='automatic'))
+        audio = journey.publish(fixtures.PREFIX, 4900, 30,
+                                title='Synthetic audio-only session',
+                                retry_key='audio-inbox-' + secrets.token_hex(8))['offering']
+        scheduling.save_schedule(**{**schedule_payload(audio, day, mode='automatic'),
+                                    'consultation_format': 'audio'})
+        fixtures.login('p1')
+        slot = self.slots(tailored, day)[0]
+        request = open_requests.publish_request(
+            service=fixtures.PREFIX, request_text='Synthetic tailored-offer request.',
+            urgency='scheduled', language='en', consultation_format='video',
+            sharing={'name': False, 'history': False},
+            retry_key='tailored-request-' + secrets.token_hex(8),
+            timezone_name='Africa/Addis_Ababa', earliest_start=slot['start'],
+            latest_start=slot['start'])
+        fixtures.login('c1')
+        visible = next(item for item in open_requests.clinician_requests() if item.id == request['id'])
+        self.assertIn(tailored, visible.eligible_offering_ids)
+        self.assertNotIn(audio, visible.eligible_offering_ids)
+        self.assertNotIn(fixtures.Integration.offers['c2'], visible.eligible_offering_ids)
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(visible))
+        submitted = open_requests.submit_offer(request['id'], tailored, slot['start'])
+        self.assertEqual(submitted['state'], 'Active')
+        self.assertTrue(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='Active')['items']))
+        self.assertFalse(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='History')['items']))
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.clinician_offers(view='Other')
+        open_requests.withdraw_offer(submitted['id'])
+        self.assertFalse(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='Active')['items']))
+        self.assertTrue(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='History')['items']))
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], fixtures.PREFIX, 'Revoked')
+        fixtures.login('c1')
+        self.assertFalse(any(item.id == request['id'] for item in open_requests.clinician_requests()))
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], fixtures.PREFIX, 'Approved')
+
     def test_public_profile_uses_tailored_offerings_and_rechecks_revoked_scope(self):
         fixtures.login('admin')
         service = fixtures.PREFIX + '-profile-scope'
