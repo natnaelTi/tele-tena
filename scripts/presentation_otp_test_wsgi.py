@@ -9,7 +9,8 @@ import os
 from pathlib import Path
 
 assert os.environ.get('TELE_TENA_LOCAL_OTP_TEST') == '1'
-assert os.environ.get('TELE_TENA_TEST_SITE') == 'teletena-mvp-presentation.localhost'
+SITE=os.environ.get('TELE_TENA_TEST_SITE')
+assert SITE in ('teletena-mvp-presentation.localhost','tele-tena-pr12-fresh.localhost')
 from scripts.review_test_wsgi import application as frappe_application
 from tele_tena import sms
 from tele_tena.review import write_private
@@ -17,7 +18,7 @@ import frappe
 
 
 def capture(phone, code):
-    assert frappe.local.site == 'teletena-mvp-presentation.localhost'
+    assert frappe.local.site == SITE
     write_private(Path(frappe.get_site_path('private', 'tele_tena_test_delivery.json')),
                   {'contact': phone, 'code': code})
     return 'accepted'
