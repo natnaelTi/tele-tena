@@ -1,3 +1,4 @@
+import PaymentActivity from "../components/PaymentActivity";
 import { careSearchScore } from "../care-search";
 import { AddFundsDialog } from "../components/AddFundsDialog";
 import { BookingReview } from "../components/BookingReview";
@@ -502,11 +503,11 @@ export function Payments() {
   return (
     <>
       <PageTitle
-        title="Payments"
-        description="Your available balance, reservations and payment activity."
+        title={w("Your balance")}
+        description={w("Your funds, clearly separated.")}
       />
       <div className="patient-payments-layout"><section>
-      {wallet.data && <section className="reference-wallet"><span>{w("Available to spend")}</span><strong>ETB {money(wallet.data.available)}</strong><p>{w("Reserved for appointments")} · ETB {money(wallet.data.reserved)}</p><Button variant="secondary" onClick={() => setFundsOpen(true)}>{w("Add funds")}</Button></section>}
+      {wallet.data && <section className="reference-wallet"><span>{w("Available to spend")}</span><strong>ETB {money(wallet.data.available)}</strong><Button variant="secondary" onClick={() => setFundsOpen(true)}>{w("Add funds")}</Button><p className="wallet-reserved-total">{w("Reserved for appointments")} · ETB {money(wallet.data.reserved)}</p></section>}
       {wallet.error && (
         <InlineNotice tone="danger">
           Balance unavailable.{" "}
@@ -515,7 +516,7 @@ export function Payments() {
       )}
       <AddFundsDialog open={fundsOpen} close={() => setFundsOpen(false)} refresh={wallet.refresh} />
       </section><section className="patient-dashboard-panel">
-      {wallet.data?.activity?.length ? <section><h2>Payment activity</h2><ul className="payment-activity">{wallet.data.activity.map((item,i)=><li key={item.activity_id||i}><span>{item.kind}</span><strong>ETB {money(item.amount)}</strong><time>{date(item.created)}</time>{item.activity_id&&<Link className="text-link" to={'/patient/payments/transactions/'+encodeURIComponent(item.activity_id)}>{w('Transaction details')}</Link>}</li>)}</ul></section>:<EmptyState title="No payment activity yet." />}
+      {wallet.data?.activity?.length ? <section><h2>{w("Recent activity")}</h2><PaymentActivity items={wallet.data.activity}/></section>:<EmptyState title="No payment activity yet." />}
       </section></div>
     </>
   );

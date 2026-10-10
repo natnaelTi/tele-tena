@@ -1,4 +1,4 @@
-.review-queue-filters { display:grid; grid-template-columns:minmax(0,2fr) minmax(180px,1fr); gap:16px; margin:24px 0; }
+.review-queue-filters { display:grid; grid-template-columns:minmax(0,1fr) 184px; gap:16px; margin:24px 0; }
 .workspace-main .page-title h1 { font-size:40px; line-height:1.12; letter-spacing:-1.6px; }
 .review-queue-table table { font-size:14px; }
 .review-queue-table th { color:var(--muted); background:var(--surface); }
@@ -22,3 +22,13 @@
 .review-overview-panel > .text-link { margin-top:20px; }
 @media(max-width:800px) { .review-overview-layout,.review-overview-metrics { grid-template-columns:1fr; } .review-overview-row { flex-wrap:wrap; } .workspace-main .page-title h1 { font-size:32px; } }
 @media(max-width:700px) { .review-queue-table { display:none; } .review-queue-cards { display:grid; gap:16px; } .review-queue-cards header { display:flex; justify-content:space-between; gap:16px; } .review-queue-cards h2 { font-size:20px; } .review-queue-filters { grid-template-columns:1fr; } }
+
+.review-queue-table table {border:1px solid var(--border);border-radius:16px;}
+.workspace-nav-admin a.active {background:var(--ink);color:white;}
+.review-queue-table td:last-child .button {color:var(--brand);text-decoration:underline;font-size:14px;padding-inline:8px;}
+@media(max-width:700px){.review-queue-filters {grid-template-columns:1fr;}}
+
+/* The optional invitation must not push the review queue below the fold. */
+.workspace-admin .workspace-body > .tour-invite {position:fixed;right:24px;bottom:24px;margin:0;z-index:70;}
+.workspace-admin .workspace-body > .tour-replay {margin:0 32px 0 auto;}
+@media(max-width:800px){.workspace-admin .workspace-body > .tour-invite {bottom:84px;right:16px;left:16px;max-width:calc(100% - 32px);width:auto;}}

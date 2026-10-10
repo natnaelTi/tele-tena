@@ -66,7 +66,7 @@
 .service-details-layout { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr); gap:32px; align-items:start; }
 @media(max-width:800px) { .service-details-layout { grid-template-columns:1fr; } }
 
-.patient-payments-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:32px; align-items:start; }
+.patient-payments-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); gap:24px; align-items:start; }
 @media(max-width:800px) { .patient-payments-layout { grid-template-columns:1fr; gap:24px; } }
 
 .public-profile-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr); gap:24px; align-items:start; }
@@ -125,3 +125,6 @@
   .reference-workspace .appointment-status-actions > p { text-align: start; flex-basis: 100%; order: 3; }
 }
 @media(max-width: 380px) { .reference-workspace .appointment-status-actions .button { width: 100%; margin: 0; } }
+
+.reference-wallet .wallet-reserved-total {align-self:stretch;border-top:1px solid #ffffff55;padding-top:24px;margin-top:12px;font-size:16px;}
+.patient-payments-layout .reference-wallet {min-height:336px;justify-content:flex-start;gap:24px;}

@@ -45,7 +45,7 @@ export function TranslationNote() {
 export function MedicalLeadLayout(){
   const {session,refresh}=useSession();const {w}=useLocale();
   if(!session?.roles.includes('Tele Tena Medical Lead'))return <main className="container"><InlineNotice tone="danger">{w('You do not have access to clinical rubric governance.')}</InlineNotice></main>;
-  return <div className="workspace"><aside className="sidebar"><Brand/><div className="workspace-label">{w('Clinical standards')}</div><nav className="workspace-nav" aria-label={w('Clinical standards')}>
+  return <div className={`workspace workspace-${kind}`}><aside className="sidebar"><Brand/><div className="workspace-label">{w('Clinical standards')}</div><nav className="workspace-nav" aria-label={w('Clinical standards')}>
     <NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>
     {session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}
   </nav><div className="sidebar-bottom"><TranslationNote/><Button variant="quiet" onClick={()=>void journeyApi.logout().then(refresh).catch(()=>undefined)}><LogOut size={20}/>{w('Sign out')}</Button></div></aside>
@@ -305,7 +305,7 @@ export function WorkspaceLayout({
     <Dialog open={moreOpen} onOpenChange={open => { setMoreOpen(open); if (!open) requestAnimationFrame(() => moreTrigger.current?.focus()); }} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer><nav className="workspace-more-links" aria-label={w("Additional workspace links")}>{mobileMore.map(item => renderNavLink(item, true))}</nav><TranslationNote /></Dialog>
   </div>;
   return (
-    <div className="workspace">
+    <div className={`workspace workspace-${kind}`}>
       <aside className="sidebar">
         <Brand />
         <div className="workspace-label">

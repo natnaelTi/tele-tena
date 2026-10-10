@@ -9,6 +9,13 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  // Provisional additions; native review remains required.
+  "Your balance": ["የእርስዎ ቀሪ ሂሳብ", "Baalansii kee"],
+  "Your funds, clearly separated.": ["ገንዘብዎ፣ በግልጽ ተለይቶ።", "Maallaqa kee, ifatti adda baafame."],
+  "Recent activity": ["የቅርብ ጊዜ እንቅስቃሴ", "Sochii dhihoo"],
+  "Clinician applications": ["የባለሙያ ማመልከቻዎች", "Iyyannoowwan ogeessotaa"],
+  "Review people by name, with their requested scopes visible.": ["ስሞችንና የተጠየቁ የአገልግሎት ወሰኖችን ይመርምሩ።", "Maqaa fi daangaa tajaajilaa isaan gaafatan ilaali."],
+
   // Provisional couples copy: native-language approval remains a release gate.
   "Two adults, separate consent and privacy.": ["ሁለት ጎልማሶች፣ የተለየ ፈቃድ እና ግላዊነት።", "Ga'eessota lama, waliigaltee fi iccitii adda addaa."],
   "Shared consultations": ["የጋራ ምክክሮች", "Marii waliin"],
