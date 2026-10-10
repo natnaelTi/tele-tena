@@ -487,7 +487,7 @@ export default function Consultation({
             {t("audioOnly")}
           </label>
           <button className="button"
-            disabled={busy || !info?.can_join}
+            disabled={busy}
             onClick={() => void checkDevices()}
           >
             {t(audioOnly ? "checkMicrophone" : "checkDevices")}
