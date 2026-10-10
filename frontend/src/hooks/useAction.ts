@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { ApiError } from "../api";
 const messages: Record<string, string> = {
+  note_required: "Enter a consultation note or turn off note sharing.",
+  summary_required: "Enter a patient summary before publishing.",
+  consultation_close_pending: "Room closure is still pending. Return to the room and retry End for everyone before finalizing. Your draft can be saved.",
+  documentation_not_ready: "End the consultation before saving or finalizing notes.",
   adult_required: "Confirm that you are 18 or older before continuing.",
   relationship_retry_changed: "This invitation submission changed. Start a new invitation.",
   relationship_invitation_rate_limited: "You have reached the invitation limit. Try again later.",
@@ -29,8 +33,8 @@ const messages: Record<string, string> = {
   schedule_exception_start_invalid: "Enter a valid exception start time.",
   schedule_exception_end_invalid: "Enter a valid exception end time.",
   schedule_exception_order: "An exception must end after it starts.",
-  session_required: "Your session has expired. Sign in again to save this schedule.",
-  permission_denied: "You don’t have permission to change this schedule.",
+  session_required: "Your session has expired. Sign in again before continuing.",
+  permission_denied: "You don’t have permission to make this change.",
   preview_changed: "Your profile changed. Review your sharing choices again.",
   offering_changed:
     "The price or duration changed. Review this offering again.",
@@ -73,7 +77,7 @@ export function useAction() {
         : e instanceof ApiError && e.status >= 500
           ? "The service is temporarily unavailable. Your changes are still here; try saving again."
           : e instanceof ApiError && e.status === 417
-            ? "The schedule could not be saved. Review the time fields and schedule requirements."
+            ? "Some details need your attention. Review your inputs and try again."
             : "We couldn’t save this change. Check your connection and inputs, then try again.");
     } finally {
       setBusy(false);

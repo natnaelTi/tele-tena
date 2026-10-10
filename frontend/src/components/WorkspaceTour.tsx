@@ -10,6 +10,7 @@ const routes:Record<string,{id:string;steps:TourStep[]}>={
   patient:{id:"patient-home",steps:[
     {title:"Find care",text:"Search and filter available clinician services.",path:"/patient/discovery",target:"patient-discovery"},
     {title:"Choose a time",text:"Pick an open slot, review what you’ll share and confirm the price.",path:"/patient/discovery",target:"patient-discovery"},
+    {title:"Private requests",text:"Post what you need, compare private offers and choose before funds are reserved.",path:"/patient/requests",target:"patient-private-requests"},
     {title:"Appointments",text:"Review upcoming sessions, requests and past consultations.",path:"/patient/appointments",target:"patient-appointments"},
     {title:"Consultations",text:"Join when the appointment is available and read published summaries.",path:"/patient/appointments",target:"patient-appointments"},
     {title:"Balance and privacy",text:"Review your balance, activity and sharing defaults in Account.",path:"/patient/account",target:"patient-account"},
@@ -18,15 +19,16 @@ const routes:Record<string,{id:string;steps:TourStep[]}>={
     {title:"Your practice",text:"Check upcoming sessions and actions for today.",path:"/clinician",target:"clinician-today"},
     {title:"Profile and resume",text:"Complete your professional profile and upload evidence for review. Approval is manual.",path:"/clinician/account",target:"clinician-account"},
     {title:"Services and schedule",text:"Publish approved services, then set a timezone-based weekly schedule.",path:"/clinician/availability",target:"clinician-availability"},
+    {title:"Private offers",text:"Review your own quotes and outcomes. Accepted offers link to their consultation.",path:"/clinician/offers",target:"clinician-offers"},
     {title:"Appointments and calls",text:"Open an appointment to see its state and join the authorized room.",path:"/clinician/appointments",target:"clinician-appointments"},
     {title:"Consultation notes",text:"After ending a call, save a private note and choose whether to publish a summary.",path:"/clinician/appointments",target:"clinician-appointments"},
     {title:"Care records",text:"Open only the encounters you treated. Clinic affiliation does not grant access.",path:"/clinician/care",target:"clinician-care"},
   ]},
   approver:{id:"reviewer-applications",steps:[
-    {title:"Application queue",text:"Review clinician names, application status and requested services.",path:"/admin",target:"reviewer-applications"},
-    {title:"Find a clinician",text:"Use the professional display name as the primary identifier.",path:"/admin",target:"reviewer-applications"},
-    {title:"Review evidence",text:"Open submitted resume evidence and assess it before deciding.",path:"/admin",target:"reviewer-applications"},
-    {title:"Make an application decision",text:"Approval is manual and does not automatically approve requested services.",path:"/admin",target:"reviewer-applications"},
+    {title:"Application queue",text:"Review clinician names, application status and requested services.",path:"/admin/applications",target:"reviewer-applications"},
+    {title:"Find a clinician",text:"Use the professional display name as the primary identifier.",path:"/admin/applications",target:"reviewer-applications"},
+    {title:"Review evidence",text:"Open submitted resume evidence and assess it before deciding.",path:"/admin/applications",target:"reviewer-applications"},
+    {title:"Make an application decision",text:"Approval is manual and does not automatically approve requested services.",path:"/admin/applications",target:"reviewer-applications"},
     {title:"Service scopes",text:"Approve each requested service separately. This does not grant access to care records.",path:"/admin/scopes",target:"reviewer-scopes"},
   ]},
   applicant:{id:"clinician-onboarding",steps:[
@@ -39,9 +41,15 @@ const routes:Record<string,{id:string;steps:TourStep[]}>={
 };
 
 export default function WorkspaceTour({role}:{role:"patient"|"clinician"|"admin"|"applicant"}){
-  const selected=role==="admin"?"approver":role;
-  const config=routes[selected];
   const {session}=useSession();const {w}=useLocale();const location=useLocation();const navigate=useNavigate();
+  const selected=role==="admin"?"approver":role==="clinician"&&!session?.roles.includes("Tele Tena Clinician")?"pendingClinician":role;
+  const config=selected==='pendingClinician'?{id:'clinician-onboarding',steps:[
+    {title:"Professional profile",text:"Keep your professional profile and evidence up to date.",path:"/clinician/account",target:"clinician-account"},
+    {title:"Review status",text:"See the current decision and any clarification requested by your reviewer.",path:"/clinician/vetting",target:"clinician-professional-review"},
+    {title:"Requested scopes",text:"Each service needs its own human approval before publication.",path:"/clinician/vetting",target:"clinician-professional-review"},
+    {title:"Private evidence",text:"Only you and authorized reviewers can access your submitted evidence.",path:"/clinician/vetting",target:"clinician-professional-review"},
+    {title:"Approval first",text:"Services and patient requests become available only after the required approvals.",path:"/clinician/vetting",target:"clinician-professional-review"},
+  ]}:routes[selected];
   const headingRef=useRef<HTMLHeadingElement>(null);
   const [state,setState]=useState<string|null>(null);const [ready,setReady]=useState(false);const [step,setStep]=useState(0);const [active,setActive]=useState(false);const [missing,setMissing]=useState(false);
   const load=useCallback(async()=>{try{const v=await journeyApi.tourState(config.id);setState(v.state);}catch{setState("Unavailable");}finally{setReady(true);}},[config.id]);
@@ -55,7 +63,8 @@ export default function WorkspaceTour({role}:{role:"patient"|"clinician"|"admin"
   const next=()=>{if(step>=config.steps.length-1){void finish("Completed");return;}const nextStep=step+1;setStep(nextStep);navigateSafely(config.steps[nextStep].path);};
   const back=()=>{const previous=Math.max(0,step-1);setStep(previous);navigateSafely(config.steps[previous].path);};
   const showInvite=state!=="Dismissed"&&state!=="Completed"&&!active;
-  if(!ready||state==="Unavailable"||hidden)return <button className="tour-replay" type="button" onClick={begin}>{w("Help & tours")}</button>;
+  if(hidden)return null;
+  if(!ready||state==="Unavailable")return <button className="tour-replay" type="button" onClick={begin}>{w("Help & tours")}</button>;
   return <>
     {showInvite&&<aside className="tour-invite" aria-label={w("Quick tour")}> <span>{w("Want a quick tour of this workspace?")}</span><Button variant="secondary" onClick={begin}>{w("Take a quick tour")}</Button><button className="tour-dismiss" type="button" aria-label={w("Dismiss tour invitation")} onClick={()=>void finish("Dismissed")}>×</button></aside>}
     {!showInvite&&<button className="tour-replay" type="button" onClick={begin}>{w("Help & tours")}</button>}

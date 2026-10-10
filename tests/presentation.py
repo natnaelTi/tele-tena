@@ -99,6 +99,156 @@ class Presentation(unittest.TestCase):
     def setUp(self):
         fixtures.login('admin')
 
+    def test_appointment_list_cancellation_actor_does_not_unmask_patient(self):
+        self.fund_patient('p1', 1000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        booked = self.book_slot(offering, self.slots(offering, day)[0], share_name=False)
+        fixtures.login('p1')
+        presentation.cancel_appointment(booked['id'], 'Plans changed')
+        own = next(row for row in journey.appointments() if row.id == booked['id'])
+        self.assertEqual(own.cancelled_by, 'You')
+        self.assertEqual(own.display_identity, 'Synthetic Test')
+        self.assertNotIn('clinician', own)
+        self.assertNotIn('clinician_display_name', own)
+        fixtures.login('c1')
+        visible = next(row for row in journey.appointments() if row.id == booked['id'])
+        self.assertEqual(visible.cancelled_by, 'Patient')
+        self.assertEqual(visible.display_identity, 'Private patient')
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(visible, default=str))
+        self.assertNotIn('patient', visible)
+        # Preserve the original actor for authorized internal auditing.
+        saved = journey.one('SELECT cancelled_by FROM tt_appointment WHERE id=%s', (booked['id'],))
+        self.assertEqual(saved.cancelled_by, fixtures.USERS['p1'])
+        fixtures.login('c2')
+        self.assertFalse(any(row.id == booked['id'] for row in journey.appointments()))
+        fixtures.login('p2')
+        self.assertFalse(any(row.id == booked['id'] for row in journey.appointments()))
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            journey.appointments()
+
+    def test_discovery_search_metadata_is_catalog_only(self):
+        fixtures.login('p1')
+        result = journey.services()
+        item = next(row for row in result if row.id == fixtures.PREFIX)
+        self.assertEqual(set(item), {'id', 'label', 'description', 'synonyms',
+                                     'service_label_am', 'service_label_om'})
+        for field in ('professional_categories', 'credentials', 'patient', 'user', 'email'):
+            self.assertNotIn(field, item)
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            journey.services()
+
+    def test_request_inbox_selects_tailored_offerings_by_scope_not_label(self):
+        day = day_offset(14)
+        fixtures.login('c1')
+        journey.save_profile('clinician', 'Synthetic scope-authorized clinician', 1, languages=['en'])
+        tailored = journey.publish(fixtures.PREFIX, 4900, 30,
+                                  title='Synthetic tailored session distinct from parent',
+                                  retry_key='tailored-inbox-' + secrets.token_hex(8))['offering']
+        scheduling.save_schedule(**schedule_payload(tailored, day, mode='automatic'))
+        audio = journey.publish(fixtures.PREFIX, 4900, 30,
+                                title='Synthetic audio-only session',
+                                retry_key='audio-inbox-' + secrets.token_hex(8))['offering']
+        scheduling.save_schedule(**{**schedule_payload(audio, day, mode='automatic'),
+                                    'consultation_format': 'audio'})
+        fixtures.login('p1')
+        slot = self.slots(tailored, day)[0]
+        request = open_requests.publish_request(
+            service=fixtures.PREFIX, request_text='Synthetic tailored-offer request.',
+            urgency='scheduled', language='en', consultation_format='video',
+            sharing={'name': False, 'history': False},
+            retry_key='tailored-request-' + secrets.token_hex(8),
+            timezone_name='Africa/Addis_Ababa', earliest_start=slot['start'],
+            latest_start=slot['start'])
+        fixtures.login('c1')
+        visible = next(item for item in open_requests.clinician_requests() if item.id == request['id'])
+        self.assertIn(tailored, visible.eligible_offering_ids)
+        self.assertNotIn(audio, visible.eligible_offering_ids)
+        self.assertNotIn(fixtures.Integration.offers['c2'], visible.eligible_offering_ids)
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(visible))
+        submitted = open_requests.submit_offer(request['id'], tailored, slot['start'])
+        self.assertEqual(submitted['state'], 'Active')
+        own_detail = open_requests.clinician_offers(offer_id=submitted['id'])['items']
+        self.assertEqual(len(own_detail), 1)
+        self.assertEqual(own_detail[0].id, submitted['id'])
+        self.assertNotIn('request_text', own_detail[0])
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(own_detail, default=str))
+        fixtures.login('c2')
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.clinician_offers(offer_id=submitted['id'])
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            open_requests.clinician_offers(offer_id=submitted['id'])
+        fixtures.login('c1')
+        self.assertTrue(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='Active')['items']))
+        self.assertFalse(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='History')['items']))
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.clinician_offers(view='Other')
+        open_requests.withdraw_offer(submitted['id'])
+        self.assertFalse(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='Active')['items']))
+        self.assertTrue(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='History')['items']))
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], fixtures.PREFIX, 'Revoked')
+        fixtures.login('c1')
+        self.assertFalse(any(item.id == request['id'] for item in open_requests.clinician_requests()))
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], fixtures.PREFIX, 'Approved')
+
+    def test_practice_only_lists_own_current_approved_scopes(self):
+        fixtures.login('admin')
+        own = fixtures.PREFIX + '-practice-own'
+        foreign = fixtures.PREFIX + '-practice-other'
+        unapproved = fixtures.PREFIX + '-practice-unapproved'
+        for service in (own, foreign, unapproved):
+            journey.save_service(service, 'Synthetic practice scope')
+        journey.review_service_scope(fixtures.USERS['c1'], own, 'Approved')
+        journey.review_service_scope(fixtures.USERS['c2'], foreign, 'Approved')
+        fixtures.login('c1')
+        approved = [item.id for item in journey.practice()['approved_services']]
+        self.assertIn(own, approved)
+        self.assertNotIn(foreign, approved)
+        self.assertNotIn(unapproved, approved)
+        created = journey.publish(own, 4500, 50, title='Synthetic fifty-minute session',
+                                  retry_key='practice-' + secrets.token_hex(10))
+        self.assertEqual(next(item.minutes for item in journey.practice()['offerings']
+                              if item.id == created['offering']), 50)
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], own, 'Revoked')
+        fixtures.login('c1')
+        self.assertNotIn(own, [item.id for item in journey.practice()['approved_services']])
+        self.assertIn(created['offering'], [item.id for item in journey.practice()['offerings']])
+        with self.assertRaises(frappe.ValidationError):
+            journey.publish(own, 4500, 50, title='Synthetic fifty-minute session',
+                            offering_id=created['offering'])
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            journey.practice()
+
+    def test_public_profile_uses_tailored_offerings_and_rechecks_revoked_scope(self):
+        fixtures.login('admin')
+        service = fixtures.PREFIX + '-profile-scope'
+        journey.save_service(service, 'Synthetic profile parent scope')
+        journey.review_service_scope(fixtures.USERS['c1'], service, 'Approved')
+        fixtures.login('c1')
+        created = journey.publish(service, 4200, 30, title='Synthetic tailored profile session',
+                                  description='Synthetic public description', retry_key='profile-' + secrets.token_hex(10))
+        start = (datetime.now(timezone.utc) + timedelta(days=2)).replace(hour=9, minute=0, second=0, microsecond=0)
+        scheduling.save_schedule(**schedule_payload(created['offering'], start.date()))
+        fixtures.login('p1')
+        discovered = next(item for item in journey.discover(service) if item.id == created['offering'])
+        result = open_requests.clinician_profile(discovered.clinician_id)
+        selected = next(item for item in result['services'] if item.offering == created['offering'])
+        self.assertEqual(selected.label, 'Synthetic tailored profile session')
+        self.assertEqual(selected.description, 'Synthetic public description')
+        self.assertNotIn('service', selected)
+        self.assertNotIn(fixtures.USERS['c1'], json.dumps(result, default=str))
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], service, 'Revoked')
+        fixtures.login('p1')
+        self.assertNotIn(created['offering'], [item.offering for item in open_requests.clinician_profile(discovered.clinician_id)['services']])
+
     def test_clinician_can_publish_multiple_retry_safe_offerings_within_one_scope(self):
         service = fixtures.PREFIX
         keys = ['offering-multi-' + secrets.token_hex(10), 'offering-multi-' + secrets.token_hex(10)]
@@ -2236,8 +2386,8 @@ class Presentation(unittest.TestCase):
             booked = self.book_slot(offering, self.slots(offering, day, who='p2')[0], 'earnings-dispute', who='p2')
             now = datetime.now(timezone.utc).replace(tzinfo=None)
             frappe.db.sql('''INSERT INTO tt_consultation
-                (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended)
-                VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s)''',
+                (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended,room_closed)
+                VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,1)''',
                 (booked['id'], str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex,
                  uuid.uuid4().hex, now, now))
             fixtures.login('c1')
@@ -2274,8 +2424,8 @@ class Presentation(unittest.TestCase):
         booked = self.book_slot(offering, self.slots(offering, day, who='p2')[0], 'release-wins', who='p2')
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         frappe.db.sql('''INSERT INTO tt_consultation
-            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended)
-            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s)''',
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,1)''',
             (booked['id'], str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex,
              uuid.uuid4().hex, now, now))
         fixtures.login('c1')
@@ -2293,6 +2443,53 @@ class Presentation(unittest.TestCase):
         self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_dispute WHERE earning=%s', (earning.id,)).n, 0)
         self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s',
                                      ('earning-refund:' + earning.id,)).n, 0)
+
+    def test_concurrent_dispute_and_release_have_one_authoritative_outcome(self):
+        from tele_tena import accounting
+        offering = fixtures.Integration.offers['c1']
+        self.fund_patient('p2', 1000)
+        day, _, _ = self.make_schedule(mode='automatic', offering=offering)
+        booked = self.book_slot(offering, self.slots(offering, day, who='p2')[0], 'dispute-release-race', who='p2')
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql("""INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,1)""",
+            (booked['id'],str(uuid.uuid4()),uuid.uuid4().hex,uuid.uuid4().hex,uuid.uuid4().hex,now,now))
+        fixtures.login('c1')
+        presentation.save_note_draft(booked['id'], 'Owned race fixture note', '')
+        presentation.finalize_consultation(booked['id'], 0)
+        frappe.db.sql('UPDATE tt_earning SET release_at=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND WHERE appointment=%s', (booked['id'],))
+        frappe.db.commit()
+        barrier = threading.Barrier(2)
+        def race(command):
+            fixtures.connect()
+            try:
+                fixtures.login('p2')
+                barrier.wait(timeout=10)
+                if command == 'dispute':
+                    try:
+                        accounting.open_earning_dispute(booked['id'], 'Owned concurrent dispute')
+                        frappe.db.commit()
+                        return 'held'
+                    except frappe.ValidationError:
+                        frappe.db.rollback()
+                        return 'release-won'
+                accounting.release_eligible_earnings()
+                frappe.db.commit()
+                return 'release-processed'
+            finally:
+                frappe.destroy()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            outcomes = list(pool.map(race, ('dispute', 'release')))
+        frappe.db.rollback()
+        earning = journey.one('SELECT id,state FROM tt_earning WHERE appointment=%s', (booked['id'],))
+        releases = journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s', ('earning-release:' + earning.id,)).n
+        disputes = journey.one("SELECT COUNT(*) n FROM tt_dispute WHERE earning=%s AND status='Open'", (earning.id,)).n
+        self.assertIn(earning.state, ('Released','Disputed'))
+        self.assertEqual((int(releases),int(disputes)), (1,0) if earning.state=='Released' else (0,1))
+        self.assertEqual(outcomes[0], 'release-won' if earning.state=='Released' else 'held')
+        accounting.release_eligible_earnings()
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s', ('earning-release:' + earning.id,)).n,releases)
 
     def test_concurrent_payouts_cannot_overreserve_earnings(self):
         from tele_tena import accounting
@@ -2396,7 +2593,184 @@ class Presentation(unittest.TestCase):
         self.assertEqual(after.start, original.start)
         self.assertEqual(after.timezone, 'Africa/Addis_Ababa')
 
+    def test_finalization_waits_for_room_closure_and_draft_retries_are_idempotent(self):
+        self.fund_patient('p1', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        appointment = self.book_slot(offering, self.slots(offering, day)[0], 'closure-before-finalize')['id']
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql("""INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended_by,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,%s,0)""",
+            (appointment, secrets.token_hex(16), secrets.token_hex(32), secrets.token_hex(24),
+             secrets.token_hex(24), now, fixtures.USERS['c1'], now))
+        fixtures.login('c1')
+        saved = presentation.save_note_draft(appointment, 'Private fictional note', 'Shared fictional summary')
+        retry = presentation.save_note_draft(appointment, 'Private fictional note', 'Shared fictional summary')
+        self.assertEqual(saved['revision'], retry['revision'])
+        self.assertTrue(retry['idempotent'])
+        with self.assertRaises(frappe.ValidationError):
+            presentation.finalize_consultation(appointment, 1)
+        self.assertEqual(frappe.local.response.get('tele_tena_error'), 'consultation_close_pending')
+        self.assertEqual(journey.one('SELECT state FROM tt_appointment WHERE id=%s', (appointment,)).state, 'Booked')
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_earning WHERE appointment=%s', (appointment,)).n, 0)
+        # Model successful provider closure, not merely elapsed scheduled time.
+        frappe.db.sql('UPDATE tt_consultation SET room_closed=1 WHERE appointment=%s', (appointment,))
+        presentation.finalize_consultation(appointment, 1)
+        retry = presentation.save_note_draft(appointment, 'Private fictional note', 'Shared fictional summary')
+        self.assertEqual(retry['status'], 'Finalized')
+        self.assertTrue(presentation.finalize_consultation(appointment, 1)['idempotent'])
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_earning WHERE appointment=%s', (appointment,)).n, 1)
+        fixtures.login('p1')
+        detail = presentation.appointment_detail(appointment)
+        self.assertEqual(sum(event['event'] == 'Consultation completed' for event in detail['timeline']), 1)
+        self.assertEqual(sum(event['event'] == 'Documentation published' for event in detail['timeline']), 1)
+        self.assertNotIn('private_note', detail)
+        self.assertNotIn('Private fictional note', str(detail))
+        from tele_tena.api import consultations
+        terminal = consultations.consultation(appointment)
+        self.assertEqual(terminal['appointment_state'], 'Completed')
+        self.assertEqual(terminal['state'], 'Ended')
+        self.assertEqual(terminal['documentation_state'], 'Finalized')
+        self.assertFalse(terminal['can_join'])
+        self.assertFalse(terminal['can_end'])
+        with self.assertRaises(frappe.ValidationError):
+            consultations.join(appointment)
+        for user in ('p2', 'admin', 'c2'):
+            fixtures.login(user)
+            with self.assertRaises(frappe.PermissionError):
+                consultations.consultation(appointment)
+        fixtures.login('c1')
+        self.assertEqual(consultations.consultation(appointment)['appointment_state'], 'Completed')
+        with self.assertRaises(frappe.ValidationError):
+            consultations.join(appointment)
+
+    def test_explicit_note_sharing_preserves_private_revisions_and_money(self):
+        self.fund_patient('p1', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        booked = self.book_slot(offering, self.slots(offering, day)[0], 'explicit-note-sharing')
+        appointment = booked['id']
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql("""INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended_by,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,%s,1)""",
+            (appointment, secrets.token_hex(16), secrets.token_hex(32), secrets.token_hex(24),
+             secrets.token_hex(24), now, fixtures.USERS['c1'], now))
+        frappe.db.commit()
+        fixtures.login('c1')
+        presentation.save_note_draft(appointment, 'First private fictional note', '')
+        presentation.finalize_consultation(appointment, 0)
+        fixtures.login('p1')
+        first = presentation.appointment_detail(appointment)
+        self.assertEqual(first['shared_consultation_notes'], [])
+        self.assertNotIn('private_note', first)
+        self.assertNotIn('First private fictional note', str(first))
+        wallet_after_completion = journey.wallet()
+        fixtures.login('c1')
+        presentation.save_note_draft(appointment, 'Explicitly shared fictional note', '', 1)
+        own = presentation.appointment_detail(appointment)
+        self.assertTrue(own['private_note']['note_share_selected'])
+        self.assertFalse(own['private_note']['note_published'])
+        fixtures.login('p1')
+        self.assertEqual(presentation.appointment_detail(appointment)['shared_consultation_notes'], [])
+        fixtures.login('c1')
+        with self.assertRaises(frappe.ValidationError):
+            presentation.finalize_consultation(appointment, 0, 'yes')
+        presentation.finalize_consultation(appointment, 0, 1)
+        fixtures.login('p1')
+        published = presentation.appointment_detail(appointment)
+        self.assertEqual([r['text'] for r in published['shared_consultation_notes']],
+                         ['Explicitly shared fictional note'])
+        self.assertNotIn('private_note', published)
+        self.assertNotIn('First private fictional note', str(published))
+        fixtures.login('c1')
+        presentation.save_note_draft(appointment, 'Later private fictional amendment', '', 0)
+        presentation.finalize_consultation(appointment, 0, 0)
+        from tele_tena.patches.v1_31_explicit_note_sharing import execute as note_patch
+        from tele_tena.patches.v1_32_note_sharing_draft_choice import execute as choice_patch
+        note_patch(); choice_patch(); note_patch(); choice_patch()
+        fixtures.login('p1')
+        final = presentation.appointment_detail(appointment)
+        self.assertEqual(final['shared_consultation_notes'], published['shared_consultation_notes'])
+        self.assertNotIn('Later private fictional amendment', str(final))
+        self.assertEqual(journey.wallet(), wallet_after_completion)
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s',
+                                     ('completion:' + appointment,)).n, 1)
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_earning WHERE appointment=%s',
+                                     (appointment,)).n, 1)
+        for other in ('p2', 'c2', 'admin'):
+            fixtures.login(other)
+            with self.assertRaises(frappe.PermissionError):
+                presentation.appointment_detail(appointment)
+
+    def test_reservation_display_uses_postings_not_completed_status(self):
+        self.fund_patient('p1', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        booked = self.book_slot(offering, self.slots(offering, day)[0], 'held-display')
+        fixtures.login('p1')
+        before = journey.wallet()
+        journals = frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0]
+        self.assertEqual(presentation.appointment_detail(booked['id'])['reservation_state'], 'Reserved')
+        # This owned fixture represents the historical Completed-but-held case.
+        # The query must not fabricate a financial consumption from its label.
+        frappe.db.sql("UPDATE tt_appointment SET state='Completed' WHERE id=%s", (booked['id'],))
+        self.assertEqual(presentation.appointment_detail(booked['id'])['reservation_state'], 'Reserved')
+        record = journey.one('SELECT price FROM tt_appointment WHERE id=%s', (booked['id'],))
+        frappe.db.sql("""INSERT INTO tt_earning
+            (id,appointment,patient,clinician,gross_minor,fee_minor,net_minor,policy_snapshot,state,created,modified)
+            VALUES (%s,%s,%s,%s,%s,0,%s,'{}','LegacyHold',UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))""",
+            (str(uuid.uuid4()), booked['id'], fixtures.USERS['p1'], fixtures.USERS['c1'],
+             record.price, record.price))
+        detail = presentation.appointment_detail(booked['id'])
+        self.assertEqual(detail['financial_state'], 'LegacyHold')
+        self.assertEqual(detail['reservation_state'], 'Review required')
+        self.assertEqual(journey.wallet(), before)
+        self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0], journals)
+        fixtures.login('p2')
+        with self.assertRaises(frappe.PermissionError):
+            presentation.appointment_detail(booked['id'])
+
+    def test_care_records_do_not_link_different_patients_with_equal_names(self):
+        self.fund_patient('p1', 3000)
+        self.fund_patient('p2', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        for who in ('p1', 'p2'):
+            fixtures.login(who)
+            journey.save_profile('patient', 'Same fictional preferred name', 1)
+        first = self.book_slot(offering, self.slots(offering, day)[0],
+                               'same-name-first', share_name=True)
+        second = self.book_slot(offering, self.slots(offering, day, who='p2')[-1],
+                                'same-name-second', share_name=True, who='p2')
+        fixtures.login('c1')
+        directory = presentation.care_directory(search='Same fictional preferred name')
+        self.assertEqual(len(directory['rows']), 2)
+        for row in directory['rows']:
+            self.assertEqual(row['encounter_count'], 1)
+            self.assertNotIn('patient', row)
+        self.assertEqual([row['id'] for row in presentation.care_patient_record(first['id'])['encounters']], [first['id']])
+        self.assertEqual([row['id'] for row in presentation.care_patient_record(second['id'])['encounters']], [second['id']])
+        # An owned synthetic legacy record has no recorded outcome; it is not future care.
+        frappe.db.sql('UPDATE tt_appointment SET start=%s,end=%s WHERE id=%s',
+                      (datetime.now(timezone.utc).replace(tzinfo=None)-timedelta(days=2),
+                       datetime.now(timezone.utc).replace(tzinfo=None)-timedelta(days=2)+timedelta(minutes=30),
+                       first['id']))
+        past = next(row for row in presentation.care_directory()['rows'] if row['id'] == first['id'])
+        self.assertIsNone(past['next_appointment'])
+        self.assertIsNone(past['last_consultation'])
+        self.assertEqual(past['state'], 'Booked')
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            presentation.care_patient_record(first['id'])
+
     def test_04_notes_privacy_revision_completion_and_encounter_scope(self):
+        fixtures.login('p1')
+        previous_count = sum(row.completed_sessions for row in journey.previous_clinicians())
+        clinician_id = journey.one('SELECT public_id FROM tt_profile WHERE user=%s',
+                                   (fixtures.USERS['c1'],)).public_id
+        reliability_before = open_requests.clinician_profile(clinician_id)['trust_indicators']['reliability']['sample_count']
         self.fund_patient('p1', 3000)
         day, _, _ = self.make_schedule(mode='automatic')
         offering = fixtures.Integration.offers['c1']
@@ -2424,6 +2798,16 @@ class Presentation(unittest.TestCase):
             (appointment, secrets.token_hex(16), secrets.token_hex(32), secrets.token_hex(24),
              secrets.token_hex(24), now, clinician, now))
         frappe.db.commit()
+        fixtures.login('c1')
+        preview = presentation.preview_patient_summary(appointment, 'Unsaved patient-visible preview')
+        self.assertEqual(preview['summary'], 'Unsaved patient-visible preview')
+        self.assertEqual(preview['revision'], 0)
+        self.assertTrue(preview['preview_only'])
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_note_revision WHERE appointment=%s',
+                                    (appointment,)).n, 0)
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            presentation.preview_patient_summary(appointment, 'Unauthorized preview')
         fixtures.login('c1')
         presentation.save_note_draft(appointment, 'Private synthetic observation', 'Helpful next steps')
         detail = presentation.appointment_detail(appointment)
@@ -2454,7 +2838,7 @@ class Presentation(unittest.TestCase):
         previous = journey.previous_clinicians()
         self.assertEqual(len(previous), 1)
         self.assertEqual(previous[0].display_name, 'Synthetic Test')
-        self.assertEqual(previous[0].completed_sessions, 1)
+        self.assertEqual(previous[0].completed_sessions, previous_count + 1)
         self.assertNotEqual(previous[0].clinician_id, fixtures.USERS['c1'])
         self.assertNotIn(fixtures.USERS['c1'], json.dumps(previous, default=str))
         fixtures.login('p2')
@@ -2504,7 +2888,7 @@ class Presentation(unittest.TestCase):
         self.assertEqual(response_metric['sample_count'], 0)
         self.assertIsNone(response_metric['rate_percent'])
         reliability_metric = public_profile['trust_indicators']['reliability']
-        self.assertEqual(reliability_metric['sample_count'], 1)
+        self.assertEqual(reliability_metric['sample_count'], reliability_before + 1)
         self.assertIsNone(reliability_metric['rate_percent'])
         fixtures.login('c1')
         presentation.save_note_draft(appointment, 'Amended private observation', 'New next steps')
@@ -2557,6 +2941,37 @@ class Presentation(unittest.TestCase):
         fixtures.login('p1')
         with self.assertRaises(frappe.PermissionError):
             presentation.tour_state('clinician-availability')
+
+    def test_legacy_unknown_event_fails_visibly_without_rewriting_owner(self):
+        from tele_tena import accounting
+        from tele_tena.patches.v1_8_legacy_event_reconciliation import reconcile_wallet_events
+        from tele_tena.patches.v1_13_financial_reconciliation_audit import audit_wallet
+        savepoint = 'tt_unknown_' + uuid.uuid4().hex[:16]
+        frappe.db.sql('SAVEPOINT ' + savepoint)
+        patient = 'unknown-' + uuid.uuid4().hex[:16] + '@example.invalid'
+        try:
+            frappe.db.sql('INSERT INTO tt_wallet (patient,available,reserved) VALUES (%s,100,0)', (patient,))
+            ref = 'opening:' + patient
+            accounting.post(ref, 'Opening', ref,
+                [(accounting.account_id('patient', patient, 'available'), 0, 100),
+                 ('demo:opening-control', 100, 0)], {'source': 'owned unknown-event regression'})
+            event_ref = 'unknown:' + uuid.uuid4().hex
+            journey.simulation_log(patient, 'UnsupportedKind', 20, event_ref)
+            before = journey.one('SELECT COUNT(*) n FROM tt_journal').n
+            for attempt in range(2):
+                with self.assertRaises(frappe.ValidationError):
+                    reconcile_wallet_events(patient)
+                result = audit_wallet(patient)
+                self.assertFalse(result['matches'])
+                self.assertEqual(result['unknown_event_count'], 1)
+                self.assertEqual(result['wallet']['available'], 100)
+                self.assertEqual(accounting.balance('patient', patient, 'available'), 100)
+            self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal').n, before)
+            self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_ledger WHERE reference=%s', (event_ref,)).n, 1)
+            self.assertEqual(journey.one('SELECT status FROM tt_financial_reconciliation WHERE patient=%s', (patient,)).status, 'ReviewRequired')
+        finally:
+            frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
+            frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
 
     def test_06_legacy_wallet_events_after_opening_snapshot_reconcile_once(self):
         from tele_tena import accounting

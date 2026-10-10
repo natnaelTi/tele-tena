@@ -1,10 +1,11 @@
 import { api } from './api'
+import { clearCareQuery } from './care-intent'
 
 type Sharing = { name: boolean; history: boolean }
 export type Profile = { kind: 'patient' | 'clinician'; display_name: string; history: string; share_name: boolean; share_history: boolean; languages?: string }
 export type Session = { user: string; roles: string[]; profile: Profile | null; csrf_token: string; simulation: boolean; clinic_workspace?: boolean; clinic_schedule_workspace?: boolean }
-export type Service = { id: string; label: string }
-export type Offer = { id: string; clinician_id:string; display_name: string; label: string; service_category?: string; price: number; minutes: number; care_languages?: ('en'|'am'|'om')[]; schedule_id?: string | null; schedule_timezone?: string | null; consultation_format?: 'video' | 'audio' }
+export type Service = { id: string; label: string; description?:string; synonyms?:string; service_label_am?:string; service_label_om?:string }
+export type Offer = { participant_structure?: 'individual'|'couple'; id: string; clinician_id:string; display_name: string; label: string; description?: string; service_category?: string; price: number; minutes: number; care_languages?: ('en'|'am'|'om')[]; schedule_id?: string | null; schedule_timezone?: string | null; consultation_format?: 'video' | 'audio' }
 export type Application = { user: string; display_name: string; statement: string; status: 'Pending' | 'Approved' | 'Rejected'; requested_services?: string[]; requested_service_labels?:string[]; resume_uploaded?: boolean; resume_size?: number; submission_date_available?: boolean; submitted_at?: string | null; evidence_complete?: boolean; verified_contacts?: {channel: string; contact: string; verified_at: string}[] }
 export type Disclosure = { request: string; name?: string; history?: string }
 export type Appointment = { id: string; start: string; end: string; state: string; price: number; minutes: number; service_label: string; disclosure: Disclosure; timezone?: string | null; consultation_format?: string; confirmation_mode?: string; expires_at?: string | null; confirmed_at?: string | null; cancelled_by?: string | null; cancelled_at?: string | null; cancel_reason?: string | null; call_state?: string; call_ended?: string | null; documentation_state?: string | null; display_identity?:string }
@@ -17,6 +18,13 @@ export type PreviousClinician = {clinician_id:string;display_name:string;last_co
 
 /** Domain-facing API. Frappe method names and HTTP/CSRF details stay out of views. */
 export const journeyApi = {
+  coupleInvite: (data:Record<string,unknown>) => api<{id:string;token:string}>('tele_tena.api.couples.invite',data,true),
+  coupleInvitation: (token:string) => api<any>('tele_tena.api.couples.preview_invitation',{token},true),
+  coupleConsent: (data:Record<string,unknown>) => api<any>('tele_tena.api.couples.consent',data,true),
+  couplePlan: (plan:string) => api<any>('tele_tena.api.couples.get_plan',{plan_id:plan}),
+  couplePlans: () => api<any[]>('tele_tena.api.couples.my_plans'),
+  coupleConfirm: (plan_id:string) => api<{id:string}>('tele_tena.api.couples.confirm',{plan_id},true),
+  coupleWithdraw: (plan_id:string) => api('tele_tena.api.couples.withdraw',{plan_id},true),
   session: () => api<Session>('session'),
   services: () => api<Service[]>('services'),
   serviceCatalog: () => api<any>('tele_tena.api.service_catalog.definitions'),
@@ -44,9 +52,9 @@ export const journeyApi = {
   respondToReschedule: (appointment:string,proposal:string,decision:'accept'|'decline') => api<any>('tele_tena.api.presentation.respond_to_reschedule',{appointment,proposal,decision},true),
   withdrawReschedule: (appointment:string,proposal:string) => api<any>('tele_tena.api.presentation.withdraw_reschedule',{appointment,proposal},true),
   respondToRequest: (appointment: string, decision: 'confirm'|'decline') => api('tele_tena.api.presentation.respond_to_request', { appointment, decision }, true),
-  saveNoteDraft: (appointment: string, private_note: string, patient_summary: string) => api('tele_tena.api.presentation.save_note_draft', { appointment, private_note, patient_summary }, true),
+  saveNoteDraft: (appointment: string, private_note: string, patient_summary: string, share_note = false, summary_recipients?:string[]) => api('tele_tena.api.presentation.save_note_draft', { appointment, private_note, patient_summary, share_note, summary_recipients }, true),
   previewSummary: (appointment: string, summary?:string) => api<{revision:number;summary:string}>('tele_tena.api.presentation.preview_patient_summary', { appointment, summary }, true),
-  finalizeConsultation: (appointment: string, publish_summary: boolean) => api('tele_tena.api.presentation.finalize_consultation', { appointment, publish_summary }, true),
+  finalizeConsultation: (appointment: string, publish_summary: boolean, publish_note = false) => api('tele_tena.api.presentation.finalize_consultation', { appointment, publish_summary, publish_note }, true),
   submitSessionFeedback: (appointment:string,rating:number) => api('tele_tena.api.trust.submit_session_feedback',{appointment,rating},true),
   careDirectory: (data: Record<string, unknown>) => api<{rows:any[];total:number;page:number;page_size:number;pages:number}>('tele_tena.api.presentation.care_directory', data),
   careDetail: (appointment: string) => api<any>('tele_tena.api.presentation.care_detail', { appointment }),
@@ -59,7 +67,7 @@ export const journeyApi = {
   uploadResume: (filename:string,content_base64:string) => api('tele_tena.api.presentation.upload_resume', {filename,content_base64}, true),
   removeResume: () => api('tele_tena.api.presentation.remove_resume', {}, true),
   windows: (offering: string) => api<{ windows: Window[]; busy: Window[] }>('windows', { offering }),
-  logout: () => api('frappe.handler.logout', {}, true),
+  logout: () => { clearCareQuery(); return api('frappe.handler.logout', {}, true) },
   saveProfile: (data: Record<string, unknown>) => api('save_profile', data, true),
   saveService: (service: string, label: string) => api('save_service', { service, label }, true),
   reviewApplication: (clinician: string, decision: 'Approved' | 'Rejected') =>
@@ -74,7 +82,7 @@ export const journeyApi = {
   simulatedDeposit: (retryKey: string) => api('simulated_deposit', { amount: 10000, retry_key: retryKey }, true),
   preview: (requestText: string, sharing: Sharing) =>
     api<{ disclosure: Disclosure }>('preview', { request_text: requestText, sharing }, true),
-  book: (data: Record<string, unknown>) => api('book', data, true),
+  book: (data: Record<string, unknown>) => api<{id:string}>('book', data, true),
   publishRequest: (data: Record<string, unknown>) => api<any>('tele_tena.api.open_requests.publish_request', data, true),
   myRequests: () => api<any[]>('tele_tena.api.open_requests.my_requests'),
   myRequestDetail: (request_id: string) => api<any>('tele_tena.api.open_requests.my_request_detail', {request_id}),
@@ -84,7 +92,8 @@ export const journeyApi = {
   requestPresence: () => api<any>('tele_tena.api.open_requests.request_presence'),
   setRequestPresence: (ready: boolean) => api<any>('tele_tena.api.open_requests.set_request_presence', {ready}, true),
   clinicianRequests: () => api<any[]>('tele_tena.api.open_requests.clinician_requests'),
-  clinicianOffers: (page=0) => api<{items:any[];page:number;has_more:boolean}>('tele_tena.api.open_requests.clinician_offers', {page}),
+  clinicianOffer: (offer_id:string) => api<{items:any[]}>('tele_tena.api.open_requests.clinician_offers',{offer_id}),
+  clinicianOffers: (page=0, view?:'Active'|'History') => api<{items:any[];page:number;has_more:boolean}>('tele_tena.api.open_requests.clinician_offers', {page, ...(view ? {view} : {})}),
   acknowledgeInboxFetch: (request_ids:string[]) => api<any>('tele_tena.api.open_requests.acknowledge_inbox_fetch',{request_ids},true),
   submitOffer: (data: Record<string, unknown>) => api<any>('tele_tena.api.open_requests.submit_offer', data, true),
   withdrawOffer: (offer_id: string) => api<any>('tele_tena.api.open_requests.withdraw_offer', {offer_id}, true),

@@ -417,7 +417,7 @@ def services():
     actor()
     from tele_tena.review import enabled as review_enabled
     legacy_allowed = int(review_enabled() or frappe.local.site == 'erp.localhost')
-    return rows('''SELECT name AS id,service_label AS label FROM `tabTele Tena Service`
+    return rows('''SELECT name AS id,service_label AS label,description,service_label_am,service_label_om,synonyms FROM `tabTele Tena Service`
         WHERE active=1 AND (catalog_status='Active' OR (catalog_status='Legacy test' AND %s=1))
         ORDER BY service_label''', (legacy_allowed,))
 
@@ -513,7 +513,7 @@ def discover(service=None):
     from tele_tena.review import enabled as review_enabled
     legacy_allowed = int(review_enabled() or frappe.local.site == 'erp.localhost')
     results = rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,p.languages AS care_languages,o.clinician,o.service,
-        COALESCE(NULLIF(o.title,''),s.service_label) AS label,s.service_label AS service_category,o.description,o.price,o.minutes,
+        COALESCE(NULLIF(o.title,''),s.service_label) AS label,s.service_label AS service_category,s.participant_structure,o.description,o.price,o.minutes,
         sc.id AS schedule_id,sc.timezone AS schedule_timezone,sc.consultation_format
         FROM tt_offering o JOIN tt_profile p ON p.user=o.clinician
         JOIN tt_application a ON a.user=o.clinician JOIN `tabTele Tena Service` s ON s.name=o.service
@@ -646,7 +646,7 @@ def simulation_log(patient, kind, amount, reference):
 @command
 def book(offering, start, request_text, sharing, retry_key, expected_price, expected_minutes,
          expected_disclosure, booked_timezone='UTC', custom_offer_id=None,
-         booking_link_token=None):
+         booking_link_token=None, couple_plan_id=None):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     p = profile('patient', True)
     selected = choices(sharing)
@@ -667,6 +667,11 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         if getattr(frappe.local, 'tele_tena_accepting_offer', None) != custom_offer_id:
             frappe.throw('Offer acceptance must use its authorized request workflow', frappe.PermissionError)
         payload_values.append({'request_offer': custom_offer_id})
+    if couple_plan_id:
+        plan = getattr(frappe.local, 'tele_tena_couple_booking', None)
+        if not plan or plan.id != couple_plan_id or plan.payer != p.user or plan.offering != offering:
+            frappe.throw('Use the consented couples booking workflow.', frappe.PermissionError)
+        payload_values.append({'couple_plan':couple_plan_id})
     payload = json.dumps(payload_values, sort_keys=True)
     digest = hashlib.sha256(payload.encode()).hexdigest()
     wallet = one('SELECT * FROM tt_wallet WHERE patient=%s FOR UPDATE', (p.user,))
@@ -682,6 +687,12 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         shared = trusted_disclosure
         if not isinstance(shared, dict) or expected_disclosure != shared:
             fail('Review the exact request disclosure before accepting this offer.', 'request_disclosure_changed')
+    elif couple_plan_id:
+        from tele_tena.api.couples import participants
+        own = next(person for person in participants(plan.id) if person.user == p.user)
+        shared = json.loads(own.disclosure)
+        if expected_disclosure != shared:
+            fail('Review the consented disclosure.', 'preview_changed')
     else:
         shared = disclosure(p, request_text, selected)
         if expected_disclosure != shared:
@@ -694,6 +705,13 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     o = one('''SELECT o.*,COALESCE(NULLIF(o.title,''),s.service_label) AS label
         FROM tt_offering o JOIN `tabTele Tena Service` s ON s.name=o.service
         WHERE o.id=%s AND o.active=1 AND s.active=1 FOR UPDATE''', (offering,))
+    structure = one('SELECT participant_structure FROM `tabTele Tena Service` WHERE name=%s', (o.service,)).participant_structure
+    if structure not in (None, '', 'individual', 'couple'):
+        fail('This participant workflow is not available.', 'participant_workflow_unavailable')
+    if structure == 'couple' and not couple_plan_id:
+        fail('Both adults must consent before booking.', 'couple_consent_required')
+    if couple_plan_id and structure != 'couple':
+        fail('Choose a couples service.', 'couple_service_required')
     if booking_link_token:
         if custom_offer_id:
             fail('Choose either a clinician booking link or a private request offer.',
@@ -746,6 +764,8 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         FOR UPDATE''', (o.clinician, end + timedelta(minutes=after),
                        start - timedelta(minutes=before), p.user, end, start)):
         fail('Appointment conflict', 'appointment_conflict')
+    from tele_tena.api.couples import conflicts
+    conflicts([p.user], start, end)
     if wallet.available < booking_price:
         fail('Insufficient simulated funds', 'insufficient_funds')
     appointment = str(uuid.uuid4())
@@ -808,23 +828,32 @@ def appointments():
     result = rows(f'''SELECT a.id,a.start,a.end,a.state,a.price,a.minutes,a.service_label,a.disclosure,a.choices,
         a.timezone,a.consultation_format,a.confirmation_mode,a.expires_at,a.confirmed_at,
         a.cancelled_by,a.cancelled_at,a.cancel_reason,a.policy_snapshot,
-        c.state AS call_state,c.ended AS call_ended,n.status AS documentation_state
+        c.state AS call_state,c.ended AS call_ended,n.status AS documentation_state,
+        provider.display_name AS clinician_display_name
         FROM tt_appointment a LEFT JOIN tt_consultation c ON c.appointment=a.id
         LEFT JOIN tt_consultation_note n ON n.appointment=a.id
-        WHERE a.{field}=%s ORDER BY a.start''', (user,))
+        LEFT JOIN tt_profile provider ON provider.user=a.clinician AND provider.kind='clinician'
+        WHERE (a.{field}=%s OR (%s='patient' AND EXISTS (SELECT 1 FROM tt_couple_plan cp JOIN tt_couple_participant part ON part.plan=cp.id WHERE cp.appointment=a.id AND part.user=%s AND part.state='Consented'))) ORDER BY a.start''', (user, p.kind, user))
     for appointment in result:
         appointment.start, appointment.end = iso(appointment.start), iso(appointment.end)
+        from tele_tena.api.couples import plan_for, participant
+        if p.kind == 'patient' and plan_for(appointment.id):
+            own = participant(appointment.id,user,require_active=False)
+            appointment.disclosure, appointment.choices = own.disclosure, own.choices
         appointment.disclosure = json.loads(appointment.disclosure)
         appointment.choices = json.loads(appointment.choices)
+        # Cancellation attribution must not reveal an otherwise masked account.
+        # Keep the raw actor only in the private auditable appointment record.
+        appointment.cancelled_by = ('You' if appointment.cancelled_by == user else
+            'Care team' if p.kind == 'patient' else 'Patient') if appointment.cancelled_by else None
         appointment.cancelled_at = iso(appointment.cancelled_at) if appointment.cancelled_at else None
         appointment.call_ended = iso(appointment.call_ended) if appointment.call_ended else None
         appointment.expires_at = iso(appointment.expires_at) if appointment.expires_at else None
         appointment.confirmed_at = iso(appointment.confirmed_at) if appointment.confirmed_at else None
         appointment.policy_snapshot = json.loads(appointment.policy_snapshot) if appointment.policy_snapshot else None
+        clinician_name = appointment.pop('clinician_display_name', None)
         if p.kind == 'patient':
-            identity = rows('SELECT display_name FROM tt_profile WHERE user=%s AND kind=%s',
-                            (appointment.clinician, 'clinician'))
-            appointment.display_identity = identity[0].display_name if identity else 'Your clinician'
+            appointment.display_identity = clinician_name or 'Your clinician'
         else:
             appointment.display_identity = appointment.disclosure.get('name') or 'Private patient'
     return result
@@ -850,6 +879,14 @@ def practice():
     available = rows('SELECT start,end FROM tt_availability WHERE clinician=%s AND end>UTC_TIMESTAMP() ORDER BY start', (user,))
     from tele_tena.api.scheduling import schedules as clinician_schedules
     schedule_rows = clinician_schedules() if 'Tele Tena Clinician' in frappe.get_roles(user) else []
+    approved_services = []
+    if 'Tele Tena Clinician' in frappe.get_roles(user) and applications and applications[0].status == 'Approved':
+        approved_services = [item for item in rows('''SELECT s.name AS id,s.service_label AS label
+            FROM `tabTele Tena Service` s
+            JOIN `tabTele Tena Service Scope` scope ON scope.service=s.name
+            WHERE scope.clinician=%s AND scope.status='Approved' ORDER BY s.service_label''', (user,))
+            if service_scope_is_current(user, item.id)]
     return {'application': applications[0] if applications else None, 'offerings': offerings,
+            'approved_services': approved_services,
             'availability': [{'start': iso(row.start), 'end': iso(row.end)} for row in available],
             'schedules': schedule_rows}

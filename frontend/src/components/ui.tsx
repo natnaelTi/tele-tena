@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, useRef } from "react";
 import type {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
@@ -44,7 +44,7 @@ export function IconButton({
     <Button
       {...props}
       variant="quiet"
-      className="icon-button"
+      className={`icon-button ${props.className || ""}`}
       aria-label={label}
       title={label}
     >
@@ -242,6 +242,8 @@ export function Dialog({
   description,
   children,
   drawer = false,
+  size = "default",
+  className = "",
 }: {
   open: boolean;
   onOpenChange: (value: boolean) => void;
@@ -249,13 +251,23 @@ export function Dialog({
   description: string;
   children: ReactNode;
   drawer?: boolean;
+  size?: "default" | "wide";
+  className?: string;
 }) {
+  const returnFocus = useRef<HTMLElement | null>(null);
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="dialog-overlay" />
         <DialogPrimitive.Content
-          className={drawer ? "dialog drawer" : "dialog"}
+          className={`${drawer ? "dialog drawer" : "dialog"} ${size === "wide" ? "dialog-wide" : ""} ${className}`}
+          onOpenAutoFocus={() => { returnFocus.current = document.activeElement as HTMLElement; }}
+          onCloseAutoFocus={event => {
+            if (returnFocus.current?.isConnected) {
+              event.preventDefault();
+              returnFocus.current.focus();
+            }
+          }}
         >
           <DialogPrimitive.Title>{title}</DialogPrimitive.Title>
           <DialogPrimitive.Description>

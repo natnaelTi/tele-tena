@@ -26,11 +26,22 @@
   --subtle: #eaf5f5;
   --border: #dfe7e9;
   --apricot: #f2bc97;
-  --success: #216141;
-  --warning: #79500e;
-  --danger: #a32c35;
+  --success: #176443;
+  --warning: #805912;
+  --danger: #b33339;
   --information: #275e77;
   --focus: #116c99;
+  /* Semantic names used by connected feature components share the reference
+     palette. Undefined aliases previously removed borders and backgrounds. */
+  --brand-primary: var(--brand);
+  --text-primary: var(--ink);
+  --text-secondary: var(--muted);
+  --surface-card: var(--card);
+  --surface: var(--card);
+  --surface-subtle: var(--subtle);
+  --tint: var(--subtle);
+  --border-default: var(--border);
+  --focus-ring: var(--focus);
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -199,3 +210,4 @@ html[lang="am"] h3 {
     transition: none !important;
   }
 }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }

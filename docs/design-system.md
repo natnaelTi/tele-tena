@@ -13,7 +13,7 @@ Calm, human, precise, mobile-first. The extracted source at
 `/home/frappe/teletena-design-reference` is the current visual and interaction
 reference; its HTML is not operational code. Port composition and interaction
 patterns into the existing React application and connect actions to Frappe APIs.
-Keep the TeleTena mark already in `Brand.tsx` and the existing product rules.
+Use the supplied `assets/teletena-logo.jpeg` in the current extracted reference for the visible brand. Preserve existing product rules. The user’s 2026-10-09 design-fidelity correction supersedes the earlier original SVG instruction below; retain historical SVG variants until favicon/maskable review is complete.
 Use task-focused hierarchy and a blue–teal identity. Avoid giant generic cards,
 excessively wide forms, repeated banners, and dashboard-as-one-long-form.
 

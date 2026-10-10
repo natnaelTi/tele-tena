@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import { appointmentStatus } from '../frontend/src/appointment-status.ts';
+const now=Date.parse('2026-10-09T12:00:00Z');
+const past={state:'Booked',end:'2026-10-09T11:00:00Z'};
+assert.equal(appointmentStatus(past,false,now).label,'Outcome not recorded');
+assert.equal(appointmentStatus({...past,end:'2026-10-10T12:00:00Z'},false,now).label,'Confirmed');
+assert.equal(appointmentStatus({...past,call_state:'Ended'},false,now).detail,'Summary being prepared');
+assert.equal(appointmentStatus({...past,call_state:'Ended'},true,now).detail,'Notes pending');
+assert.equal(appointmentStatus({...past,state:'Cancelled',call_state:'Open'},false,now).label,'Cancelled');
+assert.equal(appointmentStatus({...past,state:'Completed',call_state:'Ended'},false,now).detail,'');
+console.log('PASS: one dominant label, terminal outcome precedence, truthful elapsed status, role-specific documentation explanation.');

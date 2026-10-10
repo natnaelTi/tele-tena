@@ -13,6 +13,8 @@ const base = process.env.TELE_TENA_BROWSER_BASE || 'http://127.0.0.1:8017/telete
 async function useEmailPassword(page) {
   await page.getByRole('button', { name: 'Use email instead', exact: true }).click();
   await page.getByLabel('Email', { exact: true }).waitFor();
+  assert.equal(await page.getByLabel('Password', { exact: true }).count(), 0);
+  await page.getByRole('button', { name: 'Use password instead', exact: true }).click();
   await page.getByLabel('Password', { exact: true }).waitFor();
 }
 

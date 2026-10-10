@@ -1,0 +1,58 @@
+/* H01/H03 reference x-cols, x-panel and settings rows. Scoped to the account
+   component so legacy field/card rules cannot flatten these compositions. */
+.reference-workspace .account-overview,
+.reference-workspace .account-settings-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(270px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.reference-workspace .account-overview > *,
+.reference-workspace .account-settings-columns > * { min-width: 0; }
+.reference-workspace .account-sections .settings-section {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 26px;
+  margin: 0 0 24px;
+  max-width: none;
+  background: var(--white);
+}
+.reference-workspace .account-sections > .settings-section { max-width: 640px; }
+.account-sections .settings-section h2 { margin: 0 0 18px; font-size: 22px; letter-spacing: -.6px; }
+.account-sections .settings-section > p { color: var(--muted); }
+.account-sections .settings-section .field { margin-bottom: 20px; }
+.account-sections .settings-link-row {
+  display: flex; align-items: center; gap: 14px; width: 100%; padding: 18px 0;
+  min-height: 56px; border: 0; border-bottom: 1px solid var(--border);
+  color: var(--ink); font-size: 16px; text-align: left; background: transparent;
+  text-decoration: none;
+}
+.account-sections .settings-link-row > span { flex: 1; }
+.account-sections .settings-link-row > svg { flex: 0 0 auto; color: var(--teal); }
+.account-sections .settings-link-row:hover { color: var(--brand); background: var(--subtle); }
+.reference-workspace .account-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0; }
+.reference-workspace .account-tabs button { min-height: 44px; padding: 10px 16px; border: 1px solid var(--border); border-radius: 22px; color: var(--ink); background: white; font-size: 14px; }
+.reference-workspace .account-tabs button.selected { color: white; background: var(--ink); border-color: var(--ink); }
+.settings-preview-identity { display: flex; align-items: flex-start; gap: 16px; padding: 18px; border-radius: 12px; background: var(--subtle); }
+.settings-preview-identity > svg { flex: 0 0 auto; color: var(--teal); }
+.settings-preview-identity p { margin: 6px 0 0; overflow-wrap: anywhere; }
+.settings-defaults-list { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; margin: 24px 0; }
+.settings-defaults-list dt { color: var(--muted); }
+.settings-defaults-list dd { margin: 0; overflow-wrap: anywhere; }
+.account-sections .settings-privacy-preview .notice { font-size: 14px; }
+@media(max-width: 1000px) {
+  .reference-workspace .account-overview,
+  .reference-workspace .account-settings-columns { grid-template-columns: minmax(0, 1fr); }
+}
+@media(max-width: 650px) {
+  .reference-workspace .account-sections .settings-section { padding: 22px; }
+  .reference-workspace .account-tabs { gap: 6px; }
+  .reference-workspace .account-tabs button { padding: 10px 12px; }
+  .settings-defaults-list { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .settings-defaults-list dd { margin-bottom: 12px; }
+}
+.account-sections .settings-section > .button { width: auto; justify-self: start; }
+.account-sections .settings-link-row > span strong { display: block; color: var(--brand); text-decoration: underline; }
+.account-sections .settings-link-row > span small { display: block; margin-top: 4px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.account-sections .settings-link-row > svg:first-child { width: 44px; height: 44px; padding: 11px; border-radius: 12px; background: var(--subtle); }
+.account-sections .settings-link-row > svg:last-child { width: 18px; height: 18px; padding: 0; border-radius: 0; background: transparent; }

@@ -1,0 +1,130 @@
+/* Distinct approved C01 dashboard and C02 search-led workspace compositions. */
+.patient-dashboard-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr); gap:24px; align-items:start; }
+.discovery-layout { display:grid; grid-template-columns:minmax(0,1fr) 322px; gap:36px; align-items:start; }
+.patient-dashboard-primary,.discovery-primary { min-width:0; }
+.patient-home-hero { background:var(--ink); color:white; padding:40px; border-radius:24px; margin-bottom:24px; }
+.patient-home-hero p { color:#cfdee2; }
+.patient-home-search { margin:0 0 24px; }
+.patient-home-hero h2 { font-size:44px; line-height:1.12; letter-spacing:-1.5px; max-width:500px; }
+.patient-home-hero .care-search { padding:0; background:transparent; border:0; margin:24px 0 0; }
+.patient-home-hero .care-search h2 { font-size:20px; letter-spacing:0; }
+.patient-home-hero .care-search form { display:flex; flex-direction:row; align-items:stretch; gap:8px; }
+.patient-home-hero .care-search .field { flex:1; min-width:0; margin:0; }
+.patient-home-hero .care-search label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+.patient-home-hero .care-search .button { flex:0 0 48px; width:48px; padding:12px; }
+.home-appointment-row { display:flex; align-items:center; gap:16px; padding:12px 0 24px; border-bottom:1px solid var(--border); }
+.home-appointment-row > div { flex:1; min-width:0; }
+.home-appointment-row h3 { font-size:16px; margin:0 0 6px; }
+.home-appointment-row p { font-size:14px; margin:0; color:var(--muted); }
+.home-appointment-row .appointment-icon { width:44px; height:44px; flex-shrink:0; border-radius:12px; }
+.home-appointment-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
+.home-appointment-actions .button { flex:1; }
+.patient-dashboard-panel { border:1px solid var(--border); background:white; border-radius:16px; padding:24px; margin-bottom:24px; }
+.patient-dashboard-panel .section-line { margin-top:0; }
+.reference-wallet { position:relative; overflow:hidden; background:var(--ink); color:white; padding:32px; border-radius:24px; display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
+.reference-wallet::after { content:""; position:absolute; width:240px; height:240px; border:1px solid #ffffff22; border-radius:50%; right:-110px; top:-80px; pointer-events:none; }
+.reference-wallet strong { font-size:44px; letter-spacing:-1.3px; line-height:1.2; overflow-wrap:anywhere; }
+.reference-wallet p { color:#d6e4e8; font-size:14px; margin:0 0 8px; }
+.reference-wallet .button { background:white; color:var(--ink); }
+.patient-dashboard-aside { display:grid; gap:24px; }
+.discovery-search { display:flex; align-items:center; gap:14px; border:1px solid #bdcbd0; padding:8px 8px 8px 18px; border-radius:12px; background:white; }
+.discovery-search input { border:0; padding:8px; min-width:0; flex:1; }
+.discovery-filters { display:flex; flex-wrap:wrap; gap:12px; margin:24px 0; }
+.discovery-filters .field { flex:0 1 auto; min-width:0; margin:0; }
+.discovery-filters select { width:auto; max-width:100%; border-radius:999px; min-height:44px; padding:10px 36px 10px 16px; font-size:14px; background:white; }
+.discovery-filters label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+.discovery-results-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px; }
+.discovery-results-heading p { margin:0; font-size:14px; }
+.discovery-results-heading .field { margin:0; }
+.discovery-results-heading label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+.discovery-results-heading select { border:0; width:auto; font-size:14px; color:var(--muted); padding:8px 28px 8px 8px; }
+.discovery-request-icon { display:inline-flex; padding:12px; background:#ffffff12; border-radius:12px; margin-bottom:24px; }
+.discovery-privacy { display:flex; align-items:flex-start; gap:12px; margin-top:24px; }
+.discovery-privacy svg,.request-entry > svg { flex-shrink:0; }
+.discovery-request-aside { background:var(--ink); border-radius:18px; color:white; padding:28px; }
+.discovery-request-aside p { color:#d6e4e8; }
+.discovery-request-aside h2 { font-size:28px; }
+.discovery-request-aside .button { background:white; color:var(--ink); width:100%; }
+.reference-workspace .request-entry { display:flex; flex-direction:row; align-items:center; gap:16px; background:#eaf5f5; padding:18px 20px; border-radius:12px; margin:16px 0; }
+.reference-workspace .request-entry > div { flex:1; min-width:0; }
+.reference-workspace .request-entry h2 { font-size:16px; margin:0 0 4px; }
+.reference-workspace .request-entry p { font-size:14px; margin:0; }
+.reference-workspace .request-entry > a { flex-shrink:0; margin-left:auto; min-height:44px; display:flex; align-items:center; }
+@media(max-width:1000px) { .patient-dashboard-layout,.discovery-layout { grid-template-columns:minmax(0,1fr) 280px; gap:24px; } }
+@media(max-width:800px) { .patient-dashboard-layout,.discovery-layout { grid-template-columns:1fr; gap:24px; } .patient-home-hero { padding:24px; } .patient-home-hero h2 { font-size:40px; } .patient-dashboard-panel { padding:20px; } .discovery-search { flex-wrap:wrap; } .discovery-search input { width:calc(100% - 40px); } .discovery-search .button { width:100%; } .reference-workspace .request-entry { gap:12px; } .reference-workspace .request-entry > a { margin-left:0; max-width:35%; font-size:14px; } }
+
+.reference-booking .guided-content { max-width:none; width:100%; }
+.booking-selection-panel { border:1px solid var(--border); border-radius:16px; padding:26px; background:white; }
+.booking-selection-heading { display:flex; align-items:center; gap:24px; margin-bottom:28px; }
+.booking-selection-heading h2 { font-size:24px; margin:8px 0; }
+.booking-selection-heading p { margin:0; }
+.booking-selection-heading .avatar { width:88px; height:88px; font-size:32px; }
+.booking-selection-panel > .field { max-width:300px; }
+.booking-selection-panel .booking-calendar { border:0; padding:0; margin-bottom:0; }
+@media(max-width:600px) { .booking-selection-panel { padding:20px; } .booking-selection-heading { gap:16px; } .booking-selection-heading .avatar { width:56px; height:56px; font-size:24px; } }
+
+.service-details-layout { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr); gap:32px; align-items:start; }
+@media(max-width:800px) { .service-details-layout { grid-template-columns:1fr; } }
+
+.patient-payments-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr); gap:24px; align-items:start; }
+@media(max-width:800px) { .patient-payments-layout { grid-template-columns:1fr; gap:24px; } }
+
+.public-profile-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr); gap:24px; align-items:start; }
+.public-profile-identity { display:flex; gap:24px; align-items:center; margin-bottom:32px; }
+.public-profile-identity .avatar { width:96px; height:96px; font-size:36px; }
+.public-profile-identity h2 { font-size:32px; margin-bottom:12px; }
+.public-profile-service { padding:20px 0; border-bottom:1px solid var(--border); display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; align-items:start; }
+.public-profile-service:last-child { border:0; padding-bottom:0; }
+.public-profile-service h3 { font-size:20px; margin:0 0 8px; }
+.public-profile-service > div { flex:1 1 220px; }
+.public-profile-layout .trust-indicators { margin:0; border-radius:16px; background:white; padding:26px; }
+.public-profile-layout .trust-indicators dl { grid-template-columns:1fr; gap:20px; }
+@media(max-width:800px) { .public-profile-layout { grid-template-columns:1fr; } .public-profile-identity { gap:16px; } .public-profile-identity h2 { font-size:24px; } .public-profile-identity .avatar { width:64px; height:64px; font-size:24px; } }
+
+.reference-workspace .request-guided-composer { max-width:620px; margin:32px auto; padding:28px; border:1px solid var(--border); border-radius:16px; background:white; }
+.request-step-progress { list-style:none; padding:0; display:flex; gap:8px; margin:12px 0 28px; }
+.request-step-progress li { flex:1; border-top:4px solid var(--border); padding-top:10px; font-size:14px; color:var(--muted); }
+.request-step-progress li.complete { border-color:var(--brand); color:var(--ink); }
+@media(max-width:600px) { .reference-workspace .request-guided-composer { padding:20px; } }
+
+.reference-workspace .appointment-groups > section { background:white; border:1px solid var(--border); border-radius:16px; padding:26px; margin-bottom:24px; }
+.reference-workspace .appointment-groups > section > h2 { font-size:22px; margin:0 0 12px; }
+.reference-workspace .appointment-groups .stack { gap:0; }
+.reference-workspace .appointment-card { padding:18px 0; border:0; border-bottom:1px solid var(--border); border-radius:0; box-shadow:none; }
+.reference-workspace .appointment-card:last-child { border-bottom:0; }
+.reference-workspace .appointment-card h3 { font-size:18px; margin:8px 0; }
+.reference-workspace .appointment-card p { font-size:14px; margin:4px 0; }
+.reference-workspace .appointment-card .appointment-icon { width:44px; height:44px; border-radius:12px; }
+@media(max-width:600px) { .reference-workspace .appointment-groups > section { padding:20px; } }
+
+.public-profile-aside { display:grid; gap:24px; }
+.public-profile-booking { padding:26px; background:white; border:1px solid var(--border); border-radius:16px; display:grid; gap:18px; }
+.public-profile-booking h2 { font-size:24px; margin:0; }
+.public-profile-booking p { margin:0; }
+.public-profile-price { font-size:34px; font-weight:700; letter-spacing:-1px; }
+.public-profile-price span { font-size:14px; font-weight:400; color:var(--muted); letter-spacing:0; }
+.public-profile-booking .summary-list { margin:0; }
+.public-profile-booking .button { width:100%; }
+.public-profile-booking .text-link { justify-self:start; }
+/* E01 reference x-tabs/x-item: one readable identity and compact right-hand state. */
+.appointment-view-switch { display: flex; gap: 6px; overflow-x: auto; border-bottom: 1px solid var(--border); margin: 0 0 24px; padding-bottom: 8px; }
+.appointment-view-switch button { flex-shrink: 0; min-height: 44px; padding: 12px 18px; border: 0; border-radius: 9px; background: transparent; color: var(--ink); font-size: 14px; white-space: nowrap; }
+.appointment-view-switch button[aria-pressed="true"] { color: white; background: var(--ink); border-color: var(--ink); }
+.appointment-view-switch button span { margin-inline-start: 6px; }
+.appointment-view-switch button:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+.reference-workspace .appointment-status-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
+.reference-workspace .appointment-status-actions .button { width: auto; }
+.reference-workspace .appointment-status-actions > p { text-align: end; }
+.reference-workspace .appointment-card .appointment-icon { display: grid; place-items: center; padding: 10px; flex: 0 0 auto; }
+.reference-workspace .appointment-card h3 { margin: 0 0 6px; }
+@media(max-width: 650px) {
+  .reference-workspace .appointment-card { flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+  .reference-workspace .appointment-card .appointment-details { flex-basis: calc(100% - 56px); }
+  .reference-workspace .appointment-status-actions { width: 100%; align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+  .reference-workspace .appointment-status-actions .button { margin-inline-start: auto; }
+  .reference-workspace .appointment-status-actions > p { text-align: start; flex-basis: 100%; order: 3; }
+}
+@media(max-width: 380px) { .reference-workspace .appointment-status-actions .button { width: 100%; margin: 0; } }
+
+.reference-wallet .wallet-reserved-total {align-self:stretch;border-top:1px solid #ffffff55;padding-top:24px;margin-top:12px;font-size:16px;}
+.patient-payments-layout .reference-wallet {min-height:336px;justify-content:flex-start;gap:24px;}

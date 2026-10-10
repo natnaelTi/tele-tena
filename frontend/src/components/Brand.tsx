@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <Link to="/" className="brand" aria-label="TeleTena home">
-      <img src={import.meta.env.BASE_URL + "brand/symbol.svg"} alt="" width="36" height="36" />
+      <img src={import.meta.env.BASE_URL + "brand/teletena-logo.jpeg"} alt="" width="37" height="37" />
       {!compact && <span>TeleTena</span>}
     </Link>
   );

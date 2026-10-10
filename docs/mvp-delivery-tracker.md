@@ -1,5 +1,22 @@
 # TeleTena delivery tracker
 
+## Active MVP correction — 2026-10-10
+
+Current built source `c3e1ff1263eaec2851a1817a1bf54c90f894a40c`, preview
+http://127.0.0.1:8017/teletena/ on the separate
+`teletena-mvp-presentation.localhost`. The old fixture site is retained.
+[One current report](mvp-journey-verification-2026-10-09.md) records actual checks,
+paired evidence and remaining gates. Dedicated clean installation and repeat setup,
+real reviewer→publication→direct booking and private offer acceptance, local controlled
+registration transport, and patient/clinician read-only 390/768/1440 journeys passed.
+Complete visual acceptance, couples, continuous jobs, full owner-level legacy upgrade,
+current hosted calls and final integrated release checks remain open. No merge or remote
+change. Older entries below are historical for their named source/site, not current passes.
+
+## Current release priority — MVP handover — 2026-10-08
+
+The active branch is `feat/mvp-release-handover`, based on preserved/pushed `feat/adult-relationship-links` at `1e8d161`. The authoritative bounded release scope is `mvp-release-scope.md`; `mvp-screen-acceptance.json` maps all 142 reference screens to 99 MVP screen/state concepts and 43 post-handover concepts. This is scope coverage, not 99 operationally accepted screens. Couples consultations are mandatory and remain missing beyond relationship links. No-show adjudication is deferred by explicit user decision. Critical current-release gaps are scheduler-driven routing/earnings evidence, full fresh/owner-level upgrade verification, non-diagnostic discovery/query continuity, complete couples permissions/calls/documentation and current-source MVP redesign acceptance. The older checkpoints below are historical per-slice evidence. No merge or remote deployment occurred.
+
 ## Current local checkpoint — optional adult relationship links — 2026-10-08
 
 The active worktree is `feat/adult-relationship-links`, based on the local
@@ -696,3 +713,99 @@ calendar fields without appointment or grant identifiers. No migration is
 needed.
 
 The focused `Presentation.test_patient_clinic_grant_is_scheduling_only_revocable_and_membership_scoped` regression passed on `tele-tena-pr12-fresh.localhost` after adding week filtering, privacy shape, timezone validation, and role-denial assertions. Current branch `feat/clinic-shared-calendar` builds to source `deac339f353b3c5ca1e9042cebbe609cc789d0a4`; the built `/teletena/` browser journey passed, and full Frappe 15 suites passed (45 presentation, 24 integration). Browser coverage includes owner route/API, empty state, week navigation, timezone validation, 320/390/768/1440 widths and patient API denial. The current browser fixture has no shared appointment in its week; populated response privacy and role matrix are covered by backend tests. Screenshot evidence is in `docs/screenshots/clinic-shared-calendar/`. Frontend build passes with the existing large LiveKit bundle warning. Fresh-site/Frappe 16 checks remain pending. The route covers shared appointment viewing only; it is not clinic resource or booking management.
+
+
+### 9 October — continued connected MVP correction
+
+Current packaged source `0c69dfc2e665deba7208ea39839c766a001a91e6` on PR #44.
+Added persisted confirmed/pending booking handoff, request stages, profile booking
+panel, own approved-scope offering editor, private offer outcome routes and tour
+entries. Actual browser and focused backend results, discrepancies and screenshots
+are in [the current verification report](mvp-journey-verification-2026-10-09.md).
+Visual acceptance, couples, enabled-registration onboarding, presentation dataset,
+scheduler/cutover, fresh/upgrade reconciliation and current hosted-call release
+checks remain open. No handover acceptance, merge or remote deployment.
+
+### Documentation continuation — 9 October 2026
+
+Packaged source `a05ed13d53b690939343bc5e1a18ade5b178e54e`, same isolated 8017 preview.
+E02/E11/E13 now have paired comparison notes and real persisted documentation
+journey evidence. Posting-derived reservation display, finalized document visibility,
+unsaved summary preview, revision amendment and cross-appointment draft isolation
+are corrected. See the active journey report for actual tests and shared-fixture
+test failures. All 99 MVP reference routes have rendered structural mappings; this
+is not 99 application acceptance passes. At that checkpoint: couples, private-note sharing, clean
+presentation data, current scheduler/financial/fresh-install and hosted-call release
+checks remain gates. No merge, remote deployment or real-money activation.
+
+Latest continuation: explicit single-patient consultation-note publication is now
+implemented and locally verified at packaged source `53d7ec3`. Draft sharing intent
+and actual publication are separate; old notes remain private and later amendments
+preserve sharing history. Isolated-site backup/export and repeated migration checks
+preserve clinical/appointment and financial rows. Fresh install and full couples
+recipient/call acceptance remain pending. See the active report; earlier pending
+private-note-sharing statements are superseded.
+
+## Current 9 October account / appointment / worker checkpoint
+
+Active source/evidence: [current journey verification](mvp-journey-verification-2026-10-09.md); packaged frontend `0eb22ef`, draft PR #44 preserving PR #43. H01–H04 account/privacy/reference composition and real saves/errors, E01 status views/detail navigation/cancellation, and E02/E11/E13 note permissions/publication passed their focused owned browser checks. Paired comparisons retain explicit differences; visual acceptance is not complete. Native installed earnings job executed twice in a dedicated RQ worker, one release, dispute held, one payout reservation. Twelve retained-table pre/post fingerprints matched. Continuous scheduler remains disabled; forced dispatch is not daemon acceptance. Inherited test cleanup's global projection recalculation is removed; regression preserves unrelated discrepancies. Fresh/legacy cutover, couples, registration, hosted call, whole-MVP fidelity and coherent presentation data remain release gates.
+
+Current refinement: completed/cancelled appointment history groups by booked timezone month and year; actual browser recheck passed on `3b02709`. Existing controlled PWA client explicitly updated `9988610` → `3b02709`. Four focused persisted OTP regressions passed with mocked provider transport; full enabled-registration HTTP browser acceptance remains pending.
+
+Selected history tabs now remain visible on responsive resize and mobile reload; current owned browser captures check the selected button lies inside the strip. Supported controlled PWA update `3b02709` → `0eb22ef` passed; this does not claim physical-device installation/calling.
+
+### Current consultation checkpoint — 10 October 2026
+
+Packaged application `d720596e385e9f50c1ed9df256c09fd2e9b4cd13` on
+`teletena-mvp-presentation.localhost`, http://127.0.0.1:8017/teletena/.
+The individual hosted-Cloud fake-device journey passes two-way media,
+Leave/rejoin, signaling reconnection, closure failure/retry, cached original
+and reissued application-token denial, draft save/reload/private isolation,
+summary publication and exactly one pending earning. Focused backend 3 notes
++ 2 authorization/concurrency tests pass. Paired E05/E07/E08/E09/E11/E13
+comparisons and real 200% terminal-detail zoom are documented in the active
+[journey report](mvp-journey-verification-2026-10-09.md). Older call-pending
+claims are superseded only for these tested individual paths. Couples,
+continuous scheduler, full visual owner approval and complete MVP release
+gates remain pending. No remote deployment, physical-device, live-delivery
+or native-language approval claim. PR #44 stays draft.
+
+### Current couples / native-processing continuation (2026-10-10)
+
+Supersedes older statements that couples are absent or the presentation scheduler
+is disabled. Two independent adults can consent/book one charged appointment;
+three-party hosted fake-media and all three original/reissued token revocations
+pass, selected summary recipients are enforced by patient APIs, and one pending
+earning is created. Five focused couples MariaDB tests pass, including concurrent
+confirmation and withdrawal. Family/group remain deferred. Shared extensions and
+rescheduling refuse until renewed consent is implemented; no implicit charges.
+Native isolated scheduler/RQ automatically releases eligible earnings while a
+dispute stays held, and recovers queued expiry work after its worker restarts.
+Original Bench site scheduler is deliberately disabled for this presentation
+site; its private one-site runtime is enabled with separate queue Redis 13917.
+These are specific functional results, not all-MVP visual or release acceptance.
+Current evidence and outstanding gates remain in the existing journey report and
+`mvp-screen-acceptance.json`; no new acceptance tracker.
+
+## Current MVP gates — 10 October 2026 continuation
+
+Active report: `mvp-journey-verification-2026-10-09.md` current gate table; sole
+screen matrix: `mvp-screen-acceptance.json`. Packaged8ba375e, matching runtime code;
+later verification/documentation commits do not change frontend/backend code.
+Working persisted adult couples core, three-party hosted fake-media End/revocation,
+recipient-specific summary isolation, real registration recovery, native isolated
+release/expiry/restart and fresh v1.33 checks now have passing evidence. Read-only
+owner audit reconciles presentation balances; representative disposable financial
+cutover preserves historical obligations and visibly holds boundary/unknown events.
+Native repeat migration/full record fingerprint passes. Remaining: whole-MVP
+visual/state/language/zoom comparisons and owner review, separate simultaneously
+authored individual follow-up field, jointly consented couples reschedule/extension,
+final integrated candidate checks and current Frappe16 couples verification.
+External gates remain physical devices, live delivery, native translations and
+clinical/provider authorization. No future modules, merge or Selfmade deployment.
+
+Presentation continuation40c608f: G01 patient balance/history and I02 clinician
+application queue now have paired reference comparisons and actual persisted
+backend action/permission checks at390/768/1440. Pagination avoids a history wall;
+mobile tour no longer covers Review. Owner approval, other route/state comparisons
+and current language/200%zoom checks remain open. See sole matrix/current report.

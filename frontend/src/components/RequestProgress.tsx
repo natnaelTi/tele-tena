@@ -1,4 +1,5 @@
 import { useLocale } from '../hooks/useLocale';
+import { Check, Search, MessageSquare, CircleX } from 'lucide-react';
 
 type Props = {state:string;hasOffer?:boolean;wave?:number;clinician?:boolean;immediate?:boolean;eligibleSupply?:number|null};
 
@@ -16,10 +17,23 @@ export function RequestProgress({state,hasOffer=false,wave=1,clinician=false,imm
   const description=confirmed?'Open the appointment to review the agreed details and join window.':closed?
     'This outcome is retained in your history.':clinician?'No appointment is confirmed until the patient accepts. Your quote is private.':
     immediate&&eligibleSupply===0?'Matching continues without changing your requirements.':
-    'We aim to connect you within three minutes. Availability and your choice may take longer.';
+    hasOffer?'Review the clinician’s proposal. A booking is confirmed only after you accept.':
+    immediate?'We aim to connect you within three minutes. Availability and your choice may take longer.':
+    'Eligible clinicians can propose a time within your requested window.';
+  const Icon=confirmed?Check:closed?CircleX:clinician?MessageSquare:Search;
   return <section className={`request-progress ${closed?'settled':''}`} aria-label="Request progress">
-    <span className="request-beacon" aria-hidden="true"><span/><span/><span/>{confirmed?'✓':clinician?'↗':'…'}</span>
+    <span className="request-beacon" aria-hidden="true"><span/><span/><span/><Icon size={26}/></span>
     <div><div className="request-progress-words" aria-hidden="true">{words.map((word,i)=><span key={word} style={{animationDelay:`${i*4}s`,animationDuration:`${words.length*4}s`}}>{w(word)}</span>)}</div>
       <strong className="sr-only">{w(words[0])}</strong><p>{w(description)}</p></div>
   </section>;
+}
+
+/** Stages advance only from persisted offer/appointment facts, never a timer. */
+export function RequestStageRail({state,hasOffer=false}:{state:string;hasOffer?:boolean}) {
+  const {w}=useLocale();
+  const step=state==='Matched'?3:state==='Open'?(hasOffer?2:1):0;
+  const closed=!['Open','Matched'].includes(state);
+  return <ol className="request-stage-rail" aria-label={w('Request progress')}>
+    {['Request posted','Clinicians responding','Your choice','Appointment'].map((label,index)=><li key={label} className={!closed?(index<step?'done':index===step?'current':''):undefined} aria-current={!closed&&index===step?'step':undefined}><span aria-hidden="true">{!closed&&index<step?<Check size={16}/>:index+1}</span>{w(label)}</li>)}
+  </ol>;
 }

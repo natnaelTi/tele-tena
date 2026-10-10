@@ -9,6 +9,8 @@ import {
   WorkspaceLayout,
 } from "./layouts/Layouts";
 import Homepage, { ClinicianInvitation } from "./pages/Homepage";
+import BookingConfirmation from "./pages/BookingConfirmation";
+import {ClinicianOffers,ClinicianOfferDetail} from "./pages/ClinicianOffers";
 import SignIn from "./pages/SignIn";
 import Onboarding from "./pages/Onboarding";
 import {
@@ -28,14 +30,16 @@ import {
   PendingFeature,
   Services,
 } from "./pages/Clinician";
+import ServiceDetails from "./pages/ServiceDetails";
 import Account from "./pages/Account";
-import { Applications, FinancialDisputes, Scopes, ServiceCatalog } from "./pages/Admin";
+import { AdminOverview, Applications, FinancialDisputes, Scopes, ServiceCatalog } from "./pages/Admin";
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
 import Showcase from "./pages/Showcase";
 import { ClinicianRequestInbox, PatientOpenRequests, PatientRequestDetail, PatientRequestOfferDetail, PublicClinicianProfile } from "./pages/OpenRequests";
 import { ClinicianScopeApplications, VettingQueue, VettingRubricManagementPage } from "./pages/Vetting";
 import { ClinicianAffiliations, ClinicMembershipPortal, ClinicReview } from "./pages/Clinics";
 import ClinicCalendar from "./pages/ClinicCalendar";
+import Couples, { CoupleInvitation } from './pages/Couples';
 import Relationships, { RelationshipInvitationEntry } from "./pages/Relationships";
 import FinancialActivityDetail from "./pages/FinancialActivity";
 import PWAUpdateNotice from "./components/PWAUpdateNotice";
@@ -53,6 +57,7 @@ export default function App() {
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Homepage />} />
               <Route path="/for-clinicians" element={<ClinicianInvitation />} />
+              <Route path="/couple-invitation" element={<CoupleInvitation />} />
               <Route path="/relationship-invitation" element={<RelationshipInvitationEntry />} />
               <Route
                 path="/showcase"
@@ -88,10 +93,13 @@ export default function App() {
                 <Route path="requests/:requestId" element={<PatientRequestDetail />} />
                 <Route path="requests/:requestId/offers/:offerId" element={<PatientRequestOfferDetail />} />
                 <Route path="clinicians/:clinicianId" element={<PublicClinicianProfile />} />
+                <Route path="services/:offering" element={<ServiceDetails />} />
                 <Route path="book/:offering" element={<Booking />} />
                 <Route path="book-link/:token" element={<BookingLink />} />
+                <Route path="booked/:id" element={<BookingConfirmation />} />
                 <Route path="appointments" element={<Appointments />} />
                 <Route path="account" element={<Account />} />
+                <Route path="couples" element={<Couples />} /><Route path="couples/:planId" element={<Couples />} />
                 <Route path="relationships" element={<Relationships />} />
                 <Route path="clinic-access" element={<ClinicMembershipPortal />} />
                 <Route path="payments" element={<Payments />} />
@@ -119,6 +127,8 @@ export default function App() {
                   element={<ConsultationPage />}
                 />
                 <Route path="requests" element={<ClinicianRequestInbox />} />
+                <Route path="offers" element={<ClinicianOffers />} />
+                <Route path="offers/:offerId" element={<ClinicianOfferDetail />} />
                 <Route path="care" element={<CareRecords />} />
                 <Route path="care/:id" element={<CareRecordDetail />} />
                 <Route path="earnings" element={<ClinicianEarnings />} />
@@ -127,7 +137,8 @@ export default function App() {
                 <Route path="affiliations" element={<ClinicianAffiliations />} />
               </Route>
               <Route path="/admin" element={<WorkspaceLayout kind="admin" />}>
-                <Route index element={<Applications />} />
+                <Route index element={<AdminOverview />} />
+                <Route path="applications" element={<Applications />} />
                 <Route path="scopes" element={<Scopes />} />
                 <Route path="services" element={<ServiceCatalog />} />
                 <Route path="vetting" element={<VettingQueue />} />

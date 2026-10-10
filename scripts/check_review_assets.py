@@ -24,6 +24,11 @@ if args.site_private:
         if path.exists():
             values = json.loads(path.read_text())
             secrets.extend(str(values[key]).encode() for key in fields if values.get(key))
+    account_file = args.site_private / 'tele_tena_review_accounts.json'
+    if account_file.exists():
+        values = json.loads(account_file.read_text())
+        assert isinstance(values, dict), 'Unexpected local account credential format'
+        secrets.extend(value.encode() for value in values.values() if isinstance(value, str) and value)
 for path in files:
     content = path.read_bytes()
     assert b'127.0.0.1:5173' not in content and b'erp.localhost' not in content, 'Development URL in packaged asset'

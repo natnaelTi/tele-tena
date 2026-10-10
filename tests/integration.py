@@ -79,6 +79,36 @@ def booking(offering, start, key='test', history=False):
                 expected_minutes=30, expected_disclosure={'request': 'Synthetic request', **({'history': 'Synthetic private history'} if history else {})})
 
 
+def remove_owned_financial_fixtures(account_ids):
+    """Remove owned journals without repairing unrelated account projections.
+
+    Shared control accounts retain their pre-existing offsets. Subtract only
+    these fixtures' signed postings, under the same account locks as posting.
+    No replacement totals are inferred from the remaining journal history.
+    """
+    if not account_ids:
+        return
+    journal_ids = frappe.db.sql('SELECT DISTINCT journal_id FROM tt_journal_line WHERE account_id IN %s',
+                               (tuple(account_ids),), pluck=True)
+    if journal_ids:
+        affected = frappe.db.sql('''SELECT DISTINCT account_id FROM tt_journal_line
+            WHERE journal_id IN %s ORDER BY account_id''', (tuple(journal_ids),), pluck=True)
+        frappe.db.sql('''SELECT id FROM tt_financial_account
+            WHERE id IN %s ORDER BY id FOR UPDATE''', (tuple(affected),))
+        counterparts = frappe.db.sql('''SELECT a.id,
+            SUM(CASE WHEN a.normal_side='D' THEN l.debit_minor-l.credit_minor
+                     ELSE l.credit_minor-l.debit_minor END) AS fixture_delta
+            FROM tt_journal_line l JOIN tt_financial_account a ON a.id=l.account_id
+            WHERE l.journal_id IN %s AND a.id NOT IN %s GROUP BY a.id''',
+            (tuple(journal_ids), tuple(account_ids)), as_dict=True)
+        for account in counterparts:
+            frappe.db.sql('''UPDATE tt_financial_account SET balance_minor=balance_minor-%s
+                WHERE id=%s''', (int(account.fixture_delta), account.id))
+        frappe.db.sql('DELETE FROM tt_journal_line WHERE journal_id IN %s', (tuple(journal_ids),))
+        frappe.db.sql('DELETE FROM tt_journal WHERE id IN %s', (tuple(journal_ids),))
+    frappe.db.sql('DELETE FROM tt_financial_account WHERE id IN %s', (tuple(account_ids),))
+
+
 class Integration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -140,13 +170,7 @@ class Integration(unittest.TestCase):
         frappe.db.sql('DELETE FROM tt_payout WHERE clinician IN %s', (tuple(USERS.values()),))
         account_ids = frappe.db.sql('SELECT id FROM tt_financial_account WHERE owner IN %s',
                                     (tuple(USERS.values()),), pluck=True)
-        if account_ids:
-            journal_ids = frappe.db.sql('SELECT DISTINCT journal_id FROM tt_journal_line WHERE account_id IN %s',
-                                        (tuple(account_ids),), pluck=True)
-            if journal_ids:
-                frappe.db.sql('DELETE FROM tt_journal_line WHERE journal_id IN %s', (tuple(journal_ids),))
-                frappe.db.sql('DELETE FROM tt_journal WHERE id IN %s', (tuple(journal_ids),))
-            frappe.db.sql('DELETE FROM tt_financial_account WHERE id IN %s', (tuple(account_ids),))
+        remove_owned_financial_fixtures(account_ids)
         for appointment in appointment_ids:
             frappe.db.sql('DELETE FROM tt_note_revision WHERE appointment=%s', (appointment,))
             frappe.db.sql('DELETE FROM tt_consultation_note WHERE appointment=%s', (appointment,))
@@ -217,12 +241,6 @@ class Integration(unittest.TestCase):
         frappe.db.sql('DELETE FROM tt_service WHERE id=%s', (PREFIX,))
         for email in USERS.values():
             frappe.delete_doc('User', email)
-        # Fixture cleanup removes its own journals; restore only the cached
-        # account totals from the remaining immutable journal lines.
-        frappe.db.sql('''UPDATE tt_financial_account a SET balance_minor=COALESCE((
-            SELECT SUM(CASE WHEN a.normal_side='D' THEN l.debit_minor-l.credit_minor
-                            ELSE l.credit_minor-l.debit_minor END)
-            FROM tt_journal_line l WHERE l.account_id=a.id),0)''')
         frappe.db.commit()
         frappe.destroy()
         frappe.enqueue = cls._original_enqueue

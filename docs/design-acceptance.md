@@ -76,7 +76,7 @@ The presentation identity and flows are unchanged. Production URLs add the
 browser verification and deployment limitations are recorded separately in
 `review-deployment-verification.md`, not inferred from prior Vite screenshots.
 
-## Extracted 142-screen product design integration (current branch)
+## Extracted design reference (extended plan, superseded as release gate)
 
 The source visual reference is `/home/frappe/teletena-design-reference`; the
 latest `screen-inventory.json` has 142 screens in 14 journeys (the older handoff
@@ -87,8 +87,9 @@ Ethiopic and the existing TeleTena conversation logo. These code changes are
 not yet rendered in the built `/teletena/` app, so no extended visual acceptance
 is claimed.
 
-- [ ] Route all 142 screen/state entries through real persisted APIs or mark the
-  exact dependency that blocks them in `operational-screen-map.json`.
+- [ ] Complete current MVP screen/state acceptance in `mvp-screen-acceptance.json`;
+  retain all 142 reference entries and post-handover dependencies in
+  `operational-screen-map.json`. Extended modules are not current release gates.
 - [ ] Finish Batch A authentication/onboarding layout and three-language flows.
 - [ ] Finish human-led vetting, per-scope catalog and verified trust indicators.
 - [ ] Finish discovery, schedule, direct booking and consultation journeys.

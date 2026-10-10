@@ -1,18 +1,25 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { ArrowRight, Search } from "lucide-react";
-import { api } from "../api";
+import PaymentActivity from "../components/PaymentActivity";
+import { careSearchScore } from "../care-search";
+import { AddFundsDialog } from "../components/AddFundsDialog";
+import { BookingReview } from "../components/BookingReview";
+import { appointmentDisplayGroups, appointmentsForView, type AppointmentView } from "../appointment-groups";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { ArrowRight, Search, MessageCircle, Sparkles, LockKeyhole } from "lucide-react";
+import "./PatientJourney.css";
+import { WalletSummary } from "../components/WalletSummary";
+import { BookingCalendar } from "../components/BookingCalendar";
+import { pendingCareQuery, rememberCareQuery, discoveryFilters, rememberDiscoveryFilters } from "../care-intent";
 import { journeyApi } from "../journey-api";
 import type { Disclosure, Offer } from "../journey-api";
 import {
   AppointmentCard,
-  BookingSummary,
+  HomeAppointmentPreview,
   ClinicianCard,
   DisclosurePreview,
   PageTitle,
   date,
   money,
-  timezone,
 } from "../components/Domain";
 import {
   Button,
@@ -38,19 +45,23 @@ export function PatientHome() {
   const previousClinicians = useResource(journeyApi.previousClinicians);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const upcoming = appointments.data?.filter(a => a.state === "Booked" && a.call_state !== "Ended" && new Date(a.end).getTime() > now)
+    .sort((a,b) => new Date(a.start).getTime() - new Date(b.start).getTime());
   return (
     <>
       <PageTitle
-        eyebrow="YOUR SPACE FOR CARE"
-        title={`Welcome, ${session?.profile?.display_name || "there"}.`}
-        description="You don’t have to figure everything out at once."
+        title={w("Your care, in one place.")}
+        description={`${w("Welcome")}, ${session?.profile?.display_name || w("there")}.`}
       />
-      <section className="care-search">
-        <h2>What would you like help with?</h2>
+      <div className="patient-dashboard-layout"><section className="patient-dashboard-primary">
+      <section className="patient-home-hero"><h2>{w("A little space")}<br />{w("for yourself.")}</h2><p>{w("Find the right support for today.")}</p>
+      <section className="care-search patient-home-search">
+        <h3 className="sr-only">{w("What would you like help with?")}</h3>
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            navigate("/patient/discovery?q=" + encodeURIComponent(query));
+            rememberCareQuery(query);
+            navigate("/patient/discovery");
           }}
         >
           <TextField
@@ -59,15 +70,12 @@ export function PatientHome() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <Button type="submit">
-            <Search size={20} />
-            Find care
-          </Button>
+          <Button type="submit" variant="secondary" aria-label={w("Find care")}><Search size={20}/></Button>
         </form>
-      </section>
-      <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Share what support you’re looking for and compare private offers from eligible clinicians.")}</p></div><Link className="button secondary" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
+      </section></section>
+      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
       {!!requests.data?.some((item:any)=>item.state==='Open')&&<section className="active-request-summary"><div className="section-line"><h2>Active care requests</h2><Link to="/patient/requests">Review requests and offers <ArrowRight size={16}/></Link></div>{requests.data.filter((item:any)=>item.state==='Open').slice(0,3).map((item:any)=><Link className="active-request-row" key={item.id} to={'/patient/requests/'+encodeURIComponent(item.id)}><span>{item.urgency==='immediate'?'As soon as possible':'Schedule for later'} · {item.category}</span><strong>{item.offers.filter((offer:any)=>offer.state==='Active').length} new offers</strong></Link>)}</section>}
-      {wallet.data&&<Link to="/patient/payments" className="balance-summary"><span>Balance</span><strong>ETB {money(wallet.data.available)}</strong><small>Available · ETB {money(wallet.data.reserved)} reserved</small></Link>}
+      <section className="patient-dashboard-panel">
       <div className="section-line">
         <h2>Your next appointment</h2>
         <Link to="/patient/appointments">
@@ -81,14 +89,8 @@ export function PatientHome() {
         </InlineNotice>
       ) : !appointments.data ? (
         <Skeleton />
-      ) : appointments.data.filter((a) => a.state==="Booked" && a.call_state!=="Ended" && new Date(a.end).getTime() > now)
-          .length ? (
-        <AppointmentCard
-          appointment={
-            appointments.data.filter((a) => a.state==="Booked" && a.call_state!=="Ended" && new Date(a.end).getTime() > now)[0]
-          }
-          base="/patient"
-        />
+      ) : upcoming?.length ? (
+        <HomeAppointmentPreview appointment={upcoming[0]} />
       ) : (
         <EmptyState
           title="A conversation starts with a choice."
@@ -101,6 +103,7 @@ export function PatientHome() {
           When you book a session, its details will appear here.
         </EmptyState>
       )}
+      </section><section className="patient-dashboard-panel">
       <div className="section-line">
         <h2>{w("People you’ve spoken with")}</h2>
         <Link to="/patient/appointments">{w("Appointments")} <ArrowRight size={16} /></Link>
@@ -125,23 +128,35 @@ export function PatientHome() {
       ) : (
         <p className="supporting">{w("Clinicians you have completed a consultation with will appear here when they have current approved services available.")}</p>
       )}
+      </section></section><aside className="patient-dashboard-aside">{wallet.data ? <WalletSummary available={wallet.data.available} reserved={wallet.data.reserved} /> : wallet.error ? <InlineNotice tone="danger">{w("Balance unavailable.")} <Button variant="secondary" onClick={() => void wallet.refresh()}>{w("Try again")}</Button></InlineNotice> : <Skeleton />}<section className="patient-dashboard-panel"><h2>{w("Your care record")}</h2><p>{w("Shared summaries are available inside your completed consultations.")}</p><Link className="text-link" to="/patient/appointments">{w("View appointments")} <ArrowRight size={16} /></Link></section></aside></div>
     </>
   );
 }
 export function Discovery() {
   const routeLocation=useLocation();
+  const navigate = useNavigate();
   const { w } = useLocale();
   const offers = useResource(journeyApi.discover);
   const services = useResource(journeyApi.services);
-  const [category, setCategory] = useState("");
-  const [languageFilter, setLanguageFilter] = useState("");
-  const [formatFilter, setFormatFilter] = useState("");
-  const [availabilityFilter, setAvailabilityFilter] = useState("");
+  const [category, setCategory] = useState(discoveryFilters().category);
+  const [sort, setSort] = useState("relevance");
+  const [languageFilter, setLanguageFilter] = useState(discoveryFilters().language);
+  const [formatFilter, setFormatFilter] = useState(discoveryFilters().format);
+  const [availabilityFilter, setAvailabilityFilter] = useState(discoveryFilters().availability);
   const [availableOfferIds, setAvailableOfferIds] = useState<Set<string> | null>(null);
   const [availabilityError, setAvailabilityError] = useState(false);
   const [query, setQuery] = useState(
-    (routeLocation.state as {careQuery?:string}|null)?.careQuery || new URLSearchParams(location.search).get("q") || "",
+    pendingCareQuery(),
   );
+  useEffect(() => {
+    // Retire legacy care-query URLs without retaining their text in history.
+    if (new URLSearchParams(routeLocation.search).has("q")) {
+      navigate(routeLocation.pathname, { replace: true });
+    }
+  }, [routeLocation.pathname, routeLocation.search, navigate]);
+  useEffect(() => {
+    rememberCareQuery(query);
+  }, [query]);
   useEffect(() => {
     if (availabilityFilter !== "next14" || !offers.data) return;
     let active = true;
@@ -169,32 +184,29 @@ export function Discovery() {
     void checkAvailability();
     return () => { active = false; };
   }, [availabilityFilter, offers.data]);
+  useEffect(() => { rememberDiscoveryFilters({ category, language: languageFilter, format: formatFilter, availability: availabilityFilter }); }, [category, languageFilter, formatFilter, availabilityFilter]);
   const availabilityBusy = availabilityFilter === "next14" && !!offers.data && !availableOfferIds && !availabilityError;
+  const relevance=(offer:Offer)=>{const definition=services.data?.find(item=>item.label===offer.service_category);return careSearchScore(query,[offer.display_name,offer.label,offer.service_category||"",offer.description||"",definition?.synonyms||"",definition?.service_label_am||"",definition?.service_label_om||""]);};
   const shown = offers.data?.filter(
     (offer) =>
       (!category || offer.service_category === category) &&
       (!languageFilter || offer.care_languages?.includes(languageFilter as "en"|"am"|"om")) &&
       (!formatFilter || offer.consultation_format === formatFilter) &&
-      (availabilityFilter !== "next14" || !availableOfferIds || availableOfferIds.has(offer.id)) &&
-      `${offer.display_name} ${offer.label} ${offer.service_category || ""}`
-        .toLowerCase()
-        .includes(query.toLowerCase()),
-  );
+      (availabilityFilter !== "next14" || !!availableOfferIds?.has(offer.id)) &&
+      relevance(offer)>0,
+  )?.sort((a,b)=>sort === "price" ? a.price-b.price || relevance(b)-relevance(a) : relevance(b)-relevance(a));
   const requestDraft={request_text:query,service_label:category,language:languageFilter||undefined,format:formatFilter||undefined};
   return (
     <>
       <PageTitle
-        eyebrow="FIND CARE"
-        title="Find the right conversation for you."
-        description="Choose an approved service, a clear price and a time that works."
+        eyebrow={w("CARE THAT FITS YOU")}
+        title={w("What’s on your mind?")}
+        description={w("You don’t need the right words. Start with what you’re feeling.")}
       />
-      <div className="filter-row">
-        <TextField
-          label="Clinician or service"
-          placeholder="Search available care"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+      <div className="discovery-layout"><section className="discovery-primary">
+      <form className="discovery-search" onSubmit={event => { event.preventDefault(); rememberCareQuery(query); }}><Search size={20} /><label className="sr-only" htmlFor="discovery-care-query">Clinician or service</label><input id="discovery-care-query" placeholder={w("Search available care")} value={query} onChange={event => setQuery(event.target.value)} /><Button type="submit">{w("Search")}</Button></form>
+      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft}}>{w("Post a request")} <ArrowRight size={16} /></Link></section>
+      <div className="discovery-filters">
         <Select
           label="Service"
           value={category}
@@ -215,10 +227,8 @@ export function Discovery() {
           <option value="">{w("Any date")}</option><option value="next14">{w("Open times in the next 14 days")}</option>
         </Select>
       </div>
-      <section className="request-entry"><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link to="/patient/requests" state={{requestDraft}}>{w("Post a request")}</Link></section>
-      <p className="supporting">
-        {w("Filter approved services by care language, format and currently open times.")} · {w("Times shown in")} {timezone}.
-      </p>
+
+      {!!offers.data && !availabilityBusy && <div className="discovery-results-heading"><p>{shown?.length || 0} {w(shown?.length === 1 ? "available service" : "available services")}</p><Select label={w("Sort services")} value={sort} onChange={event=>setSort(event.target.value)}><option value="relevance">{w("Best fit")}</option><option value="price">{w("Lowest price")}</option></Select></div>}
       {availabilityError&&<InlineNotice tone="danger">{w("Available times could not be checked. Clear this filter or try again.")}</InlineNotice>}
       {offers.error ? (
         <InlineNotice tone="danger">
@@ -227,6 +237,8 @@ export function Discovery() {
         </InlineNotice>
       ) : !offers.data ? (
         <Skeleton />
+      ) : availabilityError ? (
+        <InlineNotice tone="danger">{w("Available times could not be checked. Clear this filter or try again.")} <Button variant="secondary" onClick={() => { setAvailabilityFilter(""); setAvailableOfferIds(null); setAvailabilityError(false); }}>{w("Clear availability filter")}</Button></InlineNotice>
       ) : availabilityBusy ? (
         <p role="status" className="supporting">{w("Checking open times in the next 14 days…")}</p>
       ) : shown?.length ? (
@@ -241,44 +253,48 @@ export function Discovery() {
           available. <Link to="/patient/requests" state={{requestDraft}}>Post a private request</Link> without relaxing your preferences.
         </EmptyState>
       )}
-      <p className="verification-note">
-        “Approved for this service” means the application and service scope have
-        been manually approved. This demo uses synthetic clinician details.
-      </p>
+      <p className="supporting">{w("Matching helps you find a professional. It is not a diagnosis.")}</p>
+      </section><aside className="discovery-aside"><section className="discovery-request-aside"><span className="discovery-request-icon" aria-hidden="true"><MessageCircle size={24}/></span><h2>{w("Someone to talk to. A choice that’s yours.")}</h2><p>{w("Tell us what you need. Available clinicians can respond with a session time and a clear fee.")}</p><Link className="button" to="/patient/requests" state={{requestDraft}}>{w("Post a private request")}</Link><p className="supporting">{w("Your request is only shown to eligible clinicians.")}</p></section><p className="discovery-privacy supporting"><LockKeyhole size={18} aria-hidden="true"/>{w("Your name and personal details stay private until you choose to share them.")}</p></aside></div>
     </>
   );
 }
 export function Appointments({ base = "/patient" }: { base?: string }) {
+  const {w,locale} = useLocale();
   const resource = useResource(journeyApi.appointments);
   const clinician=base==="/clinician";
-  return (
-    <>
-      <PageTitle
-        title="Appointments"
-        description={`Your booked conversations, in ${timezone}.`}
-      />
-      {resource.error ? (
-        <InlineNotice tone="danger">
-          Appointments couldn’t be loaded.{" "}
-          <Button onClick={() => void resource.refresh()}>Retry</Button>
-        </InlineNotice>
-      ) : !resource.data ? (
-        <Skeleton />
-      ) : resource.data.length ? (
-        <div className="appointment-groups">{([
-          ["Needs action", resource.data.filter(a=>a.state==="PendingConfirmation" || (clinician && a.call_state==="Ended" && a.documentation_state!=="Finalized"))],
-          ["In progress", resource.data.filter(a=>a.call_state==="Open")],
-          ["Upcoming", resource.data.filter(a=>a.state==="Booked" && a.call_state!=="Open" && a.call_state!=="Ended" && new Date(a.start).getTime()>=Date.now())],
-          ["Past", resource.data.filter(a=>["Completed","Cancelled","Expired","NoShow"].includes(a.state) || a.call_state==="Ended" || (a.state==="Booked" && new Date(a.end).getTime()<Date.now()))],
-        ] as [string,typeof resource.data][]).filter(([,rows])=>rows.length).map(([title,rows])=><section key={title}><h2>{title}</h2><div className="stack">{rows.map(a=><AppointmentCard key={a.id} appointment={a} base={base} />)}</div></section>)}</div>
-      ) : (
-        <EmptyState title="No appointments yet.">
-          Booked sessions will appear here.
-        </EmptyState>
-      )}
-    </>
-  );
+  const [search,setSearch]=useSearchParams();
+  const candidate=search.get("view");
+  const view:AppointmentView = ["all","upcoming","attention","completed","cancelled"].includes(candidate||"") ? candidate as AppointmentView : "upcoming";
+  const setView=(next:AppointmentView)=>{const params=new URLSearchParams(search);params.set("view",next);setSearch(params,{replace:true});};
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 60000); return () => clearInterval(timer); }, []);
+  const views: [AppointmentView,string][] = [["upcoming","Upcoming"],["attention",clinician?"Needs action":"Awaiting confirmation"],["completed","Completed"],["cancelled","Cancelled"],["all","All appointments"]];
+  const visible = resource.data ? appointmentsForView(resource.data,view,clinician,now) : [];
+  const viewStrip = useRef<HTMLElement>(null);
+  useEffect(()=>{
+    const strip=viewStrip.current;
+    if(!strip)return;
+    const revealSelected=()=>{
+      const selected=strip.querySelector<HTMLElement>('[aria-pressed="true"]');
+      if(!selected)return;
+      const bounds=strip.getBoundingClientRect(),target=selected.getBoundingClientRect();
+      if(target.left<bounds.left||target.right>bounds.right){
+        strip.scrollLeft+=target.left-bounds.left-(bounds.width-target.width)/2;
+      }
+    };
+    revealSelected();
+    const observer=new ResizeObserver(revealSelected);
+    observer.observe(strip);
+    return()=>observer.disconnect();
+  },[view,resource.data,locale]);
+  return <><PageTitle title={w(clinician?"Appointments":"Your appointments")} description={w("Upcoming care and past conversations, clearly separated.")} />
+    {resource.error ? <InlineNotice tone="danger">{w("Appointments couldn’t be loaded.")} <Button onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice> : !resource.data ? <Skeleton/> : <>
+      <nav ref={viewStrip} className="appointment-view-switch" aria-label={w("Appointment views")}>{views.map(([value,label])=><button type="button" key={value} aria-pressed={view===value} onClick={()=>setView(value)}>{w(label)} <span>{appointmentsForView(resource.data!,value,clinician,now).length}</span></button>)}</nav>
+      {visible.length ? <div className="appointment-groups">{appointmentDisplayGroups(visible,view,clinician,now,locale).map(([title,rows])=><section key={title}><h2>{w(!clinician&&title==="Needs action"?"Awaiting confirmation":title)}</h2><div className="stack">{rows.map(a=><AppointmentCard key={a.id} appointment={a} base={base} view={view}/>)}</div></section>)}</div> : <EmptyState title={w(resource.data.length?"No appointments in this view.":"No appointments yet.")}><p>{w(resource.data.length?"Choose another view to find your conversations.":"Booked sessions will appear here.")}</p>{view!=="all"&&resource.data.length>0&&<Button variant="secondary" onClick={()=>setView("all")}>{w("View all appointments")}</Button>}{!clinician&&resource.data.length===0&&<Link className="button secondary" to="/patient/discovery">{w("Find care")}</Link>}</EmptyState>}
+    </>}
+  </>;
 }
+
 export function BookingLink() {
   const { token = "" } = useParams();
   const load = useCallback(() => journeyApi.resolveBookingLink(token), [token]);
@@ -289,22 +305,25 @@ export function BookingLink() {
 }
 
 export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverride?: string; bookingLinkToken?: string }) {
+  const { w } = useLocale();
   const route = useParams();
   const offering = offeringOverride || route.offering;
   const { session } = useSession();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState("");
+  const [calendarFrom, setCalendarFrom] = useState("");
   const [displayZone, setDisplayZone] = useState("Africa/Addis_Ababa");
   const load = useCallback(async () => {
     const all = await journeyApi.discover();
     const today = new Intl.DateTimeFormat("en-CA", { timeZone: displayZone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     return {
       offer: all.find((o) => o.id === offering),
-      calendar: await journeyApi.calendar(offering || "", selectedDate || today, displayZone),
+      calendar: await journeyApi.calendar(offering || "", calendarFrom || today, displayZone),
     };
-  }, [offering, selectedDate, displayZone]);
+  }, [offering, calendarFrom, displayZone]);
   const { data, error, refresh } = useResource(load);
   const action = useAction();
+  const [adultConsent,setAdultConsent]=useState(false);
   const [step, setStep] = useState(0);
   const [start, setStart] = useState("");
   const [request, setRequest] = useState("");
@@ -313,6 +332,18 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
     history: !!session?.profile?.share_history,
   });
   const [preview, setPreview] = useState<Disclosure | null>(null);
+  const [previewError,setPreviewError]=useState(false);
+  const wallet=useResource(journeyApi.wallet);
+  useEffect(()=>{
+    if(step!==1||!request.trim()) return;
+    let active=true;
+    setPreviewError(false);
+    const timer=setTimeout(()=>{
+      void journeyApi.preview(request,sharing).then(result=>{if(active)setPreview(result.disclosure);})
+        .catch(()=>{if(active)setPreviewError(true);});
+    },300);
+    return()=>{active=false;clearTimeout(timer);};
+  },[request,sharing,step]);
   const [submission, setSubmission] = useState<{
     key: string;
     fingerprint: string;
@@ -328,7 +359,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
     return <EmptyState title="This service is no longer available." />;
   const offer: Offer = data.offer;
   return (
-    <div className="booking-layout">
+    <div className={step === 1 ? "booking-sharing-flow" : "reference-booking"} data-tour-unsaved={Boolean(start||request)||undefined}>
       <section className="guided-content">
         <Link className="text-link" to="/patient/discovery">
           Back to Find care
@@ -346,15 +377,12 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
         )}
         {step === 0 && (
           <>
-            <p>Choose an open appointment time. Session length: <strong>{data.calendar.duration} minutes</strong>. Times use your selected timezone.</p>
+            <section className="booking-selection-panel"><div className="booking-selection-heading"><div className="avatar" aria-hidden="true">{offer.display_name.slice(0,1)}</div><div><span className="verified">{w("Approved for this service")}</span><h2>{offer.display_name}</h2><p>{offer.label} · {offer.minutes} {w("minutes")} · ETB {money(offer.price)}</p></div></div>
             <Select label="Show times in timezone" value={displayZone} onChange={e=>{setDisplayZone(e.target.value);setStart("");setSelectedDate("");}}><option value="Africa/Addis_Ababa">Addis Ababa (EAT)</option><option value="UTC">UTC</option><option value="Africa/Nairobi">Nairobi (EAT)</option></Select>
-            <div className="booking-dates" aria-label="Available dates">
-              {data.calendar.days.filter(d=>d.slots.length).map(d=><button type="button" key={d.date} className={selectedDate===d.date?"date-chip selected":"date-chip"} onClick={()=>{setSelectedDate(d.date);setStart("");}}><strong>{new Date(d.date+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",timeZone:displayZone})}</strong><span>{d.date}</span></button>)}
-            </div>
-            {data.calendar.days.filter(d=>d.slots.length).length===0&&<InlineNotice>No open times are available in this booking window.</InlineNotice>}
-            <div className="booking-times" role="group" aria-label="Available times">
-              {(data.calendar.days.find(d=>d.date===(selectedDate||data.calendar.days.find(x=>x.slots.length)?.date))?.slots||[]).map(slot=><Button key={slot.start} variant={start===slot.start?"primary":"secondary"} onClick={()=>setStart(slot.start)}>{slot.local_time}</Button>)}
-            </div>
+            <BookingCalendar days={data.calendar.days} fromDate={calendarFrom || data.calendar.days[0]?.date || new Date().toISOString().slice(0,10)} selectedDate={selectedDate} selectedStart={start} duration={offer.minutes}
+              onMonth={date => { setCalendarFrom(date); setSelectedDate(""); setStart(""); }}
+              onDate={date => { setSelectedDate(date); setStart(""); }} onStart={setStart} />
+            </section>
             {start&&<p className="supporting">Selected: {new Date(start).toLocaleString(undefined,{dateStyle:"full",timeStyle:"short",timeZone:displayZone})} · {displayZone}</p>}
             <Button disabled={!start} onClick={() => setStep(1)}>
               Continue
@@ -362,7 +390,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
           </>
         )}
         {step === 1 && (
-          <>
+          <section className="booking-sharing-panel">
             <label className="field">
               What would you like to talk about?
               <textarea
@@ -376,8 +404,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
               />
             </label>
             <p className="supporting">
-              Include only what helps this conversation. Use synthetic
-              information in this demo.
+              Include only what helps this conversation. Identifying details you type will be visible to your clinician.
             </p>
             <Checkbox
               label="Share my preferred name"
@@ -399,6 +426,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
               These choices apply to this booking. Your profile defaults stay
               the same.
             </p>
+            {request.trim()&&(previewError?<InlineNotice tone="danger">{w("The disclosure preview could not be loaded. Try Preview and continue again.")}</InlineNotice>:preview?<DisclosurePreview disclosure={preview}/>:<Skeleton/>)}
             <Button
               loading={action.busy}
               disabled={!request.trim()}
@@ -412,17 +440,23 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
             >
               Preview and continue
             </Button>
-          </>
+          </section>
         )}
-        {step === 2 && preview && (
-          <>
-            <DisclosurePreview disclosure={preview} />
-            <p>
-              ETB {money(offer.price)} will be reserved from your balance. Under this demonstration policy, cancelling before the session starts releases the full reservation.
-            </p>
-            <Button
-              loading={action.busy}
-              onClick={() =>
+        {step === 2 && preview && offer.participant_structure === 'couple' && <Card>
+          <h2>{w("Invite the other adult")}</h2><p>{w("Each adult chooses what to share. One participant pays the total session price after both consent.")}</p>
+          <DisclosurePreview disclosure={preview}/>
+          <Checkbox label={w("I am 18 or older and freely consent to this shared consultation.")} checked={adultConsent} onChange={event=>setAdultConsent(event.target.checked)}/>
+          <Button disabled={!adultConsent||action.busy} loading={action.busy} onClick={()=>void action.run(async()=>{
+            const payload={offering:offer.id,start,request_text:request,sharing,expected_disclosure:preview,adult_confirmed:adultConsent,booked_timezone:displayZone};
+            const fingerprint=JSON.stringify(payload);const key=submission?.fingerprint===fingerprint?submission.key:crypto.randomUUID();setSubmission({key,fingerprint});
+            const result=await journeyApi.coupleInvite({...payload,retry_key:key});
+            navigate('/patient/couples/'+result.id,{state:{coupleToken:result.token}});
+          },'')}>{w("Create invitation link")}</Button>
+          <p className="supporting">{w("The invitation does not reserve a time or charge either wallet.")}</p>
+        </Card>}
+        {step === 2 && preview && offer.participant_structure !== 'couple' && (
+          <BookingReview offer={offer} start={start} zone={displayZone} format={data.calendar.format} disclosure={preview} balance={wallet.data} balanceError={Boolean(wallet.error)} onRetry={()=>void wallet.refresh()} busy={action.busy}
+              onConfirm={() =>
                 void action.run(async () => {
                   const payload = {
                     offering: offer.id,
@@ -440,18 +474,14 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
                       ? submission.key
                       : crypto.randomUUID();
                   setSubmission({ key, fingerprint });
-                  await journeyApi.book({
+                  const booked = await journeyApi.book({
                     ...payload,
                     ...(bookingLinkToken ? { booking_link_token: bookingLinkToken } : {}),
                     retry_key: key,
                   });
-                  navigate("/patient/appointments");
+                  navigate("/patient/booked/"+booked.id);
                 }, "")
-              }
-            >
-              Confirm session · ETB {money(offer.price)}
-            </Button>
-          </>
+              }/>
         )}
         {step > 0 && (
           <Button
@@ -463,65 +493,31 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
           </Button>
         )}
       </section>
-      <BookingSummary offer={offer} start={start} />
     </div>
   );
 }
 export function Payments() {
   const { w } = useLocale();
   const wallet = useResource(journeyApi.walletActivity);
-  const action = useAction();
-  const [retryKey, setRetryKey] = useState(() => crypto.randomUUID());
+  const [fundsOpen, setFundsOpen] = useState(false);
   return (
     <>
       <PageTitle
-        title="Payments"
-        description="Your available balance, reservations and payment activity."
+        title={w("Your balance")}
+        description={w("Your funds, clearly separated.")}
       />
-      {wallet.data && (
-        <div className="balance-grid">
-          <Card>
-            <p>Available balance</p>
-            <h2>ETB {money(wallet.data.available)}</h2>
-          </Card>
-          <Card>
-            <p>Reserved for appointments</p>
-            <h2>ETB {money(wallet.data.reserved)}</h2>
-          </Card>
-        </div>
-      )}
+      <div className="patient-payments-layout"><section>
+      {wallet.data && <section className="reference-wallet"><span>{w("Available to spend")}</span><strong>ETB {money(wallet.data.available)}</strong><Button variant="secondary" onClick={() => setFundsOpen(true)}>{w("Add funds")}</Button><p className="wallet-reserved-total">{w("Reserved for appointments")} · ETB {money(wallet.data.reserved)}</p></section>}
       {wallet.error && (
         <InlineNotice tone="danger">
           Balance unavailable.{" "}
           <Button onClick={() => void wallet.refresh()}>Retry</Button>
         </InlineNotice>
       )}
-      {action.error && (
-        <InlineNotice tone="danger">{action.error}</InlineNotice>
-      )}
-      <Button
-        loading={action.busy}
-        onClick={() =>
-          void action.run(async () => {
-            await api(
-              "simulated_deposit",
-              { amount: 10000, retry_key: retryKey },
-              true,
-            );
-            setRetryKey(crypto.randomUUID());
-            await wallet.refresh();
-          }, "ETB 100 added to your balance.")
-        }
-      >
-        Add funds · ETB 100
-      </Button>
-      {action.success && (
-        <InlineNotice tone="success">{action.success}</InlineNotice>
-      )}
-      <p className="supporting">
-        This review environment records demonstration funds and reservations. No external payment or refund is processed.
-      </p>
-      {wallet.data?.activity?.length ? <section><h2>Payment activity</h2><ul className="payment-activity">{wallet.data.activity.map((item,i)=><li key={item.activity_id||i}><span>{item.kind}</span><strong>ETB {money(item.amount)}</strong><time>{date(item.created)}</time>{item.activity_id&&<Link className="text-link" to={'/patient/payments/transactions/'+encodeURIComponent(item.activity_id)}>{w('Transaction details')}</Link>}</li>)}</ul></section>:<EmptyState title="No payment activity yet." />}
+      <AddFundsDialog open={fundsOpen} close={() => setFundsOpen(false)} refresh={wallet.refresh} />
+      </section><section className="patient-dashboard-panel">
+      {wallet.data?.activity?.length ? <section><h2>{w("Recent activity")}</h2><PaymentActivity items={wallet.data.activity}/></section>:<EmptyState title="No payment activity yet." />}
+      </section></div>
     </>
   );
 }

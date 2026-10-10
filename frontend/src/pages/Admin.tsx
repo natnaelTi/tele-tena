@@ -1,3 +1,4 @@
+import "./AdminWorkspace.css";
 import { useCallback, useState } from "react";
 import { api } from "../api";
 import { journeyApi } from "../journey-api";
@@ -5,6 +6,7 @@ import { PageTitle, date, money } from "../components/Domain";
 import {
   Button,
   Card,
+  Dialog,
   Checkbox,
   EmptyState,
   InlineNotice,
@@ -16,68 +18,55 @@ import {
 import { useAction } from "../hooks/useAction";
 import { useResource } from "../hooks/useResource";
 import { useLocale } from "../hooks/useLocale";
+import { Link } from "react-router-dom";
+import { ClipboardCheck, Layers, ShieldCheck, Building2, ArrowRight } from "lucide-react";
+export function AdminOverview() {
+  const {w}=useLocale();
+  const applications=useResource(journeyApi.applications);
+  const pending=applications.data?.filter(item=>item.status==='Pending');
+  return <>
+    <PageTitle title={w("Review workspace")} description={w("Focus on the decisions that need a person.")}/>
+    {applications.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void applications.refresh()}>{w("Retry")}</Button></InlineNotice>:!applications.data?<Skeleton/>:<>
+      <div className="review-overview-metrics">{[
+        [w("Applications"),applications.data.length,w("Submitted professional applications")],
+        [w("Awaiting decision"),pending?.length??0,w("Manual application review")],
+        [w("Evidence ready"),pending?.filter(item=>item.evidence_complete).length??0,w("Received evidence still requires verification")],
+      ].map(([label,count,detail])=><section key={label}><span>{label}</span><strong>{count}</strong><p>{detail}</p></section>)}</div>
+      <div className="review-overview-layout"><section className="review-overview-panel"><h2>{w("Needs your review")}</h2>
+        {pending?.length?pending.slice(0,5).map(item=><Link className="review-overview-row" key={item.user} to="/admin/applications"><ClipboardCheck size={24}/><div><strong>{item.display_name||w("Clinician application")}</strong><p>{item.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p></div><StatusBadge>{w(item.evidence_complete?"Ready for review":"Needs evidence")}</StatusBadge></Link>):<EmptyState title={w("No applications awaiting a decision.")}/>}
+        <Link className="text-link" to="/admin/applications">{w("View all applications")} <ArrowRight size={16}/></Link>
+      </section><section className="review-overview-panel"><h2>{w("Operations")}</h2>{[
+        ["/admin/scopes",w("Service scopes"),w("Review each service authorization separately"),ShieldCheck],
+        ["/admin/services",w("Service catalog"),w("Review definitions and operational requirements"),Layers],
+        ["/admin/clinics",w("Clinic affiliations"),w("Affiliation is separate from clinical approval"),Building2],
+      ].map(([route,title,detail,Icon])=>{const RowIcon=Icon as typeof ShieldCheck;return <Link className="review-overview-row" to={route as string} key={route as string}><RowIcon size={24}/><div><strong>{title as string}</strong><p>{detail as string}</p></div></Link>;})}</section></div>
+    </>}
+  </>;
+}
 export function Applications() {
-  const resource = useResource(journeyApi.applications);
-  const action = useAction();
-  return (
-    <>
-      <PageTitle
-        title="Application review"
-        description="Review professional evidence before granting approval. Approval does not grant access to patient records."
-      />
-      {action.error && (
-        <InlineNotice tone="danger">{action.error}</InlineNotice>
-      )}
-      {resource.error && (
-        <InlineNotice tone="danger">
-          The queue could not be loaded.{" "}
-          <Button onClick={() => void resource.refresh()}>Retry</Button>
-        </InlineNotice>
-      )}
-      {!resource.data && !resource.error ? (
-        <Skeleton />
-      ) : resource.data?.length ? (
-        resource.data.map((item) => (
-          <Card key={item.user}>
-            <StatusBadge>{item.status}</StatusBadge>
-            <h2>{item.display_name || "Clinician application"}</h2>
-            <p className="supporting">Application reference · {item.user}{item.submitted_at?` · Submitted ${new Date(item.submitted_at).toLocaleDateString()}`:" · Submission date unavailable"}</p>
-            <p className="prewrap">{item.statement}</p>
-            <div className="application-evidence"><h3>Requested service scopes</h3><p>{item.requested_service_labels?.length?item.requested_service_labels.join(", "):"No requested scopes recorded"}</p><p>Evidence: {item.evidence_complete?"Complete":"Incomplete"} · Resume: {item.resume_uploaded?"Uploaded":"Not uploaded"}</p>{item.resume_uploaded&&<Button variant="secondary" onClick={async()=>{try{const response=await fetch(`/api/method/tele_tena.api.presentation.download_resume?clinician=${encodeURIComponent(item.user)}`,{credentials:"same-origin",cache:"no-store"});if(!response.ok)throw new Error();const blob=await response.blob();const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="clinician-resume.pdf";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch{window.alert("Resume could not be opened. Check your reviewer access and try again.");}}}>Open resume</Button>}</div>
-            <div className="actions">
-              <Button
-                disabled={action.busy || item.status === "Approved"}
-                onClick={() =>
-                  void action.run(async () => {
-                    await journeyApi.reviewApplication(item.user, "Approved");
-                    await resource.refresh();
-                  })
-                }
-              >
-                Approve application
-              </Button>
-              <Button
-                variant="secondary"
-                disabled={action.busy}
-                onClick={() =>
-                  void action.run(async () => {
-                    await journeyApi.reviewApplication(item.user, "Rejected");
-                    await resource.refresh();
-                  })
-                }
-              >
-                Reject application
-              </Button>
-            </div>
-          </Card>
-        ))
-      ) : (
-        <EmptyState title="No applications to review.">
-          Submitted applications will appear here.
-        </EmptyState>
-      )}
-    </>
-  );
+  const {w}=useLocale();
+  const resource=useResource(journeyApi.applications);
+  const action=useAction();
+  const [query,setQuery]=useState("");
+  const [status,setStatus]=useState("");
+  const [selectedUser,setSelectedUser]=useState<string|null>(null);
+  const [resumeError,setResumeError]=useState("");
+  const selected=resource.data?.find(item=>item.user===selectedUser);
+  const shown=resource.data?.filter(item=>(!status||item.status===status)&&(!query||item.display_name?.toLocaleLowerCase().includes(query.toLocaleLowerCase())));
+  const review=(user:string)=>{setResumeError("");setSelectedUser(user);};
+  return <>
+    <PageTitle title={w("Clinician applications")} description={w("Review people by name, with their requested scopes visible.")}/>
+    <div className="review-queue-filters"><TextField label={w("Search clinician name")} placeholder={w("Search clinician name")} value={query} onChange={event=>setQuery(event.target.value)}/><Select label={w("Application status")} value={status} onChange={event=>setStatus(event.target.value)}><option value="">{w("All statuses")}</option>{["Pending","Approved","Rejected"].map(value=><option key={value} value={value}>{w(value)}</option>)}</Select></div>
+    {resource.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice>:!resource.data?<Skeleton/>:shown?.length?<>
+      <div className="table-scroll review-queue-table"><table><thead><tr>{["Clinician","Application status","Requested services","Submitted","Evidence","Action"].map(label=><th key={label}>{w(label)}</th>)}</tr></thead><tbody>{shown.map(item=><tr key={item.user}><td><strong>{item.display_name||w("Clinician application")}</strong></td><td><StatusBadge>{w(item.status)}</StatusBadge></td><td>{item.requested_service_labels?.join(", ")||w("Not recorded")}</td><td>{item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w("Date unavailable")}</td><td>{w(item.evidence_complete?"Complete":"Incomplete")}</td><td><Button variant="quiet" onClick={()=>review(item.user)}>{w("Review")}</Button></td></tr>)}</tbody></table></div>
+      <div className="review-queue-cards">{shown.map(item=><Card key={item.user}><header><h2>{item.display_name||w("Clinician application")}</h2><StatusBadge>{w(item.status)}</StatusBadge></header><p>{item.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p><p className="supporting">{w("Evidence")}: {w(item.evidence_complete?"Complete":"Incomplete")}</p><Button variant="secondary" onClick={()=>review(item.user)}>{w("Review")}</Button></Card>)}</div>
+    </>:<EmptyState title={w("No applications to review.")}>{w("Submitted applications will appear here.")}</EmptyState>}
+    {selected&&<Dialog open onOpenChange={open=>{if(!open&&!action.busy)setSelectedUser(null);}} title={selected.display_name||w("Clinician application")} description={w("Review the application and private evidence. Decide service scopes separately.")} className="application-review-dialog"><StatusBadge>{w(selected.status)}</StatusBadge><p className="supporting">{w("Contact / account reference")}: {selected.user}</p><h3>{w("Professional statement")}</h3><p className="prewrap">{selected.statement}</p><h3>{w("Requested service scopes")}</h3><p>{selected.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p><p>{w("Evidence")}: {w(selected.evidence_complete?"Complete":"Incomplete")} · {w("Resume")}: {w(selected.resume_uploaded?"Uploaded":"Not uploaded")}</p>
+      {selected.resume_uploaded&&<Button variant="secondary" onClick={async()=>{setResumeError("");try{const response=await fetch(`/api/method/tele_tena.api.presentation.download_resume?clinician=${encodeURIComponent(selected.user)}`,{credentials:"same-origin",cache:"no-store"});if(!response.ok)throw new Error();const blob=await response.blob();const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="clinician-resume.pdf";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch{setResumeError(w("Resume could not be opened. Check your reviewer access and try again."));}}}>{w("Open resume")}</Button>}
+      {resumeError&&<InlineNotice tone="danger">{resumeError}</InlineNotice>}
+      <InlineNotice>{w("Application approval does not approve every requested service. Review each scope and its evidence separately.")}</InlineNotice><div className="actions"><Button loading={action.busy} disabled={selected.status==='Approved'} onClick={()=>void action.run(async()=>{await journeyApi.reviewApplication(selected.user,'Approved');await resource.refresh();})}>{w("Approve application")}</Button><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.reviewApplication(selected.user,'Rejected');await resource.refresh();})}>{w("Reject application")}</Button></div>{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
+    </Dialog>}
+  </>;
 }
 export function Scopes() {
   const applications = useResource(journeyApi.applications);

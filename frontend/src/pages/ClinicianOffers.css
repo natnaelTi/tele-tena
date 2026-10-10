@@ -1,0 +1,10 @@
+.offers-view-tabs { margin:0 0 24px; }
+.private-offers-table { background:white; border:1px solid var(--border); border-radius:16px; }
+.private-offers-table p { font-size:14px; color:var(--muted); margin:6px 0 0; }
+.private-offers-cards { display:none; }
+.private-offer-detail { max-width:800px; padding:28px; border:1px solid var(--border); border-radius:16px; background:white; }
+.private-offer-detail header,.private-offers-cards header { display:flex; gap:16px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+.private-offer-detail h2 { font-size:24px; margin:0; }
+.private-offer-detail .request-summary-facts { margin-bottom:24px; }
+.offers-pagination { margin:24px 0; }
+@media(max-width:700px) { .private-offers-table { display:none; } .private-offers-cards { display:grid; gap:16px; } .private-offers-cards article { padding:20px; background:white; border:1px solid var(--border); border-radius:16px; } .private-offers-cards h2 { font-size:20px; margin:0; } .private-offers-cards .text-link { display:flex; margin-top:20px; } .private-offer-detail { padding:20px; } }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, LockKeyhole } from "lucide-react";
 import { ApiError, api, phoneAuth, setCsrf, signIn } from "../api";
 import {
@@ -9,6 +9,7 @@ import {
   PhoneField,
   TextField,
 } from "../components/ui";
+import { pendingCareQuery } from "../care-intent";
 import { destination, useSession } from "../hooks/useSession";
 import { useLocale } from "../hooks/useLocale";
 type SignInOptions = { phone_otp: boolean; email_otp: boolean; patient_registration: boolean; clinician_registration: boolean };
@@ -100,6 +101,9 @@ export default function SignIn() {
     const current = await refresh();
     const next = params.get("next") || "";
     const inviteToken = (routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken || "";
+    const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken||"";
+    const safeCoupleReturn=next==="/couple-invitation"&&/^[A-Za-z0-9_-]{40,64}$/.test(coupleToken);
+    if(safeCoupleReturn){navigate(current?.profile?.kind==="patient"?next:"/onboarding?intent=patient",{replace:true,state:{coupleInvitationToken:coupleToken}});return;}
     const safeBookingReturn = /^\/patient\/book-link\/[a-f0-9]{64}$/.test(next);
     const safeRelationshipReturn = next === "/relationship-invitation" && /^[A-Za-z0-9_-]{40,64}$/.test(inviteToken);
     if (inviteToken && !current?.profile) {
@@ -109,7 +113,8 @@ export default function SignIn() {
     navigate(
       (safeBookingReturn || safeRelationshipReturn || (next === "/patient/discovery" && current?.profile?.kind === "patient")) ? next : !current?.profile && params.get("intent") === "clinician"
         ? "/onboarding?intent=clinician"
-        : destination(current),
+        : current?.profile?.kind === "patient" && pendingCareQuery()
+          ? "/patient/discovery" : destination(current),
       { replace: true, state: routeLocation.state },
     );
   }
@@ -123,14 +128,14 @@ export default function SignIn() {
       <h1>
         {challenge
           ? "Check your " + (channel === "phone" ? "phone" : "email")
-          : w("Welcome to TeleTena")}
+          : w(channel === "phone" ? "What’s your number?" : "Sign in with email")}
       </h1>
       <p className="auth-description">
         {challenge
           ? "Enter the six-digit code sent to " + masked + "."
         : passwordMode
             ? t("emailPasswordPrompt")
-            : "A small step toward the support you’re looking for."}
+            : w("We’ll send a code to sign you in or get you started.")}
       </p>
       {session && (
         <p>
@@ -143,6 +148,8 @@ export default function SignIn() {
       {options && channel === "phone" && !options.phone_otp && !error && (
         <InlineNotice tone="info">{t("phoneAccessUnavailable")}</InlineNotice>
       )}
+      {options && channel === "email" && !passwordMode && !options.email_otp && <InlineNotice tone="info">{w("Email codes are unavailable on this site. Choose password sign-in if you already have an account.")}</InlineNotice>}
+      {params.get("mode") === "register" && options && !(params.get("intent") === "clinician" ? options.clinician_registration : options.patient_registration) && <InlineNotice tone="info">{w("New registration is unavailable on this site. Existing invited users can still sign in.")}</InlineNotice>}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -254,7 +261,7 @@ export default function SignIn() {
             variant="quiet"
             onClick={() => {
               setChannel("email");
-              setPasswordMode(!options?.email_otp);
+              setPasswordMode(false);
               setContact("");
               setPassword("");
               setError("");
@@ -263,7 +270,7 @@ export default function SignIn() {
           >
             {w("Use email instead")}
           </Button>}
-          {channel === "email" && options?.email_otp && (
+          {channel === "email" && (
             <Button
               variant="quiet"
               onClick={() => setPasswordMode(!passwordMode)}
@@ -275,6 +282,11 @@ export default function SignIn() {
           )}
         </div>
       )}
+      {!challenge && <div className="auth-registration">
+        <p>{w("New to TeleTena?")}</p>
+        <Link to="/sign-in?intent=patient&mode=register">{w("Create an account")}</Link>
+        <Link to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}</Link>
+      </div>}
       <p className="auth-privacy">
         <LockKeyhole size={16} />
         Your contact is verified before you set up your profile.

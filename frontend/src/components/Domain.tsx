@@ -1,12 +1,18 @@
+import type { AppointmentView } from "../appointment-groups";
+import { appointmentStatus } from "../appointment-status";
+import { useRef, useState } from "react";
+import { ClinicianPreview } from "./ClinicianPreview";
+import { useLocale } from "../hooks/useLocale";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  CalendarDays,
-  CheckCircle2,
-  Clock3,
+  Video,
+  Headphones,
+  FileText,
   ShieldCheck,
+  Languages,
 } from "lucide-react";
-import { Card, StatusBadge } from "./ui";
+import { Button, Card, StatusBadge } from "./ui";
 import type { Appointment, Disclosure, Offer } from "../journey-api";
 export const money = (minor: number) =>
   `${Math.floor(minor / 100)}.${String(minor % 100).padStart(2, "0")}`;
@@ -40,75 +46,67 @@ export function PageTitle({
   );
 }
 export function ClinicianCard({ offer }: { offer: Offer }) {
-  return (
-    <Card className="clinician-card">
-      <div className="clinician-identity">
-        <div className="avatar">
-          {offer.display_name.slice(0, 1).toUpperCase()}
-        </div>
-        <div>
-          <h3>{offer.display_name}</h3>
-          <Link className="text-link" to={'/patient/clinicians/'+offer.clinician_id}>View profile</Link>
-          <span className="verified">
-            <CheckCircle2 size={16} />
-            Approved for this service
-          </span>
-        </div>
-      </div>
-      <h4>{offer.label}</h4>
-      <p className="supporting">
-        <Clock3 size={16} />
-        {offer.minutes} minutes · Online consultation
-      </p>
-      <div className="card-bottom">
-        <div>
-          <strong>ETB {money(offer.price)}</strong>
-            <span className="supporting">per session</span>
-        </div>
-        <Link className="button secondary" to={"/patient/book/" + offer.id}>
-          Choose a time
-          <ArrowRight size={18} />
-        </Link>
-      </div>
+  const { w } = useLocale();
+  const [preview, setPreview] = useState(false);
+  const trigger = useRef<HTMLButtonElement | null>(null);
+  return <>
+    <Card className="clinician-card reference-clinician-card">
+      <div className="clinician-body"><div className="avatar" aria-hidden="true">{offer.display_name.slice(0, 1).toUpperCase()}</div><div className="clinician-card-copy">
+        <h3>{offer.display_name}</h3><p>{offer.label}</p>
+        <span className="verified"><ShieldCheck size={16} />{w("Approved for this service")}</span>
+        {offer.description && <p className="clinician-description">{offer.description}</p>}
+        <div className="clinician-facts"><span><Languages size={16} aria-hidden="true" />{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Care language not listed")}</span><span>{offer.consultation_format === 'audio' ? <Headphones size={16} aria-hidden="true" /> : <Video size={16} aria-hidden="true" />}{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')}</span></div>
+      </div></div>
+      <div className="card-actions"><div><strong>ETB {money(offer.price)}</strong><small>{offer.minutes} {w("minutes")} · {w("per session")}</small></div><div className="actions"><Button variant="quiet" onClick={event => { trigger.current = event.currentTarget; setPreview(true); }}>{w("View profile")}</Button><Link className="button" to={"/patient/book/" + offer.id}>{w("Choose a time")}</Link></div></div>
     </Card>
-  );
+    {preview && <ClinicianPreview offer={offer} close={() => { setPreview(false); requestAnimationFrame(() => trigger.current?.focus()); }} />}
+  </>;
+}
+/** Compact C01 upcoming-session row; status remains server-derived. */
+export function HomeAppointmentPreview({ appointment }: { appointment: Appointment }) {
+  const { w } = useLocale();
+  const status = appointmentStatus(appointment, false);
+  const href = "/patient/consultations/" + appointment.id;
+  return <div className="home-appointment-preview">
+    <div className="home-appointment-row"><span className="appointment-icon" aria-hidden="true">{appointment.consultation_format === "audio" ? <Headphones size={22}/> : <Video size={22}/>}</span><div><h3><Link to={href}>{appointment.display_identity || appointment.service_label}</Link></h3><p>{date(appointment.start, appointment.timezone)} · {w(appointment.consultation_format === "audio" ? "Audio" : "Video")}</p></div><StatusBadge tone={status.tone}>{w(status.label)}</StatusBadge></div>
+    <div className="home-appointment-actions"><Link className="button primary" to={href}>{w("View appointment")}</Link><Link className="button secondary" to="/patient/appointments">{w("All appointments")}</Link></div>
+  </div>;
+}
+/** F01 compact schedule row, using the same authorized snapshot/status as details. */
+export function ScheduleAppointmentRow({ appointment }: { appointment: Appointment }) {
+  const { w, locale } = useLocale();
+  const status = appointmentStatus(appointment, true);
+  const instant = new Date(appointment.start);
+  const time = new Intl.DateTimeFormat(locale, {
+    hour: "2-digit", minute: "2-digit", timeZone: appointment.timezone || timezone,
+  }).format(instant);
+  return <div className="schedule-appointment-row">
+    <span className="schedule-appointment-icon" aria-hidden="true">{appointment.call_state === "Ended" ? <FileText size={20}/> : appointment.consultation_format === "audio" ? <Headphones size={20}/> : <Video size={20}/>}</span>
+    <div className="schedule-appointment-copy">
+      <Link to={"/clinician/consultations/" + appointment.id}>{time} · {appointment.display_identity || w("Private patient")}</Link>
+      <p>{appointment.service_label} · {w(appointment.consultation_format === "audio" ? "Audio" : "Video")}</p>
+      <p><time dateTime={appointment.start}>{new Intl.DateTimeFormat(locale, {month:"short",day:"numeric",timeZone:appointment.timezone || timezone}).format(instant)}</time> · {appointment.timezone || timezone}</p>
+      {status.detail && <p>{w(status.detail)}</p>}
+    </div>
+    <StatusBadge tone={status.tone}>{w(status.label)}</StatusBadge>
+  </div>;
 }
 export function AppointmentCard({
   appointment,
   base,
+  view,
 }: {
   appointment: Appointment;
   base: string;
+  view?: AppointmentView;
 }) {
-  const elapsed = new Date(appointment.end).getTime() < Date.now();
-  const clinician = base.startsWith("/clinician");
-  const stateLabel = appointment.state === "Completed" ? "Completed" : appointment.call_state === "Open" ? "In progress" : appointment.call_state === "Ended" ? "Call ended" : appointment.state === "Booked" ? elapsed ? "Past · outcome not recorded" : "Upcoming" : appointment.state === "PendingConfirmation" ? "Needs confirmation" : appointment.state;
-  return (
-    <Card className="appointment-card">
-      <div className="appointment-icon">
-        <CalendarDays size={24} />
-      </div>
-      <div className="appointment-details">
-        <StatusBadge tone={appointment.state === "Cancelled" || appointment.state === "Expired" ? "danger" : appointment.state === "PendingConfirmation" ? "warning" : appointment.state === "Completed" ? "success" : "neutral"}>{stateLabel}</StatusBadge>
-        {appointment.call_state === "Ended" && appointment.state === "Completed" && <StatusBadge tone="neutral">Call ended</StatusBadge>}
-        {appointment.call_state === "Ended" && appointment.documentation_state !== "Finalized" && <StatusBadge tone={clinician?"warning":"neutral"}>{clinician?"Notes pending":"Summary being prepared"}</StatusBadge>}
-        <h3>{appointment.service_label}</h3>
-        <p>
-          {date(appointment.start,appointment.timezone)} · {appointment.minutes} booked minutes
-        </p>
-        <p className="supporting">
-          {(appointment.timezone || timezone)} · ETB {money(appointment.price)}
-        </p>
-      </div>
-      <Link
-        className="button secondary"
-        to={`${base}/consultations/${appointment.id}`}
-      >
-        View consultation
-        <ArrowRight size={18} />
-      </Link>
-    </Card>
-  );
+  const {w}=useLocale();
+  const presentation=appointmentStatus(appointment,base.startsWith("/clinician"));
+  return <Card className="appointment-card">
+    <div className="appointment-icon" aria-hidden="true">{appointment.state === "Completed" ? <FileText size={22}/> : appointment.consultation_format === "audio" ? <Headphones size={22}/> : <Video size={22}/>}</div>
+    <div className="appointment-details"><h3>{appointment.display_identity || appointment.service_label}</h3><p>{appointment.service_label} · {w(appointment.consultation_format === "audio" ? "Audio" : "Video")}</p><p className="supporting">{date(appointment.start,appointment.timezone)} · {appointment.minutes} {w("booked minutes")}</p><p className="supporting">{appointment.timezone || timezone} · ETB {money(appointment.price)}</p></div>
+    <div className="appointment-status-actions"><StatusBadge tone={presentation.tone}>{w(presentation.label)}</StatusBadge>{presentation.detail && <p className="supporting">{w(presentation.detail)}</p>}<Link className="button secondary" to={`${base}/consultations/${appointment.id}`} state={view?{appointmentView:view}:undefined}>{w("View consultation")}<ArrowRight size={18}/></Link></div>
+  </Card>;
 }
 export function DisclosurePreview({ disclosure }: { disclosure: Disclosure }) {
   return (
@@ -136,9 +134,11 @@ export function DisclosurePreview({ disclosure }: { disclosure: Disclosure }) {
 export function BookingSummary({
   offer,
   start,
+  displayTimezone,
 }: {
   offer: Offer;
   start?: string;
+  displayTimezone?: string;
 }) {
   return (
     <aside className="booking-summary">
@@ -156,9 +156,9 @@ export function BookingSummary({
           <>
             <dt>Time</dt>
             <dd>
-              {date(new Date(start).toISOString(), offer.schedule_timezone || timezone)}
+              {date(new Date(start).toISOString(), displayTimezone || offer.schedule_timezone || timezone)}
               <br />
-              {timezone}
+              {displayTimezone || offer.schedule_timezone || timezone}
             </dd>
           </>
         )}

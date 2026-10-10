@@ -1,140 +1,65 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  ArrowRight,
-  HeartHandshake,
-  MessageCircle,
-  ShieldCheck,
-  Sprout,
-} from "lucide-react";
-
+import { ArrowRight, CalendarDays, LockKeyhole, MessageCircle, Search, ShieldCheck, UserRound, Users } from "lucide-react";
+import { rememberCareQuery } from "../care-intent";
 import { useLocale } from "../hooks/useLocale";
+import "./Homepage.css";
+
+const tools = {
+  Schedule: ["Set hours that work for you.", "Recurring availability and date exceptions help patients book usable times.", "Preview availability", "/clinician/availability"],
+  Requests: ["Respond with a private offer.", "Review eligible requests, propose a fee and time, and track the patient’s response.", "Explore requests", "/clinician/requests"],
+  Earnings: ["Understand every balance.", "Track pending earnings, available funds and payout requests. Funds release follows completion and dispute rules.", "Explore earnings", "/clinician/earnings"],
+} as const;
 export default function Homepage() {
   const { w } = useLocale();
-  const navigate=useNavigate();
-  const [query,setQuery]=useState("");
-  const [tool,setTool]=useState("Schedule");
-  return (
-    <main>
-      <section className="dual-care-hero container">
-        <header><p className="eyebrow">MENTAL HEALTH & RELATIONSHIP CARE · ETHIOPIA</p><h1>Find support.<br/>Make time for care.</h1><p className="hero-intro">Private voice and video consultations with approved mental health and counseling professionals.</p></header>
-        <div className="care-entry-columns">
-          <section className="patient-care-entry"><p className="eyebrow">FOR PATIENTS</p><h2>Talk to someone who fits your needs.</h2><p>Choose your clinician, see the fee, and decide what you share. Browse directly or ask eligible clinicians for a private offer.</p>
-            <form onSubmit={e=>{e.preventDefault();navigate('/patient/discovery',{state:{careQuery:query}});}}><label htmlFor="landing-care-query">What would you like support with?</label><input id="landing-care-query" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Stress, relationships, feeling low…" required/><button className="button primary" type="submit">{w('Find care')}</button></form>
-            <div className="care-entry-chips">{['Work stress','Relationships','Anxiety'].map(text=><button type="button" key={text} onClick={()=>setQuery(text)}>{text}</button>)}</div>
-            <Link className="text-link" to="/patient/requests">Post a private request</Link><p className="supporting">Free to browse · Pay the agreed session fee · Adults 18+</p>
-          </section>
-          <section className="clinician-care-entry"><p className="eyebrow">FOR CLINICIANS</p><h2>Your practice. One connected workspace.</h2><p>Bring your patients, publish approved services, manage bookings, and respond to people looking for your expertise.</p>
-            <div className="care-tool-preview"><div className="care-entry-chips" aria-label="Explore clinician tools">{['Schedule','Requests','Earnings'].map(value=><button key={value} type="button" aria-pressed={tool===value} onClick={()=>setTool(value)}>{value}</button>)}</div>
-            <h3>{tool==='Schedule'?'Set hours that work for you.':tool==='Requests'?'Respond with a private offer.':'Understand every balance.'}</h3><p>{tool==='Schedule'?'Recurring availability and date exceptions help patients book usable times.':tool==='Requests'?'Review eligible requests, propose a fee and time, and track the patient’s response.':'Track pending earnings, available funds and payout requests. Funds release follows completion and dispute rules.'}</p></div>
-            <Link className="button primary" to="/sign-in?intent=clinician">Apply as a clinician</Link><Link className="text-link" to="/clinician">Open your workspace</Link><p className="supporting">Credentials and each service scope are reviewed before publication.</p>
-          </section>
-        </div>
-      </section>
-      <section className="services-section container">
-        <div className="section-heading">
-          <p className="eyebrow">START WITH WHAT’S ON YOUR MIND</p>
-          <h2>There’s room for all of it.</h2>
-          <p>
-            Explore the kind of support you’re looking for. Available services
-            depend on approved clinician offerings.
-          </p>
-        </div>
-        <div className="category-grid">
-          {[
-            [
-              Sprout,
-              "Your wellbeing",
-              "Space to talk about stress, difficult feelings and everyday life.",
-            ],
-            [
-              HeartHandshake,
-              "Your relationships",
-              "Explore connection, communication and changes in your relationships.",
-            ],
-            [
-              MessageCircle,
-              "A place to begin",
-              "You don’t need to have the perfect words to start a conversation.",
-            ],
-          ].map(([Icon, title, copy]) => {
-            const Mark = Icon as typeof Sprout;
-            return (
-              <Link key={String(title)} className="category" to="/sign-in">
-                <Mark size={28} />
-                <h3>{String(title)}</h3>
-                <p>{String(copy)}</p>
-                <span className="text-link">
-                  Explore support <ArrowRight size={18} />
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-      <section className="how-section" id="how-it-works">
-        <div className="container">
-          <p className="eyebrow">YOUR PACE. YOUR CHOICE.</p>
-          <h2>A few small steps toward support.</h2>
-          <div className="steps-grid">
-            {[
-              [
-                "01",
-                "Find your clinician",
-                "Explore approved services, session lengths and clear prices.",
-              ],
-              [
-                "02",
-                "Choose your time",
-                "Pick an available time that works for you.",
-              ],
-              [
-                "03",
-                "Decide what to share",
-                "Review the information your clinician will see before you confirm.",
-              ],
-            ].map(([number, title, copy]) => (
-              <div key={number}>
-                <span className="step-number">{number}</span>
-                <h3>{title}</h3>
-                <p>{copy}</p>
-              </div>
-            ))}
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [tool, setTool] = useState<keyof typeof tools>("Schedule");
+  const preview = tools[tool];
+  return <main className="landing-page">
+    <section className="landing-hero">
+      <header className="landing-intro">
+        <p className="eyebrow">{w("MENTAL HEALTH & RELATIONSHIP CARE · ETHIOPIA")}</p>
+        <h1>{w("Find support.")}<br />{w("Make time for care.")}</h1>
+        <p>{w("Private voice and video consultations with approved mental health and counseling professionals.")}</p>
+      </header>
+      <div className="landing-entries">
+        <section className="landing-patient">
+          <span className="landing-role"><UserRound size={18} />{w("For patients")}</span>
+          <h2>{w("Talk to someone")}<br />{w("who fits your needs.")}</h2>
+          <p>{w("Choose your clinician, see the fee, and decide what you share. Browse directly or ask eligible clinicians for a private offer.")}</p>
+          <form className="landing-search" onSubmit={e => { e.preventDefault(); rememberCareQuery(query); navigate('/patient/discovery'); }}>
+            <label htmlFor="landing-care-query">{w("What would you like support with?")}</label>
+            <div><Search size={20} /><input id="landing-care-query" value={query} onChange={e => setQuery(e.target.value)} placeholder={w("Stress, relationships, feeling low…")} required /></div>
+            <button className="button full" type="submit">{w("Find my care")}<ArrowRight size={18} /></button>
+          </form>
+          <div className="landing-chips" aria-label={w("Ideas to get started")}>{['Work stress', 'Relationships', 'Anxiety'].map(text => <button type="button" key={text} onClick={() => setQuery(w(text))}>{w(text)}</button>)}</div>
+          <Link className="text-link" to="/patient/requests">{w("Prefer clinicians to respond? Post a private request")}<ArrowRight size={16} /></Link>
+          <Link className="text-link landing-signup" to="/sign-in?intent=patient&mode=register">{w("Create an account")}</Link>
+          <p className="landing-note"><LockKeyhole size={16} />{w("Free to browse · Pay the agreed session fee · Adults 18+")}</p>
+        </section>
+        <section className="landing-clinician">
+          <span className="landing-role"><Users size={18} />{w("For clinicians")}</span>
+          <h2>{w("Your practice.")}<br />{w("One connected workspace.")}</h2>
+          <p>{w("Bring your patients, publish approved services, manage bookings, and respond to people looking for your expertise.")}</p>
+          <div className="landing-practice">
+            <div className="landing-preview-heading"><strong>{w("Practice preview")}</strong><span>{w("Clinician")}</span></div>
+            <div className="landing-chips" aria-label={w("Explore clinician tools")}>{(Object.keys(tools) as (keyof typeof tools)[]).map(value => <button key={value} type="button" aria-pressed={tool === value} onClick={() => setTool(value)}>{w(value)}</button>)}</div>
+            <div role="region" aria-live="polite" aria-label={w("Practice preview")}><h3>{w(preview[0])}</h3><p>{w(preview[1])}</p><Link className="button secondary" to={preview[3]}>{w(preview[2])}<ArrowRight size={16} /></Link></div>
           </div>
-        </div>
-      </section>
-      <section className="privacy-section container">
-        <div className="privacy-mark">
-          <ShieldCheck size={64} strokeWidth={1.2} />
-        </div>
-        <div>
-          <p className="eyebrow">A THOUGHTFUL START</p>
-          <h2>Your story. Your sharing choices.</h2>
-          <p>
-            Use a preferred name or alias. Before booking, see exactly what
-            you’ll share with your clinician. You can change your choices for
-            each request.
-          </p>
-          <Link className="text-link" to="/sign-in">
-            Take the first step <ArrowRight size={18} />
-          </Link>
-        </div>
-      </section>
-      <section className="clinician-invite container">
-        <div>
-          <p className="eyebrow">FOR CLINICIANS</p>
-          <h2>Make space for meaningful care.</h2>
-          <p>
-            Apply to offer your services on TeleTena. Applications and service
-            scopes are reviewed before you can accept bookings.
-          </p>
-        </div>
-        <Link className="button secondary" to="/for-clinicians">
-          Explore clinician access <ArrowRight size={20} />
-        </Link>
-      </section>
-    </main>
-  );
+          <Link className="button" to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}<ArrowRight size={18} /></Link>
+          <Link className="text-link" to="/clinician">{w("Already approved? Explore your workspace")}<ArrowRight size={16} /></Link>
+          <p className="landing-note"><ShieldCheck size={16} />{w("Credentials and each service scope are reviewed before publication.")}</p>
+        </section>
+      </div>
+    </section>
+    <section className="landing-principles" id="how-it-works" aria-label={w("How it works")}>
+      {[[CalendarDays, "Clear choices", "See the session fee, length and available times before you book."], [ShieldCheck, "Your disclosure, your choice", "Preview exactly what you share with your clinician."], [MessageCircle, "A real conversation", "Join a private voice or video consultation at your agreed time."]].map(([Icon, title, copy]) => {
+        const Mark = Icon as typeof CalendarDays;
+        return <div key={String(title)}><Mark size={27} /><section><h3>{w(String(title))}</h3><p>{w(String(copy))}</p></section></div>;
+      })}
+    </section>
+  </main>;
 }
 export function ClinicianInvitation() {
   return (

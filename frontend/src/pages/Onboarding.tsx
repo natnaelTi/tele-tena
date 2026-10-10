@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { pendingCareQuery } from "../care-intent";
 import { api } from "../api";
 import {
   Button,
@@ -60,7 +61,7 @@ export default function Onboarding() {
     void api<{id:string;label:string}[]>("services").then(setCatalog).catch(()=>undefined);
     void journeyApi.resumeStatus().then(value=>setResumeUploaded(value.uploaded)).catch(()=>undefined);
   }, [params]);
-  if (session?.profile) return <Navigate to={destination(session)} replace />;
+  if (session?.profile) return <Navigate to={session.profile.kind === "patient" && pendingCareQuery() ? "/patient/discovery" : destination(session)} replace />;
   const clinician = kind === "clinician";
   const titles = clinician
     ? [
@@ -96,8 +97,10 @@ export default function Onboarding() {
       setSaved(true);
       if (complete) {
         const current = await refresh();
+        const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken;
+        if(coupleToken&&kind==="patient"){navigate("/couple-invitation",{replace:true,state:{coupleInvitationToken:coupleToken}});return;}
         const invitationToken=(routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken;
-        navigate(invitationToken && current?.profile?.kind==='patient' ? '/relationship-invitation' : destination(current),
+        navigate(invitationToken && current?.profile?.kind==='patient' ? '/relationship-invitation' : current?.profile?.kind === 'patient' && pendingCareQuery() ? '/patient/discovery' : destination(current),
           { replace:true, state: invitationToken ? {relationshipInvitationToken:invitationToken} : undefined });
       }
     } catch {

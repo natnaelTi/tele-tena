@@ -132,6 +132,7 @@ export default function Relationships() {
     <PageTitle title={w('Shared care')} description={w('Create an optional adult relationship link. It does not share clinical records or appointments.')}/>
     {action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
     <div className="relationship-workspace">
+      <Link className="button secondary" to="/patient/couples">{w("Shared consultations")}</Link>
       <Card className="relationship-create">
         <div className="relationship-heading"><Link2 size={22}/><h2>{w('Invite an adult you trust')}</h2></div>
         <p>{w('Create a private link and share it directly with the intended person. Anyone who receives the link can try to accept it, so share it carefully.')}</p>
