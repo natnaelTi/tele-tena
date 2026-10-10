@@ -737,3 +737,72 @@ only documentation/screenshots differ. No runtime rebuild was required then.
 - Three focused existing private-note/closure/finalization regressions pass after these changes. TypeScript/Vite build passes; lint exits zero with existing warnings.
 - Presentation site backed up with database/config/public/private files as `20261010_144217-*` before applying additive v1.33; migration passed. Original development and remote sites were not migrated.
 - N02–N05 invitation/consent/payment screens, N06 three-party media and N07 selected recipients are implementation in progress. Actual browser, paired visual, current fresh-install and continuous scheduler gates remain open. Do not describe couples as verified from these API tests.
+
+## Couples and continuous processing — 2026-10-10
+
+This section supersedes the baseline classifications above for the specific
+couples and continuous-processing paths tested. Other gates remain open.
+
+- Actual PR44 remains draft and based on PR43's branch. New focused commits:
+  `fa3de4e` consent/recipient schema and authorization; `79b2100` connected UI;
+  `c84640d` shared-stage layout/consent-safe limitations; `9d148b5` native
+  processing harness; `dd0785c` grid sizing/camera-off surfaces; `22373e4`
+  matching-state browser capture. No merge or remote deployment.
+- Built preview is `http://127.0.0.1:8017/teletena/`, site
+  `teletena-mvp-presentation.localhost`, original bench source path. Gunicorn
+  master 453370 is the only web process reloaded. Production packaged assets,
+  no Vite. Source/build originally d720596 versus 7b866e8 differed only in docs;
+  subsequent runtime changes have been rebuilt explicitly.
+- At full source `9d148b5b3b15da1cfc43217be222fcfe5e9b9a4c`, the real hosted
+  LiveKit browser run passed independent adult consent, one reservation,
+  three participants receiving two advancing remote video tracks and audio,
+  partner Leave/rejoin, clinician End, and direct SDK rejection of still-valid
+  original and application-reissued tokens for all three identities. The
+  partner left before End. Opaque subjects, no names/metadata in JWTs. Explicit
+  selected-recipient finalization omitted private notes from both patient APIs,
+  omitted the summary from the non-recipient, and created one pending earning.
+  Automated fake devices; not physical devices or automatic SDK-refresh proof.
+- Three couples MariaDB tests rerun: pass (7.226 seconds). Two additional tests
+  pass (2.094 seconds): simultaneous confirmation returns the same appointment
+  with one reservation; shared extensions refuse without both adults' renewed
+  consent. Existing individual extension rules remain intact.
+- Paired N06 390/768/1440 screenshots:
+  `docs/screenshots/couples-current/9d148b5/`. Actual 1440 pair inspected;
+  uneven video-driven grid sizing and missing camera-off identity surfaces
+  prompted the next focused correction. These images are evidence, not owner
+  visual acceptance. Consent/payment/notes couples comparisons remain open.
+- Native scheduler and RQ worker run in `/home/frappe/teletena-mvp-runtime`,
+  one real site directory, separate loopback queue Redis 13917, subscribed
+  short/default/long. Shared bench sees presentation disable_scheduler=1;
+  isolated config sees 0. Native System Settings scheduler enabled. This avoids
+  Frappe's long-running cached Redis connection crossing the site queue cutover.
+  Read-only original queue inspection found zero presentation jobs across queued,
+  running, deferred and scheduled registries; unrelated processes/queues untouched.
+- `verify_continuous_processing.py` passed: native scheduler automatically
+  enqueued earnings release, worker completed it, one release posting, other
+  earning remained Disputed without a release posting. Only two new owned
+  synthetic bookings snapshot a one-minute policy; original site policy and
+  server clock unchanged. Media/provider mocked during finance fixture setup,
+  not presented as a consultation test.
+- `verify_worker_recovery.py` passed: stopped only dedicated worker, scheduler
+  accumulated site-bound jobs, worker restart processed invitation expiry
+  automatically. Schedule restored through API; no booked instants/balances
+  changed. Private fixture markers retained, no purge or manual release.
+- Current fresh v1.33 installation is pending administrative database-scoped
+  access. Existing retained-site additive migration and repeated couples patch
+  pass. Four focused legacy/payout tests pass, including exact opening-boundary
+  events held for review and preserved original records; this is not yet the
+  full representative pre-v1.7 owner-by-owner upgrade acceptance.
+- Still open: complete registration returning/expired/resend browsers; remaining
+  MVP paired visual/state comparisons; fresh schema and full legacy cutover
+  acceptance; final integrated candidate checks. External: physical devices,
+  native translations, live SMS/SMTP receipt, clinical/provider activation.
+  The MVP is not handover-ready or visually accepted.
+
+The `22373e4` follow-up full hosted couples browser also passed the connected
+consent/media/End/reissued-token/documentation chain. Camera-off paired comparison
+exposed an additional shared-state bug: a single muted video subscription could
+replace the entire remote layout with the audio fallback. Follow-up aggregates
+remote camera/microphone state and keeps shared tiles visible unless audio-only
+is explicitly selected. Its final rendered verification is pending below;
+this discrepancy is not hidden by the passing functional test.

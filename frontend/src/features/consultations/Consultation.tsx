@@ -260,18 +260,20 @@ export default function Consultation({
         remote.current?.querySelector(`[data-media-identity="${participant.identity}"]`)?.remove();
         if (current()) {
           setRemotePresent(connectedRoom.remoteParticipants.size > 0);
+          setRemoteVideo([...connectedRoom.remoteParticipants.values()].some(p=>p.isCameraEnabled));
+          setRemoteMuted([...connectedRoom.remoteParticipants.values()].every(p=>!p.isMicrophoneEnabled));
           if (!connectedRoom.remoteParticipants.size) { setRemoteVideo(false); setSpeaking(false); setLevel(0); }
         }
       });
       connectedRoom.on(RoomEvent.TrackMuted, (publication, participant) => {
         if (current() && participant !== connectedRoom.localParticipant && publication.kind === "video") {setRemoteVideo([...connectedRoom.remoteParticipants.values()].some(p=>p.isCameraEnabled));attachMedia();}
         if (current() && participant !== connectedRoom.localParticipant && publication.kind === "audio") {
-          setRemoteMuted(true); setSpeaking(false); setLevel(0);
+          setRemoteMuted([...connectedRoom.remoteParticipants.values()].every(p=>!p.isMicrophoneEnabled)); setSpeaking(false); setLevel(0);
         }
       });
       connectedRoom.on(RoomEvent.TrackUnmuted, (publication, participant) => {
         if (current() && participant !== connectedRoom.localParticipant && publication.kind === "audio") setRemoteMuted(false);
-        if (current() && participant !== connectedRoom.localParticipant && publication.kind === "video") setRemoteVideo(true);
+        if (current() && participant !== connectedRoom.localParticipant && publication.kind === "video") {setRemoteVideo([...connectedRoom.remoteParticipants.values()].some(p=>p.isCameraEnabled));attachMedia();}
       });
       connectedRoom.on(RoomEvent.Disconnected, () => {
         if (current()) {
@@ -292,7 +294,7 @@ export default function Consultation({
       connectedRoom.on(RoomEvent.TrackSubscribed, (track) => {
         // Subscriptions can arrive before React mounts the connected stage.
         // Attach from publications, also on stage mount, rather than discarding them.
-        if (current()) { if (track.kind === "video") setRemoteVideo(!track.isMuted); attachMedia(); }
+        if (current()) { if (track.kind === "video") setRemoteVideo([...connectedRoom.remoteParticipants.values()].some(p=>p.isCameraEnabled)); attachMedia(); }
       });
       connectedRoom.on(RoomEvent.TrackUnsubscribed, (track) => {
         track.detach().forEach((element) => element.remove());
@@ -451,7 +453,7 @@ export default function Consultation({
   }
   const sharedRoom=Boolean(info?.is_couple);
   const connected = Boolean(roomRef.current);
-  const audioSurface = audioOnly || !remoteVideo;
+  const audioSurface = audioOnly || (!sharedRoom && !remoteVideo);
   const joinTime = (value: string) => new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short", timeZone: appointment.timezone || "UTC" }).format(new Date(value));
   const detailRoute = `/${info?.role || "patient"}/consultations/${appointment.id}`;
   return (

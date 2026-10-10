@@ -1,4 +1,6 @@
 """Persisted two-adult authorization and single-charge regressions; synthetic only."""
+import concurrent.futures
+import threading
 import importlib.util
 import json
 import secrets
@@ -40,7 +42,7 @@ class Couples(base.Presentation):
         frappe.db.commit()
         super().tearDownClass()
 
-    def consented_plan(self):
+    def consented_plan(self, book=True):
         self.fund_patient('p1', 10000)
         offering = base.fixtures.Integration.offers['c1']
         day, _, _ = self.make_schedule(mode='automatic')
@@ -55,9 +57,40 @@ class Couples(base.Presentation):
             {'name':False,'history':False}, two, True)
         self.assertNotIn(one['request'], json.dumps(consent))
         base.fixtures.login('p1')
-        booked = couples.confirm(invitation['id'])
+        booked = couples.confirm(invitation['id']) if book else {'id':None}
         frappe.db.commit()
         return invitation, booked['id'], one, two
+
+    def test_concurrent_couple_confirmation_reserves_once(self):
+        invitation, _, _, _ = self.consented_plan(book=False)
+        barrier = threading.Barrier(2)
+        def confirm(_):
+            base.fixtures.connect()
+            try:
+                base.fixtures.login('p1')
+                barrier.wait(timeout=10)
+                result = couples.confirm(invitation['id'])
+                frappe.db.commit()
+                return result['id']
+            finally:
+                frappe.destroy()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(confirm, (0, 1)))
+        frappe.db.rollback()
+        self.assertEqual(results[0], results[1])
+        self.assertEqual(journey.one('SELECT reserved FROM tt_wallet WHERE patient=%s',
+                                    (base.fixtures.USERS['p1'],)).reserved, 600)
+        self.assertEqual(len(journey.rows('SELECT id FROM tt_ledger WHERE reference=%s',
+                                          ('booking:'+results[0],))), 1)
+
+    def test_shared_extensions_require_both_adults_consent(self):
+        from tele_tena.api import extensions
+        _, appointment, _, _ = self.consented_plan()
+        base.fixtures.login('c1')
+        self.assertFalse(extensions.extension_status(appointment)['can_propose'])
+        with self.assertRaises(frappe.ValidationError):
+            extensions._is_participant_open(journey.one('SELECT * FROM tt_appointment WHERE id=%s',
+                (appointment,)), base.fixtures.USERS['c1'], 'clinician')
 
     def test_couple_consent_single_charge_and_recipient_isolation(self):
         invitation, appointment, one, two = self.consented_plan()

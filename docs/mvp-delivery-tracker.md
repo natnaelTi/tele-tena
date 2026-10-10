@@ -769,3 +769,20 @@ claims are superseded only for these tested individual paths. Couples,
 continuous scheduler, full visual owner approval and complete MVP release
 gates remain pending. No remote deployment, physical-device, live-delivery
 or native-language approval claim. PR #44 stays draft.
+
+### Current couples / native-processing continuation (2026-10-10)
+
+Supersedes older statements that couples are absent or the presentation scheduler
+is disabled. Two independent adults can consent/book one charged appointment;
+three-party hosted fake-media and all three original/reissued token revocations
+pass, selected summary recipients are enforced by patient APIs, and one pending
+earning is created. Five focused couples MariaDB tests pass, including concurrent
+confirmation and withdrawal. Family/group remain deferred. Shared extensions and
+rescheduling refuse until renewed consent is implemented; no implicit charges.
+Native isolated scheduler/RQ automatically releases eligible earnings while a
+dispute stays held, and recovers queued expiry work after its worker restarts.
+Original Bench site scheduler is deliberately disabled for this presentation
+site; its private one-site runtime is enabled with separate queue Redis 13917.
+These are specific functional results, not all-MVP visual or release acceptance.
+Current evidence and outstanding gates remain in the existing journey report and
+`mvp-screen-acceptance.json`; no new acceptance tracker.
