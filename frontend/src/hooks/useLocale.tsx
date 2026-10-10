@@ -9,6 +9,13 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  "Before you join": ["ከመግባትዎ በፊት", "Osoo hin seenin dura"],
+  "Private consultation": ["የግል ምክክር", "Marii dhuunfaa"],
+  "Your privacy stays with you.": ["ግላዊነትዎ ከእርስዎ ጋር ይቆያል።", "Iccitiin kee si waliin jira."],
+  "Your clinician sees only the information you chose to share for this session.": ["ባለሙያዎ ለዚህ ምክክር ለማጋራት የመረጡትን መረጃ ብቻ ያያሉ።", "Ogeessi kee odeeffannoo marii kanaaf qooduu filatte qofa arga."],
+  "Turn video on": ["ቪዲዮ ያብሩ", "Viidiyoo bani"],
+  "Participant speaking": ["ተሳታፊው እየተናገረ ነው", "Hirmaataan dubbachaa jira"],
+  "Participant is quiet": ["ተሳታፊው ዝም ብሏል", "Hirmaataan callisee jira"],
   "Your application": ["የእርስዎ ማመልከቻ", "Iyyannoo kee"],
   "Your account": ["የእርስዎ መለያ", "Herrega kee"],
   "Review progress": ["የግምገማ ሂደት", "Adeemsa gamaaggamaa"],

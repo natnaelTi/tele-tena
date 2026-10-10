@@ -33,3 +33,22 @@
 .focused-call .device-check-summary {border:1px solid var(--border);padding:28px;border-radius:16px;background:white;}
 .focused-call .device-check-summary .button {display:flex;margin-top:16px;width:100%;}
 @media(max-width:800px){.focused-call .room-workspace,.focused-call .device-check-layout{grid-template-columns:minmax(0,1fr);}.focused-call .room-session-details{padding:0;border-top:1px solid #ffffff18;}.focused-call .device-check-preview .call-video{height:260px;}}
+.focused-call .room-connected {position:relative;border-radius:0!important;}
+.focused-call .room-heading {display:flex;align-items:center;gap:20px;padding:0 0 20px;border-bottom:1px solid #ffffff15;}
+.focused-call .room-heading .brand {color:white;font-size:21px;}
+.focused-call .room-heading img {border-radius:8px;}
+.focused-call .room-heading > div {border-left:1px solid #4e626d;padding-left:20px;}
+.focused-call .room-heading strong,.focused-call .room-heading span {display:block;font-size:14px;}
+.focused-call .room-heading > div > span {color:#b8cbd3;font-size:14px;margin-top:6px;}
+.focused-call .room-heading .room-private {margin-left:auto;display:flex;align-items:center;gap:8px;color:#b8cbd3;}
+.focused-call .room-connected > .room-connection {position:absolute;top:120px;left:44px;z-index:3;background:#122d38bb;border-radius:6px;padding:6px 10px;}
+.focused-call .room-connected .call-controls {background:none;}
+.focused-call .room-connected .call-controls button:not(.end-call) {flex-direction:column;border:0;background:none;font-size:14px;padding:0 4px;}
+.focused-call .room-connected .call-controls button:not(.end-call) svg {box-sizing:content-box;padding:14px;border:1px solid #5b707a;border-radius:12px;}
+.focused-call .room-connected .call-controls .leave-call svg {background:#be3940;border-color:#be3940;}
+.focused-call .room-private-note,.focused-call .room-privacy-note {background:#ffffff09;border:1px solid #ffffff1d;padding:16px;border-radius:10px;margin-top:24px;}
+.focused-call .room-privacy-note h4 {font-size:14px;margin:12px 0 6px;color:white;}
+.focused-call .room-session-details .extension-panel {background:#ffffff09;border:1px solid #ffffff1d;color:white;padding:16px;border-radius:10px;margin-top:24px;max-width:100%;}
+.focused-call .room-session-details .extension-panel h2 {font-size:17px;color:white;}
+.focused-call .room-session-details .extension-panel .button {white-space:normal;}
+@media(max-width:600px){.focused-call .room-heading{gap:12px;flex-wrap:wrap;}.focused-call .room-heading .room-private{margin-left:0;}.focused-call .room-connected > .room-connection{top:auto;position:static;display:inline-block;margin-top:16px;}.focused-call .room-heading > div{padding-left:12px;}.focused-call .room-connected .call-controls{align-items:start;}}

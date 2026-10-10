@@ -1,5 +1,6 @@
+import { Brand } from "../../components/Brand";
 import { Dialog, Button } from "../../components/ui";
-import { Mic, MicOff, Video, VideoOff, PhoneOff, Maximize2 } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, PhoneOff, Maximize2, Headphones, ShieldCheck } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Room as LiveKitRoom } from "livekit-client";
@@ -42,6 +43,7 @@ export default function Consultation({
   const mounted = useRef(false);
   const generation = useRef(0);
   const joining = useRef(false);
+  const endedObserved = useRef(false);
   const preview = useRef<HTMLVideoElement>(null);
   const remote = useRef<HTMLDivElement>(null);
   const roomRef = useRef<LiveKitRoom | null>(null);
@@ -53,7 +55,8 @@ export default function Consultation({
         "tele_tena.api.consultations.consultation",
         { appointment: appointment.id },
       );
-      if (!mounted.current) return;
+      if (!mounted.current || (endedObserved.current && next.state !== "Ended")) return;
+      if (next.state === "Ended") endedObserved.current = true;
       setInfo(next);
       if (next.state === "Ended" && (roomRef.current || previewStream.current)) {
         await leave(false);
@@ -97,7 +100,7 @@ export default function Consultation({
           publication.track?.detach().forEach((element) => element.remove());
       }
     }
-    remote.current?.replaceChildren();
+    if (!room || !roomRef.current || roomRef.current === room) remote.current?.replaceChildren();
   }
   async function disposeRoom(room: LiveKitRoom) {
     const tracks = [...room.localParticipant.trackPublications.values()].map(
@@ -109,7 +112,7 @@ export default function Consultation({
         if (element !== selfPreview.current) element.remove();
       });
     }
-    if (selfPreview.current) selfPreview.current.srcObject = null;
+    if (selfPreview.current && (!roomRef.current || roomRef.current === room)) selfPreview.current.srcObject = null;
     try {
       await room.disconnect();
     } catch {
@@ -241,9 +244,10 @@ export default function Consultation({
         if (roomRef.current === room) roomRef.current = null;
         await disposeRoom(room);
       }
-      stopPreview();
-      if (mounted.current && attempt === generation.current)
+      if (mounted.current && attempt === generation.current) {
+        stopPreview();
         setMediaStatus(error instanceof ApiError && error.code === "consultation_service_unconfigured" ? "callServiceUnavailable" : "callConnectError");
+      }
     } finally {
       if (attempt === generation.current) joining.current = false;
       if (mounted.current && attempt === generation.current) setBusy(false);
@@ -347,11 +351,12 @@ export default function Consultation({
   const detailRoute = `/${info?.role || "patient"}/consultations/${appointment.id}`;
   return (
     <section className={`consultation ${connected ? "room-connected" : "room-preflight"}`} aria-label={t("consultation")}>
-      <h2>{info?.state === "Ended" ? t("callEnded") : connected ? t("consultation") : w("Before you join")}</h2>
-      <p>
+      {connected && <header className="room-heading"><Brand/><div><strong>{appointment.service_label}</strong><span>{appointment.display_identity} · {appointment.minutes} {w("minutes")}</span></div><span className="room-private"><ShieldCheck size={18}/>{w("Private consultation")}</span></header>}
+      {!connected && <h2>{info?.state === "Ended" ? t("callEnded") : connected ? t("consultation") : w("Before you join")}</h2>}
+      {!connected && <p>
         {t("sessionLifecycle")}: {t(lifecycleStatus)}
-      </p>
-      <p role="status">
+      </p>}
+      <p className="room-connection" role="status">
         {t("mediaStatus")}: {t(mediaStatus)}
       </p>
       {info?.state === "Ended" && <div className="call-ended-panel">
@@ -428,7 +433,7 @@ export default function Consultation({
               {t(cameraOn ? "cameraOff" : "cameraOn")}
             </button>
           )}
-          <button type="button" disabled={busy} onClick={()=>void toggleAudioOnly()} aria-pressed={audioOnly}>{audioOnly?"Turn video on":"Audio only"}</button>
+          <button type="button" disabled={busy} onClick={()=>void toggleAudioOnly()} aria-pressed={audioOnly}><Headphones size={20}/>{w(audioOnly?"Turn video on":"Audio only")}</button>
           <button
             className="leave-call"
             type="button"
@@ -448,7 +453,7 @@ export default function Consultation({
               {t("endConsultation")}
             </button>
           )}
-        </div></div><aside className="room-session-details"><h3>{appointment.display_identity || w("Private participant")}</h3><dl><dt>{w("Service")}</dt><dd>{appointment.service_label}</dd><dt>{w("Booked duration")}</dt><dd>{appointment.minutes} {w("minutes")}</dd></dl><p>{w("Booked duration is not measured connected time.")}</p><Link to={detailRoute}>{w("Appointment details")}</Link></aside></div>}
+        </div></div><aside className="room-session-details"><h3>{appointment.display_identity || w("Private participant")}</h3><dl><dt>{w("Service")}</dt><dd>{appointment.service_label}</dd><dt>{w("Booked duration")}</dt><dd>{appointment.minutes} {w("minutes")}</dd></dl><p>{w("Booked duration is not measured connected time.")}</p><Link to={detailRoute}>{w("Appointment details")}</Link><div className="room-privacy-note"><ShieldCheck size={20}/><h4>{w("Your privacy stays with you.")}</h4><p>{w("Your clinician sees only the information you chose to share for this session.")}</p></div>{info?.state === "Open" && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</aside></div>}
       {info?.can_end && !connected && (
         <button
           className="end-call"
@@ -459,9 +464,7 @@ export default function Consultation({
           {t("endConsultation")}
         </button>
       )}
-      {info?.state === "Open" && (
-        <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t} />
-      )}
+
       <Dialog
         open={confirmEnd}
         onOpenChange={setConfirmEnd}
