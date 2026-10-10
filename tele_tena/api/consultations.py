@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 import frappe
 
-from tele_tena.api.journey import actor, fail, one, query
+from tele_tena.api.journey import actor, fail, iso, one, query
 
 
 def _minutes(config_key, default, maximum=240):
@@ -48,7 +48,9 @@ def consultation(appointment):
                             (item.id,), as_dict=True)
     state = session[0].state if session else 'Not started'
     closed = bool(session and session[0].room_closed)
-    return {'state': state, 'role': role, 'can_join': state != 'Ended' and _window(item),
+    return {'join_opens_at': iso(item.start - timedelta(minutes=_minutes('tele_tena_consultation_early_minutes', 15))),
+            'join_closes_at': iso(item.end + timedelta(minutes=_minutes('tele_tena_consultation_late_minutes', 30))),
+            'state': state, 'role': role, 'can_join': state != 'Ended' and _window(item),
             'can_end': role == 'clinician' and (state == 'Open' or (state == 'Ended' and not closed)),
             'room_close_pending': state == 'Ended' and not closed}
 

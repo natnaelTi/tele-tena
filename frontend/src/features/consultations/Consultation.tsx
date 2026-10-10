@@ -10,13 +10,15 @@ import "./consultation-room.css";
 import { ApiError, api } from "../../api";
 import type { Key } from "../../i18n";
 import ExtensionPanel from "./ExtensionPanel";
-type Appointment = { id: string; display_identity?:string; call_state?:string; service_label?:string; minutes?:number; consultation_format?:string };
+type Appointment = { id: string; display_identity?:string; call_state?:string; timezone?:string | null; service_label?:string; minutes?:number; consultation_format?:string };
 type ConsultationInfo = {
   state: "Not started" | "Open" | "Ended";
   role: "patient" | "clinician";
   can_join: boolean;
   can_end: boolean;
   room_close_pending: boolean;
+  join_opens_at: string;
+  join_closes_at: string;
 };
 export default function Consultation({
   appointment,
@@ -362,6 +364,7 @@ export default function Consultation({
         publication.track.attach(selfPreview.current);
   }
   const connected = Boolean(roomRef.current);
+  const joinTime = (value: string) => new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short", timeZone: appointment.timezone || "UTC" }).format(new Date(value));
   const detailRoute = `/${info?.role || "patient"}/consultations/${appointment.id}`;
   return (
     <section className={`consultation ${connected ? "room-connected" : "room-preflight"}`} aria-label={t("consultation")}>
@@ -410,7 +413,7 @@ export default function Consultation({
               aria-label={t("localPreview")}
             />
           )}
-          </div><aside className="device-check-summary"><h3>{appointment.display_identity || w("Private participant")}</h3><p>{appointment.service_label}</p><p>{appointment.minutes} {w("minutes")} · {t(audioOnly ? "audioOnly" : "consultation")}</p><p>{w("Find a private space")}. {w("Use headphones if possible.")}</p>
+          </div><aside className="device-check-summary"><h3>{appointment.display_identity || w("Private participant")}</h3><p>{appointment.service_label}</p><p>{appointment.minutes} {w("minutes")} · {t(audioOnly ? "audioOnly" : "consultation")}</p><p>{w("Find a private space")}. {w("Use headphones if possible.")}</p>{info?.join_opens_at&&<p className="supporting">{w("Join window")}: {joinTime(info.join_opens_at)} – {joinTime(info.join_closes_at)} · {appointment.timezone || "UTC"}</p>}
           <button className="button"
             disabled={busy || !checked || !info?.can_join}
             onClick={() => void join()}

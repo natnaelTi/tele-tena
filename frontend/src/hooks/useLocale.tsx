@@ -9,6 +9,7 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  "Join window": ["የመግቢያ ጊዜ", "Yeroo seensaa"],
   "Before you join": ["ከመግባትዎ በፊት", "Osoo hin seenin dura"],
   "Private consultation": ["የግል ምክክር", "Marii dhuunfaa"],
   "Your privacy stays with you.": ["ግላዊነትዎ ከእርስዎ ጋር ይቆያል።", "Iccitiin kee si waliin jira."],
