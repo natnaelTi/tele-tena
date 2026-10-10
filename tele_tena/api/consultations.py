@@ -15,7 +15,7 @@ def _minutes(config_key, default, maximum=240):
     return max(0, min(maximum, value))
 
 
-def _authorized_appointment(appointment):
+def _authorized_appointment(appointment, allow_completed=False):
     user = actor()
     found = frappe.db.sql('''SELECT id,patient,clinician,start,end,state
         FROM tt_appointment WHERE id=%s AND (patient=%s OR clinician=%s)''',
@@ -23,7 +23,7 @@ def _authorized_appointment(appointment):
     if not found:
         frappe.throw('Appointment unavailable', frappe.PermissionError)
     item = found[0]
-    if item.state != 'Booked':
+    if item.state != 'Booked' and not (allow_completed and item.state == 'Completed'):
         fail('Appointment is not active', 'appointment_inactive')
     if user == item.patient:
         if 'Tele Tena Patient' not in frappe.get_roles(user):
@@ -43,15 +43,16 @@ def _window(item):
 
 @query()
 def consultation(appointment):
-    item, _, role = _authorized_appointment(appointment)
+    item, _, role = _authorized_appointment(appointment, allow_completed=True)
     session = frappe.db.sql('SELECT id,state,room_closed FROM tt_consultation WHERE appointment=%s',
                             (item.id,), as_dict=True)
     state = session[0].state if session else 'Not started'
     closed = bool(session and session[0].room_closed)
     return {'join_opens_at': iso(item.start - timedelta(minutes=_minutes('tele_tena_consultation_early_minutes', 15))),
             'join_closes_at': iso(item.end + timedelta(minutes=_minutes('tele_tena_consultation_late_minutes', 30))),
-            'state': state, 'role': role, 'can_join': state != 'Ended' and _window(item),
-            'can_end': role == 'clinician' and (state == 'Open' or (state == 'Ended' and not closed)),
+            'appointment_state': item.state, 'state': state, 'role': role,
+            'can_join': item.state == 'Booked' and state != 'Ended' and _window(item),
+            'can_end': item.state == 'Booked' and role == 'clinician' and (state == 'Open' or (state == 'Ended' and not closed)),
             'room_close_pending': state == 'Ended' and not closed}
 
 

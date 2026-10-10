@@ -1,0 +1,78 @@
+const fs=require('node:fs'),assert=require('node:assert/strict'),{chromium}=require('playwright');
+// Explicit stateful test on one owned synthetic appointment. It Ends and finalizes
+// that appointment through real APIs; never run against production records.
+// Codes/passwords/tokens stay private or in browser-process memory.
+const path=require('node:path');
+const site=process.env.TELE_TENA_TEST_SITE;
+assert.equal(site,'teletena-mvp-presentation.localhost','Dedicated presentation site required');
+const bench=path.resolve(__dirname,'../../..');
+const root=path.join(bench,'sites',site,'private');
+function readPrivate(file){const stat=fs.lstatSync(file);assert.ok(!stat.isSymbolicLink()&&(stat.mode&0o077)===0,'Private mode-600 input required');return JSON.parse(fs.readFileSync(file));}
+const users=readPrivate(root+'/tele_tena_presentation_seed.json').users;
+const passwords=readPrivate(root+'/tele_tena_presentation_accounts.json');
+const appointment=readPrivate(process.env.TELE_TENA_CONSULTATION_FIXTURE||root+'/tele_tena_consultation_journey_v3.json').appointment;
+const base='http://127.0.0.1:8017/teletena',out=process.env.TELE_TENA_EVIDENCE_DIR||'/tmp/tt-call-connected-evidence';fs.mkdirSync(out,{recursive:true});let stage='launch',lastPage;
+(async()=>{const browser=await chromium.launch({args:['--use-fake-device-for-media-stream','--use-fake-ui-for-media-stream','--autoplay-policy=no-user-gesture-required']});try{
+ const pages=[],contexts=[],tokens=[],refreshed=[];
+ async function capture(p,ctx,id,variant){for(const width of[320,390,768,1440]){await p.setViewportSize({width,height:1000});await p.evaluate(()=>document.fonts.ready);await p.screenshot({path:`${out}/${id}-${variant}-${width}.png`,fullPage:true});const ref=await ctx.newPage();await ref.setViewportSize({width,height:1000});await ref.goto('http://127.0.0.1:8044/?embed=1#'+(id==='E07'?'room':id.toLowerCase()));await ref.evaluate(()=>document.fonts.ready);await ref.screenshot({path:`${out}/${id}-reference-${width}.png`,fullPage:true});await ref.close();}await p.setViewportSize({width:1440,height:1000});}
+ async function join(p){await p.getByRole('button',{name:'Check microphone and camera',exact:true}).click();await p.getByRole('status').filter({hasText:'Devices checked'}).waitFor();const response=p.waitForResponse(r=>r.url().includes('consultations.join'));await p.getByRole('button',{name:'Join consultation',exact:true}).click();const result=(await(await response).json()).message;assert.ok(result?.token);assert.ok(new URL(result.url).hostname.endsWith('.livekit.cloud'),'Hosted development project required for Cloud evidence');await p.getByRole('status').filter({hasText:'Connected'}).waitFor({timeout:45000});return{url:result.url,token:result.token};}
+ for(const role of['patient','clinician']){const ctx=await browser.newContext({viewport:{width:1440,height:1000},permissions:['camera','microphone']}),p=await ctx.newPage();lastPage=p;p.on('response',async r=>{if(r.url().includes('consultations.join')){const body=await r.json().catch(()=>({}));console.log('Join response: HTTP '+r.status()+' category '+(body.tele_tena_error||'none'));}});p.setDefaultTimeout(15000);await p.addInitScript(()=>{window.__capturedTracks=[];const original=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);navigator.mediaDevices.getUserMedia=async options=>{const stream=await original(options);window.__capturedTracks.push(...stream.getTracks());return stream;};});stage=role+' login';await p.goto(base+'/sign-in');await p.getByRole('button',{name:'Use email instead',exact:true}).click();await p.getByRole('button',{name:'Use password instead',exact:true}).click();await p.getByLabel('Email',{exact:true}).fill(users[role]);await p.getByLabel('Password',{exact:true}).fill(passwords[users[role]]);await p.getByRole('button',{name:'Sign in',exact:true}).click();await p.getByRole('button',{name:'Sign out',exact:true}).waitFor();await p.goto(base+'/'+role+'/consultations/'+appointment);await p.getByRole('link',{name:'Join consultation',exact:true}).click();await p.locator('.device-check-layout').waitFor();if(role==='patient'){await capture(p,ctx,'E05','application');stage='device failure recovery';await p.evaluate(()=>{const original=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);let first=true;navigator.mediaDevices.getUserMedia=async options=>{if(first){first=false;throw new DOMException('Denied','NotAllowedError');}return original(options);};});await p.getByRole('button',{name:'Check microphone and camera',exact:true}).click();await p.getByRole('status').filter({hasText:'Camera or microphone access failed'}).waitFor();assert.equal(await p.getByRole('button',{name:'Join consultation',exact:true}).isDisabled(),true);}if(role==='patient'){stage='connection failure recovery';await p.getByRole('button',{name:'Check microphone and camera',exact:true}).click();await p.getByRole('status').filter({hasText:'Devices checked'}).waitFor();await p.route('**/api/method/tele_tena.api.consultations.join',route=>route.abort('failed'));await p.getByRole('button',{name:'Join consultation',exact:true}).click();await p.getByRole('status').filter({hasText:'Could not connect'}).waitFor();assert.equal(await p.evaluate(()=>window.__capturedTracks.every(track=>track.readyState==='ended')),true);await p.unroute('**/api/method/tele_tena.api.consultations.join');}stage=role+' Join';tokens.push(await join(p));pages.push(p);contexts.push(ctx);}
+ stage='both receive actual media';for(const p of pages){await p.waitForFunction(()=>{const n=document.querySelector('.media-stage');return !!n?.querySelector('.call-remote video')?.srcObject&&!!n?.querySelector('.call-remote audio')?.srcObject&&!!n?.querySelector('.self-preview')?.srcObject&&n.querySelector('.call-remote video').currentTime>0&&n.querySelector('.call-remote audio').currentTime>0;},{},{timeout:20000});}
+ console.log('PASS: both independent sessions receive remote audio/video and self video (fake devices, hosted Cloud).');stage='fullscreen';await pages[1].getByRole('button',{name:'Expand consultation',exact:true}).click();await pages[1].waitForFunction(()=>!!document.fullscreenElement);assert.equal(await pages[1].evaluate(()=>!!document.fullscreenElement),true);await pages[1].getByRole('button',{name:'Expand consultation',exact:true}).click();await pages[1].waitForFunction(()=>!document.fullscreenElement);assert.equal(await pages[1].evaluate(()=>!!document.fullscreenElement),false);await capture(pages[1],contexts[1],'E07','application');
+ stage='mute and camera affect published tracks';await pages[0].getByRole('button',{name:'Mute microphone',exact:true}).click();await pages[1].waitForFunction(()=>document.querySelector('.media-stage')?.dataset.remoteAudioMuted==='true');await pages[0].getByRole('button',{name:'Unmute microphone',exact:true}).click();await pages[0].getByRole('button',{name:'Turn camera off',exact:true}).click();await pages[0].getByRole('button',{name:'Turn camera on',exact:true}).click();
+ stage='audio-only';await pages[0].getByRole('button',{name:'Audio only',exact:true}).click();await pages[0].locator('.audio-participant').waitFor();assert.equal(await pages[0].locator('.self-preview').count(),0);await capture(pages[0],contexts[0],'E08','application');
+ stage='Leave and rejoin';await pages[0].getByRole('button',{name:'Leave',exact:true}).click();await pages[0].getByRole('status').filter({hasText:'You left'}).waitFor();assert.equal(await pages[0].locator('.media-stage').count(),0);assert.equal(await pages[0].evaluate(()=>window.__capturedTracks.every(track=>track.readyState==='ended')),true);await pages[0].getByRole('checkbox',{name:/Audio only/}).uncheck();tokens[0]=await join(pages[0]);
+ for(const p of pages){refreshed.push(await p.evaluate(async appointment=>{const csrf=(await(await fetch('/api/method/tele_tena.api.journey.session')).json()).message.csrf_token;const r=await fetch('/api/method/tele_tena.api.consultations.join',{method:'POST',headers:{'Content-Type':'application/json','X-Frappe-CSRF-Token':csrf},body:JSON.stringify({appointment,audio_only:0})});const ok=r.ok;if(!ok)throw Error('Token refresh failed');const body=(await r.json()).message;return{url:body.url,token:body.token};},appointment));}
+ const sdkUrl=await pages[0].evaluate(()=>performance.getEntriesByType('resource').map(x=>x.name).find(x=>x.includes('livekit-client')&&x.includes('/assets/')));assert.ok(sdkUrl);
+ for(const token of [...tokens,...refreshed]){const claims=JSON.parse(Buffer.from(token.token.split('.')[1],'base64url'));assert.ok(claims.exp>Date.now()/1000+60,'Cached tokens must remain unexpired during End/reconnect test');assert.equal(claims.metadata,undefined);assert.equal(claims.name,undefined);assert.ok(!claims.sub.includes('@'));}
+ stage='patient leaves before End';await pages[0].getByRole('button',{name:'Leave',exact:true}).click();stage='clinician End';await pages[1].getByRole('button',{name:'End for everyone',exact:true}).click();const response=pages[1].waitForResponse(r=>r.url().includes('consultations.end'));await pages[1].getByRole('dialog').getByRole('button',{name:'End for everyone',exact:true}).click();assert.equal((await response).status(),200);await pages[1].getByRole('link',{name:'Finish the consultation',exact:true}).waitFor();await pages[0].getByRole('link',{name:'View consultation',exact:true}).waitFor();
+ for(const p of pages)assert.equal(await p.locator('.media-stage').count(),0);
+ stage='cached SDK tokens rejected';for(let i=0;i<2;i++)for(const issued of[tokens[i],refreshed[i]]){const rejected=await pages[i].evaluate(async({issued,sdkUrl})=>{const module=await import(sdkUrl);if(typeof module.Room!=='function')throw Error('SDK Room export missing');const room=new module.Room();let timer;try{const result=await Promise.race([room.connect(issued.url,issued.token).then(()=>false,()=>true),new Promise(resolve=>{timer=setTimeout(()=>resolve(null),15000);})]);return result;}finally{clearTimeout(timer);await room.disconnect();}}, {issued,sdkUrl});assert.equal(rejected,true);}
+ console.log('PASS: Leave/rejoin, audio-only, clinician End, both-role handoff, Cloud rejection of original/refreshed cached tokens for both identities including departed patient.');
+ await pages[1].getByRole('link',{name:'Finish the consultation',exact:true}).click();await pages[1].getByLabel('Private consultation note',{exact:false}).waitFor();console.log('PASS: clinician End routes to actual documentation.');
+  async function detail(p){return p.evaluate(async id=>(await(await fetch('/api/method/tele_tena.api.presentation.appointment_detail?appointment='+encodeURIComponent(id),{cache:'no-store'})).json()).message,appointment);}
+  await pages[0].getByRole('link',{name:'View consultation',exact:true}).click();
+  const page=pages[1];stage='save actual draft';
+  await page.goto(base+'/clinician/consultations/'+appointment);
+  await page.getByLabel('Private consultation note',{exact:false}).fill('Fictional private clinician observation — not for patient sharing.');
+  await page.getByLabel('Patient summary / next steps',{exact:false}).fill('We agreed to try a short daily check-in and discuss it at a follow-up.');
+  await page.getByRole('button',{name:'Preview patient summary',exact:true}).click();
+  const previewDialog=page.getByRole('dialog');await previewDialog.waitFor();
+  assert.ok(!(await previewDialog.innerText()).includes('Fictional private clinician observation'));
+  assert.equal((await detail(page)).documentation_state,'None');
+  await previewDialog.getByRole('button',{name:'Back to notes',exact:true}).click();await previewDialog.waitFor({state:'hidden'});
+  await page.route('**/api/method/tele_tena.api.presentation.save_note_draft',route=>route.abort('failed'));
+  await page.getByRole('button',{name:'Save draft',exact:true}).click();
+  await page.getByText('We couldn’t save this change. Check your connection and inputs, then try again.',{exact:true}).waitFor();
+  assert.equal(await page.getByLabel('Private consultation note',{exact:false}).inputValue(),'Fictional private clinician observation — not for patient sharing.');
+  await page.unroute('**/api/method/tele_tena.api.presentation.save_note_draft');
+  await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByText('Draft saved.',{exact:true}).waitFor();
+  await page.reload();
+  assert.equal(await page.getByLabel('Private consultation note',{exact:false}).inputValue(),'Fictional private clinician observation — not for patient sharing.');
+  assert.equal((await detail(page)).documentation_state,'Draft');
+  const patientDraft=await detail(pages[0]);assert.ok(!('private_note' in patientDraft));assert.equal(patientDraft.patient_summary_revisions.length,0);
+  await capture(page,contexts[1],'E11','application');
+  stage='finalize actual encounter';
+  await page.getByRole('button',{name:'Finalize consultation',exact:true}).click();
+  let dialog=page.getByRole('dialog');await dialog.getByRole('button',{name:'Finalize and publish',exact:true}).click();
+  await dialog.waitFor({state:'hidden'});await page.locator('.finalized-note-document').waitFor();
+  let completed=await detail(page);assert.equal(completed.status,'Completed');assert.equal(completed.reservation_state,'Consumed');
+  assert.equal(completed.private_note.text,'Fictional private clinician observation — not for patient sharing.');
+  await page.reload();await page.locator('.finalized-note-document').waitFor();
+  await capture(page,contexts[1],'E13','clinician-application');
+  stage='patient published summary';
+  // The already-open patient detail must update without a page reload.
+  await pages[0].locator('.shared-summary-document').waitFor({timeout:25000});
+  let visible=await detail(pages[0]);assert.ok(!('private_note' in visible));assert.ok(!JSON.stringify(visible).includes('Fictional private clinician observation'));
+  assert.equal(visible.patient_summary_revisions.length,1);
+  assert.equal(await pages[0].locator('.finalized-note-document').count(),0);
+  await capture(pages[0],contexts[0],'E13','patient-application');
+  stage='repeat finalization';
+  const repeat=await page.evaluate(async id=>{
+    const session=(await(await fetch('/api/method/tele_tena.api.journey.session')).json()).message;
+    const response=await fetch('/api/method/tele_tena.api.presentation.finalize_consultation',{method:'POST',headers:{'Content-Type':'application/json','X-Frappe-CSRF-Token':session.csrf_token},body:JSON.stringify({appointment:id,publish_summary:1,publish_note:0})});
+    return {status:response.status,result:(await response.json()).message};
+  },appointment);
+  assert.equal(repeat.status,200); assert.equal(repeat.result.idempotent,true);
+  console.log('PASS: actual hosted-End appointment: draft, reload, private/shared isolation, finalization, consumed reservation and repeated finalization; reference pairs captured.');
+}catch(e){if(lastPage){console.log('Safe media status: '+JSON.stringify(await lastPage.getByRole('status').allTextContents()));await lastPage.screenshot({path:out+'/failed-stage.png',fullPage:true});}console.log('FAIL: '+stage+' ('+e.name+'); tokens and private details withheld');process.exitCode=1;}finally{await browser.close();}})();

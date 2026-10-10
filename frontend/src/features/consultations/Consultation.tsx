@@ -12,6 +12,7 @@ import type { Key } from "../../i18n";
 import ExtensionPanel from "./ExtensionPanel";
 type Appointment = { id: string; display_identity?:string; call_state?:string; timezone?:string | null; service_label?:string; minutes?:number; consultation_format?:string };
 type ConsultationInfo = {
+  appointment_state: string;
   state: "Not started" | "Open" | "Ended";
   role: "patient" | "clinician";
   can_join: boolean;
@@ -69,6 +70,7 @@ export default function Consultation({
         await leave(false);
         if (mounted.current) setMediaStatus("callDisconnected");
       }
+      if (!mounted.current) return;
       setLifecycleStatus(
         next.state === "Ended"
           ? next.room_close_pending
@@ -399,7 +401,7 @@ export default function Consultation({
         {t("mediaStatus")}: {t(mediaStatus)}
       </p>
       {info?.state === "Ended" && <div className="call-ended-panel">
-        <p>{info.role === "clinician" ? w("The call has ended. Review your notes and finalize the encounter.") : w("Summary being prepared")}</p>
+        <p>{info.role === "clinician" ? w("The call has ended. Review your notes and finalize the encounter.") : w(info.appointment_state === "Completed" ? "Consultation record" : "Summary being prepared")}</p>
         <Link className="button primary" to={detailRoute}>{w(info.role === "clinician" ? "Finish the consultation" : "View consultation")}</Link>
         {info.room_close_pending && <p role="alert">{t("callClosePending")}</p>}
       </div>}

@@ -2578,6 +2578,14 @@ class Presentation(unittest.TestCase):
         detail = presentation.appointment_detail(appointment)
         self.assertNotIn('private_note', detail)
         self.assertNotIn('Private fictional note', str(detail))
+        from tele_tena.api import consultations
+        terminal = consultations.consultation(appointment)
+        self.assertEqual(terminal['appointment_state'], 'Completed')
+        self.assertEqual(terminal['state'], 'Ended')
+        self.assertFalse(terminal['can_join'])
+        self.assertFalse(terminal['can_end'])
+        with self.assertRaises(frappe.ValidationError):
+            consultations.join(appointment)
 
     def test_explicit_note_sharing_preserves_private_revisions_and_money(self):
         self.fund_patient('p1', 3000)
