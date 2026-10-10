@@ -95,6 +95,11 @@ class Couples(base.Presentation):
     def test_couple_consent_single_charge_and_recipient_isolation(self):
         invitation, appointment, one, two = self.consented_plan()
         self.assertTrue(couples.confirm(invitation['id'])['idempotent'])
+        self.assertEqual(couples.get_plan(invitation['id'])['appointment'], appointment)
+        base.fixtures.login('c2')
+        with self.assertRaises(frappe.PermissionError):
+            couples.get_plan(invitation['id'])
+        base.fixtures.login('p1')
         self.assertEqual(journey.one('SELECT reserved FROM tt_wallet WHERE patient=%s', (base.fixtures.USERS['p1'],)).reserved, 600)
         base.fixtures.login('p2')
         detail = presentation.appointment_detail(appointment)

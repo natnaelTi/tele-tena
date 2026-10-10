@@ -99,7 +99,7 @@ export default function App() {
                 <Route path="booked/:id" element={<BookingConfirmation />} />
                 <Route path="appointments" element={<Appointments />} />
                 <Route path="account" element={<Account />} />
-                <Route path="couples" element={<Couples />} />
+                <Route path="couples" element={<Couples />} /><Route path="couples/:planId" element={<Couples />} />
                 <Route path="relationships" element={<Relationships />} />
                 <Route path="clinic-access" element={<ClinicMembershipPortal />} />
                 <Route path="payments" element={<Payments />} />

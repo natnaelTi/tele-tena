@@ -449,7 +449,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
             const payload={offering:offer.id,start,request_text:request,sharing,expected_disclosure:preview,adult_confirmed:adultConsent,booked_timezone:displayZone};
             const fingerprint=JSON.stringify(payload);const key=submission?.fingerprint===fingerprint?submission.key:crypto.randomUUID();setSubmission({key,fingerprint});
             const result=await journeyApi.coupleInvite({...payload,retry_key:key});
-            navigate('/patient/couples',{state:{coupleToken:result.token}});
+            navigate('/patient/couples/'+result.id,{state:{coupleToken:result.token}});
           },'')}>{w("Create invitation link")}</Button>
           <p className="supporting">{w("The invitation does not reserve a time or charge either wallet.")}</p>
         </Card>}

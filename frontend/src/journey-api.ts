@@ -21,6 +21,7 @@ export const journeyApi = {
   coupleInvite: (data:Record<string,unknown>) => api<{id:string;token:string}>('tele_tena.api.couples.invite',data,true),
   coupleInvitation: (token:string) => api<any>('tele_tena.api.couples.preview_invitation',{token},true),
   coupleConsent: (data:Record<string,unknown>) => api<any>('tele_tena.api.couples.consent',data,true),
+  couplePlan: (plan:string) => api<any>('tele_tena.api.couples.get_plan',{plan_id:plan}),
   couplePlans: () => api<any[]>('tele_tena.api.couples.my_plans'),
   coupleConfirm: (plan_id:string) => api<{id:string}>('tele_tena.api.couples.confirm',{plan_id},true),
   coupleWithdraw: (plan_id:string) => api('tele_tena.api.couples.withdraw',{plan_id},true),

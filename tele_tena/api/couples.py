@@ -170,6 +170,16 @@ def my_plans():
         ORDER BY cp.created DESC LIMIT 50''', (user,))]
 
 
+@j.query()
+def get_plan(plan_id):
+    user = j.actor('Tele Tena Patient')
+    plan = j.rows('''SELECT cp.* FROM tt_couple_plan cp
+        JOIN tt_couple_participant p ON p.plan=cp.id WHERE cp.id=%s AND p.user=%s''', (plan_id,user))
+    if not plan:
+        frappe.throw('This invitation is unavailable.', frappe.PermissionError)
+    return _visible(plan[0],user)
+
+
 @j.command
 def confirm(plan_id):
     payer = j.actor('Tele Tena Patient')

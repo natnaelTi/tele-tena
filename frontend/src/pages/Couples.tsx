@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { HeartHandshake, ShieldCheck } from 'lucide-react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { HeartHandshake, ShieldCheck, User } from 'lucide-react';
 import { journeyApi, type Disclosure } from '../journey-api';
 import { useResource } from '../hooks/useResource';
 import { useAction } from '../hooks/useAction';
@@ -12,24 +12,25 @@ import './Couples.css';
 import { AddFundsDialog } from '../components/AddFundsDialog';
 
 export default function Couples() {
-  const {w}=useLocale();const location=useLocation();const navigate=useNavigate();
+  const {w}=useLocale();const location=useLocation();const navigate=useNavigate();const {planId}=useParams();
+  const loadPlans=useCallback(()=>planId?journeyApi.couplePlan(planId).then(plan=>[plan]):journeyApi.couplePlans(),[planId]);
   const [token]=useState(()=>(location.state as {coupleToken?:string}|null)?.coupleToken||'');
-  const plans=useResource(journeyApi.couplePlans);const wallet=useResource(journeyApi.wallet);const action=useAction();
+  const plans=useResource(loadPlans);const wallet=useResource(journeyApi.wallet);const action=useAction();
   const [addFunds,setAddFunds]=useState(false);
   const [pay,setPay]=useState<string|null>(null);
   useEffect(()=>{if(token)navigate(location.pathname,{replace:true,state:null});},[token,navigate,location.pathname]);
   useEffect(()=>{const timer=window.setInterval(()=>void plans.refresh(),10000);return()=>window.clearInterval(timer);},[plans.refresh]);
   const invitation=token?`${window.location.origin}${import.meta.env.PROD?'/teletena':''}/couple-invitation#consent=${encodeURIComponent(token)}`:'';
-  return <div className="shared-care-page"><header><HeartHandshake size={24}/><h1>{w('Shared care')}</h1><p>{w('Two adults, separate consent and privacy.')}</p></header>
+  return <div className="shared-care-page"><header><HeartHandshake size={24}/><h1>{w(planId?(plans.data?.[0]?.state==='Consented'?'Ready for your shared session':'Your shared session'):'Shared care')}</h1><p>{w(planId?'Each participant must be ready before the shared session is confirmed.':'Two adults, separate consent and privacy.')}</p></header>
     {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
     {invitation&&<Card><h2>{w('Private invitation link')}</h2><p>{w('Share this link directly with the intended adult. Anyone holding it can try to accept it.')}</p><TextField label={w('Private invitation link')} value={invitation} readOnly/><Button variant="secondary" onClick={()=>void action.run(async()=>navigator.clipboard.writeText(invitation),w('Invitation link copied.'))}>{w('Copy link')}</Button></Card>}
-    {plans.error?<InlineNotice tone="danger">{w('This step could not be loaded. Try again.')} <Button onClick={()=>void plans.refresh()}>{w('Retry')}</Button></InlineNotice>:!plans.data?<Skeleton/>:!plans.data.length?<EmptyState title={w('No shared sessions yet.')}><Link to="/patient/discovery">{w('Find care')}</Link></EmptyState>:plans.data.map(plan=><Card key={plan.id}>
-      <h2>{plan.service}</h2><p>{plan.clinician} · {date(plan.start,plan.timezone)}</p>
-      <div className="shared-care-columns"><section><h3>{w('Participants')}</h3><p>{w('Your consent')}: {w(plan.you_consented?'Ready':'Withdrawn')}</p><p>{w('Adults who consented')}: {plan.participant_count} / 2</p><p>{w(plan.appointment_state==='Completed'?'Completed':plan.appointment_state==='Cancelled'?'Cancelled':plan.call_state==='Ended'?'Call ended':plan.state==='Booked'?'Confirmed':plan.state==='Consented'?'Ready to confirm':plan.state==='Invited'?'Waiting for consent':plan.state)}</p><ShieldCheck size={20}/><p>{w('Your private intake is not visible to the other adult.')}</p></section><section><h3>{w('Session & payment')}</h3><p>{plan.minutes} {w('minutes')} · ETB {money(plan.price)}</p><p>{w(plan.you_pay?'You pay the total session price.':'Your wallet is not charged for this session.')}</p>
+    {plans.error?<InlineNotice tone="danger">{w('This step could not be loaded. Try again.')} <Button onClick={()=>void plans.refresh()}>{w('Retry')}</Button></InlineNotice>:!plans.data?<Skeleton/>:!plans.data.length?<EmptyState title={w('No shared sessions yet.')}><Link to="/patient/discovery">{w('Find care')}</Link></EmptyState>:plans.data.map(plan=>!planId?<Card key={plan.id} className="shared-plan-row"><div><h2>{plan.service}</h2><p>{plan.clinician} · {date(plan.start,plan.timezone)}</p><span>{w(plan.appointment_state||plan.state)}</span></div><Link className="button secondary" to={"/patient/couples/"+plan.id}>{w("View shared session")}</Link></Card>:<article key={plan.id}>
+      <p className="supporting">{plan.service} · {date(plan.start,plan.timezone)}</p>
+      <div className="shared-care-columns"><Card><h3>{w('Participants')}</h3><div className="shared-person-row"><User size={20}/><div><strong>{w('You')}</strong><p>{w('Your consent')}</p></div><span className="status-badge">{w(plan.you_consented?'Ready':'Withdrawn')}</span></div><div className="shared-person-row"><User size={20}/><div><strong>{w('Other adult')}</strong><p>{w('Separate consent')}</p></div><span className="status-badge">{w(plan.participant_count-(plan.you_consented?1:0)>0?'Ready':'Waiting')}</span></div><div className="shared-person-row"><ShieldCheck size={20}/><div><strong>{plan.clinician}</strong><p>{w('Clinician')}</p></div></div><p>{w(plan.appointment_state==='Completed'?'Completed':plan.appointment_state==='Cancelled'?'Cancelled':plan.call_state==='Ended'?'Call ended':plan.state==='Booked'?'Confirmed':plan.state==='Consented'?'Ready to confirm':plan.state==='Invited'?'Waiting for consent':plan.state)}</p><ShieldCheck size={20}/><p>{w('Your private intake is not visible to the other adult.')}</p></Card><Card><h3>{w('Session & payment')}</h3><dl className="shared-payment-facts"><dt>{w('Service')}</dt><dd>{plan.service}</dd><dt>{w('Duration')}</dt><dd>{plan.minutes} {w('minutes')}</dd><dt>{w('Total price')}</dt><dd>ETB {money(plan.price)}</dd><dt>{w('Paying participant')}</dt><dd>{w(plan.you_pay?'You':'Other adult')}</dd><dt>{w('Other participant’s wallet')}</dt><dd>{w('Not charged automatically')}</dd></dl><p className="supporting">{w(plan.you_pay?'You pay the total session price.':'Your wallet is not charged for this session.')}</p>
       {plan.state==='Consented'&&plan.you_pay&&<><Checkbox label={w('I authorize the total session payment.')} checked={pay===plan.id} onChange={event=>setPay(event.target.checked?plan.id:null)}/>{wallet.data&&wallet.data.available<plan.price&&<InlineNotice>{w('Add funds before confirming. The time will be checked again.')} <Button variant="secondary" onClick={()=>setAddFunds(true)}>{w("Add funds")}</Button></InlineNotice>}<Button disabled={pay!==plan.id||action.busy} loading={action.busy} onClick={()=>void action.run(async()=>{const booked=await journeyApi.coupleConfirm(plan.id);navigate('/patient/consultations/'+booked.id);},'')}>{w('Confirm appointment')}</Button></>}
       {plan.appointment&&plan.you_consented&&<Link className="button primary" to={'/patient/consultations/'+plan.appointment}>{w('View consultation')}</Link>}
       {['Invited','Consented','Booked'].includes(plan.state)&&!['Completed','Cancelled','Expired'].includes(plan.appointment_state)&&plan.you_consented&&<details><summary>{w('Withdraw consent')}</summary><p>{w('Before the scheduled start, withdrawal cancels the session and releases its reservation. After the start, the call ends and the fee requires review.')}</p><Button variant="danger" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.coupleWithdraw(plan.id);await plans.refresh();await wallet.refresh();},'')}>{w('Withdraw consent')}</Button></details>}
-      </section></div></Card>)}
+      </Card></div><InlineNotice>{w("One participant’s consent or payment does not substitute for another adult’s consent.")}</InlineNotice></article>)}
     <AddFundsDialog open={addFunds} close={()=>setAddFunds(false)} refresh={wallet.refresh}/>
   </div>;
 }
@@ -50,7 +51,7 @@ export function CoupleInvitation() {
       <Checkbox label={w('Share my saved history')} checked={sharing.history} onChange={event=>{setSharing({...sharing,history:event.target.checked});setPreview(null);}}/>
       <Checkbox label={w('I am 18 or older and freely consent to this shared consultation.')} checked={adult} onChange={event=>setAdult(event.target.checked)}/>
       {preview&&<DisclosurePreview disclosure={preview}/>}{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
-      <div className="actions"><Button variant="secondary" onClick={()=>setStep(0)}>{w("Back")}</Button><Button variant="secondary" disabled={!request.trim()} loading={action.busy} onClick={()=>void action.run(async()=>setPreview((await journeyApi.preview(request,sharing)).disclosure),'')}>{w('Preview')}</Button><Button disabled={!preview||!adult||action.busy} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.coupleConsent({token,request_text:request,sharing,expected_disclosure:preview,adult_confirmed:adult});navigate('/patient/couples');},'')}>{w('Save my choices')}</Button></div></>}
+      <div className="actions"><Button variant="secondary" onClick={()=>setStep(0)}>{w("Back")}</Button><Button variant="secondary" disabled={!request.trim()} loading={action.busy} onClick={()=>void action.run(async()=>setPreview((await journeyApi.preview(request,sharing)).disclosure),'')}>{w('Preview')}</Button><Button disabled={!preview||!adult||action.busy} loading={action.busy} onClick={()=>void action.run(async()=>{const result=await journeyApi.coupleConsent({token,request_text:request,sharing,expected_disclosure:preview,adult_confirmed:adult});navigate('/patient/couples/'+result.id);},'')}>{w('Save my choices')}</Button></div></>}
     </Card>}
   </main></div>;
 }
