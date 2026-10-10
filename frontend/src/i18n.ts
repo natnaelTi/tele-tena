@@ -24,7 +24,7 @@ export const en = {
   failure: 'Request failed. Check approval, availability, funds and your inputs. Retry a booking with the same inputs after a connection failure.',
   loading: 'Working…', noProfile: 'Save your profile to continue.', noOffer: 'No approved offerings yet.',
   requestField: 'Request', nameField: 'Name', historyField: 'History', previewNote: 'Changing inputs clears the preview. Confirmed disclosures are saved snapshots.',
-  consultation: 'Secure voice and video consultation', callNotStarted: 'Not started', callReady: 'Devices checked. Ready to join.',
+  consultation: 'Secure voice and video consultation', callNotStarted: 'Not started', callReady: 'Devices checked.',
   sessionLifecycle: 'Consultation status', mediaStatus: 'Media connection', callNotConnected: 'Not connected', callToggleError: 'That microphone or camera change failed. Check device permissions and retry.',
   callConnecting: 'Connecting…', callConnected: 'Connected', callReconnecting: 'Connection interrupted. Reconnecting…',
   callDisconnected: 'You left the consultation. Rejoin is available during the permitted window.', callEnded: 'The clinician ended this consultation.', completionPending: 'Completion pending',
@@ -83,7 +83,7 @@ export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
 export const am: Record<Key, string> = {
   sessionLifecycle:'የምክክሩ ሁኔታ', mediaStatus:'የሚዲያ ግንኙነት', callNotConnected:'አልተገናኘም', callToggleError:'ማይክሮፎኑን ወይም ካሜራውን መቀየር አልተሳካም። ፈቃዱን ያረጋግጡና እንደገና ይሞክሩ።',
-  consultation:'ደህንነቱ የተጠበቀ የድምፅና ቪዲዮ ምክክር', callNotStarted:'አልተጀመረም', callReady:'መሣሪያዎቹ ተፈትሸዋል። ለመግባት ዝግጁ ነው።',
+  consultation:'ደህንነቱ የተጠበቀ የድምፅና ቪዲዮ ምክክር', callNotStarted:'አልተጀመረም', callReady:'መሣሪያዎቹ ተፈትሸዋል።',
   callConnecting:'በመገናኘት ላይ…', callConnected:'ተገናኝቷል', callReconnecting:'ግንኙነቱ ተቋርጧል። እንደገና በመገናኘት ላይ…',
   callDisconnected:'ከምክክሩ ወጥተዋል። በተፈቀደው ጊዜ እንደገና መግባት ይችላሉ።', callEnded:'ሐኪሙ ይህን ምክክር አቋርጧል።', completionPending:'ማጠናቀቅ በመጠባበቅ ላይ',
   authOptionsUnavailable:'የመግቢያ አማራጮች አልተጫኑም። ግንኙነትዎን ያረጋግጡና ገጹን ያድሱ።', phoneAccessUnavailable:'በዚህ ገጽ የስልክ ኮድ መግቢያ አልተከፈተም። ኢሜይልን ይምረጡ።',
@@ -151,7 +151,7 @@ export const am: Record<Key, string> = {
 }
 export const om: Record<Key, string> = {
   sessionLifecycle:'Haala marii', mediaStatus:'Walqunnamtii miidiyaa', callNotConnected:'Hin wal qabamne', callToggleError:'Mikirofoonii ykn kaameraa jijjiiruun hin milkoofne. Hayyama meeshaalee ilaalii irra deebiʼi yaali.',
-  consultation:'Mariin sagalee fi viidiyoo nageenya qabu', callNotStarted:'Hin jalqabamne', callReady:'Meeshaaleen ilaalaman. Seenuuf qophaaʼe.',
+  consultation:'Mariin sagalee fi viidiyoo nageenya qabu', callNotStarted:'Hin jalqabamne', callReady:'Meeshaaleen ilaalaman.',
   callConnecting:'Wal qunnamaa jira…', callConnected:'Wal qabame', callReconnecting:'Wal qunnamtiin cite. Deebiʼee wal qunnamaa jira…',
   callDisconnected:'Mariirraa baate. Yeroo hayyamame keessatti deebiʼuu dandeessa.', callEnded:'Ogeessi marii kana xumure.', completionPending:'Xumuruun eegamaa jira',
   authOptionsUnavailable:'Filannoowwan seensaa hin feʼamne. Walqunnamtii kee ilaaliitii fuula haaromsi.', phoneAccessUnavailable:'Seensi koodii bilbilaa marsariitii kana irratti hin banamne. Imeelii filadhu.',

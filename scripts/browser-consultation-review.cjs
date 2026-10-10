@@ -23,6 +23,11 @@ const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'tt-call-zoom-'));let browser
   }else{
    await page.goto(base+role+'/consultations/'+appointment);await page.getByRole('heading',{name:'Consultation record',exact:true}).waitFor();
    for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:`${output}/E13-${role}-application-${width}.png`,fullPage:true});}
+   if(role==='clinician'){
+    await page.getByRole('button',{name:'Amend consultation notes',exact:true}).click();await page.getByRole('heading',{name:'Finish the consultation',exact:true}).waitFor();
+    for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:1000});await page.screenshot({path:`${output}/E11-amendment-application-${width}.png`,fullPage:true});const ref=await context.newPage();await ref.setViewportSize({width,height:1000});await ref.goto('http://127.0.0.1:8044/?embed=1#e11');await ref.screenshot({path:`${output}/E11-reference-${width}.png`,fullPage:true});await ref.close();}
+    await page.reload();await page.getByRole('heading',{name:'Consultation record',exact:true}).waitFor();assert.equal(await page.locator('.finalized-note-document').count(),1);
+   }
    const events=await page.locator('.consultation-timeline strong').allTextContents();assert.equal(events.filter(value=>value==='Consultation completed').length,1);assert.equal(events.filter(value=>value==='Documentation published').length,1);
    const inactive=await command(page,'tele_tena.api.consultations.join',{appointment});assert.equal(inactive.category,'appointment_inactive');
    const appointments=(await(await page.request.get('http://127.0.0.1:8017/api/method/tele_tena.api.journey.appointments')).json()).message;
