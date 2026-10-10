@@ -786,3 +786,20 @@ site; its private one-site runtime is enabled with separate queue Redis 13917.
 These are specific functional results, not all-MVP visual or release acceptance.
 Current evidence and outstanding gates remain in the existing journey report and
 `mvp-screen-acceptance.json`; no new acceptance tracker.
+
+## Current MVP gates — 10 October 2026 continuation
+
+Active report: `mvp-journey-verification-2026-10-09.md` current gate table; sole
+screen matrix: `mvp-screen-acceptance.json`. Packaged8ba375e, matching runtime code;
+later verification/documentation commits do not change frontend/backend code.
+Working persisted adult couples core, three-party hosted fake-media End/revocation,
+recipient-specific summary isolation, real registration recovery, native isolated
+release/expiry/restart and fresh v1.33 checks now have passing evidence. Read-only
+owner audit reconciles presentation balances; representative disposable financial
+cutover preserves historical obligations and visibly holds boundary/unknown events.
+Native repeat migration/full record fingerprint passes. Remaining: whole-MVP
+visual/state/language/zoom comparisons and owner review, separate simultaneously
+authored individual follow-up field, jointly consented couples reschedule/extension,
+final integrated candidate checks and current Frappe16 couples verification.
+External gates remain physical devices, live delivery, native translations and
+clinical/provider authorization. No future modules, merge or Selfmade deployment.

@@ -9,7 +9,7 @@ The existing `mvp-screen-acceptance.json` remains the sole screen acceptance mat
 - Branch `feat/mvp-release-handover`; [draft PR #44](https://github.com/natnaelTi/tele-tena/pull/44)
   depends on open PR #43 (`feat/adult-relationship-links`). Ancestor
   `1e8d161468eb8d3563f1b5743982722c749bbcbf` remains included.
-- **Built application source `d720596e385e9f50c1ed9df256c09fd2e9b4cd13`**;
+- **Built application source `8ba375e1febaa2a1e2572488d655867502fb9f32`**;
   later evidence/report commits do not change application code. The packaged
   `tele_tena/public/review/release.json` records this source and asset hashes.
 - **http://127.0.0.1:8017/teletena/** now serves **`teletena-mvp-presentation.localhost`**,
@@ -23,12 +23,79 @@ The existing `mvp-screen-acceptance.json` remains the sole screen acceptance mat
   `erp.localhost`, unrelated workers and Selfmade were not reset or migrated for this switch.
 - Observed local Frappe 15.121.2 / ERPNext 15.121.6, Python 3.12.3, Node 22.23.3.
   These checks are **not** an exact current Frappe 16 rerun.
-- New presentation site's **scheduler is disabled; no dedicated continuous worker/
-  scheduler acceptance run has passed**. Unrelated existing services were left alone.
+- **Dedicated native scheduler and worker are active** in `/home/frappe/teletena-mvp-runtime`; queue Redis loopback 13917. Original/shared site configuration keeps scheduler disabled so unrelated Bench services cannot process this site. See current gate table and native-job evidence below.
 - Normal preview remains intentionally **invited-review**: phone OTP and both public
   registration flags disabled. Phone-first entry remains visible with an accurate
   unavailable state. Email code delivery is unavailable; explicit password sign-in works.
   Enabled-registration was tested separately with a loopback-only transport and then disabled.
+
+## Current gate reconciliation — source/build 8ba375e (10 October 2026)
+
+**This table supersedes all older open/missing/disabled claims below.** Earlier
+sections are retained as dated evidence, not competing current classifications.
+No owner visual acceptance, merge or remote deployment is claimed.
+
+| Gate | Current result | Evidence and remaining boundary |
+| --- | --- | --- |
+| Registration browser | Closed for listed journeys | `check_registration_recovery.py` + `browser-registration-recovery.cjs`: real backend random-code local transport, wrong/expired code, bounded resend cooldown, patient consent/privacy, returning same phone user, clinician intent/private PDF/app submission, reload recovery passed. Test server stopped, codes deleted, original flags restored. Four HMAC/attempt/concurrency/CSRF/manual-approval tests passed. Live delivery not run |
+| Invited review | Closed for existing access | `browser-invited-review.cjs` passes disabled phone/public-registration configuration with explicitly chosen password; no frontend capability mocks or access-policy weakening |
+| Practical content | Closed for explicit idempotent seed; coverage partial | Fictional accounts, offerings, approvals through reviewer API, retained patient sessions and actual shared notes/earnings. No fabricated reviews/credentials or reset balances. Historical synthetic test services are not relabelled |
+| Individual consultation | Preserved | Previously passing hosted fake-device suite retained; not rerun because subsequent UI-only changes do not affect individual media/security |
+| Working couples | Closed for tested core workflow | Latest full hosted three-browser `34641d87cc6b826793482e2963466fd1cd301548`: independent consents, one charge, three-party advancing audio/video, muted/camera-off surfaces, audio-only without extra mic, Leave/rejoin/track cleanup, End and direct SDK rejection of original/app-reissued valid tokens for every identity including departed partner, selected-recipient finalization and one pending earning. DB tests also verify withdrawal/closure retries, unrelated access, concurrent confirmation, fixed-duration extension denial. Separate simultaneous private follow-up field and jointly renewed extensions/rescheduling are not implemented; no silent charge/consent workaround |
+| Couples records | Closed for tested routes | `browser-couples-documents.cjs` on 8ba375e: selected partner sees summary after reload, nonrecipient/private-note omission, local amendment/confirmation with unchanged revision. N07/N08 paired 390/768/1440 captures; not owner visual approval |
+| Native continuous jobs | Closed for tested release/expiry/restart | Isolated worker 495534 (short/default/long), scheduler 495535, queue Redis 487749 at13917. Native Scheduled Job Logs Complete, exactly one release posting, dispute blocks release through successive cycles, worker-down queue/restart processes invitation expiry. One-minute policy only on two new owned fixtures; clock/global policy unchanged. `docs/verification/mvp-current/tt-continuous-processing-result.json` |
+| Current owner reconciliation | Closed on presentation data | Read-only consistent snapshot: 3 patient owners, 1 clinician owner, 6 accounts, zero owner projection/obligation/account/journal mismatches. No repair or balance edit. `tt-presentation-financial-owners.json` |
+| Fresh v1.33 | Passed | Exact disposable `teletena-mvp-v133-fresh.localhost`: Frappe+ERPNext+app install, additive couples tables, guest denial, no initial funding, retained-site fingerprints unchanged. Temporary admin/file removed; disposable site retained for upgrade diagnosis. Source51f5759 test-only changes after packaged8ba375e |
+| Representative legacy financial cutover | Tested financial-schema path; historical whole-app checkout not tested | Empty named disposable database reconstructed absent v1.7 financial tables with 4 patient owners/2 clinicians, historical completed+booked reservations. Opening/retry preserves records, completed LegacyHold never auto-settles, known post-opening import once, exact-boundary/unknown events remain ReviewRequired. Retained failed-fixture diagnosis checked each owner's exact balances without clearing holds. Unknown kind unit retry test passes. Native `bench --site teletena-mvp-v133-fresh.localhost migrate` and `check_financial_migration.py` passed; full legacy/journal/line/reconciliation-value fingerprint retained. Temporary administrator removed; fixture intentionally retained with unresolved synthetic holds; do not describe this as running every old application version |
+| Whole-MVP visual fidelity | Open | Existing single matrix contains exact paired paths and remaining discrepancies. N03/N04 narrow guided forms; N05 focused plan; N06 tiles/activity; N07/N08 recipient/documents corrected. Other pending route/state comparisons, current 200% zoom and language layouts require completion. Screenshots/build are not acceptance |
+| External/manual | Pending | Physical devices/PWA installation, native translations, live SMS/SMTP receipt, medical-lead catalog/rubric/credential and clinical/legal review, real payment/provider activation. No current exact Frappe16 rerun of new couples code |
+
+### Review the current persisted shared record
+
+Open **http://127.0.0.1:8017/teletena/**. Use **Use email instead → Use password
+instead** and the mode-600 private file listed below. The file also contains the
+second adult's fictional credentials. Clinician: Appointments → completed couples
+session → consultation notes → Amend (creates a local draft only until Save).
+Partner: Appointments → completed session → shared summary / Book a follow-up.
+Payer: the same encounter does **not** show the summary selected only for Partner2.
+Patient More → Shared sessions shows consent and appointment links. Reviewer
+queues remain logistics/evidence-only, without clinical-record access.
+
+Paired evidence: `docs/screenshots/couples-current/34641d8/` (hosted media),
+`34641d8-consent/` (separate guided steps), `8ba375e-documents/` (current N07/N08).
+The N07 capture is an amendment, whereas the prototype shows a first draft;
+immutable history/earnings labels intentionally differ. The N08 summary-first
+composition and right privacy panel were visually inspected at1440 and390; actual
+recipient restrictions and demonstration ribbon remain. The separate prototype
+individual follow-up field remains a recorded discrepancy, not a pretend control.
+
+The starting 7b866e8 versus d720596 difference was docs only. Later runtime changes
+were rebuilt explicitly. Current packaged source is8ba375e; following financial
+verification/scripts/docs commits do not change `frontend/` or `tele_tena/`.
+Production assets are served by dedicated Gunicorn453370, not Vite. No public
+ports, original-site migrations or Selfmade changes occurred.
+
+### Focused financial verification and test corrections
+
+- `check_financial_migration.py` now fingerprints reconciliation **values**,
+  not dictionary keys, and all legacy/journal/line records rather than only totals.
+  It passed on the retained v1.33 disposable site after representative cutover.
+- New unknown-kind regression passed (1 test,5.012s): two import retries reject,
+  legacy row/balances/journals remain, audit stays ReviewRequired.
+- Two existing financial tests initially failed because their artificial Ended
+  rooms omitted `room_closed=1`. The newer security guard correctly refused
+  finalization. Only those owned fixtures now explicitly represent a closed room;
+  no production assertion or authorization changed. Both passed (5.855s).
+- New real-connection dispute/release race passed (1 test,7.167s): exactly one terminal outcome, no simultaneous release and open dispute, release retry does not duplicate posting. Concurrent payout test passed in the initial three-test run; the two stale-room
+  fixture failures above are preserved in this account rather than claimed passed.
+- Retained legacy fixture initially failed when the harness called a financial
+  command on its intentionally held wallet. Read-only retained diagnosis verified
+  exact balances and held-command denial; no deletion, balance repair or hold
+  clearance was used to hide that failure. The corrected harness checks healthy
+  owners and held owners separately. This result is a financial-schema fixture,
+  not an exact whole historical application installation.
+
+## Historical checkpoints (superseded classifications retained)
 
 ## Presentation data and account access
 
@@ -50,8 +117,8 @@ Patient: `patient.presentation@example.invalid`; clinician: `clinician.presentat
 reviewer: `reviewer.presentation@example.invalid`. Select **Use email instead → Use password instead**.
 The earlier review-account file belongs to the retained old site and is not this preview's credentials.
 
-Two actual bookings are retained: one direct calendar booking and one private offer
-acceptance, each ETB300. Patient currently ETB400 available / ETB600 reserved.
+At the earlier presentation setup checkpoint, two actual bookings were retained: one direct calendar booking and one private offer
+acceptance, each ETB300. Patient then had ETB400 available / ETB600 reserved; this is not the current wallet.
 Repeat setup after those bookings preserves exact owner wallets, schedules, applications,
 appointments, legacy events, accounts and journal lines; no duplicate seed or reset.
 A cancelled no-supply request and interrupted registration records are retained, not deleted

@@ -1,0 +1,14 @@
+{
+  "site": "teletena-mvp-v133-fresh.localhost",
+  "legacy_patient_owners": 4,
+  "legacy_clinician_owners": 2,
+  "legacy_completed_holds": 1,
+  "opening_journals": 4,
+  "known_post_opening_import_once": true,
+  "boundary_held_without_duplicate": true,
+  "unknown_event_retained_and_held": true,
+  "original_wallets_and_appointments_preserved": true,
+  "automatic_historical_settlement": false,
+  "scope": "representative financial-schema upgrade; not whole historical app checkout",
+  "retained_failure_diagnosis": "held-wallet command rejection was expected; projections verified by owner without clearing holds"
+}

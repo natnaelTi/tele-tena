@@ -1,0 +1,12 @@
+{
+  "source": "8ba375e1febaa2a1e2572488d655867502fb9f32",
+  "site": "teletena-mvp-presentation.localhost",
+  "recipient_isolation": true,
+  "reload": true,
+  "amendment_not_saved": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ]
+}

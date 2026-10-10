@@ -1,7 +1,7 @@
 {
   "version": 2,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "22373e495223e2ee45f7a75a0e43e5f9258604d7",
+  "source_checkpoint": "8ba375e1febaa2a1e2572488d655867502fb9f32",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -12956,9 +12956,9 @@
       "requirements_source": "docs/operational-screen-map.json#N01",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N01) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md.",
+        "implementation": "tele_tena/api/couples.py; v1_33_couples_consultations; frontend/src/pages/Couples.tsx; verified core consultation APIs reused.",
+        "current_local": "See active gate reconciliation in docs/mvp-journey-verification-2026-10-09.md; inherited missing-workflow claims superseded.",
+        "couples_release_gate": "Implemented and locally tested on specific persisted consent/media/recipient paths; full visual/language/zoom acceptance remains pending.",
         "couples_current": "docs/mvp-journey-verification-2026-10-09.md#couples-and-continuous-processing--2026-10-10"
       },
       "visual_acceptance": {
@@ -13038,11 +13038,14 @@
         ],
         "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
         "functional_status": "Locally verified on the specific paths in 2026-10-10 evidence; remaining states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure observed on the explicitly listed tested paths. Untested states remain pending, including current all-route language/zoom checks.",
         "implementation_files": [
           "frontend/src/pages/Couples.tsx",
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx",
           "tele_tena/api/couples.py",
-          "frontend/src/pages/Booking.tsx"
+          "tele_tena/api/presentation.py",
+          "tele_tena/api/consultations.py"
         ],
         "expected_reference_actions": [
           {
@@ -13075,9 +13078,9 @@
       "requirements_source": "docs/operational-screen-map.json#N02",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N02) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md.",
+        "implementation": "tele_tena/api/couples.py; v1_33_couples_consultations; frontend/src/pages/Couples.tsx; verified core consultation APIs reused.",
+        "current_local": "See active gate reconciliation in docs/mvp-journey-verification-2026-10-09.md; inherited missing-workflow claims superseded.",
+        "couples_release_gate": "Implemented and locally tested on specific persisted consent/media/recipient paths; full visual/language/zoom acceptance remains pending.",
         "couples_current": "docs/mvp-journey-verification-2026-10-09.md#couples-and-continuous-processing--2026-10-10"
       },
       "visual_acceptance": {
@@ -13144,11 +13147,14 @@
         "expected_actions": [],
         "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
         "functional_status": "Locally verified on the specific paths in 2026-10-10 evidence; remaining states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure observed on the explicitly listed tested paths. Untested states remain pending, including current all-route language/zoom checks.",
         "implementation_files": [
           "frontend/src/pages/Couples.tsx",
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx",
           "tele_tena/api/couples.py",
-          "frontend/src/pages/Booking.tsx"
+          "tele_tena/api/presentation.py",
+          "tele_tena/api/consultations.py"
         ],
         "expected_reference_actions": [
           {
@@ -13173,9 +13179,9 @@
       "requirements_source": "docs/operational-screen-map.json#N03",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N03) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md.",
+        "implementation": "tele_tena/api/couples.py; v1_33_couples_consultations; frontend/src/pages/Couples.tsx; verified core consultation APIs reused.",
+        "current_local": "See active gate reconciliation in docs/mvp-journey-verification-2026-10-09.md; inherited missing-workflow claims superseded.",
+        "couples_release_gate": "Implemented and locally tested on specific persisted consent/media/recipient paths; full visual/language/zoom acceptance remains pending.",
         "couples_current": "docs/mvp-journey-verification-2026-10-09.md#couples-and-continuous-processing--2026-10-10"
       },
       "visual_acceptance": {
@@ -13192,7 +13198,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Exact reference compositions for consent/payment/record pages still require paired comparison; no visual acceptance inferred from passing APIs.",
+        "current_differences": "Narrow guided white surface and separate invitation/intake steps match core reference composition. Added service/time/price context and explicit profile sharing controls are operational extensions. Prototype inviter name is omitted when not authorized. Back preserves unsaved intake. Native language and real zoom pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -13200,10 +13206,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implementation connected; visual correction/comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Paired captures recorded; specific comparison notes below. Owner visual acceptance pending.",
+        "reference_screenshots": [
+          "docs/screenshots/couples-current/34641d8-consent/N03-reference-1440.png",
+          "docs/screenshots/couples-current/34641d8-consent/N03-reference-390.png",
+          "docs/screenshots/couples-current/34641d8-consent/N03-reference-768.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/couples-current/34641d8-consent/N03-application-1440.png",
+          "docs/screenshots/couples-current/34641d8-consent/N03-application-390.png",
+          "docs/screenshots/couples-current/34641d8-consent/N03-application-768.png"
+        ],
+        "comparison_notes": [
+          "Inspected reference/application 1440px pair; guided form width and separate steps corrected. 390/768 pairs captured; not owner acceptance."
+        ],
         "viewports": [
           390,
           768,
@@ -13243,11 +13259,14 @@
         ],
         "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
         "functional_status": "Locally verified on the specific paths in 2026-10-10 evidence; remaining states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure observed on the explicitly listed tested paths. Untested states remain pending, including current all-route language/zoom checks.",
         "implementation_files": [
           "frontend/src/pages/Couples.tsx",
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx",
           "tele_tena/api/couples.py",
-          "frontend/src/pages/Booking.tsx"
+          "tele_tena/api/presentation.py",
+          "tele_tena/api/consultations.py"
         ],
         "expected_reference_actions": [
           {
@@ -13280,9 +13299,9 @@
       "requirements_source": "docs/operational-screen-map.json#N04",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N04) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md.",
+        "implementation": "tele_tena/api/couples.py; v1_33_couples_consultations; frontend/src/pages/Couples.tsx; verified core consultation APIs reused.",
+        "current_local": "See active gate reconciliation in docs/mvp-journey-verification-2026-10-09.md; inherited missing-workflow claims superseded.",
+        "couples_release_gate": "Implemented and locally tested on specific persisted consent/media/recipient paths; full visual/language/zoom acceptance remains pending.",
         "couples_current": "docs/mvp-journey-verification-2026-10-09.md#couples-and-continuous-processing--2026-10-10"
       },
       "visual_acceptance": {
@@ -13299,7 +13318,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Exact reference compositions for consent/payment/record pages still require paired comparison; no visual acceptance inferred from passing APIs.",
+        "current_differences": "Narrow guided white surface and separate invitation/intake steps match core reference composition. Added service/time/price context and explicit profile sharing controls are operational extensions. Prototype inviter name is omitted when not authorized. Back preserves unsaved intake. Native language and real zoom pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -13307,10 +13326,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implementation connected; visual correction/comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Paired captures recorded; specific comparison notes below. Owner visual acceptance pending.",
+        "reference_screenshots": [
+          "docs/screenshots/couples-current/34641d8-consent/N04-reference-1440.png",
+          "docs/screenshots/couples-current/34641d8-consent/N04-reference-390.png",
+          "docs/screenshots/couples-current/34641d8-consent/N04-reference-768.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/couples-current/34641d8-consent/N04-application-1440.png",
+          "docs/screenshots/couples-current/34641d8-consent/N04-application-390.png",
+          "docs/screenshots/couples-current/34641d8-consent/N04-application-768.png"
+        ],
+        "comparison_notes": [
+          "Inspected reference/application 1440px pair; guided form width and separate steps corrected. 390/768 pairs captured; not owner acceptance."
+        ],
         "viewports": [
           390,
           768,
@@ -13348,11 +13377,14 @@
         "expected_actions": [],
         "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
         "functional_status": "Locally verified on the specific paths in 2026-10-10 evidence; remaining states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure observed on the explicitly listed tested paths. Untested states remain pending, including current all-route language/zoom checks.",
         "implementation_files": [
           "frontend/src/pages/Couples.tsx",
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx",
           "tele_tena/api/couples.py",
-          "frontend/src/pages/Booking.tsx"
+          "tele_tena/api/presentation.py",
+          "tele_tena/api/consultations.py"
         ],
         "expected_reference_actions": [
           {
@@ -13369,7 +13401,7 @@
     {
       "id": "N05",
       "title": "Ready for your shared session",
-      "route": "/patient/couples",
+      "route": "/patient/couples/:planId",
       "release_disposition": "MVP",
       "reason": "Working two-adult couples required by user decision 2026-10-08; family/group workflows deferred.",
       "inherited_status": "Designed",
@@ -13377,16 +13409,16 @@
       "requirements_source": "docs/operational-screen-map.json#N05",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N05) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md.",
+        "implementation": "tele_tena/api/couples.py; v1_33_couples_consultations; frontend/src/pages/Couples.tsx; verified core consultation APIs reused.",
+        "current_local": "See active gate reconciliation in docs/mvp-journey-verification-2026-10-09.md; inherited missing-workflow claims superseded.",
+        "couples_release_gate": "Implemented and locally tested on specific persisted consent/media/recipient paths; full visual/language/zoom acceptance remains pending.",
         "couples_current": "docs/mvp-journey-verification-2026-10-09.md#couples-and-continuous-processing--2026-10-10"
       },
       "visual_acceptance": {
         "reference_screen": "N05",
         "reference_hash": "#n05",
         "reference_url": "http://127.0.0.1:8044/?embed=1#n05",
-        "product_route": "/patient/couples",
+        "product_route": "/patient/couples/:planId",
         "actor": "Independently authenticated adult participants; clinician for call",
         "states": [
           "populated",
@@ -13396,7 +13428,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Exact reference compositions for consent/payment/record pages still require paired comparison; no visual acceptance inferred from passing APIs.",
+        "current_differences": "Focused selected-plan readiness/payment; authorized get_plan query avoids an overflowing history wall. Native server confirmation performs one reservation; no funds held by invitation. Final grid specificity corrected in 8c74201; latest N05 capture of that CSS still pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -13404,9 +13436,17 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implementation connected; visual correction/comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
+        "correction_status": "Paired captures recorded; specific comparison notes below. Owner visual acceptance pending.",
+        "reference_screenshots": [
+          "docs/screenshots/couples-current/34641d8/N05-reference-1440.png",
+          "docs/screenshots/couples-current/34641d8/N05-reference-390.png",
+          "docs/screenshots/couples-current/34641d8/N05-reference-768.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/couples-current/34641d8/N05-application-1440.png",
+          "docs/screenshots/couples-current/34641d8/N05-application-390.png",
+          "docs/screenshots/couples-current/34641d8/N05-application-768.png"
+        ],
         "comparison_notes": [],
         "viewports": [
           390,
@@ -13452,11 +13492,14 @@
         ],
         "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
         "functional_status": "Locally verified on the specific paths in 2026-10-10 evidence; remaining states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure observed on the explicitly listed tested paths. Untested states remain pending, including current all-route language/zoom checks.",
         "implementation_files": [
           "frontend/src/pages/Couples.tsx",
+          "frontend/src/pages/ConsultationPage.tsx",
+          "frontend/src/features/consultations/Consultation.tsx",
           "tele_tena/api/couples.py",
-          "frontend/src/pages/Booking.tsx"
+          "tele_tena/api/presentation.py",
+          "tele_tena/api/consultations.py"
         ],
         "expected_reference_actions": [
           {
@@ -13481,9 +13524,9 @@
       "requirements_source": "docs/operational-screen-map.json#N06",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N06) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md.",
+        "implementation": "tele_tena/api/couples.py; v1_33_couples_consultations; frontend/src/pages/Couples.tsx; verified core consultation APIs reused.",
+        "current_local": "See active gate reconciliation in docs/mvp-journey-verification-2026-10-09.md; inherited missing-workflow claims superseded.",
+        "couples_release_gate": "Implemented and locally tested on specific persisted consent/media/recipient paths; full visual/language/zoom acceptance remains pending.",
         "couples_current": "docs/mvp-journey-verification-2026-10-09.md#couples-and-continuous-processing--2026-10-10"
       },
       "visual_acceptance": {
@@ -13500,7 +13543,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Exact reference compositions for consent/payment/record pages still require paired comparison; no visual acceptance inferred from passing APIs.",
+        "current_differences": "Large clinician plus two adult tiles, independent camera-off surfaces; explicit audio mode uses actual per-participant activity. Participant labels remain masked by disclosure. Global demonstration ribbon and real fullscreen/audio controls are deliberate operational additions. Physical devices and current translated/zoom layouts pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -13508,19 +13551,19 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implementation connected; visual correction/comparison pending",
+        "correction_status": "Paired captures recorded; specific comparison notes below. Owner visual acceptance pending.",
         "reference_screenshots": [
-          "docs/screenshots/couples-current/9d148b5/N06-reference-390.png",
-          "docs/screenshots/couples-current/9d148b5/N06-reference-768.png",
-          "docs/screenshots/couples-current/9d148b5/N06-reference-1440.png"
+          "docs/screenshots/couples-current/34641d8/N06-reference-1440.png",
+          "docs/screenshots/couples-current/34641d8/N06-reference-390.png",
+          "docs/screenshots/couples-current/34641d8/N06-reference-768.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/couples-current/9d148b5/N06-application-390.png",
-          "docs/screenshots/couples-current/9d148b5/N06-application-768.png",
-          "docs/screenshots/couples-current/9d148b5/N06-application-1440.png"
+          "docs/screenshots/couples-current/34641d8/N06-application-1440.png",
+          "docs/screenshots/couples-current/34641d8/N06-application-390.png",
+          "docs/screenshots/couples-current/34641d8/N06-application-768.png"
         ],
         "comparison_notes": [
-          "Inspected matching 1440 pair: correct light contained stage and clinician-dominant participant layout; earlier intrinsic video sizing made right tiles uneven. Follow-up correction constrains grid rows and provides camera-off surfaces. New comparison pending. Portraits are actual fake media, not copied reference photos; participant labels intentionally reflect disclosure."
+          "Hosted fake-media 34641d8 pairs and camera-off correction inspected. Audio mode makes two authorized speaking surfaces without acquiring an extra microphone."
         ],
         "viewports": [
           390,
@@ -13554,11 +13597,14 @@
         "expected_actions": [],
         "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
         "functional_status": "Locally verified on the specific paths in 2026-10-10 evidence; remaining states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure observed on the explicitly listed tested paths. Untested states remain pending, including current all-route language/zoom checks.",
         "implementation_files": [
+          "frontend/src/pages/Couples.tsx",
+          "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/features/consultations/Consultation.tsx",
-          "tele_tena/api/consultations.py",
-          "tele_tena/api/presentation.py"
+          "tele_tena/api/couples.py",
+          "tele_tena/api/presentation.py",
+          "tele_tena/api/consultations.py"
         ],
         "expected_reference_actions": [
           {
@@ -13579,9 +13625,9 @@
       "requirements_source": "docs/operational-screen-map.json#N07",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N07) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md.",
+        "implementation": "tele_tena/api/couples.py; v1_33_couples_consultations; frontend/src/pages/Couples.tsx; verified core consultation APIs reused.",
+        "current_local": "See active gate reconciliation in docs/mvp-journey-verification-2026-10-09.md; inherited missing-workflow claims superseded.",
+        "couples_release_gate": "Implemented and locally tested on specific persisted consent/media/recipient paths; full visual/language/zoom acceptance remains pending.",
         "couples_current": "docs/mvp-journey-verification-2026-10-09.md#couples-and-continuous-processing--2026-10-10"
       },
       "visual_acceptance": {
@@ -13598,7 +13644,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Exact reference compositions for consent/payment/record pages still require paired comparison; no visual acceptance inferred from passing APIs.",
+        "current_differences": "Notes/recipients main column and Before finalizing side panel now match reference hierarchy; immutable amendment notice and explicit earnings/call state are truthful additions. Capture is amendment state, reference initial draft. Separate simultaneously authored individual follow-up field is not implemented; one recipient-specific summary revision is supported. Recipient controls precede summary field; full visual acceptance remains open.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -13606,10 +13652,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implementation connected; visual correction/comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Paired captures recorded; specific comparison notes below. Owner visual acceptance pending.",
+        "reference_screenshots": [
+          "docs/screenshots/couples-current/8ba375e-documents/N07-reference-1440.png",
+          "docs/screenshots/couples-current/8ba375e-documents/N07-reference-390.png",
+          "docs/screenshots/couples-current/8ba375e-documents/N07-reference-768.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/couples-current/8ba375e-documents/N07-application-1440.png",
+          "docs/screenshots/couples-current/8ba375e-documents/N07-application-390.png",
+          "docs/screenshots/couples-current/8ba375e-documents/N07-application-768.png"
+        ],
+        "comparison_notes": [
+          "8ba375e pairs inspected at 1440px; private note/shared summary panels and 1.7:1 main/sidebar proportions. Extra history moved into expandable sections. Named participants intentionally masked where names not disclosed."
+        ],
         "viewports": [
           390,
           768,
@@ -13663,11 +13719,14 @@
         ],
         "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
         "functional_status": "Locally verified on the specific paths in 2026-10-10 evidence; remaining states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure observed on the explicitly listed tested paths. Untested states remain pending, including current all-route language/zoom checks.",
         "implementation_files": [
+          "frontend/src/pages/Couples.tsx",
+          "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/features/consultations/Consultation.tsx",
-          "tele_tena/api/consultations.py",
-          "tele_tena/api/presentation.py"
+          "tele_tena/api/couples.py",
+          "tele_tena/api/presentation.py",
+          "tele_tena/api/consultations.py"
         ],
         "expected_reference_actions": [
           {
@@ -13688,9 +13747,9 @@
       "requirements_source": "docs/operational-screen-map.json#N08",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N08) and design-handoff.md",
-        "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md.",
+        "implementation": "tele_tena/api/couples.py; v1_33_couples_consultations; frontend/src/pages/Couples.tsx; verified core consultation APIs reused.",
+        "current_local": "See active gate reconciliation in docs/mvp-journey-verification-2026-10-09.md; inherited missing-workflow claims superseded.",
+        "couples_release_gate": "Implemented and locally tested on specific persisted consent/media/recipient paths; full visual/language/zoom acceptance remains pending.",
         "couples_current": "docs/mvp-journey-verification-2026-10-09.md#couples-and-continuous-processing--2026-10-10"
       },
       "visual_acceptance": {
@@ -13707,7 +13766,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Exact reference compositions for consent/payment/record pages still require paired comparison; no visual acceptance inferred from passing APIs.",
+        "current_differences": "Shared summary and working follow-up lead main column, privacy panel at right; actual clinician and booked duration retained, reliable connected duration not invented. Recipient-restricted content differs truthfully from prototype both-recipient text. Audit and snapshot details remain expandable. Reference separate next-steps field is currently summary text; owner review remains pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -13715,10 +13774,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implementation connected; visual correction/comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Paired captures recorded; specific comparison notes below. Owner visual acceptance pending.",
+        "reference_screenshots": [
+          "docs/screenshots/couples-current/8ba375e-documents/N08-reference-1440.png",
+          "docs/screenshots/couples-current/8ba375e-documents/N08-reference-390.png",
+          "docs/screenshots/couples-current/8ba375e-documents/N08-reference-768.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/couples-current/8ba375e-documents/N08-application-1440.png",
+          "docs/screenshots/couples-current/8ba375e-documents/N08-application-390.png",
+          "docs/screenshots/couples-current/8ba375e-documents/N08-application-768.png"
+        ],
+        "comparison_notes": [
+          "8ba375e pairs inspected; summary-first layout/compact details corrected rather than facts-first generic appointment page. Non-recipient receives no shared summary or private note."
+        ],
         "viewports": [
           390,
           768,
@@ -13762,11 +13831,14 @@
         ],
         "expected_next_states": "Invitation → individually accepted/rejected/expired; all required consents → shared session; consent revoked → participant removed; each note recipient explicit.",
         "functional_status": "Locally verified on the specific paths in 2026-10-10 evidence; remaining states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure observed on the explicitly listed tested paths. Untested states remain pending, including current all-route language/zoom checks.",
         "implementation_files": [
+          "frontend/src/pages/Couples.tsx",
+          "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/features/consultations/Consultation.tsx",
-          "tele_tena/api/consultations.py",
-          "tele_tena/api/presentation.py"
+          "tele_tena/api/couples.py",
+          "tele_tena/api/presentation.py",
+          "tele_tena/api/consultations.py"
         ],
         "expected_reference_actions": [
           {
@@ -13854,7 +13926,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
-  "current_packaged_source": "22373e495223e2ee45f7a75a0e43e5f9258604d7",
+  "current_packaged_source": "8ba375e1febaa2a1e2572488d655867502fb9f32",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
