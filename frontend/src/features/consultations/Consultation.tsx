@@ -9,7 +9,7 @@ import "./consultation-room.css";
 import { ApiError, api } from "../../api";
 import type { Key } from "../../i18n";
 import ExtensionPanel from "./ExtensionPanel";
-type Appointment = { id: string; display_identity?:string; call_state?:string };
+type Appointment = { id: string; display_identity?:string; call_state?:string; service_label?:string; minutes?:number; consultation_format?:string };
 type ConsultationInfo = {
   state: "Not started" | "Open" | "Ended";
   role: "patient" | "clinician";
@@ -337,7 +337,7 @@ export default function Consultation({
   const connected = Boolean(roomRef.current);
   const detailRoute = `/${info?.role || "patient"}/consultations/${appointment.id}`;
   return (
-    <section className="consultation" aria-label={t("consultation")}>
+    <section className={`consultation ${connected ? "room-connected" : "room-preflight"}`} aria-label={t("consultation")}>
       <h2>{info?.state === "Ended" ? t("callEnded") : connected ? t("consultation") : w("Before you join")}</h2>
       <p>
         {t("sessionLifecycle")}: {t(lifecycleStatus)}
@@ -351,7 +351,7 @@ export default function Consultation({
         {info.room_close_pending && <p role="alert">{t("callClosePending")}</p>}
       </div>}
       {!connected && info?.state !== "Ended" && (
-        <>
+        <div className="device-check-layout"><div className="device-check-preview">
           <label className="check">
             <input
               type="checkbox"
@@ -382,6 +382,7 @@ export default function Consultation({
               aria-label={t("localPreview")}
             />
           )}
+          </div><aside className="device-check-summary"><h3>{appointment.display_identity || w("Private participant")}</h3><p>{appointment.service_label}</p><p>{appointment.minutes} {w("minutes")} · {t(audioOnly ? "audioOnly" : "consultation")}</p><p>{w("Find a private space")}. {w("Use headphones if possible.")}</p>
           <button className="button"
             disabled={busy || !checked || !info?.can_join}
             onClick={() => void join()}
@@ -391,15 +392,14 @@ export default function Consultation({
           <button className="button secondary" type="button" disabled={busy} onClick={() => void refresh()}>
             {t("refreshCall")}
           </button>
-        </>
+        </aside></div>
       )}
-      {connected&&<div className={`media-stage ${audioOnly?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected}>
+      {connected&&<div className="room-workspace"><div className="room-main"><div className={`media-stage ${audioOnly?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected}>
         <div ref={node => { remote.current = node; attachMedia(); }} className={audioOnly?"call-audio-hidden":"call-remote"} aria-label={t("remoteMedia")}/>
         {audioOnly&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><h2>{appointment.display_identity||"Private participant"}</h2><p>{mediaStatus==="callConnected"?"Connected":"Reconnecting"}</p></div>}
         {!audioOnly&&<video ref={node => { selfPreview.current = node; attachMedia(); }} autoPlay muted playsInline className="self-preview" hidden={!cameraOn} aria-label="Your camera"/>}
         <button className="fullscreen-control" type="button" onClick={()=>void toggleFullscreen()} aria-label="Expand consultation"><Maximize2 size={20}/></button>
-      </div>}
-      {connected && (
+      </div>
         <div className="call-controls">
           <button
             type="button"
@@ -439,8 +439,7 @@ export default function Consultation({
               {t("endConsultation")}
             </button>
           )}
-        </div>
-      )}
+        </div></div><aside className="room-session-details"><h3>{appointment.display_identity || w("Private participant")}</h3><dl><dt>{w("Service")}</dt><dd>{appointment.service_label}</dd><dt>{w("Booked duration")}</dt><dd>{appointment.minutes} {w("minutes")}</dd></dl><p>{w("Booked duration is not measured connected time.")}</p><Link to={detailRoute}>{w("Appointment details")}</Link></aside></div>}
       {info?.can_end && !connected && (
         <button
           className="end-call"

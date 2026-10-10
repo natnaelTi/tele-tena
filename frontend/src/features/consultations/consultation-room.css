@@ -20,3 +20,16 @@
 .focused-call .consultation:fullscreen .media-stage {height:calc(100dvh - 240px);max-height:none;}
 @media(max-width:600px){.focused-call .consultation:has(.media-stage){padding:12px;}.focused-call .consultation .media-stage{min-height:360px;height:55dvh;}.focused-call .consultation .self-preview{width:100px;height:80px;right:12px;bottom:12px;}.focused-call .consultation .call-controls{gap:8px;}.focused-call .consultation .call-controls button{font-size:14px;}}
 @media(prefers-reduced-motion:reduce){.focused-call .consultation .audio-avatar{animation:none!important;}}
+.focused-call .room-workspace {display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:24px;}
+.focused-call .room-main {min-width:0;}
+.focused-call .room-session-details {padding:28px 0;}
+.focused-call .room-session-details h3 {color:white;font-size:17px;}
+.focused-call .room-session-details dl {margin:24px 0;}
+.focused-call .room-session-details dt {color:#aabfc9;font-size:14px;}
+.focused-call .room-session-details dd {margin:4px 0 18px;padding-bottom:16px;border-bottom:1px solid #ffffff18;font-size:14px;}
+.focused-call .room-session-details p,.focused-call .room-session-details a {font-size:14px;color:#b7cbd4;}
+.focused-call .device-check-layout {display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:24px;align-items:start;margin-top:24px;}
+.focused-call .device-check-preview .call-video {width:100%;height:320px;object-fit:cover;border-radius:16px;background:#243b44;margin-top:16px;}
+.focused-call .device-check-summary {border:1px solid var(--border);padding:28px;border-radius:16px;background:white;}
+.focused-call .device-check-summary .button {display:flex;margin-top:16px;width:100%;}
+@media(max-width:800px){.focused-call .room-workspace,.focused-call .device-check-layout{grid-template-columns:minmax(0,1fr);}.focused-call .room-session-details{padding:0;border-top:1px solid #ffffff18;}.focused-call .device-check-preview .call-video{height:260px;}}
