@@ -73,7 +73,7 @@ body:has(.focused-call) {background:white;}
 .focused-call .light-call-header {display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;margin-bottom:32px;border-bottom:1px solid var(--border);}
 .focused-call .room-preflight {border:0;padding:0;background:white;border-radius:0;}
 .focused-call:has(.room-preflight),.focused-call:has(.room-audio-layout) {max-width:1200px;padding:0 36px 48px;}
-.focused-call .consultation.room-audio-layout {background:white;color:var(--text-primary);padding:0;}
+.focused-call .consultation.room-audio-layout {border:0;border-radius:0;background:white;color:var(--text-primary);padding:0;}
 .focused-call .room-audio-layout .room-workspace {grid-template-columns:minmax(0,1fr);}
 .focused-call .room-session-details[hidden] {display:none;}
 .focused-call .audio-page-title {margin-bottom:32px;}
@@ -88,7 +88,7 @@ body:has(.focused-call) {background:white;}
 .focused-call .reference-audio-stage .audio-activity-caption {font-size:14px;}
 .focused-call .room-audio-layout .call-controls {background:#0b2028;border-radius:0 0 16px 16px;padding:22px;gap:18px;}
 .focused-call .room-audio-layout .call-controls button:not(.end-call) svg {border-radius:50%;background:#274a55;border:0;}
-.focused-call .room-audio-layout .call-controls .leave-call svg {background:#be3940;}
+.focused-call .room-audio-layout .call-controls button.leave-call svg {background:#be3940;}
 .focused-call .audio-session-more {margin-top:32px;border-top:1px solid var(--border);padding-top:16px;}
 .focused-call .audio-session-more > summary {min-height:44px;cursor:pointer;}
 @media(max-width:600px){.focused-call:has(.room-preflight),.focused-call:has(.room-audio-layout){padding:0 20px 32px;}.focused-call .light-call-header{flex-wrap:wrap;}.focused-call .audio-page-title h1{font-size:32px;}.focused-call .room-audio-layout .media-stage{min-height:440px;padding:32px 20px;}.focused-call .room-audio-layout .call-controls{gap:12px;}}

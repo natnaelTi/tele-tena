@@ -2576,6 +2576,8 @@ class Presentation(unittest.TestCase):
         self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_earning WHERE appointment=%s', (appointment,)).n, 1)
         fixtures.login('p1')
         detail = presentation.appointment_detail(appointment)
+        self.assertEqual(sum(event['event'] == 'Consultation completed' for event in detail['timeline']), 1)
+        self.assertEqual(sum(event['event'] == 'Documentation published' for event in detail['timeline']), 1)
         self.assertNotIn('private_note', detail)
         self.assertNotIn('Private fictional note', str(detail))
         from tele_tena.api import consultations
@@ -2717,6 +2719,11 @@ class Presentation(unittest.TestCase):
             presentation.care_patient_record(first['id'])
 
     def test_04_notes_privacy_revision_completion_and_encounter_scope(self):
+        fixtures.login('p1')
+        previous_count = sum(row.completed_sessions for row in journey.previous_clinicians())
+        clinician_id = journey.one('SELECT public_id FROM tt_profile WHERE user=%s',
+                                   (fixtures.USERS['c1'],)).public_id
+        reliability_before = open_requests.clinician_profile(clinician_id)['trust_indicators']['reliability']['sample_count']
         self.fund_patient('p1', 3000)
         day, _, _ = self.make_schedule(mode='automatic')
         offering = fixtures.Integration.offers['c1']
@@ -2784,7 +2791,7 @@ class Presentation(unittest.TestCase):
         previous = journey.previous_clinicians()
         self.assertEqual(len(previous), 1)
         self.assertEqual(previous[0].display_name, 'Synthetic Test')
-        self.assertEqual(previous[0].completed_sessions, 1)
+        self.assertEqual(previous[0].completed_sessions, previous_count + 1)
         self.assertNotEqual(previous[0].clinician_id, fixtures.USERS['c1'])
         self.assertNotIn(fixtures.USERS['c1'], json.dumps(previous, default=str))
         fixtures.login('p2')
@@ -2834,7 +2841,7 @@ class Presentation(unittest.TestCase):
         self.assertEqual(response_metric['sample_count'], 0)
         self.assertIsNone(response_metric['rate_percent'])
         reliability_metric = public_profile['trust_indicators']['reliability']
-        self.assertEqual(reliability_metric['sample_count'], 1)
+        self.assertEqual(reliability_metric['sample_count'], reliability_before + 1)
         self.assertIsNone(reliability_metric['rate_percent'])
         fixtures.login('c1')
         presentation.save_note_draft(appointment, 'Amended private observation', 'New next steps')
