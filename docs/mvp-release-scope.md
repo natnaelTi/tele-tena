@@ -121,3 +121,44 @@ No claim of readiness until every included acceptance criterion has authoritativ
 current-source evidence or an explicitly allowed external-activation limitation.
 A designed, mocked or rendered screen is not operational acceptance. No automatic
 merge, deployment, seed, legacy adjustment or external delivery is authorized.
+
+## Couples operational implementation contract — v1 (2026-10-10)
+
+Two independently authenticated adults explicitly consent to a single selected
+service, slot, duration and whole-session price before the payer confirms. One
+patient is the payer; the other has no wallet or private-record access through
+participation. The existing reservation, cancellation, completion and earning
+postings remain authoritative and occur once for the appointment. Invitations
+are private, manually shared, short-lived bearer links whose digest is stored;
+relationship affiliation is neither required nor sufficient for participation.
+
+Each adult approves an immutable clinician-facing disclosure preview, including
+any private intake they voluntarily share. Another adult receives their own
+snapshot only. Opaque participant identities are separate from email/accounts.
+New or altered service/time/price requires a new invitation and both consents.
+Plans hold no slot or money; confirmation revalidates both accounts, current
+scope, all participants' conflicts, schedule and funds atomically.
+
+A couple appointment requires both active consents to issue any new room token.
+The clinician and two adults have independent opaque room identities; End
+revokes every issued identity, including departed participants, using the
+existing Cloud cutoff behavior. Leave never withdraws consent. Private clinician
+notes stay private. Publication explicitly selects participant recipients per
+revision; no recipient is inferred from payment or relationship. A withdrawn
+participant loses new room/clinical access. Earlier sharing remains audited.
+
+Demonstration withdrawal rule: before the scheduled start, withdraw cancels the
+whole appointment and returns its one reservation exactly once; during/after
+start it ends the room and holds the unchanged reservation for operational
+resolution, without automatically charging, refunding or finalizing. Unsupported
+post-release corrections stop for authorized review. No-show adjudication stays
+deferred. Family/group and couples open-request matching remain post-handover;
+this release's couples entry uses explicitly consented direct booking.
+
+Statuses: Invited → Consented → Booked; prebooking Cancelled/Expired, participant
+Consented → Withdrawn, and existing appointment/call/document states independently.
+Acceptance: independent consent and preview; no cross-person disclosure; concurrent
+confirmation makes one appointment/reservation; participant conflicts; three
+media sessions, Leave/rejoin and all-identity End revocation; explicit recipients;
+withdrawal/outsider denials; one consumed reservation and pending earning.
+Implementation and verification remain open until that evidence passes.

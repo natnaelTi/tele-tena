@@ -130,3 +130,6 @@ def install():
     explicit_note_sharing()
     from tele_tena.patches.v1_32_note_sharing_draft_choice import execute as note_sharing_draft_choice
     note_sharing_draft_choice()
+
+    from tele_tena.patches.v1_33_couples_consultations import execute as couples_consultations
+    couples_consultations()

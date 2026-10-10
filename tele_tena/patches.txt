@@ -35,3 +35,5 @@ tele_tena.patches.v1_29_credential_verification_provenance
 tele_tena.patches.v1_30_adult_relationship_links
 tele_tena.patches.v1_31_explicit_note_sharing
 tele_tena.patches.v1_32_note_sharing_draft_choice
+
+tele_tena.patches.v1_33_couples_consultations

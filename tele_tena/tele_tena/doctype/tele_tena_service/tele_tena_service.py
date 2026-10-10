@@ -17,8 +17,8 @@ class TeleTenaService(Document):
         if self.catalog_status == 'Active':
             if self.clinical_review_status != 'Approved' or not self.category:
                 frappe.throw('Clinical terminology review and a service category are required before activation')
-            if self.participant_structure and self.participant_structure != 'individual' and self.active:
-                frappe.throw('Couple, family and group services are not bookable in this pilot')
+            if self.participant_structure and self.participant_structure not in ('individual','couple') and self.active:
+                frappe.throw('Family and group services are not bookable in this pilot')
         if self.vetting_required and self.catalog_status == 'Legacy test':
             frappe.throw('New vetting-required services cannot use the legacy test catalog state')
         previous = self.get_doc_before_save()
