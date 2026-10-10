@@ -34,6 +34,7 @@ export default function Consultation({
   const [audioOnly, setAudioOnly] = useState(false);
   const [muted, setMuted] = useState(false);
   const [cameraOn, setCameraOn] = useState(true);
+  const [remoteMuted, setRemoteMuted] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [level, setLevel] = useState(0);
   const [expanded, setExpanded] = useState(false);
@@ -184,9 +185,17 @@ export default function Consultation({
       });
       connectedRoom.on(RoomEvent.ActiveSpeakersChanged, speakers => {
         if (!current()) return;
-        const remoteSpeaker = speakers.find(participant => participant.identity !== connectedRoom.localParticipant.identity && participant.audioLevel > 0.08);
+        const remoteSpeaker = speakers.find(participant => participant.identity !== connectedRoom.localParticipant.identity && participant.audioLevel > 0.08 && participant.isMicrophoneEnabled);
         const active = Boolean(remoteSpeaker);
         setSpeaking(active); setLevel(active ? Math.min(1, remoteSpeaker?.audioLevel || 0) : 0);
+      });
+      connectedRoom.on(RoomEvent.TrackMuted, (publication, participant) => {
+        if (current() && participant !== connectedRoom.localParticipant && publication.kind === "audio") {
+          setRemoteMuted(true); setSpeaking(false); setLevel(0);
+        }
+      });
+      connectedRoom.on(RoomEvent.TrackUnmuted, (publication, participant) => {
+        if (current() && participant !== connectedRoom.localParticipant && publication.kind === "audio") setRemoteMuted(false);
       });
       connectedRoom.on(RoomEvent.Disconnected, () => {
         if (current()) {
@@ -246,7 +255,7 @@ export default function Consultation({
     const room = roomRef.current;
     roomRef.current = null;
     stopPreview();
-    if (mounted.current) { setSpeaking(false); setLevel(0); setBusy(false); }
+    if (mounted.current) { setSpeaking(false); setLevel(0); setRemoteMuted(false); setBusy(false); }
     if (room) await disposeRoom(room);
     if (showStatus && mounted.current) setMediaStatus("callDisconnected");
   }
@@ -394,9 +403,9 @@ export default function Consultation({
           </button>
         </aside></div>
       )}
-      {connected&&<div className="room-workspace"><div className="room-main"><div className={`media-stage ${audioOnly?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected}>
+      {connected&&<div className="room-workspace"><div className="room-main"><div className={`media-stage ${audioOnly?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected} data-remote-audio-muted={remoteMuted}>
         <div ref={node => { remote.current = node; attachMedia(); }} className={audioOnly?"call-audio-hidden":"call-remote"} aria-label={t("remoteMedia")}/>
-        {audioOnly&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><h2>{appointment.display_identity||"Private participant"}</h2><p>{mediaStatus==="callConnected"?"Connected":"Reconnecting"}</p></div>}
+        {audioOnly&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><h2>{appointment.display_identity||"Private participant"}</h2><p>{remoteMuted ? t("callRemoteMuted") : t(mediaStatus === "callConnected" ? "callConnected" : "callReconnecting")}</p></div>}
         {!audioOnly&&<video ref={node => { selfPreview.current = node; attachMedia(); }} autoPlay muted playsInline className="self-preview" hidden={!cameraOn} aria-label="Your camera"/>}
         <button className="fullscreen-control" type="button" onClick={()=>void toggleFullscreen()} aria-label="Expand consultation"><Maximize2 size={20}/></button>
       </div>

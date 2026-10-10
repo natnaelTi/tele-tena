@@ -44,3 +44,7 @@
 
 .note-document-panel > h2 { margin:0 0 20px; font-size:22px; }
 .note-document-panel > .field { margin:0; }
+/* E11: keep the focused document at the reference proportions. */
+.consultation-page .note-document-panel textarea {min-height:130px;}
+.consultation-page .note-document-panel .check {margin-top:20px;padding:16px;border:1px solid var(--border);border-radius:12px;}
+.request-presence-shell[hidden] {display:none;}

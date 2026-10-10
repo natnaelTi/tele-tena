@@ -351,7 +351,7 @@ def expire_pending_appointments():
 def appointment_detail(appointment):
     item, user, role = _authorized(appointment)
     from tele_tena.api.consultations import _window
-    call = rows('SELECT state,created,ended FROM tt_consultation WHERE appointment=%s', (item.id,))
+    call = rows('SELECT state,created,ended,room_closed FROM tt_consultation WHERE appointment=%s', (item.id,))
     note = rows('SELECT status,current_revision FROM tt_consultation_note WHERE appointment=%s', (item.id,))
     events = rows('''SELECT event_type,actor,reason,created FROM tt_appointment_event
         WHERE appointment=%s ORDER BY created,id''', (item.id,))
@@ -388,6 +388,7 @@ def appointment_detail(appointment):
         'expires_at': iso(item.expires_at) if item.expires_at else None,
         'disclosure': disclosure,
         'call_state': call[0].state if call else 'NotStarted',
+        'call_room_close_pending': bool(call and call[0].state == 'Ended' and not call[0].room_closed),
         'can_join': item.state == 'Booked' and _window(item) and not (call and call[0].state == 'Ended'),
         'call_room_created_at': iso(call[0].created) if call else None,
         'call_ended_at': iso(call[0].ended) if call and call[0].ended else None,

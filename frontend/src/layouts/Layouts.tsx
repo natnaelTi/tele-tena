@@ -53,6 +53,7 @@ export function MedicalLeadLayout(){
 }
 
 function ClinicianRequestAvailability() {
+  const location = useLocation();
   const {w} = useLocale();
   const load = useCallback(() => journeyApi.requestPresence(), []);
   const presence = useResource<any>(load);
@@ -107,7 +108,7 @@ function ClinicianRequestAvailability() {
   const pausedMessage = data?.reasons?.includes("no_immediate_capacity")
     ? `${w("No full session can start within")} ${data.immediate_window_minutes || 30} ${w("minutes. Your published hours can still be used for scheduled requests.")}`
     : "Complete setup before receiving requests.";
-  return <section className="request-presence-shell" aria-label={w("Request availability")}>
+  return <section hidden={location.pathname.includes("/consultations/")} className="request-presence-shell" aria-label={w("Request availability")}>
     <details className="request-presence-details" open={failureMessage?true:undefined}><summary><strong>{w(failureMessage || (data?.ready ? "Available for requests" : "Requests paused"))}</strong>{!data?.ready&&!failureMessage&&<span>{w("Setup needed")}</span>}</summary><div>
       <span>{w(data?.ready ? "Ready status expires if this session disconnects." : pausedMessage)}</span>
       {data?.reasons?.includes("immediate_policy_required") && <span>{w("A reviewer must enable immediate requests for this service. Service-scope approval alone does not enable this. This does not guarantee a request or match.")}</span>}
