@@ -2586,6 +2586,14 @@ class Presentation(unittest.TestCase):
         self.assertFalse(terminal['can_end'])
         with self.assertRaises(frappe.ValidationError):
             consultations.join(appointment)
+        for user in ('p2', 'admin', 'c2'):
+            fixtures.login(user)
+            with self.assertRaises(frappe.PermissionError):
+                consultations.consultation(appointment)
+        fixtures.login('c1')
+        self.assertEqual(consultations.consultation(appointment)['appointment_state'], 'Completed')
+        with self.assertRaises(frappe.ValidationError):
+            consultations.join(appointment)
 
     def test_explicit_note_sharing_preserves_private_revisions_and_money(self):
         self.fund_patient('p1', 3000)

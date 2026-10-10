@@ -234,6 +234,9 @@ export default function Consultation({
       connectedRoom.on(RoomEvent.Reconnecting, () => {
         if (current()) setMediaStatus("callReconnecting");
       });
+      connectedRoom.on(RoomEvent.SignalReconnecting, () => {
+        if (current()) setMediaStatus("callReconnecting");
+      });
       connectedRoom.on(RoomEvent.Reconnected, () => {
         if (current()) setMediaStatus("callConnected");
       });
