@@ -55,3 +55,8 @@
 .documentation-actions .actions button:first-child {background:var(--text-primary);color:white;}
 .documentation-actions .actions button:last-child {background:white;color:var(--text-primary);border:1px solid var(--border);}
 @media(max-width:400px){.documentation-actions .actions {grid-template-columns:minmax(0,1fr);}.documentation-actions .actions button:nth-child(2){grid-row:auto;}}
+
+/* N08: keep summary and next action together; operational audit stays expandable. */
+.shared-care-record .shared-summary-document > .button { display:inline-flex; width:auto; min-height:48px; }
+.shared-care-record .shared-summary-document .encounter-facts { margin-top:24px; }
+.shared-care-privacy > .supporting { background:var(--surface-subtle); padding:16px; border-radius:12px; margin-bottom:0; }
