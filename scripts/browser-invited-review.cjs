@@ -19,6 +19,8 @@ async function main() {
     assert.equal(await page.getByRole('button', { name: 'Continue', exact: true }).isDisabled(), true)
     await page.getByRole('button', { name: 'Use email instead', exact: true }).click()
     await page.getByLabel('Email', { exact: true }).waitFor()
+    assert.equal(await page.getByLabel('Password', { exact: true }).count(), 0)
+    await page.getByRole('button', { name: 'Use password instead', exact: true }).click()
     await page.getByLabel('Password', { exact: true }).waitFor()
     assert.equal(await page.getByLabel('Verification code', { exact: true }).count(), 0)
     assert.equal(await page.getByRole('button', { name: 'Sign in', exact: true }).isDisabled(), false)

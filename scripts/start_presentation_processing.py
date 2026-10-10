@@ -26,7 +26,8 @@ def daemon(name,command,env,cwd):
         pid=int(pidfile.read_text())
         actual=Path(f'/proc/{pid}/cmdline').read_bytes().split(b'\0')
         expected=[part.encode() for part in command]
-        if actual[:len(expected)]!=expected:
+        redis_owned=name=='queue-redis' and b'redis-server 127.0.0.1:13917' in b' '.join(actual) and Path(f'/proc/{pid}/cwd').resolve()==RUNTIME/'redis'
+        if not redis_owned and actual[:len(expected)]!=expected:
             raise RuntimeError(name+' PID belongs to a different command; no process changed')
         return
     log=open(RUNTIME/'logs'/(name+'.log'),'ab')

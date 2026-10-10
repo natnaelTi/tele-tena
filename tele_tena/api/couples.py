@@ -117,7 +117,12 @@ def _visible(plan, user):
     clinician = j.one('''SELECT p.display_name,o.title,s.service_label FROM tt_offering o
         JOIN tt_profile p ON p.user=o.clinician JOIN `tabTele Tena Service` s ON s.name=o.service
         WHERE o.id=%s''', (plan.offering,))
+    lifecycle = j.rows('''SELECT a.state appointment_state,c.state call_state
+        FROM tt_appointment a LEFT JOIN tt_consultation c ON c.appointment=a.id
+        WHERE a.id=%s''', (plan.appointment,)) if plan.appointment and own and own.state=='Consented' else []
+    status = lifecycle[0] if lifecycle else {}
     return {'id':plan.id,'state':plan.state,'appointment':plan.appointment,
+        'appointment_state':status.get('appointment_state'), 'call_state':status.get('call_state'),
         'service':clinician.title or clinician.service_label,'clinician':clinician.display_name,
         'start':j.iso(plan.start),'timezone':plan.timezone,'price':plan.price,'minutes':plan.minutes,
         'expires_at':j.iso(plan.expires_at),'consent_version':CONSENT_VERSION,
