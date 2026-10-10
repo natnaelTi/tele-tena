@@ -47,6 +47,7 @@ export default function Consultation({
   const [cameraOn, setCameraOn] = useState(true);
   const [remotePresent, setRemotePresent] = useState(false);
   const [remoteVideo, setRemoteVideo] = useState(false);
+  const [participantLevels,setParticipantLevels]=useState<Record<string,number>>({});
   const [remoteMuted, setRemoteMuted] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [level, setLevel] = useState(0);
@@ -250,6 +251,7 @@ export default function Consultation({
       connectedRoom.on(RoomEvent.ActiveSpeakersChanged, speakers => {
         if (!current()) return;
         const remoteSpeaker = speakers.find(participant => participant.identity !== connectedRoom.localParticipant.identity && participant.audioLevel > 0.08 && participant.isMicrophoneEnabled);
+        setParticipantLevels(Object.fromEntries([...connectedRoom.remoteParticipants.values()].map(p=>[p.identity,speakers.some(s=>s.identity===p.identity)&&p.isMicrophoneEnabled?Math.min(1,p.audioLevel):0])));
         const active = Boolean(remoteSpeaker);
         setSpeaking(active); setLevel(active ? Math.min(1, remoteSpeaker?.audioLevel || 0) : 0);
       });
@@ -268,6 +270,7 @@ export default function Consultation({
       connectedRoom.on(RoomEvent.TrackMuted, (publication, participant) => {
         if (current() && participant !== connectedRoom.localParticipant && publication.kind === "video") {setRemoteVideo([...connectedRoom.remoteParticipants.values()].some(p=>p.isCameraEnabled));attachMedia();}
         if (current() && participant !== connectedRoom.localParticipant && publication.kind === "audio") {
+          setParticipantLevels(levels=>({...levels,[participant.identity]:0}));
           setRemoteMuted([...connectedRoom.remoteParticipants.values()].every(p=>!p.isMicrophoneEnabled)); setSpeaking(false); setLevel(0);
         }
       });
@@ -343,7 +346,7 @@ export default function Consultation({
     const room = roomRef.current;
     roomRef.current = null;
     stopPreview();
-    if (mounted.current) { setSpeaking(false); setLevel(0); setRemoteMuted(false); setRemotePresent(false); setRemoteVideo(false); setControlError(null); setBusy(false); }
+    if (mounted.current) { setParticipantLevels({}); setSpeaking(false); setLevel(0); setRemoteMuted(false); setRemotePresent(false); setRemoteVideo(false); setControlError(null); setBusy(false); }
     if (room) await disposeRoom(room);
     if (showStatus && mounted.current) setMediaStatus("callDisconnected");
   }
@@ -524,7 +527,7 @@ export default function Consultation({
       )}
       {connected&&<div className="room-workspace"><div className="room-main"><div className={`media-stage ${audioSurface?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected} data-remote-audio-muted={remoteMuted}>
         <div ref={node => { remote.current = node; attachMedia(); }} className={audioSurface?"call-audio-hidden":"call-remote"} aria-label={t("remoteMedia")}/>
-        {audioOnly && <AudioStage identity={appointment.display_identity || w("Private participant")} service={appointment.service_label} minutes={appointment.minutes} status={t(mediaStatus)} activity={level} waiting={!remotePresent} muted={remoteMuted}/>}{audioSurface && !audioOnly && <div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><div className="room-audio-wave" style={{"--audio-level":level} as CSSProperties} aria-hidden="true">{Array.from({length:7},(_,index)=><i key={index}/>)}</div><h2>{appointment.display_identity||w("Private participant")}</h2><p>{!remotePresent ? t("callWaiting") : remoteMuted ? t("callRemoteMuted") : t(mediaStatus === "callConnected" ? "callConnected" : "callReconnecting")}</p></div>}
+        {audioOnly && <AudioStage identity={appointment.display_identity || w("Private participant")} service={appointment.service_label} minutes={appointment.minutes} status={t(mediaStatus)} activity={level} waiting={!remotePresent} muted={remoteMuted} participants={sharedRoom?[...(roomRef.current?.remoteParticipants.values()||[])].map(p=>({identity:p.identity,label:roomLabels.current.find(item=>item.identity===p.identity)?.label||w("Private participant"),activity:participantLevels[p.identity]||0,muted:!p.isMicrophoneEnabled})):undefined}/>}{audioSurface && !audioOnly && <div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><div className="room-audio-wave" style={{"--audio-level":level} as CSSProperties} aria-hidden="true">{Array.from({length:7},(_,index)=><i key={index}/>)}</div><h2>{appointment.display_identity||w("Private participant")}</h2><p>{!remotePresent ? t("callWaiting") : remoteMuted ? t("callRemoteMuted") : t(mediaStatus === "callConnected" ? "callConnected" : "callReconnecting")}</p></div>}
         {sharedRoom&&!audioOnly&&!cameraOn&&<div className="shared-self-placeholder"><span aria-hidden="true">{w("You").slice(0,1)}</span><strong>{w("You")} · {w("Camera off")}</strong></div>}{!audioOnly&&<video ref={node => { selfPreview.current = node; attachMedia(); }} autoPlay muted playsInline className="self-preview" hidden={!cameraOn} aria-label={t("localPreview")}/>}
         <button className="fullscreen-control" type="button" onClick={()=>void toggleFullscreen()} aria-label={w("Expand consultation")}><Maximize2 size={20}/></button>
       </div>
