@@ -182,7 +182,6 @@ function PatientClinicScheduleSharing({appointment}:{appointment:string}) {
 
 export function ConsultationRoomPage() {
   const { id = "" } = useParams();
-  const { session } = useSession();
   const { t } = useLocale();
   const loadAppointments = useCallback(() => journeyApi.appointments(), []);
   const { data, error } = useResource(loadAppointments);
@@ -190,5 +189,5 @@ export function ConsultationRoomPage() {
   if (!data) return <Skeleton />;
   const appointment = data.find(item => item.id === id);
   if (!appointment) return <InlineNotice tone="danger">This consultation is unavailable to your account.</InlineNotice>;
-  return <main className="focused-call" data-appointment-id={id}><Link to={`/${session?.profile?.kind||"patient"}/consultations/${id}`} className="text-link">Back to consultation details</Link><Consultation key={id} appointment={{...appointment,display_identity:appointment.display_identity||"Private participant"}} t={t}/></main>;
+  return <main className="focused-call" data-appointment-id={id}><Consultation key={id} appointment={{...appointment,display_identity:appointment.display_identity||"Private participant"}} t={t}/></main>;
 }

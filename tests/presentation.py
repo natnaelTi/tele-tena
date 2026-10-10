@@ -2582,6 +2582,7 @@ class Presentation(unittest.TestCase):
         terminal = consultations.consultation(appointment)
         self.assertEqual(terminal['appointment_state'], 'Completed')
         self.assertEqual(terminal['state'], 'Ended')
+        self.assertEqual(terminal['documentation_state'], 'Finalized')
         self.assertFalse(terminal['can_join'])
         self.assertFalse(terminal['can_end'])
         with self.assertRaises(frappe.ValidationError):

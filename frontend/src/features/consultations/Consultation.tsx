@@ -9,10 +9,12 @@ import { useLocale } from "../../hooks/useLocale";
 import "./consultation-room.css";
 import { ApiError, api } from "../../api";
 import type { Key } from "../../i18n";
+import AudioStage from "./AudioStage";
 import ExtensionPanel from "./ExtensionPanel";
 type Appointment = { id: string; display_identity?:string; call_state?:string; timezone?:string | null; service_label?:string; minutes?:number; consultation_format?:string };
 type ConsultationInfo = {
   appointment_state: string;
+  documentation_state: string;
   state: "Not started" | "Open" | "Ended";
   role: "patient" | "clinician";
   can_join: boolean;
@@ -314,7 +316,13 @@ export default function Consultation({
       }
       if (mounted.current && attempt === generation.current) {
         stopPreview();
-        setMediaStatus(error instanceof ApiError && error.code === "consultation_service_unconfigured" ? "callServiceUnavailable" : "callConnectError");
+        if (error instanceof ApiError && error.code === "outside_join_window") {
+          setMediaStatus("callNotConnected"); setControlError("callOutsideWindow"); await refresh();
+        } else if (error instanceof ApiError && ["consultation_ended", "appointment_inactive"].includes(error.code)) {
+          setMediaStatus("callNotConnected"); await refresh();
+        } else if (error instanceof ApiError && ["permission_denied", "session_required"].includes(error.code)) {
+          setMediaStatus("callUnavailable"); setInfo(null);
+        } else setMediaStatus(error instanceof ApiError && error.code === "consultation_service_unconfigured" ? "callServiceUnavailable" : "callConnectError");
       }
     } finally {
       if (attempt === generation.current) joining.current = false;
@@ -432,20 +440,22 @@ export default function Consultation({
   const joinTime = (value: string) => new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short", timeZone: appointment.timezone || "UTC" }).format(new Date(value));
   const detailRoute = `/${info?.role || "patient"}/consultations/${appointment.id}`;
   return (
-    <section ref={root} className={`consultation ${connected ? "room-connected" : "room-preflight"} ${expanded ? "room-expanded" : ""}`} aria-label={t("consultation")}>
+    <section ref={root} className={`consultation ${connected ? "room-connected" : "room-preflight"} ${connected && audioOnly ? "room-audio-layout" : ""} ${expanded ? "room-expanded" : ""}`} aria-label={t("consultation")}>
       {(fullscreen || expanded) && <div className="room-demo" role="note">{w("Demonstration environment — no real payments or clinical care.")}</div>}
-      {connected && <header className="room-heading"><Brand/><div><strong>{appointment.service_label}</strong><span>{appointment.display_identity} · {appointment.minutes} {w("minutes")}</span></div><span className="room-private"><ShieldCheck size={18}/>{w("Private consultation")}</span></header>}
-      {!connected && <h2>{info?.state === "Ended" ? t("callEnded") : connected ? t("consultation") : w("Before you join")}</h2>}
+      {connected && !audioOnly && <header className="room-heading"><Brand/><div><strong>{appointment.service_label}</strong><span>{appointment.display_identity} · {appointment.minutes} {w("minutes")}</span></div><span className="room-private"><ShieldCheck size={18}/>{w("Private consultation")}</span></header>}
+      {(!connected || audioOnly) && <header className="light-call-header"><Brand/><Link className="text-link" to={detailRoute}>{w("Back to consultation details")}</Link></header>}
+      {connected && audioOnly && <div className="audio-page-title"><h1>{w("Audio consultation")}</h1><p>{w("More room to listen. Less bandwidth.")}</p></div>}
+      {!connected && <h2>{info?.state === "Ended" ? w("Call ended") : connected ? t("consultation") : w("Check your devices")}</h2>}
       {!connected && <p>
         {t("sessionLifecycle")}: {t(lifecycleStatus)}
       </p>}
-      <p className="room-connection" role="status">
+      {(!connected || !audioOnly) && <p className="room-connection" role="status">
         {t("mediaStatus")}: {t(mediaStatus)}
-      </p>
+      </p>}
       {controlError && <p className="call-control-error" role="alert">{t(controlError)}</p>}
       {info?.state === "Ended" && <div className="call-ended-panel">
-        <p>{info.role === "clinician" ? w("The call has ended. Review your notes and finalize the encounter.") : w(info.appointment_state === "Completed" ? "Consultation record" : "Summary being prepared")}</p>
-        <Link className="button primary" to={detailRoute}>{w(info.role === "clinician" ? "Finish the consultation" : "View consultation")}</Link>
+        <p>{info.role === "clinician" && info.documentation_state !== "Finalized" ? w("The call has ended. Review your notes and finalize the encounter.") : w(info.appointment_state === "Completed" ? "Consultation record" : "Summary being prepared")}</p>
+        <Link className="button primary" to={detailRoute}>{w(info.role === "clinician" && info.documentation_state !== "Finalized" ? "Finish the consultation" : "View consultation")}</Link>
         {info.room_close_pending && <p role="alert">{t("callClosePending")}</p>}
       </div>}
       {!connected && info?.state !== "Ended" && (
@@ -495,7 +505,7 @@ export default function Consultation({
       )}
       {connected&&<div className="room-workspace"><div className="room-main"><div className={`media-stage ${audioSurface?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected} data-remote-audio-muted={remoteMuted}>
         <div ref={node => { remote.current = node; attachMedia(); }} className={audioSurface?"call-audio-hidden":"call-remote"} aria-label={t("remoteMedia")}/>
-        {audioSurface&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><div className="room-audio-wave" style={{"--audio-level":level} as CSSProperties} aria-hidden="true">{Array.from({length:7},(_,index)=><i key={index}/>)}</div><h2>{appointment.display_identity||w("Private participant")}</h2><p>{!remotePresent ? t("callWaiting") : remoteMuted ? t("callRemoteMuted") : t(mediaStatus === "callConnected" ? "callConnected" : "callReconnecting")}</p></div>}
+        {audioOnly && <AudioStage identity={appointment.display_identity || w("Private participant")} service={appointment.service_label} minutes={appointment.minutes} status={t(mediaStatus)} activity={level} waiting={!remotePresent} muted={remoteMuted}/>}{audioSurface && !audioOnly && <div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><div className="room-audio-wave" style={{"--audio-level":level} as CSSProperties} aria-hidden="true">{Array.from({length:7},(_,index)=><i key={index}/>)}</div><h2>{appointment.display_identity||w("Private participant")}</h2><p>{!remotePresent ? t("callWaiting") : remoteMuted ? t("callRemoteMuted") : t(mediaStatus === "callConnected" ? "callConnected" : "callReconnecting")}</p></div>}
         {!audioOnly&&<video ref={node => { selfPreview.current = node; attachMedia(); }} autoPlay muted playsInline className="self-preview" hidden={!cameraOn} aria-label={t("localPreview")}/>}
         <button className="fullscreen-control" type="button" onClick={()=>void toggleFullscreen()} aria-label={w("Expand consultation")}><Maximize2 size={20}/></button>
       </div>
@@ -504,9 +514,11 @@ export default function Consultation({
             type="button"
             disabled={busy}
             onClick={() => void toggleMedia("microphone")}
+            aria-label={t(muted ? "unmute" : "mute")}
+            title={t(muted ? "unmute" : "mute")}
           >
             {muted ? <MicOff size={20} /> : <Mic size={20} />}
-            {t(muted ? "unmute" : "mute")}
+            {audioOnly ? w("Microphone") : t(muted ? "unmute" : "mute")}
           </button>
           {!audioOnly && (
             <button
@@ -518,7 +530,7 @@ export default function Consultation({
               {t(cameraOn ? "cameraOff" : "cameraOn")}
             </button>
           )}
-          <button type="button" disabled={busy} onClick={()=>void toggleAudioOnly()} aria-pressed={audioOnly}><Headphones size={20}/>{w(audioOnly?"Turn video on":"Audio only")}</button>
+          <button type="button" disabled={busy} onClick={()=>void toggleAudioOnly()} aria-pressed={audioOnly} aria-label={w(audioOnly?"Turn video on":"Audio only")} title={w(audioOnly?"Turn video on":"Audio only")}>{audioOnly ? <Video size={20}/> : <Headphones size={20}/>} {w(audioOnly?"Video":"Audio only")}</button>
           <button
             className="leave-call"
             type="button"
@@ -538,7 +550,8 @@ export default function Consultation({
               {t("endConsultation")}
             </button>
           )}
-        </div></div><aside className="room-session-details"><h3>{appointment.display_identity || w("Private participant")}</h3><dl><dt>{w("Service")}</dt><dd>{appointment.service_label}</dd><dt>{w("Booked duration")}</dt><dd>{appointment.minutes} {w("minutes")}</dd></dl><p>{w("Booked duration is not measured connected time.")}</p><Link to={detailRoute}>{w("Appointment details")}</Link><div className="room-privacy-note"><ShieldCheck size={20}/><h4>{w("Your privacy stays with you.")}</h4><p>{w("Your clinician sees only the information you chose to share for this session.")}</p></div>{info?.state === "Open" && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</aside></div>}
+        </div></div><aside className="room-session-details" hidden={audioOnly}><h3>{appointment.display_identity || w("Private participant")}</h3><dl><dt>{w("Service")}</dt><dd>{appointment.service_label}</dd><dt>{w("Booked duration")}</dt><dd>{appointment.minutes} {w("minutes")}</dd></dl><p>{w("Booked duration is not measured connected time.")}</p><Link to={detailRoute}>{w("Back to consultation details")}</Link><div className="room-privacy-note"><ShieldCheck size={20}/><h4>{w("Your privacy stays with you.")}</h4><p>{w("Your clinician sees only the information you chose to share for this session.")}</p></div>{info?.state === "Open" && !audioOnly && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</aside></div>}
+      {connected && audioOnly && <details className="audio-session-more"><summary>{w("Session details and extra time")}</summary><p>{appointment.service_label} · {appointment.minutes} {w("minutes")}</p><Link to={detailRoute}>{w("Back to consultation details")}</Link>{info?.state === "Open" && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</details>}
       {info?.can_end && !connected && (
         <button
           className="end-call"

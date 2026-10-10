@@ -14,7 +14,7 @@ export default function ExtensionPanel({appointment, role, open, t}:{appointment
   const busyRef=useRef(false)
   const mounted=useRef(false)
   const load=useCallback(async()=>{
-    try { const next=await api<ExtensionState>('tele_tena.api.extensions.extension_status',{appointment}); if(mounted.current)setData(next) }
+    try { const next=await api<ExtensionState>('tele_tena.api.extensions.extension_status',{appointment}); if(mounted.current){setData(next);setError('')} }
     catch { if(mounted.current)setError(t('extensionLoadError')) }
   },[appointment,t])
   useEffect(()=>{mounted.current=true;void Promise.resolve().then(load);const timer=window.setInterval(()=>void load(),5000);return()=>{mounted.current=false;window.clearInterval(timer)}},[load])
