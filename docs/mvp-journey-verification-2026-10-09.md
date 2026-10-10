@@ -9,14 +9,14 @@ The existing `mvp-screen-acceptance.json` remains the sole screen acceptance mat
 - Branch `feat/mvp-release-handover`; [draft PR #44](https://github.com/natnaelTi/tele-tena/pull/44)
   depends on open PR #43 (`feat/adult-relationship-links`). Ancestor
   `1e8d161468eb8d3563f1b5743982722c749bbcbf` remains included.
-- **Built application source `c3e1ff1263eaec2851a1817a1bf54c90f894a40c`**;
+- **Built application source `d720596e385e9f50c1ed9df256c09fd2e9b4cd13`**;
   later evidence/report commits do not change application code. The packaged
   `tele_tena/public/review/release.json` records this source and asset hashes.
 - **http://127.0.0.1:8017/teletena/** now serves **`teletena-mvp-presentation.localhost`**,
   bench `/home/frappe/frappe/frappe-bench`, app `apps/tele_tena`. Production React,
   same-origin Frappe APIs; no Vite server. HTTP 200 checked after packaging.
 - Dedicated Gunicorn master 453370 (pidfile `/tmp/teletena-mvp-presentation-web.pid`),
-  two workers 455068/455069; process cwd `sites`, Python path app checkout above,
+  two workers replaced through a targeted HUP (current IDs are ephemeral); process cwd `sites`, Python path app checkout above,
   observed `TELE_TENA_TEST_SITE=teletena-mvp-presentation.localhost`.
   Old preview master 392014 was stopped only after the new site passed its initial
   journey. The retained `tele-tena-pr12-fresh.localhost` records and credentials,
@@ -71,6 +71,121 @@ for screenshots. Complete populated consultation summaries/earnings/clinic scena
 | Layout / zoom | At `904c746`, C02 Amharic and Oromo 390px layout captures; actual Chrome tab zoom 200% (outer1440/CSS720/DPR2), paired reference. Not native-language approval or all-route zoom acceptance |
 | Other workspaces | At `ddfe210`, patient/clinician/reviewer real authenticated queries and paired 390/1440 captures; individual actions and visual acceptance are separate |
 | Build/privacy | Locked production packaging, TypeScript and frontend lint pass; existing lint warnings and >500KB chunk warning remain. Generated public assets checked for all four presentation passwords: none found. No unchanged broad financial suite rerun claimed |
+
+## Current consultation correction — authoritative evidence
+
+The room/post-session findings below supersede older call-pending claims in this
+report for **individual appointments only**. PR #44 remains draft. No merge or
+remote deployment occurred. Initial inspection found backend checkout
+`e4bc918bf13eca426076afff13a8c0fcb6e574f7` and packaged frontend
+`c3e1ff1263eaec2851a1817a1bf54c90f894a40c`. Both now use the corrected application
+code described above; later report/test-only commits do not alter that code.
+
+A full database/private-files backup preceded the owned synthetic appointments:
+`sites/teletena-mvp-presentation.localhost/private/backups/20261010_111920-*`.
+No historical appointment, balance, credential or clinical record was reset.
+
+| Reproduction / state | Exact cause | Correction and evidence |
+| --- | --- | --- |
+| Approved patient/clinician Join, valid window | Presentation site lacked its private LiveKit configuration; generic connection error hid that distinction | Secure mode-600 site-private setup; safe `consultation_service_unconfigured` category; no browser secrets. Existing development configuration preserved |
+| Both joined, clinician received no remote media | Subscription arrived before React mounted the attachment container | Attach existing publications when the ref mounts and on subscription/publication changes. Both actual remote audio/video streams advance in independent browser contexts |
+| End with both roles in room | Ended lifecycle left a stale room presentation and misleading Leave/rejoin text | Terminal state stops tracks/connection and presents clinician documentation versus patient completion-pending/detail actions |
+| Patient detail open during call | Polling stopped once call state became Open | Poll while appointment remains Booked; patient already-open detail receives End and later published summary without reload |
+| End closure pending → finalize | Finalization could mark Completed before room closure succeeded, making End retry unavailable | Server rejects finalization while `room_closed=0`; save draft remains available; visible closure-retry route and disabled Finalize. Controlled local configuration outage followed by real Cloud retry passed |
+| Lost draft/finalization responses | Identical saved text could produce a redundant draft revision | Identical draft retry returns current revision; finalized retry returns original result. One consumption posting/earning, no second reservation or earnings release |
+| End confirmation inside fullscreen | Portalled dialog lay outside native fullscreen element | Exit native/expanded fullscreen before confirmation; keyboard-aware expanded fallback, normal focus handling |
+| Toggle failure / late camera resolution | Control feedback could replace connection feedback; late captures could outlive navigation | Separate control errors, generation guard, room/track disposal and detached-element cleanup. Held asynchronous camera result stopped after navigation |
+| Reconnecting | Signaling reconnect event was not handled | Handle LiveKit SignalReconnecting as well as media reconnect. Test closes hosted signaling transport while offline, then restores and observes Connected |
+| E08 / E05 / E11 composition | Audio reused full dark video layout; preflight controls preceded the preview; documentation lacked reference facts/hierarchy | E08 light page + centered dark audio card; E05 preview-first device card and readiness sidebar; E11 separate private note/shared summary and compact finalization facts/actions |
+| Completed timeline showed two identical finalizations | Completion and documentation-publication audit events used the same label | Preserve both events, label “Consultation completed” and “Documentation published”; retry does not add either event |
+
+### Checks actually run
+
+- Frappe `tests/presentation.py`: three focused tests passed together:
+  closure guard/draft idempotency, explicit note sharing/revision preservation,
+  encounter privacy/completion/feedback. A combined-run fixture assumption was
+  corrected to assert the completed-session/reliability increment relative to
+  existing fixture counts; assertions and existing records were preserved.
+- Frappe `tests/integration.py`: consultation authorization/window/token/End test
+  and concurrent Join/End serialization test **2/2 passed**.
+- `scripts/browser-consultation-presentation.cjs`, application
+  `0c804ed6795c0629fd630a8d9066ba794aad6e7a`: actual hosted development Cloud,
+  independent patient and clinician sessions, fake camera/microphone devices.
+  Both receive advancing audio/video; native fullscreen; mute remote-state
+  change; camera toggles; audio-only; signaling reconnect; late camera cleanup;
+  Leave/rejoin; clinician End/configuration-failure/closure retry; handoffs;
+  draft network failure/value retention/retry/reload; preview without saving;
+  patient private-note omission; completed list, feedback availability and
+  follow-up navigation; repeat finalize; **one Pending earning with recorded
+  release time and exact balance increment**. End alone created no earning.
+- Cached original and reissued **application** tokens, still unexpired, rejected
+  when reconnecting directly with the SDK after End for both opaque identities,
+  including the patient who left before End. This is hosted Cloud evidence.
+  Automatic SDK/server token refresh was not independently intercepted/tested.
+  Self-hosted deletion still cannot invalidate an unexpired reusable JWT.
+- `scripts/browser-consultation-review.cjs`, final application
+  `d720596e385e9f50c1ed9df256c09fd2e9b4cd13`: guest/reviewer denial, generic
+  raw-table API denial, Completed Join rejection, real future-appointment
+  out-of-window rejection, disabled Join, local device preparation before the
+  window, immediate preview-track stop on mode change and navigation, preserved
+  finalized notes after entering/leaving an unsaved amendment, correct timeline.
+  320/390/768/1440 views and real Chrome 200% patient-detail zoom passed.
+- Locked production packaging / TypeScript build passed. Frontend lint exits 0
+  with existing warnings; bundle-size warning remains. Generated assets scanned
+  against private presentation passwords and LiveKit key/secret: none found.
+  Preview returned HTTP 200. No schema added; no new
+  fresh-install, complete OTP/finance or Frappe 16 suite rerun claimed.
+
+### Reference comparison (separate from functional acceptance)
+
+Paired files: `docs/screenshots/consultation-current/`; `evidence.json` records
+which source produced each set. Original connected-state pairs use `0c804ed`;
+terminal/preflight and unsaved-amendment pairs use `d720596`. Later application
+changes after the connected run are preflight/document layout, timeline labels
+and device-status copy; no token/media authorization changed.
+
+| Reference | Rendered comparison | Remaining intentional differences / gate |
+| --- | --- | --- |
+| E05 `#e05` | Preview-first bordered card, stacked device fields, right readiness/join panel, same 1128px content width at desktop | Actual fake device image, truthful clinician/service/time, explicit Check and refresh/window states instead of prototype ready claims; demo ribbon. Human visual approval pending |
+| E07 `#room` | Dominant remote stage, self-preview, dark header/sidebar and compact controls; mobile stacks facts below media | Fake green video replaces reference portrait; explicit End versus Leave; booked duration never presented as measured elapsed time. Mobile stage/control proportions require owner review |
+| E08 `#e08` | Light page, centered dark card/orb/wave, compact control bar; no black empty video area in audio-only | Quiet/muted activity is flat, not decorative speaking. Actual identity/duration, labeled controls, compact details fold, demo ribbon. Human approval pending |
+| E09 `#e09` | Real signaling reconnection status and recovery captured | Signaling-only failure can keep existing RTP media visible; cannot truthfully render a total-media-loss state or claim device/network handover coverage |
+| E11 `#e11` | Separate note/summary documents, privacy labels, finalization sidebar | Current comparison includes an **unsaved amendment** to a real finalized encounter, explicitly labeled; original persisted first draft captured on `0c804ed`. Timeline/disclosure accordions and actual booked duration retained; measured connected duration unavailable |
+| E13 `#e13` | Role-specific completed detail and actual published summary | Real feedback/dispute/sharing affordances extend prototype. Private clinician document is absent from patient API/DOM; full owner visual acceptance remains pending |
+
+The images were opened and compared at desktop/mobile; screenshot presence or
+build success is not treated as acceptance. English layout only in this batch;
+new Amharic/Oromo copy is provisional. Actual 200% zoom covers completed patient
+detail, not a connected video call.
+
+### Review the connected workflow
+
+1. Open **http://127.0.0.1:8017/teletena/**. Credentials remain in the mode-600
+   site-private `tele_tena_presentation_accounts.json`; use separate browser
+   profiles for Selam (patient) and Hana (approved clinician), email/password.
+2. Completed appointments → the latest Individual counseling encounter:
+   patient sees only published summary/feedback/follow-up; clinician sees the
+   private note, publication history and optional amendment action. Reload both.
+3. Book an eligible generated slot for a fresh call using the patient. The
+   booked clinician joins the same appointment from their list. Check devices,
+   Join, mute/camera/audio-only, Leave/rejoin, then clinician End for everyone.
+4. Clinician Finish the consultation → Save draft → preview → finalize. Patient
+   already-open detail updates. Earnings shows Pending with release time; End
+   is not payment settlement. Do not reuse completed test rooms for a new call.
+
+### Remaining substantive gates
+
+- **Working two-adult couples is missing**: current appointment/token model has
+  one patient and clinician, relationship link is not participant consent,
+  three-person authorization or recipient-scoped notes. N01–N08/SH01 remain a
+  required MVP blocker; no shared-summary access is granted via relationship.
+- Scheduler remains disabled on this presentation site, and no dedicated
+  continuous worker/scheduler acceptance was performed here. Pending earnings
+  stay pending; no withholding bypass or unrelated service restart occurred.
+- Whole-MVP owner visual approval, continuous scheduler, fresh/legacy upgrade
+  and exact Frappe 16 release gates remain. Current isolated checks do not prove
+  physical devices, live SMS/email, native translations, real payments or
+  remote deployment. No Selfmade changes occurred.
 
 ## Applicant landing correction — current build
 

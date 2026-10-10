@@ -753,3 +753,19 @@ Active source/evidence: [current journey verification](mvp-journey-verification-
 Current refinement: completed/cancelled appointment history groups by booked timezone month and year; actual browser recheck passed on `3b02709`. Existing controlled PWA client explicitly updated `9988610` → `3b02709`. Four focused persisted OTP regressions passed with mocked provider transport; full enabled-registration HTTP browser acceptance remains pending.
 
 Selected history tabs now remain visible on responsive resize and mobile reload; current owned browser captures check the selected button lies inside the strip. Supported controlled PWA update `3b02709` → `0eb22ef` passed; this does not claim physical-device installation/calling.
+
+### Current consultation checkpoint — 10 October 2026
+
+Packaged application `d720596e385e9f50c1ed9df256c09fd2e9b4cd13` on
+`teletena-mvp-presentation.localhost`, http://127.0.0.1:8017/teletena/.
+The individual hosted-Cloud fake-device journey passes two-way media,
+Leave/rejoin, signaling reconnection, closure failure/retry, cached original
+and reissued application-token denial, draft save/reload/private isolation,
+summary publication and exactly one pending earning. Focused backend 3 notes
++ 2 authorization/concurrency tests pass. Paired E05/E07/E08/E09/E11/E13
+comparisons and real 200% terminal-detail zoom are documented in the active
+[journey report](mvp-journey-verification-2026-10-09.md). Older call-pending
+claims are superseded only for these tested individual paths. Couples,
+continuous scheduler, full visual owner approval and complete MVP release
+gates remain pending. No remote deployment, physical-device, live-delivery
+or native-language approval claim. PR #44 stays draft.

@@ -1,7 +1,7 @@
 {
   "version": 2,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "c3e1ff1263eaec2851a1817a1bf54c90f894a40c",
+  "source_checkpoint": "d720596e385e9f50c1ed9df256c09fd2e9b4cd13",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -4410,13 +4410,14 @@
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implemented, verification pending",
-      "release_acceptance": "Pending current release-specific verification",
+      "release_acceptance": "Individual focused checks pass; required couples and final visual approval remain open",
       "requirements_source": "docs/operational-screen-map.json#E02",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "presentation_checkpoint": "390/768/1440 patient and clinician details/reload, keyboard link, authoritative reschedule slots/cancel without submission; wallets/earnings unchanged. See docs/mvp-journey-verification-2026-10-09.md."
+        "presentation_checkpoint": "390/768/1440 patient and clinician details/reload, keyboard link, authoritative reschedule slots/cancel without submission; wallets/earnings unchanged. See docs/mvp-journey-verification-2026-10-09.md.",
+        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending."
       },
       "visual_acceptance": {
         "reference_screen": "E02",
@@ -4440,7 +4441,7 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implemented correction; remaining differences recorded",
+        "correction_status": "Compared corrections; product-owner visual approval pending",
         "reference_screenshots": [
           "docs/screenshots/mvp-presentation-current/E02-reference-1440.png",
           "docs/screenshots/mvp-presentation-current/E02-reference-390.png",
@@ -4451,7 +4452,9 @@
           "docs/screenshots/mvp-presentation-current/E02-application-390.png",
           "docs/screenshots/mvp-presentation-current/E02-application-768.png"
         ],
-        "comparison_notes": "Current report and evidence README; visual and functional acceptance independent.",
+        "comparison_notes": [
+          "Current comparison notes and per-set full source: docs/mvp-journey-verification-2026-10-09.md and docs/screenshots/consultation-current/evidence.json. No universal pixel-match claim."
+        ],
         "viewports": [
           390,
           768,
@@ -4504,8 +4507,8 @@
           }
         ],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
-        "functional_status": "Focused persisted journey verified; complete screen/state acceptance pending",
-        "functional_failures": "Full current hosted call/lifecycle and scheduler release, coherent presentation dataset and couples participant/recipient workflows remain pending. Explicit single-patient note sharing is now locally verified.",
+        "functional_status": "Locally verified focused individual journey; whole-screen/state acceptance pending",
+        "functional_failures": "No reproduced individual call/notes/finalization failure remains in focused tested paths. Couples participant/consent/recipient model absent. Device/network handover and automatic SDK token refresh not independently verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/components/ConsultationDetails.tsx",
@@ -4891,19 +4894,20 @@
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implemented, verification pending",
-      "release_acceptance": "Pending current release-specific verification",
+      "release_acceptance": "Individual focused checks pass; required couples and final visual approval remain open",
       "requirements_source": "docs/operational-screen-map.json#E05",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E05) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending."
       },
       "visual_acceptance": {
         "reference_screen": "E05",
         "reference_hash": "#e05",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e05",
-        "product_route": "/consultation/:id/room (preflight)",
-        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
+        "product_route": "/consultation/:id/room",
+        "actor": "Authenticated appointment patient or treating clinician; private notes clinician-only; couples not yet supported",
         "states": [
           "populated",
           "empty",
@@ -4912,7 +4916,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Preview-first card, stacked microphone/camera selectors and readiness sidebar corrected. Truthful join-window/device checks, no fabricated credential badge/photo. Owner approval pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -4920,10 +4924,30 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Compared corrections; product-owner visual approval pending",
+        "reference_screenshots": [
+          "docs/screenshots/consultation-current/connected/E05-reference-1440.png",
+          "docs/screenshots/consultation-current/connected/E05-reference-320.png",
+          "docs/screenshots/consultation-current/connected/E05-reference-390.png",
+          "docs/screenshots/consultation-current/connected/E05-reference-768.png",
+          "docs/screenshots/consultation-current/terminal/E05-reference-1440.png",
+          "docs/screenshots/consultation-current/terminal/E05-reference-320.png",
+          "docs/screenshots/consultation-current/terminal/E05-reference-390.png",
+          "docs/screenshots/consultation-current/terminal/E05-reference-768.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/consultation-current/connected/E05-application-1440.png",
+          "docs/screenshots/consultation-current/connected/E05-application-320.png",
+          "docs/screenshots/consultation-current/connected/E05-application-390.png",
+          "docs/screenshots/consultation-current/connected/E05-application-768.png",
+          "docs/screenshots/consultation-current/terminal/E05-application-1440.png",
+          "docs/screenshots/consultation-current/terminal/E05-application-320.png",
+          "docs/screenshots/consultation-current/terminal/E05-application-390.png",
+          "docs/screenshots/consultation-current/terminal/E05-application-768.png"
+        ],
+        "comparison_notes": [
+          "Current comparison notes and per-set full source: docs/mvp-journey-verification-2026-10-09.md and docs/screenshots/consultation-current/evidence.json. No universal pixel-match claim."
+        ],
         "viewports": [
           390,
           768,
@@ -4969,8 +4993,8 @@
           }
         ],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Locally verified focused individual journey; whole-screen/state acceptance pending",
+        "functional_failures": "No reproduced individual call/notes/finalization failure remains in focused tested paths. Couples participant/consent/recipient model absent. Device/network handover and automatic SDK token refresh not independently verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/features/consultations/Consultation.tsx"
@@ -4994,12 +5018,13 @@
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implemented, verification pending",
-      "release_acceptance": "Pending current release-specific verification",
+      "release_acceptance": "Individual focused checks pass; required couples and final visual approval remain open",
       "requirements_source": "docs/operational-screen-map.json#E06",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E06) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending."
       },
       "visual_acceptance": {
         "reference_screen": "E06",
@@ -5023,10 +5048,12 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
+        "correction_status": "Operational individual handoff verified; matching visual/state evidence pending",
         "reference_screenshots": [],
         "implementation_screenshots": [],
-        "comparison_notes": [],
+        "comparison_notes": [
+          "Current comparison notes and per-set full source: docs/mvp-journey-verification-2026-10-09.md and docs/screenshots/consultation-current/evidence.json. No universal pixel-match claim."
+        ],
         "viewports": [
           390,
           768,
@@ -5072,8 +5099,8 @@
           }
         ],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Locally verified focused individual journey; whole-screen/state acceptance pending",
+        "functional_failures": "No reproduced individual call/notes/finalization failure remains in focused tested paths. Couples participant/consent/recipient model absent. Device/network handover and automatic SDK token refresh not independently verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/features/consultations/Consultation.tsx"
@@ -5101,19 +5128,20 @@
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implemented, verification pending",
-      "release_acceptance": "Pending current release-specific verification",
+      "release_acceptance": "Individual focused checks pass; required couples and final visual approval remain open",
       "requirements_source": "docs/operational-screen-map.json#E07",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E07) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending."
       },
       "visual_acceptance": {
         "reference_screen": "E07",
         "reference_hash": "#room",
         "reference_url": "http://127.0.0.1:8044/?embed=1#room",
         "product_route": "/consultation/:id/room",
-        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
+        "actor": "Authenticated appointment patient or treating clinician; private notes clinician-only; couples not yet supported",
         "states": [
           "populated",
           "empty",
@@ -5122,7 +5150,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Dominant remote stage/self-preview and dark reference composition corrected; fake-device image and permitted identity replace prototype assets. Mobile control density requires owner review.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -5130,10 +5158,22 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Compared corrections; product-owner visual approval pending",
+        "reference_screenshots": [
+          "docs/screenshots/consultation-current/connected/E07-reference-1440.png",
+          "docs/screenshots/consultation-current/connected/E07-reference-320.png",
+          "docs/screenshots/consultation-current/connected/E07-reference-390.png",
+          "docs/screenshots/consultation-current/connected/E07-reference-768.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/consultation-current/connected/E07-application-1440.png",
+          "docs/screenshots/consultation-current/connected/E07-application-320.png",
+          "docs/screenshots/consultation-current/connected/E07-application-390.png",
+          "docs/screenshots/consultation-current/connected/E07-application-768.png"
+        ],
+        "comparison_notes": [
+          "Current comparison notes and per-set full source: docs/mvp-journey-verification-2026-10-09.md and docs/screenshots/consultation-current/evidence.json. No universal pixel-match claim."
+        ],
         "viewports": [
           390,
           768,
@@ -5165,8 +5205,8 @@
         },
         "expected_actions": [],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Locally verified focused individual journey; whole-screen/state acceptance pending",
+        "functional_failures": "No reproduced individual call/notes/finalization failure remains in focused tested paths. Couples participant/consent/recipient model absent. Device/network handover and automatic SDK token refresh not independently verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/features/consultations/Consultation.tsx"
@@ -5190,19 +5230,20 @@
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implemented, verification pending",
-      "release_acceptance": "Pending current release-specific verification",
+      "release_acceptance": "Individual focused checks pass; required couples and final visual approval remain open",
       "requirements_source": "docs/operational-screen-map.json#E08",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E08) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending."
       },
       "visual_acceptance": {
         "reference_screen": "E08",
         "reference_hash": "#e08",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e08",
-        "product_route": "/consultation/:id/room (audio-only mode)",
-        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
+        "product_route": "/consultation/:id/room",
+        "actor": "Authenticated appointment patient or treating clinician; private notes clinician-only; couples not yet supported",
         "states": [
           "populated",
           "empty",
@@ -5211,7 +5252,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Light page with centered dark audio card corrected. Actual quiet/muted level remains flat; labeled controls and collapsed session details extend reference.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -5219,10 +5260,22 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Compared corrections; product-owner visual approval pending",
+        "reference_screenshots": [
+          "docs/screenshots/consultation-current/connected/E08-reference-1440.png",
+          "docs/screenshots/consultation-current/connected/E08-reference-320.png",
+          "docs/screenshots/consultation-current/connected/E08-reference-390.png",
+          "docs/screenshots/consultation-current/connected/E08-reference-768.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/consultation-current/connected/E08-application-1440.png",
+          "docs/screenshots/consultation-current/connected/E08-application-320.png",
+          "docs/screenshots/consultation-current/connected/E08-application-390.png",
+          "docs/screenshots/consultation-current/connected/E08-application-768.png"
+        ],
+        "comparison_notes": [
+          "Current comparison notes and per-set full source: docs/mvp-journey-verification-2026-10-09.md and docs/screenshots/consultation-current/evidence.json. No universal pixel-match claim."
+        ],
         "viewports": [
           390,
           768,
@@ -5256,8 +5309,8 @@
         },
         "expected_actions": [],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Locally verified focused individual journey; whole-screen/state acceptance pending",
+        "functional_failures": "No reproduced individual call/notes/finalization failure remains in focused tested paths. Couples participant/consent/recipient model absent. Device/network handover and automatic SDK token refresh not independently verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/features/consultations/Consultation.tsx"
@@ -5277,19 +5330,20 @@
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implemented, verification pending",
-      "release_acceptance": "Pending current release-specific verification",
+      "release_acceptance": "Individual focused checks pass; required couples and final visual approval remain open",
       "requirements_source": "docs/operational-screen-map.json#E09",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E09) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending."
       },
       "visual_acceptance": {
         "reference_screen": "E09",
         "reference_hash": "#e09",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e09",
-        "product_route": "/consultation/:id/room (reconnection state)",
-        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
+        "product_route": "/consultation/:id/room",
+        "actor": "Authenticated appointment patient or treating clinician; private notes clinician-only; couples not yet supported",
         "states": [
           "populated",
           "empty",
@@ -5298,7 +5352,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Signaling reconnect keeps live RTP where available; reference total-media interruption differs intentionally. Full network/device handover untested.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -5306,10 +5360,22 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Compared corrections; product-owner visual approval pending",
+        "reference_screenshots": [
+          "docs/screenshots/consultation-current/connected/E09-reference-1440.png",
+          "docs/screenshots/consultation-current/connected/E09-reference-320.png",
+          "docs/screenshots/consultation-current/connected/E09-reference-390.png",
+          "docs/screenshots/consultation-current/connected/E09-reference-768.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/consultation-current/connected/E09-application-1440.png",
+          "docs/screenshots/consultation-current/connected/E09-application-320.png",
+          "docs/screenshots/consultation-current/connected/E09-application-390.png",
+          "docs/screenshots/consultation-current/connected/E09-application-768.png"
+        ],
+        "comparison_notes": [
+          "Current comparison notes and per-set full source: docs/mvp-journey-verification-2026-10-09.md and docs/screenshots/consultation-current/evidence.json. No universal pixel-match claim."
+        ],
         "viewports": [
           390,
           768,
@@ -5359,8 +5425,8 @@
           }
         ],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Locally verified focused individual journey; whole-screen/state acceptance pending",
+        "functional_failures": "No reproduced individual call/notes/finalization failure remains in focused tested paths. Couples participant/consent/recipient model absent. Device/network handover and automatic SDK token refresh not independently verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/features/consultations/Consultation.tsx"
@@ -5501,19 +5567,20 @@
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implemented, verification pending",
-      "release_acceptance": "Pending current release-specific verification",
+      "release_acceptance": "Individual focused checks pass; required couples and final visual approval remain open",
       "requirements_source": "docs/operational-screen-map.json#E11",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E11) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending."
       },
       "visual_acceptance": {
         "reference_screen": "E11",
         "reference_hash": "#e11",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e11",
-        "product_route": "/clinician/consultations/:id (post-call notes)",
-        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
+        "product_route": "/patient/consultations/:id or /clinician/consultations/:id",
+        "actor": "Authenticated appointment patient or treating clinician; private notes clinician-only; couples not yet supported",
         "states": [
           "populated",
           "empty",
@@ -5522,7 +5589,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Reference separate note/summary panels and explicit sharing checkbox ported. Saved sharing choice, preview/finalization, immutable sharing and amendment history use real persisted APIs. Measured call duration is unavailable rather than fabricated. Demo ribbon, compact readiness and historical test names remain; language/zoom/couples recipient states and presentation content pending.",
+        "current_differences": "Separate note/summary and finalization sidebar corrected; current terminal comparison is explicitly an unsaved amendment. Timeline/disclosure and unavailable measured connected duration are truthful extensions.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -5530,19 +5597,29 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implemented correction; compared, visual acceptance pending",
+        "correction_status": "Compared corrections; product-owner visual approval pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/E11-reference-390.png",
-          "docs/screenshots/mvp-connected-journeys/E11-reference-768.png",
-          "docs/screenshots/mvp-connected-journeys/E11-reference-1440.png"
+          "docs/screenshots/consultation-current/connected/E11-reference-1440.png",
+          "docs/screenshots/consultation-current/connected/E11-reference-320.png",
+          "docs/screenshots/consultation-current/connected/E11-reference-390.png",
+          "docs/screenshots/consultation-current/connected/E11-reference-768.png",
+          "docs/screenshots/consultation-current/terminal/E11-reference-1440.png",
+          "docs/screenshots/consultation-current/terminal/E11-reference-320.png",
+          "docs/screenshots/consultation-current/terminal/E11-reference-390.png",
+          "docs/screenshots/consultation-current/terminal/E11-reference-768.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/E11-application-390.png",
-          "docs/screenshots/mvp-connected-journeys/E11-application-768.png",
-          "docs/screenshots/mvp-connected-journeys/E11-application-1440.png"
+          "docs/screenshots/consultation-current/connected/E11-application-1440.png",
+          "docs/screenshots/consultation-current/connected/E11-application-320.png",
+          "docs/screenshots/consultation-current/connected/E11-application-390.png",
+          "docs/screenshots/consultation-current/connected/E11-application-768.png",
+          "docs/screenshots/consultation-current/terminal/E11-amendment-application-1440.png",
+          "docs/screenshots/consultation-current/terminal/E11-amendment-application-320.png",
+          "docs/screenshots/consultation-current/terminal/E11-amendment-application-390.png",
+          "docs/screenshots/consultation-current/terminal/E11-amendment-application-768.png"
         ],
         "comparison_notes": [
-          "See current 9 October journey verification report. Comparison performed on paired 390/768/1440 captures; no claim of universal pixel equivalence or product-owner acceptance."
+          "Current comparison notes and per-set full source: docs/mvp-journey-verification-2026-10-09.md and docs/screenshots/consultation-current/evidence.json. No universal pixel-match claim."
         ],
         "viewports": [
           390,
@@ -5595,8 +5672,8 @@
           }
         ],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
-        "functional_status": "Focused persisted detail/documentation journey locally verified; complete call/lifecycle acceptance pending",
-        "functional_failures": "Full current hosted call/lifecycle and scheduler release, coherent presentation dataset and couples participant/recipient workflows remain pending. Explicit single-patient note sharing is now locally verified.",
+        "functional_status": "Locally verified focused individual journey; whole-screen/state acceptance pending",
+        "functional_failures": "No reproduced individual call/notes/finalization failure remains in focused tested paths. Couples participant/consent/recipient model absent. Device/network handover and automatic SDK token refresh not independently verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/components/ConsultationDetails.tsx",
@@ -5626,9 +5703,12 @@
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Locally verified",
-      "release_acceptance": "Pending current release-specific verification",
+      "release_acceptance": "Individual focused checks pass; required couples and final visual approval remain open",
       "requirements_source": "docs/operational-screen-map.json#E12",
-      "verification_evidence": "tests/presentation.py 23/23 on tele-tena-pr12-fresh.localhost, including direct API privacy, authorization and concurrent/idempotent feedback assertions; tests/trust_metrics.py 4/4; real browser at http://127.0.0.1:8017/teletena/patient/consultations/<synthetic appointment>, persisted rating 5 after reload, exactly one tt_session_feedback row, no page errors. Screenshots: docs/screenshots/session-feedback/. Package checked by scripts/check_review_assets.py. No real media exchange was part of this feedback fixture.",
+      "verification_evidence": {
+        "inherited": "tests/presentation.py 23/23 on tele-tena-pr12-fresh.localhost, including direct API privacy, authorization and concurrent/idempotent feedback assertions; tests/trust_metrics.py 4/4; real browser at http://127.0.0.1:8017/teletena/patient/consultations/<synthetic appointment>, persisted rating 5 after reload, exactly one tt_session_feedback row, no page errors. Screenshots: docs/screenshots/session-feedback/. Package checked by scripts/check_review_assets.py. No real media exchange was part of this feedback fixture.",
+        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending."
+      },
       "visual_acceptance": {
         "reference_screen": "E12",
         "reference_hash": "#e12",
@@ -5651,10 +5731,12 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
+        "correction_status": "Operational individual handoff verified; matching visual/state evidence pending",
         "reference_screenshots": [],
         "implementation_screenshots": [],
-        "comparison_notes": [],
+        "comparison_notes": [
+          "Current comparison notes and per-set full source: docs/mvp-journey-verification-2026-10-09.md and docs/screenshots/consultation-current/evidence.json. No universal pixel-match claim."
+        ],
         "viewports": [
           390,
           768,
@@ -5694,8 +5776,8 @@
         },
         "expected_actions": [],
         "expected_next_states": "Completed + ended + finalized encounter → one immutable patient experience rating (1–5); same-value retries are idempotent and changed resubmissions are rejected.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Locally verified focused individual journey; whole-screen/state acceptance pending",
+        "functional_failures": "No reproduced individual call/notes/finalization failure remains in focused tested paths. Couples participant/consent/recipient model absent. Device/network handover and automatic SDK token refresh not independently verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/features/consultations/Consultation.tsx"
@@ -5723,19 +5805,20 @@
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implemented, verification pending",
-      "release_acceptance": "Pending current release-specific verification",
+      "release_acceptance": "Individual focused checks pass; required couples and final visual approval remain open",
       "requirements_source": "docs/operational-screen-map.json#E13",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E13) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending."
       },
       "visual_acceptance": {
         "reference_screen": "E13",
         "reference_hash": "#e13",
         "reference_url": "http://127.0.0.1:8044/?embed=1#e13",
         "product_route": "/patient/consultations/:id or /clinician/consultations/:id",
-        "actor": "Patient and treating clinician; other roles denied unless explicitly granted",
+        "actor": "Authenticated appointment patient or treating clinician; private notes clinician-only; couples not yet supported",
         "states": [
           "populated",
           "empty",
@@ -5744,7 +5827,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Authorized clinician finalized private document and patient-only published summaries restored; sharing history and amendment are real. Booked duration is not substituted for connected time. Fictional test fixture names are diagnostic content; clean presentation dataset and complete recipient/couples states remain pending.",
+        "current_differences": "Current authorized completed detail and summary compared; feedback/dispute/clinic-sharing operational additions still need visual owner review.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -5752,29 +5835,42 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implemented correction; compared, visual acceptance pending",
+        "correction_status": "Compared corrections; product-owner visual approval pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/E13-reference-390.png",
-          "docs/screenshots/mvp-connected-journeys/E13-reference-768.png",
-          "docs/screenshots/mvp-connected-journeys/E13-reference-1440.png"
+          "docs/screenshots/consultation-current/connected/E13-reference-1440.png",
+          "docs/screenshots/consultation-current/connected/E13-reference-320.png",
+          "docs/screenshots/consultation-current/connected/E13-reference-390.png",
+          "docs/screenshots/consultation-current/connected/E13-reference-768.png",
+          "docs/screenshots/consultation-current/terminal/E13-reference-200-percent.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/E13-clinician-application-390.png",
-          "docs/screenshots/mvp-connected-journeys/E13-clinician-application-768.png",
-          "docs/screenshots/mvp-connected-journeys/E13-clinician-application-1440.png",
-          "docs/screenshots/mvp-connected-journeys/E13-patient-application-390.png",
-          "docs/screenshots/mvp-connected-journeys/E13-patient-application-768.png",
-          "docs/screenshots/mvp-connected-journeys/E13-patient-application-1440.png"
+          "docs/screenshots/consultation-current/connected/E13-clinician-application-1440.png",
+          "docs/screenshots/consultation-current/connected/E13-clinician-application-320.png",
+          "docs/screenshots/consultation-current/connected/E13-clinician-application-390.png",
+          "docs/screenshots/consultation-current/connected/E13-clinician-application-768.png",
+          "docs/screenshots/consultation-current/connected/E13-patient-application-1440.png",
+          "docs/screenshots/consultation-current/connected/E13-patient-application-320.png",
+          "docs/screenshots/consultation-current/connected/E13-patient-application-390.png",
+          "docs/screenshots/consultation-current/connected/E13-patient-application-768.png",
+          "docs/screenshots/consultation-current/terminal/E13-clinician-application-1440.png",
+          "docs/screenshots/consultation-current/terminal/E13-clinician-application-320.png",
+          "docs/screenshots/consultation-current/terminal/E13-clinician-application-390.png",
+          "docs/screenshots/consultation-current/terminal/E13-clinician-application-768.png",
+          "docs/screenshots/consultation-current/terminal/E13-patient-application-1440.png",
+          "docs/screenshots/consultation-current/terminal/E13-patient-application-200-percent.png",
+          "docs/screenshots/consultation-current/terminal/E13-patient-application-320.png",
+          "docs/screenshots/consultation-current/terminal/E13-patient-application-390.png",
+          "docs/screenshots/consultation-current/terminal/E13-patient-application-768.png"
         ],
         "comparison_notes": [
-          "See current 9 October journey verification report. Comparison performed on paired 390/768/1440 captures; no claim of universal pixel equivalence or product-owner acceptance."
+          "Current comparison notes and per-set full source: docs/mvp-journey-verification-2026-10-09.md and docs/screenshots/consultation-current/evidence.json. No universal pixel-match claim."
         ],
         "viewports": [
           390,
           768,
           1440
         ],
-        "zoom_200_percent": "Not verified",
+        "zoom_200_percent": "Patient completed detail paired at actual Chrome 200% (outer 1440, CSS 720, DPR2); other states pending",
         "languages": {
           "en": "Comparison pending",
           "am": "Layout pending; native review required",
@@ -5832,8 +5928,8 @@
           }
         ],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
-        "functional_status": "Focused persisted detail/documentation journey locally verified; complete call/lifecycle acceptance pending",
-        "functional_failures": "Full current hosted call/lifecycle and scheduler release, coherent presentation dataset and couples participant/recipient workflows remain pending. Explicit single-patient note sharing is now locally verified.",
+        "functional_status": "Locally verified focused individual journey; whole-screen/state acceptance pending",
+        "functional_failures": "No reproduced individual call/notes/finalization failure remains in focused tested paths. Couples participant/consent/recipient model absent. Device/network handover and automatic SDK token refresh not independently verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/components/ConsultationDetails.tsx",
@@ -5871,12 +5967,13 @@
       "release_disposition": "MVP",
       "reason": "MVP capability; exact depth is defined in docs/mvp-release-scope.md.",
       "inherited_status": "Implemented, verification pending",
-      "release_acceptance": "Pending current release-specific verification",
+      "release_acceptance": "Individual focused checks pass; required couples and final visual approval remain open",
       "requirements_source": "docs/operational-screen-map.json#E14",
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E14) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending."
       },
       "visual_acceptance": {
         "reference_screen": "E14",
@@ -5900,10 +5997,12 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
+        "correction_status": "Operational individual handoff verified; matching visual/state evidence pending",
         "reference_screenshots": [],
         "implementation_screenshots": [],
-        "comparison_notes": [],
+        "comparison_notes": [
+          "Current comparison notes and per-set full source: docs/mvp-journey-verification-2026-10-09.md and docs/screenshots/consultation-current/evidence.json. No universal pixel-match claim."
+        ],
         "viewports": [
           390,
           768,
@@ -5949,8 +6048,8 @@
           }
         ],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
-        "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Follow-up navigation verified; new follow-up booking not exercised in this batch",
+        "functional_failures": "No reproduced individual call/notes/finalization failure remains in focused tested paths. Couples participant/consent/recipient model absent. Device/network handover and automatic SDK token refresh not independently verified.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/features/consultations/Consultation.tsx"
@@ -12858,7 +12957,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N01) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md."
       },
       "visual_acceptance": {
         "reference_screen": "N01",
@@ -12973,7 +13073,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md."
       },
       "visual_acceptance": {
         "reference_screen": "N02",
@@ -13067,7 +13168,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N03) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md."
       },
       "visual_acceptance": {
         "reference_screen": "N03",
@@ -13170,7 +13272,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N04) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md."
       },
       "visual_acceptance": {
         "reference_screen": "N04",
@@ -13263,7 +13366,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N05) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md."
       },
       "visual_acceptance": {
         "reference_screen": "N05",
@@ -13363,7 +13467,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N06) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md."
       },
       "visual_acceptance": {
         "reference_screen": "N06",
@@ -13447,7 +13552,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N07) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md."
       },
       "visual_acceptance": {
         "reference_screen": "N07",
@@ -13552,7 +13658,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (N08) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "couples_release_gate": "Required two-adult appointment/call/recipient-consent workflow absent; private relationship link is not couples consultation. See docs/mvp-release-scope.md."
       },
       "visual_acceptance": {
         "reference_screen": "N08",
