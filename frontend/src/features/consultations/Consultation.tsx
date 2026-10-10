@@ -234,7 +234,7 @@ export default function Consultation({
       }
       stopPreview();
       if (mounted.current && attempt === generation.current)
-        setMediaStatus(error instanceof ApiError && error.code === "consultation_unavailable" ? "callServiceUnavailable" : "callConnectError");
+        setMediaStatus(error instanceof ApiError && error.code === "consultation_service_unconfigured" ? "callServiceUnavailable" : "callConnectError");
     } finally {
       if (attempt === generation.current) joining.current = false;
       if (mounted.current && attempt === generation.current) setBusy(false);
