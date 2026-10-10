@@ -21,6 +21,8 @@ const words: Record<string, [string, string]> = {
   "Previously recorded": ["ቀደም ሲል ተመዝግቧል", "Dura galmaaʼeera"],
   "Pending release after finalization": ["ከማጠናቀቅ በኋላ ለመለቀቅ በመጠባበቅ ላይ", "Erga xumuramee booda gadhiifamuu eega"],
   "This summary is visible to the patient. Keep private clinical material in the separate note.": ["ይህ ማጠቃለያ ለታካሚው ይታያል። የግል ክሊኒካዊ መረጃን በተለየው ማስታወሻ ያስቀምጡ።", "Cuunfaan kun dhukkubsataaf mulʼata. Odeeffannoo yaalaa dhuunfaa yaadannoo adda keessatti kaaʼi."],
+  "Ready when you are": ["ዝግጁ ሲሆኑ", "Yeroo qophooftu"],
+  "Make sure you’re comfortable before joining.": ["ከመቀላቀልዎ በፊት ምቹ መሆንዎን ያረጋግጡ።", "Dura mariitti makamuun haala mijataa keessa jiraachuu kee mirkaneessi."],
   "Audio consultation": ["የድምፅ ምክክር", "Marii sagalee"],
   "More room to listen. Less bandwidth.": ["ለማዳመጥ ተጨማሪ ቦታ። አነስተኛ የኢንተርኔት ፍጆታ።", "Dhaggeeffachuuf iddoo balʼaa. Fayyadama interneetii xiqqaa."],
   "Check your devices": ["መሣሪያዎችዎን ያረጋግጡ", "Meeshaalee kee ilaali"],

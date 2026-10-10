@@ -95,3 +95,13 @@ body:has(.focused-call) {background:white;}
 .focused-call .room-preflight > h2 {font-size:40px;letter-spacing:-1.6px;line-height:1.12;}
 .focused-call .device-check-preview > .check {min-height:44px;}
 @media(max-width:600px){.focused-call .room-preflight > h2{font-size:32px;}.focused-call .room-audio-layout .call-controls{flex-wrap:nowrap;}.focused-call .room-audio-layout .call-controls button{min-width:44px;}}
+
+/* E05: preview precedes the device fields, within its own restrained card. */
+.focused-call .device-check-preview {padding:26px;border:1px solid var(--border);border-radius:16px;background:white;}
+.focused-call .device-check-preview .call-video {margin:0 0 20px;}
+.focused-call .device-selectors {grid-template-columns:minmax(0,1fr);}
+.focused-call .device-check-summary > h2 {font-size:22px;margin:0 0 24px;}
+.focused-call .device-check-summary > h3 {font-size:22px;}
+.focused-call .preflight-state {padding-block:14px;border-block:1px solid var(--border);margin-block:24px;}
+.focused-call .preflight-state p {font-size:14px;overflow-wrap:anywhere;}
+@media(max-width:600px){.focused-call .device-check-preview,.focused-call .device-check-summary{padding:20px;}}

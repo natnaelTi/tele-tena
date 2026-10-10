@@ -445,11 +445,11 @@ export default function Consultation({
       {connected && !audioOnly && <header className="room-heading"><Brand/><div><strong>{appointment.service_label}</strong><span>{appointment.display_identity} · {appointment.minutes} {w("minutes")}</span></div><span className="room-private"><ShieldCheck size={18}/>{w("Private consultation")}</span></header>}
       {(!connected || audioOnly) && <header className="light-call-header"><Brand/><Link className="text-link" to={detailRoute}>{w("Back to consultation details")}</Link></header>}
       {connected && audioOnly && <div className="audio-page-title"><h1>{w("Audio consultation")}</h1><p>{w("More room to listen. Less bandwidth.")}</p></div>}
-      {!connected && <h2>{info?.state === "Ended" ? w("Call ended") : connected ? t("consultation") : w("Check your devices")}</h2>}
-      {!connected && <p>
+      {!connected && <><h2>{info?.state === "Ended" ? w("Call ended") : w("Check your devices")}</h2>{info?.state !== "Ended" && <p>{w("Make sure you’re comfortable before joining.")}</p>}</>}
+      {!connected && info?.state === "Ended" && <p>
         {t("sessionLifecycle")}: {t(lifecycleStatus)}
       </p>}
-      {(!connected || !audioOnly) && <p className="room-connection" role="status">
+      {((connected && !audioOnly) || info?.state === "Ended") && <p className="room-connection" role="status">
         {t("mediaStatus")}: {t(mediaStatus)}
       </p>}
       {controlError && <p className="call-control-error" role="alert">{t(controlError)}</p>}
@@ -460,6 +460,17 @@ export default function Consultation({
       </div>}
       {!connected && info?.state !== "Ended" && (
         <div className="device-check-layout"><div className="device-check-preview">
+          {!audioOnly && (
+            <video
+              ref={preview}
+              autoPlay
+              muted
+              playsInline
+              className="call-video"
+              aria-label={t("localPreview")}
+            />
+          )}
+
           <div className="device-selectors"><label className="field">{w("Microphone")}<select disabled={busy} value={microphone} onChange={event => { stopPreview(); setMediaStatus("callNotConnected"); setMicrophone(event.target.value); }}><option value="">{w("Default microphone")}</option>{devices.filter(device=>device.kind === "audioinput").map((device,index)=><option value={device.deviceId} key={device.deviceId}>{device.label || `${w("Microphone")} ${index + 1}`}</option>)}</select></label>{!audioOnly && <label className="field">{w("Camera")}<select disabled={busy} value={camera} onChange={event=>{stopPreview();setMediaStatus("callNotConnected");setCamera(event.target.value);}}><option value="">{w("Default camera")}</option>{devices.filter(device=>device.kind === "videoinput").map((device,index)=><option value={device.deviceId} key={device.deviceId}>{device.label || `${w("Camera")} ${index + 1}`}</option>)}</select></label>}</div>
           <label className="check">
             <input
@@ -481,17 +492,7 @@ export default function Consultation({
           >
             {t(audioOnly ? "checkMicrophone" : "checkDevices")}
           </button>
-          {!audioOnly && (
-            <video
-              ref={preview}
-              autoPlay
-              muted
-              playsInline
-              className="call-video"
-              aria-label={t("localPreview")}
-            />
-          )}
-          </div><aside className="device-check-summary"><h3>{appointment.display_identity || w("Private participant")}</h3><p>{appointment.service_label}</p><p>{appointment.minutes} {w("minutes")} · {t(audioOnly ? "audioOnly" : "consultation")}</p><p>{w("Find a private space")}. {w("Use headphones if possible.")}</p>{info?.join_opens_at&&<p className="supporting">{w("Join window")}: {joinTime(info.join_opens_at)} – {joinTime(info.join_closes_at)} · {appointment.timezone || "UTC"}</p>}
+          </div><aside className="device-check-summary"><h2>{w("Ready when you are")}</h2><h3>{appointment.display_identity || w("Private participant")}</h3><p>{appointment.service_label}</p><p>{appointment.minutes} {w("minutes")} · {t(audioOnly ? "audioOnly" : "consultation")}</p><div className="preflight-state"><p role="status">{t("sessionLifecycle")}: {t(lifecycleStatus)}</p><p role="status">{t("mediaStatus")}: {t(mediaStatus)}</p></div><p>{w("Find a private space")}. {w("Use headphones if possible.")}</p>{info?.join_opens_at&&<p className="supporting">{w("Join window")}: {joinTime(info.join_opens_at)} – {joinTime(info.join_closes_at)} · {appointment.timezone || "UTC"}</p>}
           <button className="button"
             disabled={busy || !checked || !info?.can_join}
             onClick={() => void join()}
