@@ -31,4 +31,4 @@
 /* The optional invitation must not push the review queue below the fold. */
 .workspace-admin .workspace-body > .tour-invite {position:fixed;right:24px;bottom:24px;margin:0;z-index:70;}
 .workspace-admin .workspace-body > .tour-replay {margin:0 32px 0 auto;}
-@media(max-width:800px){.workspace-admin .workspace-body > .tour-invite {bottom:84px;right:16px;left:16px;max-width:calc(100% - 32px);width:auto;}}
+@media(max-width:800px){.workspace-admin .workspace-body > .tour-invite {position:static;bottom:auto;right:auto;left:auto;margin:8px 16px;max-width:calc(100% - 32px);width:auto;}}
