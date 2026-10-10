@@ -33,6 +33,7 @@ export default function Consultation({
   const selfPreview = useRef<HTMLVideoElement>(null);
   const [info, setInfo] = useState<ConsultationInfo | null>(null);
   const [lifecycleStatus, setLifecycleStatus] = useState<Key>("callNotStarted");
+  const [controlError, setControlError] = useState<Key | null>(null);
   const [mediaStatus, setMediaStatus] = useState<Key>("callNotConnected");
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [microphone, setMicrophone] = useState("");
@@ -46,6 +47,8 @@ export default function Consultation({
   const [remoteMuted, setRemoteMuted] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [level, setLevel] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
+  const root = useRef<HTMLElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [busy, setBusy] = useState(false);
   const mounted = useRef(false);
@@ -66,9 +69,9 @@ export default function Consultation({
       if (!mounted.current || (endedObserved.current && next.state !== "Ended")) return;
       if (next.state === "Ended") endedObserved.current = true;
       setInfo(next);
-      if (next.state === "Ended" && (roomRef.current || previewStream.current)) {
-        await leave(false);
-        if (mounted.current) setMediaStatus("callDisconnected");
+      if (next.state === "Ended") {
+        if (roomRef.current || previewStream.current) await leave(false);
+        if (mounted.current) setMediaStatus("callEndedDisconnected");
       }
       if (!mounted.current) return;
       setLifecycleStatus(
@@ -110,6 +113,28 @@ export default function Consultation({
     }, 150);
     return () => window.clearInterval(timer);
   }, []);
+  useEffect(() => {
+    const changed = () => setFullscreen(document.fullscreenElement === root.current);
+    document.addEventListener("fullscreenchange", changed);
+    return () => document.removeEventListener("fullscreenchange", changed);
+  }, []);
+  useEffect(() => {
+    const node = root.current;
+    if (!expanded || !node) return;
+    const previous = document.activeElement;
+    const keys = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setExpanded(false); return; }
+      if (event.key !== "Tab") return;
+      const controls = [...node.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled])')]
+        .filter(element => element.offsetParent !== null);
+      const first = controls[0], last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    node.addEventListener("keydown", keys);
+    node.querySelector<HTMLElement>('.fullscreen-control')?.focus();
+    return () => { node.removeEventListener("keydown", keys); if (previous instanceof HTMLElement && previous.isConnected) previous.focus(); };
+  }, [expanded]);
   function stopPreview() {
     previewStream.current?.getTracks().forEach((track) => track.stop());
     previewStream.current = null;
@@ -241,7 +266,8 @@ export default function Consultation({
         if (current()) {
           roomRef.current = null;
           void disposeRoom(connectedRoom);
-          setMediaStatus("callDisconnected");
+          setMediaStatus("callConnectionLost");
+          void refresh();
         }
       });
       connectedRoom.on(RoomEvent.LocalTrackPublished, (publication) => {
@@ -298,7 +324,7 @@ export default function Consultation({
     const room = roomRef.current;
     roomRef.current = null;
     stopPreview();
-    if (mounted.current) { setSpeaking(false); setLevel(0); setRemoteMuted(false); setRemotePresent(false); setRemoteVideo(false); setBusy(false); }
+    if (mounted.current) { setSpeaking(false); setLevel(0); setRemoteMuted(false); setRemotePresent(false); setRemoteVideo(false); setControlError(null); setBusy(false); }
     if (room) await disposeRoom(room);
     if (showStatus && mounted.current) setMediaStatus("callDisconnected");
   }
@@ -312,62 +338,74 @@ export default function Consultation({
         true,
       );
       await leave(false);
-      if (mounted.current) setMediaStatus("callDisconnected");
       await refresh();
     } catch {
       // End may have committed even when Cloud closure failed. Read the
       // authoritative lifecycle rather than guessing that it ended.
       await refresh();
-      if (mounted.current) setMediaStatus("callEndError");
+      if (mounted.current) setControlError("callEndError");
     } finally {
       if (mounted.current) setBusy(false);
     }
   }
-  async function toggleMute() {
-    setBusy(true);
+  async function toggleMedia(kind: "microphone" | "camera") {
+    const room = roomRef.current;
+    const attempt = generation.current;
+    if (!room || busy) return;
+    setBusy(true); setControlError(null);
     try {
-      const next = !muted;
-      await roomRef.current?.localParticipant.setMicrophoneEnabled(!next);
-      if (mounted.current) setMuted(next);
+      if (kind === "microphone") await room.localParticipant.setMicrophoneEnabled(muted);
+      else await room.localParticipant.setCameraEnabled(!cameraOn);
     } catch {
-      if (mounted.current) setMediaStatus("callToggleError");
+      if (mounted.current && attempt === generation.current) setControlError("callToggleError");
     } finally {
-      if (mounted.current) setBusy(false);
+      if (!mounted.current || attempt !== generation.current || roomRef.current !== room) {
+        await disposeRoom(room);
+      } else {
+        setMuted(!room.localParticipant.isMicrophoneEnabled);
+        setCameraOn(room.localParticipant.isCameraEnabled);
+        setBusy(false);
+      }
     }
   }
-  async function toggleCamera() {
-    setBusy(true);
+  async function toggleAudioOnly() {
+    const room = roomRef.current;
+    const attempt = generation.current;
+    if (!room || busy) return;
+    setBusy(true); setControlError(null);
     try {
-      const next = !cameraOn;
-      await roomRef.current?.localParticipant.setCameraEnabled(next);
-      if (mounted.current) setCameraOn(next);
-    } catch {
-      if (mounted.current) setMediaStatus("callToggleError");
-    } finally {
-      if (mounted.current) setBusy(false);
-    }
-  }
-  async function toggleAudioOnly(){
-    if(!roomRef.current)return;
-    setBusy(true);
-    try{
-      const next=!audioOnly;
-      if(!next&&audioOnly){
-        // Audio-only tokens deliberately cannot publish camera tracks. Leave
-        // cleanly, then return to preflight to request a camera-capable token.
+      if (audioOnly) {
+        // Obtain a camera-capable token only after leaving and a new preflight.
         await leave(false);
-        if(mounted.current){setAudioOnly(false);setMediaStatus("callDisconnected");}
+        if (mounted.current && generation.current === attempt + 1 && !roomRef.current) {
+          setAudioOnly(false); setMediaStatus("callDisconnected");
+        }
         return;
       }
-      if(next){await roomRef.current.localParticipant.setCameraEnabled(false);setCameraOn(false);}
-      else {await roomRef.current.localParticipant.setCameraEnabled(true);setCameraOn(true);}
-      if(mounted.current)setAudioOnly(next);
-    }catch{if(mounted.current)setMediaStatus("callToggleError");}
-    finally{if(mounted.current)setBusy(false);}
+      await room.localParticipant.setCameraEnabled(false);
+      if (!mounted.current || attempt !== generation.current || roomRef.current !== room) {
+        await disposeRoom(room);
+        return;
+      }
+      setCameraOn(room.localParticipant.isCameraEnabled); setAudioOnly(true);
+    } catch {
+      if (mounted.current && attempt === generation.current) setControlError("callToggleError");
+    } finally {
+      if (mounted.current && attempt === generation.current) setBusy(false);
+    }
   }
   async function toggleFullscreen(){
-    const node=remote.current?.closest(".consultation");
-    try{if(!document.fullscreenElement&&node?.requestFullscreen)await node.requestFullscreen();else if(document.fullscreenElement)await document.exitFullscreen();else setExpanded(!expanded);}catch{setExpanded(!expanded);}
+    if (expanded) { setExpanded(false); return; }
+    const node=root.current;
+    try{if(!document.fullscreenElement&&node?.requestFullscreen)await node.requestFullscreen();else if(document.fullscreenElement)await document.exitFullscreen();else setExpanded(current=>!current);}catch{setExpanded(current=>!current);}
+  }
+  async function requestEndConfirmation() {
+    try {
+      // Radix dialogs are portalled outside the fullscreen element. Exit first
+      // so the confirmation remains visible and keyboard-accessible.
+      if (document.fullscreenElement) await document.exitFullscreen();
+      if (mounted.current) { setExpanded(false); setConfirmEnd(true); }
+    } catch { if (mounted.current) setControlError("callToggleError"); }
   }
   function attachMedia() {
     const room = roomRef.current;
@@ -391,7 +429,8 @@ export default function Consultation({
   const joinTime = (value: string) => new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short", timeZone: appointment.timezone || "UTC" }).format(new Date(value));
   const detailRoute = `/${info?.role || "patient"}/consultations/${appointment.id}`;
   return (
-    <section className={`consultation ${connected ? "room-connected" : "room-preflight"}`} aria-label={t("consultation")}>
+    <section ref={root} className={`consultation ${connected ? "room-connected" : "room-preflight"} ${expanded ? "room-expanded" : ""}`} aria-label={t("consultation")}>
+      {(fullscreen || expanded) && <div className="room-demo" role="note">{w("Demonstration environment — no real payments or clinical care.")}</div>}
       {connected && <header className="room-heading"><Brand/><div><strong>{appointment.service_label}</strong><span>{appointment.display_identity} · {appointment.minutes} {w("minutes")}</span></div><span className="room-private"><ShieldCheck size={18}/>{w("Private consultation")}</span></header>}
       {!connected && <h2>{info?.state === "Ended" ? t("callEnded") : connected ? t("consultation") : w("Before you join")}</h2>}
       {!connected && <p>
@@ -400,6 +439,7 @@ export default function Consultation({
       <p className="room-connection" role="status">
         {t("mediaStatus")}: {t(mediaStatus)}
       </p>
+      {controlError && <p className="call-control-error" role="alert">{t(controlError)}</p>}
       {info?.state === "Ended" && <div className="call-ended-panel">
         <p>{info.role === "clinician" ? w("The call has ended. Review your notes and finalize the encounter.") : w(info.appointment_state === "Completed" ? "Consultation record" : "Summary being prepared")}</p>
         <Link className="button primary" to={detailRoute}>{w(info.role === "clinician" ? "Finish the consultation" : "View consultation")}</Link>
@@ -453,14 +493,14 @@ export default function Consultation({
       {connected&&<div className="room-workspace"><div className="room-main"><div className={`media-stage ${audioSurface?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected} data-remote-audio-muted={remoteMuted}>
         <div ref={node => { remote.current = node; attachMedia(); }} className={audioSurface?"call-audio-hidden":"call-remote"} aria-label={t("remoteMedia")}/>
         {audioSurface&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><div className="room-audio-wave" style={{"--audio-level":level} as CSSProperties} aria-hidden="true">{Array.from({length:7},(_,index)=><i key={index}/>)}</div><h2>{appointment.display_identity||w("Private participant")}</h2><p>{!remotePresent ? t("callWaiting") : remoteMuted ? t("callRemoteMuted") : t(mediaStatus === "callConnected" ? "callConnected" : "callReconnecting")}</p></div>}
-        {!audioOnly&&<video ref={node => { selfPreview.current = node; attachMedia(); }} autoPlay muted playsInline className="self-preview" hidden={!cameraOn} aria-label="Your camera"/>}
-        <button className="fullscreen-control" type="button" onClick={()=>void toggleFullscreen()} aria-label="Expand consultation"><Maximize2 size={20}/></button>
+        {!audioOnly&&<video ref={node => { selfPreview.current = node; attachMedia(); }} autoPlay muted playsInline className="self-preview" hidden={!cameraOn} aria-label={t("localPreview")}/>}
+        <button className="fullscreen-control" type="button" onClick={()=>void toggleFullscreen()} aria-label={w("Expand consultation")}><Maximize2 size={20}/></button>
       </div>
         <div className="call-controls">
           <button
             type="button"
             disabled={busy}
-            onClick={() => void toggleMute()}
+            onClick={() => void toggleMedia("microphone")}
           >
             {muted ? <MicOff size={20} /> : <Mic size={20} />}
             {t(muted ? "unmute" : "mute")}
@@ -469,7 +509,7 @@ export default function Consultation({
             <button
               type="button"
               disabled={busy}
-              onClick={() => void toggleCamera()}
+              onClick={() => void toggleMedia("camera")}
             >
               {cameraOn ? <Video size={20} /> : <VideoOff size={20} />}
               {t(cameraOn ? "cameraOff" : "cameraOn")}
@@ -490,7 +530,7 @@ export default function Consultation({
               className="end-call"
               type="button"
               disabled={busy}
-              onClick={() => setConfirmEnd(true)}
+              onClick={() => void requestEndConfirmation()}
             >
               {t("endConsultation")}
             </button>
@@ -501,7 +541,7 @@ export default function Consultation({
           className="end-call"
           type="button"
           disabled={busy}
-          onClick={() => setConfirmEnd(true)}
+          onClick={() => void requestEndConfirmation()}
         >
           {t("endConsultation")}
         </button>
@@ -510,15 +550,15 @@ export default function Consultation({
       <Dialog
         open={confirmEnd}
         onOpenChange={setConfirmEnd}
-        title="End for everyone?"
-        description="This closes the consultation for both participants. Neither participant can rejoin after it ends."
+        title={w("End for everyone?")}
+        description={w("Ends the consultation for everyone. Room closure must be confirmed before finalizing notes.")}
       >
         <div className="actions">
           <Button variant="secondary" onClick={() => setConfirmEnd(false)}>
-            Keep consultation open
+            {w("Keep consultation open")}
           </Button>
           <Button variant="danger" onClick={() => void end()}>
-            End for everyone
+            {t("endConsultation")}
           </Button>
         </div>
       </Dialog>

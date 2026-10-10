@@ -65,3 +65,6 @@
 .focused-call .device-check-preview > .check {margin-block:16px;display:flex;align-items:center;gap:8px;}
 .focused-call .device-check-preview > .check input {margin:0;}
 @media(max-width:600px){.focused-call .device-selectors{grid-template-columns:1fr;}.focused-call .consultation .media-stage{height:45dvh;}.focused-call .consultation .audio-participant{gap:8px;}}
+.focused-call .room-expanded {position:fixed;inset:0;z-index:100;overflow:auto;background:#10212a;}
+.focused-call .room-demo {font-size:14px;text-align:center;padding:8px 12px;background:#eaf5f5;color:#52636a;margin-bottom:16px;}
+.focused-call .call-control-error {padding:12px;border:1px solid #d58b8f;border-radius:10px;}
