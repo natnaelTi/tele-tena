@@ -8,6 +8,7 @@ import { useLocale } from '../hooks/useLocale';
 import { useSession } from '../hooks/useSession';
 import { Button, Card, Checkbox, EmptyState, InlineNotice, Skeleton, TextField } from '../components/ui';
 import { DisclosurePreview, date, money } from '../components/Domain';
+import './Couples.css';
 import { AddFundsDialog } from '../components/AddFundsDialog';
 
 export default function Couples() {
@@ -40,7 +41,7 @@ export function CoupleInvitation() {
   const load=useCallback(()=>session?.profile?.kind==='patient'&&token?journeyApi.coupleInvitation(token):Promise.resolve(null),[session?.profile?.kind,token]);const invitation=useResource(load);
   useEffect(()=>{window.history.replaceState(window.history.state,'',window.location.pathname);},[]);
   if(loading)return <main className="container"><Skeleton/></main>;
-  return <main className="container guided-content shared-invitation"><p className="eyebrow">{w("SHARED CARE")} · {w("STEP")} {step+2} {w("OF")} 4</p><div className="step-progress" aria-label={`${w("Step")} ${step+2} ${w("of")} 4`}>{[0,1,2,3].map(value=><span key={value} data-complete={value<=step+1}/>)}</div><h1>{w(step?"Your private intake":"Your invitation")}</h1><p>{w(step?"This intake is private to you and the treating clinician.":"You choose whether to take part. Accepting an invitation does not share your care records.")}</p>
+  return <div className="shared-invitation-surface"><main className="container guided-panel shared-invitation" data-step={step?"intake":"invitation"}><p className="eyebrow sr-only">{w("SHARED CARE")} · {w("STEP")} {step+2} {w("OF")} 4</p><div className="step-progress" aria-label={`${w("Step")} ${step+2} ${w("of")} 4`}>{[0,1,2,3].map(value=><span key={value} data-complete={value<=step+1}/>)}</div><h1>{w(step?"Your private intake":"Your invitation")}</h1><p>{w(step?"This intake is private to you and the treating clinician.":"You choose whether to take part. Accepting an invitation does not share your care records.")}</p>
     {!session?<><p>{w('Each adult signs in independently before choosing what to share.')}</p><Button onClick={()=>navigate('/sign-in?intent=patient&next=%2Fcouple-invitation',{state:{coupleInvitationToken:token}})}>{w('Sign in to review invitation')}</Button></>:session.profile?.kind!=='patient'?<InlineNotice>{w('This invitation is for patient accounts. Sign in with a patient account to continue.')}</InlineNotice>:invitation.error?<InlineNotice tone="danger">{w('This invitation is no longer available.')}</InlineNotice>:!invitation.data?<Skeleton/>:<Card>
       <h2>{invitation.data.service}</h2><p>{invitation.data.clinician} · {date(invitation.data.start,invitation.data.timezone)} · ETB {money(invitation.data.price)}</p><p>{w('Your wallet is not charged for this session.')}</p>
       {step===0?<><h3>{w("Your choice")}</h3><p>{w("You will have your own account, intake, and consent choices.")}</p><div className="actions"><Button onClick={()=>setStep(1)}>{w("Review my choices")}</Button><Link className="text-link" to="/patient/couples">{w("Not now")}</Link></div></>:<><label className="field">{w('What would you like the clinician to understand?')}<textarea rows={4} maxLength={2000} value={request} onChange={event=>{setRequest(event.target.value);setPreview(null);}}/></label>
@@ -51,5 +52,5 @@ export function CoupleInvitation() {
       {preview&&<DisclosurePreview disclosure={preview}/>}{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
       <div className="actions"><Button variant="secondary" onClick={()=>setStep(0)}>{w("Back")}</Button><Button variant="secondary" disabled={!request.trim()} loading={action.busy} onClick={()=>void action.run(async()=>setPreview((await journeyApi.preview(request,sharing)).disclosure),'')}>{w('Preview')}</Button><Button disabled={!preview||!adult||action.busy} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.coupleConsent({token,request_text:request,sharing,expected_disclosure:preview,adult_confirmed:adult});navigate('/patient/couples');},'')}>{w('Save my choices')}</Button></div></>}
     </Card>}
-  </main>;
+  </main></div>;
 }

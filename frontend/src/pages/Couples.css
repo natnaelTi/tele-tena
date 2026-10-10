@@ -1,0 +1,11 @@
+/* N03/N04: shared-care consent uses the approved narrow guided composition. */
+.shared-invitation-surface{background:var(--surface-card,#fff)}
+.shared-invitation.container{max-width:640px;padding:64px 32px 56px;margin-inline:auto}
+.shared-invitation h1{font-size:36px;line-height:1.2;margin:36px 0 16px}
+.shared-invitation>.card{margin-top:32px;padding:26px;border-radius:16px}
+.shared-invitation .check-field{align-items:flex-start;padding:16px;border:1px solid var(--border);border-radius:12px;margin-bottom:12px;background:white}
+.shared-invitation .check-field input{margin-top:5px;flex-shrink:0}
+.shared-invitation .actions{margin-top:24px;flex-wrap:wrap}
+.shared-invitation[data-step=intake]>.card{border:0;padding:0;box-shadow:none}
+.shared-invitation textarea{min-height:130px}
+@media(max-width:640px){.shared-invitation.container{padding:40px 0 32px;max-width:calc(100% - 32px)}.shared-invitation h1{font-size:32px}.shared-invitation>.card{padding:20px}.shared-invitation .actions .button{flex:1}}
