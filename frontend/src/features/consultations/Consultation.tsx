@@ -87,6 +87,20 @@ export default function Consultation({
       void leave(false);
     };
   }, [appointment.id, refresh]);
+  useEffect(() => {
+    // Use LiveKit's existing received-audio measurements; no extra capture,
+    // audio recording or Web Audio microphone stream is created.
+    const timer = window.setInterval(() => {
+      const room = roomRef.current;
+      if (!room || !mounted.current) return;
+      const activity = Math.max(0, ...[...room.remoteParticipants.values()]
+        .filter(participant => participant.isMicrophoneEnabled)
+        .map(participant => participant.audioLevel));
+      setSpeaking(activity > 0.08);
+      setLevel(activity > 0.08 ? Math.min(1, activity) : 0);
+    }, 150);
+    return () => window.clearInterval(timer);
+  }, []);
   function stopPreview() {
     previewStream.current?.getTracks().forEach((track) => track.stop());
     previewStream.current = null;
@@ -410,7 +424,7 @@ export default function Consultation({
       )}
       {connected&&<div className="room-workspace"><div className="room-main"><div className={`media-stage ${audioOnly?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected} data-remote-audio-muted={remoteMuted}>
         <div ref={node => { remote.current = node; attachMedia(); }} className={audioOnly?"call-audio-hidden":"call-remote"} aria-label={t("remoteMedia")}/>
-        {audioOnly&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><h2>{appointment.display_identity||"Private participant"}</h2><p>{remoteMuted ? t("callRemoteMuted") : t(mediaStatus === "callConnected" ? "callConnected" : "callReconnecting")}</p></div>}
+        {audioOnly&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><div className="room-audio-wave" style={{"--audio-level":level} as CSSProperties} aria-hidden="true">{Array.from({length:7},(_,index)=><i key={index}/>)}</div><h2>{appointment.display_identity||w("Private participant")}</h2><p>{remoteMuted ? t("callRemoteMuted") : t(mediaStatus === "callConnected" ? "callConnected" : "callReconnecting")}</p></div>}
         {!audioOnly&&<video ref={node => { selfPreview.current = node; attachMedia(); }} autoPlay muted playsInline className="self-preview" hidden={!cameraOn} aria-label="Your camera"/>}
         <button className="fullscreen-control" type="button" onClick={()=>void toggleFullscreen()} aria-label="Expand consultation"><Maximize2 size={20}/></button>
       </div>

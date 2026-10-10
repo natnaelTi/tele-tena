@@ -52,3 +52,8 @@
 .focused-call .room-session-details .extension-panel h2 {font-size:17px;color:white;}
 .focused-call .room-session-details .extension-panel .button {white-space:normal;}
 @media(max-width:600px){.focused-call .room-heading{gap:12px;flex-wrap:wrap;}.focused-call .room-heading .room-private{margin-left:0;}.focused-call .room-connected > .room-connection{top:auto;position:static;display:inline-block;margin-top:16px;}.focused-call .room-heading > div{padding-left:12px;}.focused-call .room-connected .call-controls{align-items:start;}}
+.focused-call .room-audio-wave {height:28px;display:flex;align-items:center;gap:4px;margin:20px 0 0;}
+.focused-call .room-audio-wave i {display:block;width:3px;height:calc(3px + var(--audio-level,0) * 14px);background:#9dd3d9;border-radius:5px;}
+.focused-call .room-audio-wave i:nth-child(2n) {height:calc(3px + var(--audio-level,0) * 25px);}
+.focused-call .room-audio-wave i:nth-child(3n) {height:calc(3px + var(--audio-level,0) * 19px);}
+.focused-call .audio-avatar.speaking::before {animation:none;}
