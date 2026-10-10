@@ -66,7 +66,9 @@ for iteration in range(36):
         assert journey.rows('SELECT id FROM tt_journal WHERE event_ref=%s',('earning-release:'+next(e.id for e in earnings if e.appointment==appointments[1]),))==[]
         jobs=frappe.db.sql("SELECT t.method scheduled_job_type,l.status,l.creation FROM `tabScheduled Job Log` l JOIN `tabScheduled Job Type` t ON t.name=l.scheduled_job_type WHERE t.method IN ('tele_tena.accounting.release_eligible_earnings','tele_tena.api.couples.expire_invitations','tele_tena.api.open_requests.expire_requests') ORDER BY l.creation DESC LIMIT 30",as_dict=True)
         assert any(row.scheduled_job_type=='tele_tena.accounting.release_eligible_earnings' and row.status=='Complete' for row in jobs)
-        report={'site':SITE,'queue':'127.0.0.1:13917 / home-frappe-frappe-frappe-bench:default','one_minute_new_booking_policy':True,'automatic_release':True,'dispute_blocks_release':True,'release_postings':len(postings),'jobs':jobs,'worker_restart_recovery':'pending','source_commit':os.popen('git -C '+str(BENCH/'apps/tele_tena')+' rev-parse HEAD').read().strip()}
+        prior_path=Path('/tmp/tt-continuous-processing-result.json')
+        prior=json.loads(prior_path.read_text()) if prior_path.exists() else {}
+        report={'site':SITE,'queue':'127.0.0.1:13917 / home-frappe-frappe-frappe-bench:default','one_minute_new_booking_policy':True,'automatic_release':True,'dispute_blocks_release':True,'release_postings':len(postings),'jobs':jobs,'worker_restart_recovery':prior.get('worker_restart_recovery','pending'), 'automatically_enqueued_expiry':prior.get('automatically_enqueued_expiry',False), 'persisted_invitation_expired':prior.get('persisted_invitation_expired',False),'source_commit':os.popen('git -C '+str(BENCH/'apps/tele_tena')+' rev-parse HEAD').read().strip()}
         Path('/tmp/tt-continuous-processing-result.json').write_text(json.dumps(report,default=str,indent=2))
         print('PASS: native scheduled release produced exactly one posting; disputed earnings remained held.',flush=True)
         break

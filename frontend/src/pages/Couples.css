@@ -10,8 +10,8 @@
 .shared-invitation textarea{min-height:130px}
 @media(max-width:640px){.shared-invitation.container{padding:40px 0 32px;max-width:calc(100% - 32px)}.shared-invitation h1{font-size:32px}.shared-invitation>.card{padding:20px}.shared-invitation .actions .button{flex:1}}
 /* N05: focus payment on one selected plan; history uses compact rows. */
-.shared-care-page{max-width:1128px}
-.shared-care-columns{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:24px;align-items:start;margin-bottom:32px}
+.workspace-main .shared-care-page{max-width:1128px}
+.shared-care-page .shared-care-columns{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:24px;align-items:start;margin-bottom:32px}
 .shared-care-columns>.card{padding:26px}
 .shared-care-columns h3{font-size:22px;margin-bottom:24px}
 .shared-person-row{display:flex;align-items:center;gap:16px;padding:20px 0;border-bottom:1px solid var(--border)}
@@ -19,4 +19,4 @@
 .shared-person-row>div{flex:1}.shared-person-row p{margin:4px 0 0;font-size:14px}.shared-person-row .status-badge{font-size:14px}
 .shared-payment-facts{display:grid;grid-template-columns:1fr 1fr;margin:0 0 24px}.shared-payment-facts dt,.shared-payment-facts dd{border-bottom:1px solid var(--border);padding:16px 0;margin:0}.shared-payment-facts dt{color:var(--muted)}.shared-payment-facts dd{text-align:right;font-weight:600}
 .shared-plan-row{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:16px}.shared-plan-row h2{font-size:20px;margin-bottom:8px}.shared-plan-row p{margin-bottom:8px}
-@media(max-width:640px){.shared-care-columns{grid-template-columns:1fr}.shared-plan-row{align-items:start;flex-direction:column}.shared-care-columns>.card{padding:20px}}
+@media(max-width:640px){.shared-care-page .shared-care-columns{grid-template-columns:1fr}.shared-plan-row{align-items:start;flex-direction:column}.shared-care-columns>.card{padding:20px}}
