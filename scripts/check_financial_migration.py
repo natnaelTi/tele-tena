@@ -42,8 +42,11 @@ def snapshot():
                'earnings': [[r.appointment,r.state,int(r.gross_minor),int(r.fee_minor),int(r.net_minor)] for r in earnings],
                'journals': int(frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0]),
                'journal_lines': int(frappe.db.sql('SELECT COUNT(*) FROM tt_journal_line')[0][0]),
-               'reconciliations': [list(row) for row in reconciliations]}
-    return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+               'reconciliations': [dict(row) for row in reconciliations],
+               'legacy_records': [dict(row) for row in frappe.db.sql('SELECT * FROM tt_ledger ORDER BY id', as_dict=True)],
+               'journal_records': [dict(row) for row in frappe.db.sql('SELECT * FROM tt_journal ORDER BY id', as_dict=True)],
+               'line_records': [dict(row) for row in frappe.db.sql('SELECT * FROM tt_journal_line ORDER BY id', as_dict=True)]}
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':'), default=str).encode()).hexdigest()
 
 
 if __name__ == '__main__':

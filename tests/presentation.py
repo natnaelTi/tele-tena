@@ -2386,8 +2386,8 @@ class Presentation(unittest.TestCase):
             booked = self.book_slot(offering, self.slots(offering, day, who='p2')[0], 'earnings-dispute', who='p2')
             now = datetime.now(timezone.utc).replace(tzinfo=None)
             frappe.db.sql('''INSERT INTO tt_consultation
-                (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended)
-                VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s)''',
+                (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended,room_closed)
+                VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,1)''',
                 (booked['id'], str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex,
                  uuid.uuid4().hex, now, now))
             fixtures.login('c1')
@@ -2424,8 +2424,8 @@ class Presentation(unittest.TestCase):
         booked = self.book_slot(offering, self.slots(offering, day, who='p2')[0], 'release-wins', who='p2')
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         frappe.db.sql('''INSERT INTO tt_consultation
-            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended)
-            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s)''',
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,1)''',
             (booked['id'], str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex,
              uuid.uuid4().hex, now, now))
         fixtures.login('c1')
@@ -2443,6 +2443,53 @@ class Presentation(unittest.TestCase):
         self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_dispute WHERE earning=%s', (earning.id,)).n, 0)
         self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s',
                                      ('earning-refund:' + earning.id,)).n, 0)
+
+    def test_concurrent_dispute_and_release_have_one_authoritative_outcome(self):
+        from tele_tena import accounting
+        offering = fixtures.Integration.offers['c1']
+        self.fund_patient('p2', 1000)
+        day, _, _ = self.make_schedule(mode='automatic', offering=offering)
+        booked = self.book_slot(offering, self.slots(offering, day, who='p2')[0], 'dispute-release-race', who='p2')
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql("""INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,1)""",
+            (booked['id'],str(uuid.uuid4()),uuid.uuid4().hex,uuid.uuid4().hex,uuid.uuid4().hex,now,now))
+        fixtures.login('c1')
+        presentation.save_note_draft(booked['id'], 'Owned race fixture note', '')
+        presentation.finalize_consultation(booked['id'], 0)
+        frappe.db.sql('UPDATE tt_earning SET release_at=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND WHERE appointment=%s', (booked['id'],))
+        frappe.db.commit()
+        barrier = threading.Barrier(2)
+        def race(command):
+            fixtures.connect()
+            try:
+                fixtures.login('p2')
+                barrier.wait(timeout=10)
+                if command == 'dispute':
+                    try:
+                        accounting.open_earning_dispute(booked['id'], 'Owned concurrent dispute')
+                        frappe.db.commit()
+                        return 'held'
+                    except frappe.ValidationError:
+                        frappe.db.rollback()
+                        return 'release-won'
+                accounting.release_eligible_earnings()
+                frappe.db.commit()
+                return 'release-processed'
+            finally:
+                frappe.destroy()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            outcomes = list(pool.map(race, ('dispute', 'release')))
+        frappe.db.rollback()
+        earning = journey.one('SELECT id,state FROM tt_earning WHERE appointment=%s', (booked['id'],))
+        releases = journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s', ('earning-release:' + earning.id,)).n
+        disputes = journey.one("SELECT COUNT(*) n FROM tt_dispute WHERE earning=%s AND status='Open'", (earning.id,)).n
+        self.assertIn(earning.state, ('Released','Disputed'))
+        self.assertEqual((int(releases),int(disputes)), (1,0) if earning.state=='Released' else (0,1))
+        self.assertEqual(outcomes[0], 'release-won' if earning.state=='Released' else 'held')
+        accounting.release_eligible_earnings()
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s', ('earning-release:' + earning.id,)).n,releases)
 
     def test_concurrent_payouts_cannot_overreserve_earnings(self):
         from tele_tena import accounting
