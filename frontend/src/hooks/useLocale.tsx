@@ -9,6 +9,10 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  "Default microphone": ["ነባሪ ማይክሮፎን", "Maayikiroofonii durtii"],
+  "Default camera": ["ነባሪ ካሜራ", "Kaameraa durtii"],
+  "Microphone": ["ማይክሮፎን", "Maayikiroofonii"],
+  "Camera": ["ካሜራ", "Kaameraa"],
   "Join window": ["የመግቢያ ጊዜ", "Yeroo seensaa"],
   "Before you join": ["ከመግባትዎ በፊት", "Osoo hin seenin dura"],
   "Private consultation": ["የግል ምክክር", "Marii dhuunfaa"],

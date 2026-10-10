@@ -57,3 +57,11 @@
 .focused-call .room-audio-wave i:nth-child(2n) {height:calc(3px + var(--audio-level,0) * 25px);}
 .focused-call .room-audio-wave i:nth-child(3n) {height:calc(3px + var(--audio-level,0) * 19px);}
 .focused-call .audio-avatar.speaking::before {animation:none;}
+.focused-call .consultation .audio-avatar {margin:0;}
+.focused-call .consultation .call-controls {position:relative;bottom:auto;}
+.focused-call .room-heading .brand span {font-size:21px;}
+.focused-call .device-selectors {display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.focused-call .device-selectors select {min-height:48px;max-width:100%;}
+.focused-call .device-check-preview > .check {margin-block:16px;display:flex;align-items:center;gap:8px;}
+.focused-call .device-check-preview > .check input {margin:0;}
+@media(max-width:600px){.focused-call .device-selectors{grid-template-columns:1fr;}.focused-call .consultation .media-stage{height:45dvh;}.focused-call .consultation .audio-participant{gap:8px;}}

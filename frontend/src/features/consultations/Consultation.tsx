@@ -33,10 +33,15 @@ export default function Consultation({
   const [info, setInfo] = useState<ConsultationInfo | null>(null);
   const [lifecycleStatus, setLifecycleStatus] = useState<Key>("callNotStarted");
   const [mediaStatus, setMediaStatus] = useState<Key>("callNotConnected");
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [microphone, setMicrophone] = useState("");
+  const [camera, setCamera] = useState("");
   const [checked, setChecked] = useState(false);
   const [audioOnly, setAudioOnly] = useState(false);
   const [muted, setMuted] = useState(false);
   const [cameraOn, setCameraOn] = useState(true);
+  const [remotePresent, setRemotePresent] = useState(false);
+  const [remoteVideo, setRemoteVideo] = useState(false);
   const [remoteMuted, setRemoteMuted] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [level, setLevel] = useState(0);
@@ -147,8 +152,8 @@ export default function Consultation({
     let stream: MediaStream | null = null;
     try {
       stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: !audioOnly,
+        audio: microphone ? { deviceId: { exact: microphone } } : true,
+        video: audioOnly ? false : camera ? { deviceId: { exact: camera } } : true,
       });
       if (!mounted.current || attempt !== generation.current) {
         stream.getTracks().forEach((track) => track.stop());
@@ -159,6 +164,9 @@ export default function Consultation({
         preview.current.srcObject = stream;
         await preview.current.play().catch(() => undefined);
       }
+      const availableDevices = await navigator.mediaDevices.enumerateDevices();
+      if (!mounted.current || attempt !== generation.current) { stream.getTracks().forEach(track => track.stop()); return; }
+      setDevices(availableDevices);
       setChecked(true);
       setMediaStatus("callReady");
     } catch {
@@ -189,7 +197,7 @@ export default function Consultation({
       if (!mounted.current || attempt !== generation.current) return;
       const { Room, RoomEvent } = await import("livekit-client");
       if (!mounted.current || attempt !== generation.current) return;
-      const connectedRoom = new Room({ adaptiveStream: true, dynacast: true });
+      const connectedRoom = new Room({ adaptiveStream: true, dynacast: true, audioCaptureDefaults: { deviceId: microphone || undefined }, videoCaptureDefaults: { deviceId: camera || undefined } });
       room = connectedRoom;
       roomRef.current = connectedRoom;
       const current = () =>
@@ -208,13 +216,24 @@ export default function Consultation({
         const active = Boolean(remoteSpeaker);
         setSpeaking(active); setLevel(active ? Math.min(1, remoteSpeaker?.audioLevel || 0) : 0);
       });
+      connectedRoom.on(RoomEvent.ParticipantConnected, () => {
+        if (current()) setRemotePresent(connectedRoom.remoteParticipants.size > 0);
+      });
+      connectedRoom.on(RoomEvent.ParticipantDisconnected, () => {
+        if (current()) {
+          setRemotePresent(connectedRoom.remoteParticipants.size > 0);
+          if (!connectedRoom.remoteParticipants.size) { setRemoteVideo(false); setSpeaking(false); setLevel(0); }
+        }
+      });
       connectedRoom.on(RoomEvent.TrackMuted, (publication, participant) => {
+        if (current() && participant !== connectedRoom.localParticipant && publication.kind === "video") setRemoteVideo(false);
         if (current() && participant !== connectedRoom.localParticipant && publication.kind === "audio") {
           setRemoteMuted(true); setSpeaking(false); setLevel(0);
         }
       });
       connectedRoom.on(RoomEvent.TrackUnmuted, (publication, participant) => {
         if (current() && participant !== connectedRoom.localParticipant && publication.kind === "audio") setRemoteMuted(false);
+        if (current() && participant !== connectedRoom.localParticipant && publication.kind === "video") setRemoteVideo(true);
       });
       connectedRoom.on(RoomEvent.Disconnected, () => {
         if (current()) {
@@ -231,19 +250,21 @@ export default function Consultation({
         )
           publication.track.attach(selfPreview.current);
       });
-      connectedRoom.on(RoomEvent.TrackSubscribed, () => {
+      connectedRoom.on(RoomEvent.TrackSubscribed, (track) => {
         // Subscriptions can arrive before React mounts the connected stage.
         // Attach from publications, also on stage mount, rather than discarding them.
-        if (current()) attachMedia();
+        if (current()) { if (track.kind === "video") setRemoteVideo(!track.isMuted); attachMedia(); }
       });
-      connectedRoom.on(RoomEvent.TrackUnsubscribed, (track) =>
-        track.detach().forEach((element) => element.remove()),
-      );
+      connectedRoom.on(RoomEvent.TrackUnsubscribed, (track) => {
+        track.detach().forEach((element) => element.remove());
+        if (current() && track.kind === "video") setRemoteVideo(false);
+      });
       await connectedRoom.connect(issued.url, issued.token);
       if (!current()) {
         await disposeRoom(connectedRoom);
         return;
       }
+      setRemotePresent(connectedRoom.remoteParticipants.size > 0);
       stopPreview();
       await connectedRoom.localParticipant.setMicrophoneEnabled(true);
       if (!audioOnly)
@@ -275,7 +296,7 @@ export default function Consultation({
     const room = roomRef.current;
     roomRef.current = null;
     stopPreview();
-    if (mounted.current) { setSpeaking(false); setLevel(0); setRemoteMuted(false); setBusy(false); }
+    if (mounted.current) { setSpeaking(false); setLevel(0); setRemoteMuted(false); setRemotePresent(false); setRemoteVideo(false); setBusy(false); }
     if (room) await disposeRoom(room);
     if (showStatus && mounted.current) setMediaStatus("callDisconnected");
   }
@@ -364,6 +385,7 @@ export default function Consultation({
         publication.track.attach(selfPreview.current);
   }
   const connected = Boolean(roomRef.current);
+  const audioSurface = audioOnly || !remoteVideo;
   const joinTime = (value: string) => new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short", timeZone: appointment.timezone || "UTC" }).format(new Date(value));
   const detailRoute = `/${info?.role || "patient"}/consultations/${appointment.id}`;
   return (
@@ -383,6 +405,7 @@ export default function Consultation({
       </div>}
       {!connected && info?.state !== "Ended" && (
         <div className="device-check-layout"><div className="device-check-preview">
+          <div className="device-selectors"><label className="field">{w("Microphone")}<select disabled={busy} value={microphone} onChange={event => { stopPreview(); setMediaStatus("callNotConnected"); setMicrophone(event.target.value); }}><option value="">{w("Default microphone")}</option>{devices.filter(device=>device.kind === "audioinput").map((device,index)=><option value={device.deviceId} key={device.deviceId}>{device.label || `${w("Microphone")} ${index + 1}`}</option>)}</select></label>{!audioOnly && <label className="field">{w("Camera")}<select disabled={busy} value={camera} onChange={event=>{stopPreview();setMediaStatus("callNotConnected");setCamera(event.target.value);}}><option value="">{w("Default camera")}</option>{devices.filter(device=>device.kind === "videoinput").map((device,index)=><option value={device.deviceId} key={device.deviceId}>{device.label || `${w("Camera")} ${index + 1}`}</option>)}</select></label>}</div>
           <label className="check">
             <input
               type="checkbox"
@@ -425,9 +448,9 @@ export default function Consultation({
           </button>
         </aside></div>
       )}
-      {connected&&<div className="room-workspace"><div className="room-main"><div className={`media-stage ${audioOnly?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected} data-remote-audio-muted={remoteMuted}>
-        <div ref={node => { remote.current = node; attachMedia(); }} className={audioOnly?"call-audio-hidden":"call-remote"} aria-label={t("remoteMedia")}/>
-        {audioOnly&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><div className="room-audio-wave" style={{"--audio-level":level} as CSSProperties} aria-hidden="true">{Array.from({length:7},(_,index)=><i key={index}/>)}</div><h2>{appointment.display_identity||w("Private participant")}</h2><p>{remoteMuted ? t("callRemoteMuted") : t(mediaStatus === "callConnected" ? "callConnected" : "callReconnecting")}</p></div>}
+      {connected&&<div className="room-workspace"><div className="room-main"><div className={`media-stage ${audioSurface?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected} data-remote-audio-muted={remoteMuted}>
+        <div ref={node => { remote.current = node; attachMedia(); }} className={audioSurface?"call-audio-hidden":"call-remote"} aria-label={t("remoteMedia")}/>
+        {audioSurface&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><div className="room-audio-wave" style={{"--audio-level":level} as CSSProperties} aria-hidden="true">{Array.from({length:7},(_,index)=><i key={index}/>)}</div><h2>{appointment.display_identity||w("Private participant")}</h2><p>{!remotePresent ? t("callWaiting") : remoteMuted ? t("callRemoteMuted") : t(mediaStatus === "callConnected" ? "callConnected" : "callReconnecting")}</p></div>}
         {!audioOnly&&<video ref={node => { selfPreview.current = node; attachMedia(); }} autoPlay muted playsInline className="self-preview" hidden={!cameraOn} aria-label="Your camera"/>}
         <button className="fullscreen-control" type="button" onClick={()=>void toggleFullscreen()} aria-label="Expand consultation"><Maximize2 size={20}/></button>
       </div>
