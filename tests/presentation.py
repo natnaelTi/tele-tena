@@ -2895,6 +2895,37 @@ class Presentation(unittest.TestCase):
         with self.assertRaises(frappe.PermissionError):
             presentation.tour_state('clinician-availability')
 
+    def test_legacy_unknown_event_fails_visibly_without_rewriting_owner(self):
+        from tele_tena import accounting
+        from tele_tena.patches.v1_8_legacy_event_reconciliation import reconcile_wallet_events
+        from tele_tena.patches.v1_13_financial_reconciliation_audit import audit_wallet
+        savepoint = 'tt_unknown_' + uuid.uuid4().hex[:16]
+        frappe.db.sql('SAVEPOINT ' + savepoint)
+        patient = 'unknown-' + uuid.uuid4().hex[:16] + '@example.invalid'
+        try:
+            frappe.db.sql('INSERT INTO tt_wallet (patient,available,reserved) VALUES (%s,100,0)', (patient,))
+            ref = 'opening:' + patient
+            accounting.post(ref, 'Opening', ref,
+                [(accounting.account_id('patient', patient, 'available'), 0, 100),
+                 ('demo:opening-control', 100, 0)], {'source': 'owned unknown-event regression'})
+            event_ref = 'unknown:' + uuid.uuid4().hex
+            journey.simulation_log(patient, 'UnsupportedKind', 20, event_ref)
+            before = journey.one('SELECT COUNT(*) n FROM tt_journal').n
+            for attempt in range(2):
+                with self.assertRaises(frappe.ValidationError):
+                    reconcile_wallet_events(patient)
+                result = audit_wallet(patient)
+                self.assertFalse(result['matches'])
+                self.assertEqual(result['unknown_event_count'], 1)
+                self.assertEqual(result['wallet']['available'], 100)
+                self.assertEqual(accounting.balance('patient', patient, 'available'), 100)
+            self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal').n, before)
+            self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_ledger WHERE reference=%s', (event_ref,)).n, 1)
+            self.assertEqual(journey.one('SELECT status FROM tt_financial_reconciliation WHERE patient=%s', (patient,)).status, 'ReviewRequired')
+        finally:
+            frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
+            frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
+
     def test_06_legacy_wallet_events_after_opening_snapshot_reconcile_once(self):
         from tele_tena import accounting
         from tele_tena.patches.v1_8_legacy_event_reconciliation import reconcile_wallet_events
