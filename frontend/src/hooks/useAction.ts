@@ -3,6 +3,7 @@ import { ApiError } from "../api";
 const messages: Record<string, string> = {
   note_required: "Enter a consultation note or turn off note sharing.",
   summary_required: "Enter a patient summary before publishing.",
+  consultation_close_pending: "Room closure is still pending. Return to the room and retry End for everyone before finalizing. Your draft can be saved.",
   documentation_not_ready: "End the consultation before saving or finalizing notes.",
   adult_required: "Confirm that you are 18 or older before continuing.",
   relationship_retry_changed: "This invitation submission changed. Start a new invitation.",

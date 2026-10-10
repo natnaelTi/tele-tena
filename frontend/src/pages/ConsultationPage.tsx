@@ -29,7 +29,7 @@ function ConsultationDetail({appointmentId:id}:{appointmentId:string}) {
   const loadDetail = useCallback(() => journeyApi.appointmentDetail(id), [id]);
   const detail = useResource(loadDetail);
   useEffect(()=>{
-    if(detail.data?.status!=='Booked'||detail.data?.call_state!=='NotStarted')return;
+    if(detail.data?.status!=='Booked')return;
     const timer=window.setInterval(()=>void detail.refresh(),15000);
     return()=>window.clearInterval(timer);
   },[detail.data?.status,detail.data?.call_state,detail.refresh]);

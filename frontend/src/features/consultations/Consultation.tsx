@@ -3,7 +3,10 @@ import { Mic, MicOff, Video, VideoOff, PhoneOff, Maximize2 } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Room as LiveKitRoom } from "livekit-client";
-import { api } from "../../api";
+import { Link } from "react-router-dom";
+import { useLocale } from "../../hooks/useLocale";
+import "./consultation-room.css";
+import { ApiError, api } from "../../api";
 import type { Key } from "../../i18n";
 import ExtensionPanel from "./ExtensionPanel";
 type Appointment = { id: string; display_identity?:string; call_state?:string };
@@ -21,6 +24,7 @@ export default function Consultation({
   appointment: Appointment;
   t: (key: Key) => string;
 }) {
+  const { w } = useLocale();
   const [confirmEnd, setConfirmEnd] = useState(false);
   const selfPreview = useRef<HTMLVideoElement>(null);
   const [info, setInfo] = useState<ConsultationInfo | null>(null);
@@ -50,6 +54,10 @@ export default function Consultation({
       );
       if (!mounted.current) return;
       setInfo(next);
+      if (next.state === "Ended" && (roomRef.current || previewStream.current)) {
+        await leave(false);
+        if (mounted.current) setMediaStatus("callDisconnected");
+      }
       setLifecycleStatus(
         next.state === "Ended"
           ? next.room_close_pending
@@ -109,6 +117,7 @@ export default function Consultation({
     for (const publication of room.localParticipant.trackPublications.values())
       publication.track?.stop();
     detachRemote(room);
+    room.removeAllListeners();
   }
   async function checkDevices() {
     stopPreview();
@@ -194,14 +203,10 @@ export default function Consultation({
         )
           publication.track.attach(selfPreview.current);
       });
-      connectedRoom.on(RoomEvent.TrackSubscribed, (track) => {
-        const element = track.attach();
-        if (!current() || !remote.current) {
-          track.detach(element);
-          element.remove();
-          return;
-        }
-        remote.current.appendChild(element);
+      connectedRoom.on(RoomEvent.TrackSubscribed, () => {
+        // Subscriptions can arrive before React mounts the connected stage.
+        // Attach from publications, also on stage mount, rather than discarding them.
+        if (current()) attachMedia();
       });
       connectedRoom.on(RoomEvent.TrackUnsubscribed, (track) =>
         track.detach().forEach((element) => element.remove()),
@@ -222,14 +227,14 @@ export default function Consultation({
       setMuted(false);
       setCameraOn(!audioOnly);
       setMediaStatus("callConnected");
-    } catch {
+    } catch (error) {
       if (room) {
         if (roomRef.current === room) roomRef.current = null;
         await disposeRoom(room);
       }
       stopPreview();
       if (mounted.current && attempt === generation.current)
-        setMediaStatus("callConnectError");
+        setMediaStatus(error instanceof ApiError && error.code === "consultation_unavailable" ? "callServiceUnavailable" : "callConnectError");
     } finally {
       if (attempt === generation.current) joining.current = false;
       if (mounted.current && attempt === generation.current) setBusy(false);
@@ -241,6 +246,7 @@ export default function Consultation({
     const room = roomRef.current;
     roomRef.current = null;
     stopPreview();
+    if (mounted.current) { setSpeaking(false); setLevel(0); setBusy(false); }
     if (room) await disposeRoom(room);
     if (showStatus && mounted.current) setMediaStatus("callDisconnected");
   }
@@ -257,7 +263,10 @@ export default function Consultation({
       if (mounted.current) setMediaStatus("callDisconnected");
       await refresh();
     } catch {
-      if (mounted.current) setLifecycleStatus("callClosePending");
+      // End may have committed even when Cloud closure failed. Read the
+      // authoritative lifecycle rather than guessing that it ended.
+      await refresh();
+      if (mounted.current) setMediaStatus("callEndError");
     } finally {
       if (mounted.current) setBusy(false);
     }
@@ -308,16 +317,39 @@ export default function Consultation({
     const node=remote.current?.closest(".consultation");
     try{if(!document.fullscreenElement&&node?.requestFullscreen)await node.requestFullscreen();else if(document.fullscreenElement)await document.exitFullscreen();else setExpanded(!expanded);}catch{setExpanded(!expanded);}
   }
+  function attachMedia() {
+    const room = roomRef.current;
+    if (!room) return;
+    for (const participant of room.remoteParticipants.values()) {
+      for (const publication of participant.trackPublications.values()) {
+        const track = publication.track;
+        if (!track || !remote.current) continue;
+        // Reuse attached elements: remounting an audio/video stage must not
+        // leave detached playing elements or duplicate audio playback.
+        const element = track.attachedElements[0] || track.attach();
+        if (element.parentElement !== remote.current) remote.current.appendChild(element);
+      }
+    }
+    for (const publication of room.localParticipant.trackPublications.values())
+      if (publication.track?.kind === "video" && selfPreview.current)
+        publication.track.attach(selfPreview.current);
+  }
   const connected = Boolean(roomRef.current);
+  const detailRoute = `/${info?.role || "patient"}/consultations/${appointment.id}`;
   return (
     <section className="consultation" aria-label={t("consultation")}>
-      <h2>{connected ? t("consultation") : "Before you join"}</h2>
+      <h2>{info?.state === "Ended" ? t("callEnded") : connected ? t("consultation") : w("Before you join")}</h2>
       <p>
         {t("sessionLifecycle")}: {t(lifecycleStatus)}
       </p>
       <p role="status">
         {t("mediaStatus")}: {t(mediaStatus)}
       </p>
+      {info?.state === "Ended" && <div className="call-ended-panel">
+        <p>{info.role === "clinician" ? w("The call has ended. Review your notes and finalize the encounter.") : w("Summary being prepared")}</p>
+        <Link className="button primary" to={detailRoute}>{w(info.role === "clinician" ? "Finish the consultation" : "View consultation")}</Link>
+        {info.room_close_pending && <p role="alert">{t("callClosePending")}</p>}
+      </div>}
       {!connected && info?.state !== "Ended" && (
         <>
           <label className="check">
@@ -362,9 +394,9 @@ export default function Consultation({
         </>
       )}
       {connected&&<div className={`media-stage ${audioOnly?"audio-only":""} ${expanded?"expanded":""}`} data-connected={connected}>
-        <div ref={remote} className={audioOnly?"call-audio-hidden":"call-remote"} aria-label={t("remoteMedia")}/>
-        {audioOnly&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={speaking?"Participant speaking":"Participant is quiet"}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><h2>{appointment.display_identity||"Private participant"}</h2><p>{mediaStatus==="callConnected"?"Connected":"Reconnecting"}</p></div>}
-        {!audioOnly&&<video ref={selfPreview} autoPlay muted playsInline className="self-preview" hidden={!cameraOn} aria-label="Your camera"/>}
+        <div ref={node => { remote.current = node; attachMedia(); }} className={audioOnly?"call-audio-hidden":"call-remote"} aria-label={t("remoteMedia")}/>
+        {audioOnly&&<div className="audio-participant"><div className={`audio-avatar ${speaking?"speaking":""}`} style={{"--audio-level":level} as CSSProperties} aria-label={w(speaking?"Participant speaking":"Participant is quiet")}><span aria-hidden="true">{(appointment.display_identity||"P").slice(0,1).toUpperCase()}</span></div><h2>{appointment.display_identity||"Private participant"}</h2><p>{mediaStatus==="callConnected"?"Connected":"Reconnecting"}</p></div>}
+        {!audioOnly&&<video ref={node => { selfPreview.current = node; attachMedia(); }} autoPlay muted playsInline className="self-preview" hidden={!cameraOn} aria-label="Your camera"/>}
         <button className="fullscreen-control" type="button" onClick={()=>void toggleFullscreen()} aria-label="Expand consultation"><Maximize2 size={20}/></button>
       </div>}
       {connected && (

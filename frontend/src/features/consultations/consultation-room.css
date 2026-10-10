@@ -1,0 +1,22 @@
+/* E07/E08: scoped dark media stage; actual tracks/activity drive content. */
+.focused-call .consultation:has(.media-stage) {background:#10212a;color:#fff;border-radius:16px;padding:24px;}
+.focused-call .consultation:has(.media-stage) > h2 {color:#fff;margin:0 0 8px;}
+.focused-call .consultation:has(.media-stage) > p {color:#b8cbd3;margin:4px 0;font-size:14px;}
+.focused-call .consultation .media-stage {background:#243b44;border-radius:16px;min-height:440px;height:calc(100dvh - 300px);max-height:760px;position:relative;overflow:hidden;margin:20px 0;}
+.focused-call .consultation .call-remote {height:100%;width:100%;}
+.focused-call .consultation .call-remote video {height:100%;width:100%;object-fit:contain;}
+.focused-call .consultation .self-preview {position:absolute;right:20px;bottom:22px;width:156px;height:114px;object-fit:cover;border:1px solid #ffffff60;border-radius:12px;}
+.focused-call .consultation .audio-only {background:#243b44;}
+.focused-call .consultation .audio-participant {height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.focused-call .consultation .audio-participant h2 {color:white;margin:22px 0 0;}
+.focused-call .consultation .audio-participant p {color:#b8ccd5;}
+.focused-call .consultation .audio-avatar {width:164px;height:164px;background:#245565;color:#fff;border:1px solid #508898;box-shadow:0 0 0 22px #2d627328,0 0 0 44px #2d627315;}
+.focused-call .consultation .call-controls {display:flex;flex-wrap:wrap;justify-content:center;gap:12px;padding:4px 0 12px;}
+.focused-call .consultation .call-controls button {min-height:48px;border-radius:12px;border:1px solid #5b707a;background:#ffffff0d;color:#fff;display:flex;align-items:center;gap:8px;padding:12px;}
+.focused-call .consultation .call-controls button:hover {background:#ffffff20;}
+.focused-call .consultation .call-controls .leave-call,.focused-call .consultation .call-controls .end-call {background:#be3940;border-color:#be3940;}
+.focused-call .call-ended-panel {max-width:700px;margin:32px auto;padding:32px;border:1px solid var(--border-default,#d7e2dc);border-radius:18px;background:white;}
+.focused-call .consultation:fullscreen {border-radius:0;overflow:auto;}
+.focused-call .consultation:fullscreen .media-stage {height:calc(100dvh - 240px);max-height:none;}
+@media(max-width:600px){.focused-call .consultation:has(.media-stage){padding:12px;}.focused-call .consultation .media-stage{min-height:360px;height:55dvh;}.focused-call .consultation .self-preview{width:100px;height:80px;right:12px;bottom:12px;}.focused-call .consultation .call-controls{gap:8px;}.focused-call .consultation .call-controls button{font-size:14px;}}
+@media(prefers-reduced-motion:reduce){.focused-call .consultation .audio-avatar{animation:none!important;}}

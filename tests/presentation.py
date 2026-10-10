@@ -2546,6 +2546,39 @@ class Presentation(unittest.TestCase):
         self.assertEqual(after.start, original.start)
         self.assertEqual(after.timezone, 'Africa/Addis_Ababa')
 
+    def test_finalization_waits_for_room_closure_and_draft_retries_are_idempotent(self):
+        self.fund_patient('p1', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        appointment = self.book_slot(offering, self.slots(offering, day)[0], 'closure-before-finalize')['id']
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql("""INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended_by,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,%s,0)""",
+            (appointment, secrets.token_hex(16), secrets.token_hex(32), secrets.token_hex(24),
+             secrets.token_hex(24), now, fixtures.USERS['c1'], now))
+        fixtures.login('c1')
+        saved = presentation.save_note_draft(appointment, 'Private fictional note', 'Shared fictional summary')
+        retry = presentation.save_note_draft(appointment, 'Private fictional note', 'Shared fictional summary')
+        self.assertEqual(saved['revision'], retry['revision'])
+        self.assertTrue(retry['idempotent'])
+        with self.assertRaises(frappe.ValidationError):
+            presentation.finalize_consultation(appointment, 1)
+        self.assertEqual(frappe.local.response.get('tele_tena_error'), 'consultation_close_pending')
+        self.assertEqual(journey.one('SELECT state FROM tt_appointment WHERE id=%s', (appointment,)).state, 'Booked')
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_earning WHERE appointment=%s', (appointment,)).n, 0)
+        # Model successful provider closure, not merely elapsed scheduled time.
+        frappe.db.sql('UPDATE tt_consultation SET room_closed=1 WHERE appointment=%s', (appointment,))
+        presentation.finalize_consultation(appointment, 1)
+        retry = presentation.save_note_draft(appointment, 'Private fictional note', 'Shared fictional summary')
+        self.assertEqual(retry['status'], 'Finalized')
+        self.assertTrue(presentation.finalize_consultation(appointment, 1)['idempotent'])
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_earning WHERE appointment=%s', (appointment,)).n, 1)
+        fixtures.login('p1')
+        detail = presentation.appointment_detail(appointment)
+        self.assertNotIn('private_note', detail)
+        self.assertNotIn('Private fictional note', str(detail))
+
     def test_explicit_note_sharing_preserves_private_revisions_and_money(self):
         self.fund_patient('p1', 3000)
         day, _, _ = self.make_schedule(mode='automatic')

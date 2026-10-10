@@ -505,6 +505,12 @@ def save_note_draft(appointment, private_note, patient_summary, share_note=0):
         fail('End the consultation before documenting it', 'documentation_not_ready')
     existing = rows('SELECT status,current_revision FROM tt_consultation_note WHERE appointment=%s FOR UPDATE',
                      (item.id,))
+    if existing:
+        previous = one('SELECT private_note,patient_summary,note_share_selected FROM tt_note_revision WHERE appointment=%s AND revision=%s',
+                       (item.id, existing[0].current_revision))
+        if (previous.private_note == private_note and previous.patient_summary == patient_summary
+                and bool(previous.note_share_selected) == share_selected):
+            return {'status': existing[0].status, 'revision': int(existing[0].current_revision), 'idempotent': True}
     revision = (int(existing[0].current_revision) if existing else 0) + 1
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_note_revision
@@ -558,7 +564,7 @@ def finalize_consultation(appointment, publish_summary=0, publish_note=0):
     item, _, role = _authorized(appointment, True)
     if role != 'clinician' or item.clinician != clinician:
         frappe.throw('Consultation record unavailable', frappe.PermissionError)
-    call = rows("SELECT state FROM tt_consultation WHERE appointment=%s", (item.id,))
+    call = rows("SELECT state,room_closed FROM tt_consultation WHERE appointment=%s", (item.id,))
     note = one('SELECT current_revision,status FROM tt_consultation_note WHERE appointment=%s FOR UPDATE', (item.id,))
     if item.state == 'Completed' and note.status == 'Finalized':
         earnings = rows('SELECT state,net_minor,release_at FROM tt_earning WHERE appointment=%s', (item.id,))
@@ -566,6 +572,8 @@ def finalize_consultation(appointment, publish_summary=0, publish_note=0):
                 'idempotent': True, 'earning_state': earnings[0].state if earnings else 'LegacyHold'}
     if not call or call[0].state != 'Ended' or note.status != 'Draft':
         fail('Save a documentation draft after ending the call', 'documentation_not_ready')
+    if not call[0].room_closed:
+        fail('Close the consultation room before finalizing; retry End for everyone', 'consultation_close_pending')
     current = one('''SELECT * FROM tt_note_revision WHERE appointment=%s AND revision=%s''',
                   (item.id, note.current_revision))
     if share_note and not current.private_note.strip():
