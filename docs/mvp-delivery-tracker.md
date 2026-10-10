@@ -803,3 +803,9 @@ authored individual follow-up field, jointly consented couples reschedule/extens
 final integrated candidate checks and current Frappe16 couples verification.
 External gates remain physical devices, live delivery, native translations and
 clinical/provider authorization. No future modules, merge or Selfmade deployment.
+
+Presentation continuation40c608f: G01 patient balance/history and I02 clinician
+application queue now have paired reference comparisons and actual persisted
+backend action/permission checks at390/768/1440. Pagination avoids a history wall;
+mobile tour no longer covers Review. Owner approval, other route/state comparisons
+and current language/200%zoom checks remain open. See sole matrix/current report.

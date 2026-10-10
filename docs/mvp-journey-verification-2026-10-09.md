@@ -9,7 +9,7 @@ The existing `mvp-screen-acceptance.json` remains the sole screen acceptance mat
 - Branch `feat/mvp-release-handover`; [draft PR #44](https://github.com/natnaelTi/tele-tena/pull/44)
   depends on open PR #43 (`feat/adult-relationship-links`). Ancestor
   `1e8d161468eb8d3563f1b5743982722c749bbcbf` remains included.
-- **Built application source `8ba375e1febaa2a1e2572488d655867502fb9f32`**;
+- **Built application source `40c608f0de5dd7c9c92faeb11c6e45bbca3c7a49`**;
   later evidence/report commits do not change application code. The packaged
   `tele_tena/public/review/release.json` records this source and asset hashes.
 - **http://127.0.0.1:8017/teletena/** now serves **`teletena-mvp-presentation.localhost`**,
@@ -29,7 +29,7 @@ The existing `mvp-screen-acceptance.json` remains the sole screen acceptance mat
   unavailable state. Email code delivery is unavailable; explicit password sign-in works.
   Enabled-registration was tested separately with a loopback-only transport and then disabled.
 
-## Current gate reconciliation — source/build 8ba375e (10 October 2026)
+## Current gate reconciliation — source/build40c608f (10 October 2026)
 
 **This table supersedes all older open/missing/disabled claims below.** Earlier
 sections are retained as dated evidence, not competing current classifications.
@@ -49,6 +49,30 @@ No owner visual acceptance, merge or remote deployment is claimed.
 | Representative legacy financial cutover | Tested financial-schema path; historical whole-app checkout not tested | Empty named disposable database reconstructed absent v1.7 financial tables with 4 patient owners/2 clinicians, historical completed+booked reservations. Opening/retry preserves records, completed LegacyHold never auto-settles, known post-opening import once, exact-boundary/unknown events remain ReviewRequired. Retained failed-fixture diagnosis checked each owner's exact balances without clearing holds. Unknown kind unit retry test passes. Native `bench --site teletena-mvp-v133-fresh.localhost migrate` and `check_financial_migration.py` passed; full legacy/journal/line/reconciliation-value fingerprint retained. Temporary administrator removed; fixture intentionally retained with unresolved synthetic holds; do not describe this as running every old application version |
 | Whole-MVP visual fidelity | Open | Existing single matrix contains exact paired paths and remaining discrepancies. N03/N04 narrow guided forms; N05 focused plan; N06 tiles/activity; N07/N08 recipient/documents corrected. Other pending route/state comparisons, current 200% zoom and language layouts require completion. Screenshots/build are not acceptance |
 | External/manual | Pending | Physical devices/PWA installation, native translations, live SMS/SMTP receipt, medical-lead catalog/rubric/credential and clinical/legal review, real payment/provider activation. No current exact Frappe16 rerun of new couples code |
+
+### Subsequent faithful balance/reviewer slice —40c608f
+
+- G01 `/patient/payments`: reference1.7:1 layout, dark balance/reservation card,
+  compact icon activity. Five-row pagination preserves access to all events
+  returned by the real API; no financial edit. No unsupported external refund
+  action is fabricated. Actual balance differs from prototype illustrative values.
+- I02 `/admin/applications`: exact title/copy, compact status filter, dark active
+  sidebar, link-like Review. Readable mobile Overview/Applications/More navigation;
+  scopes remain in More. Tour invitation no longer overlays mobile Review.
+  Verified-profession column remains absent from current queue projection; evidence
+  and actual application status are truthful operational additions.
+- `browser-balance-review-layout.cjs` passed actual backend activity pagination,
+  transaction details, Add funds dialog/Escape with unchanged wallet, reviewer
+  name/status/empty filters, mobile pointer action, keyboard dialog/focus return,
+  reload, private PDF reviewer200/patient403. No mocked frontend or approval writes.
+- Paired390/768/1440: `docs/screenshots/mvp-presentation-current/40c608f/`.
+  Inspected desktop/mobile comparisons. Not owner visual acceptance, native
+  translation approval, all-state or actual200%zoom proof.
+- Locked packaging/TypeScript and lint exit0 (existing warnings); three node
+  status/grouping/service-worker tests pass. No presentation passwords found in
+  packaged public files. Individual call core unchanged; hosted suite not repeated.
+- Built40c608f replaces8ba375e after these explicit runtime/UI edits. Later
+  evidence-only commits must have empty frontend/backend runtime diff against it.
 
 ### Review the current persisted shared record
 
@@ -70,8 +94,7 @@ recipient restrictions and demonstration ribbon remain. The separate prototype
 individual follow-up field remains a recorded discrepancy, not a pretend control.
 
 The starting 7b866e8 versus d720596 difference was docs only. Later runtime changes
-were rebuilt explicitly. Current packaged source is8ba375e; following financial
-verification/scripts/docs commits do not change `frontend/` or `tele_tena/`.
+were rebuilt explicitly. The8ba375e document checkpoint was rebuilt explicitly as40c608f after the payment/admin UI corrections above. Subsequent evidence-only commits do not change runtime code.
 Production assets are served by dedicated Gunicorn453370, not Vite. No public
 ports, original-site migrations or Selfmade changes occurred.
 

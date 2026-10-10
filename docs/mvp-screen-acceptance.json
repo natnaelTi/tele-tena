@@ -1,7 +1,7 @@
 {
   "version": 2,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "8ba375e1febaa2a1e2572488d655867502fb9f32",
+  "source_checkpoint": "40c608f0de5dd7c9c92faeb11c6e45bbca3c7a49",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -7881,7 +7881,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Patient balance now matches reference dark available-balance card, reservation separator, 1.7:1 columns and compact icon activity. Genuine multiple events have five-row pagination rather than prototype one event. Global ribbon retained. General external refund control not implemented and not rendered. Clinician earnings composition is a separate remaining comparison, not claimed verified from this patient check.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -7889,20 +7889,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "correction_status": "Paired rendered comparison and focused real-backend browser paths verified; owner acceptance/current language/zoom pending.",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/G01-reference-1440.png",
-          "docs/screenshots/mvp-connected-journeys/G01-reference-390.png",
-          "docs/screenshots/mvp-connected-journeys/G01-reference-zoom200.png"
+          "docs/screenshots/mvp-presentation-current/40c608f/G01-reference-1440.png",
+          "docs/screenshots/mvp-presentation-current/40c608f/G01-reference-390.png",
+          "docs/screenshots/mvp-presentation-current/40c608f/G01-reference-768.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/G01-application-1440.png",
-          "docs/screenshots/mvp-connected-journeys/G01-application-390.png",
-          "docs/screenshots/mvp-connected-journeys/G01-application-am-390.png",
-          "docs/screenshots/mvp-connected-journeys/G01-application-om-390.png",
-          "docs/screenshots/mvp-connected-journeys/G01-application-zoom200.png"
+          "docs/screenshots/mvp-presentation-current/40c608f/G01-application-1440.png",
+          "docs/screenshots/mvp-presentation-current/40c608f/G01-application-390.png",
+          "docs/screenshots/mvp-presentation-current/40c608f/G01-application-768.png"
         ],
-        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
+        "comparison_notes": [
+          "1440px inspected against exact G01: card/hierarchy/column proportions match; no fictional amounts copied. Actual history originally created an overlong wall; pagination corrected it. Language and real200%zoom pending."
+        ],
         "viewports": [
           390,
           768,
@@ -7914,7 +7914,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
+        "functional_verification": "40c608f actual backend patient wallet/activity snapshots identical before/after; pagination Next/Back, transaction detail link, Add funds dialog/Escape without submission. Paired390/768/1440; no mocks or financial writes.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.G01",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -7946,7 +7946,7 @@
           }
         ],
         "expected_next_states": "Available → Reserved on booking; explicit finalization → Pending; dispute → Held; scheduled release → Available; payout request → PayoutReserved; cancellation releases once.",
-        "functional_status": "Locally verified slice; other release states pending",
+        "functional_status": "Locally verified on listed paths; not every screen state.",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Patient.tsx",
@@ -8736,7 +8736,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Fictional account plus actual ETB400/600 wallet. City/contact fields and shared-session workflow absent, not replaced with dead fields.",
+        "current_differences": "Actual persisted wallet, not reference illustrative amounts. City/contact editing remains partial. Working couples consultation core now verified separately; the earlier missing-shared-session claim is superseded by current N01–N08 evidence.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -9663,7 +9663,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Clinician applications title/copy, compact status width, active dark sidebar and link review action corrected. Application status and evidence columns replace the prototype profession column because current authorized query does not provide a verified profession. Extra approved scope/operations navigation remains accessible; mobile places scopes in More for readable labels. Optional tour invitation is inline on mobile so it cannot cover review actions.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -9671,16 +9671,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implemented correction; paired comparison has remaining differences",
+        "correction_status": "Paired rendered comparison and focused real-backend browser paths verified; owner acceptance/current language/zoom pending.",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/I02-reference-1440.png",
-          "docs/screenshots/mvp-connected-journeys/I02-reference-390.png"
+          "docs/screenshots/mvp-presentation-current/40c608f/I02-reference-1440.png",
+          "docs/screenshots/mvp-presentation-current/40c608f/I02-reference-390.png",
+          "docs/screenshots/mvp-presentation-current/40c608f/I02-reference-768.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/I02-application-1440.png",
-          "docs/screenshots/mvp-connected-journeys/I02-application-390.png"
+          "docs/screenshots/mvp-presentation-current/40c608f/I02-application-1440.png",
+          "docs/screenshots/mvp-presentation-current/40c608f/I02-application-390.png",
+          "docs/screenshots/mvp-presentation-current/40c608f/I02-application-768.png"
         ],
-        "comparison_notes": "See current verification report for composition comparison and explicit differences. Diagnostic retained fixtures are not accepted presentation content.",
+        "comparison_notes": [
+          "1440px exact I02 inspected: purposeful wide queue, title and sidebar treatment corrected. Mobile real pointer action passes with invitation visible. Verified profession field and additional pending/error-state comparisons remain open."
+        ],
         "viewports": [
           390,
           768,
@@ -9692,7 +9696,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Current report records actual persisted API/browser checks; not a complete release pass.",
+        "functional_verification": "40c608f actual reviewer name/status filtering, genuine empty result, mobile pointer Review, keyboard dialog/focus return/reload; reviewer private PDF200 and patient403. No approval mutation. Paired390/768/1440.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.I02",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -9726,7 +9730,7 @@
           }
         ],
         "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
-        "functional_status": "Locally verified slice; other release states pending",
+        "functional_status": "Locally verified on listed paths; not every screen state.",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Admin.tsx",
@@ -13926,7 +13930,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
-  "current_packaged_source": "8ba375e1febaa2a1e2572488d655867502fb9f32",
+  "current_packaged_source": "40c608f0de5dd7c9c92faeb11c6e45bbca3c7a49",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
