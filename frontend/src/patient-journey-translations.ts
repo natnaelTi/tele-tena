@@ -1,5 +1,9 @@
 /** Provisional interface translations; native review is a release activation gate. */
 export const patientJourneyTranslations: Record<string, [string, string]> = {
+  "Together in consultation": ["በጋራ በውይይት ላይ", "Waliin marii keessa"],
+  "participants": ["ተሳታፊዎች", "hirmaattota"],
+  "You": ["እርስዎ", "Ati"],
+  "Camera off": ["ካሜራ ጠፍቷል", "Kaameeraan cufame"],
   "Your appointments": ["የእርስዎ ቀጠሮዎች", "Beellamoota kee"],
   "Upcoming": ["ቀጣይ", "Kan dhufu"],
   "Completed": ["የተጠናቀቀ", "Xumurame"],
