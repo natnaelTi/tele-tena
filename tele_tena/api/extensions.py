@@ -26,6 +26,9 @@ def _block_policy(item):
 
 
 def _is_participant_open(item, user, role):
+    from tele_tena.api.couples import plan_for
+    if plan_for(item.id):
+        fail('Shared-session extensions require renewed consent from both adults.', 'couple_extension_unavailable')
     if item.state != 'Booked':
         fail('An extension is available only during a confirmed consultation.', 'extension_appointment_inactive')
     call = rows('SELECT state FROM tt_consultation WHERE appointment=%s', (item.id,))
@@ -76,6 +79,9 @@ def extension_status(appointment):
         duration_minutes,amount_minor,expires_at,proposed_at,
         start_after,accepted_at,started_at,closed_at FROM tt_consultation_extension
         WHERE appointment=%s ORDER BY proposed_at''', (item.id,))
+    from tele_tena.api.couples import plan_for
+    if plan_for(item.id):
+        return {'items': result, 'can_propose':False, 'can_accept':False, 'currency':'ETB'}
     return {'items': result, 'can_propose': role == 'clinician' and item.state == 'Booked',
             'can_accept': role == 'patient' and user == item.patient and item.state == 'Booked',
             'currency': 'ETB'}

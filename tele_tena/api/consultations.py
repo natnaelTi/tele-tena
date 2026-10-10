@@ -37,12 +37,12 @@ def consultation(appointment):
                             (item.id,), as_dict=True)
     state = session[0].state if session else 'Not started'
     closed = bool(session and session[0].room_closed)
-    from tele_tena.api.couples import ready
+    from tele_tena.api.couples import ready, plan_for
     note = frappe.db.sql('SELECT status FROM tt_consultation_note WHERE appointment=%s', (item.id,), as_dict=True)
     return {'join_opens_at': iso(item.start - timedelta(minutes=_minutes('tele_tena_consultation_early_minutes', 15))),
             'join_closes_at': iso(item.end + timedelta(minutes=_minutes('tele_tena_consultation_late_minutes', 30))),
             'appointment_state': item.state, 'documentation_state': note[0].status if note else 'None',
-            'state': state, 'role': role,
+            'state': state, 'role': role, 'is_couple':bool(plan_for(item.id)),
             'can_join': item.state == 'Booked' and state != 'Ended' and _window(item) and ready(item.id),
             'can_end': item.state == 'Booked' and role == 'clinician' and (state == 'Open' or (state == 'Ended' and not closed)),
             'room_close_pending': state == 'Ended' and not closed}

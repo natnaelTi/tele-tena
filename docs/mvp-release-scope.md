@@ -162,3 +162,5 @@ confirmation makes one appointment/reservation; participant conflicts; three
 media sessions, Leave/rejoin and all-identity End revocation; explicit recipients;
 withdrawal/outsider denials; one consumed reservation and pending earning.
 Implementation and verification remain open until that evidence passes.
+
+Couples v1 restrictions: existing individual fixed-block extensions remain supported. Shared-session extensions and rescheduling require both adults' renewed consent and are refused until that additional consent transition exists. The direct two-adult fixed-duration consultation is the couples release gate; this restriction must be visible and included in handover limitations. Clinic sharing of couple summaries is denied until recipient-specific grants can preserve both adults' decisions.

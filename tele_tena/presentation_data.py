@@ -17,7 +17,7 @@ from tele_tena.review import cli, write_private
 SITE = 'teletena-mvp-presentation.localhost'
 VERSION = 'presentation-v1'
 # Illustrative demonstration values; not Ethiopian market-rate claims.
-PRICES = {'individual-counseling': 30000, 'stress-support': 40000}
+PRICES = {'individual-counseling': 30000, 'stress-support': 40000, 'couples-counseling': 120000}
 
 
 def setup():

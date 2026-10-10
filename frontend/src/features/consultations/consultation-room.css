@@ -107,3 +107,22 @@ body:has(.focused-call) {background:white;}
 @media(max-width:600px){.focused-call .device-check-preview,.focused-call .device-check-summary{padding:20px;}}
 
 .consultation .call-remote.shared-remote{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:12px}.shared-media-tile{position:relative;min-height:200px;overflow:hidden;border-radius:16px;background:#172b35}.shared-media-label{position:absolute;bottom:12px;left:12px;z-index:2;background:#102a33;color:white;padding:6px 10px;border-radius:8px}.shared-media-tile.camera-muted video{visibility:hidden}.shared-media-tile video{object-fit:cover}@media(max-width:640px){.consultation .call-remote.shared-remote{grid-template-columns:1fr}.shared-media-tile{min-height:180px}}
+
+/* N06: use the approved light shared-care page and contained dark media stage. */
+.focused-call:has(.room-shared-layout){max-width:1200px;padding:0 36px 48px}
+.focused-call .consultation.room-shared-layout{background:white;color:var(--text-primary);padding:0;border:0}
+.focused-call .room-shared-layout .room-workspace{grid-template-columns:minmax(0,1fr)}
+.focused-call .room-shared-layout .media-stage{background:#102b34;height:440px;min-height:0;margin-bottom:0;padding:20px;border-radius:20px 20px 0 0}
+.focused-call .room-shared-layout .call-remote.shared-remote{padding:0;gap:12px}
+.focused-call .room-shared-layout .shared-media-tile{min-height:0;background:#203e49}
+.focused-call .room-shared-layout .call-controls{background:#0b2028;border-radius:0 0 20px 20px;padding:20px;gap:18px;color:white}
+.focused-call .room-shared-layout .call-controls button:not(.end-call) svg{border-radius:50%;background:#284d58;border:0}
+.focused-call .room-shared-layout .call-controls .leave-call svg{background:#be3940}
+.focused-call .room-shared-layout .room-connection{top:230px;left:24px}
+.focused-call .shared-patient-view .media-stage{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:12px}
+.focused-call .shared-patient-view .call-remote.shared-remote{display:contents}
+.focused-call .shared-patient-view .shared-media-tile[data-media-role="clinician"]{grid-column:1;grid-row:1 / 3}
+.focused-call .shared-patient-view .shared-media-tile[data-media-role="patient"]{grid-column:2;grid-row:2}
+.focused-call .shared-patient-view .self-preview{position:static;grid-column:2;grid-row:1;width:100%;height:100%;border:0;border-radius:16px}
+.focused-call .room-shared-layout:fullscreen .media-stage,.focused-call .room-shared-layout.room-expanded .media-stage{height:calc(100dvh - 300px)}
+@media(max-width:640px){.focused-call:has(.room-shared-layout){padding:0 16px 32px}.focused-call .room-shared-layout .media-stage{height:440px;padding:12px}.focused-call .shared-patient-view .media-stage{grid-template-columns:1fr 1fr;grid-template-rows:2fr 1fr}.focused-call .shared-patient-view .shared-media-tile[data-media-role="clinician"]{grid-column:1 / 3;grid-row:1}.focused-call .shared-patient-view .shared-media-tile[data-media-role="patient"]{grid-column:2;grid-row:2}.focused-call .shared-patient-view .self-preview{grid-column:1;grid-row:2}.focused-call .room-shared-layout .call-controls{gap:8px;flex-wrap:wrap}.focused-call .room-shared-layout .room-connection{position:static;color:var(--text-primary)}}

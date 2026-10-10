@@ -13,6 +13,7 @@ import AudioStage from "./AudioStage";
 import ExtensionPanel from "./ExtensionPanel";
 type Appointment = { id: string; display_identity?:string; call_state?:string; timezone?:string | null; service_label?:string; minutes?:number; consultation_format?:string };
 type ConsultationInfo = {
+  is_couple?:boolean;
   appointment_state: string;
   documentation_state: string;
   state: "Not started" | "Open" | "Ended";
@@ -432,7 +433,7 @@ export default function Consultation({
       let parent:HTMLElement|null=remote.current;
       if(shared&&parent){
         let tile=parent.querySelector<HTMLElement>(`[data-media-identity="${participant.identity}"]`);
-        if(!tile){tile=document.createElement('div');tile.className='shared-media-tile';tile.dataset.mediaIdentity=participant.identity;const label=document.createElement('span');label.className='shared-media-label';label.textContent=roomLabels.current.find(p=>p.identity===participant.identity)?.label||w('Private participant');tile.appendChild(label);parent.appendChild(tile);}
+        if(!tile){tile=document.createElement('div');tile.className='shared-media-tile';tile.dataset.mediaRole=roomLabels.current.find(p=>p.identity===participant.identity)?.role||'patient';tile.dataset.mediaIdentity=participant.identity;const label=document.createElement('span');label.className='shared-media-label';label.textContent=roomLabels.current.find(p=>p.identity===participant.identity)?.label||w('Private participant');tile.appendChild(label);parent.appendChild(tile);}
         tile.classList.toggle('camera-muted',!participant.isCameraEnabled);parent=tile;
       }
       for (const publication of participant.trackPublications.values()) {
@@ -448,15 +449,17 @@ export default function Consultation({
       if (publication.track?.kind === "video" && selfPreview.current)
         publication.track.attach(selfPreview.current);
   }
+  const sharedRoom=Boolean(info?.is_couple);
   const connected = Boolean(roomRef.current);
   const audioSurface = audioOnly || !remoteVideo;
   const joinTime = (value: string) => new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short", timeZone: appointment.timezone || "UTC" }).format(new Date(value));
   const detailRoute = `/${info?.role || "patient"}/consultations/${appointment.id}`;
   return (
-    <section ref={root} className={`consultation ${connected ? "room-connected" : "room-preflight"} ${connected && audioOnly ? "room-audio-layout" : ""} ${expanded ? "room-expanded" : ""}`} aria-label={t("consultation")}>
+    <section ref={root} className={`consultation ${connected ? "room-connected" : "room-preflight"} ${connected && audioOnly ? "room-audio-layout" : ""} ${expanded ? "room-expanded" : ""} ${sharedRoom?"room-shared-layout":""} ${sharedRoom&&info?.role==="patient"?"shared-patient-view":""}`} aria-label={t("consultation")}>
       {(fullscreen || expanded) && <div className="room-demo" role="note">{w("Demonstration environment — no real payments or clinical care.")}</div>}
-      {connected && !audioOnly && <header className="room-heading"><Brand/><div><strong>{appointment.service_label}</strong><span>{appointment.display_identity} · {appointment.minutes} {w("minutes")}</span></div><span className="room-private"><ShieldCheck size={18}/>{w("Private consultation")}</span></header>}
-      {(!connected || audioOnly) && <header className="light-call-header"><Brand/><Link className="text-link" to={detailRoute}>{w("Back to consultation details")}</Link></header>}
+      {connected && !audioOnly && !sharedRoom && <header className="room-heading"><Brand/><div><strong>{appointment.service_label}</strong><span>{appointment.display_identity} · {appointment.minutes} {w("minutes")}</span></div><span className="room-private"><ShieldCheck size={18}/>{w("Private consultation")}</span></header>}
+      {(!connected || audioOnly || sharedRoom) && <header className="light-call-header"><Brand/><Link className="text-link" to={detailRoute}>{w("Back to consultation details")}</Link></header>}
+      {connected&&sharedRoom&&!audioOnly&&<div className="audio-page-title"><h1>{w("Together in consultation")}</h1><p>{appointment.service_label} · 3 {w("participants")}</p></div>}
       {connected && audioOnly && <div className="audio-page-title"><h1>{w("Audio consultation")}</h1><p>{w("More room to listen. Less bandwidth.")}</p></div>}
       {!connected && <><h2>{info?.state === "Ended" ? w("Call ended") : w("Check your devices")}</h2>{info?.state !== "Ended" && <p>{w("Make sure you’re comfortable before joining.")}</p>}</>}
       {!connected && info?.state === "Ended" && <p>
@@ -564,8 +567,8 @@ export default function Consultation({
               {t("endConsultation")}
             </button>
           )}
-        </div></div><aside className="room-session-details" hidden={audioOnly}><h3>{appointment.display_identity || w("Private participant")}</h3><dl><dt>{w("Service")}</dt><dd>{appointment.service_label}</dd><dt>{w("Booked duration")}</dt><dd>{appointment.minutes} {w("minutes")}</dd></dl><p>{w("Booked duration is not measured connected time.")}</p><Link to={detailRoute}>{w("Back to consultation details")}</Link><div className="room-privacy-note"><ShieldCheck size={20}/><h4>{w("Your privacy stays with you.")}</h4><p>{w("Your clinician sees only the information you chose to share for this session.")}</p></div>{info?.state === "Open" && !audioOnly && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</aside></div>}
-      {connected && audioOnly && <details className="audio-session-more"><summary>{w("Session details and extra time")}</summary><p>{appointment.service_label} · {appointment.minutes} {w("minutes")}</p><Link to={detailRoute}>{w("Back to consultation details")}</Link>{info?.state === "Open" && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</details>}
+        </div></div><aside className="room-session-details" hidden={audioOnly||sharedRoom}><h3>{appointment.display_identity || w("Private participant")}</h3><dl><dt>{w("Service")}</dt><dd>{appointment.service_label}</dd><dt>{w("Booked duration")}</dt><dd>{appointment.minutes} {w("minutes")}</dd></dl><p>{w("Booked duration is not measured connected time.")}</p><Link to={detailRoute}>{w("Back to consultation details")}</Link><div className="room-privacy-note"><ShieldCheck size={20}/><h4>{w("Your privacy stays with you.")}</h4><p>{w("Your clinician sees only the information you chose to share for this session.")}</p></div>{info?.state === "Open" && !info.is_couple && !audioOnly && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</aside></div>}
+      {connected && audioOnly && <details className="audio-session-more"><summary>{w("Session details and extra time")}</summary><p>{appointment.service_label} · {appointment.minutes} {w("minutes")}</p><Link to={detailRoute}>{w("Back to consultation details")}</Link>{info?.state === "Open" && !info.is_couple && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</details>}
       {info?.can_end && !connected && (
         <button
           className="end-call"
