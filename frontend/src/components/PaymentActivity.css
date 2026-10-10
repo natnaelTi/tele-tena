@@ -8,3 +8,5 @@
 .payment-activity-description > span {font-size:14px;color:var(--muted);}
 .payment-activity-amount {font-size:14px;font-weight:600;white-space:nowrap;}
 @media(max-width:600px){.payment-activity-list > li > a,.payment-activity-list > li > div {grid-template-columns:44px minmax(0,1fr) 18px;gap:12px;}.payment-activity-amount {grid-column:2;grid-row:2;}.payment-activity-list > li > a > svg {grid-column:3;grid-row:1 / 3;}.payment-activity-icon {grid-row:1 / 3;}}
+
+.payment-activity-pagination {display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--border);padding-top:16px;margin-top:8px;font-size:14px;}

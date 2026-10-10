@@ -10,6 +10,9 @@ import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
   // Provisional additions; native review remains required.
+  "Payment activity pages": ["የክፍያ እንቅስቃሴ ገጾች", "Fuulota sochii kaffaltii"],
+  "Previous activity page": ["ያለፈው የእንቅስቃሴ ገጽ", "Fuula sochii darbe"],
+  "Next activity page": ["ቀጣይ የእንቅስቃሴ ገጽ", "Fuula sochii itti aanu"],
   "Your balance": ["የእርስዎ ቀሪ ሂሳብ", "Baalansii kee"],
   "Your funds, clearly separated.": ["ገንዘብዎ፣ በግልጽ ተለይቶ።", "Maallaqa kee, ifatti adda baafame."],
   "Recent activity": ["የቅርብ ጊዜ እንቅስቃሴ", "Sochii dhihoo"],

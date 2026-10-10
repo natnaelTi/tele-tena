@@ -24,7 +24,7 @@
 @media(max-width:700px) { .review-queue-table { display:none; } .review-queue-cards { display:grid; gap:16px; } .review-queue-cards header { display:flex; justify-content:space-between; gap:16px; } .review-queue-cards h2 { font-size:20px; } .review-queue-filters { grid-template-columns:1fr; } }
 
 .review-queue-table table {border:1px solid var(--border);border-radius:16px;}
-.workspace-nav-admin a.active {background:var(--ink);color:white;}
+.workspace-admin .sidebar nav.workspace-nav-admin a.active {background:var(--ink);color:white;}
 .review-queue-table td:last-child .button {color:var(--brand);text-decoration:underline;font-size:14px;padding-inline:8px;}
 @media(max-width:700px){.review-queue-filters {grid-template-columns:1fr;}}
 

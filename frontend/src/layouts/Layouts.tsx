@@ -259,7 +259,7 @@ export function WorkspaceLayout({
     : kind === "patient"
       ? ["/patient", "/patient/discovery", "/patient/appointments"]
       : kind === "admin"
-        ? ["/admin", "/admin/applications", "/admin/scopes"]
+        ? ["/admin", "/admin/applications"]
         : ["/clinic"];
   const mobilePrimary = items.filter(([to]) => mobilePrimaryRoutes.includes(to));
   const mobileMore = items.filter(([to]) => !mobilePrimaryRoutes.includes(to));
