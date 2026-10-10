@@ -22,6 +22,7 @@ import {
 } from "../components/Domain";
 import {
   Button,
+  Card,
   Checkbox,
   EmptyState,
   InlineNotice,
@@ -321,6 +322,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
   }, [offering, calendarFrom, displayZone]);
   const { data, error, refresh } = useResource(load);
   const action = useAction();
+  const [adultConsent,setAdultConsent]=useState(false);
   const [step, setStep] = useState(0);
   const [start, setStart] = useState("");
   const [request, setRequest] = useState("");
@@ -439,7 +441,19 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
             </Button>
           </section>
         )}
-        {step === 2 && preview && (
+        {step === 2 && preview && offer.participant_structure === 'couple' && <Card>
+          <h2>{w("Invite the other adult")}</h2><p>{w("Each adult chooses what to share. One participant pays the total session price after both consent.")}</p>
+          <DisclosurePreview disclosure={preview}/>
+          <Checkbox label={w("I am 18 or older and freely consent to this shared consultation.")} checked={adultConsent} onChange={event=>setAdultConsent(event.target.checked)}/>
+          <Button disabled={!adultConsent||action.busy} loading={action.busy} onClick={()=>void action.run(async()=>{
+            const payload={offering:offer.id,start,request_text:request,sharing,expected_disclosure:preview,adult_confirmed:adultConsent,booked_timezone:displayZone};
+            const fingerprint=JSON.stringify(payload);const key=submission?.fingerprint===fingerprint?submission.key:crypto.randomUUID();setSubmission({key,fingerprint});
+            const result=await journeyApi.coupleInvite({...payload,retry_key:key});
+            navigate('/patient/couples',{state:{coupleToken:result.token}});
+          },'')}>{w("Create invitation link")}</Button>
+          <p className="supporting">{w("The invitation does not reserve a time or charge either wallet.")}</p>
+        </Card>}
+        {step === 2 && preview && offer.participant_structure !== 'couple' && (
           <BookingReview offer={offer} start={start} zone={displayZone} format={data.calendar.format} disclosure={preview} balance={wallet.data} balanceError={Boolean(wallet.error)} onRetry={()=>void wallet.refresh()} busy={action.busy}
               onConfirm={() =>
                 void action.run(async () => {

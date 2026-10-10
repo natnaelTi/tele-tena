@@ -9,6 +9,27 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  // Provisional couples copy: native-language approval remains a release gate.
+  "Two adults, separate consent and privacy.": ["ሁለት ጎልማሶች፣ የተለየ ፈቃድ እና ግላዊነት።", "Ga'eessota lama, waliigaltee fi iccitii adda addaa."],
+  "Shared consultations": ["የጋራ ምክክሮች", "Marii waliin"],
+  "Invite the other adult": ["ሌላውን ጎልማሳ ይጋብዙ", "Ga'eessa biraa affeeri"],
+  "Each adult chooses what to share. One participant pays the total session price after both consent.": ["እያንዳንዱ ጎልማሳ የሚያጋራውን ይመርጣል። ሁለቱም ከተስማሙ በኋላ አንዱ ጠቅላላ ዋጋውን ይከፍላል።", "Ga'eessi hundi waan qoodu filata. Lamaan erga walii galanii booda hirmaataan tokko gatii guutuu kaffala."],
+  "I am 18 or older and freely consent to this shared consultation.": ["18 ዓመት ወይም ከዚያ በላይ ነኝ፣ ለዚህ የጋራ ምክክር በፈቃዴ እስማማለሁ።", "Umuriin koo 18 ykn isaa ol; marii waliin kanaaf fedhii kootiin walii gala."],
+  "The invitation does not reserve a time or charge either wallet.": ["ግብዣው ጊዜ አያስይዝም፣ ከማንም ሂሳብ አይቀንስም።", "Affeerraan yeroo hin qabatu, herrega kamirraayyu maallaqa hin hir'isu."],
+  "Choose recipients for this revision": ["የዚህን ክለሳ ተቀባዮች ይምረጡ", "Fudhattoota fooyya'iinsa kanaa filadhu"],
+  "Only selected adults receive the summary and any note you explicitly share.": ["ማጠቃለያውንና በግልጽ የሚያጋሩትን ማስታወሻ የተመረጡት ጎልማሶች ብቻ ይቀበላሉ።", "Ga'eessota filataman qofa cuunfaa fi yaadannoo ifatti qoodde argatu."],
+  "Your private intake is not visible to the other adult.": ["የግል መረጃዎ ለሌላው ጎልማሳ አይታይም።", "Odeeffannoon dhuunfaa kee ga'eessa biraaf hin mul'atu."],
+  "Your wallet is not charged for this session.": ["ለዚህ ምክክር ከእርስዎ ሂሳብ አይቀነስም።", "Marii kanaaf herrega keetirraa hin kaffalamu."],
+  "Your shared consultation invitation": ["የጋራ ምክክር ግብዣዎ", "Affeerraa marii waliin kee"],
+  "Consent and shared session details": ["ፈቃድ እና የጋራ ምክክር ዝርዝሮች", "Waliigaltee fi bal'ina marii waliin"],
+  "Save my choices": ["ምርጫዎቼን አስቀምጥ", "Filannoo koo kaa'i"],
+  "Withdraw consent": ["ፈቃድን ማቋረጥ", "Waliigaltee keessaa ba'i"],
+  "Participants": ["ተሳታፊዎች", "Hirmaattota"],
+  "Your consent": ["የእርስዎ ፈቃድ", "Waliigaltee kee"],
+  "Adults who consented": ["የተስማሙ ጎልማሶች", "Ga'eessota walii galan"],
+  "Session & payment": ["ምክክር እና ክፍያ", "Marii fi kaffaltii"],
+  "I authorize the total session payment.": ["ጠቅላላ የምክክር ክፍያውን እፈቅዳለሁ።", "Kaffaltii marii guutuu nan hayyama."],
+
   "Default microphone": ["ነባሪ ማይክሮፎን", "Maayikiroofonii durtii"],
   "Default camera": ["ነባሪ ካሜራ", "Kaameraa durtii"],
   "Microphone": ["ማይክሮፎን", "Maayikiroofonii"],

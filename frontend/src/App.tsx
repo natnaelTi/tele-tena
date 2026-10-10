@@ -39,6 +39,7 @@ import { ClinicianRequestInbox, PatientOpenRequests, PatientRequestDetail, Patie
 import { ClinicianScopeApplications, VettingQueue, VettingRubricManagementPage } from "./pages/Vetting";
 import { ClinicianAffiliations, ClinicMembershipPortal, ClinicReview } from "./pages/Clinics";
 import ClinicCalendar from "./pages/ClinicCalendar";
+import Couples, { CoupleInvitation } from './pages/Couples';
 import Relationships, { RelationshipInvitationEntry } from "./pages/Relationships";
 import FinancialActivityDetail from "./pages/FinancialActivity";
 import PWAUpdateNotice from "./components/PWAUpdateNotice";
@@ -56,6 +57,7 @@ export default function App() {
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Homepage />} />
               <Route path="/for-clinicians" element={<ClinicianInvitation />} />
+              <Route path="/couple-invitation" element={<CoupleInvitation />} />
               <Route path="/relationship-invitation" element={<RelationshipInvitationEntry />} />
               <Route
                 path="/showcase"
@@ -97,6 +99,7 @@ export default function App() {
                 <Route path="booked/:id" element={<BookingConfirmation />} />
                 <Route path="appointments" element={<Appointments />} />
                 <Route path="account" element={<Account />} />
+                <Route path="couples" element={<Couples />} />
                 <Route path="relationships" element={<Relationships />} />
                 <Route path="clinic-access" element={<ClinicMembershipPortal />} />
                 <Route path="payments" element={<Payments />} />

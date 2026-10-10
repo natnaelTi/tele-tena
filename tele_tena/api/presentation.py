@@ -435,6 +435,9 @@ def appointment_detail(appointment):
     if shared_plan and role == 'clinician':
         selected['couple_participants'] = [{'id':p.id,'label':json.loads(p.disclosure).get('name') or 'Participant '+str(index),'disclosure':json.loads(p.disclosure),'state':p.state} for index,p in enumerate(participants(shared_plan[0].id),1)]
     if shared_plan:
+        from tele_tena.api.couples import ready
+        selected['can_join'] = selected['can_join'] and ready(item.id)
+        selected['couple_plan_id'] = shared_plan[0].id
         selected['can_propose_reschedule'] = False
         selected['can_cancel'] = selected['can_cancel'] and user == item.patient
     earning = rows('SELECT state,release_at FROM tt_earning WHERE appointment=%s', (item.id,))

@@ -101,6 +101,9 @@ export default function SignIn() {
     const current = await refresh();
     const next = params.get("next") || "";
     const inviteToken = (routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken || "";
+    const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken||"";
+    const safeCoupleReturn=next==="/couple-invitation"&&/^[A-Za-z0-9_-]{40,64}$/.test(coupleToken);
+    if(safeCoupleReturn){navigate(current?.profile?.kind==="patient"?next:"/onboarding?intent=patient",{replace:true,state:{coupleInvitationToken:coupleToken}});return;}
     const safeBookingReturn = /^\/patient\/book-link\/[a-f0-9]{64}$/.test(next);
     const safeRelationshipReturn = next === "/relationship-invitation" && /^[A-Za-z0-9_-]{40,64}$/.test(inviteToken);
     if (inviteToken && !current?.profile) {

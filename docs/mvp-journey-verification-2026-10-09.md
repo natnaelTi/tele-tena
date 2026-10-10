@@ -712,3 +712,28 @@ and couples recipient workflows remain release gates. No visual acceptance claim
    transfers are disabled; payout requests are demonstration reservations.
 5. Reviewer Overview→Applications→Review; scope decisions remain separate. Tour
    targets now use the dedicated application queue. Do not infer record access.
+
+## Acceptance-gate reconciliation — continuation from 7b866e8
+
+`git diff d720596 HEAD -- . ':!docs'` is empty at the starting checkpoint:
+only documentation/screenshots differ. No runtime rebuild was required then.
+
+| Earlier gate | Current classification | Precise boundary / evidence |
+| --- | --- | --- |
+| Registration browsers | Still open | Existing controlled backend patient/clinician registration journeys passed at bounded 8028; returning-phone, expired-code/resend and complete abuse fixtures are not yet a release pass. Invited password access passes on current preview |
+| Practical presentation data | Closed for idempotent setup; populated-state coverage open | Actual fictional presentation seed + manual reviewer approvals and retained bookings/notes/earnings; repeat setup preserves balances. Not all required populated/empty screen states compared |
+| Individual consultation | Closed for tested paths | Hosted fake-device browser and focused tests in the current correction section; physical devices, automatic SDK refresh and total network handover remain external/unverified |
+| Fresh installation | Previous v1.32 evidence retained; next schema gate open | Fresh/repeat install report above is valid for its source, not proof of a future couples schema |
+| Legacy financial reconciliation | Still open | Preserved mismatches/holds and focused completion/refund import tests pass; full representative boundary/per-owner/repeat/cutover acceptance still required |
+| Couples | Still open | Required two-adult appointment/consent/three-person calls/recipient documentation missing at this baseline; new implementation contract in mvp-release-scope.md |
+| Continuous scheduler | Still open | Prior forced native job/RQ execution is not scheduler-daemon acceptance. No dedicated presentation scheduler active at baseline |
+| MVP visual fidelity | Still open | Existing single matrix retains each required screen's independent functional/visual status and explicit material differences |
+| Physical devices / native languages | External/manual pending | Fake browser devices and layout checks cannot prove these |
+| Provider/clinical activation | External pending | Live SMS/SMTP receipt, medical-lead catalog/rubric, credentials, clinical/legal approval and real payments remain separate; no credentials requested in chat |
+
+### Couples implementation checkpoint (in progress, 2026-10-10)
+
+- `fa3de4e` adds v1.33 consent/participant/recipient storage. Three real MariaDB tests on `tele-tena-pr12-fresh.localhost` pass: separately snapshotted consent, one reservation/completion earning and recipient omission; pre-start withdrawal with exactly one release; post-start withdrawal with provider failure/retry and no automatic earnings/refund. Provider calls are mocked in these tests; they are not hosted media evidence.
+- Three focused existing private-note/closure/finalization regressions pass after these changes. TypeScript/Vite build passes; lint exits zero with existing warnings.
+- Presentation site backed up with database/config/public/private files as `20261010_144217-*` before applying additive v1.33; migration passed. Original development and remote sites were not migrated.
+- N02–N05 invitation/consent/payment screens, N06 three-party media and N07 selected recipients are implementation in progress. Actual browser, paired visual, current fresh-install and continuous scheduler gates remain open. Do not describe couples as verified from these API tests.

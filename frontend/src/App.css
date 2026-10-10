@@ -1971,3 +1971,5 @@ button { color: inherit; background: transparent; }
 .credential-verification-inputs .supporting { margin:0; }
 .credential-verification-history > summary { min-height:44px; display:flex; align-items:center; cursor:pointer; font-weight:600; }
 .credential-verification-history p { overflow-wrap:anywhere; }
+
+.shared-care-page{max-width:1000px}.shared-care-page header{margin-bottom:24px}.shared-care-columns{display:grid;grid-template-columns:1fr 1fr;gap:32px}.shared-care-page>.card{margin-bottom:20px}.shared-care-columns details{margin-top:24px}@media(max-width:640px){.shared-care-columns{grid-template-columns:1fr;gap:20px}}

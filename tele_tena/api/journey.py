@@ -513,7 +513,7 @@ def discover(service=None):
     from tele_tena.review import enabled as review_enabled
     legacy_allowed = int(review_enabled() or frappe.local.site == 'erp.localhost')
     results = rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,p.languages AS care_languages,o.clinician,o.service,
-        COALESCE(NULLIF(o.title,''),s.service_label) AS label,s.service_label AS service_category,o.description,o.price,o.minutes,
+        COALESCE(NULLIF(o.title,''),s.service_label) AS label,s.service_label AS service_category,s.participant_structure,o.description,o.price,o.minutes,
         sc.id AS schedule_id,sc.timezone AS schedule_timezone,sc.consultation_format
         FROM tt_offering o JOIN tt_profile p ON p.user=o.clinician
         JOIN tt_application a ON a.user=o.clinician JOIN `tabTele Tena Service` s ON s.name=o.service

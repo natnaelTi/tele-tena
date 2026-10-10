@@ -77,7 +77,7 @@ def extension_status(appointment):
         start_after,accepted_at,started_at,closed_at FROM tt_consultation_extension
         WHERE appointment=%s ORDER BY proposed_at''', (item.id,))
     return {'items': result, 'can_propose': role == 'clinician' and item.state == 'Booked',
-            'can_accept': role == 'patient' and item.state == 'Booked',
+            'can_accept': role == 'patient' and user == item.patient and item.state == 'Booked',
             'currency': 'ETB'}
 
 

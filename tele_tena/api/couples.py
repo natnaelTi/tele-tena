@@ -122,7 +122,7 @@ def _visible(plan, user):
         'start':j.iso(plan.start),'timezone':plan.timezone,'price':plan.price,'minutes':plan.minutes,
         'expires_at':j.iso(plan.expires_at),'consent_version':CONSENT_VERSION,
         'you_consented':bool(own and own.state=='Consented'),
-        'you_pay':plan.payer==user,'participant_count':len(people),
+        'you_pay':plan.payer==user,'participant_count':sum(p.state=='Consented' for p in people),
         'your_disclosure':json.loads(own.disclosure) if own else None}
 
 

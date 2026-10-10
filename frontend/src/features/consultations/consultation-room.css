@@ -105,3 +105,5 @@ body:has(.focused-call) {background:white;}
 .focused-call .preflight-state {padding-block:14px;border-block:1px solid var(--border);margin-block:24px;}
 .focused-call .preflight-state p {font-size:14px;overflow-wrap:anywhere;}
 @media(max-width:600px){.focused-call .device-check-preview,.focused-call .device-check-summary{padding:20px;}}
+
+.consultation .call-remote.shared-remote{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:12px}.shared-media-tile{position:relative;min-height:200px;overflow:hidden;border-radius:16px;background:#172b35}.shared-media-label{position:absolute;bottom:12px;left:12px;z-index:2;background:#102a33;color:white;padding:6px 10px;border-radius:8px}.shared-media-tile.camera-muted video{visibility:hidden}.shared-media-tile video{object-fit:cover}@media(max-width:640px){.consultation .call-remote.shared-remote{grid-template-columns:1fr}.shared-media-tile{min-height:180px}}

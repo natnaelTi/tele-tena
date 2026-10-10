@@ -59,6 +59,7 @@ export default function Consultation({
   const endedObserved = useRef(false);
   const preview = useRef<HTMLVideoElement>(null);
   const remote = useRef<HTMLDivElement>(null);
+  const roomLabels=useRef<{identity:string;label:string;role:string}[]>([]);
   const roomRef = useRef<LiveKitRoom | null>(null);
   const previewStream = useRef<MediaStream | null>(null);
 
@@ -87,7 +88,8 @@ export default function Consultation({
               ? "callReady"
               : "callNotStarted",
       );
-    } catch {
+    } catch(error) {
+      if(error instanceof ApiError&&["permission_denied","session_required"].includes(error.code)){await leave(false);if(mounted.current)setInfo(null);}
       if (mounted.current) setLifecycleStatus("callUnavailable");
     }
   }, [appointment.id]);
@@ -218,12 +220,14 @@ export default function Consultation({
         url: string;
         token: string;
         audio_only: boolean;
+        participants?: {identity:string;label:string;role:string}[];
       }>(
         "tele_tena.api.consultations.join",
         { appointment: appointment.id, audio_only: audioOnly ? 1 : 0 },
         true,
       );
       if (!mounted.current || attempt !== generation.current) return;
+      roomLabels.current=issued.participants||[];
       const { Room, RoomEvent } = await import("livekit-client");
       if (!mounted.current || attempt !== generation.current) return;
       const connectedRoom = new Room({ adaptiveStream: true, dynacast: true, audioCaptureDefaults: { deviceId: microphone || undefined }, videoCaptureDefaults: { deviceId: camera || undefined } });
@@ -251,14 +255,15 @@ export default function Consultation({
       connectedRoom.on(RoomEvent.ParticipantConnected, () => {
         if (current()) setRemotePresent(connectedRoom.remoteParticipants.size > 0);
       });
-      connectedRoom.on(RoomEvent.ParticipantDisconnected, () => {
+      connectedRoom.on(RoomEvent.ParticipantDisconnected, participant => {
+        remote.current?.querySelector(`[data-media-identity="${participant.identity}"]`)?.remove();
         if (current()) {
           setRemotePresent(connectedRoom.remoteParticipants.size > 0);
           if (!connectedRoom.remoteParticipants.size) { setRemoteVideo(false); setSpeaking(false); setLevel(0); }
         }
       });
       connectedRoom.on(RoomEvent.TrackMuted, (publication, participant) => {
-        if (current() && participant !== connectedRoom.localParticipant && publication.kind === "video") setRemoteVideo(false);
+        if (current() && participant !== connectedRoom.localParticipant && publication.kind === "video") {setRemoteVideo([...connectedRoom.remoteParticipants.values()].some(p=>p.isCameraEnabled));attachMedia();}
         if (current() && participant !== connectedRoom.localParticipant && publication.kind === "audio") {
           setRemoteMuted(true); setSpeaking(false); setLevel(0);
         }
@@ -290,7 +295,7 @@ export default function Consultation({
       });
       connectedRoom.on(RoomEvent.TrackUnsubscribed, (track) => {
         track.detach().forEach((element) => element.remove());
-        if (current() && track.kind === "video") setRemoteVideo(false);
+        if (current() && track.kind === "video") setRemoteVideo([...connectedRoom.remoteParticipants.values()].some(p=>p.isCameraEnabled));
       });
       await connectedRoom.connect(issued.url, issued.token);
       if (!current()) {
@@ -421,14 +426,22 @@ export default function Consultation({
   function attachMedia() {
     const room = roomRef.current;
     if (!room) return;
+    const shared=roomLabels.current.length>2;
+    remote.current?.classList.toggle('shared-remote',shared);
     for (const participant of room.remoteParticipants.values()) {
+      let parent:HTMLElement|null=remote.current;
+      if(shared&&parent){
+        let tile=parent.querySelector<HTMLElement>(`[data-media-identity="${participant.identity}"]`);
+        if(!tile){tile=document.createElement('div');tile.className='shared-media-tile';tile.dataset.mediaIdentity=participant.identity;const label=document.createElement('span');label.className='shared-media-label';label.textContent=roomLabels.current.find(p=>p.identity===participant.identity)?.label||w('Private participant');tile.appendChild(label);parent.appendChild(tile);}
+        tile.classList.toggle('camera-muted',!participant.isCameraEnabled);parent=tile;
+      }
       for (const publication of participant.trackPublications.values()) {
         const track = publication.track;
         if (!track || !remote.current) continue;
         // Reuse attached elements: remounting an audio/video stage must not
         // leave detached playing elements or duplicate audio playback.
         const element = track.attachedElements[0] || track.attach();
-        if (element.parentElement !== remote.current) remote.current.appendChild(element);
+        if (parent && element.parentElement !== parent) parent.appendChild(element);
       }
     }
     for (const publication of room.localParticipant.trackPublications.values())
