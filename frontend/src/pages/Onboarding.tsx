@@ -271,10 +271,15 @@ export default function Onboarding() {
             <p>{w("Only add what you’re comfortable sharing. This step is optional.")}</p>
             <div className="field">
               <label htmlFor="onboarding-background">{w("Anything you’d like your clinician to know?")}</label>
-              <textarea id="onboarding-background" rows={6} maxLength={4000}
+              <textarea id="onboarding-background" rows={4} maxLength={4000}
                 value={answers.history || ""} aria-describedby="onboarding-background-privacy"
                 onChange={e => update({ history: e.target.value })} />
             </div>
+            <Checkbox variant="card" label={w("I’ll decide what to share for each consultation")}
+              checked={!answers.share_history} onChange={e => update({ share_history: !e.target.checked })}
+              description={w(answers.share_history
+                ? "Your background is included in your default disclosure. Preview before every booking."
+                : "This background is not included in your default disclosure. Preview before every booking.")} />
             <p id="onboarding-background-privacy" className="supporting">{w("This is saved privately. Your sharing defaults apply; preview and choose what to share before every booking.")}</p>
             {!answers.history && <Button variant="quiet" disabled={busy} onClick={() => void save(3)}>{w("Skip for now")}</Button>}
           </>}

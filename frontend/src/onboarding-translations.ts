@@ -1,5 +1,9 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "I’ll decide what to share for each consultation": ["ለእያንዳንዱ ምክክር የማጋራውን እወስናለሁ", "Marii tokkoon tokkoof waan qoodu nan murteessa"],
+  "Your background is included in your default disclosure. Preview before every booking.": ["ታሪክዎ በነባሪ የማጋራት ምርጫዎ ውስጥ ተካቷል። ከእያንዳንዱ ቀጠሮ በፊት ቅድመ እይታ ያድርጉ።", "Seenaan kee qoodinsa durtii keessatti hammatama. Beellama hunda dura durargii ilaali."],
+  "This background is not included in your default disclosure. Preview before every booking.": ["ይህ ታሪክ በነባሪ የማጋራት ምርጫዎ ውስጥ አልተካተተም። ከእያንዳንዱ ቀጠሮ በፊት ቅድመ እይታ ያድርጉ።", "Seenaan kun qoodinsa durtii keessatti hin hammatamu. Beellama hunda dura durargii ilaali."],
+
   "Care background": ["የእንክብካቤ ታሪክ", "Seenaa kunuunsaa"],
   "Only add what you’re comfortable sharing. This step is optional.": ["ለማጋራት የሚመችዎትን ብቻ ያክሉ። ይህ ደረጃ አማራጭ ነው።", "Waan qooduuf siif mijatu qofa dabali. Tarkaanfiin kun dirqama miti."],
   "Anything you’d like your clinician to know?": ["ባለሙያዎ እንዲያውቀው የሚፈልጉት ነገር አለ?", "Wanti ogeessi kee akka beeku barbaaddu jiraa?"],
