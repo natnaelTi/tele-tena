@@ -12,7 +12,7 @@ Named profile/permission/navigation defects fixed; selected offering persists
 through discovery/profile/reload/calendar/disclosure. Real DB4/4 and additive
 repeat migrations preserve existing records. Profile paired/reference, narrow
 language and actual200% zoom evidence is recorded. Whole-MVP visual/state,
-freshv1.36 and owner acceptance remain open. Live delivery, physical devices,
+owner acceptance remain open. Freshv1.36 installation and scoped cleanup passed on11October. Live delivery, physical devices,
 clinical/native review and real-money activation are external gates. No merge or
 remote deployment. See mvp-screen-acceptance.json and the active journey report.
 

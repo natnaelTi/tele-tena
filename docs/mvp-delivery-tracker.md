@@ -10,7 +10,7 @@ reconciliation and native processing have new actual passing evidence in
 [mvp-journey-verification-2026-10-09.md](mvp-journey-verification-2026-10-09.md).
 Reviewer matching operations now use a protected logistics-only query. The
 existing [screen matrix](mvp-screen-acceptance.json) separates functional, visual
-and owner acceptance; no all-MVP pass. Freshv1.36, remaining visual/state gates,
+and owner acceptance; no all-MVP pass. Remaining visual/state gates,
 final integrated checks and external/manual validation remain open. No merge or
 remote change. Dated entries below are historical, not the active completion claim.
 

@@ -64,8 +64,29 @@ screen/completion matrix; the sections below this active checkpoint are historic
 - Paired evidence: `docs/screenshots/mvp-current/bc20f72-onboarding/` and
   `bc20f72-reviewer/`. Inspected English390/768/1440 compositions; documented
   operational exceptions, missing fuller states and language/actual-zoom gates.
-  Visual owner acceptance and whole-MVP completion remain open. Freshv1.36 is
-  blocked on the requested scoped local DB helper; sudo -n requires a password.
+  Visual owner acceptance and whole-MVP completion remain open. Freshv1.36
+  installation passed11October; the exact schema/cleanup check is recorded below.
+
+## Fresh v1.36 completion —11October
+
+Source4a71d2a73b42471f571cf6ad5ef4c58de2a55859, Python3.12.3,
+Frappe15.121.2/ERPNext15.121.6. `scripts/check_fresh_install.py` passed on
+`teletena-mvp-v136-fresh.localhost`: genuine fresh application installation,
+v1.34/v1.35/v1.36 tables/column/PatchLog assertions, native catalog/clinic/roles,
+guest denial and disabled funding before explicit setup. Retained erp/pr12
+record and private-configuration fingerprints were unchanged. Temporary
+localhost administrator, credential file, disposable database/site/user removed;
+administrator reauthentication denied. This invocation did **not** run optional
+registration browser checks or native repeat migration. Latest existing-site
+v1.36 twice-migration preservation and real registration evidence remain separate.
+No root authentication, sudoers, presentation records or Selfmade change.
+
+Account continuation reproduced a populated private-history accessible-name
+failure and corrected separate labels; matched reference comparisons motivated
+privacy card variants, compact section navigation and shared-care notice.
+Contact section now queries existing site capabilities rather than suggesting
+unavailable OTP methods. Build/browser verification of this latest change is
+pending below; it does not close the full H01–H05 visual gate.
 
 ## Checks actually run in this continuation
 
@@ -112,8 +133,8 @@ Original ERP site and Selfmade were not migrated, seeded or restarted.
   pr12 rows unchanged, no inferred introduction. Initial harness incorrectly used
   DocType column helper on rawtt tables; failed BEFORE migration, corrected to
   SHOW COLUMNS. Native upgrade/repeat then passed. Found/fixed fresh bootstrap
-  omissions forv1.34/v1.35. Freshv1.36 remains blocked on scoped DB administration;
-  existing migration is not a fresh-install pass.
+  omissions forv1.34/v1.35. Freshv1.36 subsequently passed on11October; existing-site repeat migration
+  and fresh installation remain independently recorded checks.
 - **Selected offering lost:** actual390 browser selecting the second individual
   offering failed full-profile selection againstbf3d63c; default was first/couples.
   d82948a carries only opaque PUBLIC offering context via router state, revalidated

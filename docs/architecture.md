@@ -14,7 +14,10 @@ Profile v1.36 adds one nullable introduction column in versioned command storage
 owner commands validate type/length and retain existing content when omitted.
 The patient-facing approved-profile projection exposes only explicit public
 content. Fresh bootstrap now invokes v1.34/v1.35/v1.36 routines; native migration
-preservation passed on the named local sites, latest fresh install still pending.
+preservation passed on the named local sites. Latest v1.36 fresh installation
+passed on11October on a disposable Frappe15/ERPNext15 site with temporary
+DB-administrator and site cleanup verified; this does not establish latest Frappe16
+workflow compatibility.
 
 React + TypeScript + Vite talks to a dedicated custom Frappe application. ERPNext
 provides accounting. Frappe RQ workers and scheduler handle jobs. No Django or Celery.

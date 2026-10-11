@@ -15418,8 +15418,8 @@
       "evidence": "Current read-only3patient/1clinician/6accounts0mismatches; v1.35 native migration exact financial fingerprint preserved. Prior v1.7/v1.8 reconstructed legacy-schema boundary/unknown holds/per-owner retry evidence retained, not every historical whole-app release."
     },
     "fresh_latest_schema": {
-      "status": "Blocked by stated external dependency",
-      "action": "Latest v1.36 fresh installation pending scoped DB administration. Fixed schema.install missing explicit v1.34/v1.35 bootstrap; fresh assertions now include these tables and public introduction. Existing-site native repeats preserve54tables on both named sites; not fresh-install evidence."
+      "status": "Functionally verified",
+      "evidence": "2026-10-11 scripts/check_fresh_install.py on source4a71d2a73b42471f571cf6ad5ef4c58de2a55859: fresh Frappe15.121.2/ERPNext15.121.6 install on teletena-mvp-v136-fresh.localhost, explicit v1.34/v1.35/v1.36 tables/column/PatchLog assertions, guest denial and disabled simulation; retained erp.localhost/pr12 fingerprints unchanged. Disposable site/database/user and temporary admin/file removed; admin reauthentication denied. This run did not invoke optional registration browser or repeat migration; existing v1.36 native twice-migration preservation evidence on both retained sites remains separate."
     },
     "whole_mvp_visual": {
       "status": "Implementation in progress",
