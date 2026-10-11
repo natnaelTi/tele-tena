@@ -142,14 +142,15 @@ export default function Onboarding() {
     } finally { setBusy(false); }
   }
   if (chooseRole) return <section className="guided-panel onboarding-guided">
+    <p className="eyebrow">{w("Contact verified")}</p><div className="step-progress" aria-hidden="true"><span data-complete="true" /></div>
     <h1>{w("Choose your account")}</h1><p>{w("How will you use TeleTena?")}</p>
     {error && <InlineNotice tone="danger">{w(error)}</InlineNotice>}
     {!access ? <Skeleton /> : <div className="onboarding-account-choices">
-      <section className="onboarding-review-panel"><UserRound size={28} aria-hidden="true"/><h2>{w("I’m looking for care")}</h2><p>{w("Find clinicians, book a session, and keep your care connected.")}</p>
+      <section className="onboarding-review-panel"><UserRound size={20} aria-hidden="true"/><h2>{w("I’m looking for care")}</h2><p>{w("Find clinicians, book a session, and keep your care connected.")}</p>
         <Button loading={busy} disabled={!access.patient_registration} onClick={() => void choose("patient")}>{w("Continue as a patient")}</Button>
         {!access.patient_registration && <p>{w("New registration is unavailable on this site. Existing invited users can still sign in.")}</p>}
       </section>
-      <section className="onboarding-review-panel"><Users size={28} aria-hidden="true"/><h2>{w("I provide care")}</h2><p>{w("Apply, verify your expertise, and set up your practice.")}</p>
+      <section className="onboarding-review-panel"><Users size={20} aria-hidden="true"/><h2>{w("I provide care")}</h2><p>{w("Apply, verify your expertise, and set up your practice.")}</p>
         <Button loading={busy} disabled={!access.clinician_registration} onClick={() => void choose("clinician")}>{w("Apply as a clinician")}</Button>
         {!access.clinician_registration && <p>{w("New registration is unavailable on this site. Existing invited users can still sign in.")}</p>}
       </section>
@@ -296,11 +297,11 @@ export default function Onboarding() {
               </>
             ))}
           {step === 4 && !clinician && <>
-            <p>{w("Only add what you’re comfortable sharing. This step is optional.")}</p>
+            <p id="onboarding-background-help">{w("Only add what you’re comfortable sharing. This step is optional.")}</p>
             <div className="field">
               <label htmlFor="onboarding-background">{w("Anything you’d like your clinician to know?")}</label>
               <textarea id="onboarding-background" rows={4} maxLength={4000}
-                value={answers.history || ""} aria-describedby="onboarding-background-privacy"
+                value={answers.history || ""} aria-describedby="onboarding-background-help"
                 onChange={e => update({ history: e.target.value })} />
             </div>
             <Checkbox variant="card" label={w("I’ll decide what to share for each consultation")}
@@ -308,7 +309,6 @@ export default function Onboarding() {
               description={w(answers.share_history
                 ? "Your background is included in your default disclosure. Preview before every booking."
                 : "This background is not included in your default disclosure. Preview before every booking.")} />
-            <p id="onboarding-background-privacy" className="supporting">{w("This is saved privately. Your sharing defaults apply; preview and choose what to share before every booking.")}</p>
             {!answers.history && <Button variant="quiet" disabled={busy} onClick={() => void save(3)}>{w("Skip for now")}</Button>}
           </>}
           {step === 3 && !clinician && <section className="onboarding-ready-hero"><div><h2>{w("What’s on your mind?")}</h2><p>{w("Describe what you need, browse specialists, or ask available clinicians to respond.")}</p><Button type="submit" loading={busy}>{w("Find care")}</Button></div><aside><ShieldCheck size={26}/><h2>{w("Your choices come with you.")}</h2><dl><dt>{w("Display name")}</dt><dd>{answers.name}</dd><dt>{w("Care language")}</dt><dd>{{en:"English",am:"አማርኛ",om:"Afaan Oromo"}[answers.language as "en"|"am"|"om"]||"English"}</dd><dt>{w("Sharing")}</dt><dd>{w("Preview before every booking")}</dd></dl></aside></section>}

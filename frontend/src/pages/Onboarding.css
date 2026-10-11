@@ -34,6 +34,6 @@
 
 .onboarding-account-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:24px}
 .onboarding-account-choices .onboarding-review-panel{margin:0;padding:24px}
-.onboarding-account-choices h2{margin:20px 0 12px;line-height:1.25}.onboarding-account-choices p{line-height:1.6}
-.onboarding-account-choices .button{width:100%}
+.onboarding-account-choices h2{font-size:22px;margin:20px 0 16px;line-height:1.25}.onboarding-account-choices p{line-height:1.6;color:var(--ink)}
+.onboarding-account-choices .onboarding-review-panel>svg{box-sizing:content-box;padding:12px;background:var(--subtle);color:var(--brand);border-radius:12px}
 @media(max-width:600px){.onboarding-account-choices{grid-template-columns:1fr}}
