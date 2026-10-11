@@ -8,7 +8,8 @@ import {
   MedicalLeadLayout,
   WorkspaceLayout,
 } from "./layouts/Layouts";
-import Homepage, { ClinicianInvitation } from "./pages/Homepage";
+import Homepage from "./pages/Homepage";
+import PublicJourney from "./pages/PublicJourneys";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import {ClinicianOffers,ClinicianOfferDetail} from "./pages/ClinicianOffers";
 import SignIn from "./pages/SignIn";
@@ -57,7 +58,8 @@ export default function App() {
           <Routes>
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Homepage />} />
-              <Route path="/for-clinicians" element={<ClinicianInvitation />} />
+              <Route path="/for-clinicians" element={<PublicJourney clinician />} />
+              <Route path="/how-it-works" element={<PublicJourney />} />
               <Route path="/couple-invitation" element={<CoupleInvitation />} />
               <Route path="/relationship-invitation" element={<RelationshipInvitationEntry />} />
               <Route

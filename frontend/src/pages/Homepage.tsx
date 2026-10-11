@@ -61,28 +61,3 @@ export default function Homepage() {
     </section>
   </main>;
 }
-export function ClinicianInvitation() {
-  return (
-    <main className="container editorial">
-      <p className="eyebrow">FOR CLINICIANS</p>
-      <h1>Care starts with a thoughtful connection.</h1>
-      <p className="hero-intro">
-        Bring your professional experience to TeleTena. Set your availability,
-        publish approved services and meet patients with clear sharing choices.
-      </p>
-      <ol className="plain-steps">
-        <li>Verify your contact.</li>
-        <li>
-          Share your professional identity, credentials and requested service
-          scope.
-        </li>
-        <li>
-          Submit for manual review. Approval is required before offering care.
-        </li>
-      </ol>
-      <Link className="button primary" to="/sign-in?intent=clinician">
-        Start your application <ArrowRight size={20} />
-      </Link>
-    </main>
-  );
-}

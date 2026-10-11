@@ -127,7 +127,7 @@ export function PublicLayout() {
         <Brand />
         <nav aria-label="Main navigation">
           <Link to="/patient/discovery">{w("Find care")}</Link>
-          <a href={(import.meta.env.PROD ? "/teletena/" : "/") + "#how-it-works"}>{w("How it works")}</a>
+          <Link to="/how-it-works">{w("How it works")}</Link>
           <Link to="/for-clinicians">{w("For clinicians")}</Link>
           <LanguageSelect />
           <Link className="button secondary" to="/sign-in">

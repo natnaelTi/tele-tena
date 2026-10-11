@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { accountTranslations } from "../account-translations";
 import { patientJourneyTranslations } from "../patient-journey-translations";
 import { landingTranslations } from "../landing-translations";
+import { publicJourneyTranslations } from "../public-journey-translations";
 import { locales } from "../i18n";
 import type { Key } from "../i18n";
 import { useSession } from "./useSession";
@@ -99,6 +100,7 @@ const words: Record<string, [string, string]> = {
   "Best fit": ["የበለጠ ተስማሚ", "Kan caalaatti siif malu"],
   "Lowest price": ["ዝቅተኛ ዋጋ", "Gatii gadi aanaa"],
   ...landingTranslations,
+  ...publicJourneyTranslations,
   ...patientJourneyTranslations,
   ...accountTranslations,
   "Shared care": ["የጋራ እንክብካቤ", "Kunuunsa waliin"],
