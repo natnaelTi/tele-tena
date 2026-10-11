@@ -55,7 +55,7 @@ let stage = "launch";
         .getByRole("heading", { name: "Application progress", exact: true })
         .waitFor();
       await page.getByText("Pending", { exact: true }).waitFor();
-      if (width <= 768) {
+      {
         await page.locator('.tour-invite, .tour-replay').waitFor();
         const spacing = await page.evaluate(() => {
           const tour = document.querySelector('.tour-invite, .tour-replay');

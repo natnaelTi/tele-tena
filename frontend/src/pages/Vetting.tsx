@@ -144,7 +144,7 @@ export function ClinicianScopeApplications() {
     <section className="scope-application-workspace">
       <div className="scope-application-form" data-tour-unsaved={dirty ? 'true' : 'false'} onChange={()=>setDirty(true)}>
         <p className="eyebrow">{w("STEP")} {step+1} {w("OF")} 3</p>
-        <div className="step-progress" aria-hidden="true">{[0,1,2].map(index=><span key={index} className={index<=step?"done":""}/>)}</div>
+        <div className="step-progress" aria-hidden="true">{[0,1,2].map(index=><span key={index} data-complete={index<=step}/>)}</div>
         <h2 ref={headingRef} tabIndex={-1}>{w(step===0?"Professional details":step===1?"Relevant experience":"Review your application")}</h2>
         <p className="supporting">{w("Documents are private to authorized reviewers.")}</p>
         {reverificationOf&&<InlineNotice>{w("A renewal request does not extend an expired approval. If the credential has expired, this service remains unavailable until a reviewer records a new approval.")}</InlineNotice>}
