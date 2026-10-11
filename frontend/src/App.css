@@ -322,6 +322,10 @@ button { color: inherit; background: transparent; }
 .field label {
   font-weight: 600;
 }
+/* Reference form values are regular weight; do not inherit label emphasis. */
+.field :is(input, select, textarea) {
+  font-weight: 400;
+}
 .field-hint,
 .field-error,
 .supporting {
