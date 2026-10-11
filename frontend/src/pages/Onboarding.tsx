@@ -267,18 +267,20 @@ export default function Onboarding() {
               <p>
                 {w("Your application will be submitted for manual review. You cannot accept bookings until your professional status and service scopes are approved.")}
               </p>
-              <dl className="summary-list">
-                <dt>{w("Name")}</dt>
-                <dd>{answers.name}</dd>
-                <dt>{w("Credentials & scope")}</dt>
-                <dd>
-                  {clinician
-                    ? answers.statement
-                    : answers.share_name
-                      ? "Preferred name"
-                      : "Preferred name stays private"}
-                </dd>
-              </dl>
+              <section className="onboarding-review-panel">
+                <h2>{w("Professional details")}</h2>
+                <dl>
+                  <div><dt>{w("Professional name")}</dt><dd>{answers.name}</dd></div>
+                  <div><dt>{w("Credentials & scope")}</dt><dd>{answers.statement}</dd></div>
+                  <div><dt>{w("Résumé")}</dt><dd>{w(resumeUploaded?"Resume uploaded for authorized review.":"Not provided")}</dd></div>
+                  <div><dt>{w("Clinic affiliations (optional)")}</dt><dd>{answers.affiliations||w("Not provided")}</dd></div>
+                </dl>
+              </section>
+              <section className="onboarding-review-panel">
+                <h2>{w("Requested scopes")}</h2>
+                <ul>{(answers.requested_services||[]).map(id=><li key={id}><ShieldCheck size={22} aria-hidden="true"/><div><strong>{catalog.find(service=>service.id===id)?.label||w("Service details unavailable")}</strong><p>{w("Pending review")}</p></div></li>)}</ul>
+                <p className="supporting">{w("Each service needs its own human approval before publication.")}</p>
+              </section>
             </>
           )}
           <div className="form-actions" data-tour={step===3&&clinician?"applicant-submit":undefined}>

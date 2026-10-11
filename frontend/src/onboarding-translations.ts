@@ -104,4 +104,9 @@ export const onboardingTranslations:Record<string,[string,string]>={
   "Not provided": ["አልቀረበም", "Hin kennamne"],
   "Yes": ["አዎ", "Eeyyee"],
   "No": ["አይ", "Lakki"],
+  "Résumé": ["የሥራ ማጠቃለያ", "Seenaa hojii"],
+  "Requested scopes": ["የተጠየቁ የአገልግሎት ወሰኖች", "Daangaawwan tajaajilaa gaafataman"],
+  "Pending review": ["ግምገማ በመጠበቅ ላይ", "Gamaaggama eeggachaa"],
+  "Service details unavailable": ["የአገልግሎት ዝርዝር አይገኝም", "Bal'inni tajaajilaa hin jiru"],
+  "Each service needs its own human approval before publication.": ["እያንዳንዱ አገልግሎት ከመታተሙ በፊት በሰው የሚደረግ ማጽደቅ ያስፈልገዋል።", "Tajaajilli hundi maxxanfamuu dura namaan hayyamamuu qaba."],
 };
