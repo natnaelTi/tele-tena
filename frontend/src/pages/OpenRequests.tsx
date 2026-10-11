@@ -246,7 +246,8 @@ export function PublicClinicianProfile(){
   const {clinicianId=''}=useParams();
   const load=useCallback(()=>journeyApi.publicClinician(clinicianId),[clinicianId]);
   const resource=useResource(load);
-  const [selectedService,setSelectedService]=useState('');
+  const location=useLocation();
+  const [selectedService,setSelectedService]=useState(()=>typeof location.state?.selectedOffering==='string'?location.state.selectedOffering:'');
   const bookingService=resource.data?.services.find((item:any)=>item.offering===selectedService)||resource.data?.services[0];
   if(resource.error)return <InlineNotice tone="danger">{w("This clinician profile is unavailable or no longer approved.")} <Button variant="secondary" onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice>;
   if(!resource.data)return <Skeleton/>;
@@ -262,7 +263,7 @@ export function PublicClinicianProfile(){
         : <>{resource.data.trust_indicators.responsiveness.rate_percent}% {t("offerResponseRate")} · {resource.data.trust_indicators.responsiveness.response_count}/{resource.data.trust_indicators.responsiveness.sample_count} {t("immediateRequestsPresented")}</>}</dd></div>
       <div><dt>{t("reliability")}</dt><dd>{resource.data.trust_indicators.reliability.rate_percent===null
         ? resource.data.trust_indicators.reliability.status==="new"?t("noAppointmentHistory"): <>{t("trustInsufficientData")} · {resource.data.trust_indicators.reliability.sample_count} {t("completedAndCancelledSessions")}</>
-        : <>{resource.data.trust_indicators.reliability.rate_percent}% · {resource.data.trust_indicators.reliability.clinician_cancelled_count}/{resource.data.trust_indicators.reliability.sample_count} {t("clinicianCancellations")}</>}</dd></div>
+        : <>{resource.data.trust_indicators.reliability.rate_percent}% {t("clinicianCancellations")} · {resource.data.trust_indicators.reliability.clinician_cancelled_count}/{resource.data.trust_indicators.reliability.sample_count} {t("completedAndCancelledSessions")}</>}</dd></div>
     </dl></section>
     </aside></div>
   </>;

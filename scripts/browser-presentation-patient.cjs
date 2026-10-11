@@ -101,9 +101,9 @@ async function pair(ctx, p, id, hash, width) {
         .locator("label[for=discovery-care-query]")
         .boundingBox();
       assert.ok(labelBox.width <= 1 && labelBox.height <= 1);
-      const trigger = p
-        .getByRole("button", { name: "View profile", exact: true })
-        .first();
+      const profileButtons=p.getByRole("button",{name:"View profile",exact:true});
+      assert.ok(await profileButtons.count()>=2,'Presentation requires distinct selectable offerings');
+      const trigger = profileButtons.nth(1);
       await trigger.click();
       await p
         .getByRole("dialog")
@@ -130,6 +130,7 @@ async function pair(ctx, p, id, hash, width) {
         { timeout: 2000 },
       );
       await trigger.click();
+      const selectedBooking=await p.getByRole('dialog').getByRole('link',{name:'Choose a time',exact:true}).getAttribute('href');
       await p
         .getByRole("dialog")
         .getByRole("link", { name: "View full profile", exact: true })
@@ -138,12 +139,15 @@ async function pair(ctx, p, id, hash, width) {
         .getByRole("heading", { name: "Hana Tesfaye", exact: true })
         .first()
         .waitFor();
+      stage='selected profile offering '+width;
+      assert.equal(await p.locator('.public-profile-booking').getByRole('link',{name:'Choose a time',exact:true}).getAttribute('href'),selectedBooking,'Full profile must retain the service selected in discovery');
+      await p.reload();
+      await p.locator('.public-profile-booking').getByRole('link',{name:'Choose a time',exact:true}).waitFor();
+      assert.equal(await p.locator('.public-profile-booking').getByRole('link',{name:'Choose a time',exact:true}).getAttribute('href'),selectedBooking);
       await pair(ctx, p, "C04", "c04", width);
+      if(process.env.TELE_TENA_PROFILE_CONTEXT_ONLY==='1'){await ctx.close();continue;}
       await p.goto(base + "/patient/discovery");
-      await p
-        .getByRole("link", { name: "Choose a time", exact: true })
-        .first()
-        .click();
+      await p.locator('a[href="'+selectedBooking+'"]').first().click();
       await p.locator(".booking-month-grid button:enabled").first().click();
       const selected = p.locator(
         ".booking-month-grid button[aria-pressed=true]",
@@ -175,7 +179,9 @@ async function pair(ctx, p, id, hash, width) {
       );
       await ctx.close();
     }
-    console.log(
+    const manifest=JSON.parse(fs.readFileSync('tele_tena/public/review/release.json'));
+    fs.writeFileSync(output+'/result.json',JSON.stringify({source:manifest.source_commit,site:'teletena-mvp-presentation.localhost',real_backend:true,selected_offering_profile_reload:true,preview_focus_return:true,calendar_disclosure_back:process.env.TELE_TENA_PROFILE_CONTEXT_ONLY!=='1',viewports:[390,768,1440]},null,2));
+    console.log(process.env.TELE_TENA_PROFILE_CONTEXT_ONLY==='1' ? 'PASS: real password session, Home/discovery, preview focus, selected offering preserved through public profile and reload at390/768/1440; calendar/disclosure not repeated.' :
       "PASS: invited-review real password login; patient home/discovery/public profile; preview focus; authoritative calendar and hover contrast; disclosure review/back preserves input; paired 390/768/1440 evidence. No bookings or financial mutations. Visual comparison required separately.",
     );
   } catch (e) {
