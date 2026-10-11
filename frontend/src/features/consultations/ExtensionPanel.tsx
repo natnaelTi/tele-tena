@@ -2,12 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../api'
 import { Button, InlineNotice } from '../../components/ui'
+import {useLocale} from '../../hooks/useLocale'
 import type { Key } from '../../i18n'
 
-type Extension = {id:string;state:string;duration_minutes:number;amount_minor:number;expires_at:string;start_after:string}
-type ExtensionState = {items:Extension[];can_propose:boolean;can_accept:boolean}
+type Extension = {id:string;state:string;duration_minutes:number;amount_minor:number;expires_at:string;start_after:string;your_response?:string;accepted_count?:number;required_count?:number;all_agreed?:boolean;is_payer?:boolean}
+type ExtensionState = {items:Extension[];can_propose:boolean;can_accept:boolean;is_couple?:boolean;is_payer?:boolean}
 
 export default function ExtensionPanel({appointment, role, open, t}:{appointment:string;role:'patient'|'clinician';open:boolean;t:(key:Key)=>string}) {
+  const {w}=useLocale()
   const [data,setData]=useState<ExtensionState|null>(null)
   const [error,setError]=useState('')
   const [busy,setBusy]=useState(false)
@@ -29,7 +31,7 @@ export default function ExtensionPanel({appointment, role, open, t}:{appointment
     {error&&<InlineNotice tone="danger">{error}</InlineNotice>}
     {!current&&role==='clinician'&&data?.can_propose&&<Button variant="secondary" loading={busy} onClick={()=>void run(()=>api('tele_tena.api.extensions.propose_extension',{appointment,retry_key:crypto.randomUUID()},true))}>{t('offerExtraTime')}</Button>}
     {current&&<div className="extension-offer" aria-live="polite"><strong>{t(`extension${current.state}` as Key)}</strong><span>{current.duration_minutes} {t('minutes')} · {amount(current.amount_minor)}</span>
-      {current.state==='Proposed'&&role==='patient'&&<><p>{t('extensionOfferExpiry')} {new Date(current.expires_at).toLocaleTimeString()}</p><div className="actions"><Button loading={busy} onClick={()=>void run(()=>api('tele_tena.api.extensions.respond_extension',{appointment,extension_id:current.id,decision:'accept'},true))}>{t('acceptAndReserve')}</Button><Button variant="secondary" disabled={busy} onClick={()=>void run(()=>api('tele_tena.api.extensions.respond_extension',{appointment,extension_id:current.id,decision:'decline'},true))}>{t('Decline')}</Button></div><Link className="text-link" to="/patient/account/payments">{t('addFunds')}</Link></>}
+      {current.state==='Proposed'&&role==='patient'&&<>{data?.is_couple&&<p role="status">{current.accepted_count} / {current.required_count} {w('participants have agreed')}. {w(data.is_payer?'After both adults agree, authorize the reservation from your balance.':'Your agreement does not charge your balance or the other adult’s balance.')}</p>}<p>{t('extensionOfferExpiry')} {new Date(current.expires_at).toLocaleTimeString()}</p><div className="actions"><Button disabled={data?.is_couple&&current.your_response==='accept'&&(!data.is_payer||!current.all_agreed)} loading={busy} onClick={()=>void run(()=>api('tele_tena.api.extensions.respond_extension',{appointment,extension_id:current.id,decision:'accept'},true))}>{data?.is_couple?w(data.is_payer&&current.all_agreed?'Authorize reservation':'Agree to extra time'):t('acceptAndReserve')}</Button><Button variant="secondary" disabled={busy} onClick={()=>void run(()=>api('tele_tena.api.extensions.respond_extension',{appointment,extension_id:current.id,decision:'decline'},true))}>{t('Decline')}</Button></div><Link className="text-link" to="/patient/account/payments">{t('addFunds')}</Link></>}
       {current.state==='Proposed'&&role==='clinician'&&<Button variant="secondary" loading={busy} onClick={()=>void run(()=>api('tele_tena.api.extensions.withdraw_extension',{appointment,extension_id:current.id},true))}>{t('withdrawExtension')}</Button>}
       {current.state==='Accepted'&&role==='clinician'&&<><p>{t('extensionStartAfter')} {new Date(current.start_after).toLocaleTimeString()}</p><Button loading={busy} onClick={()=>void run(()=>api('tele_tena.api.extensions.start_extension',{appointment,extension_id:current.id},true))}>{t('startAgreedExtension')}</Button></>}
     </div>}

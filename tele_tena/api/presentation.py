@@ -142,9 +142,9 @@ def _reschedule_expiry():
 
 
 def _can_change_time(item):
-    from tele_tena.api.couples import plan_for
-    if plan_for(item.id):
-        return False  # A new time requires both adults' renewed consent.
+    from tele_tena.api.couples import plan_for, ready
+    if plan_for(item.id) and not ready(item.id):
+        return False
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     return (item.state == 'Booked' and item.start > now and
             not rows('SELECT appointment FROM tt_consultation WHERE appointment=%s', (item.id,)) and
@@ -195,6 +195,9 @@ def propose_reschedule(appointment, start, retry_key):
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Pending',%s,%s)''',
         (proposal_id, item.id, user, start, start + timedelta(minutes=int(item.minutes)),
          schedule.timezone if schedule else item.timezone, key, payload_hash, now, expires))
+    from tele_tena.api.couples import plan_for, change_vote
+    if plan_for(item.id):
+        change_vote(item, 'reschedule', proposal_id, user, 'accept')
     _event(item.id, 'RescheduleProposed', user, 'A new appointment time was proposed')
     return {'id': proposal_id, 'state': 'Pending', 'expires_at': iso(expires),
             'start': iso(start), 'timezone': schedule.timezone if schedule else item.timezone}
@@ -207,9 +210,8 @@ def journey_instant(value):
 
 @command
 def respond_to_reschedule(appointment, proposal, decision):
-    from tele_tena.api.couples import plan_for
-    if plan_for(appointment):
-        fail('Both adults must consent to a new booking time.', 'couple_consent_required')
+    from tele_tena.api.couples import plan_for, change_vote, participants
+    shared = bool(plan_for(appointment))
     if decision not in ('accept', 'decline'):
         fail('Choose whether to accept or decline the proposed time')
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
@@ -225,7 +227,7 @@ def respond_to_reschedule(appointment, proposal, decision):
         if decision == 'decline' and record.state == 'Declined' and record.responded_by == user:
             return {'state': 'Declined', 'idempotent': True}
         fail('This time-change request is already resolved', 'reschedule_resolved')
-    if record.proposer == user:
+    if record.proposer == user and not shared:
         frappe.throw('Only the other appointment participant may respond', frappe.PermissionError)
     if record.state != 'Pending':
         fail('This time-change request is no longer available', 'reschedule_resolved')
@@ -236,10 +238,14 @@ def respond_to_reschedule(appointment, proposal, decision):
         _event(item.id, 'RescheduleExpired', 'System')
         return {'state': 'Expired'}
     if decision == 'decline':
+        if shared:
+            change_vote(item, 'reschedule', record.id, user, decision)
         frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Declined',responded_by=%s,responded_at=%s WHERE id=%s",
                       (user, now, record.id))
         _event(item.id, 'RescheduleDeclined', user)
         return {'state': 'Declined'}
+    if shared and not change_vote(item, 'reschedule', record.id, user, decision):
+        return {'state': 'Pending', 'awaiting_participants': True}
     if not _can_change_time(item):
         frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Superseded',responded_by=%s,responded_at=%s WHERE id=%s",
                       (user, now, record.id))
@@ -273,6 +279,13 @@ def respond_to_reschedule(appointment, proposal, decision):
         _event(item.id, 'RescheduleSlotUnavailable', 'System')
         return {'state': 'Unavailable', 'message': 'That time is no longer available. Ask for another time.'}
     end = record.start + timedelta(minutes=int(item.minutes))
+    if shared:
+        from tele_tena.api.couples import conflicts
+        try:
+            conflicts([p.user for p in participants(plan_for(item.id)[0].id)], record.start, end, exclude_appointment=item.id)
+        except frappe.ValidationError:
+            frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Unavailable',responded_at=%s WHERE id=%s", (now, record.id))
+            return {'state': 'Unavailable', 'message': 'A participant is no longer available at that time.'}
     # The original reservation and immutable price/disclosure/policy remain on
     # this same appointment. No financial posting is created by rescheduling.
     frappe.db.sql('''UPDATE tt_appointment SET start=%s,end=%s,timezone=%s,schedule_id=%s,
@@ -285,6 +298,8 @@ def respond_to_reschedule(appointment, proposal, decision):
                   (user, now, record.id))
     frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Superseded',responded_at=%s WHERE appointment=%s AND id<>%s AND state='Pending'",
                   (now, item.id, record.id))
+    if shared:
+        frappe.db.sql('UPDATE tt_couple_plan SET start=%s,timezone=%s WHERE appointment=%s', (record.start, record.timezone, item.id))
     _event(item.id, 'RescheduleAccepted', user)
     return {'state': 'Accepted', 'start': iso(record.start), 'end': iso(end),
             'timezone': schedule.timezone if schedule else record.timezone}
@@ -438,7 +453,10 @@ def appointment_detail(appointment):
         from tele_tena.api.couples import ready
         selected['can_join'] = selected['can_join'] and ready(item.id)
         selected['couple_plan_id'] = shared_plan[0].id
-        selected['can_propose_reschedule'] = False
+        selected['can_propose_reschedule'] = _can_change_time(item) and not bool(reschedule)
+        if reschedule:
+            from tele_tena.api.couples import change_response
+            selected['reschedule'].update(change_response(item, 'reschedule', reschedule[0].id, user))
         selected['can_cancel'] = selected['can_cancel'] and user == item.patient
     earning = rows('SELECT state,release_at FROM tt_earning WHERE appointment=%s', (item.id,))
     if earning:

@@ -26,17 +26,18 @@ def _block_policy(item):
 
 
 def _is_participant_open(item, user, role):
-    from tele_tena.api.couples import plan_for
+    from tele_tena.api.couples import plan_for, change_people
     if plan_for(item.id):
-        fail('Shared-session extensions require renewed consent from both adults.', 'couple_extension_unavailable')
+        change_people(item)
     if item.state != 'Booked':
         fail('An extension is available only during a confirmed consultation.', 'extension_appointment_inactive')
     call = rows('SELECT state FROM tt_consultation WHERE appointment=%s', (item.id,))
     if not call or call[0].state != 'Open':
         fail('The consultation is not open for an extension.', 'extension_call_inactive')
-    if role == 'clinician' and item.clinician == user:
-        service = one('SELECT service FROM tt_offering WHERE id=%s', (item.offering,))
-        approved_service(item.clinician, service.service)
+    from tele_tena.api.journey import approved
+    service = one('SELECT service FROM tt_offering WHERE id=%s', (item.offering,))
+    approved(item.clinician, True)
+    approved_service(item.clinician, service.service, True)
     return call[0]
 
 
@@ -81,7 +82,12 @@ def extension_status(appointment):
         WHERE appointment=%s ORDER BY proposed_at''', (item.id,))
     from tele_tena.api.couples import plan_for
     if plan_for(item.id):
-        return {'items': result, 'can_propose':False, 'can_accept':False, 'currency':'ETB'}
+        from tele_tena.api.couples import change_response, ready
+        for extension in result:
+            extension.update(change_response(item, 'extension', extension.id, user))
+        return {'items': result, 'is_couple': True, 'is_payer': user == item.patient,
+                'can_propose': role == 'clinician' and item.state == 'Booked' and ready(item.id),
+                'can_accept': role == 'patient' and item.state == 'Booked' and ready(item.id), 'currency':'ETB'}
     return {'items': result, 'can_propose': role == 'clinician' and item.state == 'Booked',
             'can_accept': role == 'patient' and user == item.patient and item.state == 'Booked',
             'currency': 'ETB'}
@@ -138,6 +144,9 @@ def propose_extension(appointment, retry_key):
         (extension, item.id, item.patient, item.clinician, key, duration, amount,
          json.dumps(price_snapshot, separators=(',', ':'), sort_keys=True),
          json.dumps(policy, separators=(',', ':'), sort_keys=True), item.end, expiry, now))
+    from tele_tena.api.couples import plan_for, change_vote
+    if plan_for(item.id):
+        change_vote(item, 'extension', extension, clinician, 'accept')
     _event(item.id, 'ExtensionProposed', clinician)
     return {'id': extension, 'state': 'Proposed', 'duration_minutes': duration,
             'amount_minor': amount, 'expires_at': expiry, 'idempotent': False}
@@ -150,12 +159,14 @@ def respond_extension(appointment, extension_id, decision):
         fail('Choose accept or decline.')
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
-    if role != 'patient' or item.patient != patient:
+    from tele_tena.api.couples import plan_for, change_vote
+    shared = bool(plan_for(item.id))
+    if role != 'patient' or (not shared and item.patient != patient):
         frappe.throw('Consultation unavailable', frappe.PermissionError)
     _is_participant_open(item, patient, role)
     extension = one('''SELECT * FROM tt_consultation_extension
-        WHERE id=%s AND appointment=%s AND patient=%s FOR UPDATE''',
-        (extension_id, item.id, patient))
+        WHERE id=%s AND appointment=%s FOR UPDATE''',
+        (extension_id, item.id))
     if extension.state == 'Accepted' and decision == 'accept':
         return {'state': 'Accepted', 'idempotent': True}
     if extension.state != 'Proposed':
@@ -167,10 +178,18 @@ def respond_extension(appointment, extension_id, decision):
         _event(item.id, 'ExtensionExpired', 'System')
         return {'state': 'Expired'}
     if decision == 'decline':
+        if shared:
+            change_vote(item, 'extension', extension.id, patient, decision)
         frappe.db.sql("UPDATE tt_consultation_extension SET state='Declined',closed_at=%s WHERE id=%s",
                       (now, extension.id))
         _event(item.id, 'ExtensionDeclined', patient)
         return {'state': 'Declined'}
+    if shared:
+        agreed = change_vote(item, 'extension', extension.id, patient, decision)
+        if not agreed:
+            return {'state': 'Proposed', 'awaiting_participants': True}
+        if patient != item.patient:
+            return {'state': 'Proposed', 'awaiting_payer': True}
     new_end = item.end + timedelta(minutes=int(extension.duration_minutes))
     conflicts = rows('''SELECT id FROM tt_appointment WHERE clinician=%s AND id<>%s
         AND state IN ('Booked','PendingConfirmation') AND start<%s AND end>%s FOR UPDATE''',
@@ -178,6 +197,9 @@ def respond_extension(appointment, extension_id, decision):
     if conflicts:
         fail('That added time conflicts with another appointment. Ask the clinician about another option.',
              'extension_time_unavailable')
+    if shared:
+        from tele_tena.api.couples import participants, conflicts
+        conflicts([p.user for p in participants(plan_for(item.id)[0].id)], item.end, new_end, exclude_appointment=item.id)
     wallet = one('SELECT available,reserved FROM tt_wallet WHERE patient=%s FOR UPDATE', (patient,))
     amount = int(extension.amount_minor)
     if int(wallet.available) < amount:
@@ -235,6 +257,9 @@ def start_extension(appointment, extension_id):
         (extension_id, item.id, clinician))
     if extension.state == 'Started':
         return {'state': 'Started', 'idempotent': True}
+    from tele_tena.api.couples import plan_for, change_agreed
+    if plan_for(item.id) and not change_agreed(item, 'extension', extension.id):
+        fail('Both adults must still consent before the extension starts.', 'couple_consent_required')
     if extension.state != 'Accepted':
         fail('The patient must accept and fund the extension before it can start.',
              'extension_not_accepted')

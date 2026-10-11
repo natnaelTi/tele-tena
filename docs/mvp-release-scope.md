@@ -164,3 +164,22 @@ withdrawal/outsider denials; one consumed reservation and pending earning.
 Implementation and verification remain open until that evidence passes.
 
 Couples v1 restrictions: existing individual fixed-block extensions remain supported. Shared-session extensions and rescheduling require both adults' renewed consent and are refused until that additional consent transition exists. The direct two-adult fixed-duration consultation is the couples release gate; this restriction must be visible and included in handover limitations. Clinic sharing of couple summaries is denied until recipient-specific grants can preserve both adults' decisions.
+
+## Shared time and extension consent completion — 2026-10-11
+
+A new couples time requires both adults and the clinician to consent to the exact
+persisted proposal. Until then the original appointment and reservation remain.
+Any decline closes the proposal; absent responses expire under the existing
+proposal policy. Slot/format/duration and every participant's conflicts are
+rechecked at the final response. An unavailable proposal closes without moving
+or cancelling the original booking. The original disclosure/price/policy remains.
+
+Extensions reuse the fixed-block price snapshot and subledger. The clinician
+proposes; each adult independently accepts. Once both agree, the original payer
+must explicitly authorize the reservation (including retry after adding funds).
+The other adult never charges the payer's account. Existing expiry, limits,
+conflicts, End release for unstarted blocks, withholding and finalization apply.
+Consent withdrawal prevents new changes and starts the existing closure/hold or
+pre-start cancellation path. No automatic penalty or financial settlement is
+introduced. These are implemented changes pending current regression/browser
+verification; no acceptance is inferred from this policy text.

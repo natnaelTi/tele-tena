@@ -37,3 +37,4 @@ tele_tena.patches.v1_31_explicit_note_sharing
 tele_tena.patches.v1_32_note_sharing_draft_choice
 
 tele_tena.patches.v1_33_couples_consultations
+tele_tena.patches.v1_34_shared_change_consent

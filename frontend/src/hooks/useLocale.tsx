@@ -10,6 +10,14 @@ import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
   // Provisional additions; native review remains required.
+  "participants have agreed": ["ተሳታፊዎች ተስማምተዋል", "hirmaattonni walii galaniiru"],
+  "Your agreement is recorded.": ["ፈቃድዎ ተመዝግቧል።", "Waliigalteen kee galmaa’eera."],
+  "Review the new time before agreeing.": ["ከመስማማትዎ በፊት አዲሱን ጊዜ ይመልከቱ።", "Walii galuu dura yeroo haaraa ilaali."],
+  "The original appointment stays reserved until both adults and the clinician agree.": ["ሁለቱ ጎልማሶችና ባለሙያው እስኪስማሙ ድረስ ዋናው ቀጠሮ ይቆያል።", "Ga’eessonni lamaan fi ogeessi hanga walii galanitti beellamni duraa qabamee tura."],
+  "After both adults agree, authorize the reservation from your balance.": ["ሁለቱም ከተስማሙ በኋላ ከሂሳብዎ ማስያዙን ያጽድቁ።", "Ga’eessonni lamaan erga walii galanii booda baalansii keetirraa maallaqa qabsiisuu hayyami."],
+  "Your agreement does not charge your balance or the other adult’s balance.": ["ፈቃድዎ ከእርስዎ ወይም ከሌላው ጎልማሳ ሂሳብ ገንዘብ አይቀንስም።", "Waliigalteen kee baalansii kee ykn kan ga’eessa biraa hin hir’isu."],
+  "Authorize reservation": ["ማስያዙን ፍቀድ", "Maallaqa qabsiisuu hayyami"],
+  "Agree to extra time": ["ለተጨማሪ ጊዜ ተስማማ", "Yeroo dabalataaf walii gali"],
   "Payment activity pages": ["የክፍያ እንቅስቃሴ ገጾች", "Fuulota sochii kaffaltii"],
   "Previous activity page": ["ያለፈው የእንቅስቃሴ ገጽ", "Fuula sochii darbe"],
   "Next activity page": ["ቀጣይ የእንቅስቃሴ ገጽ", "Fuula sochii itti aanu"],

@@ -40,7 +40,8 @@ def ready(appointment):
         'Tele Tena Patient' in frappe.get_roles(p.user) for p in people)
 
 
-def conflicts(users, start, end):
+def conflicts(users, start, end, exclude_appointment=""):
+
     for user in users:
         if j.rows('''SELECT a.id FROM tt_appointment a WHERE
             (a.patient=%s OR EXISTS (SELECT 1 FROM tt_couple_plan cp
@@ -48,7 +49,7 @@ def conflicts(users, start, end):
              WHERE cp.appointment=a.id AND p.user=%s AND p.state='Consented'))
             AND a.state IN ('Booked','PendingConfirmation')
             AND (a.expires_at IS NULL OR a.expires_at>UTC_TIMESTAMP(6))
-            AND a.start<%s AND a.end>%s FOR UPDATE''', (user, user, end, start)):
+            AND a.start<%s AND a.end>%s AND a.id<>%s FOR UPDATE''', (user, user, end, start, exclude_appointment)):
             j.fail('A participant already has an appointment at this time.', 'appointment_conflict')
 
 
@@ -286,3 +287,65 @@ def room_labels(appointment, viewer, clinician_identity):
         label = json.loads(p.disclosure).get('name') if viewer == item.clinician else None
         labels.append({'identity':p.room_identity,'label':label or 'Participant '+str(index),'role':'patient'})
     return labels
+
+
+def change_people(item, require_ready=True):
+    """All independently consented adults plus treating clinician; no account data returned."""
+    plans = plan_for(item.id)
+    if not plans:
+        return []
+    if require_ready and not ready(item.id):
+        j.fail('Both adults must have active consent before changing this session.', 'couple_consent_required')
+    return [p.user for p in participants(plans[0].id)] + [item.clinician]
+
+
+def change_vote(item, kind, change_id, user, decision):
+    required = change_people(item)
+    if user not in required:
+        frappe.throw('Consultation unavailable', frappe.PermissionError)
+    prior = j.rows('SELECT decision FROM tt_shared_change_consent WHERE kind=%s AND change_id=%s AND participant=%s',
+                   (kind, change_id, user))
+    if prior and prior[0].decision != decision:
+        j.fail('This response is already recorded. Request a new proposal to change it.', 'shared_response_changed')
+    if not prior:
+        frappe.db.sql('''INSERT INTO tt_shared_change_consent
+            (kind,change_id,participant,decision,created) VALUES (%s,%s,%s,%s,UTC_TIMESTAMP(6))''',
+            (kind, change_id, user, decision))
+    return change_agreed(item, kind, change_id)
+
+
+def change_agreed(item, kind, change_id):
+    required = change_people(item)
+    votes = j.rows('SELECT participant,decision FROM tt_shared_change_consent WHERE kind=%s AND change_id=%s',
+                   (kind, change_id))
+    accepted = {v.participant for v in votes if v.decision == 'accept'}
+    return bool(required) and set(required).issubset(accepted)
+
+
+def change_response(item, kind, change_id, user):
+    required = change_people(item, require_ready=False)
+    votes = j.rows('SELECT participant,decision FROM tt_shared_change_consent WHERE kind=%s AND change_id=%s',
+                   (kind, change_id))
+    accepted = {v.participant for v in votes if v.decision == 'accept'}
+    return {'your_response': next((v.decision for v in votes if v.participant == user), None),
+            'accepted_count': len(accepted.intersection(required)), 'required_count': len(required),
+            'all_agreed': ready(item.id) and set(required).issubset(accepted), 'is_payer': user == item.patient}
+
+
+@j.command
+def decline_invitation(token):
+    """Authenticated invite holder can decline without supplying intake or sharing identity."""
+    user = j.actor('Tele Tena Patient')
+    j.profile('patient')
+    j.one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    plan = j.one('SELECT * FROM tt_couple_plan WHERE token_digest=%s FOR UPDATE', (_token_digest(token),))
+    if plan.state == 'Declined' and j.rows('SELECT decision FROM tt_shared_change_consent WHERE kind=%s AND change_id=%s AND participant=%s AND decision=%s',
+                                         ('invitation', plan.id, user, 'decline')):
+        return {'state': 'Declined', 'idempotent': True}
+    if user == plan.payer or plan.state != 'Invited' or plan.expires_at <= datetime.now(timezone.utc).replace(tzinfo=None):
+        frappe.throw('Invitation unavailable.', frappe.PermissionError)
+    frappe.db.sql('''INSERT INTO tt_shared_change_consent
+        (kind,change_id,participant,decision,created) VALUES ('invitation',%s,%s,'decline',UTC_TIMESTAMP(6))''',
+        (plan.id, user))
+    frappe.db.sql("UPDATE tt_couple_plan SET state='Declined' WHERE id=%s AND state='Invited'", (plan.id,))
+    return {'state': 'Declined', 'idempotent': False}

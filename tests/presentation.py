@@ -2252,7 +2252,8 @@ class Presentation(unittest.TestCase):
                       (proposal['id'],))
         fixtures.login('c1')
         self.assertEqual(extensions.start_extension(appointment, proposal['id'])['state'], 'Started')
-        frappe.db.sql("UPDATE tt_consultation SET state='Ended',ended=UTC_TIMESTAMP(6) WHERE appointment=%s", (appointment,))
+        with patch('tele_tena.livekit.close_room'):
+            consultations.end(appointment)
         presentation.save_note_draft(appointment, 'Synthetic private note', 'Synthetic patient summary')
         with patch.dict(frappe.conf, {'tele_tena_demo_platform_fee_bps': 0,
                                      'tele_tena_demo_dispute_window_minutes': 30}):
