@@ -16,7 +16,7 @@ let browser,stage='launch';
    let changed=false;for(let i=0;i<360;i++){await new Promise(r=>setTimeout(r,1000));const sha=(await(await page.request.get(origin+'/assets/tele_tena/review/release.json')).json()).source_commit;if(sha!==initial){changed=true;break}}
    assert.ok(changed,'No new release published during the bounded update test');
    await page.evaluate(async()=>{const r=await navigator.serviceWorker.getRegistration();await r.update()});
-   await page.getByRole('button',{name:'Refresh to update',exact:true}).click();await page.waitForLoadState('domcontentloaded');
+   await Promise.all([page.waitForNavigation({waitUntil:'load'}),page.getByRole('button',{name:'Refresh to update',exact:true}).click()]);
  }
  stage='authenticated deep link';const seed=JSON.parse(fs.readFileSync(root+'/tele_tena_presentation_seed.json'));const file=root+'/tele_tena_presentation_accounts.json';assert.equal(fs.statSync(file).mode&0o077,0);const accounts=JSON.parse(fs.readFileSync(file));
  await page.goto(base+'/sign-in');await page.getByRole('button',{name:'Use email instead',exact:true}).click();await page.getByRole('button',{name:'Use password instead',exact:true}).click();await page.getByLabel('Email',{exact:true}).fill(seed.users.patient);await page.getByLabel('Password',{exact:true}).fill(accounts[seed.users.patient]);await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('button',{name:'Sign out',exact:true}).waitFor();
