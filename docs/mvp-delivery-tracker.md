@@ -2,7 +2,7 @@
 
 ## Active MVP completion —2026-10-11
 
-Packaged source `b87d843de0827d3d4d80b8717fe0995d64346ef6`, stable URL
+Packaged source `9308b303ca5a7c243eed84aa063960dd76f8c69d`, stable URL
 http://127.0.0.1:8017/teletena/ on `teletena-mvp-presentation.localhost`, original
 Bench `/home/frappe/frappe/frappe-bench`. Preview reboot/PWA recovery, couples
 joint time/extension consent, recipient-specific follow-up, current owner
@@ -10,9 +10,17 @@ reconciliation and native processing have new actual passing evidence in
 [mvp-journey-verification-2026-10-09.md](mvp-journey-verification-2026-10-09.md).
 Reviewer matching operations now use a protected logistics-only query. The
 existing [screen matrix](mvp-screen-acceptance.json) separates functional, visual
-and owner acceptance; no all-MVP pass. Freshv1.34/v1.35, remaining visual/state gates,
+and owner acceptance; no all-MVP pass. Freshv1.36, remaining visual/state gates,
 final integrated checks and external/manual validation remain open. No merge or
 remote change. Dated entries below are historical, not the active completion claim.
+
+Current continuation closes pending-profile403 and unavailable practice links,
+persists explicit public introductions, preserves the selected offering through
+profile/reload, and records matched calendar/disclosure journeys. Four real DB
+profile/privacy/retry tests and native repeat migrations preserve all54existing
+app tables on both retained sites. Profile keyboard/provisional language/actual
+200% zoom checks pass; paired comparisons retain material differences and owner
+review. Details and remaining gates stay in the single active matrix/report.
 
 ## Historical release priority — MVP handover — 2026-10-08
 

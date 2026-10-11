@@ -10,6 +10,12 @@ operational review flag. It does not change appointment or financial state and
 does not expose patient records to vetting reviewers. Human operational
 continuity policy remains required.
 
+Clinician profile clarification (2026-10-11): an optional owner-authored public
+introduction is distinct from private patient history and application evidence.
+It is shown only through the approved clinician profile projection; no approval,
+credential verification or service authorization follows from editing it.
+Existing records receive no inferred public text.
+
 ## First internal demonstration
 Adults 18+. English, Amharic and Afaan Oromo with native review before pilot.
 Patient and clinician portals; administrator approval; independent and multi-clinic

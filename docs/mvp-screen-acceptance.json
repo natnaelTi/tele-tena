@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "b87d843de0827d3d4d80b8717fe0995d64346ef6",
+  "source_checkpoint": "9308b303ca5a7c243eed84aa063960dd76f8c69d",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -1641,7 +1641,8 @@
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
         "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
-        "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json"
+        "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
+        "initial_review_current": "docs/screenshots/mvp-current/c0d911d-onboarding-review/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "B07",
@@ -1678,7 +1679,8 @@
         ],
         "comparison_notes": [
           "Real private PDF upload/remove and service multi-selection. Large test catalog previously stretched this step into a very long form; searchable bounded list retains all available scopes and selected values. Search empty-state/reset selection and resume/application persistence pass. Structured primary qualification/license/evidence fields remain in professional-vetting page; exact composition not accepted.",
-          "Structured /clinician/vetting is now a focused572px three-step wizard: qualifications, experience, review. Back retains fields; saved drafts resume; repeated save and submit retain one application without approval, real backend at9254a65. Current matched screenshots use read-only existing fixture after20/20 SMS budget enforcement. Prototype has five total onboarding steps and inline uploads; operational per-scope form retains mandatory category/institution/jurisdiction and revisioned evidence below. Initial signup composition and fuller reference summary still need correction; not visually accepted."
+          "Structured /clinician/vetting is now a focused572px three-step wizard: qualifications, experience, review. Back retains fields; saved drafts resume; repeated save and submit retain one application without approval, real backend at9254a65. Current matched screenshots use read-only existing fixture after20/20 SMS budget enforcement. Prototype has five total onboarding steps and inline uploads; operational per-scope form retains mandatory category/institution/jurisdiction and revisioned evidence below. Initial signup composition and fuller reference summary still need correction; not visually accepted.",
+          "c0d911d initial B10 professional/scope panels inspected. Actual answers and pending document icon; real two contact-proof onboarding and structured draft/submission under explicit loopback test budget100 restored20. Full typed five-stage initial application/inline evidence remains different; not native/owner accepted."
         ],
         "viewports": [
           390,
@@ -1990,7 +1992,8 @@
         "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
         "current_local": "Frappe 15 isolated presentation regressions passed 27/27, including owner/reviewer authorization and assessment evidence snapshot. Built-browser reviewer queue displayed submitted applicant and evidence; authorized reviewer downloaded the newest private PDF revision successfully. Frappe 16.2.1/ERPNext 16.1.0/Python 3.14.2 disposable site was backed up, migrated v1.8→v1.16, repeat-migrated, and passed the 27-test backend suite. Screenshot: /tmp/tele-tena-presentation-review/scope-evidence/reviewer-evidence.png. Fresh-empty-site check and Frappe 16 browser journey remain pending; no external credential validation or malware scanning is claimed.",
         "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
-        "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json"
+        "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
+        "initial_review_current": "docs/screenshots/mvp-current/c0d911d-onboarding-review/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "B10",
@@ -2027,7 +2030,8 @@
         ],
         "comparison_notes": [
           "Persisted application review/submission with no clinician approval or privileged role. Explicit manual-review statement and resume requirement. Exact professional/evidence summary composition remains to complete.",
-          "Structured /clinician/vetting is now a focused572px three-step wizard: qualifications, experience, review. Back retains fields; saved drafts resume; repeated save and submit retain one application without approval, real backend at9254a65. Current matched screenshots use read-only existing fixture after20/20 SMS budget enforcement. Prototype has five total onboarding steps and inline uploads; operational per-scope form retains mandatory category/institution/jurisdiction and revisioned evidence below. Initial signup composition and fuller reference summary still need correction; not visually accepted."
+          "Structured /clinician/vetting is now a focused572px three-step wizard: qualifications, experience, review. Back retains fields; saved drafts resume; repeated save and submit retain one application without approval, real backend at9254a65. Current matched screenshots use read-only existing fixture after20/20 SMS budget enforcement. Prototype has five total onboarding steps and inline uploads; operational per-scope form retains mandatory category/institution/jurisdiction and revisioned evidence below. Initial signup composition and fuller reference summary still need correction; not visually accepted.",
+          "c0d911d initial B10 professional/scope panels inspected. Actual answers and pending document icon; real two contact-proof onboarding and structured draft/submission under explicit loopback test budget100 restored20. Full typed five-stage initial application/inline evidence remains different; not native/owner accepted."
         ],
         "viewports": [
           390,
@@ -2115,7 +2119,8 @@
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
         "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
-        "current_2026_10_11": "docs/screenshots/mvp-current/b87d843-application-progress/result.json"
+        "current_2026_10_11": "docs/screenshots/mvp-current/b87d843-application-progress/result.json",
+        "pending_account_current": "docs/screenshots/mvp-current/bf3d63c-pending-account/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "B11",
@@ -2151,7 +2156,8 @@
           "docs/screenshots/mvp-current/b87d843-application-progress/B11-pending-application-1440.png"
         ],
         "comparison_notes": [
-          "Compared named English desktop/mobile pending state: reference title, review timeline and service-decisions panels retained. Demo ribbon and non-overlapping optional tour are operational additions. No fabricated credential-review events or approved scopes; empty per-scope record stays honest. Populated/Rejected/clarification and language/zoom still pending."
+          "Compared named English desktop/mobile pending state: reference title, review timeline and service-decisions panels retained. Demo ribbon and non-overlapping optional tour are operational additions. No fabricated credential-review events or approved scopes; empty per-scope record stays honest. Populated/Rejected/clarification and language/zoom still pending.",
+          "4371be4 fixes pending own-profile save403 without approval grant; d376568 hides unavailable practice links, bf3d63c makes their names concise. Actual same-name Save200/reload, no clinical navigation and direct appointments403 passed390/768/1440."
         ],
         "viewports": [
           390,
@@ -2833,7 +2839,9 @@
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C04) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "presentation_checkpoint": "Preview full-profile route and approved offering booking link passed; full profile acceptance pending. See docs/mvp-journey-verification-2026-10-09.md."
+        "presentation_checkpoint": "Preview full-profile route and approved offering booking link passed; full profile acceptance pending. See docs/mvp-journey-verification-2026-10-09.md.",
+        "profile_current": "docs/screenshots/mvp-current/9308b30-professional-profile/result.json",
+        "selected_offering": "docs/screenshots/mvp-current/d82948a-patient-profile/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "C04",
@@ -2849,7 +2857,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Meet your clinician heading; actual approved offering. Rich public professional biography/approaches/affiliation incomplete.",
+        "current_differences": "Real introduction added; selected discovery offering survives profile/reload and backend validates availability. No invented expertise years, qualification, affiliation, ratings or portrait. Fuller reference public expertise/affiliation composition and other states remain.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -2859,16 +2867,19 @@
         ],
         "correction_status": "Implemented correction; remaining differences recorded",
         "reference_screenshots": [
-          "docs/screenshots/mvp-presentation-current/C04-reference-1440.png",
-          "docs/screenshots/mvp-presentation-current/C04-reference-390.png",
-          "docs/screenshots/mvp-presentation-current/C04-reference-768.png"
+          "docs/screenshots/mvp-current/9308b30-professional-profile/C04-reference-390.png",
+          "docs/screenshots/mvp-current/9308b30-professional-profile/C04-reference-768.png",
+          "docs/screenshots/mvp-current/9308b30-professional-profile/C04-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-presentation-current/C04-application-1440.png",
-          "docs/screenshots/mvp-presentation-current/C04-application-390.png",
-          "docs/screenshots/mvp-presentation-current/C04-application-768.png"
+          "docs/screenshots/mvp-current/9308b30-professional-profile/C04-application-390.png",
+          "docs/screenshots/mvp-current/9308b30-professional-profile/C04-application-768.png",
+          "docs/screenshots/mvp-current/9308b30-professional-profile/C04-application-1440.png"
         ],
-        "comparison_notes": "Current report and evidence README; visual and functional acceptance independent.",
+        "comparison_notes": [
+          "Current report and evidence README; visual and functional acceptance independent.",
+          "9308b30: authored public introduction, regular-weight values, identity/icon practice rows and expandable private evidence. English matched pairs inspected; no whole-screen/owner acceptance. Initials and withheld credentials preserve truthful evidence."
+        ],
         "viewports": [
           390,
           768,
@@ -2917,7 +2928,7 @@
           }
         ],
         "expected_next_states": "Discovery → EligibleOffering → GeneratedSlot → DisclosureSnapshot → Price/PolicyReview → AtomicReservation → Booked or PendingConfirmation; conflicts fail without partial writes.",
-        "functional_status": "Focused persisted journey verified; complete screen/state acceptance pending",
+        "functional_status": "Functionally verified for named owner introduction/save/reload and separate patient query; other states retained",
         "functional_failures": "Actual published-service selection, booking sidebar, separate session-experience facts. Public biography/verified expertise and coherent presentation content remain incomplete.",
         "implementation_files": [
           "frontend/src/pages/OpenRequests.tsx",
@@ -2938,10 +2949,10 @@
         "verification_evidence_note": "2026-10-10 dedicated presentation-site check; retained original fixtures untouched."
       },
       "completion": {
-        "functional": "Implemented but unverified",
+        "functional": "Functionally verified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Meet your clinician heading; actual approved offering. Rich public professional biography/approaches/affiliation incomplete.",
+        "remaining_action": "Finish truthful expertise/affiliation composition and status/owner comparisons. Selected offering, introduction and booking context verified.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (C04) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
@@ -9884,7 +9895,9 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H02) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "profile_current": "docs/screenshots/mvp-current/9308b30-professional-profile/result.json",
+        "profile_accessibility": "docs/screenshots/mvp-current/9308b30-profile-accessibility/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "H02",
@@ -9900,10 +9913,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": [
-          "Reference portrait/public introduction and fuller professional editing remain incomplete.",
-          "Actual professional name, multiple care languages, private PDF resume and practice/affiliation links are connected. No fabricated credentials."
-        ],
+        "current_differences": "Introduction persisted. Identity summary and icon practice rows corrected. Multiple care languages instead of one primary language; optional evidence progressive. Initials instead of invented portrait; shell/presence/tour/settings navigation adds spacing. Other states/owner review pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -9913,29 +9923,30 @@
         ],
         "correction_status": "Reference composition ported; comparison recorded; remaining fields/states not accepted",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/H02-reference-390.png",
-          "docs/screenshots/mvp-connected-journeys/H02-reference-768.png",
-          "docs/screenshots/mvp-connected-journeys/H02-reference-1440.png"
+          "docs/screenshots/mvp-current/9308b30-professional-profile/H02-reference-390.png",
+          "docs/screenshots/mvp-current/9308b30-professional-profile/H02-reference-768.png",
+          "docs/screenshots/mvp-current/9308b30-professional-profile/H02-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/H02-application-390.png",
-          "docs/screenshots/mvp-connected-journeys/H02-application-768.png",
-          "docs/screenshots/mvp-connected-journeys/H02-application-1440.png"
+          "docs/screenshots/mvp-current/9308b30-professional-profile/H02-application-390.png",
+          "docs/screenshots/mvp-current/9308b30-professional-profile/H02-application-768.png",
+          "docs/screenshots/mvp-current/9308b30-professional-profile/H02-application-1440.png"
         ],
         "comparison_notes": [
           "Reference portrait/public introduction and fuller professional editing remain incomplete.",
-          "Actual professional name, multiple care languages, private PDF resume and practice/affiliation links are connected. No fabricated credentials."
+          "Actual professional name, multiple care languages, private PDF resume and practice/affiliation links are connected. No fabricated credentials.",
+          "9308b30: authored public introduction, regular-weight values, identity/icon practice rows and expandable private evidence. English matched pairs inspected; no whole-screen/owner acceptance. Initials and withheld credentials preserve truthful evidence."
         ],
         "viewports": [
           390,
           768,
           1440
         ],
-        "zoom_200_percent": "Not verified",
+        "zoom_200_percent": "Actual Chromium tabs.setZoom2 outer1440/inner720,DPR2,scale1; PNG1440; inspected but scroll anchors differ, remaining capture limitation",
         "languages": {
-          "en": "Comparison pending",
-          "am": "Layout pending; native review required",
-          "om": "Layout pending; native review required"
+          "en": "Paired inspected; differences remain",
+          "am": "320/390/768/1440 rendered/inspected and Noto glyph check; stale Affiliation override fixed; native review pending",
+          "om": "320/390/768/1440 rendered/inspected; native review pending"
         },
         "functional_verification": [
           "scripts/check_mvp_account_browser.py: real authenticated backend saves and reloads; account-state persistence checked in MariaDB.",
@@ -9972,7 +9983,7 @@
         },
         "expected_actions": [],
         "expected_next_states": "Profile/Preferences saved independently; privacy defaults are not mutated by booking overrides; tour dismissed/completed state is versioned.",
-        "functional_status": "Locally verified profile/defaults/preferences slice; remaining capabilities pending",
+        "functional_status": "Functionally verified for named owner introduction/save/reload and separate patient query; other states retained",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Account.tsx",
@@ -10009,12 +10020,12 @@
         "evidence_source": "7aa1ea939c94530f4ea7061051efd58239e416a0"
       },
       "completion": {
-        "functional": "Implemented but unverified",
+        "functional": "Functionally verified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
         "remaining_action": [
-          "Reference portrait/public introduction and fuller professional editing remain incomplete.",
-          "Actual professional name, multiple care languages, private PDF resume and practice/affiliation links are connected. No fabricated credentials."
+          "Remaining error/loading/resume states and shell spacing comparison; owner visual acceptance.",
+          "Profile/save/private resume/practice links connected. Multi-language care eligibility and withholding unverified qualifications are truthful operational deviations."
         ],
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H02) and design-handoff.md",
@@ -15281,7 +15292,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
-  "current_packaged_source": "b87d843de0827d3d4d80b8717fe0995d64346ef6",
+  "current_packaged_source": "9308b303ca5a7c243eed84aa063960dd76f8c69d",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15293,7 +15304,7 @@
     "site": "teletena-mvp-presentation.localhost",
     "bench": "/home/frappe/frappe/frappe-bench",
     "branch": "feat/mvp-release-handover",
-    "build_source": "b87d843de0827d3d4d80b8717fe0995d64346ef6",
+    "build_source": "9308b303ca5a7c243eed84aa063960dd76f8c69d",
     "date": "2026-10-11",
     "report": "docs/mvp-journey-verification-2026-10-09.md",
     "note": "Compatibility Bench is separate and not serving this URL. Evidence/docs-only commits may differ; compare runtime diff before rebuilding."
@@ -15338,11 +15349,11 @@
   "completion_gates": {
     "preview_reboot_and_pwa": {
       "status": "Functionally verified",
-      "evidence": "scripts/local_review.py; browser-preview-recovery.cjs existing-session update passed at48f7da9; Windows curl.exe200; no original-site changes"
+      "evidence": "scripts/local_review.py; browser-preview-recovery.cjs existing-session update passed at48f7da9; Windows curl.exe200; no original-site changes bf3d63c existing-session update passed after correcting test navigation to wait for actual controller-change reload; hashes/deep links/403/cache exclusions passed. Later changes do not modify update/worker behavior."
     },
     "registration_browser": {
       "status": "Functionally verified",
-      "evidence": "Full real-DB random-code browser run at a001e62: wrong/expired/resend/new/returning/clinician intent. Focused fb94c29 repeats new patient/clinician recovery, private resume, searchable multi-scope persistence without approval; wrong/expiry/cooldown/returning not repeated. Site settings restored and captured codes removed; no live SMS. Structured actual draft/reload/resume/repeat-save/submission passes at9254a65; current layout-only continuation uses existing authenticated fixture after site send budget20/20, no limit reset or send. Last random-code attempt was rejected before onboarding and retained as an enforced-budget result."
+      "evidence": "Full real-DB random-code browser run at a001e62: wrong/expired/resend/new/returning/clinician intent. Focused fb94c29 repeats new patient/clinician recovery, private resume, searchable multi-scope persistence without approval; wrong/expiry/cooldown/returning not repeated. Site settings restored and captured codes removed; no live SMS. Structured actual draft/reload/resume/repeat-save/submission passes at9254a65; current layout-only continuation uses existing authenticated fixture after site send budget20/20, no limit reset or send. Last random-code attempt was rejected before onboarding and retained as an enforced-budget result. c0d911d focused real random-code recovery/review/draft submission passed under explicit loopback test send budget100 then restored20; no counter reset/live send. Prior full a001 wrong/expiry/cooldown/returning evidence retained."
     },
     "presentation_data": {
       "status": "Functionally verified",
@@ -15366,7 +15377,7 @@
     },
     "fresh_latest_schema": {
       "status": "Blocked by stated external dependency",
-      "action": "Fresh v1.33 passed previously. Fresh v1.34/v1.35 table additions not yet freshly installed; normal user needs one scoped temporary DB-admin helper because sudo -n requires local authentication. No root auth change."
+      "action": "Latest v1.36 fresh installation pending scoped DB administration. Fixed schema.install missing explicit v1.34/v1.35 bootstrap; fresh assertions now include these tables and public introduction. Existing-site native repeats preserve54tables on both named sites; not fresh-install evidence."
     },
     "whole_mvp_visual": {
       "status": "Implementation in progress",

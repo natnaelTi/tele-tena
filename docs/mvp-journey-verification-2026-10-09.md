@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **b87d843de0827d3d4d80b8717fe0995d64346ef6**. Later report/evidence-only commits
+  **9308b303ca5a7c243eed84aa063960dd76f8c69d**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -35,6 +35,83 @@ screen/completion matrix; the sections below this active checkpoint are historic
 | Financial preservation | Named presentation-site backup with private/public files, scoped stop retaining queue, native migration throughv1.35. Exact wallets, all legacy events/journals/lines, earnings and reconciliation-values fingerprint unchanged. New tables do not rewrite historical notes/consents. Read-only owner check:3patients,1clinician,6accounts, zero projection/obligation/journal/balance errors |
 | Native background jobs | Current scheduler/worker automatically execute release, invitation expiry, request expiry and extension expiry (Scheduled Job Logs Complete), queue contains only intended site jobs. Fixed native scheduler_interval10→60 while keeping tick10: Frappe converted sub-minute All intervals to invalid */0 cron steps. No framework modification. `verify_continuous_processing.py` observed one release posting and a disputed hold; original short policy applies only to its2owned encounters. Prior worker-down enqueue/restart evidence retained |
 | Frontend/syntax | Locked package build, TypeScript, lint exit0; existing large-chunk/lint warnings retained. Python syntax checks passed. No full unchanged individual hosted suite repeated |
+
+## Current professional profile and patient handoff — 11 October
+
+This checkpoint closes named defects, not whole-MVP visual or owner acceptance.
+Source/build9308b30; API behavior unchanged since467f755 apart from the explicit
+presentation seed helper. Web50748, worker50742, native scheduler50744,
+loopback queue13917 Redis10747; only presentation services were stopped/restarted.
+Original ERP site and Selfmade were not migrated, seeded or restarted.
+
+- **Pending own-profile403:** real valid-name browser save failed because approved
+  Clinician role was required for even an existing applicant-owned profile.4371be4
+  permits Applicant+existing own clinician profile; cannot create or change kind,
+  grant approval/scopes or edit another user. Same-name Save200, roles unchanged,
+  direct appointments403 and reload passed390/768/1440. Removed pending Earnings /
+  Services / Availability links that led to protected403; applications remain accessible.
+- **H02/C04 introduction:** optional2000-character explicit public content, owner
+  editable and only approved public clinician query exposes it. No history or
+  vetting evidence copied. Omitted field preserves content; empty explicitly clears.
+  React renders plain text; other patient/profile fields never publicly returned.
+  Separate clinician save/reload and patient context passed. New seed content only
+  applies to newly created fictional profiles; setup is not rerun to rewrite records.
+- **Four matched-site real DB regressions:**9.029s, owner introduction/validation/
+  private-field omission/pending/Guest denial; pending existing profile; original
+  booking retry after profile changes; defaults versus booking overrides. Earlier
+  retry401 was fixture DBpr12 versus HTTPpresentation8017; corrected owned8028 on
+  SAMEpr12, no weakened assertion/credential changes. Temporary server stopped.
+- **Two native migrations each, v1.36:** backed up DB/private/public files first;
+  compared old columns of ALL54existing command tables:667presentation and3921
+  pr12 rows unchanged, no inferred introduction. Initial harness incorrectly used
+  DocType column helper on rawtt tables; failed BEFORE migration, corrected to
+  SHOW COLUMNS. Native upgrade/repeat then passed. Found/fixed fresh bootstrap
+  omissions forv1.34/v1.35. Freshv1.36 remains blocked on scoped DB administration;
+  existing migration is not a fresh-install pass.
+- **Selected offering lost:** actual390 browser selecting the second individual
+  offering failed full-profile selection againstbf3d63c; default was first/couples.
+  d82948a carries only opaque PUBLIC offering context via router state, revalidated
+  in current authorized services. Full real Home→discovery→preview/focus→profile /
+  reload→generated calendar→disclosure/review/Back passes390/768/1440. No booking
+  submission/financial mutation in this read-only test. Earlier calendar fixture
+  accidentally asserted individual review on first/couples offering; corrected to
+  selected individual path, not relaxed couples consent.
+- **Paired visuals:** current H02/C04 English390/768/1440 inspected; restored own
+  identity summary, icon/description practice links, compact multiple languages,
+  expandable private evidence, regular-weight form values. Still different: no
+  invented portrait/qualifications/affiliation/ratings; fuller expertise/affiliation,
+  shell spacing and remaining state comparisons need work/owner review.
+- **Keyboard/languages/zoom:** actual profile Tab order,320/390/768/1440 Amharic and
+  Oromo rendered; Noto glyph availability checked. Removed stale dictionary entry
+  overriding Amharic Affiliations with Oromo; added Services/pricing translations.
+  Real Chromium tabs.setZoom2 outer1440/inner720/DPR2/scale1; native viewport PNG
+  width1440. Intro zoom scroll anchors differ and should be improved before final
+  paired-image acceptance. Reference is English; local language rendering is not
+  same-language reference fidelity or native approval. User-authored intro is not
+  automatically translated; no medical text sent to translation services.
+- **PWA:** actual existing browser bf3d63c update passed; test originally attempted
+  next navigation before controller-change reload and got ERR_ABORTED. Wait for
+  real navigation fixed test orchestration; no service-worker assertion removed.
+  Offline Try again, password/deep links/refresh, guest/unrelated403, asset hashes /
+  sensitive cache exclusion pass. Current9308b30 hash/private scan7passed; no
+  Vite or credentials embedded. Build/TypeScript/lint exit0 (existing warnings);
+  syntax and3dependency-checks plus worker-cache tests pass. One concurrent local
+  build/npm-ci attempt lacked Vite; clean sequential locked packaging then passed.
+- **Registration:** c0d911d real two-account contact proof, recovery/private PDF /
+  scope draft/reload/resume/repeat-save/submission and initialB10panels. Explicit
+  LOOPBACK test cap100 restored original20; no phone/IP/day counters reset, no live
+  SMS. Focused result correctly does not claim wrong/expiry/resend/returning repeats;
+  unchanged full a001 evidence retained. Historical application/service pointer
+  mismatch still preserved and documented; no record deleted or reclassified.
+
+Evidence: `docs/screenshots/mvp-current/9308b30-professional-profile/`,
+`9308b30-profile-accessibility/`, `d82948a-patient-profile/`,
+`bf3d63c-pending-account/`, `c0d911d-onboarding-review/`, and safe hashes/results in
+`docs/verification/mvp-current/`. The single matrix retains ALL99MVP entries.
+Latest fresh schema, whole-product visual/state work and integrated candidate
+acceptance remain open. Hosted411c293 couples/token evidence retained unchanged;
+no full hosted suite repeated for profile-only work. No physical-device/live
+SMS/email/native-language/owner/real-money or remote-deployment pass claimed.
 
 ## Public entry, registration and shared-calendar continuation
 

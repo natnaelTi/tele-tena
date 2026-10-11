@@ -4,7 +4,19 @@
 
 The user bounded this handover to the agreed MVP and its redesign. Preserve the entire 142-screen reference, but use `mvp-release-scope.md` and `mvp-screen-acceptance.json` for release acceptance. Two-adult couples consultations are required; full clinic/lab/subscription/second-opinion/tourism expansion and no-show adjudication are deferred. The current release is not ready. Prior entries below are historical checkpoint evidence, not current-release completion claims.
 
-## Current verification delta — 2026-10-08
+## Current local MVP delta — 2026-10-11
+
+Draft PR44 retains PR43 ancestry; packaged9308b30 on
+teletena-mvp-presentation.localhost at http://127.0.0.1:8017/teletena/.
+Named profile/permission/navigation defects fixed; selected offering persists
+through discovery/profile/reload/calendar/disclosure. Real DB4/4 and additive
+repeat migrations preserve existing records. Profile paired/reference, narrow
+language and actual200% zoom evidence is recorded. Whole-MVP visual/state,
+freshv1.36 and owner acceptance remain open. Live delivery, physical devices,
+clinical/native review and real-money activation are external gates. No merge or
+remote deployment. See mvp-screen-acceptance.json and the active journey report.
+
+## Historical verification delta — 2026-10-08
 
 - Draft PR #42 (`feat/clinic-shared-calendar`) is stacked on PR #41 → PR #40;
   all PR #42 checks passed. No merge or deployment occurred.

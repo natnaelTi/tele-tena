@@ -10,6 +10,12 @@ Python3.14.2, Node24.13.0, MariaDB10.6.22 and Redis6.0.16. See
 differences. This does not authorize upgrading the retained development bench or
 changing shared remote dependencies.
 
+Profile v1.36 adds one nullable introduction column in versioned command storage;
+owner commands validate type/length and retain existing content when omitted.
+The patient-facing approved-profile projection exposes only explicit public
+content. Fresh bootstrap now invokes v1.34/v1.35/v1.36 routines; native migration
+preservation passed on the named local sites, latest fresh install still pending.
+
 React + TypeScript + Vite talks to a dedicated custom Frappe application. ERPNext
 provides accounting. Frappe RQ workers and scheduler handle jobs. No Django or Celery.
 MariaDB and framework versions must match the user's isolated WSL bench; do not upgrade
