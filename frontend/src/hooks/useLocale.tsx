@@ -693,6 +693,7 @@ const words: Record<string, [string, string]> = {
   "Follow-up sharing history": ["የክትትል ማጋራት ታሪክ", "Seenaa qoodinsa hordoffii"],
   "Your individual follow-up": ["የእርስዎ የግል ክትትል", "Hordoffii dhuunfaa kee"],
   "Shared only with you": ["ለእርስዎ ብቻ የተጋራ", "Siif qofa qoodame"],
+  "Request routing activity": ["የጥያቄ ስርጭት መረጃ", "Odeeffannoo raabsaa gaaffii"],
   "Matching operations": ["የማዛመድ ክትትል", "Hordoffii walitti simsiisuu"],
   "Understand matching without exposing request content.": ["የጥያቄውን ይዘት ሳያሳዩ ማዛመዱን ይከታተሉ።", "Qabiyyee gaaffii osoo hin saaxilin walitti simsiisuu hubadhu."],
   "Matching activity could not be loaded.": ["የማዛመድ መረጃን ማሳየት አልተቻለም።", "Odeeffannoo walitti simsiisuu fe’uun hin danda’amne."],

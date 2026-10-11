@@ -42,7 +42,11 @@
 .review-overview-metrics.compact p { font-size:14px; }
 .matching-operations .review-queue-filters { grid-template-columns:minmax(220px,320px) auto; justify-content:start; align-items:end; }
 .matching-operations .review-queue-filters .button { height:48px; }
-.matching-operations .review-queue-table td { padding:14px; }
-.matching-operations .review-queue-table .supporting { margin:6px 0 0; }
-.matching-operations .review-queue-table td details { margin-top:0; }
+.matching-operations .matching-table td { padding:14px; }
+.matching-operations .matching-table .supporting { margin:6px 0 0; }
+.matching-operations .matching-table td details { margin-top:0; }
 @media(max-width:600px) { .matching-operations .review-queue-filters { grid-template-columns:minmax(0,1fr) auto; } }
+
+.matching-table { display:block; overflow-x:auto; }
+.matching-table table { font-size:14px; min-width:680px; }
+.matching-table th { background:var(--canvas); color:var(--muted); }
