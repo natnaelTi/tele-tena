@@ -117,9 +117,13 @@ let stage = "launch";
     stage = "pending professional settings navigation";
     await page.getByRole('button',{name:'Professional profile & practice',exact:true}).click();
     for (const label of ['Services and pricing','Availability','Earnings']) {
-      assert.equal(await page.getByRole('link',{name:label,exact:true}).count(),0);
+      const count=await page.getByRole('link',{name:label,exact:true}).count();
+      console.log('Pending practice link '+label+': '+count);
+      assert.equal(count,0);
     }
-    assert.equal(await page.getByRole('link',{name:'Application & credentials',exact:true}).count(),1);
+    const applicationLink=page.getByRole('link',{name:'Application & credentials',exact:true});
+    console.log('Pending application link count: '+await applicationLink.count());
+    assert.equal(await applicationLink.count(),1);
     await page.goto(base+'/clinician/account');
     await page.getByRole('heading',{name:'Your account',exact:true}).waitFor();
     stage = "pending own profile save";
