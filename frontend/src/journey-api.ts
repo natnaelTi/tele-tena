@@ -52,7 +52,7 @@ export const journeyApi = {
   respondToReschedule: (appointment:string,proposal:string,decision:'accept'|'decline') => api<any>('tele_tena.api.presentation.respond_to_reschedule',{appointment,proposal,decision},true),
   withdrawReschedule: (appointment:string,proposal:string) => api<any>('tele_tena.api.presentation.withdraw_reschedule',{appointment,proposal},true),
   respondToRequest: (appointment: string, decision: 'confirm'|'decline') => api('tele_tena.api.presentation.respond_to_request', { appointment, decision }, true),
-  saveNoteDraft: (appointment: string, private_note: string, patient_summary: string, share_note = false, summary_recipients?:string[]) => api('tele_tena.api.presentation.save_note_draft', { appointment, private_note, patient_summary, share_note, summary_recipients }, true),
+  saveNoteDraft: (appointment: string, private_note: string, patient_summary: string, share_note = false, summary_recipients?:string[], followup_text?:string, followup_recipient?:string) => api('tele_tena.api.presentation.save_note_draft', { appointment, private_note, patient_summary, share_note, summary_recipients, followup_text, followup_recipient }, true),
   previewSummary: (appointment: string, summary?:string) => api<{revision:number;summary:string}>('tele_tena.api.presentation.preview_patient_summary', { appointment, summary }, true),
   finalizeConsultation: (appointment: string, publish_summary: boolean, publish_note = false) => api('tele_tena.api.presentation.finalize_consultation', { appointment, publish_summary, publish_note }, true),
   submitSessionFeedback: (appointment:string,rating:number) => api('tele_tena.api.trust.submit_session_feedback',{appointment,rating},true),

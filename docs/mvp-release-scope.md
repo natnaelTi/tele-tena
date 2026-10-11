@@ -183,3 +183,13 @@ Consent withdrawal prevents new changes and starts the existing closure/hold or
 pre-start cancellation path. No automatic penalty or financial settlement is
 introduced. These are implemented changes pending current regression/browser
 verification; no acceptance is inferred from this policy text.
+
+### Individual adult follow-up — v1.35
+
+The N07 documentation form includes a separate optional follow-up message for one
+consenting adult. Drafts remain clinician-only. Explicit finalization publishes
+the message to that adult only, with immutable revision/recipient history; the
+other adult, unrelated clinicians and vetting reviewers receive no message.
+An amendment retains previously published content. This does not create another
+charge or earning. Existing summaries, clinical notes and historical records are
+not rewritten. New Amharic/Afaan Oromo copy is provisional pending human review.

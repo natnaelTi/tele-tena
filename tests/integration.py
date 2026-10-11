@@ -172,6 +172,7 @@ class Integration(unittest.TestCase):
                                     (tuple(USERS.values()),), pluck=True)
         remove_owned_financial_fixtures(account_ids)
         for appointment in appointment_ids:
+            frappe.db.sql('DELETE FROM tt_note_followup WHERE appointment=%s', (appointment,))
             frappe.db.sql('DELETE FROM tt_note_revision WHERE appointment=%s', (appointment,))
             frappe.db.sql('DELETE FROM tt_consultation_note WHERE appointment=%s', (appointment,))
             frappe.db.sql('DELETE FROM tt_appointment_event WHERE appointment=%s', (appointment,))

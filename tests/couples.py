@@ -13,7 +13,7 @@ base = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(base)
 import frappe
 from tele_tena.api import couples, journey, presentation, consultations, clinic_access
-from tele_tena.patches import v1_33_couples_consultations, v1_34_shared_change_consent
+from tele_tena.patches import v1_33_couples_consultations, v1_34_shared_change_consent, v1_35_individual_followup
 
 
 class Couples(unittest.TestCase):
@@ -29,6 +29,7 @@ class Couples(unittest.TestCase):
         base.Presentation.setUpClass.__func__(cls)
         v1_33_couples_consultations.execute()
         v1_34_shared_change_consent.execute()
+        v1_35_individual_followup.execute()
         base.fixtures.login('admin')
         service = frappe.get_doc('Tele Tena Service', base.fixtures.PREFIX)
         service.participant_structure = 'couple'
@@ -305,6 +306,47 @@ class Couples(unittest.TestCase):
         self.assertEqual(journey.rows('SELECT id FROM tt_earning WHERE appointment=%s',(appointment,)), [])
         with self.assertRaises(frappe.ValidationError):
             consultations.join(appointment)
+
+    def test_individual_followup_draft_and_amendment_are_recipient_scoped(self):
+        invitation, appointment, _, _ = self.consented_plan()
+        base.fixtures.login('c1')
+        recipient = next(p.id for p in couples.participants(invitation['id']) if p.user == base.fixtures.USERS['p2'])
+        with patch.object(consultations, '_window', return_value=True), patch('tele_tena.livekit._credentials', return_value=('wss://example.invalid','key','secret')), patch('tele_tena.livekit.participant_token', return_value='private-test-token'):
+            consultations.join(appointment)
+        with patch('tele_tena.livekit.close_room'):
+            consultations.end(appointment)
+        with self.assertRaises(frappe.ValidationError):
+            presentation.save_note_draft(appointment,'Private','',followup_text='Private next step')
+        with self.assertRaises(frappe.ValidationError):
+            presentation.save_note_draft(appointment,'Private','',followup_text='Private next step',followup_recipient='unknown')
+        first = presentation.save_note_draft(appointment,'Private','',followup_text='Private next step',followup_recipient=recipient)
+        self.assertTrue(presentation.save_note_draft(appointment,'Private','',followup_text='Private next step',followup_recipient=recipient)['idempotent'])
+        base.fixtures.login('p2')
+        self.assertEqual(presentation.appointment_detail(appointment)['individual_followup_revisions'], [])
+        base.fixtures.login('c1')
+        # Omitted optional fields from an older client preserve the saved content.
+        self.assertTrue(presentation.save_note_draft(appointment,'Private','')['idempotent'])
+        self.assertEqual(presentation.appointment_detail(appointment)['private_note']['revision'],first['revision'])
+        presentation.finalize_consultation(appointment)
+        presentation.finalize_consultation(appointment)
+        base.fixtures.login('p1')
+        self.assertNotIn('Private next step', json.dumps(presentation.appointment_detail(appointment),default=str))
+        base.fixtures.login('p2')
+        visible = presentation.appointment_detail(appointment)['individual_followup_revisions']
+        self.assertEqual(len(visible),1)
+        self.assertEqual(visible[0]['text'],'Private next step')
+        self.assertNotIn('private_note',presentation.appointment_detail(appointment))
+        base.fixtures.login('c1')
+        presentation.save_note_draft(appointment,'Private','',followup_text='Amended next step',followup_recipient=recipient)
+        presentation.finalize_consultation(appointment)
+        base.fixtures.login('p2')
+        self.assertEqual([r['text'] for r in presentation.appointment_detail(appointment)['individual_followup_revisions']],['Private next step','Amended next step'])
+        self.assertEqual(len(journey.rows('SELECT id FROM tt_earning WHERE appointment=%s',(appointment,))),1)
+        base.fixtures.login('c2')
+        with self.assertRaises(frappe.PermissionError):
+            presentation.appointment_detail(appointment)
+        v1_35_individual_followup.execute()
+        self.assertEqual(len(journey.rows('SELECT revision FROM tt_note_followup WHERE appointment=%s AND published=1',(appointment,))),2)
 
     def test_couple_withdrawal_before_start_releases_once(self):
         invitation, appointment, _, _ = self.consented_plan()

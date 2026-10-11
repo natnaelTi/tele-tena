@@ -481,6 +481,7 @@ def appointment_detail(appointment):
         selected['reservation_state'] = 'Reserved'
     else:
         selected['reservation_state'] = 'Unavailable'
+    selected['individual_followup_revisions'] = []
     if role == 'patient':
         clinician = one('SELECT display_name FROM tt_profile WHERE user=%s AND kind=%s',
                         (item.clinician, 'clinician'))
@@ -497,6 +498,14 @@ def appointment_detail(appointment):
         # Critically, this SELECT never reads private_note.
         revisions = rows('''SELECT revision,patient_summary,created FROM tt_note_revision
             WHERE appointment=%s AND summary_published=1 AND (%s=0 OR EXISTS (SELECT 1 FROM tt_note_recipient nr JOIN tt_couple_participant cp ON cp.id=nr.participant WHERE nr.appointment=tt_note_revision.appointment AND nr.revision=tt_note_revision.revision AND cp.user=%s AND cp.state='Consented')) ORDER BY revision''', (item.id,int(bool(shared_plan)),user))
+        selected['individual_followup_revisions'] = [
+            {'revision': r.revision, 'text': r.content, 'published_at': iso(r.created)}
+            for r in rows('''SELECT f.revision,f.content,n.created
+                FROM tt_note_followup f JOIN tt_note_revision n
+                ON n.appointment=f.appointment AND n.revision=f.revision
+                JOIN tt_couple_participant cp ON cp.id=f.recipient
+                WHERE f.appointment=%s AND f.published=1 AND cp.user=%s
+                AND cp.state='Consented' ORDER BY f.revision''', (item.id,user))]
         # Only explicitly published revision text crosses the patient boundary.
         shared_notes = rows('''SELECT revision,private_note AS shared_text,created FROM tt_note_revision
             WHERE appointment=%s AND note_published=1 AND (%s=0 OR EXISTS (SELECT 1 FROM tt_note_recipient nr JOIN tt_couple_participant cp ON cp.id=nr.participant WHERE nr.appointment=tt_note_revision.appointment AND nr.revision=tt_note_revision.revision AND cp.user=%s AND cp.state='Consented')) ORDER BY revision''', (item.id,int(bool(shared_plan)),user))
@@ -524,6 +533,17 @@ def appointment_detail(appointment):
                     'summary_recipients': json.loads(current[0].recipient_ids or '[]'),
                     'author': 'You' if current[0].author == user else 'Treating clinician',
                 }
+        if selected.get('private_note'):
+            followup = rows('SELECT recipient,content FROM tt_note_followup WHERE appointment=%s AND revision=%s',
+                            (item.id,note[0].current_revision))
+            selected['private_note']['individual_followup'] = (
+                {'recipient': followup[0].recipient, 'text': followup[0].content} if followup else None)
+        selected['individual_followup_history'] = [
+            {'revision': r.revision, 'recipient': r.recipient, 'text': r.content, 'published_at': iso(r.created)}
+            for r in rows('''SELECT f.revision,f.recipient,f.content,n.created
+                FROM tt_note_followup f JOIN tt_note_revision n
+                ON n.appointment=f.appointment AND n.revision=f.revision
+                WHERE f.appointment=%s AND f.published=1 ORDER BY f.revision''', (item.id,))]
         selected['prior_shared_revisions'] = [
             {'revision': r.revision, 'published_at': iso(r.created),
              'note_published': bool(r.note_published), 'summary_published': bool(r.summary_published)}
@@ -533,7 +553,7 @@ def appointment_detail(appointment):
 
 
 @frappe.whitelist(methods=['POST'])
-def save_note_draft(appointment, private_note, patient_summary, share_note=0, summary_recipients=None):
+def save_note_draft(appointment, private_note, patient_summary, share_note=0, summary_recipients=None, followup_text=None, followup_recipient=None):
     clinician = actor('Tele Tena Clinician')
     if share_note not in (True, False, 0, 1, '0', '1'):
         fail('Choose whether to share the consultation note')
@@ -551,12 +571,26 @@ def save_note_draft(appointment, private_note, patient_summary, share_note=0, su
     recipients = recipient_ids(item.id, [] if summary_recipients is None else summary_recipients)
     existing = rows('SELECT status,current_revision FROM tt_consultation_note WHERE appointment=%s FOR UPDATE',
                      (item.id,))
+    previous_followup = rows('SELECT recipient,content FROM tt_note_followup WHERE appointment=%s AND revision=%s',
+                             (item.id,existing[0].current_revision)) if existing else []
+    # Older clients omit these optional fields; preserve an existing draft rather
+    # than silently removing independently recipient-scoped content.
+    followup_text = text(previous_followup[0].content if followup_text is None and previous_followup else followup_text or '', 6000, required=False)
+    followup_recipient = previous_followup[0].recipient if followup_recipient is None and previous_followup else followup_recipient or ''
+    if followup_text:
+        if not followup_recipient:
+            fail('Choose the adult who will receive the follow-up.', 'followup_recipient_required')
+        recipient_ids(item.id,[followup_recipient])
+    else:
+        followup_recipient = ''
     if existing:
         previous = one('SELECT private_note,patient_summary,note_share_selected,recipient_ids FROM tt_note_revision WHERE appointment=%s AND revision=%s',
                        (item.id, existing[0].current_revision))
         if (previous.private_note == private_note and previous.patient_summary == patient_summary
                 and bool(previous.note_share_selected) == share_selected
-                and json.loads(previous.recipient_ids or '[]') == recipients):
+                and json.loads(previous.recipient_ids or '[]') == recipients
+                and (previous_followup[0].content if previous_followup else '') == followup_text
+                and (previous_followup[0].recipient if previous_followup else '') == followup_recipient):
             return {'status': existing[0].status, 'revision': int(existing[0].current_revision), 'idempotent': True}
     revision = (int(existing[0].current_revision) if existing else 0) + 1
     now = datetime.now(timezone.utc).replace(tzinfo=None)
@@ -564,6 +598,9 @@ def save_note_draft(appointment, private_note, patient_summary, share_note=0, su
         (id,appointment,clinician,revision,private_note,patient_summary,summary_published,note_share_selected,recipient_ids,author,created)
         VALUES (%s,%s,%s,%s,%s,%s,0,%s,%s,%s,%s)''',
         (str(uuid.uuid4()), item.id, clinician, revision, private_note, patient_summary, int(share_selected), json.dumps(recipients), clinician, now))
+    if followup_text:
+        frappe.db.sql('INSERT INTO tt_note_followup (appointment,revision,recipient,content,published) VALUES (%s,%s,%s,%s,0)',
+                      (item.id,revision,followup_recipient,followup_text))
     if existing:
         frappe.db.sql("UPDATE tt_consultation_note SET status='Draft',current_revision=%s,modified=%s WHERE appointment=%s",
                       (revision, now, item.id))
@@ -634,6 +671,10 @@ def finalize_consultation(appointment, publish_summary=0, publish_note=0):
         fail('Add a consultation note before publishing it', 'note_required')
     if publish and not current.patient_summary.strip():
         fail('Add a patient summary before publishing it', 'summary_required')
+    followup = rows('SELECT recipient,content FROM tt_note_followup WHERE appointment=%s AND revision=%s',
+                    (item.id,note.current_revision))
+    if followup:
+        recipient_ids(item.id,[followup[0].recipient])
     finalized_revision = int(note.current_revision) + 1
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_note_revision
@@ -641,6 +682,9 @@ def finalize_consultation(appointment, publish_summary=0, publish_note=0):
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
         (str(uuid.uuid4()), item.id, clinician, finalized_revision, current.private_note,
          current.patient_summary, int(publish), int(share_note), int(share_note), json.dumps(recipients), clinician, now))
+    if followup:
+        frappe.db.sql('INSERT INTO tt_note_followup (appointment,revision,recipient,content,published) VALUES (%s,%s,%s,%s,1)',
+                      (item.id,finalized_revision,followup[0].recipient,followup[0].content))
     for recipient in recipients if (publish or share_note) else []:
         frappe.db.sql('INSERT INTO tt_note_recipient (appointment,revision,participant,published_at) VALUES (%s,%s,%s,%s)', (item.id,finalized_revision,recipient,now))
     frappe.db.sql("UPDATE tt_consultation_note SET status='Finalized',current_revision=%s,modified=%s WHERE appointment=%s",
