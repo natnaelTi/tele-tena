@@ -37,3 +37,11 @@ export function RequestStageRail({state,hasOffer=false}:{state:string;hasOffer?:
     {['Request posted','Clinicians responding','Your choice','Appointment'].map((label,index)=><li key={label} className={!closed?(index<step?'done':index===step?'current':''):undefined} aria-current={!closed&&index===step?'step':undefined}><span aria-hidden="true">{!closed&&index<step?<Check size={16}/>:index+1}</span>{w(label)}</li>)}
   </ol>;
 }
+
+/** F13 reflects the submitted quote and its persisted outcome, never elapsed time. */
+export function OfferStageRail({state}:{state:string}){
+  const {w}=useLocale();const accepted=state==='Accepted';const active=state==='Active';
+  return <ol className="request-stage-rail" aria-label={w('Offer progress')}>
+    {['Eligible request','Private offer sent','Patient response','Appointment'].map((label,index)=><li key={label} className={index<2||accepted&&index<3?'done':active&&index===2||accepted&&index===3?'current':undefined} aria-current={active&&index===2||accepted&&index===3?'step':undefined}><span aria-hidden="true">{index<2||accepted&&index<3?<Check size={16}/>:index+1}</span>{w(label)}</li>)}
+  </ol>;
+}
