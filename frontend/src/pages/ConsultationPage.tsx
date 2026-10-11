@@ -1,3 +1,4 @@
+import {BookingCalendar} from "../components/BookingCalendar";
 import { SharedCarePrivacy, ConversationFacts, DisclosureSnapshot, PreparationPanel, RecordedCallTiming } from "../components/ConsultationDetails";
 import { appointmentStatus } from "../appointment-status";
 import { Link, useParams, useLocation } from "react-router-dom";
@@ -126,9 +127,11 @@ function ReschedulePanel({appointment,refresh}:{appointment:any;refresh:()=>Prom
   const [outcome,setOutcome]=useState("");
   const action=useAction();
   const today=new Intl.DateTimeFormat('en-CA',{timeZone:appointment.timezone||'UTC',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-  const load=useCallback(()=>journeyApi.calendar(appointment.offering,today,appointment.timezone||'UTC'),[appointment.offering,appointment.timezone,today]);
+  const [fromDate,setFromDate]=useState(today);
+  const [selectedDate,setSelectedDate]=useState('');
+  const load=useCallback(()=>journeyApi.calendar(appointment.offering,fromDate,appointment.timezone||'UTC'),[appointment.offering,appointment.timezone,fromDate]);
   const calendar=useResource(load);
-  const slots=(calendar.data?.days||[]).flatMap(day=>day.slots.map(slot=>({slot,label:`${day.date} · ${slot.local_time} (${slot.timezone})`})));
+  const hasSlots=(calendar.data?.days||[]).some(day=>day.slots.length>0);
   const current=appointment.reschedule;
   const propose=async()=>{
     if(!selected||!retryKey)return;
@@ -151,8 +154,8 @@ function ReschedulePanel({appointment,refresh}:{appointment:any;refresh:()=>Prom
       {!expanded?<Button variant="secondary" onClick={()=>{setExpanded(true);void calendar.refresh();}}>{w('Request a new time')}</Button>:<>
         {calendar.error&&<InlineNotice tone="danger">Available times could not be loaded. <Button variant="secondary" onClick={()=>void calendar.refresh()}>{w('Try again')}</Button></InlineNotice>}
         {!calendar.error&&!calendar.data?<Skeleton/>:null}
-        {calendar.data&&slots.length>0&&<><Select label={w('Choose an available time')} value={selected} onChange={event=>{setSelected(event.target.value);setRetryKey(crypto.randomUUID());}}><option value="">{w('Choose an available time')}</option>{slots.map(({slot,label})=><option key={slot.start} value={slot.start}>{label}</option>)}</Select><div className="actions"><Button loading={action.busy} disabled={!selected||!retryKey} onClick={()=>void propose()}>{w('Send time request')}</Button><Button variant="secondary" onClick={()=>setExpanded(false)}>{w('Cancel')}</Button></div></>}
-        {calendar.data&&!slots.length&&<InlineNotice>{w('No available times to propose in the current booking window.')}</InlineNotice>}
+        {calendar.data&&<><p className="supporting">{w('Timezone')}: {appointment.timezone}</p><BookingCalendar days={calendar.data.days} fromDate={fromDate} selectedDate={selectedDate} selectedStart={selected} duration={appointment.booked_minutes} onMonth={value=>{setFromDate(value);setSelectedDate('');setSelected('');setRetryKey('');}} onDate={value=>{setSelectedDate(value);setSelected('');setRetryKey('');}} onStart={value=>{setSelected(value);setRetryKey(crypto.randomUUID());}}/><div className="actions"><Button loading={action.busy} disabled={!selected||!retryKey} onClick={()=>void propose()}>{w('Send time request')}</Button><Button variant="secondary" onClick={()=>setExpanded(false)}>{w('Cancel')}</Button></div></>}
+        {calendar.data&&!hasSlots&&<InlineNotice>{w('No available times to propose in the current booking window.')}</InlineNotice>}
       </>}
     </>}
     {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
