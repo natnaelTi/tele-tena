@@ -24,7 +24,14 @@ export default function Account() {
   const [tab,setTab]=useState("Overview");
   const sectionNavigation = useRef<HTMLElement>(null);
   useEffect(() => {
-    sectionNavigation.current?.querySelector<HTMLElement>('[aria-current="page"]')?.scrollIntoView({block:"nearest",inline:"nearest"});
+    const navigation = sectionNavigation.current;
+    const selected = navigation?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!navigation || !selected) return;
+    const boundary = navigation.getBoundingClientRect();
+    const item = selected.getBoundingClientRect();
+    // Reveal only within the horizontal strip; never move the page vertically.
+    if (item.left < boundary.left) navigation.scrollLeft += item.left - boundary.left;
+    else if (item.right > boundary.right) navigation.scrollLeft += item.right - boundary.right;
   }, [tab]);
   const [name, setName] = useState(profile.display_name);
   const [nameAttempted,setNameAttempted]=useState(false);
