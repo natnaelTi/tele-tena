@@ -38,6 +38,12 @@
 @media(min-width:801px) { .reference-workspace-main { position:relative; } .reference-workspace-main > .tour-replay,.reference-workspace-main > .tour-invite { position:absolute; top:8px; bottom:auto; right:36px; margin:0; } }
 @media(max-width:800px) { .reference-workspace-main > .page-title h1 { font-size:32px; } }
 
+/* In-flow invitations must leave the page heading readable on compact screens. */
+@media(max-width:800px) {
+  .reference-workspace-main > .tour-invite { margin:0 0 20px; max-width:100%; }
+  .reference-workspace-main > .tour-replay { margin:0 0 16px auto; }
+}
+
 /* Request presence stays in the shell without a repeated setup banner. */
 .request-presence-shell { align-items:flex-start; padding:4px 14px; gap:12px; }
 .request-presence-details { flex:1; min-width:0; }

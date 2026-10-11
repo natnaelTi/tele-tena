@@ -55,6 +55,15 @@ let stage = "launch";
         .getByRole("heading", { name: "Application progress", exact: true })
         .waitFor();
       await page.getByText("Pending", { exact: true }).waitFor();
+      if (width <= 768) {
+        await page.locator('.tour-invite, .tour-replay').waitFor();
+        const spacing = await page.evaluate(() => {
+          const tour = document.querySelector('.tour-invite, .tour-replay');
+          const heading = document.querySelector('.reference-workspace-main h1');
+          return heading.getBoundingClientRect().top - tour.getBoundingClientRect().bottom;
+        });
+        assert.ok(spacing >= 16, 'In-flow tour must not crowd the page title');
+      }
       assert.equal(await page.locator(".practice-metrics").count(), 0);
       assert.equal(await page.getByRole("link", { name: "Availability", exact: true }).count(), 0);
       assert.equal(await page.getByRole("link", { name: "Requests", exact: true }).count(), 0);
