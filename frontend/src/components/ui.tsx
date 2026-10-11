@@ -130,10 +130,12 @@ export function Checkbox({
   variant = "plain",
   ...props
 }: InputHTMLAttributes<HTMLInputElement> & { label: ReactNode; description?: ReactNode; variant?: "plain" | "card" }) {
+  const id = useId();
   return (
     <label className={`check-field${variant === "card" ? " check-card" : ""}`}>
-      <input {...props} type="checkbox" />
-      <span>{label}{description && <small>{description}</small>}</span>
+      <input {...props} type="checkbox" aria-labelledby={props["aria-labelledby"] || id + "-label"}
+        aria-describedby={[props["aria-describedby"], description ? id + "-description" : undefined].filter(Boolean).join(" ") || undefined} />
+      <span><span id={id + "-label"}>{label}</span>{description && <small id={id + "-description"}>{description}</small>}</span>
     </label>
   );
 }
