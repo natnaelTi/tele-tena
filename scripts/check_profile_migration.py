@@ -26,7 +26,7 @@ def digest(table, columns):
     return hashlib.sha256(json.dumps(encoded).encode()).hexdigest(), len(records)
 
 connect()
-columns = {table: frappe.db.get_table_columns(table) for table in frappe.db.get_tables(cached=False) if table.startswith('tt_')}
+columns = {table: [row[0] for row in frappe.db.sql('SHOW COLUMNS FROM `'+table+'`')] for table in frappe.db.get_tables(cached=False) if table.startswith('tt_')}
 before = {table: digest(table, keys) for table, keys in columns.items()}
 frappe.destroy()
 for attempt in (1, 2):
