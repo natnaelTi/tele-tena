@@ -19,7 +19,8 @@
 .review-overview-row p { font-size:14px; margin:4px 0 0; }
 .review-overview-row > svg { flex-shrink:0; box-sizing:content-box; padding:10px; border-radius:12px; background:var(--subtle); }
 .review-overview-panel > .text-link { margin-top:20px; }
-@media(max-width:800px) { .review-overview-layout,.review-overview-metrics { grid-template-columns:1fr; } .review-overview-row { flex-wrap:wrap; } .workspace-main .page-title h1 { font-size:32px; } }
+@media(max-width:800px) { .review-overview-layout { grid-template-columns:1fr; } .review-overview-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } .review-overview-row { flex-wrap:wrap; } .workspace-main .page-title h1 { font-size:32px; } }
+@media(max-width:600px) { .review-overview-metrics { grid-template-columns:1fr; } }
 @media(max-width:700px) { .review-queue-table { display:none; } .review-queue-cards { display:grid; gap:16px; } .review-queue-cards header { display:flex; justify-content:space-between; gap:16px; } .review-queue-cards h2 { font-size:20px; } .review-queue-filters { grid-template-columns:1fr; } }
 
 .review-queue-table table {border:1px solid var(--border);border-radius:16px;}

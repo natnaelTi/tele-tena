@@ -18,7 +18,7 @@ import {
 import { useAction } from "../hooks/useAction";
 import { useResource } from "../hooks/useResource";
 import { useLocale } from "../hooks/useLocale";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ClipboardCheck, Layers, ShieldCheck, Building2, ArrowRight, FileText } from "lucide-react";
 export function AdminOverview() {
   const {w}=useLocale();
@@ -33,7 +33,7 @@ export function AdminOverview() {
         [w("Evidence ready"),pending?.filter(item=>item.evidence_complete).length??0,w("Received evidence still requires verification")],
       ].map(([label,count,detail])=><section key={label}><span>{label}</span><strong>{count}</strong><p>{detail}</p></section>)}</div>
       <div className="review-overview-layout"><section className="review-overview-panel"><h2>{w("Needs your review")}</h2>
-        {pending?.length?pending.slice(0,5).map(item=><Link className="review-overview-row" key={item.user} to="/admin/applications"><ClipboardCheck size={24}/><div><strong>{item.display_name||w("Clinician application")}</strong><p>{item.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p></div><StatusBadge>{w(item.evidence_complete?"Ready for review":"Needs evidence")}</StatusBadge></Link>):<EmptyState title={w("No applications awaiting a decision.")}/>}
+        {pending?.length?pending.slice(0,5).map(item=><Link className="review-overview-row" key={item.user} to="/admin/applications" state={{applicationUser:item.user}}><ClipboardCheck size={24}/><div><strong>{item.display_name||w("Clinician application")}</strong><p>{item.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p></div><StatusBadge>{w(item.evidence_complete?"Ready for review":"Needs evidence")}</StatusBadge></Link>):<EmptyState title={w("No applications awaiting a decision.")}/>}
         <Link className="text-link" to="/admin/applications">{w("View all applications")} <ArrowRight size={16}/></Link>
       </section><section className="review-overview-panel"><h2>{w("Operations")}</h2>{[
         ["/admin/scopes",w("Service scopes"),w("Review each service authorization separately"),ShieldCheck],
@@ -45,11 +45,12 @@ export function AdminOverview() {
 }
 export function Applications() {
   const {w}=useLocale();
+  const location=useLocation();
   const resource=useResource(journeyApi.applications);
   const action=useAction();
   const [query,setQuery]=useState("");
   const [status,setStatus]=useState("");
-  const [selectedUser,setSelectedUser]=useState<string|null>(null);
+  const [selectedUser,setSelectedUser]=useState<string|null>(() => (location.state as {applicationUser?:string}|null)?.applicationUser || null);
   const [resumeError,setResumeError]=useState("");
   const selected=resource.data?.find(item=>item.user===selectedUser);
   const shown=resource.data?.filter(item=>(!status||item.status===status)&&(!query||item.display_name?.toLocaleLowerCase().includes(query.toLocaleLowerCase())));
