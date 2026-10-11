@@ -1,5 +1,6 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Save and continue": ["ያስቀምጡ እና ይቀጥሉ", "Kuusii itti fufi"],
   "Private documents": ["የግል ሰነዶች", "Sanadoota dhuunfaa"],
   "Review actions": ["የግምገማ እርምጃዎች", "Tarkaanfiiwwan gamaaggamaa"],
   "Review scope applications": ["የአገልግሎት ወሰን ማመልከቻዎችን ይገምግሙ", "Iyyata daangaa tajaajilaa gamaaggami"],

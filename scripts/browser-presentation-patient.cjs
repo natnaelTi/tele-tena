@@ -3,6 +3,7 @@
 const fs = require("node:fs"),
   assert = require("node:assert/strict"),
   { chromium } = require("playwright");
+const initialBuild=JSON.parse(fs.readFileSync("tele_tena/public/review/release.json"));
 const privateRoot =
   "/home/frappe/frappe/frappe-bench/sites/teletena-mvp-presentation.localhost/private";
 const seed = JSON.parse(
@@ -180,6 +181,7 @@ async function pair(ctx, p, id, hash, width) {
       await ctx.close();
     }
     const manifest=JSON.parse(fs.readFileSync('tele_tena/public/review/release.json'));
+    assert.equal(manifest.source_commit,initialBuild.source_commit,'Package changed during browser verification');
     fs.writeFileSync(output+'/result.json',JSON.stringify({source:manifest.source_commit,site:'teletena-mvp-presentation.localhost',real_backend:true,selected_offering_profile_reload:true,preview_focus_return:true,calendar_disclosure_back:process.env.TELE_TENA_PROFILE_CONTEXT_ONLY!=='1',viewports:[390,768,1440]},null,2));
     console.log(process.env.TELE_TENA_PROFILE_CONTEXT_ONLY==='1' ? 'PASS: real password session, Home/discovery, preview focus, selected offering preserved through public profile and reload at390/768/1440; calendar/disclosure not repeated.' :
       "PASS: invited-review real password login; patient home/discovery/public profile; preview focus; authoritative calendar and hover contrast; disclosure review/back preserves input; paired 390/768/1440 evidence. No bookings or financial mutations. Visual comparison required separately.",

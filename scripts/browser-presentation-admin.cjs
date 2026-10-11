@@ -3,6 +3,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),assert=require('nod
 const root='/home/frappe/frappe/frappe-bench/sites/teletena-mvp-presentation.localhost/private';
 const seed=JSON.parse(fs.readFileSync(root+'/tele_tena_presentation_seed.json'));
 const credentials=JSON.parse(fs.readFileSync(root+'/tele_tena_presentation_accounts.json'));
+const build=JSON.parse(fs.readFileSync('tele_tena/public/review/release.json'));
 const base='http://127.0.0.1:8017/teletena/',out='/tmp/tt-presentation-admin';fs.mkdirSync(out,{recursive:true});let browser,stage='launch';
 (async()=>{try{
  browser=await chromium.launch();const context=await browser.newContext({viewport:{width:1440,height:1000}});const page=await context.newPage();page.setDefaultTimeout(15000);
@@ -17,5 +18,6 @@ const base='http://127.0.0.1:8017/teletena/',out='/tmp/tt-presentation-admin';fs
   await dialog.evaluate(el=>el.scrollTop=0);if(width===1440)assert.ok((await dialog.boundingBox()).width>=1000);await pair('I03',width);await dialog.evaluate(el=>el.scrollTop=el.scrollHeight);await page.screenshot({path:out+'/I03-application-bottom-'+width+'.png'});await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});assert.ok(await trigger.evaluate(el=>el===document.activeElement));await pair('I02',width);
  }
  assert.deepEqual(await query('tele_tena.api.journey.applications'),before);const denied=await page.request.get('http://127.0.0.1:8017/api/method/tele_tena.api.journey.wallet');assert.equal(denied.status(),403);
- fs.writeFileSync(out+'/result.json',JSON.stringify({source:JSON.parse(fs.readFileSync('tele_tena/public/review/release.json')).source_commit,site:'teletena-mvp-presentation.localhost',real_backend:true,read_only:true,viewports:[390,768,1440],reviewer_queue:true,dialog_keyboard_focus:true,authorized_resume_download:!!candidate.resume_uploaded,applications_unchanged:true},null,2));console.log('PASS: real reviewer queue/search, private resume when present, dialog/focus at390/768/1440; no application decisions or changes. Paired images require visual inspection.');
+ assert.equal(JSON.parse(fs.readFileSync('tele_tena/public/review/release.json')).source_commit,build.source_commit,'Package changed during browser verification');
+ fs.writeFileSync(out+'/result.json',JSON.stringify({source:build.source_commit,site:'teletena-mvp-presentation.localhost',real_backend:true,read_only:true,viewports:[390,768,1440],reviewer_queue:true,dialog_keyboard_focus:true,authorized_resume_download:!!candidate.resume_uploaded,applications_unchanged:true},null,2));console.log('PASS: real reviewer queue/search, private resume when present, dialog/focus at390/768/1440; no application decisions or changes. Paired images require visual inspection.');
  }catch(e){console.error('FAIL: reviewer at '+stage+' ('+e.name+'); sensitive details withheld');process.exitCode=1;}finally{await browser?.close();}})();

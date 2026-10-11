@@ -348,7 +348,7 @@ export default function Onboarding() {
                 ? clinician
                   ? w("Submit for review")
                   : w("Find care")
-                : w("Continue")}
+                : w(step === 4 ? "Save and continue" : "Continue")}
             </Button>}
           </div>
           <Button
