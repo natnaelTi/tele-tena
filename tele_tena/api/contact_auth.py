@@ -192,7 +192,7 @@ def onboarding():
 @command
 def save_onboarding(kind, step, answers, complete=0):
     user = actor()
-    if kind not in ('patient', 'clinician') or str(step) not in ('0', '1', '2', '3'):
+    if kind not in ('patient', 'clinician') or str(step) not in ('0', '1', '2', '3', '4') or (str(step) == '4' and kind != 'patient'):
         fail('Invalid onboarding step')
     from tele_tena.review import registration_enabled
     if not registration_enabled(kind):
@@ -202,9 +202,9 @@ def save_onboarding(kind, step, answers, complete=0):
     rows = frappe.db.sql('SELECT completed FROM tt_onboarding WHERE user=%s FOR UPDATE', (user,))
     if not rows or rows[0][0]:
         fail('Onboarding already complete')
-    if not isinstance(answers, dict) or set(answers) - {'name', 'adult', 'consent', 'language', 'share_name', 'share_history', 'statement', 'affiliations', 'requested_services'}:
+    if not isinstance(answers, dict) or set(answers) - {'name', 'adult', 'consent', 'language', 'share_name', 'share_history', 'statement', 'affiliations', 'requested_services', 'history'}:
         fail('Invalid onboarding answers')
-    clean = {k: text(v, 2000 if k == 'statement' else 120, False) for k, v in answers.items() if k in ('name', 'language', 'statement', 'affiliations')}
+    clean = {k: text(v, 4000 if k == 'history' else 2000 if k == 'statement' else 120, False) for k, v in answers.items() if k in ('name', 'language', 'statement', 'affiliations', 'history')}
     for key in ('adult', 'consent', 'share_name', 'share_history'):
         clean[key] = boolean(answers.get(key, False))
     requested_services = answers.get('requested_services', [])
@@ -217,6 +217,8 @@ def save_onboarding(kind, step, answers, complete=0):
     clean['requested_services'] = requested_services
     if clean.get('language', 'en') not in ('en', 'am', 'om'):
         fail('Unsupported language')
+    if kind == 'clinician' and clean.get('history'):
+        fail('Care background is for patient registration')
     finish = boolean(complete)
     if finish:
         name = text(clean.get('name', ''), 120)
@@ -233,8 +235,8 @@ def save_onboarding(kind, step, answers, complete=0):
         with authorized_user_change():
             frappe.get_doc('User', user).add_roles(role)
         frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history,public_id)
-            VALUES (%s,%s,%s,'',%s,%s,%s)''',
-            (user, kind, name, clean['share_name'], clean['share_history'], str(uuid.uuid4())))
+            VALUES (%s,%s,%s,%s,%s,%s,%s)''',
+            (user, kind, name, clean.get('history', '') if kind == 'patient' else '', clean['share_name'], clean['share_history'], str(uuid.uuid4())))
         if kind == 'patient':
             frappe.db.sql('INSERT INTO tt_wallet (patient) VALUES (%s)', (user,))
         else:

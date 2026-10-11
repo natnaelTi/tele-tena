@@ -107,6 +107,35 @@ class ContactAuth(unittest.TestCase):
         self.assertNotIn('Tele Tena Clinician', frappe.get_roles(user))
         frappe.db.commit()
 
+    def test_optional_patient_background_preserves_owned_draft_and_private_defaults(self):
+        result, code = self.challenge()
+        user = self.verify(result, code)
+        frappe.set_user(user)
+        answers = {'name': 'Fictional alias', 'adult': True, 'consent': True,
+                   'history': 'Fictional optional care background', 'language': 'en'}
+        auth.save_onboarding('patient', 4, answers)
+        draft = auth.onboarding()
+        self.assertEqual(draft['step'], 4)
+        self.assertEqual(draft['answers']['history'], answers['history'])
+        self.assertFalse(draft['answers']['share_history'])
+        with self.assertRaises(frappe.ValidationError):
+            auth.save_onboarding('clinician', 4, answers)
+        with self.assertRaises(frappe.ValidationError):
+            auth.save_onboarding('patient', 4, {**answers, 'history': 'x' * 4001})
+        self.assertEqual(auth.onboarding()['answers']['history'], answers['history'])
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            auth.onboarding()
+        frappe.set_user(user)
+        auth.save_onboarding('patient', 3, answers, 1)
+        profile = frappe.db.sql('SELECT history,share_history FROM tt_profile WHERE user=%s', (user,), as_dict=True)[0]
+        self.assertEqual(profile.history, answers['history'])
+        self.assertFalse(profile.share_history)
+        with self.assertRaises(frappe.ValidationError):
+            auth.save_onboarding('patient', 3, answers, 1)
+        self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_profile WHERE user=%s', (user,))[0][0], 1)
+        frappe.db.commit()
+
     def test_request_response_does_not_reveal_contact_lookup_or_delivery(self):
         first_contact = self.contact
         second_contact = 'another-' + secrets.token_hex(8) + '@example.invalid'

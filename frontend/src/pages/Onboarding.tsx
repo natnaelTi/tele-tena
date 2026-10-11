@@ -18,6 +18,7 @@ import { FileText, ShieldCheck } from "lucide-react";
 import "./Onboarding.css";
 type Answers = {
   name?: string;
+  history?: string;
   adult?: boolean;
   consent?: boolean;
   language?: string;
@@ -66,6 +67,10 @@ export default function Onboarding() {
   }, [params]);
   if (session?.profile) return <Navigate to={session.profile.kind === "patient" && pendingCareQuery() ? "/patient/discovery" : destination(session)} replace />;
   const clinician = kind === "clinician";
+  // Retain stored step 3 as the ready screen for existing saved journeys.
+  // Patient-only step 4 is inserted before it without reinterpreting old drafts.
+  const steps = clinician ? [0, 1, 2, 3] : [0, 1, 2, 4, 3];
+  const position = Math.max(0, steps.indexOf(step));
   const titles = clinician
     ? [
         "Your professional profile",
@@ -78,6 +83,7 @@ export default function Onboarding() {
         "Adult eligibility",
         "Your privacy defaults",
         "You’re ready",
+        "Care background",
       ];
   const update = (value: Partial<Answers>) => {
     setAnswers({ ...answers, ...value });
@@ -126,11 +132,11 @@ export default function Onboarding() {
     <section className={`guided-panel onboarding-guided ${!clinician&&step===3?"onboarding-ready-page":""}`}>
       <p className="eyebrow">
         {w(clinician ? "CLINICIAN APPLICATION" : "YOUR SPACE FOR CARE")} · {w("STEP")}{" "}
-        {step + 1} {w("of")} 4
+        {position + 1} {w("of")} {steps.length}
       </p>
-      <div className="step-progress" aria-label={`${w("Step")} ${step + 1} ${w("of")} 4`}>
-        {[0, 1, 2, 3].map((value) => (
-          <span key={value} data-complete={value <= step} />
+      <div className="step-progress" aria-label={`${w("Step")} ${position + 1} ${w("of")} ${steps.length}`}>
+        {steps.map((value, index) => (
+          <span key={value} data-complete={index <= position} />
         ))}
       </div>
       <h1>{w(titles[step])}</h1>
@@ -141,7 +147,7 @@ export default function Onboarding() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            void save(Math.min(step + 1, 3), step === 3);
+            void save(steps[Math.min(position + 1, steps.length - 1)], step === 3);
           }}
         >
           {step === 0 && (
@@ -261,6 +267,17 @@ export default function Onboarding() {
                 />
               </>
             ))}
+          {step === 4 && !clinician && <>
+            <p>{w("Only add what you’re comfortable sharing. This step is optional.")}</p>
+            <label className="field" htmlFor="onboarding-background">
+              {w("Anything you’d like your clinician to know?")}
+              <textarea id="onboarding-background" rows={6} maxLength={4000}
+                value={answers.history || ""} aria-describedby="onboarding-background-privacy"
+                onChange={e => update({ history: e.target.value })} />
+            </label>
+            <p id="onboarding-background-privacy" className="supporting">{w("This is saved privately. Your sharing defaults apply; preview and choose what to share before every booking.")}</p>
+            {!answers.history && <Button variant="quiet" disabled={busy} onClick={() => void save(3)}>{w("Skip for now")}</Button>}
+          </>}
           {step === 3 && !clinician && <section className="onboarding-ready-hero"><div><h2>{w("What’s on your mind?")}</h2><p>{w("Describe what you need, browse specialists, or ask available clinicians to respond.")}</p><Button type="submit" loading={busy}>{w("Find care")}</Button></div><aside><ShieldCheck size={26}/><h2>{w("Your choices come with you.")}</h2><dl><dt>{w("Display name")}</dt><dd>{answers.name}</dd><dt>{w("Care language")}</dt><dd>{{en:"English",am:"አማርኛ",om:"Afaan Oromo"}[answers.language as "en"|"am"|"om"]||"English"}</dd><dt>{w("Sharing")}</dt><dd>{w("Preview before every booking")}</dd></dl></aside></section>}
           {step === 3 && clinician && (
             <>
@@ -288,7 +305,7 @@ export default function Onboarding() {
               <Button
                 variant="secondary"
                 disabled={busy}
-                onClick={() => void save(step - 1)}
+                onClick={() => void save(steps[position - 1])}
               >
                 {w("Back")}
               </Button>
