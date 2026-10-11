@@ -52,7 +52,7 @@ let stage = "launch";
       await page.setViewportSize({ width, height: 1000 });
       await page.goto(base + "/clinician");
       await page
-        .getByRole("heading", { name: "Your application", exact: true })
+        .getByRole("heading", { name: "Application progress", exact: true })
         .waitFor();
       await page.getByText("Pending", { exact: true }).waitFor();
       assert.equal(await page.locator(".practice-metrics").count(), 0);
@@ -75,6 +75,7 @@ let stage = "launch";
         fullPage: true,
       });
       const reference = await context.newPage();
+      await reference.setViewportSize({width,height:1000});
       await reference.goto("http://127.0.0.1:8044/?embed=1#b11");
       await reference.evaluate(() => document.fonts.ready);
       await reference.screenshot({
@@ -99,6 +100,9 @@ let stage = "launch";
         (await fetch("/api/method/tele_tena.api.journey.appointments")).status,
     );
     assert.equal(status, 403);
+    const manifest=JSON.parse(fs.readFileSync(require('node:path').resolve(__dirname,'../tele_tena/public/review/release.json')));
+    fs.writeFileSync(output+'/result.json',JSON.stringify({source:manifest.source_commit,site:'teletena-mvp-presentation.localhost',real_backend:true,pending_state:true,approved_only_navigation_absent:true,profile_reload:true,no_approval_mutation:true,direct_appointments_denied:true,viewports:[390,768,1440]},null,2));
+
     console.log(
       "PASS: pending applicant lands on actual application state, profile/reload works at 390/768/1440, no approved-only dashboard queries; direct appointment API denied 403. No approval or financial mutation.",
     );

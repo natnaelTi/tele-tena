@@ -44,16 +44,23 @@ export function ClinicianToday() {
   useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),60000);return()=>clearInterval(timer);},[]);
   const appointments=useResource(useCallback(()=>approved?journeyApi.appointments():Promise.resolve([]),[approved]));
   const current=useResource(practice);
+  const scopeApplications=useResource(useCallback(()=>!approved?journeyApi.myScopeApplications():Promise.resolve([]),[approved]));
   const earnings=useResource(useCallback(()=>approved?api<EarningsView>("tele_tena.accounting.clinician_earnings"):Promise.resolve(null),[approved]));
   const inbox=useResource(useCallback(()=>approved?journeyApi.clinicianRequests():Promise.resolve(null),[approved]));
   const groups=appointmentGroups(appointments.data||[],true,now).filter(([label])=>label!=="Past");
   const day=new Date(now).toLocaleDateString(undefined,{timeZone:timezone});
   const today=appointments.data?.filter(item=>new Date(item.start).toLocaleDateString(undefined,{timeZone:timezone})===day);
   if (!approved) return <>
-    <PageTitle title={w("Your application")} description={w("Complete your professional profile and upload evidence for review. Approval is manual.")}/>
-    <div className="clinician-today-layout"><section className="practice-panel"><h2>{w("Review progress")}</h2>
-      {current.error?<InlineNotice tone="danger">{w("Practice details unavailable.")} <Button variant="secondary" onClick={()=>void current.refresh()}>{w("Retry")}</Button></InlineNotice>:!current.data?<Skeleton/>:<><p>{w("Current status")}</p><StatusBadge tone={current.data.application?.status === "Rejected" ? "danger" : "warning"}>{w(current.data.application?.status || "Not submitted")}</StatusBadge><p>{w("Approval and each service scope are reviewed by an administrator. Resume files are private application evidence; upload does not verify credentials.")}</p><Link className="button primary" to="/clinician/vetting">{w("Professional review")}</Link></>}
-    </section><aside className="practice-panel"><h2>{w("Professional profile")}</h2><p>{w("Complete your professional profile and upload evidence for review. Approval is manual.")}</p><Link className="button secondary" to="/clinician/account">{w("Your account")}</Link></aside></div>
+    <PageTitle title={w("Application progress")} description={w("Track each part of your application.")}/>
+    <div className="clinician-today-layout application-progress-layout"><section className="practice-panel"><h2>{w("Review progress")}</h2>
+      {current.error?<InlineNotice tone="danger">{w("Practice details unavailable.")} <Button variant="secondary" onClick={()=>void current.refresh()}>{w("Retry")}</Button></InlineNotice>:!current.data?<Skeleton/>:<>
+        <ol className="application-progress-timeline"><li><strong>{w(current.data.application?"Application received":"Complete your application")}</strong><p>{w(current.data.application?"Your application is saved for manual review.":"Complete your professional profile and upload evidence for review. Approval is manual.")}</p></li><li><strong>{w("Current status")}</strong><StatusBadge tone={current.data.application?.status === "Rejected" ? "danger" : "warning"}>{w(current.data.application?.status || "Not submitted")}</StatusBadge><p>{w("Approval and each service scope are reviewed by an administrator. Resume files are private application evidence; upload does not verify credentials.")}</p></li></ol>
+        <Link className="button secondary" to="/clinician/account">{w("Your account")}</Link>
+      </>}
+    </section><aside className="practice-panel"><h2>{w("Service decisions")}</h2>
+      {scopeApplications.error?<InlineNotice tone="danger">{w("Your scope applications could not be loaded.")} <Button variant="secondary" onClick={()=>void scopeApplications.refresh()}>{w("Retry")}</Button></InlineNotice>:!scopeApplications.data?<Skeleton/>:scopeApplications.data.length?<div className="application-scope-decisions">{scopeApplications.data.map((item:any)=><section key={item.name}><ShieldCheck size={22} aria-hidden="true"/><div><h3>{item.service_label}</h3><p>{item.decision_reason||item.clarification_request||w("Awaiting an individual service decision.")}</p></div><StatusBadge tone={item.status==='Approved'?'success':['Rejected','Suspended','Expired'].includes(item.status)?'danger':'warning'}>{w(item.status)}</StatusBadge></section>)}</div>:<EmptyState title={w("No service decisions yet.")}>{w("Apply for each service separately. General application status does not approve a service.")}</EmptyState>}
+      <Link className="button primary" to="/clinician/vetting">{w("Professional review")}</Link>
+    </aside></div>
   </>;
   return <>
     <PageTitle title={w("Your day at a glance")} description={`${new Date(now).toLocaleDateString(undefined,{dateStyle:"full"})} · ${timezone}`} action={<Link className="button secondary" to="/clinician/availability">{w("Manage availability")}</Link>}/>

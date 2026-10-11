@@ -88,4 +88,14 @@ export const onboardingTranslations:Record<string,[string,string]>={
   "Your session has expired. Sign in again to continue your saved registration.": ["ክፍለ ጊዜዎ አልቋል። የተቀመጠውን ምዝገባ ለመቀጠል እንደገና ይግቡ።", "Yeroon seensaa kee darbeera. Galmee kuufame itti fufuuf deebi’ii seeni."],
   "Registration is unavailable on this site. Your saved progress has not been submitted.": ["በዚህ ጣቢያ ምዝገባ አይገኝም። የተቀመጠው ሂደትዎ አልቀረበም።", "Galmeen marsariitii kana irratti hin jiru. Adeemsi kuufame hin dhiyaanne."],
   "We couldn’t save this step. Your entries are still here; check your connection and try again.": ["ይህን ደረጃ ማስቀመጥ አልቻልንም። ያስገቡት አሁንም አለ፤ ግንኙነትዎን ያረጋግጡ እና እንደገና ይሞክሩ።", "Tarkaanfii kana kuusuu hin dandeenye. Waan galchite asuma jira; walqunnamtii kee ilaalii irra deebi’i."],
+
+  "Application progress": ["የማመልከቻ ሂደት", "Adeemsa iyyataa"],
+  "Track each part of your application.": ["የእያንዳንዱን የማመልከቻዎ ክፍል ሂደት ይከታተሉ።", "Kutaa iyyata kee hunda hordofi."],
+  "Application received": ["ማመልከቻ ተቀብለናል", "Iyyanni fudhatameera"],
+  "Complete your application": ["ማመልከቻዎን ያጠናቅቁ", "Iyyata kee xumuri"],
+  "Your application is saved for manual review.": ["ማመልከቻዎ በሰው ለሚደረግ ግምገማ ተቀምጧል።", "Iyyanni kee namaan ilaalamuuf kuufameera."],
+  "Service decisions": ["የአገልግሎት ውሳኔዎች", "Murtii tajaajilaa"],
+  "Awaiting an individual service decision.": ["የግለሰብ አገልግሎት ውሳኔን በመጠባበቅ ላይ።", "Murtii tajaajila tokkoo eegaa jira."],
+  "No service decisions yet.": ["እስካሁን የአገልግሎት ውሳኔዎች የሉም።", "Hanga ammaatti murtiin tajaajilaa hin jiru."],
+  "Apply for each service separately. General application status does not approve a service.": ["ለእያንዳንዱ አገልግሎት ለብቻው ያመልክቱ። አጠቃላይ የማመልከቻ ሁኔታ አገልግሎትን አያጸድቅም።", "Tajaajila tokkoon tokkoof addaan iyyadhu. Haalli iyyataa waliigalaa tajaajila hin hayyamu."],
 };
