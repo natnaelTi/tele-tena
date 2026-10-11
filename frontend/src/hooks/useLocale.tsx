@@ -17,6 +17,7 @@ const words: Record<string, [string, string]> = {
   "Choose a shared session": ["የጋራ ምክክር ይምረጡ", "Marii waliin filadhu"],
   "No shared services are available right now.": ["በአሁኑ ጊዜ የጋራ አገልግሎቶች የሉም።", "Amma tajaajiloonni waliin hin jiran."],
   "This service is for adults 18+. Each person signs in independently and chooses what to share. Linking accounts does not expose private records.": ["ይህ አገልግሎት 18 ዓመት እና ከዚያ በላይ ለሆኑ ጎልማሶች ነው። እያንዳንዱ ሰው በተናጠል ይገባል እና የሚያጋራውን ይመርጣል። መለያዎችን ማገናኘት የግል መዝገቦችን አያሳይም።", "Tajaajilli kun ga'eessota umuriin18 fi isaa oliif. Namni hundi dhuunfaan seenee waan qoodu filata. Herregoota walitti hidhuun galmee dhuunfaa hin mul'isu."],
+  "Past shared sessions": ["ያለፉ የጋራ ምክክሮች", "Mariiwwan waliin darban"],
   "Your shared sessions": ["የጋራ ምክክሮችዎ", "Mariiwwan keessan waliin"],
   "participants have agreed": ["ተሳታፊዎች ተስማምተዋል", "hirmaattonni walii galaniiru"],
   "Your agreement is recorded.": ["ፈቃድዎ ተመዝግቧል።", "Waliigalteen kee galmaa’eera."],

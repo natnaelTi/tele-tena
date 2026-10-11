@@ -10,7 +10,7 @@
 .shared-invitation textarea{min-height:130px}
 @media(max-width:640px){.shared-invitation.container{padding:40px 0 32px;max-width:calc(100% - 32px)}.shared-invitation h1{font-size:32px}.shared-invitation>.card{padding:20px}.shared-invitation .actions .button{flex:1}}
 /* N05: focus payment on one selected plan; history uses compact rows. */
-.shared-service-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:20px;margin-bottom:24px}
+.shared-service-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:20px;margin-bottom:24px}
 .shared-service-card{display:flex;flex-direction:column;align-items:flex-start;padding:26px;min-width:0}
 .shared-service-card h2{font-size:22px;margin:0 0 20px}
 .shared-service-symbol{width:42px;height:42px;display:grid;place-items:center;background:var(--subtle);border-radius:12px;color:var(--ink)}
@@ -27,3 +27,6 @@
 .shared-payment-facts{display:grid;grid-template-columns:1fr 1fr;margin:0 0 24px}.shared-payment-facts dt,.shared-payment-facts dd{border-bottom:1px solid var(--border);padding:16px 0;margin:0}.shared-payment-facts dt{color:var(--muted)}.shared-payment-facts dd{text-align:right;font-weight:600}
 .shared-plan-row{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:16px}.shared-plan-row h2{font-size:20px;margin-bottom:8px}.shared-plan-row p{margin-bottom:8px}
 @media(max-width:640px){.shared-care-page .shared-care-columns{grid-template-columns:1fr}.shared-plan-row{align-items:start;flex-direction:column}.shared-care-columns>.card{padding:20px}}
+
+.shared-plan-history{margin-top:20px;border-top:1px solid var(--border)}
+.shared-plan-history>summary{cursor:pointer;min-height:48px;display:flex;align-items:center;font-weight:600;margin-bottom:16px}
