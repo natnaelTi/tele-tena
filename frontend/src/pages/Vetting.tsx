@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import './Vetting.css';
 import { journeyApi } from '../journey-api';
 import { Button, Checkbox, EmptyState, InlineNotice, Select, Skeleton, TextField } from '../components/ui';
 import { PageTitle } from '../components/Domain';
@@ -93,6 +94,10 @@ export function ClinicianScopeApplications() {
   const applications = useResource(journeyApi.myScopeApplications);
   const action = useAction();
   const [service, setService] = useState('');
+  const [dirty, setDirty] = useState(false);
+  const [step, setStep] = useState(0);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const changeStep = (next:number) => { setStep(next); requestAnimationFrame(()=>headingRef.current?.focus()); };
   const [category, setCategory] = useState('');
   const [qualification, setQualification] = useState('');
   const [institution, setInstitution] = useState('');
@@ -118,9 +123,10 @@ export function ClinicianScopeApplications() {
       applicant_statement:statement};
     await journeyApi.saveScopeApplication(service,values,submit,reverificationOf);
     await applications.refresh();
+    setDirty(false);
   });
   const continueApplication=(item:any)=>{
-    setService(item.service);setCategory(item.professional_category||'');
+    setDirty(false);setStep(0);setService(item.service);setCategory(item.professional_category||'');
     setReverificationOf(item.reverification_of||null);
     setQualification(item.qualification||'');setInstitution(item.issuing_institution||'');
     setLicense(item.registration_number||'');setAuthority(item.issuing_authority||'');
@@ -136,11 +142,15 @@ export function ClinicianScopeApplications() {
     <InlineNotice>{w("TeleTena’s proposed vetting rubric is versioned for medical-lead review. Credential verification is manual. Upload your PDF CV in Account and attach supporting evidence to each service application.")}</InlineNotice>
     {applications.error&&<InlineNotice tone="danger">{w("Your scope applications could not be loaded.")} <Button onClick={()=>void applications.refresh()}>{w("Retry")}</Button></InlineNotice>}
     <section className="scope-application-workspace">
-      <div className="scope-application-form">
-        <h2>{w(reverificationOf?"Update credentials for this approved scope":"Apply for a service scope")}</h2>
+      <div className="scope-application-form" data-tour-unsaved={dirty ? 'true' : 'false'} onChange={()=>setDirty(true)}>
+        <p className="eyebrow">{w("STEP")} {step+1} {w("OF")} 3</p>
+        <div className="step-progress" aria-hidden="true">{[0,1,2].map(index=><span key={index} className={index<=step?"done":""}/>)}</div>
+        <h2 ref={headingRef} tabIndex={-1}>{w(step===0?"Professional details":step===1?"Relevant experience":"Review your application")}</h2>
+        <p className="supporting">{w("Documents are private to authorized reviewers.")}</p>
         {reverificationOf&&<InlineNotice>{w("A renewal request does not extend an expired approval. If the credential has expired, this service remains unavailable until a reviewer records a new approval.")}</InlineNotice>}
         {!services.data?<Skeleton/>:services.data.length===0?<EmptyState title={w("No reviewed service scopes are open yet.")}>{w("The service catalog is present in draft and remains non-bookable until the medical lead approves its terminology and local credential requirements.")}</EmptyState>:<>
           <Select label={w("Service scope")} value={service} onChange={e=>{setService(e.target.value);setReverificationOf(null)}}><option value="">{w("Choose a service")}</option>{services.data.map((item:any)=><option key={item.id} value={item.id}>{item.label}</option>)}</Select>
+          {step===0&&<>
           <TextField label={w("Professional category")} value={category} onChange={e=>setCategory(e.target.value)} required />
           <TextField label={w("Relevant qualification")} value={qualification} onChange={e=>setQualification(e.target.value)} required />
           <TextField label={w("Issuing institution")} value={institution} onChange={e=>setInstitution(e.target.value)} required />
@@ -148,15 +158,27 @@ export function ClinicianScopeApplications() {
           <TextField label={w("Issuing authority")} value={authority} onChange={e=>setAuthority(e.target.value)} />
           <TextField label={w("Jurisdiction")} value={jurisdiction} onChange={e=>setJurisdiction(e.target.value)} />
           <TextField label={w("Credential expiry, if applicable")} type="date" value={expiry} onChange={e=>setExpiry(e.target.value)} />
+          </>}
+          {step===1&&<>
           <TextField label={w("Years of relevant experience")} type="number" min="0" max="60" value={experience} onChange={e=>setExperience(e.target.value)} />
           <label className="field">{w("Treatment approaches (one per line)")}<textarea rows={3} value={approaches} onChange={e=>setApproaches(e.target.value)} /></label>
           <label className="field">{w("Relevant training")}<textarea rows={3} value={training} onChange={e=>setTraining(e.target.value)} /></label>
           <label className="field">{w("Why are you prepared to provide this service?")}<textarea rows={4} value={statement} onChange={e=>setStatement(e.target.value)} /></label>
           <Checkbox label={w("My application is limited to adult care.")} checked={adults} onChange={e=>setAdults(e.target.checked)} />
           <Checkbox label={w("I practice independently (optional).")} checked={independent} onChange={e=>setIndependent(e.target.checked)} />
-          <div className="actions"><Button variant="secondary" loading={action.busy} onClick={()=>save(false)}>{w("Save draft")}</Button><Button loading={action.busy} onClick={()=>save(true)}>{w("Submit for review")}</Button></div>
+          </>}
+          {step===2&&<dl className="scope-application-preview">
+            {[['Professional category',category],['Relevant qualification',qualification],['Issuing institution',institution],['Registration or license number',license],['Issuing authority',authority],['Jurisdiction',jurisdiction],['Credential expiry, if applicable',expiry],['Years of relevant experience',experience],['Relevant training',training],['Why are you prepared to provide this service?',statement]].map(([label,value])=><div key={label}><dt>{w(label)}</dt><dd>{value||w('Not provided')}</dd></div>)}
+            <div><dt>{w('My application is limited to adult care.')}</dt><dd>{w(adults?'Yes':'No')}</dd></div>
+          </dl>}
+          <div className="scope-form-actions">
+            {step>0&&<Button variant="quiet" disabled={action.busy} onClick={()=>changeStep(step-1)}>{w('Back')}</Button>}
+            <Button variant="secondary" disabled={!service||action.busy} loading={action.busy} onClick={()=>save(false)}>{w('Save draft')}</Button>
+            {step<2?<Button disabled={action.busy} onClick={()=>changeStep(step+1)}>{w('Continue')}</Button>:<Button disabled={action.busy} loading={action.busy} onClick={()=>save(true)}>{w('Submit for review')}</Button>}
+          </div>
         </>}
-        {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
+        {action.error&&<InlineNotice tone="danger">{w(action.error)}</InlineNotice>}
+        {action.success&&!dirty&&<InlineNotice tone="success">{w(action.success)}</InlineNotice>}
       </div>
       <section className="scope-application-list"><h2>{w("Your applications")}</h2>{!applications.data?<Skeleton/>:applications.data.length?applications.data.map((item:any)=><article className="scope-application-row" key={item.name}><strong>{item.service_label}</strong><span>{w(item.status)}</span>{item.reverification_of&&<InlineNotice>{w('Credential re-verification for an existing scope. A reviewer must approve it before expired credentials can be used.')}</InlineNotice>}{['Approved','Expired'].includes(item.status)&&(item.credential_expired||item.status==='Expired')&&!item.scope_eligible&&<InlineNotice tone="danger">{w('This credential has expired. The service is paused until a reviewer approves updated credentials.')}</InlineNotice>}{item.clarification_request&&<InlineNotice>{item.clarification_request}</InlineNotice>}{item.decision_reason&&<p>{item.decision_reason}</p>}{item.restrictions&&<p>{w("Restrictions:")} {item.restrictions}</p>}{item.appeals?.map((appeal:any)=><InlineNotice key={appeal.name}>{w('Reconsideration')}: {w(appeal.status)}{appeal.reviewer_reason?` — ${appeal.reviewer_reason}`:''}</InlineNotice>)}{['Rejected','Suspended','Expired'].includes(item.status)&&!item.appeals?.some((appeal:any)=>appeal.basis_assessment===item.latest_assessment)&&<div className="scope-appeal-form"><label className="field">{w('Request reconsideration')}<textarea rows={3} maxLength={1600} value={appealStatements[item.name]||''} onChange={e=>setAppealStatements({...appealStatements,[item.name]:e.target.value})} /></label><Button loading={action.busy} onClick={()=>void action.run(async()=>{const statement=(appealStatements[item.name]||'').trim();if(!statement)throw new Error(w('Explain why this decision should be reconsidered.'));await journeyApi.submitScopeAppeal(item.name,statement);await applications.refresh();})}>{w('Submit reconsideration')}</Button></div>}{['Draft','Clarification'].includes(item.status)&&<Button variant="secondary" onClick={()=>continueApplication(item)}>{w('Continue this application')}</Button>}{['Approved','Expired'].includes(item.status)&&['Approved','Revoked'].includes(item.service_scope_status)&&!applications.data?.some((other:any)=>other.reverification_of===item.name)&&<Button variant="secondary" onClick={()=>beginReverification(item)}>{w('Update credential details')}</Button>}<ScopeEvidencePanel item={item} canUpload={['Draft','Clarification'].includes(item.status)} refresh={applications.refresh}/>{item.status==='Approved'&&<p>{w("This specific scope is approved. Offerings still require the matching service configuration and published availability.")}</p>}</article>):<EmptyState title={w("No scope applications yet.")} />}</section>
     </section>

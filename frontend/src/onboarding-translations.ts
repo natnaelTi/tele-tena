@@ -98,4 +98,10 @@ export const onboardingTranslations:Record<string,[string,string]>={
   "Awaiting an individual service decision.": ["የግለሰብ አገልግሎት ውሳኔን በመጠባበቅ ላይ።", "Murtii tajaajila tokkoo eegaa jira."],
   "No service decisions yet.": ["እስካሁን የአገልግሎት ውሳኔዎች የሉም።", "Hanga ammaatti murtiin tajaajilaa hin jiru."],
   "Apply for each service separately. General application status does not approve a service.": ["ለእያንዳንዱ አገልግሎት ለብቻው ያመልክቱ። አጠቃላይ የማመልከቻ ሁኔታ አገልግሎትን አያጸድቅም።", "Tajaajila tokkoon tokkoof addaan iyyadhu. Haalli iyyataa waliigalaa tajaajila hin hayyamu."],
+  "Professional details": ["የሙያ ዝርዝሮች", "Bal'ina ogummaa"],
+  "Documents are private to authorized reviewers.": ["ሰነዶች ለተፈቀዱ ገምጋሚዎች ብቻ ይታያሉ።", "Sanadoonni gamaaggamtoota hayyamamaniif qofa mul'atu."],
+  "Relevant experience": ["ተዛማጅ ልምድ", "Muuxannoo barbaachisaa"],
+  "Not provided": ["አልቀረበም", "Hin kennamne"],
+  "Yes": ["አዎ", "Eeyyee"],
+  "No": ["አይ", "Lakki"],
 };

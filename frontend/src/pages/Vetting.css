@@ -1,0 +1,21 @@
+/* B07/B10: focused reference wizard with a separate persisted-application rail. */
+.scope-application-workspace{display:grid;grid-template-columns:minmax(0,572px) minmax(0,1fr);gap:48px;align-items:start;margin-top:32px}
+.scope-application-form{min-width:0;border:1px solid var(--border);border-radius:16px;padding:32px;background:white}
+.scope-application-form>.eyebrow{margin:0 0 20px}
+.scope-application-form>.step-progress{margin:20px 0 32px}
+.scope-application-form>h2{font-size:28px;line-height:1.2;letter-spacing:-.8px;margin:0 0 12px}
+.scope-application-form>.supporting{margin:0 0 28px}
+.scope-application-form>.field{margin-bottom:20px}
+.scope-form-actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;border-top:1px solid var(--border);margin-top:28px;padding-top:24px}
+.scope-application-preview{margin:24px 0}
+.scope-application-preview>div{padding:12px 0;border-bottom:1px solid var(--border)}
+.scope-application-preview dt{font-size:14px;color:var(--muted);margin-bottom:6px}
+.scope-application-preview dd{margin:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.scope-application-list{min-width:0}
+.scope-application-list>h2{font-size:24px;margin-top:0}
+.scope-application-row{border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px;background:white}
+.scope-application-row>strong{display:block;font-size:18px;line-height:1.4;margin-bottom:8px}
+.scope-application-row>span{display:inline-block;background:var(--subtle);border-radius:999px;padding:4px 12px;font-size:14px;margin-bottom:16px}
+.scope-application-row>.button{margin:12px 0}
+@media(max-width:1000px){.scope-application-workspace{grid-template-columns:minmax(0,572px);justify-content:center;gap:32px}}
+@media(max-width:600px){.scope-application-form{padding:24px 20px}.scope-application-row{padding:20px}.scope-form-actions .button{flex:1;min-width:100px}}
