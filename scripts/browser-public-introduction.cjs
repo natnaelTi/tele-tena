@@ -37,6 +37,7 @@ async function pair(context,page,id,width){
   stage='account route'; await page.goto(base+'/clinician/account');
   await page.getByRole('button',{name:'Professional profile & practice',exact:true}).click();
   stage='introduction field'; const field=page.getByLabel('Introduction',{exact:true});
+  assert.equal(await field.evaluate(input=>getComputedStyle(input).fontWeight),'400');
   const introduction=(await field.inputValue())||'I offer a supportive space for adults to talk through stress, life changes and relationship concerns. We can explore what matters to you and practical next steps together.';
   await field.fill(introduction);
   stage='owner save';

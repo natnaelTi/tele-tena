@@ -1,5 +1,6 @@
 /** Provisional account copy. Native Amharic/Afaan Oromo review remains required. */
 export const accountTranslations: Record<string, [string, string]> = {
+  "Services and pricing": ["አገልግሎቶችና ዋጋ", "Tajaajiloota fi gatii"],
   "Approved scopes and tailored offerings": ["የተፈቀዱ ወሰኖችና የተዘጋጁ አገልግሎቶች", "Daangaa hayyamamee fi tajaajiloota qophaa'an"],
   "Confirmation, buffers and notice": ["ማረጋገጫ፣ መካከለኛ ጊዜና ማሳወቂያ", "Mirkaneessa, yeroo boqonnaa fi beeksisa"],
   "Balances and payment activity": ["ቀሪ ሂሳብና የክፍያ እንቅስቃሴ", "Haftee fi sochii kaffaltii"],

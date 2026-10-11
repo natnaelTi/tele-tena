@@ -542,7 +542,6 @@ const words: Record<string, [string, string]> = {
   "Approaches and training": ["Malaafi leenjii", "Malaafi leenjii"],
   "None listed": ["Homtuu hin tarreeffamne", "Homtuu hin tarreeffamne"],
   "No training summary": ["Ibsa leenjii hin jiru", "Ibsa leenjii hin jiru"],
-  Affiliations: ["Waliin hojjechuu", "Waliin hojjechuu"],
   "Independent or not provided; affiliation is not competence evidence": ["Of danda'e ykn hin ibsamne; waliin hojjechuun dandeettii hin mirkaneessu", "Of danda'e ykn hin ibsamne; waliin hojjechuun dandeettii hin mirkaneessu"],
   "Application evidence": ["Ragaa iyyannoo", "Ragaa iyyannoo"],
   "Private CV uploaded": ["CV dhuunfaa olkaa'ameera", "CV dhuunfaa olkaa'ameera"],
