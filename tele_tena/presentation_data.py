@@ -18,6 +18,10 @@ SITE = 'teletena-mvp-presentation.localhost'
 VERSION = 'presentation-v1'
 # Illustrative demonstration values; not Ethiopian market-rate claims.
 PRICES = {'individual-counseling': 30000, 'stress-support': 40000, 'couples-counseling': 120000}
+INTRODUCTIONS = {
+    'clinician': 'I offer a supportive space for adults to talk through stress, life changes and relationship concerns. We can explore what matters to you and practical next steps together.',
+    'second_clinician': 'I welcome adults who would like to talk through everyday challenges and identify manageable next steps together.',
+}
 
 
 def setup():
@@ -62,7 +66,8 @@ def _setup(private):
     for key in ('patient', 'clinician', 'second_clinician'):
         frappe.set_user(users[key])
         journey.save_profile('patient' if key == 'patient' else 'clinician', names[key], True,
-                             languages=None if key == 'patient' else ['en', 'am'])
+                             languages=None if key == 'patient' else ['en', 'am'],
+                             **({'introduction': INTRODUCTIONS[key]} if key != 'patient' else {}))
         if key != 'patient':
             presentation.upload_resume('professional-profile.pdf', base64.b64encode(
                 b'%PDF-1.4\nFictional presentation applicant. No real qualifications or license verified.\n%%EOF').decode())
