@@ -944,9 +944,11 @@ def request_metrics():
     immediate = [req for req in requests if req.urgency == 'immediate']
     first_offer, confirmed, both_joined = [], [], []
     counts = {'matched': 0, 'unmatched': 0, 'expired': 0, 'cancelled': 0, 'open': 0,
-              'failed_acceptance': 0, 'matched_under_3_minutes': 0, 'eligible_supply_total': 0}
+              'failed_acceptance': 0, 'matched_under_3_minutes': 0, 'eligible_supply_total': 0, 'no_eligible_supply': 0}
     for req in immediate:
         supply = rows("SELECT eligible_supply FROM tt_request_metric WHERE request_id=%s AND event='Published' LIMIT 1", (req.id,))
+        if supply and supply[0].eligible_supply is not None and int(supply[0].eligible_supply) == 0:
+            counts['no_eligible_supply'] += 1
         counts['eligible_supply_total'] += int(supply[0].eligible_supply or 0) if supply else 0
         metrics = rows('SELECT event,occurred_at FROM tt_request_metric WHERE request_id=%s', (req.id,))
         events = {item.event: item.occurred_at for item in metrics}

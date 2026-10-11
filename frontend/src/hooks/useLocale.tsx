@@ -701,6 +701,8 @@ const words: Record<string, [string, string]> = {
   "Last 90 days": ["ያለፉት 90 ቀናት", "Guyyoota 90 darban"],
   "Under 3 minutes": ["ከ3 ደቂቃ በታች", "Daqiiqaa 3 gadi"],
   "immediate requests, including unmatched": ["አስቸኳይ ጥያቄዎች፣ ያልተዛመዱትን ጨምሮ", "gaaffiiwwan yeroo dhihoo, kan hin simanne dabalatee"],
+  "No eligible supply": ["ብቁ ባለሙያ የለም", "Dhiyeessiin ulaagaalee guutu hin jiru"],
+  "unmatched": ["ያልተዛመዱ", "kan hin simanne"],
   "Unmatched requests": ["ያልተዛመዱ ጥያቄዎች", "Gaaffiiwwan hin simanne"],
   "Open, expired and cancelled requests": ["ክፍት፣ ጊዜያቸው ያለፈ እና የተሰረዙ ጥያቄዎች", "Gaaffiiwwan banaa, yeroon isaanii darbee fi haqaman"],
   "Request status": ["የጥያቄ ሁኔታ", "Haala gaaffii"],

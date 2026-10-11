@@ -36,3 +36,13 @@
 .matching-boundaries { margin-top:24px; }
 .review-queue-table td details { margin-top:8px; }
 .review-queue-table td details summary { cursor:pointer; min-height:44px; font-weight:600; }
+
+.review-overview-metrics.compact > section { padding:24px; }
+.review-overview-metrics.compact strong { margin:10px 0; }
+.review-overview-metrics.compact p { font-size:14px; }
+.matching-operations .review-queue-filters { grid-template-columns:minmax(220px,320px) auto; justify-content:start; align-items:end; }
+.matching-operations .review-queue-filters .button { height:48px; }
+.matching-operations .review-queue-table td { padding:14px; }
+.matching-operations .review-queue-table .supporting { margin:6px 0 0; }
+.matching-operations .review-queue-table td details { margin-top:0; }
+@media(max-width:600px) { .matching-operations .review-queue-filters { grid-template-columns:minmax(0,1fr) auto; } }
