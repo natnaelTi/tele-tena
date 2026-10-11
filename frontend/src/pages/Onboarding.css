@@ -41,4 +41,4 @@
 /* B09 uses standalone scope cards; the legacy enclosing fieldset border is not
    part of the reference composition. Keep a bounded region for large catalogs. */
 .onboarding-guided .onboarding-scope-picker { border: 0; padding: 0; margin: 24px 0; }
-.onboarding-scope-picker .onboarding-scope-options .check-field.card { align-items: flex-start; min-height: 76px; margin-bottom: 10px; }
+.onboarding-scope-picker .onboarding-scope-options .check-field.check-card { align-items: flex-start; min-height: 76px; margin-bottom: 10px; }
