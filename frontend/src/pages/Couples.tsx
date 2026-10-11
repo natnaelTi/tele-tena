@@ -1,14 +1,14 @@
 import {api} from "../api";
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { HeartHandshake, ShieldCheck, User } from 'lucide-react';
+import { HeartHandshake, ShieldCheck, User, MessageCircle } from 'lucide-react';
 import { journeyApi, type Disclosure } from '../journey-api';
 import { useResource } from '../hooks/useResource';
 import { useAction } from '../hooks/useAction';
 import { useLocale } from '../hooks/useLocale';
 import { useSession } from '../hooks/useSession';
 import { Button, Card, Checkbox, EmptyState, InlineNotice, Skeleton, TextField, StatusBadge } from '../components/ui';
-import { DisclosurePreview, date, money } from '../components/Domain';
+import { DisclosurePreview, PageTitle, date, money } from '../components/Domain';
 import './Couples.css';
 import { AddFundsDialog } from '../components/AddFundsDialog';
 
@@ -17,13 +17,21 @@ export default function Couples() {
   const loadPlans=useCallback(()=>planId?journeyApi.couplePlan(planId).then(plan=>[plan]):journeyApi.couplePlans(),[planId]);
   const [token]=useState(()=>(location.state as {coupleToken?:string}|null)?.coupleToken||'');
   const plans=useResource(loadPlans);const wallet=useResource(journeyApi.wallet);const action=useAction();
+  const loadServices=useCallback(()=>planId?Promise.resolve([]):journeyApi.discover().then(offers=>offers.filter(offer=>offer.participant_structure==='couple')), [planId]);
+  const services=useResource(loadServices);
+  const sharedServices=services.data?.filter((offer,index,offers)=>offers.findIndex(candidate=>candidate.service_category===offer.service_category)===index);
   const [addFunds,setAddFunds]=useState(false);
   const [pay,setPay]=useState<string|null>(null);
   useEffect(()=>{if(token)navigate(location.pathname,{replace:true,state:null});},[token,navigate,location.pathname]);
   useEffect(()=>{const timer=window.setInterval(()=>void plans.refresh(),10000);return()=>window.clearInterval(timer);},[plans.refresh]);
   const invitation=token?`${window.location.origin}${import.meta.env.PROD?'/teletena':''}/couple-invitation#consent=${encodeURIComponent(token)}`:'';
-  return <div className="shared-care-page"><header><HeartHandshake size={24}/><h1>{w(planId?(plans.data?.[0]?.state==='Consented'?'Ready for your shared session':'Your shared session'):'Shared care')}</h1><p>{w(planId?'Each participant must be ready before the shared session is confirmed.':'Two adults, separate consent and privacy.')}</p></header>
+  return <div className="shared-care-page"><PageTitle title={w(planId?(plans.data?.[0]?.state==='Consented'?'Ready for your shared session':'Your shared session'):'Care, together')} description={w(planId?'Each participant must be ready before the shared session is confirmed.':'Shared care with independent privacy for every adult.')}/>
     {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
+    {!planId&&<>
+      {services.error?<InlineNotice tone="danger">{w('Shared services could not be loaded.')} <Button variant="secondary" onClick={()=>void services.refresh()}>{w('Retry')}</Button></InlineNotice>:!services.data?<Skeleton/>:sharedServices?.length?<section className="shared-service-grid" aria-label={w('Shared consultations')}>{sharedServices.map((offer,index)=><Card key={offer.id} className="shared-service-card"><h2>{offer.service_category||offer.label}</h2><span className="shared-service-symbol" aria-hidden="true">{index%2?<MessageCircle size={24}/>:<HeartHandshake size={24}/>}</span><p>{offer.description||w('Choose an approved offering, then invite the other adult to make their own choices.')}</p><Link className={index?'button secondary':'button primary'} to={'/patient/services/'+offer.id}>{w('Choose a shared session')}</Link></Card>)}</section>:<EmptyState title={w('No shared services are available right now.')}><Link to="/patient/discovery">{w('Find care')}</Link></EmptyState>}
+      <InlineNotice>{w('This service is for adults 18+. Each person signs in independently and chooses what to share. Linking accounts does not expose private records.')}</InlineNotice>
+      <h2 className="shared-session-heading">{w('Your shared sessions')}</h2>
+    </>}
     {invitation&&<Card><h2>{w('Private invitation link')}</h2><p>{w('Share this link directly with the intended adult. Anyone holding it can try to accept it.')}</p><TextField label={w('Private invitation link')} value={invitation} readOnly/><Button variant="secondary" onClick={()=>void action.run(async()=>navigator.clipboard.writeText(invitation),w('Invitation link copied.'))}>{w('Copy link')}</Button></Card>}
     {plans.error?<InlineNotice tone="danger">{w('This step could not be loaded. Try again.')} <Button onClick={()=>void plans.refresh()}>{w('Retry')}</Button></InlineNotice>:!plans.data?<Skeleton/>:!plans.data.length?<EmptyState title={w('No shared sessions yet.')}><Link to="/patient/discovery">{w('Find care')}</Link></EmptyState>:plans.data.map(plan=>!planId?<Card key={plan.id} className="shared-plan-row"><div><h2>{plan.service}</h2><p>{plan.clinician} · {date(plan.start,plan.timezone)}</p><span>{w(plan.appointment_state||plan.state)}</span></div><Link className="button secondary" to={"/patient/couples/"+plan.id}>{w("View shared session")}</Link></Card>:<article key={plan.id}>
       <p className="supporting">{plan.service} · {date(plan.start,plan.timezone)}</p>
