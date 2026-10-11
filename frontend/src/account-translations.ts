@@ -1,5 +1,8 @@
 /** Provisional account copy. Native Amharic/Afaan Oromo review remains required. */
 export const accountTranslations: Record<string, [string, string]> = {
+  "Approved scopes and tailored offerings": ["የተፈቀዱ ወሰኖችና የተዘጋጁ አገልግሎቶች", "Daangaa hayyamamee fi tajaajiloota qophaa'an"],
+  "Confirmation, buffers and notice": ["ማረጋገጫ፣ መካከለኛ ጊዜና ማሳወቂያ", "Mirkaneessa, yeroo boqonnaa fi beeksisa"],
+  "Balances and payment activity": ["ቀሪ ሂሳብና የክፍያ እንቅስቃሴ", "Haftee fi sochii kaffaltii"],
   "Introduction": ["መግቢያ", "Seensa"],
   "This introduction is visible on your approved public profile. Do not include private patient information.": ["ይህ መግቢያ በተፈቀደው የሕዝብ መገለጫዎ ይታያል። የግል የታካሚ መረጃ አያካትቱ።", "Seensi kun ibsa uummataa kee hayyamame irratti mul'ata. Odeeffannoo dhukkubsataa dhuunfaa hin dabaliin."],
   "Enter your professional name.": ["የሙያ ስምዎን ያስገቡ።", "Maqaa ogummaa kee galchi."],
