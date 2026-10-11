@@ -2,7 +2,7 @@ import "./Account.css";
 import { api } from "../api";
 import { WalletSummary } from "../components/WalletSummary";
 import { useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, ShieldCheck, Settings2, LockKeyhole, Users, Layers, CalendarDays, WalletCards } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PageTitle } from "../components/Domain";
@@ -22,6 +22,10 @@ export default function Account() {
   const sections=profile.kind==="clinician"?["Personal profile","Contact & sign-in","Language & timezone","Professional profile & practice"]:["Personal profile","Privacy & sharing","Language & timezone","Contact & sign-in"];
   const tabs = ["Overview", ...sections];
   const [tab,setTab]=useState("Overview");
+  const sectionNavigation = useRef<HTMLElement>(null);
+  useEffect(() => {
+    sectionNavigation.current?.querySelector<HTMLElement>('[aria-current="page"]')?.scrollIntoView({block:"nearest",inline:"nearest"});
+  }, [tab]);
   const [name, setName] = useState(profile.display_name);
   const [nameAttempted,setNameAttempted]=useState(false);
   const [introduction, setIntroduction] = useState(profile.introduction || "");
@@ -59,7 +63,7 @@ export default function Account() {
   const personalEditor = <form className="settings-section" onSubmit={e=>{e.preventDefault();saveProfile();}}><h2>{w("Personal details")}</h2>{tab === "Personal profile" && <p>{w("Your preferred name is used in your account. Sharing it with a clinician is decided for each appointment.")}</p>}<TextField label={w(profile.kind === "clinician" ? "Professional name" : "Preferred name or alias")} value={name} maxLength={120} onChange={e=>setName(e.target.value)} required pattern={String.raw`.*\S.*`} onInvalid={()=>setNameAttempted(true)} error={nameAttempted&&!name.trim()?w(profile.kind === "clinician"?"Enter your professional name.":"Enter a preferred name or alias."):undefined} disabled={action.busy}/>{tab === "Personal profile" && profile.kind === "patient" && <details className="settings-disclosure"><summary>{w("Optional saved history")}</summary><div className="field"><label htmlFor="account-private-history">{w("Information you may choose to share")}</label><textarea id="account-private-history" aria-describedby="account-history-help" rows={5} maxLength={4000} value={history} onChange={e=>setHistory(e.target.value)} disabled={action.busy}/></div><p id="account-history-help" className="supporting">{w("Your saved history is not shared unless you choose it for an appointment.")}</p></details>}<Button type="submit" variant="secondary" loading={action.busy}>{w("Save details")}</Button></form>;
   return <>
     <PageTitle title={w(title)} description={w(description)} />
-    {tab !== "Overview" && <nav className="account-tabs" aria-label={w("Account settings")}>{tabs.map(label=><button type="button" key={label} className={tab===label?"selected":""} onClick={()=>setTab(label)} aria-current={tab===label?"page":undefined}>{w(label)}</button>)}</nav>}
+    {tab !== "Overview" && <nav ref={sectionNavigation} className="account-tabs" aria-label={w("Account settings")}>{tabs.map(label=><button type="button" key={label} className={tab===label?"selected":""} onClick={()=>setTab(label)} aria-current={tab===label?"page":undefined}>{w(label)}</button>)}</nav>}
     <div className="account-sections" data-tour-unsaved={dirty?"true":"false"} onChange={()=>setDirty(true)}>
     {tab === "Overview" && <div className="account-overview"><div>{personalEditor}<section className="settings-section"><h2>{w("Your settings")}</h2>{sections.filter(label => label !== "Personal profile").map(label => <button type="button" className="settings-link-row" aria-label={w(label)} key={label} onClick={() => setTab(label)}>{label === "Privacy & sharing" ? <ShieldCheck size={20}/> : label === "Contact & sign-in" ? <LockKeyhole size={20}/> : <Settings2 size={20}/>}<span><strong>{w(label)}</strong><small>{w(label === "Privacy & sharing" ? "Defaults and encounter-level control" : label === "Language & timezone" ? "Language and appointment timezone" : label === "Contact & sign-in" ? "Sign-in methods" : "Profile, languages and evidence")}</small></span><ArrowRight size={18}/></button>)}</section></div><aside>{profile.kind === "patient" ? <>{wallet.data ? <WalletSummary available={wallet.data.available} reserved={wallet.data.reserved} /> : wallet.error ? <InlineNotice tone="danger">{w("Balance unavailable.")} <Button variant="secondary" onClick={()=>void wallet.refresh()}>{w("Try again")}</Button></InlineNotice> : <p role="status">{w("Loading balance…")}</p>}<section className="settings-section"><h2>{w("People in your care")}</h2><Link className="settings-link-row" to="/patient/couples"><Users size={20}/><span><strong>{w("Shared care")}</strong><small>{w("Manage invitations and consent")}</small></span><ArrowRight size={18}/></Link><InlineNotice>{w("Relationships are private. Being linked never automatically shares records.")}</InlineNotice></section></> : practiceSettings}</aside></div>}
 

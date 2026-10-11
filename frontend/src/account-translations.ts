@@ -1,5 +1,7 @@
 /** Provisional account copy. Native Amharic/Afaan Oromo review remains required. */
 export const accountTranslations: Record<string, [string, string]> = {
+  "Phone code": ["የስልክ ኮድ", "Koodii bilbilaa"],
+  "Email code": ["የኢሜይል ኮድ", "Koodii imeelii"],
   "Email and password": ["ኢሜይልና የይለፍ ቃል", "Imeelii fi jecha iccitii"],
   "Unavailable on this site": ["በዚህ ጣቢያ አይገኝም", "Marsariitii kana irratti hin jiru"],
   "Sign-in methods could not be loaded.": ["የመግቢያ ዘዴዎችን መጫን አልተቻለም።", "Maloota seensaa fe'uun hin danda'amne."],
