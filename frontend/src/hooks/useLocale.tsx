@@ -4,6 +4,7 @@ import { accountTranslations } from "../account-translations";
 import { patientJourneyTranslations } from "../patient-journey-translations";
 import { landingTranslations } from "../landing-translations";
 import { publicJourneyTranslations } from "../public-journey-translations";
+import { onboardingTranslations } from "../onboarding-translations";
 import { locales } from "../i18n";
 import type { Key } from "../i18n";
 import { useSession } from "./useSession";
@@ -102,6 +103,7 @@ const words: Record<string, [string, string]> = {
   "Lowest price": ["ዝቅተኛ ዋጋ", "Gatii gadi aanaa"],
   ...landingTranslations,
   ...publicJourneyTranslations,
+  ...onboardingTranslations,
   ...patientJourneyTranslations,
   ...accountTranslations,
   "Shared care": ["የጋራ እንክብካቤ", "Kunuunsa waliin"],

@@ -1,0 +1,19 @@
+/* B01–B03/B06–B10 use the reference wizard; B05 has its own readiness hero. */
+.onboarding-guided{max-width:572px}
+.onboarding-guided>.eyebrow{font-size:12px;margin-bottom:24px}
+.onboarding-guided>.step-progress{margin:24px 0 38px}
+.onboarding-guided>h1{font-size:36px;line-height:1.15;letter-spacing:-1.3px;margin:0 0 16px}
+.onboarding-guided .check-field.check-card{margin:12px 0}
+.onboarding-guided .form-actions{margin-top:24px}
+.onboarding-ready-page{max-width:1128px}
+.onboarding-ready-hero{background:var(--ink);color:white;border-radius:24px;padding:40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:32px;margin-top:32px}
+.onboarding-ready-hero>div,.onboarding-ready-hero>aside{min-width:0}
+.onboarding-ready-hero>div>h2{font-size:44px;line-height:1.12;letter-spacing:-1.6px;color:white;margin:0 0 16px}
+.onboarding-ready-hero>div>p{line-height:1.6;color:#d4e2e7}
+.onboarding-ready-hero>div>.button{background:white;color:var(--ink);border-color:white}
+.onboarding-ready-hero>aside{background:var(--subtle);color:var(--ink);border-radius:20px;padding:28px}
+.onboarding-ready-hero>aside>h2{font-size:24px;margin:24px 0}
+.onboarding-ready-hero dl{display:grid;grid-template-columns:minmax(100px,1fr) minmax(0,1fr);margin:0}
+.onboarding-ready-hero dt,.onboarding-ready-hero dd{margin:0;padding:16px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
+.onboarding-ready-hero dt{color:var(--muted)}.onboarding-ready-hero dd{text-align:right;font-weight:600}
+@media(max-width:650px){.onboarding-guided>h1{font-size:32px}.onboarding-ready-hero{grid-template-columns:1fr;padding:28px 24px;gap:24px}.onboarding-ready-hero>div>h2{font-size:36px}.onboarding-ready-hero>aside{padding:22px}}

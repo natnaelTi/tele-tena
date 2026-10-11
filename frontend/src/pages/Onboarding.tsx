@@ -14,6 +14,8 @@ import { destination, useSession } from "../hooks/useSession";
 import { useLocale } from "../hooks/useLocale";
 import { journeyApi } from "../journey-api";
 import WorkspaceTour from "../components/WorkspaceTour";
+import { ShieldCheck } from "lucide-react";
+import "./Onboarding.css";
 type Answers = {
   name?: string;
   adult?: boolean;
@@ -65,16 +67,16 @@ export default function Onboarding() {
   const clinician = kind === "clinician";
   const titles = clinician
     ? [
-        "Your professional identity",
-        "Your experience and service scope",
-        "A few final details",
+        "Your professional profile",
+        "Qualifications & résumé",
+        "Clinic affiliations",
         "Review your application",
       ]
     : [
-        "What should we call you?",
-        "A thoughtful start",
-        "Your language. Your privacy.",
-        "You’re ready to find care.",
+        "A little about you",
+        "Adult eligibility",
+        "Your privacy defaults",
+        "You’re ready",
       ];
   const update = (value: Partial<Answers>) => {
     setAnswers({ ...answers, ...value });
@@ -113,7 +115,7 @@ export default function Onboarding() {
   }
   return (
     <>
-    <section className="guided-panel">
+    <section className={`guided-panel onboarding-guided ${!clinician&&step===3?"onboarding-ready-page":""}`}>
       <p className="eyebrow">
         {clinician ? "CLINICIAN APPLICATION" : "YOUR SPACE FOR CARE"} · STEP{" "}
         {step + 1} OF 4
@@ -123,8 +125,8 @@ export default function Onboarding() {
           <span key={value} data-complete={value <= step} />
         ))}
       </div>
-      <h1>{titles[step]}</h1>
-      {error && <InlineNotice tone="danger">{error}</InlineNotice>}
+      <h1>{w(titles[step])}</h1>
+      {error && <InlineNotice tone="danger">{w(error)}</InlineNotice>}
       {!ready ? (
         <Skeleton />
       ) : (
@@ -152,6 +154,7 @@ export default function Onboarding() {
               /></div>
             </>
           )}
+          {step === 1 && !clinician && <p className="supporting">{w("For a shared session, every participating adult completes their own registration and consent.")}</p>}
           {step === 1 &&
             (clinician ? (
               <>
@@ -167,8 +170,7 @@ export default function Onboarding() {
                 </label>
                 <p className="supporting">
                   Describe your qualification, registration and the services you
-                  would like reviewed. This demonstration accepts synthetic
-                  information only. Upload a PDF resume (up to 5 MB); receipt
+                  would like reviewed. Upload a PDF resume (up to 5 MB); receipt
                   does not mean your credentials are verified.
                 </p>
                 <fieldset className="scope-picker" data-tour="applicant-scopes"><legend>Services requested for approval</legend>{catalog.map(service=><Checkbox key={service.id} label={service.label} checked={(answers.requested_services||[]).includes(service.id)} onChange={e=>update({requested_services:e.target.checked?[...(answers.requested_services||[]),service.id]:(answers.requested_services||[]).filter(x=>x!==service.id)})}/>)}</fieldset>
@@ -181,13 +183,15 @@ export default function Onboarding() {
                   continuing.
                 </p>
                 <Checkbox
-                  label="I am 18 or older."
+                  variant="card"
+                  label={w("I am 18 or older.")}
                   checked={!!answers.adult}
                   required
                   onChange={(e) => update({ adult: e.target.checked })}
                 />
                 <Checkbox
-                  label="I consent to storing my profile and the information I choose to share for this care journey."
+                  variant="card"
+                  label={w("I consent to storing my profile and the information I choose to share for this care journey.")}
                   checked={!!answers.consent}
                   required
                   onChange={(e) => update({ consent: e.target.checked })}
@@ -198,19 +202,21 @@ export default function Onboarding() {
             (clinician ? (
               <>
                 <TextField
-                  label="Clinic affiliations (optional)"
+                  label={w("Clinic affiliations (optional)")}
                   value={answers.affiliations || ""}
                   onChange={(e) => update({ affiliations: e.target.value })}
-                  hint="Affiliation does not grant access to patient records."
+                  hint={w("Affiliation does not grant access to patient records.")}
                 />
                 <Checkbox
-                  label="I am 18 or older."
+                  variant="card"
+                  label={w("I am 18 or older.")}
                   checked={!!answers.adult}
                   required
                   onChange={(e) => update({ adult: e.target.checked })}
                 />
                 <Checkbox
-                  label="I consent to storing these details for manual application review."
+                  variant="card"
+                  label={w("I consent to storing these details for manual application review.")}
                   checked={!!answers.consent}
                   required
                   onChange={(e) => update({ consent: e.target.checked })}
@@ -219,7 +225,7 @@ export default function Onboarding() {
             ) : (
               <>
                 <Select
-                  label="Preferred language"
+                  label={w("Preferred language")}
                   value={answers.language || "en"}
                   onChange={(e) => update({ language: e.target.value })}
                 >
@@ -232,18 +238,21 @@ export default function Onboarding() {
                   booking.
                 </p>
                 <Checkbox
-                  label="Share my preferred name by default"
+                  variant="card"
+                  label={w("Share my preferred name by default")}
                   checked={!!answers.share_name}
                   onChange={(e) => update({ share_name: e.target.checked })}
                 />
                 <Checkbox
-                  label="Share my saved history by default"
+                  variant="card"
+                  label={w("Share my saved history by default")}
                   checked={!!answers.share_history}
                   onChange={(e) => update({ share_history: e.target.checked })}
                 />
               </>
             ))}
-          {step === 3 && (
+          {step === 3 && !clinician && <section className="onboarding-ready-hero"><div><h2>{w("What’s on your mind?")}</h2><p>{w("Describe what you need, browse specialists, or ask available clinicians to respond.")}</p><Button type="submit" loading={busy}>{w("Find care")}</Button></div><aside><ShieldCheck size={26}/><h2>{w("Your choices come with you.")}</h2><dl><dt>{w("Display name")}</dt><dd>{answers.name}</dd><dt>{w("Care language")}</dt><dd>{{en:"English",am:"አማርኛ",om:"Afaan Oromo"}[answers.language as "en"|"am"|"om"]||"English"}</dd><dt>{w("Sharing")}</dt><dd>{w("Preview before every booking")}</dd></dl></aside></section>}
+          {step === 3 && clinician && (
             <>
               <p>
                 {clinician
@@ -274,13 +283,13 @@ export default function Onboarding() {
                 {w("Back")}
               </Button>
             )}
-            <Button type="submit" loading={busy}>
+            {(clinician||step!==3)&&<Button type="submit" loading={busy}>
               {step === 3
                 ? clinician
-                  ? "Submit for review"
+                  ? w("Submit for review")
                   : w("Find care")
                 : w("Continue")}
-            </Button>
+            </Button>}
           </div>
           <Button
             variant="quiet"
@@ -288,10 +297,10 @@ export default function Onboarding() {
             disabled={busy}
             onClick={() => void save(step)}
           >
-            Save for later
+            {w("Save for later")}
           </Button>
           {saved && (
-            <p role="status">Progress saved. You can return to this step.</p>
+            <p role="status">{w("Progress saved. You can return to this step.")}</p>
           )}
         </form>
       )}
