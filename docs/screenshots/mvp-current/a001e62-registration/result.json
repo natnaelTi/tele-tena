@@ -1,0 +1,26 @@
+{
+  "source": "a001e625528d28f0a704185da382966de81f64c7",
+  "site": "tele-tena-pr12-fresh.localhost",
+  "real_backend": true,
+  "test_transport_only": true,
+  "wrong_expired_code": true,
+  "resend_cooldown": true,
+  "patient_recovery": true,
+  "returning_same_account": true,
+  "clinician_intent_manual_approval": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ],
+  "screens": [
+    "A05",
+    "B01",
+    "B02",
+    "B03",
+    "B05",
+    "B06",
+    "B07",
+    "B10"
+  ]
+}

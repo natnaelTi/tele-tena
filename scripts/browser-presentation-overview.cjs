@@ -49,6 +49,7 @@ async function pair(context, page, id, width) {
     fullPage: true,
   });
   const reference = await context.newPage();
+  await reference.setViewportSize({width,height:1000});
   await reference.goto(
     "http://127.0.0.1:8044/?embed=1#" + id.split("-")[0].toLowerCase(),
   );
@@ -110,9 +111,11 @@ async function pair(context, page, id, width) {
             ),
           );
           await pair(context, page, "F01", width);
+          stage = "F01 keyboard detail navigation " + width;
           await link.press("Enter");
           await page.waitForURL(/consultations\//);
-          await page.getByRole("heading", { level: 1 }).waitFor();
+          await page.locator(".consultation-summary").waitFor();
+          stage = "F01 single detail summary " + width;
           assert.equal(await page.locator(".consultation-summary").count(), 1);
         }
         stage = role + " persisted appointment detail " + width;
@@ -136,28 +139,25 @@ async function pair(context, page, id, width) {
         if (await timeAction.count()) {
           assert.equal(await page.locator(".reschedule-panel").count(), 0);
           await timeAction.click();
-          const choices = page.getByLabel("Choose an available time", {
-            exact: true,
-          });
-          await choices.waitFor();
-          await choices.selectOption({ index: 1 });
-          assert.ok(
-            await page
-              .getByRole("button", { name: "Send time request", exact: true })
-              .isEnabled(),
-          );
-          await page
-            .locator(".reschedule-panel")
-            .getByRole("button", { name: "Cancel", exact: true })
-            .click();
-          assert.equal(await page.locator(".reschedule-panel").count(), 0);
+          stage = role + " reschedule controls " + width;
+          await page.waitForURL(/consultations\/[^/]+\/reschedule$/);
+          await page.getByRole("heading",{name:"Choose a new time",exact:true}).waitFor();
+          await page.locator(".booking-calendar").waitFor();
+          const slots=page.locator(".booking-slot-grid button");
+          assert.ok(await slots.count()>0,"Presentation offering must have a real generated alternative slot");
+          await slots.first().focus();await slots.first().press("Enter");
+          assert.ok(await page.getByRole("button",{name:"Send reschedule request",exact:true}).isEnabled());
+          await page.getByRole("button",{name:"Keep current time",exact:true}).click();
+          await page.waitForURL(/consultations\/[^/]+$/);
+          await page.locator(".consultation-summary").waitFor();
+          assert.equal(await page.locator(".reschedule-panel").count(),0);
         }
       }
       assert.deepEqual(await query(page, walletMethod), before);
       await context.close();
     }
     console.log(
-      "PASS: compact clinician overview, keyboard detail navigation, loaded participant details/reload at 390/768/1440; financial queries unchanged. Paired evidence is not universal visual acceptance.",
+      "PASS: compact clinician overview, keyboard detail navigation, generated-slot keyboard selection/return, loaded participant details/reload at matched390/768/1440; financial queries unchanged. Paired evidence is not universal visual acceptance.",
     );
   } catch (error) {
     console.error(

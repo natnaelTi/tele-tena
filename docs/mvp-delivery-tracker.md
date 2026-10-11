@@ -2,7 +2,7 @@
 
 ## Active MVP completion —2026-10-11
 
-Packaged source `bcbac7533e67757985fec3a4861c9b7869cf0824`, stable URL
+Packaged source `fb94c293d8f010d8f5775ee0c2d2696bf3fce9d7`, stable URL
 http://127.0.0.1:8017/teletena/ on `teletena-mvp-presentation.localhost`, original
 Bench `/home/frappe/frappe/frappe-bench`. Preview reboot/PWA recovery, couples
 joint time/extension consent, recipient-specific follow-up, current owner

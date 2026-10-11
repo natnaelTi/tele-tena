@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **bcbac7533e67757985fec3a4861c9b7869cf0824**. Later report/evidence-only commits
+  **fb94c293d8f010d8f5775ee0c2d2696bf3fce9d7**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -35,6 +35,46 @@ screen/completion matrix; the sections below this active checkpoint are historic
 | Financial preservation | Named presentation-site backup with private/public files, scoped stop retaining queue, native migration throughv1.35. Exact wallets, all legacy events/journals/lines, earnings and reconciliation-values fingerprint unchanged. New tables do not rewrite historical notes/consents. Read-only owner check:3patients,1clinician,6accounts, zero projection/obligation/journal/balance errors |
 | Native background jobs | Current scheduler/worker automatically execute release, invitation expiry, request expiry and extension expiry (Scheduled Job Logs Complete), queue contains only intended site jobs. Fixed native scheduler_interval10→60 while keeping tick10: Frappe converted sub-minute All intervals to invalid */0 cron steps. No framework modification. `verify_continuous_processing.py` observed one release posting and a disputed hold; original short policy applies only to its2owned encounters. Prior worker-down enqueue/restart evidence retained |
 | Frontend/syntax | Locked package build, TypeScript, lint exit0; existing large-chunk/lint warnings retained. Python syntax checks passed. No full unchanged individual hosted suite repeated |
+
+## Public entry, registration and shared-calendar continuation
+
+Packaged source `fb94c293d8f010d8f5775ee0c2d2696bf3fce9d7` includes the following
+focused changes. Later documentation/test commits do not require a rebuild when
+the frontend/backend runtime diff is empty. Runtime backend is unchanged since
+`cc52e8f`; no new migration or financial write was needed for these UI changes.
+
+- **A02/A03**: dedicated public explanation and clinician invitation routes,
+  reference hero/cards/header and real access-policy/intent/deep-link checks at
+  c09a6d3. Desktop/mobile inspected; 768 also captured. Operational preview does
+  not fabricate appointments, patients, credential status or earnings.
+- **N01**: approved shared-care catalog, Account/navigation entry, expandable
+  retained history and service→generated calendar pass at c09a6d3. Fixed retained
+  resource-list rendering multiple plans on one detail route. No records deleted.
+- **E03**: three-party generated-slot consent/unchanged financial snapshot passes
+  at4553fe4. Corrected tablet/native200% calendar pairing. Actual browser zoom,
+  including separately captured scrolled calendar, is not device emulation.
+- **A05/B01–03/B05–07/B10**: full real backend transport run at a001e62 proves
+  wrong/expired codes, native cooldown/resend, new patient/recovery, same-account
+  return, new clinician intent/private PDF/submission without clinical approval.
+  Observed premature resend rejection is retained as diagnostic evidence; backend
+  limits were correct. Client now computes cooldown from an absolute deadline and
+  resets waiting on server cooldown rejection. No throttle was relaxed.
+- **fb94c29 focused onboarding**: two real random-code contact proofs, patient and
+  clinician draft/reload/submit, searchable scope no-result/reset preserving
+  selection, private resume and no privileged roles all pass. This focused rerun
+  does **not** repeat cooldown/expiry/returning coverage or prove live delivery.
+  Temporary configuration restored, loopback transport stopped, codes removed.
+  Paired B05 exposed old global guided width overriding the readiness hero;
+  scoped width fixes now render a wide hero and readable mobile stack.
+
+Paired evidence is under `docs/screenshots/mvp-current/` in the named source
+folders. Registration screenshots use the isolated technical fixture site;
+its service-test wording is not presentation content. English screen comparisons
+are recorded individually in the existing matrix, including remaining structured
+clinician onboarding composition differences. Native-language approval, all-state
+visual acceptance and owner acceptance remain open. Build/typecheck/lint pass;
+existing lint and chunk-size warnings remain. No unchanged financial or hosted
+consultation suite was repeated for these frontend changes.
 
 ## Remaining release work, not silently dropped
 

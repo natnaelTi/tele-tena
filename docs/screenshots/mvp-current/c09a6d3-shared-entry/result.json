@@ -1,0 +1,13 @@
+{
+  "source": "c09a6d3a432c7bddb152187d368d24d4f935c147",
+  "site": "teletena-mvp-presentation.localhost",
+  "real_catalog": true,
+  "service_to_generated_calendar": true,
+  "existing_plan_reload": true,
+  "no_mutation": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ]
+}
