@@ -2204,6 +2204,7 @@ class Presentation(unittest.TestCase):
         self.assertEqual(after, before)
 
     def test_prefunded_extension_requires_consent_and_settles_once(self):
+        from tele_tena.api import consultations
         from tele_tena import accounting
         offering = fixtures.Integration.offers['c1']
         day, _, _ = self.make_schedule(mode='automatic', offering=offering)
