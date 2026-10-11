@@ -193,7 +193,7 @@ const patientNav = [
   ["/patient/requests", "My requests", ClipboardCheck],
   ["/patient/account", "Account", Settings2],
   ["/patient/clinic-access", "Clinic access", Building2],
-  ["/patient/relationships", "Shared care", HeartHandshake],
+  ["/patient/couples", "Shared care", HeartHandshake],
 ] as const;
 const clinicianNav = [
   ["/clinician", "Today", Home],

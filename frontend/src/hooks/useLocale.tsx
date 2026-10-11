@@ -11,6 +11,7 @@ import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
   // Provisional additions; native review remains required.
+  "Manage relationship links": ["የግንኙነት ማገናኛዎችን ያስተዳድሩ", "Hidhannoo walitti dhufeenyaa bulchi"],
   "Care, together": ["እንክብካቤ፣ በጋራ", "Kunuunsa, waliin"],
   "Shared care with independent privacy for every adult.": ["ለእያንዳንዱ ጎልማሳ የተለየ ግላዊነት ያለው የጋራ እንክብካቤ።", "Kunuunsa waliin, iccitii dhuunfaa ga'eessa hundaaf."],
   "Shared services could not be loaded.": ["የጋራ አገልግሎቶችን መጫን አልተቻለም።", "Tajaajiloota waliin fe'uun hin danda'amne."],
