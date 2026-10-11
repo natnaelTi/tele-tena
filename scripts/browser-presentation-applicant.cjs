@@ -103,6 +103,25 @@ let stage = "launch";
         .getByRole("heading", { name: "Your account", exact: true })
         .waitFor();
     }
+    stage = "pending practice navigation";
+    if (process.env.TELE_TENA_REPRO_PENDING_NAV==='1') {
+      const denied=page.waitForResponse(response=>response.url().includes('tele_tena.accounting.clinician_earnings'));
+      await page.getByRole('link',{name:'Earnings',exact:true}).click();
+      assert.equal((await denied).status(),403);
+      console.log('Pending Account earnings link reaches protected HTTP403; no financial data returned.');
+      await page.goto(base+'/clinician/account');
+      await page.getByRole('heading',{name:'Your account',exact:true}).waitFor();
+    } else {
+      assert.equal(await page.getByRole('link',{name:'Earnings',exact:true}).count(),0);
+    }
+    stage = "pending professional settings navigation";
+    await page.getByRole('button',{name:'Professional profile & practice',exact:true}).click();
+    for (const label of ['Services and pricing','Availability','Earnings']) {
+      assert.equal(await page.getByRole('link',{name:label,exact:true}).count(),0);
+    }
+    assert.equal(await page.getByRole('link',{name:'Application & credentials',exact:true}).count(),1);
+    await page.goto(base+'/clinician/account');
+    await page.getByRole('heading',{name:'Your account',exact:true}).waitFor();
     stage = "pending own profile save";
     const nameField=page.getByLabel('Professional name',{exact:true});
     const unchangedName=await nameField.inputValue();
@@ -127,7 +146,7 @@ let stage = "launch";
     );
     assert.equal(status, 403);
     const manifest=JSON.parse(fs.readFileSync(require('node:path').resolve(__dirname,'../tele_tena/public/review/release.json')));
-    fs.writeFileSync(output+'/result.json',JSON.stringify({source:manifest.source_commit,site:'teletena-mvp-presentation.localhost',real_backend:true,pending_state:true,approved_only_navigation_absent:true,profile_reload:true,no_approval_mutation:true,pending_profile_save_status:saveStatus,direct_appointments_denied:true,viewports:[390,768,1440]},null,2));
+    fs.writeFileSync(output+'/result.json',JSON.stringify({source:manifest.source_commit,site:'teletena-mvp-presentation.localhost',real_backend:true,pending_state:true,approved_only_navigation_absent:true,profile_reload:true,no_approval_mutation:true,pending_profile_save_status:saveStatus,pending_practice_link_reproduction:process.env.TELE_TENA_REPRO_PENDING_NAV==='1',direct_appointments_denied:true,viewports:[390,768,1440]},null,2));
 
     console.log(
       "PASS: pending applicant lands on actual application state, profile/reload works at 390/768/1440, no approved-only dashboard queries; direct appointment API denied 403. No approval or financial mutation.",
