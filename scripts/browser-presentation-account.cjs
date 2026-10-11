@@ -29,6 +29,7 @@ let stage = 'launch', browser;
     const before = (await query('tele_tena.api.contact_auth.session')).profile;
     const moneyMethod = role === 'patient' ? 'tele_tena.api.journey.wallet' : 'tele_tena.accounting.clinician_earnings';
     const moneyBefore = await query(moneyMethod);
+    const access = await query('tele_tena.api.contact_auth.sign_in_options');
     async function pair(id,width) {
       await page.evaluate(()=>document.fonts.ready);
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth));
@@ -77,6 +78,11 @@ let stage = 'launch', browser;
       if (role === 'patient') await pair('H04',width);
       await page.getByRole('button',{name:'Contact & sign-in',exact:true}).click();
       await page.getByRole('heading',{name:'Contact and sign-in',exact:true}).waitFor();
+      for (const [label,enabled] of [['Phone code',access.phone_otp],['Email code',access.email_otp]]) {
+        const term = page.locator('dt').filter({hasText:new RegExp('^'+label+'$')});
+        await term.waitFor();
+        assert.equal(await term.evaluate(el=>el.nextElementSibling.textContent),enabled ? 'Available' : 'Unavailable on this site');
+      }
       if (role === 'patient') await pair('H05',width);
     }
     assert.deepEqual((await query('tele_tena.api.contact_auth.session')).profile,before);
@@ -84,6 +90,6 @@ let stage = 'launch', browser;
     await context.close();
   }
   assert.deepEqual(JSON.parse(fs.readFileSync('tele_tena/public/review/release.json')),build,'Build changed during evidence capture');
-  fs.writeFileSync(out+'/result.json',JSON.stringify({source:build.source_commit,site:'teletena-mvp-presentation.localhost',widths:[390,768,1440],roles:['patient','clinician'],stable_private_field_label:true,draft_navigation_preserved:true,profile_and_money_unchanged:true,english_only:true,zoom_200_verified:false},null,2));
+  fs.writeFileSync(out+'/result.json',JSON.stringify({source:build.source_commit,site:'teletena-mvp-presentation.localhost',widths:[390,768,1440],roles:['patient','clinician'],site_capabilities_truthful:true,stable_private_field_label:true,draft_navigation_preserved:true,profile_and_money_unchanged:true,english_only:true,zoom_200_verified:false},null,2));
   console.log('PASS: named-site account sections, private draft accessibility/navigation, unchanged profiles/privacy/funds and paired English captures');
 } finally { if (browser) await browser.close(); } })().catch(()=>{console.error('FAIL: account evidence stage '+stage+'; sensitive request contents withheld');process.exit(1)});
