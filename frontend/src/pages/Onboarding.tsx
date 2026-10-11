@@ -269,12 +269,12 @@ export default function Onboarding() {
             ))}
           {step === 4 && !clinician && <>
             <p>{w("Only add what you’re comfortable sharing. This step is optional.")}</p>
-            <label className="field" htmlFor="onboarding-background">
-              {w("Anything you’d like your clinician to know?")}
+            <div className="field">
+              <label htmlFor="onboarding-background">{w("Anything you’d like your clinician to know?")}</label>
               <textarea id="onboarding-background" rows={6} maxLength={4000}
                 value={answers.history || ""} aria-describedby="onboarding-background-privacy"
                 onChange={e => update({ history: e.target.value })} />
-            </label>
+            </div>
             <p id="onboarding-background-privacy" className="supporting">{w("This is saved privately. Your sharing defaults apply; preview and choose what to share before every booking.")}</p>
             {!answers.history && <Button variant="quiet" disabled={busy} onClick={() => void save(3)}>{w("Skip for now")}</Button>}
           </>}
