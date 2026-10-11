@@ -124,6 +124,12 @@ async function pair(context, page, id, width) {
         await page
           .getByRole("heading", { name: "Your conversation", exact: true })
           .waitFor();
+        const audit=page.locator(".consultation-audit-history");
+        assert.equal(await audit.getAttribute("open"),null);
+        const timeline=audit.locator("summary");await timeline.focus();await timeline.press("Enter");
+        assert.ok(await audit.evaluate(el=>el.open));
+        assert.ok(await audit.locator("li").count()>0,"Persisted audit events remain accessible");
+        await timeline.press("Enter");assert.equal(await audit.getAttribute("open"),null);
         await pair(
           context,
           page,

@@ -74,3 +74,7 @@
 .note-recipient-choices { border:0; padding:0; margin-top:20px; }
 .note-recipient-choices legend { font-size:14px; color:var(--muted); }
 .note-document-panel .visibility-label { display:block; margin:6px 0 8px; }
+
+/* Audit history stays available without dominating the preparation/record layout. */
+.consultation-audit-history .consultation-timeline{max-height:400px;overflow-y:auto;overscroll-behavior:contain;padding-right:8px}
+.consultation-audit-history .consultation-timeline:focus-visible{outline:2px solid var(--brand);outline-offset:4px;border-radius:8px}
