@@ -13,5 +13,7 @@
 .booking-slot-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; max-height:280px; overflow-y:auto; padding:3px; scrollbar-gutter:stable; }
 .booking-slot-grid .button.secondary { color:var(--brand); border-color:var(--brand); background:white; }
 .booking-slot-grid .button.primary { background:var(--brand); border-color:var(--brand); }
-@media(max-width:1000px) { .booking-calendar { grid-template-columns:1fr; } }
+/* Keep the reference's date/time pairing at tablet width and real 200% zoom.
+   Phones retain a single readable column with all generated slots accessible. */
+@media(max-width:680px) { .booking-calendar { grid-template-columns:1fr; } }
 @media(max-width:480px) { .booking-slot-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .booking-calendar { padding:16px; margin-inline:-8px; } .booking-month-grid { gap:3px; } }
