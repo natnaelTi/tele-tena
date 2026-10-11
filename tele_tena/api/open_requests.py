@@ -1033,3 +1033,42 @@ def livekit_webhook():
         # record the untrusted body, signature, aliases or exception text.
         frappe.local.response['http_status_code'] = 401
         return {'received': False}
+
+
+@query()
+def matching_operations(state='', page=1, page_size=20):
+    """Logistics-only reviewer projection; never select narrative or identity.
+
+    Enqueue and inbox fetch are observable transport events, not proof that a
+    clinician read a request. Quote prices and encounter records are excluded.
+    """
+    actor('Tele Tena Approver')
+    page, page_size = integer(page, 1, 100000), integer(page_size, 5, 50)
+    if state not in ('', 'Open', 'Matched', 'Cancelled', 'Expired'):
+        fail('Choose a supported request status')
+    where = 'r.published_at>=UTC_TIMESTAMP(6)-INTERVAL 90 DAY'
+    values = []
+    if state:
+        where += ' AND r.state=%s'
+        values.append(state)
+    total = int(one('SELECT COUNT(*) n FROM tt_open_request r WHERE ' + where, tuple(values)).n)
+    requests = rows('''SELECT r.id,r.state,r.urgency,r.published_at,r.current_wave,
+        (SELECT m.eligible_supply FROM tt_request_metric m
+         WHERE m.request_id=r.id AND m.event='Published' ORDER BY m.occurred_at LIMIT 1) eligible_supply,
+        (SELECT COUNT(*) FROM tt_request_recipient rr WHERE rr.request_id=r.id AND rr.enqueued_at IS NOT NULL) enqueued,
+        (SELECT COUNT(*) FROM tt_request_recipient rr WHERE rr.request_id=r.id AND rr.inbox_fetched_at IS NOT NULL) fetched,
+        (SELECT COUNT(*) FROM tt_request_offer o WHERE o.request_id=r.id) offers
+        FROM tt_open_request r WHERE ''' + where + ' ORDER BY r.published_at DESC,r.id LIMIT %s OFFSET %s',
+        (*values,page_size,(page-1)*page_size))
+    items = []
+    for req in requests:
+        reasons = rows('''SELECT event,reason_code,COUNT(*) occurrences,MAX(created_at) last_at
+            FROM tt_request_route_log WHERE request_id=%s
+            GROUP BY event,reason_code ORDER BY last_at DESC LIMIT 30''', (req.id,))
+        items.append({'reference':req.id[:8], 'state':req.state, 'urgency':req.urgency,
+                      'published_at':req.published_at.isoformat()+'Z', 'wave':int(req.current_wave),
+                      'eligible_supply':req.eligible_supply, 'enqueued':int(req.enqueued),
+                      'inbox_fetched':int(req.fetched), 'offers':int(req.offers),
+                      'routing_events':[{'event':r.event, 'reason_code':r.reason_code,
+                                         'occurrences':int(r.occurrences), 'at':r.last_at.isoformat()+'Z'} for r in reasons]})
+    return {'items':items,'page':page,'page_size':page_size,'total':total,'metrics':request_metrics()}

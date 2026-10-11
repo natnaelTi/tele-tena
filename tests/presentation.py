@@ -1514,6 +1514,33 @@ class Presentation(unittest.TestCase):
             frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
 
+    def test_matching_operations_omit_identity_narrative_quotes_and_records(self):
+        fixtures.login('p1')
+        start = (datetime.now(timezone.utc) + timedelta(days=3)).isoformat()
+        request = open_requests.publish_request(service=fixtures.PREFIX,
+            request_text='Private matching operations fixture narrative', urgency='scheduled',
+            language='en',consultation_format='audio',sharing={'name':False,'history':False},
+            retry_key='operations-'+secrets.token_hex(8),timezone_name='Africa/Addis_Ababa',
+            earliest_start=start,latest_start=start)
+        for role in ('p1','p2','c1','c2'):
+            fixtures.login(role)
+            with self.assertRaises(frappe.PermissionError):
+                open_requests.matching_operations()
+        fixtures.login('admin')
+        result = open_requests.matching_operations(page_size=5)
+        self.assertGreater(result['total'],0)
+        self.assertLessEqual(len(result['items']),5)
+        encoded=json.dumps(result,default=str)
+        self.assertNotIn('Private matching operations fixture narrative',encoded)
+        self.assertNotIn(fixtures.USERS['p1'],encoded)
+        self.assertNotIn('price_minor',encoded)
+        self.assertNotIn('disclosure_snapshot',encoded)
+        self.assertTrue(any(row['reference']==request['id'][:8] for row in result['items']))
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.matching_operations(state='Unsupported')
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.matching_operations(page_size=1000)
+
     def test_patient_request_detail_is_owner_scoped_and_returns_persisted_snapshot(self):
         fixtures.login('p1')
         key = 'request-detail-' + secrets.token_hex(8)

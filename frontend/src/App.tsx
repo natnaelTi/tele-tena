@@ -31,6 +31,7 @@ import {
   Services,
 } from "./pages/Clinician";
 import ServiceDetails from "./pages/ServiceDetails";
+import MatchingOperations from "./pages/MatchingOperations";
 import Account from "./pages/Account";
 import { AdminOverview, Applications, FinancialDisputes, Scopes, ServiceCatalog } from "./pages/Admin";
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
@@ -143,6 +144,7 @@ export default function App() {
                 <Route path="applications" element={<Applications />} />
                 <Route path="scopes" element={<Scopes />} />
                 <Route path="services" element={<ServiceCatalog />} />
+                <Route path="matching" element={<MatchingOperations />} />
                 <Route path="vetting" element={<VettingQueue />} />
                 <Route path="clinics" element={<ClinicReview />} />
                 <Route path="financial-disputes" element={<FinancialDisputes />} />

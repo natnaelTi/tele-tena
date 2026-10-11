@@ -221,6 +221,7 @@ const adminNav = [
   ["/admin/vetting", "Scope vetting", ClipboardCheck],
   ["/admin/clinics", "Clinics", Building2],
   ["/admin/financial-disputes", "Financial disputes", Wallet],
+  ["/admin/matching", "Matching operations", Settings2],
   ["/admin/exceptions", "Exceptions", Settings2],
 ] as const;
 const clinicHomeNav = [["/clinic", "Clinic workspace", Building2]] as const;
