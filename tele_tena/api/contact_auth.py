@@ -192,7 +192,7 @@ def onboarding():
 @command
 def save_onboarding(kind, step, answers, complete=0):
     user = actor()
-    if kind not in ('patient', 'clinician') or str(step) not in ('0', '1', '2', '3', '4') or (str(step) == '4' and kind != 'patient'):
+    if kind not in ('patient', 'clinician') or str(step) not in ('0', '1', '2', '3', '4', '5') or (str(step) == '4' and kind != 'patient') or (str(step) == '5' and kind != 'clinician'):
         fail('Invalid onboarding step')
     from tele_tena.review import registration_enabled
     if not registration_enabled(kind):

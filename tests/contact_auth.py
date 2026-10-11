@@ -172,6 +172,12 @@ class ContactAuth(unittest.TestCase):
         answers = {'name': 'Synthetic applicant', 'statement': 'Synthetic credentials and scope',
                    'adult': True, 'consent': True, 'requested_services': [service]}
         auth.save_onboarding('clinician', 2, answers)
+        auth.save_onboarding('clinician', 5, answers)
+        self.assertEqual(auth.onboarding()['step'], 5)
+        self.assertEqual(auth.onboarding()['answers']['requested_services'], [service])
+        with self.assertRaises(frappe.ValidationError):
+            auth.save_onboarding('patient', 5, answers)
+        self.assertEqual(auth.onboarding()['kind'], 'clinician')
         from tele_tena.api import presentation
         import base64
         pdf = b'%PDF-1.7\n1 0 obj<</Type/Catalog>>endobj\n%%EOF\n'

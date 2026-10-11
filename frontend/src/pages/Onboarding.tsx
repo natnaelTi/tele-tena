@@ -74,7 +74,7 @@ export default function Onboarding() {
   const clinician = kind === "clinician";
   // Retain stored step 3 as the ready screen for existing saved journeys.
   // Patient-only step 4 is inserted before it without reinterpreting old drafts.
-  const steps = clinician ? [0, 1, 2, 3] : [0, 1, 2, 4, 3];
+  const steps = clinician ? [0, 1, 2, 5, 3] : [0, 1, 2, 4, 3];
   const position = Math.max(0, steps.indexOf(step));
   const titles = clinician
     ? [
@@ -82,6 +82,8 @@ export default function Onboarding() {
         "Qualifications & résumé",
         "Clinic affiliations",
         "Review your application",
+        "",
+        "Services requested for approval",
       ]
     : [
         "A little about you",
@@ -176,6 +178,10 @@ export default function Onboarding() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            if (clinician && step === 5 && !(answers.requested_services || []).length) {
+              setError("Choose at least one service for review.");
+              return;
+            }
             void save(steps[Math.min(position + 1, steps.length - 1)], step === 3);
           }}
         >
@@ -199,28 +205,20 @@ export default function Onboarding() {
           {step === 1 &&
             (clinician ? (
               <>
-                <label className="field">
-                  {w("Credentials and requested services")}
+                <div className="field">
+                  <label htmlFor="onboarding-credentials">{w("Qualifications and experience")}</label>
                   <textarea
+                    id="onboarding-credentials"
                     required
                     maxLength={2000}
                     rows={6}
                     value={answers.statement || ""}
                     onChange={(e) => update({ statement: e.target.value })}
                   />
-                </label>
+                </div>
                 <p className="supporting">
                   {w("Describe your qualification, registration and the services you would like reviewed. Upload a PDF resume (up to 5 MB); receipt does not mean your credentials are verified.")}
                 </p>
-                <fieldset className="scope-picker onboarding-scope-picker" data-tour="applicant-scopes">
-                  <legend>{w("Services requested for approval")}</legend>
-                  <TextField label={w("Search services")} type="search" value={scopeSearch} onChange={e=>setScopeSearch(e.target.value)}/>
-                  <div className="onboarding-scope-options" role="group" aria-label={w("Services requested for approval")}>
-                    {catalog.filter(service=>service.label.toLocaleLowerCase().includes(scopeSearch.trim().toLocaleLowerCase())).map(service=><Checkbox key={service.id} label={service.label} checked={(answers.requested_services||[]).includes(service.id)} onChange={e=>update({requested_services:e.target.checked?[...(answers.requested_services||[]),service.id]:(answers.requested_services||[]).filter(x=>x!==service.id)})}/>)}
-                    {!catalog.some(service=>service.label.toLocaleLowerCase().includes(scopeSearch.trim().toLocaleLowerCase()))&&<p role="status">{w("No services match this search. Try another term.")}</p>}
-                  </div>
-                  <p className="supporting" role="status">{w("Selected services")}: {(answers.requested_services||[]).length}</p>
-                </fieldset>
                 <label className="field" data-tour="applicant-resume">{w("Resume (PDF, up to 5 MB)")}<input type="file" accept="application/pdf,.pdf" disabled={resumeBusy} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;if(file.size>5*1024*1024){setError("Choose a PDF no larger than 5 MB.");return;}setResumeBusy(true);setError("");try{const base64=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]||"");reader.onerror=()=>reject(new Error("Read failed"));reader.readAsDataURL(file);});await journeyApi.uploadResume(file.name,base64);setResumeUploaded(true);}catch{setError("The resume could not be uploaded. Choose a valid PDF and try again.");}finally{setResumeBusy(false);e.target.value="";}}}/>{resumeUploaded&&<span role="status">{w("Resume uploaded for authorized review.")} <button type="button" className="text-button" onClick={()=>void journeyApi.removeResume().then(()=>setResumeUploaded(false)).catch(()=>setError("Resume could not be removed."))}>{w("Remove")}</button></span>}</label>
               </>
             ) : (
@@ -296,6 +294,18 @@ export default function Onboarding() {
                 />
               </>
             ))}
+          {step === 5 && clinician && <>
+            <p>{w("Select each service you are qualified to provide. Each is reviewed separately.")}</p>
+                <fieldset className="scope-picker onboarding-scope-picker" data-tour="applicant-scopes">
+                  <legend>{w("Services requested for approval")}</legend>
+                  <TextField label={w("Search services")} type="search" value={scopeSearch} onChange={e=>setScopeSearch(e.target.value)}/>
+                  <div className="onboarding-scope-options" role="group" aria-label={w("Services requested for approval")}>
+                    {catalog.filter(service=>service.label.toLocaleLowerCase().includes(scopeSearch.trim().toLocaleLowerCase())).map(service=><Checkbox key={service.id} label={service.label} checked={(answers.requested_services||[]).includes(service.id)} onChange={e=>update({requested_services:e.target.checked?[...(answers.requested_services||[]),service.id]:(answers.requested_services||[]).filter(x=>x!==service.id)})}/>)}
+                    {!catalog.some(service=>service.label.toLocaleLowerCase().includes(scopeSearch.trim().toLocaleLowerCase()))&&<p role="status">{w("No services match this search. Try another term.")}</p>}
+                  </div>
+                  <p className="supporting" role="status">{w("Selected services")}: {(answers.requested_services||[]).length}</p>
+                </fieldset>
+          </>}
           {step === 4 && !clinician && <>
             <p id="onboarding-background-help">{w("Only add what you’re comfortable sharing. This step is optional.")}</p>
             <div className="field">
