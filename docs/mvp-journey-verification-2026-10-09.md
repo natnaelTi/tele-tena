@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **9308b303ca5a7c243eed84aa063960dd76f8c69d**. Later report/evidence-only commits
+  **191762abf23e062c07d9c8331b94a7bd85334c7a**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -39,7 +39,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
 ## Current professional profile and patient handoff — 11 October
 
 This checkpoint closes named defects, not whole-MVP visual or owner acceptance.
-Source/build9308b30; API behavior unchanged since467f755 apart from the explicit
+Active source/build191762a (latest shared CSS); profile/localization evidence9308b30; API behavior unchanged since467f755 apart from the explicit
 presentation seed helper. Web50748, worker50742, native scheduler50744,
 loopback queue13917 Redis10747; only presentation services were stopped/restarted.
 Original ERP site and Selfmade were not migrated, seeded or restarted.
@@ -112,6 +112,15 @@ Latest fresh schema, whole-product visual/state work and integrated candidate
 acceptance remain open. Hosted411c293 couples/token evidence retained unchanged;
 no full hosted suite repeated for profile-only work. No physical-device/live
 SMS/email/native-language/owner/real-money or remote-deployment pass claimed.
+
+Latest shared composition191762a: desktop Help & tours replay now shares the
+heading row without absolute overlap; first-visit/mobile invitations retain their
+in-flow spacing. Pending role/navigation/save and approved introduction/reload /
+public-query checks repeat successfully, matched390/768/1440; desktop pairs
+inspected. No consultation or financial logic change. CI on191762a passed all8
+runs (Node22/24 frontend and Python3.12/3.14 syntax); this is not freshFrappe16
+workflow verification. Feature push initially stalled; one bounded HTTP/1.1
+retry confirmed remote191762a, normal fast-forward with no global Git change.
 
 ## Public entry, registration and shared-calendar continuation
 

@@ -1,0 +1,15 @@
+{
+  "source": "191762abf23e062c07d9c8331b94a7bd85334c7a",
+  "site": "teletena-mvp-presentation.localhost",
+  "real_backend": true,
+  "owner_save_reload": true,
+  "public_introduction": true,
+  "private_fields_omitted": true,
+  "roles_other_profile_fields_unchanged": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ],
+  "visual_acceptance": "Comparison pending; screenshot capture is not acceptance"
+}
