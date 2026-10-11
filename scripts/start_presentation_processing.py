@@ -58,10 +58,13 @@ def run():
         assert link.resolve()==item.resolve()
     (RUNTIME/'sites/apps.txt').write_text((BENCH/'sites/apps.txt').read_text())
     existing=json.loads((BENCH/'sites/common_site_config.json').read_text())
+    # Frappe 15 converts the All frequency to scheduler_interval // 60.
+    # A ten-second interval produces invalid */0 cron; tick may be ten seconds
+    # but All jobs require at least a full minute.
     from_config={'redis_queue':f'redis://127.0.0.1:{PORT}',
                  'redis_cache':existing['redis_cache'],
                  'bench_id':str(BENCH).strip('/').replace('/','-'),
-                 'scheduler_tick_interval':10,'scheduler_interval':10,'maintenance_mode':0}
+                 'scheduler_tick_interval':10,'scheduler_interval':60,'maintenance_mode':0}
     # Some environments have explicit DB host settings. Copy only needed keys.
     for key in ('db_host','db_port','redis_socketio'):
         if key in existing:from_config[key]=existing[key]
