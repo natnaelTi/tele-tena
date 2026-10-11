@@ -6,7 +6,7 @@ The user bounded this handover to the agreed MVP and its redesign. Preserve the 
 
 ## Current local MVP delta — 2026-10-11
 
-Draft PR44 retains PR43 ancestry; packaged9308b30 on
+Draft PR44 retains PR43 ancestry; packagedbc20f72 on
 teletena-mvp-presentation.localhost at http://127.0.0.1:8017/teletena/.
 Named profile/permission/navigation defects fixed; selected offering persists
 through discovery/profile/reload/calendar/disclosure. Real DB4/4 and additive

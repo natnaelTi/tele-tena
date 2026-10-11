@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **191762abf23e062c07d9c8331b94a7bd85334c7a**. Later report/evidence-only commits
+  **bc20f722848a84b7b857284b1599bef0f8b1f451**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -20,6 +20,52 @@ screen/completion matrix; the sections below this active checkpoint are historic
   preview. `scripts/local_review.py start/status/stop` restores it without migrations,
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Active continuation: registration and reviewer fidelity
+
+- Current package/source `bc20f722848a84b7b857284b1599bef0f8b1f451`.
+  Matching web/worker/scheduler restarted through the scoped lifecycle at eb670a3;
+  subsequent backend API/job code is unchanged. Owned web59693, worker59687,
+  scheduler59689, isolated queue Redis10747/13917. HTTP200; no unrelated restart.
+- Added missing B04 optional care background through owner-only saved onboarding.
+  New patient step4 is inserted before stored ready step3, so historical drafts
+  are not reinterpreted. Text length4000, patient only, no implicit sharing,
+  no clinical text in browser storage/logs. Two real DB tests passed2.811s:
+  owned draft/default privacy/reload-ready completion, oversize/clinician/Guest
+  rejection, repeat completion cannot duplicate a profile. No schema change.
+- A07 now offers only site-permitted account types after verified contact when
+  no intent/draft exists. Patient/clinician CTA intent remains explicit; choosing
+  clinician grants no scope or clinical role. Real loopback browser at bc20f72
+  exercised both choices, reload, patient Back/background/default-private,
+  resume upload and pending clinician submission. Settings restored and random
+  captured codes removed. Test-only transport, not SMS receipt. Wrong/expired,
+  resend and returning-user checks remain the prior full-run evidence.
+- Test failures were diagnosed: populated textarea label → fixed separate label;
+  numeric share_history0 versus strict JSfalse → normalized boolean assertion;
+  checkbox support description polluting accessible name → shared label/description
+  IDs. Source throttle10/15min then blocked a repeated run: preserved counters,
+  waited for normal window expiry while doing reviewer work, final pass. No IP,
+  phone, daily cap or production authentication rule was bypassed.
+- Reviewer browser at bc20f72 passed named queue/search, selected overview-row
+  handoff, private résumé download, mobile/desktop dialog scroll, Escape/focus,
+  unchanged application projection and wallet403. No decision mutation.
+  Fixed max-width CSS collision via existing --dialog-width, and consumed-link
+  state after Close so a closed review does not reopen on refresh. Tablet metrics
+  retain2columns. Full structured per-scope/rubric/state fidelity remains open.
+- Frozen-build invited-review Home→discovery→selected public profile/reload→
+  generated calendar→disclosure/review/Back passed at2f3de58, 390/768/1440.
+  Later bc20f72 only changes reviewer close context/onboarding primary label and
+  test identity guards; patient booking path unchanged. No booking/funds mutation
+  in this read-only run. Initial source-before/after assertions prevent mixed
+  build evidence. Earlier overlapping-build capture is not the current pass.
+- Locked package/TypeScript build, lint(exit0, existing warnings), Python syntax
+  and asset hashes/private credential scan passed. No new hosted-call replay:
+  call/token/finance/runtime jobs unchanged; reuse named prior evidence.
+- Paired evidence: `docs/screenshots/mvp-current/bc20f72-onboarding/` and
+  `bc20f72-reviewer/`. Inspected English390/768/1440 compositions; documented
+  operational exceptions, missing fuller states and language/actual-zoom gates.
+  Visual owner acceptance and whole-MVP completion remain open. Freshv1.36 is
+  blocked on the requested scoped local DB helper; sudo -n requires a password.
 
 ## Checks actually run in this continuation
 

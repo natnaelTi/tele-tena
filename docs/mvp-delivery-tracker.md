@@ -2,7 +2,7 @@
 
 ## Active MVP completion —2026-10-11
 
-Packaged source `191762abf23e062c07d9c8331b94a7bd85334c7a`, stable URL
+Packaged source `bc20f722848a84b7b857284b1599bef0f8b1f451`, stable URL
 http://127.0.0.1:8017/teletena/ on `teletena-mvp-presentation.localhost`, original
 Bench `/home/frappe/frappe/frappe-bench`. Preview reboot/PWA recovery, couples
 joint time/extension consent, recipient-specific follow-up, current owner
@@ -21,6 +21,13 @@ profile/privacy/retry tests and native repeat migrations preserve all54existing
 app tables on both retained sites. Profile keyboard/provisional language/actual
 200% zoom checks pass; paired comparisons retain material differences and owner
 review. Details and remaining gates stay in the single active matrix/report.
+
+Current continuation also implements the missing optional B04 private background
+and verified-contact A07 account choice. Real enabled-registration browser uses
+only the isolated transport; invited-review policy remains unchanged. Reviewer
+panels/selected-application navigation/private resume/Escape/refresh checks pass.
+Paired comparisons and remaining scope-specific states are in the same matrix;
+no human scope approval, live delivery or all-screen acceptance is inferred.
 
 ## Historical release priority — MVP handover — 2026-10-08
 

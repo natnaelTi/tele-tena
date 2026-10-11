@@ -16,6 +16,11 @@ It is shown only through the approved clinician profile projection; no approval,
 credential verification or service authorization follows from editing it.
 Existing records receive no inferred public text.
 
+Patient onboarding clarification (2026-10-11): optional care background is saved
+in the owner-only draft and copied to private profile history only on adult-consented
+completion. It does not imply disclosure; existing global defaults and per-booking
+preview/overrides apply. Existing ready-step drafts keep their stored meaning.
+
 ## First internal demonstration
 Adults 18+. English, Amharic and Afaan Oromo with native review before pilot.
 Patient and clinician portals; administrator approval; independent and multi-clinic
