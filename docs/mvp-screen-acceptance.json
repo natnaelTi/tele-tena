@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "067b450052d11c4ad3fcf83902ab8c5b8de389d4",
+  "source_checkpoint": "41b6cf5fc6be1952c5ac36cc38b3d1f30aa3785f",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -1547,7 +1547,8 @@
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B06) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json"
+        "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
+        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt."
       },
       "visual_acceptance": {
         "reference_screen": "B06",
@@ -1573,14 +1574,14 @@
         ],
         "correction_status": "Comparison recorded; remaining state/owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B06-reference-1440.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B06-reference-390.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B06-reference-768.png"
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-reference-390.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-reference-768.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B06-application-1440.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B06-application-390.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B06-application-768.png"
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-application-390.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-application-768.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-application-1440.png"
         ],
         "comparison_notes": [
           "Reference heading, focused wizard and white authentication surface. Current initial step collects professional name; structured qualification/practice-language fields live in the later persisted professional-vetting page. Material difference from five-stage reference remains and needs integrated composition work; not visually complete."
@@ -1668,7 +1669,8 @@
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
         "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
         "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
-        "initial_review_current": "docs/screenshots/mvp-current/c0d911d-onboarding-review/result.json"
+        "initial_review_current": "docs/screenshots/mvp-current/c0d911d-onboarding-review/result.json",
+        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt."
       },
       "visual_acceptance": {
         "reference_screen": "B07",
@@ -1694,14 +1696,14 @@
         ],
         "correction_status": "Comparison recorded; remaining state/owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B07-reference-1440.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B07-reference-390.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B07-reference-768.png"
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-reference-390.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-reference-768.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B07-application-1440.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B07-application-390.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B07-application-768.png"
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-application-390.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-application-768.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-application-1440.png"
         ],
         "comparison_notes": [
           "Real private PDF upload/remove and service multi-selection. Large test catalog previously stretched this step into a very long form; searchable bounded list retains all available scopes and selected values. Search empty-state/reset selection and resume/application persistence pass. Structured primary qualification/license/evidence fields remain in professional-vetting page; exact composition not accepted.",
@@ -1902,7 +1904,8 @@
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B09) and design-handoff.md",
         "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
         "current_local": "Frappe 15.121.2 isolated site tele-tena-pr12-fresh.localhost: the synthetic applicant browser flow uploaded two private evidence revisions, submitted a scope application, and the authorized reviewer opened/downloaded the current revision. After v1.29, the reviewer form displayed the four provenance controls at 390/1440px; no decision was submitted. tests/presentation.py 45/45 and tests/integration.py 24/24 pass. Fresh-site v1.29 install, 320/768/200%-zoom coverage, native-language review, and Frappe 16 browser verification remain pending.",
-        "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending."
+        "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
+        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt."
       },
       "visual_acceptance": {
         "reference_screen": "B09",
@@ -1918,7 +1921,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Reference title/progress/searchable evidence cards/Review application ported. Back/Save for later, visible search label, bounded large catalog and demo/auth header retained. Test-site fixture names differ honestly; fuller language/zoom/failure/owner comparisons pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -1926,9 +1929,17 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison pending",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
+        "correction_status": "Visually verified by Codex for named English B09 compositions; remaining states and owner acceptance pending",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-reference-390.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-reference-768.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-application-390.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-application-768.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-application-1440.png"
+        ],
         "comparison_notes": [],
         "viewports": [
           390,
@@ -1941,7 +1952,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.B09",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -2019,7 +2030,8 @@
         "current_local": "Frappe 15 isolated presentation regressions passed 27/27, including owner/reviewer authorization and assessment evidence snapshot. Built-browser reviewer queue displayed submitted applicant and evidence; authorized reviewer downloaded the newest private PDF revision successfully. Frappe 16.2.1/ERPNext 16.1.0/Python 3.14.2 disposable site was backed up, migrated v1.8→v1.16, repeat-migrated, and passed the 27-test backend suite. Screenshot: /tmp/tele-tena-presentation-review/scope-evidence/reviewer-evidence.png. Fresh-empty-site check and Frappe 16 browser journey remain pending; no external credential validation or malware scanning is claimed.",
         "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
         "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
-        "initial_review_current": "docs/screenshots/mvp-current/c0d911d-onboarding-review/result.json"
+        "initial_review_current": "docs/screenshots/mvp-current/c0d911d-onboarding-review/result.json",
+        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt."
       },
       "visual_acceptance": {
         "reference_screen": "B10",
@@ -2045,14 +2057,14 @@
         ],
         "correction_status": "Comparison recorded; remaining state/owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B10-reference-1440.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B10-reference-390.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B10-reference-768.png"
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-reference-390.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-reference-768.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B10-application-1440.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B10-application-390.png",
-          "docs/screenshots/mvp-current/fb94c29-onboarding/B10-application-768.png"
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-application-390.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-application-768.png",
+          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-application-1440.png"
         ],
         "comparison_notes": [
           "Persisted application review/submission with no clinician approval or privileged role. Explicit manual-review statement and resume requirement. Exact professional/evidence summary composition remains to complete.",

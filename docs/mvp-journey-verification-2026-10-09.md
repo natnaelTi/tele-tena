@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **067b450052d11c4ad3fcf83902ab8c5b8de389d4**. Later report/evidence-only commits
+  **41b6cf5fc6be1952c5ac36cc38b3d1f30aa3785f**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -66,6 +66,36 @@ screen/completion matrix; the sections below this active checkpoint are historic
   operational exceptions, missing fuller states and language/actual-zoom gates.
   Visual owner acceptance and whole-MVP completion remain open. Freshv1.36
   installation passed11October; the exact schema/cleanup check is recorded below.
+
+## Current clinician scope-selection continuation —11October
+
+Source/package41b6cf5fc6be1952c5ac36cc38b3d1f30aa3785f. Initial clinician flow now
+has five stages, with a separately saved B09 scope-selection step5 before existing
+review-step3. Old stored drafts retain their meaning. Patient cannot use clinician
+step5; credentials, resume, adult consent and manual approvals remain required.
+A populated credential textarea also uses an explicit stable label.
+
+Two Frappe DB tests PASS1.705s (single-use/role injection/new step/patient denial and
+optional patient background). Connected real-backend browser PASS at41b6cf5:
+patient/clinician contact-proof account choice, draft recovery, private background,
+B09 searchable selections/Save/reload, private PDF and Pending submission without
+clinical or reviewer privileges. Captured random codes removed, original settings
+restored, owned8028 test server stopped. Wrong/expired/resend/returning-user checks
+were not repeated; retain prior named evidence. No provider send.
+
+Reviewed B09 desktop/mobile pairs; title/progress/standalone evidence cards and
+Review application match the reference. Full initial B06/B07 typed-professional
+composition still needs correction; those fields currently live in separate
+per-scope vetting. No whole-flow visual acceptance claim. Safe paired evidence in
+`docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/`.
+
+Only the validated8017 Gunicorn master59693 received graceful HUP after API change;
+its replacement workers74536/74537 load the current source. Isolated scheduler/
+financial worker and unrelated Bench services remained untouched. Job/finance/call
+logic is unchanged. Build/typecheck, lint(exit0/existing43warnings), asset hash and
+private-secret scan passed. No DDL change since the successful v1.36 fresh install.
+Previous account/PWA067b450 and profile dc5a582 evidence remains valid for unchanged
+components; no redundant hosted-call suite replay.
 
 ## Current account correction and recovery —11October
 
