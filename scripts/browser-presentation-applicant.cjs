@@ -60,9 +60,10 @@ let stage = "launch";
         const spacing = await page.evaluate(() => {
           const tour = document.querySelector('.tour-invite, .tour-replay');
           const heading = document.querySelector('.reference-workspace-main h1');
-          return heading.getBoundingClientRect().top - tour.getBoundingClientRect().bottom;
+          const titleBox=heading.getBoundingClientRect(),tourBox=tour.getBoundingClientRect();
+          return {vertical:titleBox.top-tourBox.bottom,horizontal:tourBox.left-titleBox.right,replay:tour.classList.contains('tour-replay')};
         });
-        assert.ok(spacing >= 16, 'In-flow tour must not crowd the page title');
+        assert.ok(spacing.vertical>=16 || (width>800&&spacing.replay&&spacing.horizontal>=16), 'Tour/title must have clear space and never overlap');
       }
       assert.equal(await page.locator(".practice-metrics").count(), 0);
       assert.equal(await page.getByRole("link", { name: "Availability", exact: true }).count(), 0);

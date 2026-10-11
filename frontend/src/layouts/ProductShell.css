@@ -35,7 +35,14 @@
 @media(max-width:800px) { .reference-workspace-main.workspace-wide { padding-inline:20px; } }
 
 .reference-workspace-main > .page-title h1 { font-size:40px; line-height:1.12; letter-spacing:-1.6px; }
-@media(min-width:801px) { .reference-workspace-main > .tour-replay,.reference-workspace-main > .tour-invite { position:static; margin:0 0 20px auto; } }
+@media(min-width:801px) {
+  .reference-workspace-main { display:flow-root; }
+  .reference-workspace-main > .tour-invite { position:static; margin:0 0 20px auto; }
+  /* Replay shares the heading row using normal float exclusion, never overlays
+     long headings. First-visit invitations retain their full in-flow space. */
+  .reference-workspace-main > .tour-replay { position:static; float:right; margin:0 0 16px 24px; }
+  .reference-workspace-main > .page-title > div { min-width:0; }
+}
 @media(max-width:800px) { .reference-workspace-main > .page-title h1 { font-size:32px; } }
 
 /* In-flow invitations must leave the page heading readable on compact screens. */
