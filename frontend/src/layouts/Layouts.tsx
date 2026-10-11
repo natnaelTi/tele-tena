@@ -149,7 +149,7 @@ export function PublicLayout() {
 }
 export function AuthLayout() {
   return (
-    <>
+    <div className="auth-layout">
       <DemoBar />
       <header className="auth-header">
         <Brand />
@@ -161,7 +161,7 @@ export function AuthLayout() {
       <div className="auth-footer">
         <TranslationNote />
       </div>
-    </>
+    </div>
   );
 }
 export function RequireSession() {
