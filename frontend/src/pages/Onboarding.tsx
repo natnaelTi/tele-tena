@@ -83,7 +83,7 @@ export default function Onboarding() {
         "Clinic affiliations",
         "Review your application",
         "",
-        "Services requested for approval",
+        "Choose your service scopes",
       ]
     : [
         "A little about you",
@@ -296,11 +296,10 @@ export default function Onboarding() {
             ))}
           {step === 5 && clinician && <>
             <p>{w("Select each service you are qualified to provide. Each is reviewed separately.")}</p>
-                <fieldset className="scope-picker onboarding-scope-picker" data-tour="applicant-scopes">
-                  <legend>{w("Services requested for approval")}</legend>
+                <fieldset className="scope-picker onboarding-scope-picker" aria-label={w("Services requested for approval")} data-tour="applicant-scopes">
                   <TextField label={w("Search services")} type="search" value={scopeSearch} onChange={e=>setScopeSearch(e.target.value)}/>
                   <div className="onboarding-scope-options" role="group" aria-label={w("Services requested for approval")}>
-                    {catalog.filter(service=>service.label.toLocaleLowerCase().includes(scopeSearch.trim().toLocaleLowerCase())).map(service=><Checkbox key={service.id} label={service.label} checked={(answers.requested_services||[]).includes(service.id)} onChange={e=>update({requested_services:e.target.checked?[...(answers.requested_services||[]),service.id]:(answers.requested_services||[]).filter(x=>x!==service.id)})}/>)}
+                    {catalog.filter(service=>service.label.toLocaleLowerCase().includes(scopeSearch.trim().toLocaleLowerCase())).map(service=><Checkbox key={service.id} variant="card" description={w("Evidence and approved scope are required.")} label={service.label} checked={(answers.requested_services||[]).includes(service.id)} onChange={e=>update({requested_services:e.target.checked?[...(answers.requested_services||[]),service.id]:(answers.requested_services||[]).filter(x=>x!==service.id)})}/>)}
                     {!catalog.some(service=>service.label.toLocaleLowerCase().includes(scopeSearch.trim().toLocaleLowerCase()))&&<p role="status">{w("No services match this search. Try another term.")}</p>}
                   </div>
                   <p className="supporting" role="status">{w("Selected services")}: {(answers.requested_services||[]).length}</p>
@@ -358,7 +357,7 @@ export default function Onboarding() {
                 ? clinician
                   ? w("Submit for review")
                   : w("Find care")
-                : w(step === 4 ? "Save and continue" : "Continue")}
+                : w(step === 5 ? "Review application" : step === 4 ? "Save and continue" : "Continue")}
             </Button>}
           </div>
           <Button

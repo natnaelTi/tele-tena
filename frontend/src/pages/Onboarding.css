@@ -37,3 +37,8 @@
 .onboarding-account-choices h2{font-size:22px;margin:20px 0 16px;line-height:1.25}.onboarding-account-choices p{line-height:1.6;color:var(--ink)}
 .onboarding-account-choices .onboarding-review-panel>svg{box-sizing:content-box;padding:12px;background:var(--subtle);color:var(--brand);border-radius:12px}
 @media(max-width:600px){.onboarding-account-choices{grid-template-columns:1fr}}
+
+/* B09 uses standalone scope cards; the legacy enclosing fieldset border is not
+   part of the reference composition. Keep a bounded region for large catalogs. */
+.onboarding-guided .onboarding-scope-picker { border: 0; padding: 0; margin: 24px 0; }
+.onboarding-scope-picker .onboarding-scope-options .check-field.card { align-items: flex-start; min-height: 76px; margin-bottom: 10px; }

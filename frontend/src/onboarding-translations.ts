@@ -1,5 +1,8 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Choose your service scopes": ["የአገልግሎት ወሰኖችዎን ይምረጡ", "Daangaawwan tajaajilaa kee filadhu"],
+  "Evidence and approved scope are required.": ["ማስረጃና የተፈቀደ የአገልግሎት ወሰን ያስፈልጋሉ።", "Ragaa fi daangaan hayyamame barbaachisu."],
+  "Review application": ["ማመልከቻውን ይገምግሙ", "Iyyata ilaali"],
   "Qualifications and experience": ["ትምህርትና ልምድ", "Ulaagaalee fi muuxannoo"],
   "Choose at least one service for review.": ["ለግምገማ ቢያንስ አንድ አገልግሎት ይምረጡ።", "Gamaaggamaaf tajaajila tokko yoo xiqqaate filadhu."],
   "Select each service you are qualified to provide. Each is reviewed separately.": ["ለመስጠት ብቁ የሆኑበትን እያንዳንዱን አገልግሎት ይምረጡ። እያንዳንዱ ለብቻው ይገመገማል።", "Tajaajila kennuuf gahumsa qabdu hunda filadhu. Tokkoon tokkoon addaan gamaaggamama."],
