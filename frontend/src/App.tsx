@@ -108,6 +108,7 @@ export default function App() {
                   path="consultations/:id"
                   element={<ConsultationPage />}
                 />
+                <Route path="consultations/:id/reschedule" element={<ConsultationPage />} />
               </Route>
               <Route
                 path="/clinician"
@@ -126,6 +127,7 @@ export default function App() {
                   path="consultations/:id"
                   element={<ConsultationPage />}
                 />
+                <Route path="consultations/:id/reschedule" element={<ConsultationPage />} />
                 <Route path="requests" element={<ClinicianRequestInbox />} />
                 <Route path="offers" element={<ClinicianOffers />} />
                 <Route path="offers/:offerId" element={<ClinicianOfferDetail />} />

@@ -1,13 +1,13 @@
 import {BookingCalendar} from "../components/BookingCalendar";
 import { SharedCarePrivacy, ConversationFacts, DisclosureSnapshot, PreparationPanel, RecordedCallTiming } from "../components/ConsultationDetails";
 import { appointmentStatus } from "../appointment-status";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { useResource } from "../hooks/useResource";
 import { useSession } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
 import { api } from "../api";
-import { date } from "../components/Domain";
+import { date, PageTitle } from "../components/Domain";
 import { Button, Card, Checkbox, Dialog, InlineNotice, Select, Skeleton } from "../components/ui";
 import { useAction } from "../hooks/useAction";
 import Consultation from "../features/consultations/Consultation";
@@ -23,6 +23,7 @@ export default function ConsultationPage() {
 function ConsultationDetail({appointmentId:id}:{appointmentId:string}) {
   const { session } = useSession();
   const location=useLocation();
+  const navigate=useNavigate();
   const returnView=location.state?.appointmentView;
   const appointmentQuery=["all","upcoming","attention","completed","cancelled"].includes(returnView)?"?view="+returnView:"";
   const { t, w } = useLocale();
@@ -57,6 +58,10 @@ function ConsultationDetail({appointmentId:id}:{appointmentId:string}) {
   const noteSharingSelected=shareNote??item.private_note?.note_share_selected??false;
   const sharedCompleted=item.is_couple&&!clinician&&item.status==="Completed";
   const documenting=clinician&&callEnded&&(item.documentation_state!=="Finalized"||amending);
+  if(location.pathname.endsWith('/reschedule')) return <section className="reschedule-workspace">
+    <PageTitle title={w('Choose a new time')} description={w(item.is_couple?'A new time takes effect only when both adults and the clinician agree.':'A new time takes effect only when both sides agree.')}/>
+    <ReschedulePanel appointment={item} refresh={detail.refresh} focused onClose={()=>navigate(base+'/consultations/'+id,{state:location.state})}/>
+  </section>;
   const documentationActions=<div className="actions"><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{const savedPrivate=privateNote??item.private_note?.text??"";const savedSummary=summary??item.private_note?.patient_summary??"";await journeyApi.saveNoteDraft(id,savedPrivate,savedSummary,noteSharingSelected,recipients??item.private_note?.summary_recipients??[]);setPrivateNote(current=>current===savedPrivate?null:current);setSummary(current=>current===savedSummary?null:current);setShareNote(current=>current===noteSharingSelected?null:current);setAmending(false);await detail.refresh();},"Draft saved.")}>{w("Save draft")}</Button><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{const result=await journeyApi.previewSummary(id,summary??item.private_note?.patient_summary??"");setPreview(result.summary);},"")}>{w("Preview patient summary")}</Button><Button loading={action.busy} disabled={item.call_room_close_pending} onClick={()=>setFinalizeOpen(true)}>{w("Finalize consultation")}</Button></div>;
   const conversationPanel=<Card className="conversation-overview"><h2>{w("Your conversation")}</h2><ConversationFacts item={item} clinician={clinician} status={displayStatus}/>
       {item.status === "PendingConfirmation"&&<InlineNotice>Waiting for the clinician to respond. Request expires {item.expires_at?date(item.expires_at):"at the time shown in the request"}.</InlineNotice>}
@@ -119,9 +124,12 @@ function PatientClinicSummarySharing({appointment}:{appointment:string}) {
   </Card>;
 }
 
-function ReschedulePanel({appointment,refresh}:{appointment:any;refresh:()=>Promise<void>}) {
+function ReschedulePanel({appointment,refresh,focused=false,onClose}:{appointment:any;refresh:()=>Promise<void>;focused?:boolean;onClose?:()=>void}) {
   const {w}=useLocale();
-  const [expanded,setExpanded]=useState(false);
+  const navigate=useNavigate();
+  const location=useLocation();
+  const {session}=useSession();
+  const base=session?.profile?.kind==="clinician"?"/clinician":"/patient";
   const [selected,setSelected]=useState("");
   const [retryKey,setRetryKey]=useState("");
   const [outcome,setOutcome]=useState("");
@@ -135,33 +143,32 @@ function ReschedulePanel({appointment,refresh}:{appointment:any;refresh:()=>Prom
   const current=appointment.reschedule;
   const propose=async()=>{
     if(!selected||!retryKey)return;
-    await action.run(async()=>{await journeyApi.proposeReschedule(appointment.id,selected,retryKey);setSelected("");setRetryKey("");await refresh();},"");
+    await action.run(async()=>{await journeyApi.proposeReschedule(appointment.id,selected,retryKey);setSelected("");setRetryKey("");await refresh();onClose?.();},"");
   };
-  // E02 keeps booking actions compact until a time change is requested.
-  // Existing proposals remain visible; this only changes presentation, not holds.
-  if (!current && !expanded) return appointment.can_propose_reschedule
-    ? <Button variant="secondary" onClick={()=>{setExpanded(true);void calendar.refresh();}}>{w('Request a new time')}</Button>
+  if(!current&&!focused) return appointment.can_propose_reschedule
+    ? <Button variant="secondary" onClick={()=>navigate(base+'/consultations/'+appointment.id+'/reschedule',{state:location.state})}>{w('Request a new time')}</Button>
     : null;
-  return <Card className="reschedule-panel">
-    <h2>{w('Request a new time')}</h2>
-    <p>{w(appointment.is_couple?'The original appointment stays reserved until both adults and the clinician agree.':'The original appointment stays reserved until both of you agree.')}</p>
-    {current&&appointment.is_couple&&<p role="status">{current.accepted_count} / {current.required_count} {w('participants have agreed')}. {w(current.your_response==='accept'?'Your agreement is recorded.':'Review the new time before agreeing.')}</p>}
-    {current&&<InlineNotice tone="info"><strong>{w('A new time is waiting for your response.')}</strong><br/>
-      {w('Your proposed time')}: {date(current.start,current.timezone)} · {current.timezone}
-      {current.proposed_by_you?<Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.withdrawReschedule(appointment.id,current.id);await refresh();},w('Withdraw request'))}>{w('Withdraw request')}</Button>:<div className="actions"><Button disabled={appointment.is_couple&&current.your_response==='accept'} loading={action.busy} onClick={()=>void action.run(async()=>{const result=await journeyApi.respondToReschedule(appointment.id,current.id,'accept');if(result.state==='Unavailable')setOutcome(result.message);await refresh();},w('Accept new time'))}>{w('Accept new time')}</Button><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondToReschedule(appointment.id,current.id,'decline');await refresh();},w('Decline new time'))}>{w('Decline new time')}</Button></div>}
-    </InlineNotice>}
-    {!current&&appointment.can_propose_reschedule&&<>
-      {!expanded?<Button variant="secondary" onClick={()=>{setExpanded(true);void calendar.refresh();}}>{w('Request a new time')}</Button>:<>
-        {calendar.error&&<InlineNotice tone="danger">Available times could not be loaded. <Button variant="secondary" onClick={()=>void calendar.refresh()}>{w('Try again')}</Button></InlineNotice>}
-        {!calendar.error&&!calendar.data?<Skeleton/>:null}
-        {calendar.data&&<><p className="supporting">{w('Timezone')}: {appointment.timezone}</p><BookingCalendar days={calendar.data.days} fromDate={fromDate} selectedDate={selectedDate} selectedStart={selected} duration={appointment.booked_minutes} onMonth={value=>{setFromDate(value);setSelectedDate('');setSelected('');setRetryKey('');}} onDate={value=>{setSelectedDate(value);setSelected('');setRetryKey('');}} onStart={value=>{setSelected(value);setRetryKey(crypto.randomUUID());}}/><div className="actions"><Button loading={action.busy} disabled={!selected||!retryKey} onClick={()=>void propose()}>{w('Send time request')}</Button><Button variant="secondary" onClick={()=>setExpanded(false)}>{w('Cancel')}</Button></div></>}
+  return <>
+    <Card className={`reschedule-panel${focused?' reschedule-calendar-panel':''}`}>
+      <h2>{w(current?'Review the proposed time':'Choose a proposed time')}</h2>
+      {current&&appointment.is_couple&&<p role="status">{current.accepted_count} / {current.required_count} {w('participants have agreed')}. {w(current.your_response==='accept'?'Your agreement is recorded.':'Review the new time before agreeing.')}</p>}
+      {current&&<><p><strong>{w('A new time is waiting for your response.')}</strong></p><p>{w('Your proposed time')}: {date(current.start,current.timezone)}</p>
+        {current.proposed_by_you?<Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.withdrawReschedule(appointment.id,current.id);await refresh();},w('Withdraw request'))}>{w('Withdraw request')}</Button>:<div className="actions"><Button disabled={appointment.is_couple&&current.your_response==='accept'} loading={action.busy} onClick={()=>void action.run(async()=>{const result=await journeyApi.respondToReschedule(appointment.id,current.id,'accept');if(result.state==='Unavailable')setOutcome(result.message);await refresh();},w('Accept new time'))}>{w('Accept new time')}</Button><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.respondToReschedule(appointment.id,current.id,'decline');await refresh();},w('Decline new time'))}>{w('Decline new time')}</Button></div>}
+      </>}
+      {!current&&appointment.can_propose_reschedule&&<>
+        {calendar.error&&<InlineNotice tone="danger">{w('Available times could not be loaded.')} <Button variant="secondary" onClick={()=>void calendar.refresh()}>{w('Try again')}</Button></InlineNotice>}
+        {!calendar.error&&!calendar.data&&<Skeleton/>}
+        {calendar.data&&<><p className="supporting">{w('Timezone')}: {appointment.timezone}</p><BookingCalendar days={calendar.data.days} fromDate={fromDate} selectedDate={selectedDate} selectedStart={selected} duration={appointment.booked_minutes} onMonth={value=>{setFromDate(value);setSelectedDate('');setSelected('');setRetryKey('');}} onDate={value=>{setSelectedDate(value);setSelected('');setRetryKey('');}} onStart={value=>{setSelected(value);setRetryKey(crypto.randomUUID());}}/></>}
         {calendar.data&&!hasSlots&&<InlineNotice>{w('No available times to propose in the current booking window.')}</InlineNotice>}
       </>}
-    </>}
+      {!current&&!appointment.can_propose_reschedule&&<InlineNotice>{w('This appointment is not eligible for a time change.')}</InlineNotice>}
+    </Card>
+    {focused&&<InlineNotice>{w(appointment.is_couple?'The original appointment stays reserved until both adults and the clinician agree.':'The original appointment stays reserved until both of you agree.')}</InlineNotice>}
     {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
     {outcome&&<InlineNotice tone="info">{outcome}</InlineNotice>}
     {action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
-  </Card>;
+    {focused&&<div className="actions">{!current&&appointment.can_propose_reschedule&&<Button loading={action.busy} disabled={!selected||!retryKey} onClick={()=>void propose()}>{w('Send reschedule request')}</Button>}<Button variant="secondary" disabled={action.busy} onClick={onClose}>{w(current?'Back to appointment':'Keep current time')}</Button></div>}
+  </>;
 }
 
 function PatientClinicScheduleSharing({appointment}:{appointment:string}) {
