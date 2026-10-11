@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **fb94c293d8f010d8f5775ee0c2d2696bf3fce9d7**. Later report/evidence-only commits
+  **20172f3356e239ffd801b71d8690dd712ee99b11**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -75,6 +75,33 @@ clinician onboarding composition differences. Native-language approval, all-stat
 visual acceptance and owner acceptance remain open. Build/typecheck/lint pass;
 existing lint and chunk-size warnings remain. No unchanged financial or hosted
 consultation suite was repeated for these frontend changes.
+
+## Clinician workspace and detail comparisons — source20172f3
+
+F01 now has one compact schedule surface with distinct actionable/future group
+headings and actual readiness icon rows. F13 uses the reference offer-stage rail
+and wide detail panel; F14 uses the history heading/panel and truthful persisted
+rows. Patient and unrelated-clinician direct offer queries are denied; accepted
+own-offer reload/consultation handoff passes. Matched320/390/768/1440 captures,
+plus provisionalAmharic/Oromo390 captures, are preserved in the existing matrix.
+This does not prove active/expired/withdrawn UI states or native translation review.
+
+`browser-presentation-overview.cjs` passes at390/768/1440 on both roles: keyboard
+Today→details, detail reload, real generated alternative slot selected by keyboard,
+return without mutation, preserved audit-history keyboard expand/collapse, exact
+wallet/earnings queries unchanged during the bounded flow. Its outdated dropdown
+expectation was corrected to the dedicated calendar route; reference pages now
+explicitly receive the same viewport rather than inheriting the context's1440px.
+The app's expanded15-event audit timeline created a very tall page; it now starts
+collapsed, retaining every event in an accessible scrolling region. No audit event,
+appointment, note or financial record was removed.
+
+Paired F01/E02 English desktop/mobile images were inspected; remaining status,
+language/zoom and owner comparisons stay open. Current PWA recovery/hash/auth/cache
+check passes at5882b11; later offer/timeline changes do not change service-worker
+code, but latest candidate hash checks remain a final integrated gate. A read-only
+consistent per-owner audit reports3patients/1clinician/6accounts and zero projection,
+obligation, journal-balance or posting mismatches. No balance repair occurred.
 
 ## Remaining release work, not silently dropped
 

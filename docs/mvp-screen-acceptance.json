@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "fb94c293d8f010d8f5775ee0c2d2696bf3fce9d7",
+  "source_checkpoint": "20172f3356e239ffd801b71d8690dd712ee99b11",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -1013,7 +1013,7 @@
         "expected_actions": [],
         "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
         "functional_status": "Functionally verified for the named persisted browser paths; untested states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure in the named new-account draft/reload/resume/submission flows at fb94c29. Other per-scope vetting/profile states require their own evidence.",
         "implementation_files": [
           "frontend/src/pages/Onboarding.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -1129,7 +1129,7 @@
         "expected_actions": [],
         "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
         "functional_status": "Functionally verified for the named persisted browser paths; untested states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure in the named new-account draft/reload/resume/submission flows at fb94c29. Other per-scope vetting/profile states require their own evidence.",
         "implementation_files": [
           "frontend/src/pages/Onboarding.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -1245,7 +1245,7 @@
         "expected_actions": [],
         "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
         "functional_status": "Functionally verified for the named persisted browser paths; untested states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure in the named new-account draft/reload/resume/submission flows at fb94c29. Other per-scope vetting/profile states require their own evidence.",
         "implementation_files": [
           "frontend/src/pages/Onboarding.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -1475,7 +1475,7 @@
         ],
         "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
         "functional_status": "Functionally verified for the named persisted browser paths; untested states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure in the named new-account draft/reload/resume/submission flows at fb94c29. Other per-scope vetting/profile states require their own evidence.",
         "implementation_files": [
           "frontend/src/pages/Onboarding.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -1599,7 +1599,7 @@
         "expected_actions": [],
         "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
         "functional_status": "Functionally verified for the named persisted browser paths; untested states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure in the named new-account draft/reload/resume/submission flows at fb94c29. Other per-scope vetting/profile states require their own evidence.",
         "implementation_files": [
           "frontend/src/pages/Onboarding.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -1718,7 +1718,7 @@
         "expected_actions": [],
         "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
         "functional_status": "Functionally verified for the named persisted browser paths; untested states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure in the named new-account draft/reload/resume/submission flows at fb94c29. Other per-scope vetting/profile states require their own evidence.",
         "implementation_files": [
           "frontend/src/pages/Onboarding.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -1732,7 +1732,9 @@
             "label": "Continue",
             "hash": "#b08"
           }
-        ]
+        ],
+        "verified_onboarding_route": "/onboarding?intent=clinician",
+        "separate_route_gate": "The paired onboarding step does not verify every structured /clinician/vetting state."
       },
       "completion": {
         "functional": "Functionally verified",
@@ -2060,7 +2062,7 @@
         "expected_actions": [],
         "expected_next_states": "Draft/Clarification → append immutable evidence revision → submission/resubmission → reviewer sees evidence → decision snapshot records evidence IDs/revisions/digests; no applicant mutation after submission.",
         "functional_status": "Functionally verified for the named persisted browser paths; untested states pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "No failure in the named new-account draft/reload/resume/submission flows at fb94c29. Other per-scope vetting/profile states require their own evidence.",
         "implementation_files": [
           "frontend/src/pages/Onboarding.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -2074,7 +2076,9 @@
             "label": "Submit application",
             "hash": "#b11"
           }
-        ]
+        ],
+        "verified_onboarding_route": "/onboarding?intent=clinician",
+        "separate_route_gate": "The paired onboarding step does not verify every structured /clinician/vetting state."
       },
       "completion": {
         "functional": "Functionally verified",
@@ -4963,7 +4967,8 @@
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
         "presentation_checkpoint": "390/768/1440 patient and clinician details/reload, keyboard link, authoritative reschedule slots/cancel without submission; wallets/earnings unchanged. See docs/mvp-journey-verification-2026-10-09.md.",
-        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending."
+        "consultation_2026_10_10": "docs/mvp-journey-verification-2026-10-09.md#current-consultation-correction--authoritative-evidence; hosted Cloud fake-device individual journey 0c804ed; terminal/preflight/read-only d720596e385e9f50c1ed9df256c09fd2e9b4cd13. Couples, physical devices, continuous scheduler and full visual approval remain pending.",
+        "workspace_2026_10_11": "docs/screenshots/mvp-current/20172f3-overview/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "E02",
@@ -4979,7 +4984,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Loaded facts/preparation/disclosure columns; compact time-change action. Truthful initials, actual reservations and extra timeline differ from prototype.",
+        "current_differences": "Reference primary conversation/disclosure and supporting preparation. Preserved growing audit timeline previously dominated page height; now collapsed by default and keyboard expandable with all real events in bounded scrolling region. Actual snapshot/time/price remain authoritative. Upcoming couple and authorized clinician/patient detail/reload tested; other status visuals remain separately covered/pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -4989,17 +4994,17 @@
         ],
         "correction_status": "Compared corrections; product-owner visual approval pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-presentation-current/E02-reference-1440.png",
-          "docs/screenshots/mvp-presentation-current/E02-reference-390.png",
-          "docs/screenshots/mvp-presentation-current/E02-reference-768.png"
+          "docs/screenshots/mvp-current/20172f3-overview/E02-reference-1440.png",
+          "docs/screenshots/mvp-current/20172f3-overview/E02-reference-390.png",
+          "docs/screenshots/mvp-current/20172f3-overview/E02-reference-768.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-presentation-current/E02-application-1440.png",
-          "docs/screenshots/mvp-presentation-current/E02-application-390.png",
-          "docs/screenshots/mvp-presentation-current/E02-application-768.png"
+          "docs/screenshots/mvp-current/20172f3-overview/E02-application-1440.png",
+          "docs/screenshots/mvp-current/20172f3-overview/E02-application-390.png",
+          "docs/screenshots/mvp-current/20172f3-overview/E02-application-768.png"
         ],
         "comparison_notes": [
-          "Current comparison notes and per-set full source: docs/mvp-journey-verification-2026-10-09.md and docs/screenshots/consultation-current/evidence.json. No universal pixel-match claim."
+          "Reference primary conversation/disclosure and supporting preparation. Preserved growing audit timeline previously dominated page height; now collapsed by default and keyboard expandable with all real events in bounded scrolling region. Actual snapshot/time/price remain authoritative. Upcoming couple and authorized clinician/patient detail/reload tested; other status visuals remain separately covered/pending."
         ],
         "viewports": [
           390,
@@ -5012,7 +5017,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "390/768/1440 patient and clinician details/reload, keyboard link, authoritative reschedule slots/cancel without submission; wallets/earnings unchanged.",
+        "functional_verification": "docs/screenshots/mvp-current/20172f3-overview/result.json",
         "expected_layout": {
           "reference_source": "inventory.js#forms.E02",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -5053,8 +5058,8 @@
           }
         ],
         "expected_next_states": "Appointment PendingConfirmation/Booked → Cancelled/Expired/Completed only by authorized actions; Call NotStarted/Open/Ended; Documentation None/Draft/Finalized are independent states.",
-        "functional_status": "Locally verified focused individual journey; whole-screen/state acceptance pending",
-        "functional_failures": "No reproduced individual call/notes/finalization failure remains in focused tested paths. Couples participant/consent/recipient model absent. Device/network handover and automatic SDK token refresh not independently verified.",
+        "functional_status": "Functionally verified for named persisted paths; remaining states explicit",
+        "functional_failures": "No failure observed in listed current paths. See comparison notes for untested state gates.",
         "implementation_files": [
           "frontend/src/pages/ConsultationPage.tsx",
           "frontend/src/components/ConsultationDetails.tsx",
@@ -5081,13 +5086,14 @@
         ],
         "visual_status": "Comparison recorded; not accepted",
         "evidence_source": "c9c25cd87d1e5a6342aedcf0858379e04fbda433 (current packaged app); per-capture sources in evidence README",
-        "verification_evidence_note": "2026-10-10 dedicated presentation-site check; retained original fixtures untouched."
+        "verification_evidence_note": "2026-10-10 dedicated presentation-site check; retained original fixtures untouched.",
+        "visual_verification_limit": "Named English comparisons only; not universal state/language/zoom or owner acceptance."
       },
       "completion": {
-        "functional": "Implemented but unverified",
-        "visual": "Implemented but unverified",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Loaded facts/preparation/disclosure columns; compact time-change action. Truthful initials, actual reservations and extra timeline differ from prototype.",
+        "remaining_action": "Reference primary conversation/disclosure and supporting preparation. Preserved growing audit timeline previously dominated page height; now collapsed by default and keyboard expandable with all real events in bounded scrolling region. Actual snapshot/time/price remain authoritative. Upcoming couple and authorized clinician/patient detail/reload tested; other status visuals remain separately covered/pending.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (E02) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
@@ -6954,7 +6960,8 @@
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F01) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "presentation_checkpoint": "390/768/1440 real queries, keyboard row link to loaded details/reload; no financial mutation. Continuous jobs not tested. See docs/mvp-journey-verification-2026-10-09.md."
+        "presentation_checkpoint": "390/768/1440 real queries, keyboard row link to loaded details/reload; no financial mutation. Continuous jobs not tested. See docs/mvp-journey-verification-2026-10-09.md.",
+        "workspace_2026_10_11": "docs/screenshots/mvp-current/20172f3-overview/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "F01",
@@ -6970,7 +6977,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Reference heading and compact Up next rows; permitted alias/time/status. Presence ribbon/tour/readiness differences remain.",
+        "current_differences": "One compact schedule surface retains distinct Needs action/Up next; reference icon/readiness rows use real saved application/services/schedules. No fake credential expiry, statistics or patient identities. Current actual balances may change through isolated scheduled policy processing. Matched390/768/1440 keyboard detail navigation and generated-slot selection/return pass without mutations. English desktop/mobile inspected; language/zoom/owner pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -6980,16 +6987,18 @@
         ],
         "correction_status": "Implemented correction; remaining differences recorded",
         "reference_screenshots": [
-          "docs/screenshots/mvp-presentation-current/F01-reference-1440.png",
-          "docs/screenshots/mvp-presentation-current/F01-reference-390.png",
-          "docs/screenshots/mvp-presentation-current/F01-reference-768.png"
+          "docs/screenshots/mvp-current/20172f3-overview/F01-reference-1440.png",
+          "docs/screenshots/mvp-current/20172f3-overview/F01-reference-390.png",
+          "docs/screenshots/mvp-current/20172f3-overview/F01-reference-768.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-presentation-current/F01-application-1440.png",
-          "docs/screenshots/mvp-presentation-current/F01-application-390.png",
-          "docs/screenshots/mvp-presentation-current/F01-application-768.png"
+          "docs/screenshots/mvp-current/20172f3-overview/F01-application-1440.png",
+          "docs/screenshots/mvp-current/20172f3-overview/F01-application-390.png",
+          "docs/screenshots/mvp-current/20172f3-overview/F01-application-768.png"
         ],
-        "comparison_notes": "Current report and evidence README; visual and functional acceptance independent.",
+        "comparison_notes": [
+          "One compact schedule surface retains distinct Needs action/Up next; reference icon/readiness rows use real saved application/services/schedules. No fake credential expiry, statistics or patient identities. Current actual balances may change through isolated scheduled policy processing. Matched390/768/1440 keyboard detail navigation and generated-slot selection/return pass without mutations. English desktop/mobile inspected; language/zoom/owner pending."
+        ],
         "viewports": [
           390,
           768,
@@ -7001,7 +7010,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "390/768/1440 real queries, keyboard row link to loaded details/reload; no financial mutation. Continuous jobs not tested.",
+        "functional_verification": "docs/screenshots/mvp-current/20172f3-overview/result.json",
         "expected_layout": {
           "reference_source": "inventory.js#forms.F01",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -7044,8 +7053,8 @@
           }
         ],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Focused persisted journey verified; complete screen/state acceptance pending",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_status": "Functionally verified for named persisted paths; remaining states explicit",
+        "functional_failures": "No failure observed in listed current paths. See comparison notes for untested state gates.",
         "implementation_files": [
           "frontend/src/pages/Clinician.tsx",
           "frontend/src/pages/OpenRequests.tsx"
@@ -7086,13 +7095,14 @@
             "hash": "#h02"
           }
         ],
-        "verification_evidence_note": "2026-10-10 dedicated presentation-site check; retained original fixtures untouched."
+        "verification_evidence_note": "2026-10-10 dedicated presentation-site check; retained original fixtures untouched.",
+        "visual_verification_limit": "Named English comparisons only; not universal state/language/zoom or owner acceptance."
       },
       "completion": {
-        "functional": "Implemented but unverified",
-        "visual": "Implemented but unverified",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Reference heading and compact Up next rows; permitted alias/time/status. Presence ribbon/tour/readiness differences remain.",
+        "remaining_action": "One compact schedule surface retains distinct Needs action/Up next; reference icon/readiness rows use real saved application/services/schedules. No fake credential expiry, statistics or patient identities. Current actual balances may change through isolated scheduled policy processing. Matched390/768/1440 keyboard detail navigation and generated-slot selection/return pass without mutations. English desktop/mobile inspected; language/zoom/owner pending.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F01) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
@@ -8432,7 +8442,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F13) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "workspace_2026_10_11": "docs/screenshots/mvp-current/20172f3-offers/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "F13",
@@ -8448,7 +8459,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Private persisted own quote facts, terminal state and accepted consultation handoff. Other clinician guessed ID and patient direct query denied. Active withdrawal lifecycle pending.",
+        "current_differences": "Reference four-stage rail derives only from persisted own offer outcome; replaces oversized generic success banner. Wide facts panel and privacy/cancellation notice, permitted patient label, real expiry/format/fee. Accepted offer reload and consultation handoff pass; patient and unrelated clinician direct query denied. English desktop/mobile inspected;320/768 captured; Amharic/Oromo390 layouts captured, no native approval. Active withdrawal/expiry/error visuals still need specific evidence.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -8458,14 +8469,22 @@
         ],
         "correction_status": "Comparison recorded; visual acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/F13-reference-390.png",
-          "docs/screenshots/mvp-connected-journeys/F13-reference-1440.png"
+          "docs/screenshots/mvp-current/20172f3-offers/F13-reference-1440.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F13-reference-320.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F13-reference-390.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F13-reference-768.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/F13-application-390.png",
-          "docs/screenshots/mvp-connected-journeys/F13-application-1440.png"
+          "docs/screenshots/mvp-current/20172f3-offers/F13-application-1440.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F13-application-320.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F13-application-390.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F13-application-768.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F13-application-am-390.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F13-application-om-390.png"
         ],
-        "comparison_notes": [],
+        "comparison_notes": [
+          "Reference four-stage rail derives only from persisted own offer outcome; replaces oversized generic success banner. Wide facts panel and privacy/cancellation notice, permitted patient label, real expiry/format/fee. Accepted offer reload and consultation handoff pass; patient and unrelated clinician direct query denied. English desktop/mobile inspected;320/768 captured; Amharic/Oromo390 layouts captured, no native approval. Active withdrawal/expiry/error visuals still need specific evidence."
+        ],
         "viewports": [
           390,
           768,
@@ -8477,7 +8496,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "docs/mvp-journey-verification-2026-10-09.md; exact source annotations per check",
+        "functional_verification": "docs/screenshots/mvp-current/20172f3-offers/result.json",
         "expected_layout": {
           "reference_source": "request-experience.js#forms.F13",
           "source_file_sha256": "3e9623877966af4ad3391b1167eb027793d06fb193fb18c7be372b91026f2520",
@@ -8499,8 +8518,8 @@
         },
         "expected_actions": [],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Verified specified persisted slice; full journey/state acceptance pending",
-        "functional_failures": "Private persisted own quote facts, terminal state and accepted consultation handoff. Other clinician guessed ID and patient direct query denied. Active withdrawal lifecycle pending.",
+        "functional_status": "Functionally verified for named persisted paths; remaining states explicit",
+        "functional_failures": "No failure observed in listed current paths. See comparison notes for untested state gates.",
         "implementation_files": [
           "frontend/src/pages/ClinicianOffers.tsx",
           "tele_tena/api/open_requests.py"
@@ -8510,13 +8529,14 @@
             "label": "Open offers history",
             "hash": "#f14"
           }
-        ]
+        ],
+        "visual_verification_limit": "Named English comparisons only; not universal state/language/zoom or owner acceptance."
       },
       "completion": {
-        "functional": "Implemented but unverified",
-        "visual": "Implemented but unverified",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Private persisted own quote facts, terminal state and accepted consultation handoff. Other clinician guessed ID and patient direct query denied. Active withdrawal lifecycle pending.",
+        "remaining_action": "Reference four-stage rail derives only from persisted own offer outcome; replaces oversized generic success banner. Wide facts panel and privacy/cancellation notice, permitted patient label, real expiry/format/fee. Accepted offer reload and consultation handoff pass; patient and unrelated clinician direct query denied. English desktop/mobile inspected;320/768 captured; Amharic/Oromo390 layouts captured, no native approval. Active withdrawal/expiry/error visuals still need specific evidence.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F13) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
@@ -8537,7 +8557,8 @@
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F14) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "presentation_checkpoint": "Accepted private offer in own history, links to authorized consultation; complete pagination/other-state regression pending. See docs/mvp-journey-verification-2026-10-09.md."
+        "presentation_checkpoint": "Accepted private offer in own history, links to authorized consultation; complete pagination/other-state regression pending. See docs/mvp-journey-verification-2026-10-09.md.",
+        "workspace_2026_10_11": "docs/screenshots/mvp-current/20172f3-offers/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "F14",
@@ -8553,7 +8574,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Owned offer history/accepted handoff with actual statuses. Audit screenshots are not all-actions acceptance.",
+        "current_differences": "Reference Offers history heading and grouped history surface, actual private rows/mobile cards, closed-record privacy explanation and real pagination. Service/duration/format and explicit timezone retained as operational additions. Accepted populated state320/390/768/1440 passes; permission denial tested. No fake expired/withdrawn rows copied from prototype; those separate state comparisons remain pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -8563,14 +8584,20 @@
         ],
         "correction_status": "Implemented correction; remaining differences recorded",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/F14-reference-390.png",
-          "docs/screenshots/mvp-connected-journeys/F14-reference-1440.png"
+          "docs/screenshots/mvp-current/20172f3-offers/F14-reference-1440.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F14-reference-320.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F14-reference-390.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F14-reference-768.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/F14-application-390.png",
-          "docs/screenshots/mvp-connected-journeys/F14-application-1440.png"
+          "docs/screenshots/mvp-current/20172f3-offers/F14-application-1440.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F14-application-320.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F14-application-390.png",
+          "docs/screenshots/mvp-current/20172f3-offers/F14-application-768.png"
         ],
-        "comparison_notes": "Current report and evidence README; visual and functional acceptance independent.",
+        "comparison_notes": [
+          "Reference Offers history heading and grouped history surface, actual private rows/mobile cards, closed-record privacy explanation and real pagination. Service/duration/format and explicit timezone retained as operational additions. Accepted populated state320/390/768/1440 passes; permission denial tested. No fake expired/withdrawn rows copied from prototype; those separate state comparisons remain pending."
+        ],
         "viewports": [
           390,
           768,
@@ -8582,7 +8609,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Accepted private offer in own history, links to authorized consultation; complete pagination/other-state regression pending.",
+        "functional_verification": "docs/screenshots/mvp-current/20172f3-offers/result.json",
         "expected_layout": {
           "reference_source": "request-experience.js#forms.F14",
           "source_file_sha256": "3e9623877966af4ad3391b1167eb027793d06fb193fb18c7be372b91026f2520",
@@ -8604,8 +8631,8 @@
         },
         "expected_actions": [],
         "expected_next_states": "Applicant → scope-approved → offering published → availability published → request-ready; presence expires on stale authenticated heartbeat.",
-        "functional_status": "Focused persisted journey verified; complete screen/state acceptance pending",
-        "functional_failures": "Own closed/accepted history table/mobile cards; illustrative prototype rows not copied. Large-page navigation and remaining outcomes pending.",
+        "functional_status": "Functionally verified for named persisted paths; remaining states explicit",
+        "functional_failures": "No failure observed in listed current paths. See comparison notes for untested state gates.",
         "implementation_files": [
           "frontend/src/pages/ClinicianOffers.tsx",
           "tele_tena/api/open_requests.py"
@@ -8622,13 +8649,14 @@
         ],
         "visual_status": "Comparison recorded; not accepted",
         "evidence_source": "c9c25cd87d1e5a6342aedcf0858379e04fbda433 (current packaged app); per-capture sources in evidence README",
-        "verification_evidence_note": "2026-10-10 dedicated presentation-site check; retained original fixtures untouched."
+        "verification_evidence_note": "2026-10-10 dedicated presentation-site check; retained original fixtures untouched.",
+        "visual_verification_limit": "Named English comparisons only; not universal state/language/zoom or owner acceptance."
       },
       "completion": {
-        "functional": "Implemented but unverified",
-        "visual": "Implemented but unverified",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Owned offer history/accepted handoff with actual statuses. Audit screenshots are not all-actions acceptance.",
+        "remaining_action": "Reference Offers history heading and grouped history surface, actual private rows/mobile cards, closed-record privacy explanation and real pagination. Service/duration/format and explicit timezone retained as operational additions. Accepted populated state320/390/768/1440 passes; permission denial tested. No fake expired/withdrawn rows copied from prototype; those separate state comparisons remain pending.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (F14) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
@@ -15242,7 +15270,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
-  "current_packaged_source": "fb94c293d8f010d8f5775ee0c2d2696bf3fce9d7",
+  "current_packaged_source": "20172f3356e239ffd801b71d8690dd712ee99b11",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15254,7 +15282,7 @@
     "site": "teletena-mvp-presentation.localhost",
     "bench": "/home/frappe/frappe/frappe-bench",
     "branch": "feat/mvp-release-handover",
-    "build_source": "fb94c293d8f010d8f5775ee0c2d2696bf3fce9d7",
+    "build_source": "20172f3356e239ffd801b71d8690dd712ee99b11",
     "date": "2026-10-11",
     "report": "docs/mvp-journey-verification-2026-10-09.md",
     "note": "Compatibility Bench is separate and not serving this URL. Evidence/docs-only commits may differ; compare runtime diff before rebuilding."
