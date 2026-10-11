@@ -1,5 +1,6 @@
 /** Provisional account copy. Native Amharic/Afaan Oromo review remains required. */
 export const accountTranslations: Record<string, [string, string]> = {
+  "Manage invitations and consent": ["ግብዣዎችንና ፈቃድን ያስተዳድሩ", "Affeerraa fi hayyama bulchi"],
   "Services and pricing": ["አገልግሎቶችና ዋጋ", "Tajaajiloota fi gatii"],
   "Approved scopes and tailored offerings": ["የተፈቀዱ ወሰኖችና የተዘጋጁ አገልግሎቶች", "Daangaa hayyamamee fi tajaajiloota qophaa'an"],
   "Confirmation, buffers and notice": ["ማረጋገጫ፣ መካከለኛ ጊዜና ማሳወቂያ", "Mirkaneessa, yeroo boqonnaa fi beeksisa"],

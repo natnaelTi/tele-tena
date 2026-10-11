@@ -30,7 +30,8 @@
 .account-sections .settings-link-row > span { flex: 1; }
 .account-sections .settings-link-row > svg { flex: 0 0 auto; color: var(--teal); }
 .account-sections .settings-link-row:hover { color: var(--brand); background: var(--subtle); }
-.reference-workspace .account-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0; }
+.reference-workspace .account-tabs { display: flex; flex-wrap: nowrap; gap: 8px; margin: 24px 0; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; }
+.reference-workspace .account-tabs button { flex: 0 0 auto; white-space: nowrap; }
 .reference-workspace .account-tabs button { min-height: 44px; padding: 10px 16px; border: 1px solid var(--border); border-radius: 22px; color: var(--ink); background: white; font-size: 14px; }
 .reference-workspace .account-tabs button.selected { color: white; background: var(--ink); border-color: var(--ink); }
 .settings-preview-identity { display: flex; align-items: flex-start; gap: 16px; padding: 18px; border-radius: 12px; background: var(--subtle); }
