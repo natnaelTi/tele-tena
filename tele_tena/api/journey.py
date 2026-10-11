@@ -195,12 +195,22 @@ def session():
 def save_profile(kind, display_name, adult, history='', share_name=None, share_history=None, languages=None):
     if kind not in ('patient', 'clinician'):
         fail('Unsupported profile type')
-    user = actor('Tele Tena ' + kind.title())
+    user = actor()
     if not boolean(adult):
         fail('Adults 18+ only')
     existing = rows('SELECT kind,share_name,share_history,languages,public_id FROM tt_profile WHERE user=%s FOR UPDATE', (user,))
     if existing and existing[0].kind != kind:
         fail('Profile type cannot change')
+    roles = set(frappe.get_roles(user))
+    if kind == 'patient':
+        actor('Tele Tena Patient')
+    elif 'Tele Tena Clinician' not in roles and not (
+        'Tele Tena Applicant' in roles and existing and existing[0].kind == 'clinician'
+    ):
+        # Contact-verified onboarding creates the applicant's profile. Editing
+        # it is separate from approval; applicants cannot create a profile here
+        # or use this command to gain any clinical/service authorization.
+        frappe.throw('Clinician profile access required', frappe.PermissionError)
     share_name = existing[0].share_name if share_name is None and existing else (False if share_name is None else share_name)
     share_history = existing[0].share_history if share_history is None and existing else (False if share_history is None else share_history)
     name = text(display_name, 120)

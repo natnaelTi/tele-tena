@@ -256,6 +256,39 @@ class Integration(unittest.TestCase):
         api.simulated_deposit(amount, secrets.token_hex(12))
         frappe.db.commit()
 
+    def test_pending_applicant_can_edit_only_existing_own_profile(self):
+        # Fixture provisioning is a local Administrator action. A vetting
+        # reviewer itself must not have generic User role-write privileges.
+        frappe.set_user('Administrator')
+        user = frappe.get_doc('User', USERS['c3'])
+        user.remove_roles('Tele Tena Clinician')
+        user.add_roles('Tele Tena Applicant')
+        frappe.clear_cache(user=USERS['c3'])
+        login('c3')
+        original_application = api.one('SELECT status FROM tt_application WHERE user=%s', (USERS['c3'],)).status
+        api.save_profile('clinician', 'Updated Applicant', True, languages=['am'])
+        own = api.one('SELECT kind,display_name,languages FROM tt_profile WHERE user=%s', (USERS['c3'],))
+        self.assertEqual(own.display_name, 'Updated Applicant')
+        self.assertEqual(json.loads(own.languages), ['am'])
+        self.assertEqual(api.one('SELECT status FROM tt_application WHERE user=%s', (USERS['c3'],)).status, original_application)
+        self.assertNotIn('Tele Tena Clinician', frappe.get_roles(USERS['c3']))
+        self.assertFalse(api.rows('SELECT name FROM `tabTele Tena Service Scope` WHERE clinician=%s', (USERS['c3'],)))
+        with self.assertRaises(frappe.PermissionError):
+            api.publish(PREFIX, 600, 30)
+        login('p1')
+        original_patient = api.one('SELECT display_name,history,share_name,share_history FROM tt_profile WHERE user=%s', (USERS['p1'],))
+        with self.assertRaises(frappe.ValidationError):
+            api.save_profile('clinician', 'Not a clinician', True)
+        self.assertEqual(api.one('SELECT display_name,history,share_name,share_history FROM tt_profile WHERE user=%s', (USERS['p1'],)), original_patient)
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            api.save_profile('clinician', 'Guest', True)
+        login('c3')
+        # Only this method's disposable fixture is removed inside its rollback.
+        frappe.db.sql('DELETE FROM tt_profile WHERE user=%s', (USERS['c3'],))
+        with self.assertRaises(frappe.PermissionError):
+            api.save_profile('clinician', 'Unverified new profile', True)
+
     def test_01_approval_and_stale_offering(self):
         login('c3')
         with self.assertRaises(frappe.ValidationError):

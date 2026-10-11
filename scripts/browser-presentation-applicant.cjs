@@ -103,6 +103,23 @@ let stage = "launch";
         .getByRole("heading", { name: "Your account", exact: true })
         .waitFor();
     }
+    stage = "pending own profile save";
+    const nameField=page.getByLabel('Professional name',{exact:true});
+    const unchangedName=await nameField.inputValue();
+    await nameField.fill(unchangedName);
+    const validity=await nameField.evaluate(input=>({valid:input.validity.valid,patternMismatch:input.validity.patternMismatch}));
+    console.log('Pending profile field validity: '+JSON.stringify(validity));
+    assert.ok(validity.valid, 'A non-empty professional name must pass native input validation');
+    const savedResponse=page.waitForResponse(response=>response.url().includes('tele_tena.api.journey.save_profile'));
+    await page.getByRole('button',{name:'Save details',exact:true}).click();
+    const saveStatus=(await savedResponse).status();
+    const expected=process.env.TELE_TENA_REPRO_PENDING_PROFILE==='1'?403:200;
+    assert.equal(saveStatus,expected);
+    assert.equal(await nameField.inputValue(),unchangedName);
+    const unchangedSession=await page.evaluate(async()=>(await(await fetch('/api/method/tele_tena.api.journey.session')).json()).message);
+    assert.equal(unchangedSession.profile.display_name,session.profile.display_name);
+    assert.deepEqual(unchangedSession.roles,session.roles);
+    console.log('Pending own-profile save HTTP status: '+saveStatus+'; same-value input and roles preserved.');
     stage = "direct appointment API remains denied";
     const status = await page.evaluate(
       async () =>
@@ -110,7 +127,7 @@ let stage = "launch";
     );
     assert.equal(status, 403);
     const manifest=JSON.parse(fs.readFileSync(require('node:path').resolve(__dirname,'../tele_tena/public/review/release.json')));
-    fs.writeFileSync(output+'/result.json',JSON.stringify({source:manifest.source_commit,site:'teletena-mvp-presentation.localhost',real_backend:true,pending_state:true,approved_only_navigation_absent:true,profile_reload:true,no_approval_mutation:true,direct_appointments_denied:true,viewports:[390,768,1440]},null,2));
+    fs.writeFileSync(output+'/result.json',JSON.stringify({source:manifest.source_commit,site:'teletena-mvp-presentation.localhost',real_backend:true,pending_state:true,approved_only_navigation_absent:true,profile_reload:true,no_approval_mutation:true,pending_profile_save_status:saveStatus,direct_appointments_denied:true,viewports:[390,768,1440]},null,2));
 
     console.log(
       "PASS: pending applicant lands on actual application state, profile/reload works at 390/768/1440, no approved-only dashboard queries; direct appointment API denied 403. No approval or financial mutation.",
