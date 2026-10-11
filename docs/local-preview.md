@@ -28,7 +28,9 @@ rather than force killing it or removing its queued work.
 `status` prints source and packaged-source identities separately. Evidence-only
 commits can differ; runtime changes require a clean-checkout package build and
 preview stop/start. Never let old workers continue through financial migrations:
-back up the named site, stop these services, migrate **only** that site, build
+back up the named site, run `scripts/local_review.py stop --keep-queue`
+with Bench Python so queue Redis remains available but no old workers/web can
+write, migrate **only** that site, build
 from the pinned clean source, then start and run authenticated smoke checks.
 
 An offline fallback after reboot may indicate a stopped server. Check status and

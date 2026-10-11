@@ -57,9 +57,10 @@ def status():
         print('HTTP: unreachable')
 
 
-def stop():
+def stop(keep_queue=False):
     # Scheduler first; worker drains its current job; queue remains until it exits.
-    for name in ('scheduler', 'web', 'worker', 'queue-redis'):
+    names = ('scheduler', 'web', 'worker') if keep_queue else ('scheduler', 'web', 'worker', 'queue-redis')
+    for name in names:
         pid = owned_pid(name)
         if not pid:
             continue
@@ -102,9 +103,12 @@ def start():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('start', 'status', 'stop'))
+    parser.add_argument('--keep-queue', action='store_true', help='With stop, retain queue Redis for site migration; no workers remain')
     args = parser.parse_args()
+    if args.keep_queue and args.action != 'stop':
+        parser.error('--keep-queue is valid only with stop')
     try:
-        {'start': start, 'stop': stop, 'status': status}[args.action]()
+        {'start': start, 'stop': lambda: stop(args.keep_queue), 'status': status}[args.action]()
     except Exception as error:
         print(str(error), file=sys.stderr)
         sys.exit(1)

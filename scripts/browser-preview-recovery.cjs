@@ -20,7 +20,7 @@ let browser,stage='launch';
  }
  stage='authenticated deep link';const seed=JSON.parse(fs.readFileSync(root+'/tele_tena_presentation_seed.json'));const file=root+'/tele_tena_presentation_accounts.json';assert.equal(fs.statSync(file).mode&0o077,0);const accounts=JSON.parse(fs.readFileSync(file));
  await page.goto(base+'/sign-in');await page.getByRole('button',{name:'Use email instead',exact:true}).click();await page.getByRole('button',{name:'Use password instead',exact:true}).click();await page.getByLabel('Email',{exact:true}).fill(seed.users.patient);await page.getByLabel('Password',{exact:true}).fill(accounts[seed.users.patient]);await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('button',{name:'Sign out',exact:true}).waitFor();
- await page.goto(base+'/patient/appointments');await page.getByRole('heading',{name:'Appointments',exact:true}).waitFor();await page.reload();await page.getByRole('heading',{name:'Appointments',exact:true}).waitFor();
+ await page.goto(base+'/patient/appointments');await page.getByRole('heading',{name:'Your appointments',exact:true}).waitFor();await page.reload();await page.getByRole('heading',{name:'Your appointments',exact:true}).waitFor();
  assert.equal((await page.request.get(origin+'/api/method/tele_tena.api.presentation.wallet_summary')).status(),200);
  assert.equal((await page.request.get(origin+'/api/method/tele_tena.api.journey.applications')).status(),403);
  stage='asset identities and private cache exclusions';const manifest=await(await page.request.get(origin+'/assets/tele_tena/review/release.json')).json();
