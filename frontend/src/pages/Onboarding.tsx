@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { pendingCareQuery } from "../care-intent";
-import { api } from "../api";
+import { api, ApiError } from "../api";
 import {
   Button,
   Checkbox,
@@ -43,6 +43,7 @@ export default function Onboarding() {
   const [catalog, setCatalog] = useState<{id:string;label:string}[]>([]);
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [resumeBusy, setResumeBusy] = useState(false);
+  const [scopeSearch, setScopeSearch] = useState("");
   useEffect(() => {
     api<{ kind: string; step: number; answers: Answers }>(
       "tele_tena.api.contact_auth.onboarding",
@@ -105,10 +106,17 @@ export default function Onboarding() {
         navigate(invitationToken && current?.profile?.kind==='patient' ? '/relationship-invitation' : current?.profile?.kind === 'patient' && pendingCareQuery() ? '/patient/discovery' : destination(current),
           { replace:true, state: invitationToken ? {relationshipInvitationToken:invitationToken} : undefined });
       }
-    } catch {
-      setError(
-        "Please check this step and try again. Adult eligibility and consent are required to finish.",
-      );
+    } catch (failure) {
+      const code = failure instanceof ApiError ? failure.code : "network_error";
+      setError(code === "adult_required"
+        ? "Please check this step and try again. Adult eligibility and consent are required to finish."
+        : code === "resume_required"
+          ? "Upload a resume and select at least one service to request before submitting."
+          : code === "session_required" || code === "contact_required"
+            ? "Your session has expired. Sign in again to continue your saved registration."
+            : code === "registration_unavailable"
+              ? "Registration is unavailable on this site. Your saved progress has not been submitted."
+              : "We couldn’t save this step. Your entries are still here; check your connection and try again.");
     } finally {
       setBusy(false);
     }
@@ -117,10 +125,10 @@ export default function Onboarding() {
     <>
     <section className={`guided-panel onboarding-guided ${!clinician&&step===3?"onboarding-ready-page":""}`}>
       <p className="eyebrow">
-        {clinician ? "CLINICIAN APPLICATION" : "YOUR SPACE FOR CARE"} · STEP{" "}
-        {step + 1} OF 4
+        {w(clinician ? "CLINICIAN APPLICATION" : "YOUR SPACE FOR CARE")} · {w("STEP")}{" "}
+        {step + 1} {w("of")} 4
       </p>
-      <div className="step-progress" aria-label={`Step ${step + 1} of 4`}>
+      <div className="step-progress" aria-label={`${w("Step")} ${step + 1} ${w("of")} 4`}>
         {[0, 1, 2, 3].map((value) => (
           <span key={value} data-complete={value <= step} />
         ))}
@@ -139,14 +147,12 @@ export default function Onboarding() {
           {step === 0 && (
             <>
               <p>
-                {clinician
+                {w(clinician
                   ? "Use the professional name your credentials are issued under."
-                  : "A preferred name or alias is enough. You choose whether to share it when you book."}
+                  : "A preferred name or alias is enough. You choose whether to share it when you book.")}
               </p>
               <div data-tour={clinician?"applicant-profile":undefined}><TextField
-                label={
-                  clinician ? "Professional name" : "Preferred name or alias"
-                }
+                label={w(clinician ? "Professional name" : "Preferred name or alias")}
                 value={answers.name || ""}
                 maxLength={120}
                 required
@@ -159,7 +165,7 @@ export default function Onboarding() {
             (clinician ? (
               <>
                 <label className="field">
-                  Credentials and requested services
+                  {w("Credentials and requested services")}
                   <textarea
                     required
                     maxLength={2000}
@@ -169,18 +175,23 @@ export default function Onboarding() {
                   />
                 </label>
                 <p className="supporting">
-                  Describe your qualification, registration and the services you
-                  would like reviewed. Upload a PDF resume (up to 5 MB); receipt
-                  does not mean your credentials are verified.
+                  {w("Describe your qualification, registration and the services you would like reviewed. Upload a PDF resume (up to 5 MB); receipt does not mean your credentials are verified.")}
                 </p>
-                <fieldset className="scope-picker" data-tour="applicant-scopes"><legend>Services requested for approval</legend>{catalog.map(service=><Checkbox key={service.id} label={service.label} checked={(answers.requested_services||[]).includes(service.id)} onChange={e=>update({requested_services:e.target.checked?[...(answers.requested_services||[]),service.id]:(answers.requested_services||[]).filter(x=>x!==service.id)})}/>)}</fieldset>
-                <label className="field" data-tour="applicant-resume">Resume (PDF, up to 5 MB)<input type="file" accept="application/pdf,.pdf" disabled={resumeBusy} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;if(file.size>5*1024*1024){setError("Choose a PDF no larger than 5 MB.");return;}setResumeBusy(true);setError("");try{const base64=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]||"");reader.onerror=()=>reject(new Error("Read failed"));reader.readAsDataURL(file);});await journeyApi.uploadResume(file.name,base64);setResumeUploaded(true);}catch{setError("The resume could not be uploaded. Choose a valid PDF and try again.");}finally{setResumeBusy(false);e.target.value="";}}}/>{resumeUploaded&&<span role="status">Resume uploaded for authorized review. <button type="button" className="text-button" onClick={()=>void journeyApi.removeResume().then(()=>setResumeUploaded(false)).catch(()=>setError("Resume could not be removed."))}>Remove</button></span>}</label>
+                <fieldset className="scope-picker onboarding-scope-picker" data-tour="applicant-scopes">
+                  <legend>{w("Services requested for approval")}</legend>
+                  <TextField label={w("Search services")} type="search" value={scopeSearch} onChange={e=>setScopeSearch(e.target.value)}/>
+                  <div className="onboarding-scope-options" role="group" aria-label={w("Services requested for approval")}>
+                    {catalog.filter(service=>service.label.toLocaleLowerCase().includes(scopeSearch.trim().toLocaleLowerCase())).map(service=><Checkbox key={service.id} label={service.label} checked={(answers.requested_services||[]).includes(service.id)} onChange={e=>update({requested_services:e.target.checked?[...(answers.requested_services||[]),service.id]:(answers.requested_services||[]).filter(x=>x!==service.id)})}/>)}
+                    {!catalog.some(service=>service.label.toLocaleLowerCase().includes(scopeSearch.trim().toLocaleLowerCase()))&&<p role="status">{w("No services match this search. Try another term.")}</p>}
+                  </div>
+                  <p className="supporting" role="status">{w("Selected services")}: {(answers.requested_services||[]).length}</p>
+                </fieldset>
+                <label className="field" data-tour="applicant-resume">{w("Resume (PDF, up to 5 MB)")}<input type="file" accept="application/pdf,.pdf" disabled={resumeBusy} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;if(file.size>5*1024*1024){setError("Choose a PDF no larger than 5 MB.");return;}setResumeBusy(true);setError("");try{const base64=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]||"");reader.onerror=()=>reject(new Error("Read failed"));reader.readAsDataURL(file);});await journeyApi.uploadResume(file.name,base64);setResumeUploaded(true);}catch{setError("The resume could not be uploaded. Choose a valid PDF and try again.");}finally{setResumeBusy(false);e.target.value="";}}}/>{resumeUploaded&&<span role="status">{w("Resume uploaded for authorized review.")} <button type="button" className="text-button" onClick={()=>void journeyApi.removeResume().then(()=>setResumeUploaded(false)).catch(()=>setError("Resume could not be removed."))}>{w("Remove")}</button></span>}</label>
               </>
             ) : (
               <>
                 <p>
-                  This service is for adults. Please review these choices before
-                  continuing.
+                  {w("This service is for adults. Please review these choices before continuing.")}
                 </p>
                 <Checkbox
                   variant="card"
@@ -234,8 +245,7 @@ export default function Onboarding() {
                   <option value="om">Afaan Oromo</option>
                 </Select>
                 <p>
-                  Start with private defaults. You can change these for each
-                  booking.
+                  {w("Start with private defaults. You can change these for each booking.")}
                 </p>
                 <Checkbox
                   variant="card"
@@ -255,14 +265,12 @@ export default function Onboarding() {
           {step === 3 && clinician && (
             <>
               <p>
-                {clinician
-                  ? "Your application will be submitted for manual review. You cannot accept bookings until your professional status and service scopes are approved."
-                  : "You can explore available clinicians and choose what to share before each appointment."}
+                {w("Your application will be submitted for manual review. You cannot accept bookings until your professional status and service scopes are approved.")}
               </p>
               <dl className="summary-list">
-                <dt>Name</dt>
+                <dt>{w("Name")}</dt>
                 <dd>{answers.name}</dd>
-                <dt>{clinician ? "Credentials & scope" : "Default sharing"}</dt>
+                <dt>{w("Credentials & scope")}</dt>
                 <dd>
                   {clinician
                     ? answers.statement
