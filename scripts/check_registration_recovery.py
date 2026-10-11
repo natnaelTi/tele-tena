@@ -28,6 +28,13 @@ server=None
 try:
     values=json.loads(before)
     values.update(tele_tena_phone_otp_enabled=True,tele_tena_patient_registration_enabled=True,tele_tena_clinician_registration_enabled=True)
+    # Explicit bounded fixture policy, only with the loopback capture transport.
+    # Never reset consumed sends or source/phone counters. Restore original policy.
+    cap=os.environ.get('TELE_TENA_OTP_TEST_CAP')
+    if cap is not None:
+        assert cap.isascii() and cap.isdecimal() and 1<=int(cap)<=100
+        values['tele_tena_sms_24h_cap']=int(cap)
+        print('Isolated loopback fixture SMS budget configured:',int(cap),'; no provider sends; original restored afterward.',flush=True)
     config.write_text(json.dumps(values));os.chmod(config,0o600)
     env=dict(os.environ,TELE_TENA_LOCAL_OTP_TEST='1',TELE_TENA_TEST_SITE=SITE,NODE_PATH='/tmp/tele-tena-browser/node_modules',TELE_TENA_REGISTRATION_ROOT=str(root))
     server=subprocess.Popen([str(BENCH/'env/bin/gunicorn'),'--bind','127.0.0.1:8028','--workers','1','--pythonpath',str(APP),'--chdir',str(BENCH/'sites'),'scripts.presentation_otp_test_wsgi:application'],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)

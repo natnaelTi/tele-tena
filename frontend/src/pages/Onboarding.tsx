@@ -14,7 +14,7 @@ import { destination, useSession } from "../hooks/useSession";
 import { useLocale } from "../hooks/useLocale";
 import { journeyApi } from "../journey-api";
 import WorkspaceTour from "../components/WorkspaceTour";
-import { ShieldCheck } from "lucide-react";
+import { FileText, ShieldCheck } from "lucide-react";
 import "./Onboarding.css";
 type Answers = {
   name?: string;
@@ -278,7 +278,7 @@ export default function Onboarding() {
               </section>
               <section className="onboarding-review-panel">
                 <h2>{w("Requested scopes")}</h2>
-                <ul>{(answers.requested_services||[]).map(id=><li key={id}><ShieldCheck size={22} aria-hidden="true"/><div><strong>{catalog.find(service=>service.id===id)?.label||w("Service details unavailable")}</strong><p>{w("Pending review")}</p></div></li>)}</ul>
+                <ul>{(answers.requested_services||[]).map(id=><li key={id}><FileText size={22} aria-hidden="true"/><div><strong>{catalog.find(service=>service.id===id)?.label||w("Service details unavailable")}</strong><p>{w("Pending review")}</p></div></li>)}</ul>
                 <p className="supporting">{w("Each service needs its own human approval before publication.")}</p>
               </section>
             </>
