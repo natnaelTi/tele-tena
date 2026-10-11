@@ -516,7 +516,9 @@ button { color: inherit; background: transparent; }
 }
 .page-title h1 {
   margin-bottom: 12px;
-  font-size: 32px;
+  font-size: clamp(32px, 3vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -1.2px;
 }
 .page-title p:last-child {
   margin-bottom: 0;
