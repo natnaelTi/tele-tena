@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **20172f3356e239ffd801b71d8690dd712ee99b11**. Later report/evidence-only commits
+  **b87d843de0827d3d4d80b8717fe0995d64346ef6**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -102,6 +102,47 @@ check passes at5882b11; later offer/timeline changes do not change service-worke
 code, but latest candidate hash checks remain a final integrated gate. A read-only
 consistent per-owner audit reports3patients/1clinician/6accounts and zero projection,
 obligation, journal-balance or posting mismatches. No balance repair occurred.
+
+## Pending applications and structured scope wizard —11 October continuation
+
+Packaged source `b87d843de0827d3d4d80b8717fe0995d64346ef6`; current preview unchanged. Real pending-applicant
+browser passes390/768/1440, profile/reload, no approved-only navigation and direct
+appointments403. B11 uses real application/per-scope records in the reference
+review-progress/service-decisions panels; unknown review milestones are never
+fabricated. Tour invitation now remains in flow and cannot overlap long headings.
+Paired pending English desktop/mobile inspected. Rejected/populated decisions,
+provisional language layouts, actual zoom and owner acceptance remain pending.
+
+The ungrouped scope form now uses a focused572px reference wizard with Back,
+Save draft and a separate review step. At9254a65, the real registration fixture
+proved draft→reload→resume→review→repeat save→submit: one application, retained
+fields, private resume from onboarding, no clinician approval granted. Settings
+restored, local transport stopped and captured codes removed. Current layout
+comparison at`b87d843de0827d3d4d80b8717fe0995d64346ef6` is read-only, not a second submission proof.
+
+A subsequent random-code screenshot rerun was rejected before onboarding.
+Read-only diagnosis: isolated fixture site20counted24-hour sends/cap20; source
+bucket5/10 within900seconds. Controls were not weakened/reset. Existing fixture
+password access then passed current screenshots/navigation with exact unchanged
+applications. Its old private metadata service pointer differs from its original
+owned application; comparison resolves the retained application ID through the
+authorized API and records the mismatch, without rewriting metadata or records.
+The historical cause of that metadata drift has not been established.
+
+Paired evidence: `docs/screenshots/mvp-current/9254a65-vetting/` (persisted flow),
+`b87d843-vetting-layout/` (current read-only layout),
+`b87d843-application-progress/` (pending status). Scope-test wording belongs to
+the technical fixture site and is not presentation content. Current form width,
+typography, progress and review hierarchy compared; initial signup/full inline
+upload/reference summary differences remain explicit in the matrix. Technical
+fixture's prior role status is unchanged; only new-registration tests prove no
+approval granted.
+
+Locked build/typecheck and lint exit0 (existing warnings); packaged hashes,
+PWA scope/no maps/config and exact7private-credential scan pass. Python syntax
+for the new read-only harness passes. No new backend/schema/financial changes,
+no unchanged hosted call suite or financial suite repeated for these UI changes.
+No live SMS/email, physical-device or native-language approval claim.
 
 ## Remaining release work, not silently dropped
 
