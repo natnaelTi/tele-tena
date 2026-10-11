@@ -126,12 +126,14 @@ export function Select({
 }
 export function Checkbox({
   label,
+  description,
+  variant = "plain",
   ...props
-}: InputHTMLAttributes<HTMLInputElement> & { label: ReactNode }) {
+}: InputHTMLAttributes<HTMLInputElement> & { label: ReactNode; description?: ReactNode; variant?: "plain" | "card" }) {
   return (
-    <label className="check-field">
+    <label className={`check-field${variant === "card" ? " check-card" : ""}`}>
       <input {...props} type="checkbox" />
-      <span>{label}</span>
+      <span>{label}{description && <small>{description}</small>}</span>
     </label>
   );
 }

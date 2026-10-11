@@ -46,14 +46,13 @@
 .note-document-panel > .field { margin:0; }
 /* E11: keep the focused document at the reference proportions. */
 .consultation-page .note-document-panel textarea {min-height:130px;}
-.consultation-page .note-document-panel .check {margin-top:20px;padding:16px;border:1px solid var(--border);border-radius:12px;}
+.consultation-page .note-document-panel .check-field {margin-top:20px;padding:16px;border:1px solid var(--border);border-radius:12px;}
 .request-presence-shell[hidden] {display:none;}
 
 .consultation-documenting .consultation-summary {margin-top:0;}
 .documentation-actions .actions {grid-template-columns:repeat(2,minmax(0,1fr));}
 .documentation-actions .actions button:nth-child(2) {grid-column:1 / -1;grid-row:2;}
-.documentation-actions .actions button:first-child {background:var(--text-primary);color:white;}
-.documentation-actions .actions button:last-child {background:white;color:var(--text-primary);border:1px solid var(--border);}
+.documentation-actions .actions button:last-child {background:var(--text-primary);color:white;}
 @media(max-width:400px){.documentation-actions .actions {grid-template-columns:minmax(0,1fr);}.documentation-actions .actions button:nth-child(2){grid-row:auto;}}
 
 /* N08: keep summary and next action together; operational audit stays expandable. */
@@ -71,3 +70,7 @@
   .reschedule-calendar-panel .booking-calendar { margin-inline: 0; }
   .reschedule-workspace > .actions { flex-direction: column; align-items: stretch; }
 }
+
+.note-recipient-choices { border:0; padding:0; margin-top:20px; }
+.note-recipient-choices legend { font-size:14px; color:var(--muted); }
+.note-document-panel .visibility-label { display:block; margin:6px 0 8px; }

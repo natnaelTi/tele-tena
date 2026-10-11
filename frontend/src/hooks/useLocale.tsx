@@ -682,6 +682,8 @@ const words: Record<string, [string, string]> = {
   "A new time takes effect only when both adults and the clinician agree.": ["አዲሱ ሰዓት ሁለቱም አዋቂዎች እና ባለሙያው ሲስማሙ ብቻ ይፀናል።", "Yeroon haaraan ga'eessonni lamaan fi ogeessi yoo walii galan qofa hojii irra oola."],
   "Available times could not be loaded.": ["ክፍት ሰዓቶችን ማሳየት አልተቻለም።", "Yeroowwan banaa fe'uun hin danda'amne."],
   "This appointment is not eligible for a time change.": ["የዚህ ቀጠሮ ሰዓት መቀየር አይቻልም።", "Beellama kanaaf yeroo jijjiiruun hin danda'amu."],
+  "Include in summary recipients.": ["በማጠቃለያው ተቀባዮች ውስጥ አካትት።", "Fudhattoota cuunfaa keessa dabali."],
+  "Only selected adults receive this summary after finalization.": ["ይህን ማጠቃለያ ከማጠናቀቅ በኋላ የተመረጡ አዋቂዎች ብቻ ይቀበላሉ።", "Cuunfaa kana erga xumuramee ga’eessonni filataman qofa argatu."],
   "Individual follow-up": ["የግል ክትትል", "Hordoffii dhuunfaa"],
   "Recipient": ["ተቀባይ", "Fudhataa"],
   "Choose a recipient": ["ተቀባይ ይምረጡ", "Fudhataa filadhu"],
