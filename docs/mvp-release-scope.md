@@ -20,13 +20,18 @@ The 142-screen reference remains preserved; it is not the release completion tar
 - Current schema/records, credentials, extended foundations and source branches
   are preserved. This scope change does not run migrations or seed records.
 
-## Active preview correction — 2026-10-10
+## Active preview correction — 2026-10-11
 
 The original source/preservation checkpoint above is historical. Current review URL
 still http://127.0.0.1:8017/teletena/, now on a **separate clean presentation site**
-`teletena-mvp-presentation.localhost`, packaged `c3e1ff1263eaec2851a1817a1bf54c90f894a40c`.
+`teletena-mvp-presentation.localhost`, packaged `bcbac7533e67757985fec3a4861c9b7869cf0824`.
 The old fixture site remains retained. Scope does not change. See the current journey
 report and existing screen matrix for per-state evidence and remaining release blockers.
+
+Current v1.34/v1.35 couples consent/time-change/extension/follow-up behavior is verified
+for named backend/browser flows in the active journey report. The capability table
+below is the original release-boundary inventory; its earlier pending-check text is
+historical. Current closure and remaining-action status lives in the single matrix.
 
 ## Agreed release capabilities and acceptance
 

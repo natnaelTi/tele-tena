@@ -1,0 +1,21 @@
+{
+  "source": "bcbac7533e67757985fec3a4861c9b7869cf0824",
+  "site": "teletena-mvp-presentation.localhost",
+  "independent_sessions": 3,
+  "generated_calendar_selection": true,
+  "original_retained_until_all_agree": true,
+  "persistent_after_reload": true,
+  "reservation_unchanged": true,
+  "disclosure_unchanged": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ],
+  "actual_200_percent_zoom": true,
+  "language_layouts": [
+    "am",
+    "om"
+  ],
+  "native_language_review": false
+}

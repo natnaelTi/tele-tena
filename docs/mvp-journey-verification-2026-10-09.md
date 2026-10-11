@@ -1,6 +1,66 @@
-# Current MVP journey correction — 10 October 2026
+# Active MVP verification — 11 October 2026
 
-**Active checkpoint; PR #44 remains draft. Not full visual acceptance or handover readiness.**
+PR #44 remains draft and preserves PR #43 ancestry. This is **not** a handover-ready
+candidate or owner visual acceptance. `mvp-screen-acceptance.json` is the only
+screen/completion matrix; the sections below this active checkpoint are historical.
+
+## Current preview and source
+
+- URL: **http://127.0.0.1:8017/teletena/**; site
+  **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
+  WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
+- Branch **feat/mvp-release-handover**; packaged runtime source
+  **bcbac7533e67757985fec3a4861c9b7869cf0824**. Later report/evidence-only commits
+  must have an empty frontend/backend runtime diff from this build.
+- Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
+  working directories, selected site and served asset identity. Web at8017,
+  isolated queue Redis13917, worker subscribed short/default/long, native site-only
+  scheduler. No old financial worker remains after cutover.
+- After reboot8017 had no listener; the original Bench did not start this dedicated
+  preview. `scripts/local_review.py start/status/stop` restores it without migrations,
+  seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
+  [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Checks actually run in this continuation
+
+| Gate | Result and exact evidence |
+|---|---|
+| Existing browser/PWA recovery | `browser-preview-recovery.cjs` passed offline navigation→Try again→online, password session/deep-link refresh, guest403/unrelated-role403, every packaged JS/CSS hash and cache exclusions. Existing session explicitly received48f7da9 through Refresh to update; no automatic active-call reload |
+| Shared state model | v1.34 immutable individual consent: original time stays reserved until both adults+clinician agree; decline/expiry/unavailable target preserve booking. Extension agreement never implicitly charges the payer; payer explicitly authorizes after both consent |
+| Real DB couples regressions | 11/11 passed4.476s on disposable pr12. Concurrent booking, disclosures, invitation decline, withdrawal/retry/hold, three-party time changes, extension reserve/release and controlled-clock started extension→one earning, separate follow-up draft/idempotency/amendment/recipient isolation. Provider calls mocked in these DB checks |
+| Hosted three-person journey | First connection attempt failed at Connected wait; retained appointment/financial records. Direct SDK connection and microphone/camera publication then passed. A bounded retry on the SAME appointment passed at411c293: three-way actual media exchange, Leave cleanup/rejoin, cameras off/audio-only/no extra capture/muted level0, joint extension consent and payer reservation, End releases unused block once, original+app-reissued still-valid tokens rejected directly by Cloud SDK for all3 including departed partner, reload draft/private follow-up/recipient summary/one Pending earning. Fake devices; first transient cause not conclusively established; no natural SDK auto-refresh/physical-device claim |
+| Joint rescheduling browser | `browser-shared-reschedule.cjs`: three actual password contexts, generated date/time→proposal→1/3→2/3 with original unchanged→3/3 persisted move; exact wallet and disclosure unchanged. Paired390/768/1440 plus provisionalAmharic/Oromo layouts; actual Chromium zoom via tabs.setZoom2 (outer1440/inner720,DPR2,visual scale1). Old full-page zoom captures were cropped; native viewport replacement must be inspected before image acceptance |
+| Follow-up and document browser | `browser-couples-documents.cjs` passed read-only Completed recipient isolation, reload, local amendment/confirmation, unchanged revision, pairedN07/N08 at390/768/1440. N07 now has a separately authorized individual follow-up; no second earning on amendment |
+| Reviewer matching | One real-DB permission/projection/pagination-validation test passed2.721s. Browser reviewer200, patient/clinician403, private-field omission, status-filter+reload, actual5request dataset and pairedI10. Visual inspection caught a mobile table hidden by application-only CSS; new matching table retains rows and gets a focused visibility regression |
+| Financial preservation | Named presentation-site backup with private/public files, scoped stop retaining queue, native migration throughv1.35. Exact wallets, all legacy events/journals/lines, earnings and reconciliation-values fingerprint unchanged. New tables do not rewrite historical notes/consents. Read-only owner check:3patients,1clinician,6accounts, zero projection/obligation/journal/balance errors |
+| Native background jobs | Current scheduler/worker automatically execute release, invitation expiry, request expiry and extension expiry (Scheduled Job Logs Complete), queue contains only intended site jobs. Fixed native scheduler_interval10→60 while keeping tick10: Frappe converted sub-minute All intervals to invalid */0 cron steps. No framework modification. `verify_continuous_processing.py` observed one release posting and a disputed hold; original short policy applies only to its2owned encounters. Prior worker-down enqueue/restart evidence retained |
+| Frontend/syntax | Locked package build, TypeScript, lint exit0; existing large-chunk/lint warnings retained. Python syntax checks passed. No full unchanged individual hosted suite repeated |
+
+## Remaining release work, not silently dropped
+
+- **Fresh latest schema**: v1.33 fresh install and representative legacy financial
+  cutover evidence remain valid. v1.34/v1.35 fresh installation not yet run; temporary
+  scoped DB administrator needs local sudo authentication (`sudo -n` fails).
+  Harness now checks/fingerprints new shared-consent/follow-up tables as well.
+- **Whole-MVP visual fidelity**: existing matrix keeps all99MVP dispositions and
+ 43post-handover entries. Current matched screenshots do not accept uninspected
+ routes/states. Finish remaining screen/state comparisons, actual zoom captures,
+ language layouts, mobile dialogs/tours and integrated candidate checks.
+- **External/manual**: owner acceptance; physical-device calls/PWA installation;
+ live SMS/email received/verified with consenting recipient; native-language review;
+ clinical/catalog/rubric/legal approval; actual provider settlement. Current new
+ couples code has not been rerun on exactFrappe16. No remote deployment.
+
+Credentials: mode600 private file
+`/home/frappe/frappe/frappe-bench/sites/teletena-mvp-presentation.localhost/private/tele_tena_presentation_accounts.json`.
+Use **Use email instead→Use password instead** on invited review; enabled signup
+is tested on a separate configuration. No credentials appear in this report.
+
+## Historical evidence retained below
+
+# Historical checkpoint — 10 October 2026
+
+**Historical checkpoint; superseded by the active section above. Its passing evidence remains valid only for named unchanged behavior.**
 The runtime below supersedes every earlier site/build/process reference in this report.
 The existing `mvp-screen-acceptance.json` remains the sole screen acceptance matrix.
 

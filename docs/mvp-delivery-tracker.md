@@ -1,19 +1,20 @@
 # TeleTena delivery tracker
 
-## Active MVP correction — 2026-10-10
+## Active MVP completion —2026-10-11
 
-Current built source `c3e1ff1263eaec2851a1817a1bf54c90f894a40c`, preview
-http://127.0.0.1:8017/teletena/ on the separate
-`teletena-mvp-presentation.localhost`. The old fixture site is retained.
-[One current report](mvp-journey-verification-2026-10-09.md) records actual checks,
-paired evidence and remaining gates. Dedicated clean installation and repeat setup,
-real reviewer→publication→direct booking and private offer acceptance, local controlled
-registration transport, and patient/clinician read-only 390/768/1440 journeys passed.
-Complete visual acceptance, couples, continuous jobs, full owner-level legacy upgrade,
-current hosted calls and final integrated release checks remain open. No merge or remote
-change. Older entries below are historical for their named source/site, not current passes.
+Packaged source `bcbac7533e67757985fec3a4861c9b7869cf0824`, stable URL
+http://127.0.0.1:8017/teletena/ on `teletena-mvp-presentation.localhost`, original
+Bench `/home/frappe/frappe/frappe-bench`. Preview reboot/PWA recovery, couples
+joint time/extension consent, recipient-specific follow-up, current owner
+reconciliation and native processing have new actual passing evidence in
+[mvp-journey-verification-2026-10-09.md](mvp-journey-verification-2026-10-09.md).
+Reviewer matching operations now use a protected logistics-only query. The
+existing [screen matrix](mvp-screen-acceptance.json) separates functional, visual
+and owner acceptance; no all-MVP pass. Freshv1.34/v1.35, remaining visual/state gates,
+final integrated checks and external/manual validation remain open. No merge or
+remote change. Dated entries below are historical, not the active completion claim.
 
-## Current release priority — MVP handover — 2026-10-08
+## Historical release priority — MVP handover — 2026-10-08
 
 The active branch is `feat/mvp-release-handover`, based on preserved/pushed `feat/adult-relationship-links` at `1e8d161`. The authoritative bounded release scope is `mvp-release-scope.md`; `mvp-screen-acceptance.json` maps all 142 reference screens to 99 MVP screen/state concepts and 43 post-handover concepts. This is scope coverage, not 99 operationally accepted screens. Couples consultations are mandatory and remain missing beyond relationship links. No-show adjudication is deferred by explicit user decision. Critical current-release gaps are scheduler-driven routing/earnings evidence, full fresh/owner-level upgrade verification, non-diagnostic discovery/query continuity, complete couples permissions/calls/documentation and current-source MVP redesign acceptance. The older checkpoints below are historical per-slice evidence. No merge or remote deployment occurred.
 
