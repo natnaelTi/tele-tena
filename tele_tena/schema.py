@@ -133,3 +133,8 @@ def install():
 
     from tele_tena.patches.v1_33_couples_consultations import execute as couples_consultations
     couples_consultations()
+
+    from tele_tena.patches.v1_34_shared_change_consent import execute as shared_change_consent
+    shared_change_consent()
+    from tele_tena.patches.v1_35_individual_followup import execute as individual_followup
+    individual_followup()
