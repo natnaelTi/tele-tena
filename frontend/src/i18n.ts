@@ -1,4 +1,5 @@
 export const en = {
+  resendInSeconds: "Resend in {seconds}s",
   scopeRevoked: 'Revoked', serviceScopeRequired: 'The clinician is not approved for this service.', scopeService: 'Service scope to review', serviceScopes: 'Approved service scopes', approveScope: 'Approve service scope', revokeScope: 'Revoke service scope',
   timezone: 'Dates and times use', availabilityTiming: 'Choose a start at least five minutes from now in your local timezone; the end must be later and within 24 hours.', invalidAvailabilityWindow: 'Availability must start in the future, end later, and last no more than 24 hours.', availabilityOverlap: 'This availability overlaps another saved window. Choose a different time.', outsideAvailability: 'This session does not fit within the clinician’s availability. Choose a start from the displayed window, allowing for the full session duration.',
   appointmentConflict: 'This time overlaps an existing appointment. Choose another time.', insufficientFunds: 'Your available simulated funds are insufficient for this session.',
@@ -82,6 +83,7 @@ export const en = {
 export type Key = keyof typeof en
 // Provisional copy, deliberately labeled in the UI; native review required before pilot.
 export const am: Record<Key, string> = {
+  resendInSeconds: "በ{seconds} ሰከንድ እንደገና ላክ",
   sessionLifecycle:'የምክክሩ ሁኔታ', mediaStatus:'የሚዲያ ግንኙነት', callNotConnected:'አልተገናኘም', callToggleError:'ማይክሮፎኑን ወይም ካሜራውን መቀየር አልተሳካም። ፈቃዱን ያረጋግጡና እንደገና ይሞክሩ።',
   consultation:'ደህንነቱ የተጠበቀ የድምፅና ቪዲዮ ምክክር', callNotStarted:'አልተጀመረም', callReady:'መሣሪያዎቹ ተፈትሸዋል።',
   callConnecting:'በመገናኘት ላይ…', callConnected:'ተገናኝቷል', callReconnecting:'ግንኙነቱ ተቋርጧል። እንደገና በመገናኘት ላይ…',
@@ -150,6 +152,7 @@ export const am: Record<Key, string> = {
   offerExtraTime:'ተጨማሪ ጊዜ አቅርብ', acceptAndReserve:'ተቀበልና ገንዘብ ያዝ', withdrawExtension:'ጥቆማውን መልስ', extensionStartAfter:'የተስማሙበት ጊዜ የሚጀምረው ከ', startAgreedExtension:'የተስማሙበትን ጊዜ ጀምር', extensionHistory:'የቀድሞ ጥቆማዎች', addFunds:'ገንዘብ ጨምር',
 }
 export const om: Record<Key, string> = {
+  resendInSeconds: "Sekondii {seconds} keessatti irra deebiʼii ergi",
   sessionLifecycle:'Haala marii', mediaStatus:'Walqunnamtii miidiyaa', callNotConnected:'Hin wal qabamne', callToggleError:'Mikirofoonii ykn kaameraa jijjiiruun hin milkoofne. Hayyama meeshaalee ilaalii irra deebiʼi yaali.',
   consultation:'Mariin sagalee fi viidiyoo nageenya qabu', callNotStarted:'Hin jalqabamne', callReady:'Meeshaaleen ilaalaman.',
   callConnecting:'Wal qunnamaa jira…', callConnected:'Wal qabame', callReconnecting:'Wal qunnamtiin cite. Deebiʼee wal qunnamaa jira…',

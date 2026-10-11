@@ -26,6 +26,7 @@ export default function SignIn() {
   const [challenge, setChallenge] = useState("");
   const [code, setCode] = useState("");
   const [cooldown, setCooldown] = useState(0);
+  const [resendAt, setResendAt] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -43,10 +44,14 @@ export default function SignIn() {
     return () => { active = false; };
   }, []);
   useEffect(() => {
-    if (!cooldown) return;
-    const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [cooldown]);
+    if (!resendAt) return;
+    // A decrementing counter can diverge from server time through suspension,
+    // clock corrections or background throttling. Recompute from the deadline.
+    const update = () => setCooldown(Math.max(0, Math.ceil((resendAt-Date.now())/1000)));
+    update();
+    const timer = setInterval(update, 250);
+    return () => clearInterval(timer);
+  }, [resendAt]);
   async function run(task: () => Promise<void>) {
     if (busy) return;
     setBusy(true);
@@ -57,6 +62,7 @@ export default function SignIn() {
       await task();
     } catch (error) {
       const code = error instanceof ApiError ? error.code : "";
+      if (code === "resend_cooldown") { setCooldown(60); setResendAt(Date.now()+60000); }
       const key = code === "review_password_required" ? "phoneAccessUnavailable"
         : code === "sms_budget_exhausted" ? "smsTemporarilyUnavailable"
         : code === "resend_cooldown" ? "resendCooldown"
@@ -79,6 +85,7 @@ export default function SignIn() {
         challenge_id: string;
         delivery_state: string;
         message: string;
+        resend_after: number;
       }>(
         "tele_tena.api.contact_auth.request_code",
         { channel, contact, request_id: requestKey.current },
@@ -88,10 +95,12 @@ export default function SignIn() {
       if (result.delivery_state === "rejected") {
         setError("The provider could not send a code. Check your contact or use another sign-in option.");
         setCooldown(60);
+        setResendAt(Date.now()+60000);
         return;
       }
       setChallenge(result.challenge_id);
-      setCooldown(60);
+      setCooldown(Math.max(60,result.resend_after||60));
+      setResendAt(Date.now()+Math.max(60,result.resend_after||60)*1000);
       setNotice(result.delivery_state === "accepted"
         ? "The provider accepted the request. Check your messages; delivery is not yet confirmed."
         : "Delivery could not be confirmed. If a code arrives, enter it here. Wait one minute before resending.");
@@ -238,7 +247,7 @@ export default function SignIn() {
               disabled={cooldown > 0 || busy}
               onClick={() => void request()}
             >
-              {cooldown > 0 ? `Resend in ${cooldown}s` : w("Resend code")}
+              {cooldown > 0 ? t("resendInSeconds").replace("{seconds}",String(cooldown)) : w("Resend code")}
             </Button>
           </div>
         </>
