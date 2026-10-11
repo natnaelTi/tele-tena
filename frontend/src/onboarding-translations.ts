@@ -1,5 +1,9 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Private documents": ["የግል ሰነዶች", "Sanadoota dhuunfaa"],
+  "Review actions": ["የግምገማ እርምጃዎች", "Tarkaanfiiwwan gamaaggamaa"],
+  "Review scope applications": ["የአገልግሎት ወሰን ማመልከቻዎችን ይገምግሙ", "Iyyata daangaa tajaajilaa gamaaggami"],
+
   "Contact verified": ["የመገናኛ መረጃ ተረጋግጧል", "Odeeffannoon quunnamtii mirkanaa’eera"],
   "Choose your account": ["የመለያዎን አይነት ይምረጡ", "Gosa herrega kee filadhu"],
   "How will you use TeleTena?": ["TeleTenaን እንዴት ይጠቀሙበታል?", "TeleTena akkamitti fayyadamta?"],

@@ -19,7 +19,7 @@ import { useAction } from "../hooks/useAction";
 import { useResource } from "../hooks/useResource";
 import { useLocale } from "../hooks/useLocale";
 import { Link } from "react-router-dom";
-import { ClipboardCheck, Layers, ShieldCheck, Building2, ArrowRight } from "lucide-react";
+import { ClipboardCheck, Layers, ShieldCheck, Building2, ArrowRight, FileText } from "lucide-react";
 export function AdminOverview() {
   const {w}=useLocale();
   const applications=useResource(journeyApi.applications);
@@ -61,10 +61,24 @@ export function Applications() {
       <div className="table-scroll review-queue-table"><table><thead><tr>{["Clinician","Application status","Requested services","Submitted","Evidence","Action"].map(label=><th key={label}>{w(label)}</th>)}</tr></thead><tbody>{shown.map(item=><tr key={item.user}><td><strong>{item.display_name||w("Clinician application")}</strong></td><td><StatusBadge>{w(item.status)}</StatusBadge></td><td>{item.requested_service_labels?.join(", ")||w("Not recorded")}</td><td>{item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w("Date unavailable")}</td><td>{w(item.evidence_complete?"Complete":"Incomplete")}</td><td><Button variant="quiet" onClick={()=>review(item.user)}>{w("Review")}</Button></td></tr>)}</tbody></table></div>
       <div className="review-queue-cards">{shown.map(item=><Card key={item.user}><header><h2>{item.display_name||w("Clinician application")}</h2><StatusBadge>{w(item.status)}</StatusBadge></header><p>{item.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p><p className="supporting">{w("Evidence")}: {w(item.evidence_complete?"Complete":"Incomplete")}</p><Button variant="secondary" onClick={()=>review(item.user)}>{w("Review")}</Button></Card>)}</div>
     </>:<EmptyState title={w("No applications to review.")}>{w("Submitted applications will appear here.")}</EmptyState>}
-    {selected&&<Dialog open onOpenChange={open=>{if(!open&&!action.busy)setSelectedUser(null);}} title={selected.display_name||w("Clinician application")} description={w("Review the application and private evidence. Decide service scopes separately.")} className="application-review-dialog"><StatusBadge>{w(selected.status)}</StatusBadge><p className="supporting">{w("Contact / account reference")}: {selected.user}</p><h3>{w("Professional statement")}</h3><p className="prewrap">{selected.statement}</p><h3>{w("Requested service scopes")}</h3><p>{selected.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p><p>{w("Evidence")}: {w(selected.evidence_complete?"Complete":"Incomplete")} · {w("Resume")}: {w(selected.resume_uploaded?"Uploaded":"Not uploaded")}</p>
+    {selected&&<Dialog open onOpenChange={open=>{if(!open&&!action.busy)setSelectedUser(null);}} title={selected.display_name||w("Clinician application")} description={w("Review the application and private evidence. Decide service scopes separately.")} className="application-review-dialog">
+      <div className="application-review-meta"><StatusBadge>{w(selected.status)}</StatusBadge><span>{w("Submitted")}: {selected.submitted_at?new Date(selected.submitted_at).toLocaleDateString():w("Date unavailable")}</span></div>
+      <div className="application-review-layout"><div>
+        <section className="application-review-panel"><h2>{w("Professional profile")}</h2><h3>{w("Professional statement")}</h3><p className="prewrap">{selected.statement||w("Not provided")}</p>
+          <h3>{w("Requested service scopes")}</h3><ul>{(selected.requested_service_labels||[]).map(label=><li key={label}>{label}</li>)}</ul>{!selected.requested_service_labels?.length&&<p>{w("No requested scopes recorded")}</p>}
+          <details><summary>{w("Contact / account reference")}</summary><p className="supporting">{selected.user}</p></details>
+        </section>
+        <section className="application-review-panel"><h2>{w("Private documents")}</h2><div className="application-document-row"><FileText size={24} aria-hidden="true"/><div><strong>{w("Resume")}</strong><p>{w(selected.resume_uploaded?"Uploaded":"Not uploaded")}</p></div></div>
       {selected.resume_uploaded&&<Button variant="secondary" onClick={async()=>{setResumeError("");try{const response=await fetch(`/api/method/tele_tena.api.presentation.download_resume?clinician=${encodeURIComponent(selected.user)}`,{credentials:"same-origin",cache:"no-store"});if(!response.ok)throw new Error();const blob=await response.blob();const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="clinician-resume.pdf";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch{setResumeError(w("Resume could not be opened. Check your reviewer access and try again."));}}}>{w("Open resume")}</Button>}
       {resumeError&&<InlineNotice tone="danger">{resumeError}</InlineNotice>}
-      <InlineNotice>{w("Application approval does not approve every requested service. Review each scope and its evidence separately.")}</InlineNotice><div className="actions"><Button loading={action.busy} disabled={selected.status==='Approved'} onClick={()=>void action.run(async()=>{await journeyApi.reviewApplication(selected.user,'Approved');await resource.refresh();})}>{w("Approve application")}</Button><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.reviewApplication(selected.user,'Rejected');await resource.refresh();})}>{w("Reject application")}</Button></div>{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
+
+        </section>
+      </div><aside className="application-review-panel"><h2>{w("Review actions")}</h2>
+        <p>{w("Evidence")}: {w(selected.evidence_complete?"Complete":"Incomplete")}</p>
+        <InlineNotice>{w("Application approval does not approve every requested service. Review each scope and its evidence separately.")}</InlineNotice>
+        <Link className="settings-link-row" to="/admin/vetting">{w("Review scope applications")} <ArrowRight size={18} aria-hidden="true"/></Link>
+        <div className="actions"><Button loading={action.busy} disabled={selected.status==='Approved'} onClick={()=>void action.run(async()=>{await journeyApi.reviewApplication(selected.user,'Approved');await resource.refresh();})}>{w("Approve application")}</Button><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.reviewApplication(selected.user,'Rejected');await resource.refresh();})}>{w("Reject application")}</Button></div>{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
+      </aside></div>
     </Dialog>}
   </>;
 }
