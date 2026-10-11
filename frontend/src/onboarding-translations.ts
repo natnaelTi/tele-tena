@@ -1,5 +1,13 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Choose your account": ["የመለያዎን አይነት ይምረጡ", "Gosa herrega kee filadhu"],
+  "How will you use TeleTena?": ["TeleTenaን እንዴት ይጠቀሙበታል?", "TeleTena akkamitti fayyadamta?"],
+  "I’m looking for care": ["እንክብካቤ እየፈለግሁ ነው", "Kunuunsa barbaadaa jira"],
+  "I provide care": ["እንክብካቤ እሰጣለሁ", "Kunuunsa nan kenna"],
+  "Find clinicians, book a session, and keep your care connected.": ["ባለሙያዎችን ያግኙ፣ ምክክር ያስይዙ እና እንክብካቤዎን ያገናኙ።", "Ogeessota argadhu, marii qabsiifadhu, kunuunsa kee walitti hidhi."],
+  "Apply, verify your expertise, and set up your practice.": ["ያመልክቱ፣ ብቃትዎን ለግምገማ ያቅርቡ እና ስራዎን ያዘጋጁ።", "Iyyadhu, ogummaa kee ilaalchiisi, hojii kee qopheessi."],
+  "Continue as a patient": ["እንደ ታካሚ ይቀጥሉ", "Akka dhukkubsataatti itti fufi"],
+
   "I’ll decide what to share for each consultation": ["ለእያንዳንዱ ምክክር የማጋራውን እወስናለሁ", "Marii tokkoon tokkoof waan qoodu nan murteessa"],
   "Your background is included in your default disclosure. Preview before every booking.": ["ታሪክዎ በነባሪ የማጋራት ምርጫዎ ውስጥ ተካቷል። ከእያንዳንዱ ቀጠሮ በፊት ቅድመ እይታ ያድርጉ።", "Seenaan kee qoodinsa durtii keessatti hammatama. Beellama hunda dura durargii ilaali."],
   "This background is not included in your default disclosure. Preview before every booking.": ["ይህ ታሪክ በነባሪ የማጋራት ምርጫዎ ውስጥ አልተካተተም። ከእያንዳንዱ ቀጠሮ በፊት ቅድመ እይታ ያድርጉ።", "Seenaan kun qoodinsa durtii keessatti hin hammatamu. Beellama hunda dura durargii ilaali."],

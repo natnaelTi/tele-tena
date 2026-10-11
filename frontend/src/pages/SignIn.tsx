@@ -120,8 +120,8 @@ export default function SignIn() {
       return;
     }
     navigate(
-      (safeBookingReturn || safeRelationshipReturn || (next === "/patient/discovery" && current?.profile?.kind === "patient")) ? next : !current?.profile && params.get("intent") === "clinician"
-        ? "/onboarding?intent=clinician"
+      (safeBookingReturn || safeRelationshipReturn || (next === "/patient/discovery" && current?.profile?.kind === "patient")) ? next : !current?.profile && ["patient", "clinician"].includes(params.get("intent") || "")
+        ? "/onboarding?intent=" + params.get("intent")
         : current?.profile?.kind === "patient" && pendingCareQuery()
           ? "/patient/discovery" : destination(current),
       { replace: true, state: routeLocation.state },
