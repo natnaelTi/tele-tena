@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **bc20f722848a84b7b857284b1599bef0f8b1f451**. Later report/evidence-only commits
+  **067b450052d11c4ad3fcf83902ab8c5b8de389d4**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -66,6 +66,44 @@ screen/completion matrix; the sections below this active checkpoint are historic
   operational exceptions, missing fuller states and language/actual-zoom gates.
   Visual owner acceptance and whole-MVP completion remain open. Freshv1.36
   installation passed11October; the exact schema/cleanup check is recorded below.
+
+## Current account correction and recovery —11October
+
+Runtime/build067b450052d11c4ad3fcf83902ab8c5b8de389d4; source after this
+checkpoint may differ only by evidence/docs. Backend API/jobs are unchanged from
+the matching owned59693web/59687worker/59689scheduler checkout. No service restart,
+financial rewrite or remote operation was needed for these frontend corrections.
+
+- Reproduced private-history field’s accessible label changing after populated
+  input (exact label count0). Separate explicit label fixes it; draft-only browser
+  regression passes with stable count1 and content retained across sections.
+- Inspected H01/H03/H04/H05 English paired images. Restored reference card choices,
+  primary privacy action, settings order, shared-care row/notice and compact wallet
+  amount. Account navigation reveals its selected item horizontally without moving
+  the page. Site capability rows replace misleading generic OTP availability.
+- `browser-presentation-account.cjs` PASS: real patient/clinician sessions, all
+  section routes at390/768/1440, capabilities match server, private draft survives
+  section changes, existing profiles/privacy/funds exactly unchanged. This is
+  readonly evidence, not new persisted-save coverage.
+- `browser-profile-accessibility.cjs` PASS atdc5a582: actual Chrome200% zoom,
+  keyboard Introduction→English, provisional Amharic/Afaan Oromo320/390/768/1440
+  and Ethiopic font check. Subsequent067b450 changes only wallet typography;
+  profile controls/navigation unchanged. No native-language approval.
+- `browser-preview-recovery.cjs` PASS on067b450: offline fallback→Try again,
+  authenticated deep-link/refresh, guest/unrelated403, exact served asset hashes,
+  sensitive cache exclusions. This run did not exercise a build transition;
+  prior explicit existing-session Refresh-to-update evidence remains separately
+  recorded. No automatic reload during calls.
+- Locked production build/typecheck and asset/private-secret scan PASS; lint exit0
+  with existing43warnings, large bundle warning remains. Hosted call/financial
+  suites were not repeated for this unchanged backend/call path.
+
+Safe pairs/results in `docs/screenshots/mvp-current/067b450-account/` and
+`dc5a582-profile-accessibility/`. H04 prototype notification/accessibility settings
+and H05 contact/session administration are not represented as working. Global
+ribbon/tours/authenticated navigation, unsupported profile fields and remaining
+state comparisons are explicit exceptions in the matrix. Whole-MVP visual and
+owner acceptance remain open; no acceptance is inferred from captured images.
 
 ## Fresh v1.36 completion —11October
 

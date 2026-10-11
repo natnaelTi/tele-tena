@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "bc20f722848a84b7b857284b1599bef0f8b1f451",
+  "source_checkpoint": "067b450052d11c4ad3fcf83902ab8c5b8de389d4",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -9773,7 +9773,8 @@
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H01) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "presentation_checkpoint": "Current authenticated query/capture only; older account edit/privacy evidence retained separately. Full state acceptance pending. See docs/mvp-journey-verification-2026-10-09.md."
+        "presentation_checkpoint": "Current authenticated query/capture only; older account edit/privacy evidence retained separately. Full state acceptance pending. See docs/mvp-journey-verification-2026-10-09.md.",
+        "account_current": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence."
       },
       "visual_acceptance": {
         "reference_screen": "H01",
@@ -9789,7 +9790,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Actual persisted wallet, not reference illustrative amounts. City/contact editing remains partial. Working couples consultation core now verified separately; the earlier missing-shared-session claim is superseded by current N01–N08 evidence.",
+        "current_differences": "Reference two-column settings order/shared-care notice/wallet retained; compact amount corrected. Demo/shell/tour offsets and unavailable city/contact edits remain.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -9797,18 +9798,21 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Implemented correction; remaining differences recorded",
+        "correction_status": "Implemented correction; remaining visual states and owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/H01-reference-390.png",
-          "docs/screenshots/mvp-connected-journeys/H01-reference-768.png",
-          "docs/screenshots/mvp-connected-journeys/H01-reference-1440.png"
+          "docs/screenshots/mvp-current/067b450-account/H01-reference-390.png",
+          "docs/screenshots/mvp-current/067b450-account/H01-reference-768.png",
+          "docs/screenshots/mvp-current/067b450-account/H01-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/H01-application-390.png",
-          "docs/screenshots/mvp-connected-journeys/H01-application-768.png",
-          "docs/screenshots/mvp-connected-journeys/H01-application-1440.png"
+          "docs/screenshots/mvp-current/067b450-account/H01-application-390.png",
+          "docs/screenshots/mvp-current/067b450-account/H01-application-768.png",
+          "docs/screenshots/mvp-current/067b450-account/H01-application-1440.png"
         ],
-        "comparison_notes": "Current report and evidence README; visual and functional acceptance independent.",
+        "comparison_notes": [
+          "Current report and evidence README; visual and functional acceptance independent.",
+          "11October067b450: Reference two-column settings order/shared-care notice/wallet retained; compact amount corrected. Demo/shell/tour offsets and unavailable city/contact edits remain."
+        ],
         "viewports": [
           390,
           768,
@@ -9820,7 +9824,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "Current authenticated query/capture only; older account edit/privacy evidence retained separately. Full state acceptance pending.",
+        "functional_verification": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.H01",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -9924,7 +9928,8 @@
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
         "profile_current": "docs/screenshots/mvp-current/191762a-professional-profile/result.json",
-        "profile_accessibility": "docs/screenshots/mvp-current/9308b30-profile-accessibility/result.json"
+        "profile_accessibility": "docs/screenshots/mvp-current/9308b30-profile-accessibility/result.json",
+        "account_current": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence."
       },
       "visual_acceptance": {
         "reference_screen": "H02",
@@ -9940,7 +9945,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Introduction persisted. Identity summary and icon practice rows corrected. Multiple care languages instead of one primary language; optional evidence progressive. Initials instead of invented portrait; shell/presence/tour/settings navigation adds spacing. Other states/owner review pending.",
+        "current_differences": "Professional profile keyboard, provisional Amharic/Afaan Oromo320/390/768/1440 and actual Chrome200% checks passed at dc5a582. Equivalent translated reference absent; owner review pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -9948,22 +9953,23 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Reference composition ported; comparison recorded; remaining fields/states not accepted",
+        "correction_status": "Implemented correction; remaining visual states and owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-current/191762a-professional-profile/H02-reference-390.png",
-          "docs/screenshots/mvp-current/191762a-professional-profile/H02-reference-768.png",
-          "docs/screenshots/mvp-current/191762a-professional-profile/H02-reference-1440.png"
+          "docs/screenshots/mvp-current/067b450-account/H02-reference-390.png",
+          "docs/screenshots/mvp-current/067b450-account/H02-reference-768.png",
+          "docs/screenshots/mvp-current/067b450-account/H02-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-current/191762a-professional-profile/H02-application-390.png",
-          "docs/screenshots/mvp-current/191762a-professional-profile/H02-application-768.png",
-          "docs/screenshots/mvp-current/191762a-professional-profile/H02-application-1440.png"
+          "docs/screenshots/mvp-current/067b450-account/H02-application-390.png",
+          "docs/screenshots/mvp-current/067b450-account/H02-application-768.png",
+          "docs/screenshots/mvp-current/067b450-account/H02-application-1440.png"
         ],
         "comparison_notes": [
           "Reference portrait/public introduction and fuller professional editing remain incomplete.",
           "Actual professional name, multiple care languages, private PDF resume and practice/affiliation links are connected. No fabricated credentials.",
           "9308b30: authored public introduction, regular-weight values, identity/icon practice rows and expandable private evidence. English matched pairs inspected; no whole-screen/owner acceptance. Initials and withheld credentials preserve truthful evidence.",
-          "191762a desktop replay shares heading row with natural float exclusion rather than absolute positioning; long headings retain space. First invitation/mobile remain in flow. H02/C04 current matched desktop captures inspected. Removes64px excess pre-heading replay space; presence/ribbon and unresolved composition differences remain explicit."
+          "191762a desktop replay shares heading row with natural float exclusion rather than absolute positioning; long headings retain space. First invitation/mobile remain in flow. H02/C04 current matched desktop captures inspected. Removes64px excess pre-heading replay space; presence/ribbon and unresolved composition differences remain explicit.",
+          "11October067b450: Professional profile keyboard, provisional Amharic/Afaan Oromo320/390/768/1440 and actual Chrome200% checks passed at dc5a582. Equivalent translated reference absent; owner review pending."
         ],
         "viewports": [
           390,
@@ -9976,10 +9982,7 @@
           "am": "320/390/768/1440 rendered/inspected and Noto glyph check; stale Affiliation override fixed; native review pending",
           "om": "320/390/768/1440 rendered/inspected; native review pending"
         },
-        "functional_verification": [
-          "scripts/check_mvp_account_browser.py: real authenticated backend saves and reloads; account-state persistence checked in MariaDB.",
-          "Native associated validation and abort-on-save preserve draft; retry checked. Fault injection is not proof of real outage recovery."
-        ],
+        "functional_verification": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.H02",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -10074,7 +10077,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H03) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "account_current": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence."
       },
       "visual_acceptance": {
         "reference_screen": "H03",
@@ -10090,10 +10094,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": [
-          "Reference age/name disclosure options exceed current name/history defaults; current preview accurately reflects supported sharing.",
-          "Account navigation remains an operational extension of the isolated reference page."
-        ],
+        "current_differences": "Bordered disclosure cards and primary save restored. Real two-default profile does not fabricate age-range sharing. Operational navigation stays horizontal on mobile.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -10101,20 +10102,21 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Reference composition ported; comparison recorded; remaining fields/states not accepted",
+        "correction_status": "Implemented correction; remaining visual states and owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/H03-reference-390.png",
-          "docs/screenshots/mvp-connected-journeys/H03-reference-768.png",
-          "docs/screenshots/mvp-connected-journeys/H03-reference-1440.png"
+          "docs/screenshots/mvp-current/067b450-account/H03-reference-390.png",
+          "docs/screenshots/mvp-current/067b450-account/H03-reference-768.png",
+          "docs/screenshots/mvp-current/067b450-account/H03-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/H03-application-390.png",
-          "docs/screenshots/mvp-connected-journeys/H03-application-768.png",
-          "docs/screenshots/mvp-connected-journeys/H03-application-1440.png"
+          "docs/screenshots/mvp-current/067b450-account/H03-application-390.png",
+          "docs/screenshots/mvp-current/067b450-account/H03-application-768.png",
+          "docs/screenshots/mvp-current/067b450-account/H03-application-1440.png"
         ],
         "comparison_notes": [
           "Reference age/name disclosure options exceed current name/history defaults; current preview accurately reflects supported sharing.",
-          "Account navigation remains an operational extension of the isolated reference page."
+          "Account navigation remains an operational extension of the isolated reference page.",
+          "11October067b450: Bordered disclosure cards and primary save restored. Real two-default profile does not fabricate age-range sharing. Operational navigation stays horizontal on mobile."
         ],
         "viewports": [
           390,
@@ -10127,10 +10129,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": [
-          "scripts/check_mvp_account_browser.py: real authenticated backend saves and reloads; account-state persistence checked in MariaDB.",
-          "Native associated validation and abort-on-save preserve draft; retry checked. Fault injection is not proof of real outage recovery."
-        ],
+        "functional_verification": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.H03",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -10208,7 +10207,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H04) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "account_current": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence."
       },
       "visual_acceptance": {
         "reference_screen": "H04",
@@ -10224,10 +10224,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": [
-          "Only language/timezone are persisted here; reference notification/accessibility preferences are not implemented.",
-          "Amharic/Oromo layouts captured, translations provisional, not native-language accepted."
-        ],
+        "current_differences": "Real language/timezone focused form; prototype notification/accessibility preferences not implemented. Reference grid remains a recorded difference, not an accepted screenshot.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -10235,20 +10232,21 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Reference composition ported; comparison recorded; remaining fields/states not accepted",
+        "correction_status": "Implemented correction; remaining visual states and owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/H04-reference-390.png",
-          "docs/screenshots/mvp-connected-journeys/H04-reference-768.png",
-          "docs/screenshots/mvp-connected-journeys/H04-reference-1440.png"
+          "docs/screenshots/mvp-current/067b450-account/H04-reference-390.png",
+          "docs/screenshots/mvp-current/067b450-account/H04-reference-768.png",
+          "docs/screenshots/mvp-current/067b450-account/H04-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-connected-journeys/H04-application-390.png",
-          "docs/screenshots/mvp-connected-journeys/H04-application-768.png",
-          "docs/screenshots/mvp-connected-journeys/H04-application-1440.png"
+          "docs/screenshots/mvp-current/067b450-account/H04-application-390.png",
+          "docs/screenshots/mvp-current/067b450-account/H04-application-768.png",
+          "docs/screenshots/mvp-current/067b450-account/H04-application-1440.png"
         ],
         "comparison_notes": [
           "Only language/timezone are persisted here; reference notification/accessibility preferences are not implemented.",
-          "Amharic/Oromo layouts captured, translations provisional, not native-language accepted."
+          "Amharic/Oromo layouts captured, translations provisional, not native-language accepted.",
+          "11October067b450: Real language/timezone focused form; prototype notification/accessibility preferences not implemented. Reference grid remains a recorded difference, not an accepted screenshot."
         ],
         "viewports": [
           390,
@@ -10261,10 +10259,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": [
-          "scripts/check_mvp_account_browser.py: real authenticated backend saves and reloads; account-state persistence checked in MariaDB.",
-          "Native associated validation and abort-on-save preserve draft; retry checked. Fault injection is not proof of real outage recovery."
-        ],
+        "functional_verification": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.H04",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -10347,7 +10342,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (H05) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "account_current": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence."
       },
       "visual_acceptance": {
         "reference_screen": "H05",
@@ -10363,7 +10359,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Readable sign-in rows use actual site capabilities; code methods unavailable on invited review shown accurately. Contact edits/session revocation remain unavailable; no fabricated sessions.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -10371,10 +10367,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Post-handover",
-        "reference_screenshots": [],
-        "implementation_screenshots": [],
-        "comparison_notes": [],
+        "correction_status": "Implemented correction; remaining visual states and owner acceptance pending",
+        "reference_screenshots": [
+          "docs/screenshots/mvp-current/067b450-account/H05-reference-390.png",
+          "docs/screenshots/mvp-current/067b450-account/H05-reference-768.png",
+          "docs/screenshots/mvp-current/067b450-account/H05-reference-1440.png"
+        ],
+        "implementation_screenshots": [
+          "docs/screenshots/mvp-current/067b450-account/H05-application-390.png",
+          "docs/screenshots/mvp-current/067b450-account/H05-application-768.png",
+          "docs/screenshots/mvp-current/067b450-account/H05-application-1440.png"
+        ],
+        "comparison_notes": [
+          "11October067b450: Readable sign-in rows use actual site capabilities; code methods unavailable on invited review shown accurately. Contact edits/session revocation remain unavailable; no fabricated sessions."
+        ],
         "viewports": [
           390,
           768,
@@ -10386,7 +10392,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence."
+        "functional_verification": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence."
       }
     },
     {
