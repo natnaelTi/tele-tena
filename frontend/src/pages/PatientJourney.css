@@ -130,3 +130,9 @@
 .patient-payments-layout .reference-wallet {min-height:336px;justify-content:flex-start;gap:24px;}
 
 .public-profile-introduction { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; }
+
+/* Reference wallet amount stays prominent without splitting ordinary balances
+   into a separate currency line on compact screens. Large totals may still wrap. */
+@media (max-width: 650px) {
+  .reference-wallet strong { font-size: clamp(30px, 8.7vw, 34px); letter-spacing: -1px; }
+}
