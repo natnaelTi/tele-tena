@@ -446,7 +446,7 @@ def clinician_profile(clinician_id):
     actor('Tele Tena Patient')
     if not isinstance(clinician_id, str) or len(clinician_id) != 36:
         fail('Clinician profile unavailable', 'clinician_profile_unavailable')
-    clinician = rows('''SELECT p.user,p.display_name FROM tt_profile p
+    clinician = rows('''SELECT p.user,p.display_name,p.introduction FROM tt_profile p
         JOIN tt_application a ON a.user=p.user AND a.status='Approved'
         JOIN `tabHas Role` r ON r.parent=p.user AND r.role='Tele Tena Clinician'
         JOIN tabUser u ON u.name=p.user AND u.enabled=1
@@ -492,7 +492,7 @@ def clinician_profile(clinician_id):
             OR (a.state='Cancelled' AND a.cancelled_by=%s
                 AND a.cancelled_at>=UTC_TIMESTAMP(6)-INTERVAL 365 DAY))''',
         (clinician.user, clinician.user, clinician.user))
-    return {'display_name': clinician.display_name, 'services': services,
+    return {'display_name': clinician.display_name, 'introduction': clinician.introduction or '', 'services': services,
             'approval_meaning': 'Application and listed service scopes are manually approved.',
             'trust_indicators': {
                 'credential_status': 'Manually reviewed application and listed scopes',

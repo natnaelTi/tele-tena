@@ -128,3 +128,5 @@
 
 .reference-wallet .wallet-reserved-total {align-self:stretch;border-top:1px solid #ffffff55;padding-top:24px;margin-top:12px;font-size:16px;}
 .patient-payments-layout .reference-wallet {min-height:336px;justify-content:flex-start;gap:24px;}
+
+.public-profile-introduction { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; }

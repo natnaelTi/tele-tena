@@ -16,7 +16,7 @@ try:
                 if response.status==200:break
         except Exception:time.sleep(.25)
     else:raise RuntimeError('Owned isolated server not ready')
-    subprocess.run([str(BENCH/'env/bin/python'),str(APP/'tests/integration.py'),'Integration.test_pending_applicant_can_edit_only_existing_own_profile','Integration.test_12_successful_retry_precedes_mutable_profile_validation','Integration.test_13_request_overrides_never_change_profile_defaults'],env=env,cwd=APP,timeout=150,check=True)
+    subprocess.run([str(BENCH/'env/bin/python'),str(APP/'tests/integration.py'),'Integration.test_public_introduction_is_explicit_owner_content','Integration.test_pending_applicant_can_edit_only_existing_own_profile','Integration.test_12_successful_retry_precedes_mutable_profile_validation','Integration.test_13_request_overrides_never_change_profile_defaults'],env=env,cwd=APP,timeout=150,check=True)
 finally:
     if server:
         server.terminate()

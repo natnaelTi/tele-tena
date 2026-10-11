@@ -1,5 +1,7 @@
 /** Provisional account copy. Native Amharic/Afaan Oromo review remains required. */
 export const accountTranslations: Record<string, [string, string]> = {
+  "Introduction": ["መግቢያ", "Seensa"],
+  "This introduction is visible on your approved public profile. Do not include private patient information.": ["ይህ መግቢያ በተፈቀደው የሕዝብ መገለጫዎ ይታያል። የግል የታካሚ መረጃ አያካትቱ።", "Seensi kun ibsa uummataa kee hayyamame irratti mul'ata. Odeeffannoo dhukkubsataa dhuunfaa hin dabaliin."],
   "Enter your professional name.": ["የሙያ ስምዎን ያስገቡ።", "Maqaa ogummaa kee galchi."],
   "Enter a preferred name or alias.": ["የመረጡትን ስም ወይም ቅጽል ስም ያስገቡ።", "Maqaa filatame ykn maqaa masoo galchi."],
   "Defaults and encounter-level control": ["ነባሪ ምርጫዎችና ለእያንዳንዱ ውይይት ቁጥጥር", "Filannoo duraa fi to'annoo marii"],

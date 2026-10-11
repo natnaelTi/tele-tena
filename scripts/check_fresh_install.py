@@ -217,12 +217,13 @@ try:
     assert frappe.db.exists('DocType', 'Tele Tena Clinic Membership')
     assert frappe.db.exists('DocType', 'Tele Tena Clinic Encounter Access')
     assert frappe.db.sql("SHOW COLUMNS FROM tt_appointment LIKE 'policy_snapshot'")
+    assert frappe.db.sql("SHOW COLUMNS FROM tt_profile LIKE 'introduction'")
     assert frappe.db.sql("SHOW COLUMNS FROM tt_application LIKE 'requested_services'")
     assert frappe.db.count('Tele Tena Service Scope') == 0
     assert frappe.db.sql('SELECT COUNT(*) FROM tt_wallet')[0][0] == 0
     for role in ('Tele Tena Patient', 'Tele Tena Clinician', 'Tele Tena Approver'):
         assert frappe.db.exists('Role', role)
-    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state', 'v1_5_contact_onboarding', 'v1_6_presentation_release', 'v1_7_demo_subledger', 'v1_8_legacy_event_reconciliation', 'v1_13_financial_reconciliation_audit', 'v1_14_session_feedback', 'v1_19_scope_reverification', 'v1_20_scope_appointment_review', 'v1_21_scope_review_history', 'v1_24_legacy_completion_activity', 'v1_25_legacy_refund_activity','v1_33_couples_consultations','v1_34_shared_change_consent','v1_35_individual_followup'):
+    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state', 'v1_5_contact_onboarding', 'v1_6_presentation_release', 'v1_7_demo_subledger', 'v1_8_legacy_event_reconciliation', 'v1_13_financial_reconciliation_audit', 'v1_14_session_feedback', 'v1_19_scope_reverification', 'v1_20_scope_appointment_review', 'v1_21_scope_review_history', 'v1_24_legacy_completion_activity', 'v1_25_legacy_refund_activity','v1_33_couples_consultations','v1_34_shared_change_consent','v1_35_individual_followup','v1_36_public_introduction'):
         assert frappe.db.exists('Patch Log', {'patch': 'tele_tena.patches.' + version})
     from tele_tena.api import journey
     assert not journey.simulation_enabled(), 'Simulation unexpectedly enabled on disposable site'

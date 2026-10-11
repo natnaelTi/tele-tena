@@ -256,6 +256,38 @@ class Integration(unittest.TestCase):
         api.simulated_deposit(amount, secrets.token_hex(12))
         frappe.db.commit()
 
+    def test_public_introduction_is_explicit_owner_content(self):
+        from tele_tena.api.open_requests import clinician_profile
+        login('c1')
+        api.save_profile('clinician', 'Profile author', True, introduction='A fictional supportive space.\nWe work at your pace.')
+        key = api.one('SELECT public_id FROM tt_profile WHERE user=%s', (USERS['c1'],)).public_id
+        api.save_profile('clinician', 'Profile author', True, languages=['en'])
+        self.assertEqual(api.one('SELECT introduction FROM tt_profile WHERE user=%s', (USERS['c1'],)).introduction, 'A fictional supportive space.\nWe work at your pace.')
+        before = api.one('SELECT * FROM tt_profile WHERE user=%s', (USERS['c2'],))
+        login('p1')
+        public = clinician_profile(key)
+        self.assertEqual(public['introduction'], 'A fictional supportive space.\nWe work at your pace.')
+        for private in ('user', 'history', 'email', 'statement'):
+            self.assertNotIn(private, public)
+        with self.assertRaises(frappe.ValidationError):
+            api.save_profile('patient', 'Patient', True, introduction='Not a clinician')
+        login('c1')
+        with self.assertRaises(frappe.ValidationError):
+            api.save_profile('clinician', 'Changed', True, introduction='x' * 2001)
+        self.assertEqual(api.one('SELECT display_name FROM tt_profile WHERE user=%s', (USERS['c1'],)).display_name, 'Profile author')
+        self.assertEqual(api.one('SELECT * FROM tt_profile WHERE user=%s', (USERS['c2'],)), before)
+        api.save_profile('clinician', 'Profile author', True, introduction='')
+        login('p1')
+        self.assertEqual(clinician_profile(key)['introduction'], '')
+        login('c3')
+        pending_key = api.one('SELECT public_id FROM tt_profile WHERE user=%s', (USERS['c3'],)).public_id
+        login('p1')
+        with self.assertRaises(frappe.ValidationError):
+            clinician_profile(pending_key)
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            clinician_profile(key)
+
     def test_pending_applicant_can_edit_only_existing_own_profile(self):
         # Fixture provisioning is a local Administrator action. A vetting
         # reviewer itself must not have generic User role-write privileges.

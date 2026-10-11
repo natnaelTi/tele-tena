@@ -138,3 +138,5 @@ def install():
     shared_change_consent()
     from tele_tena.patches.v1_35_individual_followup import execute as individual_followup
     individual_followup()
+    from tele_tena.patches.v1_36_public_introduction import execute as public_introduction
+    public_introduction()

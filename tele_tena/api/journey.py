@@ -192,13 +192,13 @@ def session():
 
 
 @command
-def save_profile(kind, display_name, adult, history='', share_name=None, share_history=None, languages=None):
+def save_profile(kind, display_name, adult, history='', share_name=None, share_history=None, languages=None, introduction=None):
     if kind not in ('patient', 'clinician'):
         fail('Unsupported profile type')
     user = actor()
     if not boolean(adult):
         fail('Adults 18+ only')
-    existing = rows('SELECT kind,share_name,share_history,languages,public_id FROM tt_profile WHERE user=%s FOR UPDATE', (user,))
+    existing = rows('SELECT kind,share_name,share_history,languages,public_id,introduction FROM tt_profile WHERE user=%s FOR UPDATE', (user,))
     if existing and existing[0].kind != kind:
         fail('Profile type cannot change')
     roles = set(frappe.get_roles(user))
@@ -227,11 +227,14 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
         if not isinstance(languages, list) or len(set(languages)) != len(languages) or not set(languages).issubset(supported):
             fail('Choose supported care languages')
         language_values = sorted(set(languages)) if kind == 'clinician' else []
+    if introduction is not None and kind != 'clinician':
+        fail('Public introductions are for clinician profiles')
+    introduction = (existing[0].introduction if existing else None) if introduction is None else text(introduction, 2000, False)
     public_id = existing[0].public_id if existing else str(uuid.uuid4())
-    frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history,languages,public_id)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE display_name=VALUES(display_name),
-        history=VALUES(history),share_name=VALUES(share_name),share_history=VALUES(share_history),languages=VALUES(languages)''',
-        (user, kind, name, history, boolean(share_name), boolean(share_history), json.dumps(language_values), public_id))
+    frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history,languages,public_id,introduction)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE display_name=VALUES(display_name),
+        history=VALUES(history),share_name=VALUES(share_name),share_history=VALUES(share_history),languages=VALUES(languages),introduction=VALUES(introduction)''',
+        (user, kind, name, history, boolean(share_name), boolean(share_history), json.dumps(language_values), public_id, introduction))
     if kind == 'patient':
         frappe.db.sql('INSERT IGNORE INTO tt_wallet (patient) VALUES (%s)', (user,))
     audit(user, 'ProfileConsent', {'adult_attested': True, 'share_name': boolean(share_name), 'share_history': boolean(share_history)})

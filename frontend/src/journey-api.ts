@@ -2,7 +2,7 @@ import { api } from './api'
 import { clearCareQuery } from './care-intent'
 
 type Sharing = { name: boolean; history: boolean }
-export type Profile = { kind: 'patient' | 'clinician'; display_name: string; history: string; share_name: boolean; share_history: boolean; languages?: string }
+export type Profile = { kind: 'patient' | 'clinician'; display_name: string; history: string; share_name: boolean; share_history: boolean; languages?: string; introduction?: string }
 export type Session = { user: string; roles: string[]; profile: Profile | null; csrf_token: string; simulation: boolean; clinic_workspace?: boolean; clinic_schedule_workspace?: boolean }
 export type Service = { id: string; label: string; description?:string; synonyms?:string; service_label_am?:string; service_label_om?:string }
 export type Offer = { participant_structure?: 'individual'|'couple'; id: string; clinician_id:string; display_name: string; label: string; description?: string; service_category?: string; price: number; minutes: number; care_languages?: ('en'|'am'|'om')[]; schedule_id?: string | null; schedule_timezone?: string | null; consultation_format?: 'video' | 'audio' }
