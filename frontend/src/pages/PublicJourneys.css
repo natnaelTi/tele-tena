@@ -1,10 +1,11 @@
 /* Approved inventory A02/A03 .x-page, .x-hero and .x-grid; scoped to public journeys. */
+.public-journey-surface{background:white}
 .public-journey{max-width:1200px;margin:auto;padding:48px 36px 90px}
 .public-journey-hero{background:var(--ink);color:white;border-radius:24px;padding:40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:32px;margin-bottom:32px}
 .public-journey-hero>div,.public-journey-preview{min-width:0}
-.public-journey-hero .eyebrow{color:#c2d9df}
-.public-journey-hero h1{font-size:44px;line-height:1.12;letter-spacing:-1.6px;margin:18px 0}
-.public-journey-hero>div>p:not(.eyebrow){color:#d4e2e7;font-size:18px;line-height:1.6}
+.public-journey-hero .eyebrow{color:#c2d9df;margin:0}
+.public-journey-hero h1{font-size:44px;line-height:1.12;letter-spacing:-1.6px;margin:0 0 14px}
+.public-journey-hero>div>p:not(.eyebrow){color:#d4e2e7;font-size:16px;line-height:1.6}
 .public-journey-hero>div>.button{background:white;color:var(--ink);border-color:white;margin-top:12px}
 .public-journey-preview{background:var(--subtle);color:var(--ink);border-radius:20px;padding:28px;display:flex;flex-direction:column;justify-content:center}
 .public-journey-preview>h2{font-size:24px;margin-top:20px}
@@ -14,9 +15,11 @@
 .public-journey-step p{font-size:14px;color:var(--muted);margin:4px 0 0}
 .public-journey-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-bottom:20px}
 .public-journey-grid>.card{padding:26px;min-width:0}
-.public-journey-grid h2{font-size:22px;margin:20px 0 12px}
+.public-journey-grid h2{font-size:22px;margin:0 0 16px}
 .public-journey-grid p{line-height:1.6;color:var(--muted);margin:0}
 .public-journey-next{display:flex;justify-content:space-between;gap:16px;border-top:1px solid var(--border);margin-top:40px;padding-top:20px}
 .public-journey-next a{display:inline-flex;align-items:center;min-height:44px}
 @media(max-width:1000px){.public-journey-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.public-journey-hero h1{font-size:38px}}
 @media(max-width:650px){.public-journey{padding:28px 20px 70px}.public-journey-hero{grid-template-columns:1fr;padding:28px 24px;gap:24px}.public-journey-hero h1{font-size:36px}.public-journey-preview{padding:22px}.public-journey-grid{grid-template-columns:1fr}.public-journey-grid>.card{padding:22px}}
+
+.reference-information-header nav{margin-left:auto}

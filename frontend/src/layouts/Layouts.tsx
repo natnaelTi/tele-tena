@@ -120,13 +120,15 @@ function ClinicianRequestAvailability() {
 }
 export function PublicLayout() {
   const { w } = useLocale();
+  const location=useLocation();
+  const informationPage=["/how-it-works","/for-clinicians"].includes(location.pathname);
   return (
     <>
       <DemoBar />
-      <header className="public-header reference-public-header">
+      <header className={`public-header reference-public-header ${informationPage?"reference-information-header":""}`}>
         <Brand />
         <nav aria-label="Main navigation">
-          <Link to="/patient/discovery">{w("Find care")}</Link>
+          {!informationPage&&<Link to="/patient/discovery">{w("Find care")}</Link>}
           <Link to="/how-it-works">{w("How it works")}</Link>
           <Link to="/for-clinicians">{w("For clinicians")}</Link>
           <LanguageSelect />
