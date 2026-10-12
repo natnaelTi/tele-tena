@@ -59,7 +59,7 @@ export function Applications() {
   const reviewContent=selected&&<>
       <div className="application-review-meta"><StatusBadge>{w(selected.status)}</StatusBadge><span>{w("Submitted")}: {selected.submitted_at?new Date(selected.submitted_at).toLocaleDateString():w("Date unavailable")}</span></div>
       <div className="application-review-layout"><div>
-        <section className="application-review-panel"><h2>{w("Professional profile")}</h2>{selected.application_profile&&Object.keys(selected.application_profile).length>0&&<><p className="supporting">{w("Self-reported application details — verification is recorded separately.")}</p><dl>{([["professional_category","Profession"],["qualification","Primary qualification"],["issuing_institution","Issuing institution"],["experience_years","Years of practice"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl><details className="application-credential-details"><summary>{w("Credential details")}</summary><dl>{([["issuing_authority","Licensing authority"],["registration_number","License number"],["jurisdiction","Credential jurisdiction"],["credential_expiry","License expiry"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl></details></>}<h3>{w("Professional statement")}</h3><p className="prewrap">{selected.statement||w("Not provided")}</p>
+        <section className="application-review-panel"><h2>{w("Professional profile")}</h2>{selected.application_profile&&Object.keys(selected.application_profile).length>0&&<><p className="supporting">{w("Self-reported application details — verification is recorded separately.")}</p><dl>{([["professional_category","Profession"],["qualification","Primary qualification"],["issuing_institution","Issuing institution"],["experience_years","Years of practice"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl><details className="application-credential-details"><summary>{w("Credential details")}</summary><dl>{([["issuing_authority","Licensing authority"],["registration_number","License number"],["jurisdiction","Credential jurisdiction"],["credential_valid_from","License valid from"],["credential_expiry","License expiry"],["competencies","Professional competencies"],["certifications","Certifications"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl></details></>}<h3>{w("Professional statement")}</h3><p className="prewrap">{selected.statement||w("Not provided")}</p>
           <h3>{w("Requested service scopes")}</h3><ul>{(selected.requested_service_labels||[]).map(label=><li key={label}>{label}</li>)}</ul>{!selected.requested_service_labels?.length&&<p>{w("No requested scopes recorded")}</p>}
           <details><summary>{w("Contact / account reference")}</summary><p className="supporting">{selected.user}</p></details>
         </section>
@@ -239,6 +239,7 @@ export function ServiceCatalog() {
   const [selected,setSelected]=useState("");
   const [attribute,setAttribute]=useState(emptyAttribute);
   const [saved,setSaved]=useState("");
+  const [clinicalReason,setClinicalReason]=useState("");
   const definitions=catalog.data?.definitions||[];
   const chosen=definitions.find((item:any)=>item.id===selected);
   const editable=!chosen||(chosen.catalog_status==="Draft"&&chosen.clinical_review_status==="Not reviewed"&&!chosen.active);
@@ -274,7 +275,7 @@ export function ServiceCatalog() {
   },w("Sent for clinical terminology review. This does not activate bookings."));
   return <>
     <PageTitle eyebrow={w("REVIEW WORKSPACE")} title={w("Service catalog")} description={w("Maintain typed service definitions and versioned attributes. Patient concerns remain navigation terms, not diagnoses.")} />
-    <InlineNotice tone="info">{w("Definitions remain drafts until separate clinical terminology review. This workspace cannot approve clinician scopes or make a service bookable.")}</InlineNotice>
+    <InlineNotice tone="info">{w("Definitions remain drafts until medical-lead review. Clinician scope approval is a separate decision.")}</InlineNotice>
     {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
     {action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
     {catalog.error&&<InlineNotice tone="danger">{w("Service catalog could not be loaded.")} <Button variant="secondary" onClick={()=>void catalog.refresh()}>{w("Try again")}</Button></InlineNotice>}
@@ -291,6 +292,7 @@ export function ServiceCatalog() {
       <section className="service-catalog-editor">
         <header><h2>{selected?form.service_label||form.service_key:w("New service definition")}</h2>
           {chosen&&<StatusBadge>{w(chosen.clinical_review_status||chosen.catalog_status)}</StatusBadge>}</header>
+        {catalog.data?.can_review&&chosen?.clinical_review_status==='In review'&&<section className="catalog-clinical-decision"><h3>{w("Medical-lead definition review")}</h3><p>{w("This reviews the service requirements. It does not approve any clinician or independently verify their credentials.")}</p><TextField label={w("Clinical review reason")} value={clinicalReason} onChange={e=>setClinicalReason(e.target.value)} maxLength={1000}/><div className="action-row"><Button disabled={action.busy||!clinicalReason.trim()} onClick={()=>void action.run(async()=>{await journeyApi.reviewServiceDefinition(selected,'Approved',clinicalReason);setClinicalReason('');await catalog.refresh();})}>{w("Approve service definition")}</Button><Button variant="secondary" disabled={action.busy||!clinicalReason.trim()} onClick={()=>void action.run(async()=>{await journeyApi.reviewServiceDefinition(selected,'Needs information',clinicalReason);setClinicalReason('');await catalog.refresh();})}>{w("Return definition for correction")}</Button></div></section>}
         {!editable&&<InlineNotice tone="info">{w("This definition is locked after terminology review begins. Create a new version for future changes; existing definitions and records are preserved.")}</InlineNotice>}
         <fieldset disabled={!editable||action.busy}>
           <div className="form-grid two-column">

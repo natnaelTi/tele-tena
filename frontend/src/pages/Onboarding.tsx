@@ -17,7 +17,7 @@ import WorkspaceTour from "../components/WorkspaceTour";
 import { FileText, ShieldCheck, UserRound, Users } from "lucide-react";
 import "./Onboarding.css";
 type Answers = {
-  professional?: {professional_category?:string; qualification?:string; issuing_institution?:string; registration_number?:string; issuing_authority?:string; jurisdiction?:string; credential_expiry?:string; experience_years?:number};
+  professional?: {competencies?:string; certifications?:string; credential_valid_from?:string; professional_category?:string; qualification?:string; issuing_institution?:string; registration_number?:string; issuing_authority?:string; jurisdiction?:string; credential_expiry?:string; experience_years?:number};
   care_languages?: string[];
   introduction?: string;
   name?: string;
@@ -70,7 +70,7 @@ export default function Onboarding() {
       );
     void api<{patient_registration:boolean;clinician_registration:boolean}>("tele_tena.api.contact_auth.sign_in_options")
       .then(setAccess).catch(() => setError("Your saved progress could not be loaded. Reload to try again."));
-    void api<{id:string;label:string}[]>("services").then(setCatalog).catch(()=>undefined);
+    void api<{id:string;label:string}[]>("tele_tena.api.contact_auth.application_services").then(setCatalog).catch(()=>undefined);
     void journeyApi.resumeStatus().then(value=>setResumeUploaded(value.uploaded)).catch(()=>undefined);
   }, [params]);
   if (session?.profile) return <Navigate to={session.profile.kind === "patient" && pendingCareQuery() ? "/patient/discovery" : destination(session)} replace />;
@@ -222,6 +222,9 @@ export default function Onboarding() {
               <>
                 <p className="supporting">{w("Documents and credential identifiers are private to you and authorized reviewers.")}</p>
                 {([["qualification","Primary qualification",180,true],["issuing_institution","Issuing institution",180,true],["issuing_authority","Licensing authority",180,false],["registration_number","License number",100,false]] as const).map(([key,label,maximum,required])=><TextField key={key} label={w(label)} required={required} maxLength={maximum} value={answers.professional?.[key]||""} onChange={e=>update({professional:{...answers.professional,[key]:e.target.value}})}/>)}
+                <TextField label={w("License valid from")} type="date" value={answers.professional?.credential_valid_from||""} onChange={e=>update({professional:{...answers.professional,credential_valid_from:e.target.value}})}/>
+                <TextField label={w("Professional competencies")} maxLength={2000} value={answers.professional?.competencies||""} onChange={e=>update({professional:{...answers.professional,competencies:e.target.value}})}/>
+                <TextField label={w("Certifications")} maxLength={2000} value={answers.professional?.certifications||""} onChange={e=>update({professional:{...answers.professional,certifications:e.target.value}})}/>
                 <TextField label={w("License expiry")} type="date" value={answers.professional?.credential_expiry||""} onChange={e=>update({professional:{...answers.professional,credential_expiry:e.target.value}})}/>
                 <details className="onboarding-optional-credentials"><summary>{w("Additional application details (optional)")}</summary>
                 <TextField label={w("Credential jurisdiction")} maxLength={120} value={answers.professional?.jurisdiction||""} onChange={e=>update({professional:{...answers.professional,jurisdiction:e.target.value}})}/>

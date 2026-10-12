@@ -21,6 +21,23 @@ screen/completion matrix; the sections below this active checkpoint are historic
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
 
+## Active clinician intake correction —12October2026 (verification in progress)
+
+The current work corrects draft catalog selection in both contact-verified onboarding
+and per-scope intake. Multiple services create distinct atomic applications with private
+competencies/certifications/license-validity claims. Identical submitted retries return
+the original applications; changed submitted content remains locked for clarification.
+A separate reasoned medical-lead catalog decision is required before scope approval;
+generic APIs cannot substitute for this action or change approved definition metadata.
+
+The owner selected Medical Lead controls for the existing fictional presentation
+reviewer. That site-only, audited role assignment is independent of any approval.
+No catalog, rubric or clinician scope has been automatically approved. The named
+presentation site was backed up before v1.37 nullable native-field migration.
+Existing financial, consultation, availability and notification behavior is unchanged.
+Backend and built-browser evidence is recorded below once run; unfinished checks are
+not passes. Current acceptance remains the existing screen matrix, not this section.
+
 ## Desktop consultation-column clarification —12October
 
 The user confirmed the preceding functionality and clarified that the original

@@ -188,4 +188,18 @@ export const onboardingTranslations:Record<string,[string,string]>={
   "Dismiss notification": ["ማሳወቂያውን ዝጋ", "Beeksisa cufi"],
   "We could not mark this notification as read. Try again.": ["ይህን ማሳወቂያ እንደተነበበ መመዝገብ አልተቻለም። እንደገና ይሞክሩ።", "Beeksisa kana akka dubbifameetti mallatteessuu hin dandeenye. Irra deebi'ii yaali."],
   "The appointment is confirmed. Open its details to prepare or join.": ["ቀጠሮው ተረጋግጧል። ለመዘጋጀት ወይም ለመቀላቀል ዝርዝሩን ይክፈቱ።", "Beellamni mirkanaa'eera. Qophaa'uuf yookaan seenuuf bal'ina isaa bani."],
+
+  // Provisional scope-intake translations: native and medical-lead review pending.
+  "Services you want to provide": ["ለማቅረብ የሚፈልጉት አገልግሎቶች", "Tajaajiloota kennuu barbaaddu"],
+  "Clinical definition review pending. Applying does not authorize bookings.": ["የአገልግሎት ትርጉም ግምገማ በመጠባበቅ ላይ ነው። ማመልከት ቀጠሮ ለመቀበል ፈቃድ አይሰጥም።", "Gamaaggamni hiika tajaajilaa eegamaa jira. Iyyachuun beellama fudhachuuf hayyama hin kennu."],
+  "Professional competencies": ["የሙያ ብቃቶች", "Dandeettiiwwan ogummaa"],
+  "Certifications": ["የስልጠና ማረጋገጫዎች", "Ragaa leenjii"],
+  "License valid from": ["ፈቃዱ የሚሰራበት መጀመሪያ ቀን", "Guyyaa hayyamni hojii itti jalqabu"],
+  "Credential valid from, if applicable": ["ካለ፣ የሙያ ፈቃድ መጀመሪያ ቀን", "Yoo jiraate, guyyaa hayyamni itti jalqabu"],
+  "Medical-lead definition review": ["የሕክምና መሪ የአገልግሎት ግምገማ", "Gamaaggama hiika tajaajilaa hogganaa yaalaa"],
+  "Clinical review reason": ["የክሊኒካዊ ግምገማ ምክንያት", "Sababa gamaaggama yaalaa"],
+  "Approve service definition": ["የአገልግሎት ትርጉሙን አጽድቅ", "Hiika tajaajilaa mirkaneessi"],
+  "Return definition for correction": ["ትርጉሙን ለእርማት መልስ", "Hiika sirreeffamaaf deebisi"],
+  "This reviews the service requirements. It does not approve any clinician or independently verify their credentials.": ["ይህ የአገልግሎት መስፈርቶችን ይገመግማል። ማንኛውንም ባለሙያ አያጸድቅም ወይም ማስረጃዎቹን በተናጠል አያረጋግጥም።", "Kun ulaagaalee tajaajilaa gamaaggama. Ogeessa kamiyyuu hin mirkaneessu yookaan ragaa isaa of danda'ee hin qulqulleessu."],
+  "No service applications are open yet.": ["እስካሁን ለአገልግሎት የማመልከቻ መንገድ አልተከፈተም።", "Ammaaf iyyannoon tajaajilaa hin banamne."],
 };

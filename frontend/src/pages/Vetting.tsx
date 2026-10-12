@@ -94,6 +94,8 @@ export function ClinicianScopeApplications() {
   const applications = useResource(journeyApi.myScopeApplications);
   const action = useAction();
   const [service, setService] = useState('');
+  const [selectedServices,setSelectedServices]=useState<string[]>([]);
+  const [competencies,setCompetencies]=useState('');const [certifications,setCertifications]=useState('');const [validFrom,setValidFrom]=useState('');
   const [dirty, setDirty] = useState(false);
   const [step, setStep] = useState(0);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -115,18 +117,19 @@ export function ClinicianScopeApplications() {
   const [reverificationOf,setReverificationOf]=useState<string|null>(null);
 
   const save = (submit:boolean) => void action.run(async()=>{
-    if(!service) throw new Error('Choose an active reviewed service scope.');
-    const values={professional_category:category,qualification,issuing_institution:institution,
+    if(!service) throw new Error('Choose at least one service to apply for.');
+    const values={professional_category:category,qualification,issuing_institution:institution,competencies,certifications,credential_valid_from:validFrom,
       registration_number:license,issuing_authority:authority,jurisdiction,credential_expiry:expiry,
       experience_years:experience||'0',approach_keys:approaches,population_adults:adults,
       independent_practice:independent,clinic_affiliations:'',relevant_training:training,
       applicant_statement:statement};
-    await journeyApi.saveScopeApplication(service,values,submit,reverificationOf);
+    if(!reverificationOf&&selectedServices.length>1)await journeyApi.saveScopeApplications(selectedServices,values,submit);
+    else await journeyApi.saveScopeApplication(service,values,submit,reverificationOf);
     await applications.refresh();
     setDirty(false);
   });
   const continueApplication=(item:any)=>{
-    setDirty(false);setStep(0);setService(item.service);setCategory(item.professional_category||'');
+    setDirty(false);setStep(0);setService(item.service);setSelectedServices([item.service]);setCompetencies(item.competencies||'');setCertifications(item.certifications||'');setValidFrom(item.credential_valid_from||'');setCategory(item.professional_category||'');
     setReverificationOf(item.reverification_of||null);
     setQualification(item.qualification||'');setInstitution(item.issuing_institution||'');
     setLicense(item.registration_number||'');setAuthority(item.issuing_authority||'');
@@ -146,8 +149,8 @@ export function ClinicianScopeApplications() {
         <h2 ref={headingRef} tabIndex={-1}>{w(step===0?"Qualifications & résumé":step===1?"Relevant experience":"Review your application")}</h2>
         <p className="supporting">{w("Documents are private to authorized reviewers.")}</p>
         {reverificationOf&&<InlineNotice>{w("A renewal request does not extend an expired approval. If the credential has expired, this service remains unavailable until a reviewer records a new approval.")}</InlineNotice>}
-        {!services.data?<Skeleton/>:services.data.length===0?<EmptyState title={w("No reviewed service scopes are open yet.")}>{w("The service catalog is present in draft and remains non-bookable until the medical lead approves its terminology and local credential requirements.")}</EmptyState>:<>
-          <Select label={w("Service scope")} value={service} onChange={e=>{setService(e.target.value);setReverificationOf(null)}}><option value="">{w("Choose a service")}</option>{services.data.map((item:any)=><option key={item.id} value={item.id}>{item.label}</option>)}</Select>
+        {!services.data?<Skeleton/>:services.data.length===0?<EmptyState title={w("No service applications are open yet.")}>{w("The service catalog is present in draft and remains non-bookable until the medical lead approves its terminology and local credential requirements.")}</EmptyState>:<>
+          <fieldset className="scope-selection"><legend>{w("Services you want to provide")}</legend>{services.data.map((item:any)=><div key={item.id}><Checkbox label={item.label} checked={selectedServices.includes(item.id)} disabled={!!reverificationOf} onChange={event=>{const next=event.target.checked?[...selectedServices,item.id]:selectedServices.filter(id=>id!==item.id);setSelectedServices(next);setService(next[0]||'');}}/>{selectedServices.includes(item.id)&&<p className="supporting">{item.clinical_review_status!=='Approved'&&w("Clinical definition review pending. Applying does not authorize bookings.")} {item.credential_requirements}</p>}</div>)}</fieldset>
           {step===0&&<>
           <TextField label={w("Professional category")} value={category} onChange={e=>setCategory(e.target.value)} required />
           <TextField label={w("Relevant qualification")} value={qualification} onChange={e=>setQualification(e.target.value)} required />
@@ -155,6 +158,9 @@ export function ClinicianScopeApplications() {
           <TextField label={w("Registration or license number")} value={license} onChange={e=>setLicense(e.target.value)} />
           <TextField label={w("Issuing authority")} value={authority} onChange={e=>setAuthority(e.target.value)} />
           <TextField label={w("Jurisdiction")} value={jurisdiction} onChange={e=>setJurisdiction(e.target.value)} />
+          <TextField label={w("Credential valid from, if applicable")} type="date" value={validFrom} onChange={e=>setValidFrom(e.target.value)} />
+          <TextField label={w("Professional competencies")} value={competencies} onChange={e=>setCompetencies(e.target.value)} maxLength={2000}/>
+          <TextField label={w("Certifications")} value={certifications} onChange={e=>setCertifications(e.target.value)} maxLength={2000}/>
           <TextField label={w("Credential expiry, if applicable")} type="date" value={expiry} onChange={e=>setExpiry(e.target.value)} />
           </>}
           {step===1&&<>
@@ -165,8 +171,8 @@ export function ClinicianScopeApplications() {
           <Checkbox label={w("My application is limited to adult care.")} checked={adults} onChange={e=>setAdults(e.target.checked)} />
           <Checkbox label={w("I practice independently (optional).")} checked={independent} onChange={e=>setIndependent(e.target.checked)} />
           </>}
-          {step===2&&<dl className="scope-application-preview">
-            {[['Professional category',category],['Relevant qualification',qualification],['Issuing institution',institution],['Registration or license number',license],['Issuing authority',authority],['Jurisdiction',jurisdiction],['Credential expiry, if applicable',expiry],['Years of relevant experience',experience],['Relevant training',training],['Why are you prepared to provide this service?',statement]].map(([label,value])=><div key={label}><dt>{w(label)}</dt><dd>{value||w('Not provided')}</dd></div>)}
+          {step===2&&<dl className="scope-application-preview"><div><dt>{w('Services you want to provide')}</dt><dd>{services.data.filter((item:any)=>selectedServices.includes(item.id)).map((item:any)=>item.label).join(', ')}</dd></div>
+            {[['Professional competencies',competencies],['Certifications',certifications],['Credential valid from, if applicable',validFrom],['Professional category',category],['Relevant qualification',qualification],['Issuing institution',institution],['Registration or license number',license],['Issuing authority',authority],['Jurisdiction',jurisdiction],['Credential expiry, if applicable',expiry],['Years of relevant experience',experience],['Relevant training',training],['Why are you prepared to provide this service?',statement]].map(([label,value])=><div key={label}><dt>{w(label)}</dt><dd>{value||w('Not provided')}</dd></div>)}
             <div><dt>{w('My application is limited to adult care.')}</dt><dd>{w(adults?'Yes':'No')}</dd></div>
           </dl>}
           <div className="scope-form-actions">
@@ -214,7 +220,7 @@ export function VettingQueue() {
     {!queue.data?<Skeleton/>:queue.data.length?queue.data.map((item:any)=><article className="scope-review-card" key={item.name}>
       <header><div><h2>{item.display_name||w('Clinician application')}</h2><p className="supporting">{item.service_label} · {w(item.status)} · {w('Submitted')} {item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w('date unavailable')}</p></div><span>{w('Rubric')} {item.rubric_version}</span></header>
       {item.reverification_of&&<InlineNotice>{w('Credential renewal for a previously approved scope. Check the new credential evidence and validity dates; do not treat the earlier approval as renewed.')}</InlineNotice>}
-      <dl className="scope-review-facts"><dt>{w('Professional category')}</dt><dd>{item.professional_category}</dd><dt>{w('Qualification')}</dt><dd>{item.qualification} · {item.issuing_institution}</dd><dt>{w('Registration')}</dt><dd>{item.registration_number||w('Not provided')} · {item.issuing_authority||w('Authority not provided')}</dd><dt>{w('Jurisdiction and expiry')}</dt><dd>{item.jurisdiction||w('Not provided')} · {item.credential_expiry||w('No expiry recorded')}</dd><dt>{w('Relevant experience')}</dt><dd>{item.experience_years} {w('years')} · {w('adult scope')} {item.population_adults?w('confirmed'):w('not confirmed')}</dd><dt>{w('Approaches and training')}</dt><dd>{item.approach_keys||w('None listed')} · {item.relevant_training||w('No training summary')}</dd><dt>{w('Affiliations')}</dt><dd>{item.clinic_affiliations||w('Independent or not provided; affiliation is not competence evidence')}</dd><dt>{w('Application evidence')}</dt><dd>{item.resume_uploaded?w('Private CV uploaded'):w('CV missing')}</dd></dl>
+      <dl className="scope-review-facts"><dt>{w('Professional category')}</dt><dd>{item.professional_category}</dd><dt>{w('Qualification')}</dt><dd>{item.qualification} · {item.issuing_institution}</dd><dt>{w("Professional competencies")}</dt><dd>{item.competencies||w("Not provided")}</dd><dt>{w("Certifications")}</dt><dd>{item.certifications||w("Not provided")}</dd><dt>{w("License valid from")}</dt><dd>{item.credential_valid_from||w("Not provided")}</dd><dt>{w('Registration')}</dt><dd>{item.registration_number||w('Not provided')} · {item.issuing_authority||w('Authority not provided')}</dd><dt>{w('Jurisdiction and expiry')}</dt><dd>{item.jurisdiction||w('Not provided')} · {item.credential_expiry||w('No expiry recorded')}</dd><dt>{w('Relevant experience')}</dt><dd>{item.experience_years} {w('years')} · {w('adult scope')} {item.population_adults?w('confirmed'):w('not confirmed')}</dd><dt>{w('Approaches and training')}</dt><dd>{item.approach_keys||w('None listed')} · {item.relevant_training||w('No training summary')}</dd><dt>{w('Affiliations')}</dt><dd>{item.clinic_affiliations||w('Independent or not provided; affiliation is not competence evidence')}</dd><dt>{w('Application evidence')}</dt><dd>{item.resume_uploaded?w('Private CV uploaded'):w('CV missing')}</dd></dl>
       {item.resume_uploaded&&<Button variant="secondary" onClick={async()=>{try{const response=await fetch(`/api/method/tele_tena.api.presentation.download_resume?clinician=${encodeURIComponent(item.clinician)}`,{credentials:'same-origin',cache:'no-store'});if(!response.ok)throw new Error();const blob=await response.blob();const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='clinician-cv.pdf';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch{window.alert(w('Private evidence could not be opened. Check reviewer authorization and retry.'))}}}>{w('Open private CV')}</Button>}
       {!!item.scope_evidence?.length&&<ScopeEvidencePanel item={item} canUpload={false} refresh={()=>Promise.resolve()}/>}
       {item.rubric_definition&&<details className="vetting-scored-rubric"><summary>{w('Structured evidence assessment')} · {item.rubric_definition.version} ({w(item.rubric_definition.status)})</summary>

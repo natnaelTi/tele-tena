@@ -22,3 +22,9 @@
 
 .scope-review-policy{max-width:572px;margin:24px auto;color:var(--muted);font-size:14px;line-height:1.6}
 .scope-review-policy>summary{cursor:pointer;min-height:44px;padding:12px 0}
+
+/* Multi-scope choices extend the reference wizard; each decision stays separate. */
+.scope-selection{border:1px solid var(--border);border-radius:12px;padding:16px;margin:0 0 24px;min-width:0}
+.scope-selection legend{padding:0 8px;font-weight:600}
+.scope-selection>div+div{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.scope-selection .supporting{margin:6px 0 0 32px;overflow-wrap:anywhere}

@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { ApiError } from "../api";
 const messages: Record<string, string> = {
+  scope_not_open: "This service is not accepting applications. Your other choices are still here.",
+  scope_selection_invalid: "Choose between one and ten different services.",
+  scope_application_locked: "This application is awaiting review. Respond to a clarification request to change it.",
+  credential_date_range: "The license expiry must be on or after its validity start date.",
+  credential_not_current: "This credential is not valid yet and cannot authorize current practice.",
+  catalog_requirements_missing: "Complete the professional, credential, consent and jurisdiction requirements before approval.",
+  catalog_review_state: "Only a submitted draft definition can receive a clinical review decision.",
+  catalog_workflow_unavailable: "This service requires a workflow outside the current adult MVP.",
+
   note_required: "Enter a consultation note or turn off note sharing.",
   summary_required: "Enter a patient summary before publishing.",
   consultation_close_pending: "Room closure is still pending. Return to the room and retry End for everyone before finalizing. Your draft can be saved.",
