@@ -284,7 +284,7 @@ export function ServiceCatalog() {
     <div className="review-queue-filters"><TextField label={w("Search service or category")} value={catalogSearch} onChange={e=>setCatalogSearch(e.target.value)}/><Select label={w("Category")} value={catalogCategory} onChange={e=>setCatalogCategory(e.target.value)}><option value="">{w("All categories")}</option>{(catalog.data?.categories||[]).map((item:any)=><option key={item.id} value={item.id}>{item.label}</option>)}</Select></div>
     {catalog.error?<InlineNotice tone="danger">{w("Service catalog could not be loaded.")} <Button onClick={()=>void catalog.refresh()}>{w("Retry")}</Button></InlineNotice>:!catalog.data?<Skeleton/>:<div className="catalog-table-wrap"><table className="catalog-definition-table"><thead><tr>{["Service","Category","Population","Required profession","Status"].map(label=><th key={label}>{w(label)}</th>)}</tr></thead><tbody>{definitions.filter((item:any)=>(!catalogCategory||item.category===catalogCategory)&&(!catalogSearch||`${item.service_label} ${item.category}`.toLocaleLowerCase().includes(catalogSearch.toLocaleLowerCase()))).map((item:any)=><tr key={item.id}><td><Link to={`/admin/services/${encodeURIComponent(item.id)}/edit`}>{item.service_label}</Link></td><td>{catalog.data.categories.find((category:any)=>category.id===item.category)?.label||w("Not provided")}</td><td>{w(item.population_restriction||"Not specified")}</td><td>{item.professional_categories||w("Clinical definition review pending")}</td><td><StatusBadge>{w(item.catalog_status)}</StatusBadge></td></tr>)}</tbody></table>{!definitions.length&&<EmptyState title={w("No service definitions yet.")}/>}</div>}
   </>;
-  if(catalog.data&&!isCreate&&!chosen)return <EmptyState title={w("Service definition unavailable")}><Link to="/admin/services">{w("Back to service catalog")}</Link></EmptyState>;
+  if(catalog.data&&!isCreate&&!definitions.some((item:any)=>item.id===serviceId))return <EmptyState title={w("Service definition unavailable")}><Link to="/admin/services">{w("Back to service catalog")}</Link></EmptyState>;
   return <>
     <Link className="button quiet" to="/admin/services">{w("Back to service catalog")}</Link>
     <PageTitle eyebrow={w("REVIEW WORKSPACE")} title={w("Service definition")} description={w("Maintain typed service definitions and versioned attributes. Patient concerns remain navigation terms, not diagnoses.")} />
@@ -298,7 +298,7 @@ export function ServiceCatalog() {
           {chosen&&<StatusBadge>{w(chosen.clinical_review_status||chosen.catalog_status)}</StatusBadge>}</header>
         {catalog.data?.can_review&&chosen?.clinical_review_status==='In review'&&<section className="catalog-clinical-decision"><h3>{w("Medical-lead definition review")}</h3><p>{w("This reviews the service requirements. It does not approve any clinician or independently verify their credentials.")}</p><TextField label={w("Clinical review reason")} value={clinicalReason} onChange={e=>setClinicalReason(e.target.value)} maxLength={1000}/><div className="action-row"><Button disabled={action.busy||!clinicalReason.trim()} onClick={()=>void action.run(async()=>{await journeyApi.reviewServiceDefinition(selected,'Approved',clinicalReason);setClinicalReason('');await catalog.refresh();})}>{w("Approve service definition")}</Button><Button variant="secondary" disabled={action.busy||!clinicalReason.trim()} onClick={()=>void action.run(async()=>{await journeyApi.reviewServiceDefinition(selected,'Needs information',clinicalReason);setClinicalReason('');await catalog.refresh();})}>{w("Return definition for correction")}</Button></div></section>}
         {!editable&&<InlineNotice tone="info">{w("This definition is locked after terminology review begins. Create a new version for future changes; existing definitions and records are preserved.")}</InlineNotice>}
-        <fieldset disabled={!editable||action.busy}>
+        <div className="definition-panel-grid"><section className="definition-core"><h3>{w("Core definition")}</h3><fieldset disabled={!editable||action.busy}>
           <div className="form-grid two-column">
             <TextField label={w("Stable service code")} value={form.service_key} onChange={e=>set("service_key",e.target.value)} required maxLength={80} hint={w("Lowercase letters, numbers, and hyphens; stable after creation.")}/>
             <TextField label={w("Definition version")} value={form.definition_version} onChange={e=>set("definition_version",e.target.value)} required maxLength={80}/>
@@ -335,10 +335,11 @@ export function ServiceCatalog() {
             {selected&&chosen?.clinical_review_status!=="In review"&&<Button variant="secondary" loading={action.busy} onClick={submit}>{w("Request clinical review")}</Button>}</div>}
         </fieldset>
         {saved&&<InlineNotice tone="success">{w("Draft definition saved. It is not bookable.")}</InlineNotice>}
-        {selected&&<section className="service-attribute-editor"><h3>{w("Versioned attributes")}</h3>
+        </section><section className="service-attribute-editor"><h3>{w("Required attributes")}</h3>
           <p className="supporting">{w("These definitions are metadata only. Runtime intake collection and validation are not implemented yet.")}</p>
+          {!chosen?.attributes?.length&&<p className="supporting">{w("No service-specific attributes defined.")}</p>}
           {(chosen?.attributes||[]).map((item:any)=><article className="service-attribute-row" key={item.id}><strong>{item.label_en} · {item.field_key}</strong><span>{item.data_type} · {item.visibility} · {item.sensitivity} · v{item.definition_version}</span>{item.allowed_values&&<span className="supporting">{item.allowed_values.split("\n").join(" · ")}</span>}</article>)}
-          {editable&&<details className="service-catalog-advanced"><summary>{w("Add or edit an attribute")}</summary><fieldset disabled={action.busy}>
+          {editable&&selected&&<details className="service-catalog-advanced"><summary>{w("Add or edit an attribute")}</summary><fieldset disabled={action.busy}>
             <div className="form-grid two-column"><TextField label={w("Stable field key")} value={attribute.field_key} onChange={e=>setAttribute({...attribute,field_key:e.target.value})}/>
               <TextField label={w("English field label")} value={attribute.label_en} onChange={e=>setAttribute({...attribute,label_en:e.target.value})}/>
               <TextField label={w("Amharic field label (provisional)")} value={attribute.label_am} onChange={e=>setAttribute({...attribute,label_am:e.target.value})}/>
@@ -355,7 +356,7 @@ export function ServiceCatalog() {
             <Checkbox label={w("Usable for matching")} checked={attribute.matching_field} onChange={e=>setAttribute({...attribute,matching_field:e.target.checked})}/>
             <Button loading={action.busy} disabled={!editable} onClick={saveAttribute}>{w("Save versioned attribute")}</Button>
           </fieldset></details>}
-        </section>}
+        </section></div>
       </section>
     </div>}
   </>;

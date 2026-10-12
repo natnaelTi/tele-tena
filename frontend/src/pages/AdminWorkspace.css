@@ -78,3 +78,12 @@
 .catalog-definition-table tbody tr:last-child td{border-bottom:0}
 .catalog-definition-table a{color:var(--primary);font-weight:600;text-underline-offset:3px}
 .service-definition-workspace{max-width:1000px;margin:24px auto}
+
+.definition-panel-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.definition-core,.definition-panel-grid>.service-attribute-editor{min-width:0;border:1px solid var(--border);border-radius:16px;padding:24px}
+.definition-core>h3,.definition-panel-grid>.service-attribute-editor>h3{font-size:20px;margin:0 0 20px}
+.definition-core .form-grid{grid-template-columns:minmax(0,1fr)}
+@media(max-width:900px){.definition-panel-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.definition-core,.definition-panel-grid>.service-attribute-editor{padding:16px}.catalog-definition-table th,.catalog-definition-table td{padding:12px}}
+
+.service-definition-workspace>.service-catalog-editor{padding:0;border:0;background:transparent}
