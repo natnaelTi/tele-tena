@@ -202,7 +202,7 @@ def save_onboarding(kind, step, answers, complete=0):
     rows = frappe.db.sql('SELECT completed FROM tt_onboarding WHERE user=%s FOR UPDATE', (user,))
     if not rows or rows[0][0]:
         fail('Onboarding already complete')
-    if not isinstance(answers, dict) or set(answers) - {'name', 'adult', 'consent', 'language', 'share_name', 'share_history', 'statement', 'affiliations', 'requested_services', 'history'}:
+    if not isinstance(answers, dict) or set(answers) - {'name', 'adult', 'consent', 'language', 'share_name', 'share_history', 'statement', 'affiliations', 'requested_services', 'history', 'professional', 'care_languages', 'introduction'}:
         fail('Invalid onboarding answers')
     clean = {k: text(v, 4000 if k == 'history' else 2000 if k == 'statement' else 120, False) for k, v in answers.items() if k in ('name', 'language', 'statement', 'affiliations', 'history')}
     for key in ('adult', 'consent', 'share_name', 'share_history'):
@@ -219,6 +219,24 @@ def save_onboarding(kind, step, answers, complete=0):
         fail('Unsupported language')
     if kind == 'clinician' and clean.get('history'):
         fail('Care background is for patient registration')
+    professional_keys = {'professional_category', 'qualification', 'issuing_institution',
+                         'registration_number', 'issuing_authority', 'jurisdiction',
+                         'credential_expiry', 'experience_years'}
+    if kind != 'clinician' and any(key in answers for key in ('professional', 'care_languages', 'introduction')):
+        fail('Professional application fields are for clinician registration')
+    if 'professional' in answers:
+        values = answers['professional']
+        if not isinstance(values, dict) or set(values) - professional_keys:
+            fail('Application contains unsupported fields.')
+        from tele_tena.api.vetting import _validated_form
+        clean['professional'] = _validated_form(values)
+    if 'care_languages' in answers:
+        languages = answers['care_languages']
+        if not isinstance(languages, list) or any(not isinstance(value, str) for value in languages) or len(languages) != len(set(languages)) or not set(languages).issubset({'en', 'am', 'om'}):
+            fail('Choose supported care languages')
+        clean['care_languages'] = sorted(languages)
+    if 'introduction' in answers:
+        clean['introduction'] = text(answers['introduction'], 2000, False)
     finish = boolean(complete)
     if finish:
         name = text(clean.get('name', ''), 120)
@@ -230,13 +248,18 @@ def save_onboarding(kind, step, answers, complete=0):
                 fail('Choose at least one service for review')
             if not frappe.db.sql('SELECT clinician FROM tt_resume_evidence WHERE clinician=%s', (user,)):
                 fail('Upload a PDF resume before submitting your application', 'resume_required')
+        if kind == 'clinician' and clean.get('professional'):
+            if any(not clean['professional'].get(key) for key in ('professional_category', 'qualification', 'issuing_institution')) or not clean.get('care_languages'):
+                fail('Complete your profession, qualification, institution and care languages before submission', 'professional_required')
         role = 'Tele Tena Patient' if kind == 'patient' else 'Tele Tena Applicant'
         from tele_tena.account_context import authorized_user_change
         with authorized_user_change():
             frappe.get_doc('User', user).add_roles(role)
-        frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history,public_id)
-            VALUES (%s,%s,%s,%s,%s,%s,%s)''',
-            (user, kind, name, clean.get('history', '') if kind == 'patient' else '', clean['share_name'], clean['share_history'], str(uuid.uuid4())))
+        frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history,public_id,languages,introduction)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+            (user, kind, name, clean.get('history', '') if kind == 'patient' else '', clean['share_name'], clean['share_history'], str(uuid.uuid4()),
+             json.dumps(clean.get('care_languages', []) if kind == 'clinician' else []),
+             clean.get('introduction', '') if kind == 'clinician' else ''))
         if kind == 'patient':
             frappe.db.sql('INSERT INTO tt_wallet (patient) VALUES (%s)', (user,))
         else:

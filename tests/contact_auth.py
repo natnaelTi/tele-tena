@@ -171,9 +171,22 @@ class ContactAuth(unittest.TestCase):
         frappe.set_user(user)
         answers = {'name': 'Synthetic applicant', 'statement': 'Synthetic credentials and scope',
                    'adult': True, 'consent': True, 'requested_services': [service]}
+        structured = {'professional_category': 'Counselor', 'qualification': 'Fictional qualification',
+                      'issuing_institution': 'Fictional institution', 'registration_number': 'PRIVATE-CREDENTIAL',
+                      'experience_years': 8, 'credential_expiry': '2027-06-30'}
+        for values in ({'professional': {'roles': ['System Manager']}},
+                       {'professional': {'experience_years': -1}},
+                       {'professional': {'credential_expiry': 'not-a-date'}},
+                       {'care_languages': ['en', 'en']}, {'care_languages': ['unsupported']}):
+            with self.assertRaises(frappe.ValidationError):
+                auth.save_onboarding('clinician', 0, {**answers, **values})
+        with self.assertRaises(frappe.ValidationError):
+            auth.save_onboarding('patient', 0, {**answers, 'professional': structured})
+        answers.update(professional=structured, care_languages=['en', 'am'], introduction='Public fictional introduction')
         auth.save_onboarding('clinician', 2, answers)
         auth.save_onboarding('clinician', 5, answers)
         self.assertEqual(auth.onboarding()['step'], 5)
+        self.assertEqual(auth.onboarding()['answers']['professional'], structured)
         self.assertEqual(auth.onboarding()['answers']['requested_services'], [service])
         with self.assertRaises(frappe.ValidationError):
             auth.save_onboarding('patient', 5, answers)
@@ -186,6 +199,15 @@ class ContactAuth(unittest.TestCase):
         self.assertIn('Tele Tena Applicant', frappe.get_roles(user))
         self.assertNotIn('Tele Tena Clinician', frappe.get_roles(user))
         self.assertEqual(frappe.db.sql('SELECT status FROM tt_application WHERE user=%s', (user,))[0][0], 'Pending')
+        from tele_tena.api import journey
+        self.assertEqual(journey.applications()[0].application_profile, structured)
+        profile = frappe.db.sql('SELECT languages,introduction,history FROM tt_profile WHERE user=%s', (user,), as_dict=True)[0]
+        self.assertEqual(json.loads(profile.languages), ['am', 'en'])
+        self.assertEqual(profile.introduction, 'Public fictional introduction')
+        self.assertNotIn('PRIVATE-CREDENTIAL', json.dumps(profile))
+        with self.assertRaises(frappe.ValidationError):
+            auth.save_onboarding('clinician', 3, answers, 1)
+        self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_application WHERE user=%s', (user,))[0][0], 1)
         frappe.db.commit()
 
     def test_delivery_send_once_uncertain_and_no_plaintext_storage(self):

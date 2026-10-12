@@ -269,6 +269,23 @@ def apply(statement, requested_services='[]'):
     return {'status': 'Pending'}
 
 
+def _initial_application_profile(user):
+    # Only called after owner/reviewer authorization; never part of discovery.
+    saved = rows('SELECT answers FROM tt_onboarding WHERE user=%s AND kind=%s AND completed IS NOT NULL',
+                 (user, 'clinician'))
+    if not saved:
+        return {}
+    try:
+        answers = json.loads(saved[0].answers or '{}')
+    except (ValueError, TypeError):
+        return {}
+    values = answers.get('professional', {})
+    allowed = {'professional_category', 'qualification', 'issuing_institution',
+               'registration_number', 'issuing_authority', 'jurisdiction',
+               'credential_expiry', 'experience_years'}
+    return {key: value for key, value in values.items() if key in allowed} if isinstance(values, dict) else {}
+
+
 @query()
 def applications():
     user = actor()
@@ -276,6 +293,7 @@ def applications():
         result = rows('''SELECT a.*,p.display_name FROM tt_application a
             JOIN tt_profile p ON p.user=a.user ORDER BY a.submitted_at IS NULL,a.submitted_at,a.user''')
         for item in result:
+            item.application_profile = _initial_application_profile(item.user)
             try:
                 item.requested_services = json.loads(item.requested_services or '[]')
             except ValueError:
@@ -297,7 +315,10 @@ def applications():
     p = one('SELECT kind FROM tt_profile WHERE user=%s', (user,))
     if p.kind != 'clinician':
         frappe.throw('Clinician application unavailable', frappe.PermissionError)
-    return rows('SELECT * FROM tt_application WHERE user=%s', (user,))
+    result = rows('SELECT * FROM tt_application WHERE user=%s', (user,))
+    for item in result:
+        item.application_profile = _initial_application_profile(user)
+    return result
 
 
 @command
