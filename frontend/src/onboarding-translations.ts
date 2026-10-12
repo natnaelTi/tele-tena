@@ -1,5 +1,7 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Consultation language": ["የምክክር ቋንቋ", "Afaan marii"],
+  "Receipt does not mean your credentials are verified. Each requested scope is reviewed separately.": ["ሰነድ መቀበል ማስረጃዎችዎ ተረጋግጠዋል ማለት አይደለም። እያንዳንዱ የተጠየቀ ወሰን ለብቻው ይገመገማል።", "Sanada fudhachuun ragaan kee mirkanaa’e jechuu miti. Daangaan gaafatame hundi addaan gamaaggamama."],
   "Profession": ["ሙያ", "Ogummaa"],
   "Choose your profession": ["ሙያዎን ይምረጡ", "Ogummaa kee filadhu"],
   "Years of practice": ["የስራ ልምድ ዓመታት", "Waggoota muuxannoo hojii"],

@@ -211,8 +211,8 @@ export default function Onboarding() {
                   {["Counseling psychologist","Psychiatrist","Clinical psychologist","Counselor","Other"].map(value=><option key={value} value={value}>{w(value)}</option>)}
                 </Select>
                 <TextField label={w("Years of practice")} type="number" min={0} max={60} value={answers.professional?.experience_years ?? ""} onChange={e=>update({professional:{...answers.professional,experience_years:Number(e.target.value)}})}/>
-                <div className="field"><label htmlFor="onboarding-introduction">{w("Professional introduction")}</label><textarea id="onboarding-introduction" rows={3} maxLength={2000} value={answers.introduction||""} onChange={e=>update({introduction:e.target.value})}/><p className="field-hint">{w("This introduction may appear on your approved public profile. Keep credential identifiers in the private application fields.")}</p></div>
-                <fieldset className="onboarding-language-options"><legend>{w("Consultation languages")}</legend>{[["en","English"],["am","Amharic"],["om","Afaan Oromo"]].map(([code,label])=><Checkbox key={code} label={w(label)} checked={(answers.care_languages||[]).includes(code)} onChange={e=>update({care_languages:e.target.checked?[...(answers.care_languages||[]),code]:(answers.care_languages||[]).filter(value=>value!==code)})}/>)}</fieldset>
+                <div className="field"><label htmlFor="onboarding-introduction">{w("Professional introduction")}</label><textarea id="onboarding-introduction" rows={4} maxLength={2000} value={answers.introduction||""} onChange={e=>update({introduction:e.target.value})}/><p className="field-hint">{w("This introduction may appear on your approved public profile. Keep credential identifiers in the private application fields.")}</p></div>
+                <fieldset className="onboarding-language-options"><legend>{w("Consultation languages")}</legend>{[["en","English"],["am","Amharic"],["om","Afaan Oromo"]].map(([code,label])=><Checkbox key={code} variant="card" hint={w("Consultation language")} label={w(label)} checked={(answers.care_languages||[]).includes(code)} onChange={e=>update({care_languages:e.target.checked?[...(answers.care_languages||[]),code]:(answers.care_languages||[]).filter(value=>value!==code)})}/>)}</fieldset>
               </>}
             </>
           )}
@@ -229,14 +229,12 @@ export default function Onboarding() {
                     id="onboarding-credentials"
                     required
                     maxLength={2000}
-                    rows={6}
+                    rows={3}
                     value={answers.statement || ""}
                     onChange={(e) => update({ statement: e.target.value })}
                   />
                 </div>
-                <p className="supporting">
-                  {w("Describe your qualification, registration and the services you would like reviewed. Upload a PDF resume (up to 5 MB); receipt does not mean your credentials are verified.")}
-                </p>
+                <p className="supporting">{w("Receipt does not mean your credentials are verified. Each requested scope is reviewed separately.")}</p>
                 <label className="field" data-tour="applicant-resume">{w("Resume (PDF, up to 5 MB)")}<input type="file" accept="application/pdf,.pdf" disabled={resumeBusy} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;if(file.size>5*1024*1024){setError("Choose a PDF no larger than 5 MB.");return;}setResumeBusy(true);setError("");try{const base64=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]||"");reader.onerror=()=>reject(new Error("Read failed"));reader.readAsDataURL(file);});await journeyApi.uploadResume(file.name,base64);setResumeUploaded(true);}catch{setError("The resume could not be uploaded. Choose a valid PDF and try again.");}finally{setResumeBusy(false);e.target.value="";}}}/>{resumeUploaded&&<span role="status">{w("Resume uploaded for authorized review.")} <button type="button" className="text-button" onClick={()=>void journeyApi.removeResume().then(()=>setResumeUploaded(false)).catch(()=>setError("Resume could not be removed."))}>{w("Remove")}</button></span>}</label>
               </>
             ) : (
