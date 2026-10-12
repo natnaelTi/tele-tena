@@ -52,7 +52,7 @@ async function main() {
     for(const width of widths){await page.setViewportSize({width,height:960});await page.evaluate(()=>document.fonts.ready);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`${name} overflows at ${width}`);await page.screenshot({path:`/tmp/tele-tena-presentation-review/${name}-${width}.png`,fullPage:true})}
   }
   async function prepareAndJoin(page) {
-    await call(page).getByRole('button', { name: 'Check microphone and camera' }).click()
+    await call(page).getByRole('button', { name: /^Check microphone(?: and camera)?$/ }).click()
     let joinResponses = 0
     page.on('response', response => { if (response.url().includes('tele_tena.api.consultations.join')) joinResponses++ })
     const button = call(page).getByRole('button', { name: 'Join consultation' })
@@ -72,7 +72,7 @@ async function main() {
   }
   async function failPublicationAndCheckCleanup(page) {
     checkpoint = 'publication recovery preflight'
-    await call(page).getByRole('button', { name: 'Check microphone and camera' }).click()
+    await call(page).getByRole('button', { name: /^Check microphone(?: and camera)?$/ }).click()
     await call(page).getByRole('status').filter({ hasText: 'Devices checked' }).waitFor()
     await call(page).locator('.call-video').evaluate(video => { window.__testFailedPreview = video.srcObject })
     await page.evaluate(() => {
@@ -101,7 +101,7 @@ async function main() {
     })
   }
   async function failConnectionAndCheckCleanup(page) {
-    await call(page).getByRole('button', { name: 'Check microphone and camera' }).click()
+    await call(page).getByRole('button', { name: /^Check microphone(?: and camera)?$/ }).click()
     await call(page).getByRole('status').filter({ hasText: 'Devices checked' }).waitFor()
     await call(page).locator('.call-video').evaluate(video => { video.__testConnectionPreview = video.srcObject })
     await page.route('**/api/method/tele_tena.api.consultations.join', async route => {
@@ -118,7 +118,7 @@ async function main() {
   }
   async function doubleJoinAndUnmountBeforeToken(page) {
     checkpoint='duplicate join preflight check'
-    await call(page).getByRole('button', { name: 'Check microphone and camera' }).click()
+    await call(page).getByRole('button', { name: /^Check microphone(?: and camera)?$/ }).click()
     checkpoint='duplicate join media preview ready'
     await call(page).getByRole('status').filter({ hasText: 'Devices checked' }).waitFor()
     await call(page).locator('.call-video').evaluate(video => { window.__lateJoinPreview = video.srcObject })
@@ -188,6 +188,7 @@ async function main() {
       await call(patient).getByRole('button',{name:'Audio only',exact:true}).click()
       await call(patient).locator('.reference-audio-stage').waitFor()
       await desktopFit(patient,'audio-only-patient')
+      checkpoint='patient leaves audio mode and rejoins'
       await call(patient).getByRole('button', { name: /Leave/ }).click()
       await call(patient).getByRole('status').filter({ hasText: 'You left the consultation' }).waitFor()
       await prepareAndJoin(patient)
@@ -225,7 +226,7 @@ async function main() {
     await clinicianCard().waitFor()
     checkpoint = 'patient joins'
     checkpoint = 'patient preflight button'
-    try { await call(patient).getByRole('button', { name: 'Check microphone and camera' }).click() }
+    try { await call(patient).getByRole('button', { name: /^Check microphone(?: and camera)?$/ }).click() }
     catch {
       diagnostic = await call(patient).evaluate(node => JSON.stringify({
         statusText: [...node.querySelectorAll('[role=status]')].map(item => item.innerText),
