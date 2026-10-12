@@ -177,6 +177,7 @@ async function main() {
           assert.ok(Math.abs(fit.left)<1&&Math.abs(fit.right-fit.width)<1,'Connected room must span desktop width')
           assert.ok(Math.abs(fit.bottom-fit.view)<1,'Connected room must reach viewport bottom')
           assert.ok(fit.pageHeight<=fit.view+1&&fit.bodyHeight<=fit.view+1,'Desktop call must not scroll the page')
+          console.log('Viewport PASS:',name,size.width,JSON.stringify(fit))
           const leave=await call(page).getByRole('button',{name:'Leave',exact:true}).boundingBox()
           assert.ok(leave&&leave.y+leave.height<=size.height,'Leave must remain visible')
           await page.screenshot({path:`/tmp/tele-tena-presentation-review/${name}-${size.width}.png`,fullPage:true})
@@ -191,6 +192,7 @@ async function main() {
       checkpoint='patient leaves audio mode and rejoins'
       await call(patient).getByRole('button', { name: /Leave/ }).click()
       await call(patient).getByRole('status').filter({ hasText: 'You left the consultation' }).waitFor()
+      await call(patient).getByRole('checkbox',{name:'Audio only',exact:true}).uncheck()
       await prepareAndJoin(patient)
       const endButton = call(clinician).getByRole('button', { name: 'End for everyone' })
       try { await endButton.waitFor({ timeout: 10000 }) }
