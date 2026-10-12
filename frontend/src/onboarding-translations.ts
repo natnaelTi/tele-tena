@@ -1,5 +1,10 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Counseling psychologist": ["የምክር ሥነ ልቦና ባለሙያ", "Ogeessa saayikoloojii gorsaa"],
+  "Clinical psychologist": ["ክሊኒካዊ ሥነ ልቦና ባለሙያ", "Ogeessa saayikoloojii klinikaa"],
+  "Psychiatrist": ["የአእምሮ ጤና ሐኪም", "Doktara fayyaa sammuu"],
+  "Counselor": ["አማካሪ", "Gorsaa"],
+  "Full professional name": ["ሙሉ የሙያ ስም", "Maqaa ogummaa guutuu"],
   "Consultation language": ["የምክክር ቋንቋ", "Afaan marii"],
   "Receipt does not mean your credentials are verified. Each requested scope is reviewed separately.": ["ሰነድ መቀበል ማስረጃዎችዎ ተረጋግጠዋል ማለት አይደለም። እያንዳንዱ የተጠየቀ ወሰን ለብቻው ይገመገማል።", "Sanada fudhachuun ragaan kee mirkanaa’e jechuu miti. Daangaan gaafatame hundi addaan gamaaggamama."],
   "Profession": ["ሙያ", "Ogummaa"],

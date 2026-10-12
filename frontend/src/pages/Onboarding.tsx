@@ -199,7 +199,7 @@ export default function Onboarding() {
                   : "A preferred name or alias is enough. You choose whether to share it when you book.")}
               </p>
               <div data-tour={clinician?"applicant-profile":undefined}><TextField
-                label={w(clinician ? "Professional name" : "Preferred name or alias")}
+                label={w(clinician ? "Full professional name" : "Preferred name or alias")}
                 value={answers.name || ""}
                 maxLength={120}
                 required
