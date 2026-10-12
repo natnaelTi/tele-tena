@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **eb82d388029e2116f46cccf251382fde4f5b988b**. Later test/report/evidence-only commits
+  **7daf9c084dcf9982cd1ee622b7cf2c0413417a4d**. Later test/report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -59,6 +59,58 @@ separate pieces of evidence, not one continuous new-applicant reviewer browser r
 Ten sourced presentation definitions remain Draft pending human clinical requirements
 and decisions. Owner-selected reviewer Medical Lead controls exist; nothing was
 approved automatically. Current acceptance remains the single existing matrix.
+
+## Current Home/catalog follow-through —12October2026
+
+Current package7daf9c084dcf9982cd1ee622b7cf2c0413417a4d. C01care-record rows now
+link only recipient-authorized published summaries/follow-ups through the existing
+appointment-detail API. No private text, new records or financial changes.
+32068b7browser verifies Home→discovery→preview→selected profile/reload→calendar→
+disclosure/back at390/768/1440 and compares record links with authorized backend data.
+Only catalog UI/testing and clinical activation validation changed afterward; this
+Home evidence is reused. Source/built frontend match before this evidence-only update.
+
+I07/I08 now separate listing/editing, preserve deep links, show loading/unknown/filter
+empty states and use compact reference panels and format cards. b280f00read-only
+browser passes without application/definition mutations. Actual Chromium200% zoom
+(outer1440/inner720/devicePixelRatio2) passes C01/B09/I08 with paired captures.
+This proves zoom behavior, not all-state visual acceptance. Current screenshot folders:
+`docs/screenshots/mvp-current/32068b7-home-care/`, `32068b7-actual-zoom/`,
+`b280f00-catalog/`. DesktopC01 and desktop/mobileI08 compared; remaining differences
+are recorded in the single screen matrix. No owner acceptance claimed.
+
+Medical Lead activation now revalidates native back-office definitions: unsupported
+formats, reversed durations and couples without consent workflow fail visibly without
+activation. Two focused persisted tests pass8.833s, including the valid new clinician
+three-scope →bookable offering/published schedule/discovery/immediate inbox chain.
+Only the owned8017web master was reloaded; queue13917worker/scheduler remain running.
+Current package offline recovery, password/deep-link refresh, guest/unrelated denial,
+asset hashes and sensitive-cache exclusion pass. Existing-session *new-build update*
+was not repeated in this run; earlier unchanged mechanism evidence remains separate.
+No hosted-call repeat: runtime diff of consultation core from the acceptedfde86c3 is empty.
+
+### Reviewer steps for structured applications
+
+1. Existing fictional reviewer has the owner-authorized Medical Lead controls.
+   Open Administration→Service catalog→a Draft definition. Complete professional,
+   credential, adult consent, jurisdiction, duration, sources and supported workflow
+   requirements; Save draft→Request clinical review→record a reasoned decision.
+   These are human decisions; ten sourced drafts were not automatically activated.
+2. General Applications review remains separate. Newly verified clinician onboarding
+   captures private professional claims and CV. An approved clinician opens
+   More→Scope applications, selects multiple definitions, supplies qualifications,
+   saves/resumes and submits per-scope private evidence.
+3. Scope vetting decides each independently: approve, clarify or decline with reasons
+   and mandatory rubric/evidence checks. General or catalog approval grants no scope.
+4. Only approved scopes allow offerings; publish the schedule explicitly. Discovery
+   and immediate requests still require approved exact scope, offering, language,
+   format, feasible time and fresh presence. Manual grants remain audited.
+
+Remaining release gates: one continuous new-clinician/reviewer browser mutation chain,
+latestv1.37fresh install requiring a scoped disposable DB credential, remaining MVP
+state/locale visual comparisons and owner review. Priorv1.36fresh/couples/scheduler/
+financial evidence remains named and preserved, not silently promoted to a new pass.
+Live SMS/SMTP receipt, physical devices and native-language/clinical approval remain external.
 
 ## Desktop consultation-column clarification —12October
 

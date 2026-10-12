@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "eb82d388029e2116f46cccf251382fde4f5b988b",
+  "source_checkpoint": "7daf9c084dcf9982cd1ee622b7cf2c0413417a4d",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -2434,7 +2434,8 @@
         "implementation": "Patient dashboard now loads a signed-in-patient-only previous-clinician list from completed encounters, filtered to current approved scope and active published availability. Opaque profile key only; no cross-patient encounter linking.",
         "current_local": "Backend integration test covers a completed patient-owned appointment, another patient sees no row, clinician role is denied, and account email is absent. Pending execution on the disposable Frappe site; browser rendering pending.",
         "mvp_private_query": "Built-app 390px password-flow check passes on 42574c4; no URL/history/storage query, clear on sign-out. Full visual and OTP/onboarding acceptance still pending; see mvp-release-verification.md.",
-        "presentation_checkpoint": "Actual patient password→Home→search/discovery; real reserved balance. Complete populated history/state acceptance pending. See docs/mvp-journey-verification-2026-10-09.md."
+        "presentation_checkpoint": "Actual patient password→Home→search/discovery; real reserved balance. Complete populated history/state acceptance pending. See docs/mvp-journey-verification-2026-10-09.md.",
+        "home_published_records": "32068b7 real backend browser at390/768/1440 verifies recipient-authorized record links against completed appointment details, with no private_note field or mutations. Actual Chrome200% paired capture passes; C01desktop comparison inspected. See docs/screenshots/mvp-current/32068b7-home-care/ and 32068b7-actual-zoom/."
       },
       "visual_acceptance": {
         "reference_screen": "C01",
@@ -2450,7 +2451,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Compact care hero/search, next-session row, actual wallet; mobile icons restored. Help/tour height and empty care history differ from reference.",
+        "current_differences": "Reference main care/wallet/appointment hierarchy and published record rows implemented. Required inline care query/private-request entry, truthful reserved amount and available record content differ deliberately. Full empty/failure/locale/mobile comparison and owner acceptance remain.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -11446,7 +11447,8 @@
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I07) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
+        "current_catalog_states": "b280f00 built read-only catalog search, empty filter, deep-link/reload, unknown recovery and unchanged definitions pass390/768/1440. 32068b7 actual200% capture; scope/call/finance permissions unchanged. Latest Medical Lead native invalid format/duration/couples-workflow and approval chain tests2/2 pass8.833s."
       },
       "visual_acceptance": {
         "reference_screen": "I07",
@@ -11462,7 +11464,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Dedicated catalog table and two-panel definition layout, delivery-format cards, compact form spacing and secondary localization ported. Additional medical-lead reason/requirements and empty attributes reflect actual data. Paired desktop/mobile inspected; all language/state and owner review remain pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -11581,7 +11583,8 @@
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I08) and design-handoff.md",
         "implementation": "Dedicated reviewer route /teletena/admin/services uses existing Tele Tena Service, Category, Participant Format and Service Attribute Definition DocTypes. Draft save forces inactive/vetting-required/immediate-disabled; draft locks on review request. No terminology approval or service activation is exposed.",
         "current_local": "2026-10-08: `tests/presentation.py` 37/37 passed on isolated tele-tena-pr12-fresh.localhost; packaged reviewer route create/reload/typed draft/review-lock browser journey passed at 390/768/1440 with no horizontal overflow. Evidence: docs/service-catalog-editor-verification.md and docs/screenshots/service-catalog/.",
-        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
+        "current_catalog_states": "b280f00 built read-only catalog search, empty filter, deep-link/reload, unknown recovery and unchanged definitions pass390/768/1440. 32068b7 actual200% capture; scope/call/finance permissions unchanged. Latest Medical Lead native invalid format/duration/couples-workflow and approval chain tests2/2 pass8.833s."
       },
       "visual_acceptance": {
         "reference_screen": "I08",
@@ -11597,7 +11600,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "current_differences": "Dedicated catalog table and two-panel definition layout, delivery-format cards, compact form spacing and secondary localization ported. Additional medical-lead reason/requirements and empty attributes reflect actual data. Paired desktop/mobile inspected; all language/state and owner review remain pending.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -15397,7 +15400,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
-  "current_packaged_source": "eb82d388029e2116f46cccf251382fde4f5b988b",
+  "current_packaged_source": "7daf9c084dcf9982cd1ee622b7cf2c0413417a4d",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15412,7 +15415,8 @@
     "build_source": "bc20f722848a84b7b857284b1599bef0f8b1f451",
     "date": "2026-10-11",
     "report": "docs/mvp-journey-verification-2026-10-09.md",
-    "note": "Compatibility Bench is separate and not serving this URL. Evidence/docs-only commits may differ; compare runtime diff before rebuilding."
+    "note": "Compatibility Bench is separate and not serving this URL. Evidence/docs-only commits may differ; compare runtime diff before rebuilding.",
+    "packaged_source": "7daf9c084dcf9982cd1ee622b7cf2c0413417a4d"
   },
   "historical_checkpoints": {
     "before_2026_10_11": {

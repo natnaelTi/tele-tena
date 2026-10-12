@@ -2,7 +2,7 @@
 
 ## Active checkpoint —12October2026
 
-Current runtime package `eb82d388029e2116f46cccf251382fde4f5b988b` on the presentation8017 preview. Structured Draft/Active scope intake, private professional claims and reasoned Medical Lead catalog decisions are implemented. Five focused Frappe regressions, random-OTP scope draft browser, cross-page acceptance notifications, repeat-migration preservation and current patient discovery/calendar path pass for their named states. Full MVP visual/state acceptance, a continuous reviewer-browser chain and v1.37 fresh installation remain open. No automatic approvals, merge or remote change. The dated checkpoint sections below are historical; the single screen matrix and active journey report are authoritative.
+Current runtime package `7daf9c084dcf9982cd1ee622b7cf2c0413417a4d` on the presentation8017 preview. Structured Draft/Active scope intake, private professional claims and reasoned Medical Lead catalog decisions are implemented. Five focused Frappe regressions, random-OTP scope draft browser, cross-page acceptance notifications, repeat-migration preservation and current patient discovery/calendar path pass for their named states. Full MVP visual/state acceptance, a continuous reviewer-browser chain and v1.37 fresh installation remain open. No automatic approvals, merge or remote change. The dated checkpoint sections below are historical; the single screen matrix and active journey report are authoritative.
 
 ## Latest accepted-offer / room delta —12October2026
 
