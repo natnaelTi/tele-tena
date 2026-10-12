@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **fde86c3132e9af65eb88b437dca7dea2435c23a9**. Later test/report/evidence-only commits
+  **eb82d388029e2116f46cccf251382fde4f5b988b**. Later test/report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -35,8 +35,30 @@ reviewer. That site-only, audited role assignment is independent of any approval
 No catalog, rubric or clinician scope has been automatically approved. The named
 presentation site was backed up before v1.37 nullable native-field migration.
 Existing financial, consultation, availability and notification behavior is unchanged.
-Backend and built-browser evidence is recorded below once run; unfinished checks are
-not passes. Current acceptance remains the existing screen matrix, not this section.
+Actual checks:
+- Five persisted Frappe regressions pass (5.317s): draft multi-scope atomic/private/retry,
+  Medical Lead/generic-write authorization, independent scope decisions through offering,
+  published schedule/discovery/immediate inbox, clarification and credential expiry.
+- Real-backend captured random OTP registration/onboarding plus multi-scope draft/reload/
+  resume/submission pass. Focused mode did not repeat wrong/expired/resend checks; prior
+  full evidence is retained. No live SMS/SMTP.
+- Accepted-offer browser passes while on Account and Requests, deduplicated polling,
+  persisted read/reload, authorized consultation link and private projection. Capacity
+  UI fault injection is separate from the existing real-backend capacity test.
+- Native migration plus two repeat migrations preserve all15 named product/financial/
+  catalog/vetting table values. A private presentation backup precedes schema change.
+- Current production-build, lint and private-asset/hash scan pass; inherited warnings
+  remain. v1.37 fresh installation is still unrun, not covered by the v1.36 result.
+- Current patient password/Home/discovery/preview/profile reload/calendar/disclosure-back
+  browser passes at390/768/1440 with no booking or balance mutation. The older harness
+  hard-coded a clinician name and mislabeled the failing stage; it now asserts the
+  selected fictional clinician and retains focus and offering-preservation assertions.
+
+The browser registration/intake and backend reviewer/approval-to-bookable chain are
+separate pieces of evidence, not one continuous new-applicant reviewer browser run.
+Ten sourced presentation definitions remain Draft pending human clinical requirements
+and decisions. Owner-selected reviewer Medical Lead controls exist; nothing was
+approved automatically. Current acceptance remains the single existing matrix.
 
 ## Desktop consultation-column clarification —12October
 

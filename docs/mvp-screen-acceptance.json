@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "fde86c3132e9af65eb88b437dca7dea2435c23a9",
+  "source_checkpoint": "eb82d388029e2116f46cccf251382fde4f5b988b",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -1549,7 +1549,8 @@
         "current_local": "docs/screenshots/mvp-current/38ac535-initial-clinician/result.json",
         "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
         "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
-        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
+        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json",
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
       },
       "visual_acceptance": {
         "reference_screen": "B06",
@@ -1641,13 +1642,14 @@
             "label": "Continue",
             "hash": "#b07"
           }
-        ]
+        ],
+        "current_scope_intake_evidence": "docs/screenshots/mvp-current/eb82d38-scope-intake/"
       },
       "completion": {
         "functional": "Functionally verified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Current typed initial application/reload/private evidence/selection/submission passed. Compact reference mobile gutters/title/actions and optional details compared. Separate per-scope evidence, other states, locale/zoom and owner acceptance remain.",
+        "remaining_action": "Complete remaining state/locale/actual-zoom visual comparisons and one continuous new-clinician reviewer browser chain; medical-lead catalog/rubric approval is human controlled, not automatically seeded.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B06) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
@@ -1673,7 +1675,8 @@
         "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
         "initial_review_current": "docs/screenshots/mvp-current/c0d911d-onboarding-review/result.json",
         "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
-        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
+        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json",
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
       },
       "visual_acceptance": {
         "reference_screen": "B07",
@@ -1769,13 +1772,14 @@
         "separate_route_gate": "The paired onboarding step does not verify every structured /clinician/vetting state.",
         "structured_scope_route": "/clinician/vetting",
         "structured_functional_evidence": "docs/screenshots/mvp-current/9254a65-vetting/result.json",
-        "structured_comparison_evidence": "docs/screenshots/mvp-current/b87d843-vetting-layout/result.json"
+        "structured_comparison_evidence": "docs/screenshots/mvp-current/b87d843-vetting-layout/result.json",
+        "current_scope_intake_evidence": "docs/screenshots/mvp-current/eb82d38-scope-intake/"
       },
       "completion": {
         "functional": "Functionally verified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Current typed initial application/reload/private evidence/selection/submission passed. Compact reference mobile gutters/title/actions and optional details compared. Separate per-scope evidence, other states, locale/zoom and owner acceptance remain.",
+        "remaining_action": "Complete remaining state/locale/actual-zoom visual comparisons and one continuous new-clinician reviewer browser chain; medical-lead catalog/rubric approval is human controlled, not automatically seeded.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B07) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
@@ -1908,7 +1912,8 @@
         "current_local": "docs/screenshots/mvp-current/38ac535-initial-clinician/result.json",
         "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
         "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
-        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
+        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json",
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
       },
       "visual_acceptance": {
         "reference_screen": "B09",
@@ -2005,13 +2010,14 @@
             "label": "Review application",
             "hash": "#b10"
           }
-        ]
+        ],
+        "current_scope_intake_evidence": "docs/screenshots/mvp-current/eb82d38-scope-intake/"
       },
       "completion": {
         "functional": "Functionally verified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Current typed initial application/reload/private evidence/selection/submission passed. Compact reference mobile gutters/title/actions and optional details compared. Separate per-scope evidence, other states, locale/zoom and owner acceptance remain.",
+        "remaining_action": "Complete remaining state/locale/actual-zoom visual comparisons and one continuous new-clinician reviewer browser chain; medical-lead catalog/rubric approval is human controlled, not automatically seeded.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B09) and design-handoff.md",
           "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
@@ -2038,7 +2044,8 @@
         "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
         "initial_review_current": "docs/screenshots/mvp-current/c0d911d-onboarding-review/result.json",
         "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
-        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
+        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json",
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
       },
       "visual_acceptance": {
         "reference_screen": "B10",
@@ -2133,13 +2140,14 @@
         "separate_route_gate": "The paired onboarding step does not verify every structured /clinician/vetting state.",
         "structured_scope_route": "/clinician/vetting",
         "structured_functional_evidence": "docs/screenshots/mvp-current/9254a65-vetting/result.json",
-        "structured_comparison_evidence": "docs/screenshots/mvp-current/b87d843-vetting-layout/result.json"
+        "structured_comparison_evidence": "docs/screenshots/mvp-current/b87d843-vetting-layout/result.json",
+        "current_scope_intake_evidence": "docs/screenshots/mvp-current/eb82d38-scope-intake/"
       },
       "completion": {
         "functional": "Functionally verified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Current typed initial application/reload/private evidence/selection/submission passed. Compact reference mobile gutters/title/actions and optional details compared. Separate per-scope evidence, other states, locale/zoom and owner acceptance remain.",
+        "remaining_action": "Complete remaining state/locale/actual-zoom visual comparisons and one continuous new-clinician reviewer browser chain; medical-lead catalog/rubric approval is human controlled, not automatically seeded.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B10) and design-handoff.md",
           "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
@@ -2164,7 +2172,8 @@
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
         "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
         "current_2026_10_11": "docs/screenshots/mvp-current/b87d843-application-progress/result.json",
-        "pending_account_current": "docs/screenshots/mvp-current/191762a-application-progress/result.json"
+        "pending_account_current": "docs/screenshots/mvp-current/191762a-application-progress/result.json",
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
       },
       "visual_acceptance": {
         "reference_screen": "B11",
@@ -2267,13 +2276,14 @@
           }
         ],
         "visual_status": "Comparison recorded; not accepted",
-        "evidence_source": "b87d843de0827d3d4d80b8717fe0995d64346ef6"
+        "evidence_source": "b87d843de0827d3d4d80b8717fe0995d64346ef6",
+        "current_scope_intake_evidence": "docs/screenshots/mvp-current/eb82d38-scope-intake/"
       },
       "completion": {
         "functional": "Functionally verified",
         "visual": "Visually verified by Codex",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Pending English comparison only; populated decisions, Rejected/clarification, languages/zoom and owner acceptance remain open.",
+        "remaining_action": "Complete remaining state/locale/actual-zoom visual comparisons and one continuous new-clinician reviewer browser chain; medical-lead catalog/rubric approval is human controlled, not automatically seeded.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B11) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
@@ -2294,7 +2304,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B12) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
       },
       "visual_acceptance": {
         "reference_screen": "B12",
@@ -2394,13 +2405,14 @@
             "label": "View your application",
             "hash": "#b11"
           }
-        ]
+        ],
+        "current_scope_intake_evidence": "docs/screenshots/mvp-current/eb82d38-scope-intake/"
       },
       "completion": {
         "functional": "Implemented but unverified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "remaining_action": "Complete remaining state/locale/actual-zoom visual comparisons and one continuous new-clinician reviewer browser chain; medical-lead catalog/rubric approval is human controlled, not automatically seeded.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B12) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
@@ -10958,7 +10970,8 @@
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json; real backend, named state only; no live delivery or clinical decisions.",
         "current_2026_10_11_onboarding_review": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json",
-        "current_2026_10_12": "docs/screenshots/mvp-current/8b5802d-application-review/result.json"
+        "current_2026_10_12": "docs/screenshots/mvp-current/8b5802d-application-review/result.json",
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
       },
       "visual_acceptance": {
         "reference_screen": "I03",
@@ -11070,13 +11083,14 @@
             "label": "Review service scopes",
             "hash": "#i05"
           }
-        ]
+        ],
+        "current_scope_intake_evidence": "docs/screenshots/mvp-current/eb82d38-scope-intake/"
       },
       "completion": {
         "functional": "Functionally verified",
         "visual": "Visually verified by Codex for named populated state; other states pending",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Queue-overlay modal replaced by dedicated opaque route and refreshable page. Main professional/private-documents and supporting action panels compared. Truthful Pending/self-reported fields replace invented verified badge/portrait. Private credential details expandable; individual gate decisions remain in native scope vetting. Named English/mobile/actual200 and provisional-language layouts pass; other states/native scope-review composition and owner review remain.",
+        "remaining_action": "Complete remaining state/locale/actual-zoom visual comparisons and one continuous new-clinician reviewer browser chain; medical-lead catalog/rubric approval is human controlled, not automatically seeded.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I03) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
@@ -11320,7 +11334,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I06) and design-handoff.md",
         "implementation": "PR feature branch feat/vetting-reconsideration: native append-only appeal DocType, authenticated commands, reviewer/applicant UI, and focused tests.",
-        "current_local": "29/29 presentation tests passed on Frappe 15.121.2 and Frappe 16.2.1; migration and repeat migration passed on retained isolated sites. Built browser verified applicant normal page and reviewer empty queue at 1440/390px; populated appeal actions remain unverified in browser. See docs/vetting-appeals-verification.md."
+        "current_local": "29/29 presentation tests passed on Frappe 15.121.2 and Frappe 16.2.1; migration and repeat migration passed on retained isolated sites. Built browser verified applicant normal page and reviewer empty queue at 1440/390px; populated appeal actions remain unverified in browser. See docs/vetting-appeals-verification.md.",
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
       },
       "visual_acceptance": {
         "reference_screen": "I06",
@@ -11403,13 +11418,14 @@
             "label": "Review restriction",
             "hash": null
           }
-        ]
+        ],
+        "current_scope_intake_evidence": "docs/screenshots/mvp-current/eb82d38-scope-intake/"
       },
       "completion": {
         "functional": "Implemented but unverified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "remaining_action": "Complete remaining state/locale/actual-zoom visual comparisons and one continuous new-clinician reviewer browser chain; medical-lead catalog/rubric approval is human controlled, not automatically seeded.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I06) and design-handoff.md",
           "implementation": "PR feature branch feat/vetting-reconsideration: native append-only appeal DocType, authenticated commands, reviewer/applicant UI, and focused tests.",
@@ -11429,7 +11445,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I07) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+        "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
       },
       "visual_acceptance": {
         "reference_screen": "I07",
@@ -11492,8 +11509,8 @@
             "label": "Add service definition"
           }
         ],
-        "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
-        "functional_status": "Pending current complete journey acceptance",
+        "expected_next_states": "Draft save → submitted terminology review → reasoned authorized Medical Lead approval or correction. Catalog approval never grants clinician scopes. Approved metadata immutable; versioned replacement required.",
+        "functional_status": "Functionally verified for named native review/permission/idempotency tests and read-only built catalog search/deep-link/reload; complete reviewer browser mutation chain pending.",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Admin.tsx",
@@ -11536,13 +11553,14 @@
             "label": "Add service definition",
             "hash": "#i08"
           }
-        ]
+        ],
+        "current_scope_intake_evidence": "docs/screenshots/mvp-current/eb82d38-scope-intake/"
       },
       "completion": {
         "functional": "Implemented but unverified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "remaining_action": "Complete remaining state/locale/actual-zoom visual comparisons and one continuous new-clinician reviewer browser chain; medical-lead catalog/rubric approval is human controlled, not automatically seeded.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I07) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
@@ -11562,7 +11580,8 @@
       "verification_evidence": {
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I08) and design-handoff.md",
         "implementation": "Dedicated reviewer route /teletena/admin/services uses existing Tele Tena Service, Category, Participant Format and Service Attribute Definition DocTypes. Draft save forces inactive/vetting-required/immediate-disabled; draft locks on review request. No terminology approval or service activation is exposed.",
-        "current_local": "2026-10-08: `tests/presentation.py` 37/37 passed on isolated tele-tena-pr12-fresh.localhost; packaged reviewer route create/reload/typed draft/review-lock browser journey passed at 390/768/1440 with no horizontal overflow. Evidence: docs/service-catalog-editor-verification.md and docs/screenshots/service-catalog/."
+        "current_local": "2026-10-08: `tests/presentation.py` 37/37 passed on isolated tele-tena-pr12-fresh.localhost; packaged reviewer route create/reload/typed draft/review-lock browser journey passed at 390/768/1440 with no horizontal overflow. Evidence: docs/service-catalog-editor-verification.md and docs/screenshots/service-catalog/.",
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
       },
       "visual_acceptance": {
         "reference_screen": "I08",
@@ -11634,8 +11653,8 @@
           "note": "Rendered extracted reference, not application evidence. Fictional example names, fees and outcomes are not operational requirements or data."
         },
         "expected_actions": [],
-        "expected_next_states": "Draft editable → typed attributes saved → terminology review requested and draft locked. Separate human terminology approval/activation is not exposed. Scope vetting decisions and financial exception resolution remain separate audited workflows.",
-        "functional_status": "Pending current complete journey acceptance",
+        "expected_next_states": "Draft save → submitted terminology review → reasoned authorized Medical Lead approval or correction. Catalog approval never grants clinician scopes. Approved metadata immutable; versioned replacement required.",
+        "functional_status": "Functionally verified for named native review/permission/idempotency tests and read-only built catalog search/deep-link/reload; complete reviewer browser mutation chain pending.",
         "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
         "implementation_files": [
           "frontend/src/pages/Admin.tsx",
@@ -11650,13 +11669,14 @@
             "label": "Save definition draft",
             "hash": null
           }
-        ]
+        ],
+        "current_scope_intake_evidence": "docs/screenshots/mvp-current/eb82d38-scope-intake/"
       },
       "completion": {
         "functional": "Implemented but unverified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "remaining_action": "Complete remaining state/locale/actual-zoom visual comparisons and one continuous new-clinician reviewer browser chain; medical-lead catalog/rubric approval is human controlled, not automatically seeded.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I08) and design-handoff.md",
           "implementation": "Dedicated reviewer route /teletena/admin/services uses existing Tele Tena Service, Category, Participant Format and Service Attribute Definition DocTypes. Draft save forces inactive/vetting-required/immediate-disabled; draft locks on review request. No terminology approval or service activation is exposed.",
@@ -15377,7 +15397,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
-  "current_packaged_source": "6ec7d09dc25d3704bb0e0fd1e4ea78bb4cb2ae3e",
+  "current_packaged_source": "eb82d388029e2116f46cccf251382fde4f5b988b",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15461,8 +15481,8 @@
       "evidence": "Current read-only3patient/1clinician/6accounts0mismatches; v1.35 native migration exact financial fingerprint preserved. Prior v1.7/v1.8 reconstructed legacy-schema boundary/unknown holds/per-owner retry evidence retained, not every historical whole-app release."
     },
     "fresh_latest_schema": {
-      "status": "Functionally verified",
-      "evidence": "2026-10-11 scripts/check_fresh_install.py on source4a71d2a73b42471f571cf6ad5ef4c58de2a55859: fresh Frappe15.121.2/ERPNext15.121.6 install on teletena-mvp-v136-fresh.localhost, explicit v1.34/v1.35/v1.36 tables/column/PatchLog assertions, guest denial and disabled simulation; retained erp.localhost/pr12 fingerprints unchanged. Disposable site/database/user and temporary admin/file removed; admin reauthentication denied. This run did not invoke optional registration browser or repeat migration; existing v1.36 native twice-migration preservation evidence on both retained sites remains separate."
+      "status": "Implemented but unverified",
+      "evidence": "Prior v1.36 fresh install remains valid for its source. v1.37 adds three nullable native scope fields; native upgrade and two repeat migrations preserve every value in15 named tables. Updated fresh-install assertions await a separate scoped disposable database credential; latest fresh install has not been run."
     },
     "whole_mvp_visual": {
       "status": "Implementation in progress",
