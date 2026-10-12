@@ -33,6 +33,7 @@ from tele_tena.api import extensions
 from tele_tena.api import service_policy
 from tele_tena.api import service_catalog
 from tele_tena.api import financial_activity
+from tele_tena.account_context import authorized_user_change
 from tele_tena.patches import v1_23_multiple_offerings
 from tele_tena.patches import v1_24_legacy_completion_activity
 from tele_tena.patches import v1_25_legacy_refund_activity
@@ -54,6 +55,35 @@ def credential_source_payload(evidence):
             'credential_checked_on':frappe.utils.today(),
             'credential_evidence':evidence,
             'credential_source_reference':'SYNTHETIC-REGISTRY-REF'}
+
+
+def reviewed_test_service(values):
+    """Synthetic definitions still pass the real human-review command gates."""
+    user = frappe.get_doc('User', fixtures.USERS['admin'])
+    was_lead = 'Tele Tena Medical Lead' in frappe.get_roles(user.name)
+    with authorized_user_change():
+        user.add_roles('Tele Tena Medical Lead')
+    frappe.clear_cache(user=user.name)
+    values = {**values, 'catalog_status': 'Draft', 'active': 0,
+              'clinical_review_status': 'Not reviewed',
+              'professional_categories': 'Synthetic clinician',
+              'credential_requirements': 'Synthetic qualification and license evidence',
+              'supported_formats': 'video\naudio',
+              'required_consent_schema': 'adult-v1',
+              'location_jurisdiction_policy': 'synthetic-only',
+              'required_workflows': 'individual-consultation',
+              'min_duration_minutes': 15, 'max_duration_minutes': 120,
+              'catalog_source': 'Synthetic regression definition; not a clinical source'}
+    doc = frappe.get_doc(values).insert()
+    try:
+        service_catalog.submit_for_clinical_review(doc.name)
+        service_catalog.review_definition(doc.name, 'Approved', 'Synthetic human-led regression review.')
+    finally:
+        if not was_lead:
+            with authorized_user_change():
+                user.remove_roles('Tele Tena Medical Lead')
+            frappe.clear_cache(user=user.name)
+    return doc
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -426,12 +456,12 @@ class Presentation(unittest.TestCase):
     def test_structured_scope_vetting_blocks_legacy_approval_bypass(self):
         service = fixtures.PREFIX + '-vetting-scope'
         fixtures.login('admin')
-        frappe.get_doc({'doctype':'Tele Tena Service','service_key':service,
+        reviewed_test_service({'doctype':'Tele Tena Service','service_key':service,
             'service_label':'Synthetic vetted service','active':1,'catalog_status':'Active',
             'category':'psychotherapy','description':'Synthetic test definition',
             'population_restriction':'Adults only','participant_structure':'individual',
             'clinical_review_status':'Approved','vetting_required':1,
-            'definition_version':'test-v1'}).insert()
+            'definition_version':'test-v1'})
         fixtures.login('c1')
         submitted = vetting.save_scope_application(service, {
             'professional_category':'Synthetic clinician','qualification':'Synthetic qualification',
@@ -937,12 +967,12 @@ class Presentation(unittest.TestCase):
     def test_vetting_draft_clarification_resubmission_and_scope_decision(self):
         service = fixtures.PREFIX + '-reviewed-scope'
         fixtures.login('admin')
-        frappe.get_doc({'doctype':'Tele Tena Service','service_key':service,
+        reviewed_test_service({'doctype':'Tele Tena Service','service_key':service,
             'service_label':'Synthetic adult counseling scope','active':1,'catalog_status':'Active',
             'category':'counseling','description':'Synthetic only; reviewer lifecycle regression.',
             'population_restriction':'Adults only','participant_structure':'individual',
             'clinical_review_status':'Approved','vetting_required':1,
-            'definition_version':'synthetic-v1'}).insert()
+            'definition_version':'synthetic-v1'})
         email = 'vetting-' + secrets.token_hex(6) + '@example.invalid'
         fixtures.USERS['vetting'] = email
         frappe.set_user('Administrator')
@@ -1217,12 +1247,12 @@ class Presentation(unittest.TestCase):
     def test_scope_credential_reverification_is_separate_and_expiry_fails_closed(self):
         service = fixtures.PREFIX + '-credential-renewal'
         fixtures.login('admin')
-        frappe.get_doc({'doctype':'Tele Tena Service','service_key':service,
+        reviewed_test_service({'doctype':'Tele Tena Service','service_key':service,
             'service_label':'Synthetic credential renewal scope','active':1,'catalog_status':'Active',
             'category':'counseling','description':'Synthetic renewal behavior only.',
             'population_restriction':'Adults only','participant_structure':'individual',
             'clinical_review_status':'Approved','vetting_required':1,
-            'definition_version':'synthetic-v1'}).insert()
+            'definition_version':'synthetic-v1'})
         email = 'renewal-' + secrets.token_hex(6) + '@example.invalid'
         fixtures.USERS['renewal'] = email
         frappe.set_user('Administrator')
@@ -3187,6 +3217,99 @@ class Presentation(unittest.TestCase):
         finally:
             frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
+
+    def test_draft_catalog_multi_scope_intake_is_atomic_private_and_retry_safe(self):
+        keys = [fixtures.PREFIX + '-intake-' + suffix for suffix in ('one', 'two')]
+        values = {'professional_category': 'Fictional counselor',
+                  'qualification': 'Fictional counseling degree',
+                  'issuing_institution': 'Fictional college', 'experience_years': 4,
+                  'competencies': 'Adult counseling', 'certifications': 'Fictional training',
+                  'credential_valid_from': '2020-01-01', 'credential_expiry': '2030-01-01',
+                  'population_adults': True}
+        for key in keys:
+            service_catalog.save_draft_definition({
+                'service_key': key, 'service_label': 'Fictional counseling service',
+                'category': 'counseling', 'description': 'Fictional service test.',
+                'participant_structure': 'individual', 'supported_formats': 'audio\nvideo',
+                'population_restriction': 'Adults only', 'definition_version': 'test-1',
+                'catalog_source': 'Fictional source'})
+        email = 'intake-' + secrets.token_hex(6) + '@example.invalid'
+        fixtures.USERS['intake'] = email
+        frappe.set_user('Administrator')
+        user = frappe.get_doc({'doctype': 'User', 'email': email, 'first_name': 'Fictional applicant',
+                              'send_welcome_email': 0, 'user_type': 'Website User'}).insert()
+        user.add_roles('Tele Tena Clinician')
+        fixtures.login('intake')
+        journey.save_profile('clinician', 'Fictional applicant', True, languages=['en'])
+        listed = {item.id for item in vetting.vetting_services()}
+        self.assertTrue(set(keys) <= listed)
+        with self.assertRaises(frappe.ValidationError):
+            vetting.save_scope_applications([keys[0], fixtures.PREFIX], values)
+        self.assertEqual(frappe.db.count('Tele Tena Vetting Scope Application',
+                                        {'clinician': email, 'service': keys[0]}), 0)
+        draft = vetting.save_scope_applications(keys, values)['applications']
+        again = vetting.save_scope_applications(keys, values)['applications']
+        self.assertEqual([r['name'] for r in draft], [r['name'] for r in again])
+        presentation.upload_resume('fictional-intake-cv.pdf',
+                                  base64.b64encode(b'%PDF-1.4\nFictional CV\n%%EOF').decode())
+        submitted = vetting.save_scope_applications(keys, values, True)['applications']
+        repeated = vetting.save_scope_applications(keys, values, True)['applications']
+        self.assertEqual([r['name'] for r in submitted], [r['name'] for r in repeated])
+        self.assertTrue(all(r['idempotent'] for r in repeated))
+        with self.assertRaises(frappe.ValidationError):
+            vetting.save_scope_application(keys[0], {**values, 'qualification': 'Changed'}, True)
+        with self.assertRaises(frappe.ValidationError):
+            journey.publish(keys[0], 30000, 30)
+        saved = next(r for r in vetting.my_scope_applications() if r.service == keys[0])
+        self.assertEqual(saved.competencies, values['competencies'])
+        fixtures.login('c2')
+        self.assertFalse(any(r.service in keys for r in vetting.my_scope_applications()))
+        doc = frappe.get_doc('Tele Tena Vetting Scope Application', submitted[0]['name'])
+        self.assertFalse(frappe.has_permission(doc.doctype, 'read', doc=doc,
+                                              user=fixtures.USERS['c2']))
+        with self.assertRaises(frappe.ValidationError):
+            vetting.save_scope_application(keys[1], {**values, 'credential_valid_from': '2031-01-01'})
+        fixtures.login('admin')
+        self.assertTrue(all(frappe.db.get_value('Tele Tena Service', key, 'active') == 0
+                            for key in keys))
+
+    def test_clinical_catalog_review_requires_lead_and_cannot_grant_scopes(self):
+        key = fixtures.PREFIX + '-clinical-review'
+        payload = {'service_key': key, 'service_label': 'Fictional adult counseling',
+                   'category': 'counseling', 'description': 'Fictional test definition.',
+                   'participant_structure': 'individual', 'population_restriction': 'Adults only',
+                   'supported_formats': 'audio\nvideo', 'required_workflows': 'individual-consultation',
+                   'definition_version': 'test-1', 'catalog_source': 'Fictional source',
+                   'professional_categories': 'Fictional counselor',
+                   'credential_requirements': 'Relevant qualification and license evidence',
+                   'required_consent_schema': 'adult-v1',
+                   'location_jurisdiction_policy': 'synthetic-only',
+                   'min_duration_minutes': 20, 'max_duration_minutes': 60}
+        service_catalog.save_draft_definition(payload)
+        service_catalog.submit_for_clinical_review(key)
+        with self.assertRaises(frappe.PermissionError):
+            service_catalog.review_definition(key, 'Approved', 'Not a designated medical lead.')
+        native = frappe.get_doc('Tele Tena Service', key)
+        native.clinical_review_status = 'Approved'; native.active = 1; native.catalog_status = 'Active'
+        with self.assertRaises(frappe.PermissionError):
+            native.save()
+        user = frappe.get_doc('User', fixtures.USERS['admin'])
+        with authorized_user_change():
+            user.add_roles('Tele Tena Medical Lead')
+        frappe.clear_cache(user=user.name)
+        try:
+            native = frappe.get_doc('Tele Tena Service', key)
+            native.clinical_review_status = 'Approved'; native.active = 1; native.catalog_status = 'Active'
+            with self.assertRaises(frappe.PermissionError):
+                native.save()
+            result = service_catalog.review_definition(key, 'Approved', 'Fictional human review decision.')
+            self.assertTrue(result['active']); self.assertFalse(result['scope_granted'])
+            self.assertFalse(journey.service_scope_is_current(fixtures.USERS['c1'], key))
+            self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_audit WHERE subject=%s AND action='ServiceClinicalReview'", (key,)).n, 1)
+        finally:
+            with authorized_user_change():
+                user.remove_roles('Tele Tena Medical Lead')
+            frappe.clear_cache(user=user.name)
 
     def test_service_catalog_edits_are_typed_draft_only_and_reviewer_scoped(self):
         key = 'synthetic-catalog-' + secrets.token_hex(5)

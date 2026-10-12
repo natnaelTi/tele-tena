@@ -140,3 +140,5 @@ def install():
     individual_followup()
     from tele_tena.patches.v1_36_public_introduction import execute as public_introduction
     public_introduction()
+    from tele_tena.patches.v1_37_scope_intake import execute as scope_intake
+    scope_intake()

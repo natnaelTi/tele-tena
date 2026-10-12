@@ -189,6 +189,15 @@ def onboarding():
     return {**rows[0], 'answers': json.loads(rows[0].answers), 'completed': bool(rows[0].completed)}
 
 
+@query()
+def application_services():
+    """Contact-verified/onboarding accounts can choose non-bookable draft scopes."""
+    actor()
+    return frappe.db.sql("""SELECT name AS id,service_label AS label,clinical_review_status
+        FROM `tabTele Tena Service` WHERE vetting_required=1
+        AND catalog_status IN ('Draft','Active') ORDER BY service_label,name""", as_dict=True)
+
+
 @command
 def save_onboarding(kind, step, answers, complete=0):
     user = actor()
@@ -212,7 +221,7 @@ def save_onboarding(kind, step, answers, complete=0):
         fail('Invalid requested service scopes')
     requested_services = sorted(set(text(item, 80) for item in requested_services))
     for service in requested_services:
-        if not frappe.db.sql('SELECT name FROM `tabTele Tena Service` WHERE name=%s AND active=1', (service,)):
+        if not frappe.db.sql("SELECT name FROM `tabTele Tena Service` WHERE name=%s AND (active=1 OR (vetting_required=1 AND catalog_status='Draft'))", (service,)):
             fail('Choose from available services')
     clean['requested_services'] = requested_services
     if clean.get('language', 'en') not in ('en', 'am', 'om'):
@@ -221,7 +230,7 @@ def save_onboarding(kind, step, answers, complete=0):
         fail('Care background is for patient registration')
     professional_keys = {'professional_category', 'qualification', 'issuing_institution',
                          'registration_number', 'issuing_authority', 'jurisdiction',
-                         'credential_expiry', 'experience_years'}
+                         'credential_expiry', 'experience_years', 'competencies', 'certifications', 'credential_valid_from'}
     if kind != 'clinician' and any(key in answers for key in ('professional', 'care_languages', 'introduction')):
         fail('Professional application fields are for clinician registration')
     if 'professional' in answers:

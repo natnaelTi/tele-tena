@@ -171,6 +171,21 @@
       "label": "Decided at",
       "fieldtype": "Datetime",
       "read_only": 1
+    },
+    {
+      "fieldname": "competencies",
+      "label": "Professional competencies",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "certifications",
+      "label": "Certifications",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "credential_valid_from",
+      "label": "Credential valid from",
+      "fieldtype": "Date"
     }
   ],
   "permissions": [

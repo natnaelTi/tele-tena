@@ -18,6 +18,7 @@ SCOPE_EVIDENCE_TYPES = {
 }
 APPLICANT_FIELDS = {
     'professional_category': 80, 'qualification': 180, 'issuing_institution': 180,
+    'competencies': 2000, 'certifications': 2000, 'credential_valid_from': 10,
     'registration_number': 100, 'issuing_authority': 180, 'jurisdiction': 120,
     'credential_expiry': 10, 'experience_years': 2, 'approach_keys': 800,
     'population_adults': 1, 'independent_practice': 1, 'clinic_affiliations': 1000,
@@ -260,7 +261,7 @@ def _validated_form(values):
             result[key] = integer(value, 0, 60)
         elif key in ('population_adults', 'independent_practice'):
             result[key] = int(journey.boolean(value))
-        elif key == 'credential_expiry':
+        elif key in ('credential_expiry', 'credential_valid_from'):
             if not value:
                 result[key] = None
             else:
@@ -275,6 +276,8 @@ def _validated_form(values):
             result[key] = '\n'.join(keys)
         else:
             result[key] = text(value or '', maximum, required=False)
+    if result.get('credential_valid_from') and result.get('credential_expiry') and result['credential_expiry'] < result['credential_valid_from']:
+        fail('Credential expiry must be on or after the validity start date.', 'credential_date_range')
     return result
 
 
@@ -302,7 +305,7 @@ def my_scope_applications():
     result = rows('''SELECT a.name,a.service,s.service_label,a.status,a.reverification_of,
         ss.status AS service_scope_status,a.professional_category,a.qualification,
         a.issuing_institution,a.registration_number,a.issuing_authority,a.jurisdiction,a.credential_expiry,
-        a.experience_years,a.approach_keys,a.population_adults,a.independent_practice,a.clinic_affiliations,
+        a.competencies,a.certifications,a.credential_valid_from,a.experience_years,a.approach_keys,a.population_adults,a.independent_practice,a.clinic_affiliations,
         a.relevant_training,a.applicant_statement,a.applicant_response,a.clarification_request,
         a.decision_reason,a.restrictions,a.submitted_at,a.decided_at,a.rubric_version,
         (SELECT d.name FROM `tabTele Tena Vetting Assessment` d WHERE d.scope_application=a.name
@@ -521,8 +524,9 @@ def vetting_services():
     user = actor()
     if not set(frappe.get_roles(user)).intersection({'Tele Tena Applicant', 'Tele Tena Clinician'}):
         frappe.throw('Clinician application access required', frappe.PermissionError)
-    return rows("""SELECT name AS id,service_label AS label,category,description,definition_version
-        FROM `tabTele Tena Service` WHERE active=1 AND catalog_status='Active' AND vetting_required=1
+    return rows("""SELECT name AS id,service_label AS label,category,description,definition_version,
+        professional_categories,credential_requirements,clinical_review_status,catalog_status
+        FROM `tabTele Tena Service` WHERE catalog_status IN ('Draft','Active') AND vetting_required=1
         ORDER BY service_label""")
 
 
@@ -532,7 +536,7 @@ def save_scope_application(service, values, submit=False, reverification_of=None
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     definition = one('''SELECT name,active,catalog_status,vetting_required FROM `tabTele Tena Service`
         WHERE name=%s''', (service,))
-    if not definition.active or definition.catalog_status != 'Active' or not definition.vetting_required:
+    if definition.catalog_status not in ('Draft', 'Active') or not definition.vetting_required:
         fail('This service scope is not currently open for professional applications.', 'scope_not_open')
     form = _validated_form(values)
     if reverification_of:
@@ -563,9 +567,9 @@ def save_scope_application(service, values, submit=False, reverification_of=None
         if reverification_of and prior.reverification_of != reverification_of:
             fail('This renewal is linked to a different approved application.', 'renewal_reference_mismatch')
         payload_hash = hashlib.sha256(json.dumps(form, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
-        if reverification_of and submit and prior.status in ('Submitted', 'Resubmitted', 'Approved'):
+        if submit and prior.status in ('Submitted', 'Resubmitted', 'Approved') and prior.reverification_payload_hash:
             if prior.reverification_payload_hash != payload_hash:
-                fail('A submitted renewal cannot be changed. Use its clarification or reconsideration path.',
+                fail('A submitted application cannot be changed. Use its clarification or reconsideration path.',
                      'scope_application_locked')
             return {'name': existing[0].name, 'status': prior.status, 'idempotent': True}
         if prior.status not in ('Draft', 'Clarification'):
@@ -599,9 +603,9 @@ def save_scope_application(service, values, submit=False, reverification_of=None
     values = {**form, 'status': status, 'submitted_at': now if submit else None}
     if renewal_ref:
         values['reverification_of'] = renewal_ref
-        if submit:
-            values['reverification_payload_hash'] = hashlib.sha256(
-                json.dumps(form, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+    if submit:
+        values['reverification_payload_hash'] = hashlib.sha256(
+            json.dumps(form, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
     if existing:
         updates = ','.join(f'`{key}`=%s' for key in values)
         frappe.db.sql(f'''UPDATE `tabTele Tena Vetting Scope Application` SET {updates},
@@ -699,6 +703,9 @@ def review_scope_application(application, decision, identity_reviewed=False,
         service = one('SELECT vetting_required,clinical_review_status,active FROM `tabTele Tena Service` WHERE name=%s', (doc.service,))
         if not service.vetting_required or service.clinical_review_status != 'Approved' or not service.active:
             fail('The service definition has not completed clinical review.', 'catalog_not_approved')
+        valid_from = frappe.db.get_value('Tele Tena Vetting Scope Application', doc.name, 'credential_valid_from')
+        if valid_from and frappe.utils.getdate(valid_from) > frappe.utils.getdate():
+            fail('A future credential validity date cannot authorize current practice.', 'credential_not_current')
         expiry = frappe.db.get_value('Tele Tena Vetting Scope Application', doc.name, 'credential_expiry')
         if expiry and frappe.utils.getdate(expiry) < frappe.utils.getdate():
             fail('An expired credential cannot support scope approval.', 'credential_expired')
@@ -881,3 +888,20 @@ def assign_scope_reviewer(application, reviewer):
     journey.audit(assigned_by, 'ScopeReviewerAssignment', {'application': current[0].name,
                                                             'reviewer': reviewer})
     return {'assigned': True}
+
+
+@journey.command
+def save_scope_applications(services, values, submit=False):
+    """Atomic multi-scope intake; every scope retains its own evidence and decision."""
+    _applicant()
+    if isinstance(services, str):
+        try:
+            services = json.loads(services)
+        except (TypeError, ValueError):
+            fail('Choose the services you want to apply for.', 'scope_selection_invalid')
+    if (not isinstance(services, list) or not 1 <= len(services) <= 10
+            or any(not isinstance(item, str) for item in services)
+            or len(set(services)) != len(services)):
+        fail('Choose between one and ten distinct services.', 'scope_selection_invalid')
+    return {'applications': [save_scope_application(service, values, submit)
+                             for service in services]}

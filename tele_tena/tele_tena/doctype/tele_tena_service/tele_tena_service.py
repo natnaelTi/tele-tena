@@ -22,6 +22,17 @@ class TeleTenaService(Document):
         if self.vetting_required and self.catalog_status == 'Legacy test':
             frappe.throw('New vetting-required services cannot use the legacy test catalog state')
         previous = self.get_doc_before_save()
+        reviewed_transition = (self.clinical_review_status == 'Approved' and
+            (not previous or previous.clinical_review_status != 'Approved'))
+        if reviewed_transition and not getattr(frappe.local, 'tele_tena_catalog_review_action', False):
+            frappe.throw('Clinical approval must use the audited medical-lead review action',
+                         frappe.PermissionError)
+        if previous and previous.clinical_review_status == 'Approved':
+            from tele_tena.api.service_catalog import SERVICE_FIELDS
+            mutable = {'active', 'catalog_status', 'immediate_care_enabled'}
+            if any(self.get(key) != previous.get(key) for key in SERVICE_FIELDS if key not in mutable):
+                frappe.throw('Reviewed definitions are versioned; create a new draft instead of changing accepted requirements',
+                             frappe.PermissionError)
         immediate_changed = (bool(self.immediate_care_enabled) != bool(
             previous.immediate_care_enabled if previous else 0))
         if immediate_changed and not getattr(frappe.local, 'tele_tena_service_policy_action', False):

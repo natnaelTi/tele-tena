@@ -40,3 +40,5 @@ tele_tena.patches.v1_33_couples_consultations
 tele_tena.patches.v1_34_shared_change_consent
 tele_tena.patches.v1_35_individual_followup
 tele_tena.patches.v1_36_public_introduction
+
+tele_tena.patches.v1_37_scope_intake

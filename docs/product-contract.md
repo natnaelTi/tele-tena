@@ -41,6 +41,27 @@ self-reported application fields means attachments/information are present, not
 that any credential or scope is verified. Per-scope evidence and human mandatory
 gates remain separate and unchanged.
 
+## Structured service intake and clinical definition review — 12October2026
+
+Applicants may select multiple structured Draft or Active definitions. Draft intake
+is deliberately distinct from authorization: general application approval, a submitted
+scope application, and catalog presence never grant a service scope or booking rights.
+Each scope retains separate supporting evidence, clarification, decision and appeal.
+A designated Medical Lead who also has vetting-review permissions records a reasoned
+clinical-definition decision after professional, credential, adult, consent,
+jurisdiction, duration and implemented-workflow requirements are supplied. Generic
+DocType writes cannot grant clinical-definition approval. Approved definition metadata
+is preserved; changes require a new versioned draft. Immediate-care policy remains a
+separate reviewed action. None of these actions verifies an external credential.
+
+Initial private onboarding and scope applications support competencies, certifications
+and license validity start as applicant claims, in addition to existing qualification,
+issuer, expiry, experience and PDF evidence. Existing applications get nullable fields;
+no approval, credential, service name or historical snapshot is inferred. The clinical
+catalog's ten sourced drafts remain awaiting actual medical-lead requirements/decisions.
+Legacy demonstration scopes remain historical and usable under existing rules, but
+are excluded from new structured scope selection. No automatic catalog activation.
+
 ## First internal demonstration
 Adults 18+. English, Amharic and Afaan Oromo with native review before pilot.
 Patient and clinician portals; administrator approval; independent and multi-clinic
