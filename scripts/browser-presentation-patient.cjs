@@ -125,11 +125,16 @@ async function pair(ctx, p, id, hash, width) {
       await p.keyboard.press("Escape");
       await p.getByRole("dialog").waitFor({ state: "hidden" });
       stage = "preview focus return " + width;
-      await p.waitForFunction(
-        (el) => el === document.activeElement,
-        await trigger.elementHandle(),
-        { timeout: 2000 },
-      );
+      // Evaluate in the locator's own context: reference capture opens another tab.
+      // Retain the same focus assertion and bounded retry, without passing a DOM
+      // handle into waitForFunction's isolated execution world.
+      let focusReturned = false;
+      for (let attempt = 0; attempt < 20; attempt++) {
+        focusReturned = await trigger.evaluate(el => el === document.activeElement);
+        if (focusReturned) break;
+        await p.waitForTimeout(100);
+      }
+      assert.ok(focusReturned, "Closing clinician preview must restore focus to its opener");
       await trigger.click();
       const selectedBooking=await p.getByRole('dialog').getByRole('link',{name:'Choose a time',exact:true}).getAttribute('href');
       await p
