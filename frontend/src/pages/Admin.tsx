@@ -300,8 +300,6 @@ export function ServiceCatalog() {
         {!editable&&<InlineNotice tone="info">{w("This definition is locked after terminology review begins. Create a new version for future changes; existing definitions and records are preserved.")}</InlineNotice>}
         <div className="definition-panel-grid"><section className="definition-core"><h3>{w("Core definition")}</h3><fieldset disabled={!editable||action.busy}>
           <div className="form-grid two-column">
-            <TextField label={w("Stable service code")} value={form.service_key} onChange={e=>set("service_key",e.target.value)} required maxLength={80} hint={w("Lowercase letters, numbers, and hyphens; stable after creation.")}/>
-            <TextField label={w("Definition version")} value={form.definition_version} onChange={e=>set("definition_version",e.target.value)} required maxLength={80}/>
             <TextField label={w("Patient-facing name (English)")} value={form.service_label} onChange={e=>set("service_label",e.target.value)} required maxLength={120}/>
             <Select label={w("Service category")} value={form.category} onChange={e=>set("category",e.target.value)} required>
               <option value="">{w("Choose a category")}</option>{catalog.data?.categories.map((item:any)=><option key={item.id} value={item.id}>{item.label} · {w(item.status)}</option>)}
@@ -310,15 +308,17 @@ export function ServiceCatalog() {
             <TextField label={w("Afaan Oromo name (provisional)")} value={form.service_label_om} onChange={e=>set("service_label_om",e.target.value)} maxLength={120}/>
           </div>
           <label className="field">{w("Professional description")}<textarea rows={4} maxLength={2000} value={form.description} onChange={e=>set("description",e.target.value)}/></label>
-          <label className="field">{w("Search names and synonyms (one per line)")}<textarea rows={2} maxLength={1000} value={form.synonyms} onChange={e=>set("synonyms",e.target.value)}/></label>
           <Select label={w("Participant structure")} value={form.participant_structure} onChange={e=>set("participant_structure",e.target.value)}>
             {catalog.data?.participant_formats.map((item:any)=><option key={item.id} value={item.id}>{item.label} · {w(item.status)}</option>)}
           </Select>
           <Select label={w("Population restriction")} value={form.population_restriction} onChange={e=>set("population_restriction",e.target.value)}>
             <option>Adults only</option><option>All ages</option><option>Not specified</option>
           </Select>
-          <label className="field">{w("Allowed delivery formats")}<textarea rows={2} value={form.supported_formats} onChange={e=>set("supported_formats",e.target.value)}/><span className="field-hint">{w("Use one of these keys per line: audio, video, in_person.")}</span></label>
+          <fieldset className="definition-delivery"><legend>{w("Allowed delivery formats")}</legend>{[["video","Video"],["audio","Audio"],["in_person","In person"]].map(([key,label])=><Checkbox key={key} variant="card" label={w(label)} checked={form.supported_formats.split("\n").includes(key)} onChange={event=>{const formats=form.supported_formats.split("\n").filter(Boolean);set("supported_formats",(event.target.checked?[...formats.filter(value=>value!==key),key]:formats.filter(value=>value!==key)).join("\n"));}}/>)}</fieldset>
+          <TextField label={w("Definition version")} value={form.definition_version} onChange={e=>set("definition_version",e.target.value)} required maxLength={80}/>
           <details className="service-catalog-advanced"><summary>{w("Professional eligibility and workflow rules")}</summary>
+            <TextField label={w("Stable service code")} value={form.service_key} onChange={e=>set("service_key",e.target.value)} required maxLength={80} hint={w("Lowercase letters, numbers, and hyphens; stable after creation.")}/>
+            <label className="field">{w("Search names and synonyms (one per line)")}<textarea rows={2} maxLength={1000} value={form.synonyms} onChange={e=>set("synonyms",e.target.value)}/></label>
             <label className="field">{w("Eligible professional categories")}<textarea rows={3} value={form.professional_categories} onChange={e=>set("professional_categories",e.target.value)}/></label>
             <label className="field">{w("Credential requirements")}<textarea rows={3} value={form.credential_requirements} onChange={e=>set("credential_requirements",e.target.value)}/></label>
             <label className="field">{w("Booking rules")}<textarea rows={2} value={form.booking_rules} onChange={e=>set("booking_rules",e.target.value)}/><span className="field-hint">{w("Controlled keys: direct-booking, scheduled, immediate-request.")}</span></label>
