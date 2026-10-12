@@ -171,4 +171,11 @@ export const onboardingTranslations:Record<string,[string,string]>={
   "Pending review": ["ግምገማ በመጠበቅ ላይ", "Gamaaggama eeggachaa"],
   "Service details unavailable": ["የአገልግሎት ዝርዝር አይገኝም", "Bal'inni tajaajilaa hin jiru"],
   "Each service needs its own human approval before publication.": ["እያንዳንዱ አገልግሎት ከመታተሙ በፊት በሰው የሚደረግ ማጽደቅ ያስፈልገዋል።", "Tajaajilli hundi maxxanfamuu dura namaan hayyamamuu qaba."],
+  "Save to publish these hours for patient booking.": ["እነዚህን ሰዓቶች ለታካሚ ቀጠሮ ለማተም ያስቀምጡ።", "Sa'aatii kana beellama dhukkubsattootaaf maxxansuuf olkaa'i."],
+  "Draft and paused schedules are not available for booking or requests. Choose Published and save when ready.": ["ረቂቅ እና የታገዱ መርሐ ግብሮች ለቀጠሮ ወይም ጥያቄ አይቀርቡም። ዝግጁ ሲሆኑ Published ይምረጡ እና ያስቀምጡ።", "Sagantaaleen Wixinee fi dhaabbatan beellama yookaan gaaffiidhaaf hin banaman. Yeroo qophooftu Published filadhuutii olkaa'i."],
+  "Schedule published.": ["መርሐ ግብሩ ታትሟል።", "Sagantaan maxxanfameera."],
+  "Draft saved. Publish it to enable bookings.": ["ረቂቁ ተቀምጧል። ቀጠሮ ለማስያዝ ያትሙት።", "Wixineen olkaa'ameera. Beellama banuuf maxxansi."],
+  "Schedule paused.": ["መርሐ ግብሩ ታግዷል።", "Sagantaan dhaabbateera."],
+  "Service applications, license details and supporting evidence": ["የአገልግሎት ማመልከቻዎች፣ የፈቃድ ዝርዝሮች እና ደጋፊ ማስረጃ", "Iyyannoowwan tajaajilaa, bal'ina hayyamaa fi ragaa deeggarsaa"],
+  "Apply for each service and submit private qualifications for individual review. Public profile edits do not grant service approval.": ["ለእያንዳንዱ አገልግሎት ያመልክቱ እና የግል የብቃት ማስረጃዎችን ለተናጠል ግምገማ ያቅርቡ። የሕዝብ መገለጫ ለውጥ የአገልግሎት ፈቃድ አይሰጥም።", "Tajaajila hundaaf iyyadhuutii gahumsa dhuunfaa gamaaggama adda addaatiif dhiyeessi. Gulaalliin seenaa uummataa hayyama tajaajilaa hin kennu."],
 };

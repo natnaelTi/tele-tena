@@ -149,7 +149,7 @@ export function Availability() {
     if(!name.trim()){setNameError("Enter a name for this schedule.");return;}
     if(status==="Published"&&!intervals.length&&!exceptions.some(x=>x.kind==="replace")){setAvailabilityError("Add at least one available time before publishing.");return;}
     if(!validTimes)return;
-    void action.run(async()=>{await journeyApi.saveSchedule({offering,schedule_name:name,timezone_name:zone,consultation_format:format,confirmation_mode:confirmation,minimum_notice_minutes:Number(notice),horizon_days:Number(horizon),buffer_before:Number(before),buffer_after:Number(after),status,intervals,exceptions});setDirty(false);await current.refresh();},"Schedule saved.");
+    void action.run(async()=>{await journeyApi.saveSchedule({offering,schedule_name:name,timezone_name:zone,consultation_format:format,confirmation_mode:confirmation,minimum_notice_minutes:Number(notice),horizon_days:Number(horizon),buffer_before:Number(before),buffer_after:Number(after),status,intervals,exceptions});setDirty(false);await current.refresh();},status==="Published"?"Schedule published.":status==="Draft"?"Draft saved. Publish it to enable bookings.":"Schedule paused.");
   }
   async function createBookingLink() {
     setBookingLinkStatus("");
@@ -193,11 +193,12 @@ export function Availability() {
             <option value="">Choose a published service</option>{offerings.data?.offerings.map(o=><option key={o.id} value={o.id}>{o.label} · {o.minutes} min</option>)}
           </Select>
           <TextField label="Timezone" value={zone} onChange={e=>setZone(e.target.value)} required placeholder="Africa/Addis_Ababa" />
+          <Select label="Patient visibility" value={status} onChange={e=>setStatus(e.target.value as "Draft"|"Published"|"Paused")}><option>Draft</option><option>Published</option><option>Paused</option></Select>
+          <p className="supporting">{w(status==="Published"?"Save to publish these hours for patient booking.":"Draft and paused schedules are not available for booking or requests. Choose Published and save when ready.")}</p>
           <details className="schedule-advanced"><summary>Format, confirmation and booking rules</summary>
             <Select label="Consultation format" value={format} onChange={e=>setFormat(e.target.value as "video"|"audio")}><option value="video">Video</option><option value="audio">Audio</option></Select>
             <Select label="Booking confirmation" value={confirmation} onChange={e=>setConfirmation(e.target.value as "automatic"|"manual")}><option value="automatic">Confirm automatically</option><option value="manual">Review each request</option></Select>
             <div className="schedule-number-grid"><TextField label="Notice (minutes)" type="number" min="0" value={notice} onChange={e=>setNotice(e.target.value)} /><TextField label="Book ahead (days)" type="number" min="1" value={horizon} onChange={e=>setHorizon(e.target.value)} /><TextField label="Buffer before (min)" type="number" min="0" value={before} onChange={e=>setBefore(e.target.value)} /><TextField label="Buffer after (min)" type="number" min="0" value={after} onChange={e=>setAfter(e.target.value)} /></div>
-            <Select label="Patient visibility" value={status} onChange={e=>setStatus(e.target.value as "Draft"|"Published"|"Paused")}><option>Draft</option><option>Published</option><option>Paused</option></Select>
           </details>
           {selectedSchedule && <p className="supporting">Preview: ETB {money(selectedSchedule.price)} · {selectedSchedule.minutes} minutes · {format}</p>}
           {availabilityError&&<InlineNotice tone="danger">{availabilityError}</InlineNotice>}
