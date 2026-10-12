@@ -170,6 +170,24 @@ async function main() {
     if (process.env.TELE_TENA_MEDIA_PHASE === 'end') {
       await prepareAndJoin(patient)
       await prepareAndJoin(clinician)
+      async function desktopFit(page, name) {
+        for (const size of [{width:1440,height:960},{width:1024,height:768}]) {
+          await page.setViewportSize(size)
+          const fit=await page.locator('.focused-call').evaluate(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,bottom:r.bottom,view:innerHeight,width:innerWidth,pageHeight:document.documentElement.scrollHeight,bodyHeight:document.body.scrollHeight};})
+          assert.ok(Math.abs(fit.left)<1&&Math.abs(fit.right-fit.width)<1,'Connected room must span desktop width')
+          assert.ok(Math.abs(fit.bottom-fit.view)<1,'Connected room must reach viewport bottom')
+          assert.ok(fit.pageHeight<=fit.view+1&&fit.bodyHeight<=fit.view+1,'Desktop call must not scroll the page')
+          const leave=await call(page).getByRole('button',{name:'Leave',exact:true}).boundingBox()
+          assert.ok(leave&&leave.y+leave.height<=size.height,'Leave must remain visible')
+          await page.screenshot({path:`/tmp/tele-tena-presentation-review/${name}-${size.width}.png`,fullPage:true})
+        }
+      }
+      checkpoint='desktop video viewport and accessible controls'
+      await desktopFit(patient,'video-call-patient');await desktopFit(clinician,'video-call-clinician')
+      checkpoint='desktop audio-only viewport'
+      await call(patient).getByRole('button',{name:'Audio only',exact:true}).click()
+      await call(patient).locator('.audio-participant').waitFor()
+      await desktopFit(patient,'audio-only-patient')
       await call(patient).getByRole('button', { name: /Leave/ }).click()
       await call(patient).getByRole('status').filter({ hasText: 'You left the consultation' }).waitFor()
       await prepareAndJoin(patient)
