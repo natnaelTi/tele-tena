@@ -195,6 +195,9 @@ class ContactAuth(unittest.TestCase):
         import base64
         pdf = b'%PDF-1.7\n1 0 obj<</Type/Catalog>>endobj\n%%EOF\n'
         presentation.upload_resume('synthetic.pdf', base64.b64encode(pdf).decode())
+        with self.assertRaises(frappe.ValidationError):
+            auth.save_onboarding('clinician', 3, {**answers, 'professional': {'professional_category': 'Counselor'}}, 1)
+        self.assertFalse(frappe.db.sql('SELECT user FROM tt_profile WHERE user=%s', (user,)))
         auth.save_onboarding('clinician', 3, answers, 1)
         self.assertIn('Tele Tena Applicant', frappe.get_roles(user))
         self.assertNotIn('Tele Tena Clinician', frappe.get_roles(user))
@@ -205,6 +208,15 @@ class ContactAuth(unittest.TestCase):
         self.assertEqual(json.loads(profile.languages), ['am', 'en'])
         self.assertEqual(profile.introduction, 'Public fictional introduction')
         self.assertNotIn('PRIVATE-CREDENTIAL', json.dumps(profile))
+        frappe.set_user('Administrator')
+        reviewed = [item for item in journey.applications() if item.user == user]
+        self.assertEqual(reviewed[0].application_profile['registration_number'], 'PRIVATE-CREDENTIAL')
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            journey.applications()
+        with self.assertRaises(frappe.PermissionError):
+            auth.onboarding()
+        frappe.set_user(user)
         with self.assertRaises(frappe.ValidationError):
             auth.save_onboarding('clinician', 3, answers, 1)
         self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_application WHERE user=%s', (user,))[0][0], 1)
