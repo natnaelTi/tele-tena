@@ -1,5 +1,16 @@
 # TeleTena operational progress export
 
+## Latest accepted-offer / room delta —12October2026
+
+Package2784701 at the stable8017 presentation preview. Cross-page clinician
+accepted-offer popup/inbox and private persisted read receipts passed a two-session
+real-backend browser. No-immediate-capacity is a paused readiness condition, not a
+setup failure. Desktop video/audio viewport work uses existing media/auth/End core.
+See active `mvp-journey-verification-2026-10-09.md`; full MVP/owner acceptance remains
+open, including the previously reported reviewed-catalog application gate.
+No merge, migration, reseed or remote deployment.
+
+
 ## Latest request-outcome delta —12October2026
 
 Current package6ec7d09 on the stable8017 presentation site. Matched requests

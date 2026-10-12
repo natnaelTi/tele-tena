@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **89631b02d385ef722151f408abb5c6f820b2060d**. Later report/evidence-only commits
+  **2784701dd09774d528322993aa485cccda9d0222**. Later test/report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -20,6 +20,70 @@ screen/completion matrix; the sections below this active checkpoint are historic
   preview. `scripts/local_review.py start/status/stop` restores it without migrations,
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Accepted-offer notification and desktop call delta —12October
+
+Runtime/build2784701dd09774d528322993aa485cccda9d0222, stable8017 presentation
+preview. Later commits change test harnesses or evidence only. PR44 remains draft.
+
+- An immediate-presence heartbeat revalidates continuous free time. If a new
+  reservation removes the last eligible opening, the backend may return
+  `no_immediate_capacity`. The shell previously classified it as a generic setup
+  update failure. This expected transition now refreshes readiness and displays
+  Requests paused / No immediate opening, with availability guidance. It does not
+  bypass any eligibility check. Real read-only presentation inspection currently
+  finds both clinicians configured=true, ready=false, reasons=[]; the user's
+  earlier exact failed response was not captured, so this is not a claim that
+  every possible update error has the same cause.
+- Clinicians receive a compact accepted-offer popup anywhere in their workspace
+  and a Notifications bell with a persisted read state and consultation links.
+  Authenticated polling every5seconds; no OS push/background delivery guarantee.
+  No forced navigation, booking mutation or interruption of the focused call.
+  Requests/owned offer history retain their accepted-consultation handoff.
+- New backend projections return only the owning clinician's opaque offer and
+  appointment references, acceptance timestamp and read state. Other clinicians,
+  patients and guests cannot fetch/acknowledge the clinician's notification.
+  No patient name, health narrative, disclosure or competing quote is sent.
+- Connected desktop rooms fill viewport width/bottom below the demonstration
+  ribbon, with zero outer margin/padding/border. Video stage flexes to available
+  height, controls remain visible, and optional details scroll internally.
+  Audio-only uses the existing real-track activity surface. This user-requested
+  dark connected audio backdrop is an explicit deviation from referenceE08's
+  earlier light outer page; preflight/ended/mobile layouts retain existing rules.
+
+Checks actually run:
+- Two focused real-DB presentation tests passed: competing private offers,
+  insufficient funds, atomic match/retry plus notification ownership/read retries;
+  and readiness pausing when a published interval no longer fits the immediate
+  window. No new schema/migration or financial write path.
+- `check_accepted_offer_notification.py` passed on the isolatedpr12 site: two real
+  signed-in browser contexts, patient accepts an offer, clinician Account receives
+  popup without refresh, consultation navigation, server-persisted read after
+  reload and accepted offer history link. Additional capacity-error UI assertion
+  uses an explicitly identified fault-injected422response, not mocked booking
+  success. Result/screenshot: `screenshots/accepted-offer-room-2026-10-12/`.
+- Production build/typecheck passed on2784701; lint previously passed on the same
+  feature with44warnings/no errors. Last runtime delta is one CSS border removal.
+  Asset hash/scope/private credential leakage scan passed,7private values checked
+  without printing any values. Existing previewHTTP200 and owned site/PIDs verified.
+- Focused hosted LiveKit Cloud fake-device two-context browser passed on the
+  final package: patient/clinician video viewport fit at1440×960 and1024×768;
+  patient audio-only fit at both sizes; controls visible and no desktop page
+  scrolling; patient audio Leave, video rejoin and clinician End close both views.
+  Inspected the rendered video and audio screenshots, including control placement,
+  full-width dark canvas and preserved alias/metadata limits. This is functional
+  geometry/rendered evidence for the requested delta, not whole-MVP owner visual
+  acceptance. Result: `screenshots/accepted-offer-room-2026-10-12/hosted-focused-result.txt`.
+  Temporary private provider configuration and owned8028server removed afterward.
+  Cached-token Cloud revocation, physical devices, SMS/email receipt and native
+  translation approval are not reverified by a viewport test. Token issuance,
+  End/revocation implementation and financial/notes logic are unchanged.
+
+Test harness issues were corrected without relaxing media assertions: current
+phone-first/password alternative markup, new AudioStage selector, and selecting
+video explicitly before asserting camera-capable rejoin. A colliding diagnostic
+fixture attempt was aborted; its owned fixture/server cleaned up. Final runs are
+sequential. Presentation data, credentials and original Bench remain untouched.
 
 ## Clinician setup report investigation —12October
 

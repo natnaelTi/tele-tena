@@ -1,0 +1,7 @@
+Viewport PASS: video-call-patient 1440 {"left":0,"right":1440,"bottom":960,"view":960,"width":1440,"pageHeight":960,"bodyHeight":32}
+Viewport PASS: video-call-patient 1024 {"left":0,"right":1024,"bottom":768,"view":768,"width":1024,"pageHeight":768,"bodyHeight":32}
+Viewport PASS: video-call-clinician 1440 {"left":0,"right":1440,"bottom":960,"view":960,"width":1440,"pageHeight":960,"bodyHeight":32}
+Viewport PASS: video-call-clinician 1024 {"left":0,"right":1024,"bottom":768,"view":768,"width":1024,"pageHeight":768,"bodyHeight":32}
+Viewport PASS: audio-only-patient 1440 {"left":0,"right":1440,"bottom":960,"view":960,"width":1440,"pageHeight":960,"bodyHeight":32}
+Viewport PASS: audio-only-patient 1024 {"left":0,"right":1024,"bottom":768,"view":768,"width":1024,"pageHeight":768,"bodyHeight":32}
+PASS: clinician End closed both sessions after patient Leave/rejoin
