@@ -308,7 +308,8 @@ def applications():
             item.resume_size = evidence[0].content_size if evidence else None
             item.resume_revision = evidence[0].revision if evidence else None
             item.submission_date_available = bool(item.submitted_at)
-            item.evidence_complete = bool(item.statement.strip() and evidence)
+            item.evidence_complete = bool(evidence and (item.statement.strip() or all(
+                item.application_profile.get(key) for key in ('professional_category', 'qualification', 'issuing_institution'))))
             item.verified_contacts = rows('SELECT channel,contact,verified_at FROM tt_contact_identity WHERE user=%s',
                                           (item.user,))
         return result

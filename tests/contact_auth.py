@@ -198,7 +198,7 @@ class ContactAuth(unittest.TestCase):
         with self.assertRaises(frappe.ValidationError):
             auth.save_onboarding('clinician', 3, {**answers, 'professional': {'professional_category': 'Counselor'}}, 1)
         self.assertFalse(frappe.db.sql('SELECT user FROM tt_profile WHERE user=%s', (user,)))
-        auth.save_onboarding('clinician', 3, answers, 1)
+        auth.save_onboarding('clinician', 3, {**answers, 'statement': ''}, 1)
         self.assertIn('Tele Tena Applicant', frappe.get_roles(user))
         self.assertNotIn('Tele Tena Clinician', frappe.get_roles(user))
         self.assertEqual(frappe.db.sql('SELECT status FROM tt_application WHERE user=%s', (user,))[0][0], 'Pending')
@@ -211,6 +211,8 @@ class ContactAuth(unittest.TestCase):
         frappe.set_user('Administrator')
         reviewed = [item for item in journey.applications() if item.user == user]
         self.assertEqual(reviewed[0].application_profile['registration_number'], 'PRIVATE-CREDENTIAL')
+        self.assertTrue(reviewed[0].evidence_complete)
+        self.assertEqual(reviewed[0].statement, '')
         frappe.set_user('Guest')
         with self.assertRaises(frappe.PermissionError):
             journey.applications()

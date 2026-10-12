@@ -33,6 +33,14 @@ profile; qualifications and credential identifiers never follow it into discover
 Existing saved applications remain valid without inferred or fabricated new fields.
 No schema, approval, payment or call policy changes follow from this composition.
 
+For the structured initial application, profession, qualification, institution
+and care languages replace a duplicate mandatory free-text credential narrative.
+Additional narrative and jurisdiction can be saved optionally; existing narrative
+applications retain their original requirement. Resume receipt plus complete
+self-reported application fields means attachments/information are present, not
+that any credential or scope is verified. Per-scope evidence and human mandatory
+gates remain separate and unchanged.
+
 ## First internal demonstration
 Adults 18+. English, Amharic and Afaan Oromo with native review before pilot.
 Patient and clinician portals; administrator approval; independent and multi-clinic

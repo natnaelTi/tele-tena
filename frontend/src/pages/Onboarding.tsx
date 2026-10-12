@@ -221,19 +221,21 @@ export default function Onboarding() {
             (clinician ? (
               <>
                 <p className="supporting">{w("Documents and credential identifiers are private to you and authorized reviewers.")}</p>
-                {([["qualification","Primary qualification",180,true],["issuing_institution","Issuing institution",180,true],["issuing_authority","Licensing authority",180,false],["registration_number","License number",100,false],["jurisdiction","Credential jurisdiction",120,false]] as const).map(([key,label,maximum,required])=><TextField key={key} label={w(label)} required={required} maxLength={maximum} value={answers.professional?.[key]||""} onChange={e=>update({professional:{...answers.professional,[key]:e.target.value}})}/>)}
+                {([["qualification","Primary qualification",180,true],["issuing_institution","Issuing institution",180,true],["issuing_authority","Licensing authority",180,false],["registration_number","License number",100,false]] as const).map(([key,label,maximum,required])=><TextField key={key} label={w(label)} required={required} maxLength={maximum} value={answers.professional?.[key]||""} onChange={e=>update({professional:{...answers.professional,[key]:e.target.value}})}/>)}
                 <TextField label={w("License expiry")} type="date" value={answers.professional?.credential_expiry||""} onChange={e=>update({professional:{...answers.professional,credential_expiry:e.target.value}})}/>
+                <details className="onboarding-optional-credentials"><summary>{w("Additional application details (optional)")}</summary>
+                <TextField label={w("Credential jurisdiction")} maxLength={120} value={answers.professional?.jurisdiction||""} onChange={e=>update({professional:{...answers.professional,jurisdiction:e.target.value}})}/>
                 <div className="field">
                   <label htmlFor="onboarding-credentials">{w("Qualifications and experience")}</label>
                   <textarea
                     id="onboarding-credentials"
-                    required
                     maxLength={2000}
                     rows={3}
                     value={answers.statement || ""}
                     onChange={(e) => update({ statement: e.target.value })}
                   />
                 </div>
+                </details>
                 <p className="supporting">{w("Receipt does not mean your credentials are verified. Each requested scope is reviewed separately.")}</p>
                 <label className="field" data-tour="applicant-resume">{w("Resume (PDF, up to 5 MB)")}<input type="file" accept="application/pdf,.pdf" disabled={resumeBusy} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;if(file.size>5*1024*1024){setError("Choose a PDF no larger than 5 MB.");return;}setResumeBusy(true);setError("");try{const base64=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]||"");reader.onerror=()=>reject(new Error("Read failed"));reader.readAsDataURL(file);});await journeyApi.uploadResume(file.name,base64);setResumeUploaded(true);}catch{setError("The resume could not be uploaded. Choose a valid PDF and try again.");}finally{setResumeBusy(false);e.target.value="";}}}/>{resumeUploaded&&<span role="status">{w("Resume uploaded for authorized review.")} <button type="button" className="text-button" onClick={()=>void journeyApi.removeResume().then(()=>setResumeUploaded(false)).catch(()=>setError("Resume could not be removed."))}>{w("Remove")}</button></span>}</label>
               </>

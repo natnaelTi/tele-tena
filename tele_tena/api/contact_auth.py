@@ -243,7 +243,8 @@ def save_onboarding(kind, step, answers, complete=0):
         if not clean['adult'] or not clean['consent']:
             fail('Adult eligibility and consent are required', 'adult_required')
         if kind == 'clinician':
-            text(clean.get('statement', ''), 2000)
+            if not clean.get('professional'):
+                text(clean.get('statement', ''), 2000)
             if not requested_services:
                 fail('Choose at least one service for review')
             if not frappe.db.sql('SELECT clinician FROM tt_resume_evidence WHERE clinician=%s', (user,)):
@@ -264,7 +265,7 @@ def save_onboarding(kind, step, answers, complete=0):
             frappe.db.sql('INSERT INTO tt_wallet (patient) VALUES (%s)', (user,))
         else:
             frappe.db.sql("INSERT INTO tt_application (user,statement,status,requested_services,submitted_at) VALUES (%s,%s,'Pending',%s,UTC_TIMESTAMP(6))",
-                          (user, clean['statement'], json.dumps(requested_services)))
+                          (user, clean.get('statement', ''), json.dumps(requested_services)))
     frappe.db.sql('''UPDATE tt_onboarding SET kind=%s,step=%s,answers=%s,
         completed=IF(%s,UTC_TIMESTAMP(6),NULL),modified=UTC_TIMESTAMP(6) WHERE user=%s''',
         (kind, int(step), json.dumps(clean), finish, user))

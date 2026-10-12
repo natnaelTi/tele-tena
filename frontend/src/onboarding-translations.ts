@@ -1,5 +1,6 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Additional application details (optional)": ["ተጨማሪ የማመልከቻ ዝርዝሮች (አማራጭ)", "Odeeffannoo iyyataa dabalataa (filannoo)"],
   "Credential details": ["የማስረጃ ዝርዝሮች", "Odeeffannoo ragaa"],
   "Back to applications": ["ወደ ማመልከቻዎች ይመለሱ", "Gara iyyataatti deebi’i"],
   "Application unavailable": ["ማመልከቻው አይገኝም", "Iyyanni hin jiru"],

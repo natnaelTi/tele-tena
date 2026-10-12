@@ -46,3 +46,5 @@
 .onboarding-guided .onboarding-language-options {border:0;padding:0;margin:0;}
 .onboarding-guided .onboarding-language-options legend {font-weight:600;margin-bottom:12px;}
 .onboarding-guided .onboarding-language-options .check-field.check-card {margin:10px 0;}
+
+.onboarding-optional-credentials>summary{min-height:44px;padding:12px 0;cursor:pointer;font-weight:600;color:var(--brand)}
