@@ -94,6 +94,7 @@ export function ClinicianScopeApplications() {
   const services = useResource(journeyApi.vettingServices);
   const context = useResource(journeyApi.scopeApplicationContext);
   const contextApplied=useRef(false);
+  const [initialized,setInitialized]=useState(false);
   const applications = useResource(journeyApi.myScopeApplications);
   const action = useAction();
   const [service, setService] = useState('');
@@ -138,6 +139,7 @@ export function ClinicianScopeApplications() {
       setStatement(resumable.applicant_statement||'');setAdults(!!resumable.population_adults);
       setIndependent(!!resumable.independent_practice);
     }
+    setInitialized(true);
   },[context.data,applications.data,dirty]);
 
   const save = (submit:boolean) => void action.run(async()=>{
@@ -176,7 +178,7 @@ export function ClinicianScopeApplications() {
         <h2 ref={headingRef} tabIndex={-1}>{w(step===0?"Choose your service scopes":step===1?"Qualifications & résumé":step===2?"Relevant experience":"Review your application")}</h2>
         <p className="supporting">{w(step===0?"Select each service you are qualified to provide. Each is reviewed separately.":"Documents are private to authorized reviewers.")}</p>
         {reverificationOf&&<InlineNotice>{w("A renewal request does not extend an expired approval. If the credential has expired, this service remains unavailable until a reviewer records a new approval.")}</InlineNotice>}
-        {!services.data?<Skeleton/>:services.data.length===0?<EmptyState title={w("No service applications are open yet.")}>{w("The service catalog is present in draft and remains non-bookable until the medical lead approves its terminology and local credential requirements.")}</EmptyState>:<>
+        {!services.data||!initialized?<Skeleton/>:services.data.length===0?<EmptyState title={w("No service applications are open yet.")}>{w("The service catalog is present in draft and remains non-bookable until the medical lead approves its terminology and local credential requirements.")}</EmptyState>:<>
           {step===0&&<><TextField label={w("Search service scopes")} value={serviceSearch} onChange={e=>setServiceSearch(e.target.value)}/><fieldset className="scope-selection"><legend className="sr-only">{w("Services you want to provide")}</legend>{services.data.filter((item:any)=>item.label.toLocaleLowerCase().includes(serviceSearch.toLocaleLowerCase())).map((item:any)=><div key={item.id}><Checkbox variant="card" description={w("Evidence and approved scope are required.")} label={item.label} checked={selectedServices.includes(item.id)} disabled={!!reverificationOf} onChange={event=>{const next=event.target.checked?[...selectedServices,item.id]:selectedServices.filter(id=>id!==item.id);setSelectedServices(next);setService(next[0]||'');}}/>{selectedServices.includes(item.id)&&<p className="supporting">{item.clinical_review_status!=='Approved'&&w("Clinical definition review pending. Applying does not authorize bookings.")} {item.credential_requirements}</p>}</div>)}</fieldset><p className="supporting">{w("Selected services")}: {selectedServices.length}</p></>}
           {step===1&&<>
           <TextField label={w("Professional category")} value={category} onChange={e=>setCategory(e.target.value)} required />
