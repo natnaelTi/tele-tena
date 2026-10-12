@@ -105,6 +105,7 @@ async function pair(ctx, p, id, hash, width) {
       const profileButtons=p.getByRole("button",{name:"View profile",exact:true});
       assert.ok(await profileButtons.count()>=2,'Presentation requires distinct selectable offerings');
       const trigger = profileButtons.nth(1);
+      const selectedClinician = await trigger.locator("xpath=ancestor::section[contains(@class, 'clinician-card')]").locator("h3").innerText();
       await trigger.click();
       await p
         .getByRole("dialog")
@@ -135,14 +136,16 @@ async function pair(ctx, p, id, hash, width) {
         await p.waitForTimeout(100);
       }
       assert.ok(focusReturned, "Closing clinician preview must restore focus to its opener");
+      stage = "reopen clinician preview " + width;
       await trigger.click();
       const selectedBooking=await p.getByRole('dialog').getByRole('link',{name:'Choose a time',exact:true}).getAttribute('href');
       await p
         .getByRole("dialog")
         .getByRole("link", { name: "View full profile", exact: true })
         .click();
+      stage = "selected clinician profile " + width;
       await p
-        .getByRole("heading", { name: "Hana Tesfaye", exact: true })
+        .getByRole("heading", { name: selectedClinician, exact: true })
         .first()
         .waitFor();
       stage='selected profile offering '+width;
