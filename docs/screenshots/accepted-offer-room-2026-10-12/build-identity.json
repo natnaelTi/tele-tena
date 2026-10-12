@@ -1,0 +1,18 @@
+{
+  "packaged_source": "42cb041818613aa87dbe5d7a9aceefd23f32297d",
+  "notification_browser_source": "2784701dd09774d528322993aa485cccda9d0222",
+  "notification_runtime_unchanged": true,
+  "hosted_focused_media_source": "42cb041818613aa87dbe5d7a9aceefd23f32297d",
+  "fake_devices": true,
+  "viewport_sizes": [
+    [
+      1440,
+      960
+    ],
+    [
+      1024,
+      768
+    ]
+  ],
+  "physical_devices_tested": false
+}

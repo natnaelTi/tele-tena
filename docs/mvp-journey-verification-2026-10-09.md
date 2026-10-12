@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **2784701dd09774d528322993aa485cccda9d0222**. Later test/report/evidence-only commits
+  **42cb041818613aa87dbe5d7a9aceefd23f32297d**. Later test/report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -23,7 +23,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
 
 ## Accepted-offer notification and desktop call delta —12October
 
-Runtime/build2784701dd09774d528322993aa485cccda9d0222, stable8017 presentation
+Runtime/build42cb041818613aa87dbe5d7a9aceefd23f32297d, stable8017 presentation
 preview. Later commits change test harnesses or evidence only. PR44 remains draft.
 
 - An immediate-presence heartbeat revalidates continuous free time. If a new
@@ -59,11 +59,12 @@ Checks actually run:
 - `check_accepted_offer_notification.py` passed on the isolatedpr12 site: two real
   signed-in browser contexts, patient accepts an offer, clinician Account receives
   popup without refresh, consultation navigation, server-persisted read after
-  reload and accepted offer history link. Additional capacity-error UI assertion
+  reload and accepted offer history link (package2784701, unchanged except one
+  call CSS border rule in42cb041). Additional capacity-error UI assertion
   uses an explicitly identified fault-injected422response, not mocked booking
   success. Result/screenshot: `screenshots/accepted-offer-room-2026-10-12/`.
-- Production build/typecheck passed on2784701; lint previously passed on the same
-  feature with44warnings/no errors. Last runtime delta is one CSS border removal.
+- Production build/typecheck passed on42cb041; lint previously passed on the same
+  feature with44warnings/no errors. Final runtime delta removes the connected card border; prior notification/permission evidence remains applicable.
   Asset hash/scope/private credential leakage scan passed,7private values checked
   without printing any values. Existing previewHTTP200 and owned site/PIDs verified.
 - Focused hosted LiveKit Cloud fake-device two-context browser passed on the
