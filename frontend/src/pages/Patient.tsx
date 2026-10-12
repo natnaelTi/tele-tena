@@ -196,23 +196,16 @@ export function Discovery() {
       relevance(offer)>0,
   )?.sort((a,b)=>sort === "price" ? a.price-b.price || relevance(b)-relevance(a) : relevance(b)-relevance(a));
   const requestDraft={request_text:query,service_label:category,language:languageFilter||undefined,format:formatFilter||undefined};
-  return (
-    <>
-      <PageTitle
-        eyebrow={w("CARE THAT FITS YOU")}
-        title={w("What’s on your mind?")}
-        description={w("You don’t need the right words. Start with what you’re feeling.")}
-      />
-      <div className="discovery-layout"><section className="discovery-primary">
-      <form className="discovery-search" onSubmit={event => { event.preventDefault(); rememberCareQuery(query); }}><Search size={20} /><label className="sr-only" htmlFor="discovery-care-query">Clinician or service</label><input id="discovery-care-query" placeholder={w("Search available care")} value={query} onChange={event => setQuery(event.target.value)} /><Button type="submit">{w("Search")}</Button></form>
-      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft}}>{w("Post a request")} <ArrowRight size={16} /></Link></section>
+  const [resultsMode,setResultsMode]=useState(()=>Boolean(pendingCareQuery().trim()||discoveryFilters().category||discoveryFilters().language||discoveryFilters().format||discoveryFilters().availability));
+  const searchInput=useRef<HTMLInputElement>(null);
+  const filterControls=(
       <div className="discovery-filters">
         <Select
-          label="Service"
+          label={w("Service")}
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
-          <option value="">All services</option>
+          <option value="">{w("All services")}</option>
           {services.data?.map((service) => (
             <option key={service.id}>{service.label}</option>
           ))}
@@ -226,9 +219,22 @@ export function Discovery() {
         <Select label={w("Availability")} value={availabilityFilter} onChange={e=>{setAvailabilityFilter(e.target.value);setAvailableOfferIds(null);setAvailabilityError(false);}}>
           <option value="">{w("Any date")}</option><option value="next14">{w("Open times in the next 14 days")}</option>
         </Select>
-      </div>
+      </div>  );
+  const searchControls=(<>      <form className="discovery-search" onSubmit={event => { event.preventDefault(); rememberCareQuery(query);setResultsMode(Boolean(query.trim()||category||languageFilter||formatFilter||availabilityFilter));requestAnimationFrame(()=>searchInput.current?.focus()); }}><Search size={20} /><label className="sr-only" htmlFor="discovery-care-query">Clinician or service</label><input ref={searchInput} id="discovery-care-query" placeholder={w("Search available care")} value={query} onChange={event => setQuery(event.target.value)} /><Button type="submit">{w("Search")}</Button></form>
+      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft}}>{w("Post a request")} <ArrowRight size={16} /></Link></section></>);
+  return (
+    <section className={resultsMode?"matching-results-page":""}>
+      <PageTitle
+        eyebrow={resultsMode?undefined:w("CARE THAT FITS YOU")}
+        title={w(resultsMode?"Your matching clinicians":"What’s on your mind?")}
+        description={w(resultsMode?"Choose from approved services that fit your selections.":"You don’t need the right words. Start with what you’re feeling.")}
+      />
+      {resultsMode&&searchControls}
+      <div className={`discovery-layout ${resultsMode?"discovery-matching-layout":""}`}><section className="discovery-primary">
+      {!resultsMode&&searchControls}
+      {!resultsMode&&filterControls}
 
-      {!!offers.data && !availabilityBusy && <div className="discovery-results-heading"><p>{shown?.length || 0} {w(shown?.length === 1 ? "available service" : "available services")}</p><Select label={w("Sort services")} value={sort} onChange={event=>setSort(event.target.value)}><option value="relevance">{w("Best fit")}</option><option value="price">{w("Lowest price")}</option></Select></div>}
+      {!!offers.data && !availabilityBusy && <div className="discovery-results-heading"><p role="status" aria-live="polite">{shown?.length || 0} {w(shown?.length === 1 ? "available service" : "available services")}</p><Select label={w("Sort services")} value={sort} onChange={event=>setSort(event.target.value)}><option value="relevance">{w("Best fit")}</option><option value="price">{w("Lowest price")}</option></Select></div>}
       {availabilityError&&<InlineNotice tone="danger">{w("Available times could not be checked. Clear this filter or try again.")}</InlineNotice>}
       {offers.error ? (
         <InlineNotice tone="danger">
@@ -254,8 +260,8 @@ export function Discovery() {
         </EmptyState>
       )}
       <p className="supporting">{w("Matching helps you find a professional. It is not a diagnosis.")}</p>
-      </section><aside className="discovery-aside"><section className="discovery-request-aside"><span className="discovery-request-icon" aria-hidden="true"><MessageCircle size={24}/></span><h2>{w("Someone to talk to. A choice that’s yours.")}</h2><p>{w("Tell us what you need. Available clinicians can respond with a session time and a clear fee.")}</p><Link className="button" to="/patient/requests" state={{requestDraft}}>{w("Post a private request")}</Link><p className="supporting">{w("Your request is only shown to eligible clinicians.")}</p></section><p className="discovery-privacy supporting"><LockKeyhole size={18} aria-hidden="true"/>{w("Your name and personal details stay private until you choose to share them.")}</p></aside></div>
-    </>
+      </section><aside className="discovery-aside">{resultsMode?<Card className="discovery-refine-card"><h2>{w("Refine your care")}</h2>{filterControls}<InlineNotice>{w("Approval, language and format determine eligible services. Open times are checked before booking.")}</InlineNotice></Card>:<><section className="discovery-request-aside"><span className="discovery-request-icon" aria-hidden="true"><MessageCircle size={24}/></span><h2>{w("Someone to talk to. A choice that’s yours.")}</h2><p>{w("Tell us what you need. Available clinicians can respond with a session time and a clear fee.")}</p><Link className="button" to="/patient/requests" state={{requestDraft}}>{w("Post a private request")}</Link><p className="supporting">{w("Your request is only shown to eligible clinicians.")}</p></section><p className="discovery-privacy supporting"><LockKeyhole size={18} aria-hidden="true"/>{w("Your name and personal details stay private until you choose to share them.")}</p></>}</aside></div>
+    </section>
   );
 }
 export function Appointments({ base = "/patient" }: { base?: string }) {

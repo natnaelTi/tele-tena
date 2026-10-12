@@ -1,5 +1,9 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Your matching clinicians": ["የሚስማሙዎት ባለሙያዎች", "Ogeessota siif mijatan"],
+  "Refine your care": ["የእንክብካቤ ምርጫዎን ያጣሩ", "Filannoo kunuunsa kee fooyyessi"],
+  "Choose from approved services that fit your selections.": ["ከምርጫዎችዎ ጋር የሚስማሙ ከተፈቀዱ አገልግሎቶች ይምረጡ።", "Tajaajiloota hayyamaman filannoo keef mijatan keessaa filadhu."],
+  "Approval, language and format determine eligible services. Open times are checked before booking.": ["ፈቃድ፣ ቋንቋና የምክክር ዘዴ ብቁ አገልግሎቶችን ይወስናሉ። ክፍት ጊዜዎች ከቦታ ማስያዝ በፊት ይፈተሻሉ።", "Hayyamni, afaanii fi bifa marii tajaajila mijataa murteessu. Yeroon banaan qabsiisuu dura sakatta’ama."],
   "Additional application details (optional)": ["ተጨማሪ የማመልከቻ ዝርዝሮች (አማራጭ)", "Odeeffannoo iyyataa dabalataa (filannoo)"],
   "Credential details": ["የማስረጃ ዝርዝሮች", "Odeeffannoo ragaa"],
   "Back to applications": ["ወደ ማመልከቻዎች ይመለሱ", "Gara iyyataatti deebi’i"],

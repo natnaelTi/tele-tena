@@ -136,3 +136,16 @@
 @media (max-width: 650px) {
   .reference-wallet strong { font-size: clamp(30px, 8.7vw, 34px); letter-spacing: -1px; }
 }
+
+/* C03 is a results workspace, separate from C02's care-entry composition. */
+.matching-results-page{max-width:1128px;margin-inline:auto;}
+.matching-results-page>.request-entry{margin-bottom:24px;}
+.discovery-layout.discovery-matching-layout{grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr);gap:24px;margin-top:24px;}
+.discovery-refine-card{padding:26px;}
+.discovery-refine-card h2{font-size:25px;line-height:1.25;margin:0 0 20px;}
+.discovery-refine-card .discovery-filters{display:block;margin:0;}
+.discovery-refine-card .discovery-filters .field{display:block;margin:20px 0;}
+.discovery-refine-card .discovery-filters label{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal;}
+.discovery-refine-card .discovery-filters select{width:100%;border-radius:10px;min-height:50px;padding:12px 14px;font-size:16px;}
+@media(max-width:800px){.discovery-layout.discovery-matching-layout{grid-template-columns:1fr;}.discovery-matching-layout>.discovery-aside{order:-1;}.discovery-refine-card{padding:22px;}.discovery-refine-card .discovery-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}.discovery-refine-card .discovery-filters .field{margin:0;}.discovery-refine-card .inline-notice{margin-top:20px;}}
+@media(max-width:420px){.discovery-refine-card .discovery-filters{grid-template-columns:1fr;}}
