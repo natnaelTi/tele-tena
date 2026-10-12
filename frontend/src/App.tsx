@@ -148,6 +148,8 @@ export default function App() {
                 <Route path="application-review" element={<Applications />} />
                 <Route path="scopes" element={<Scopes />} />
                 <Route path="services" element={<ServiceCatalog />} />
+                <Route path="services/new" element={<ServiceCatalog />} />
+                <Route path="services/:serviceId/edit" element={<ServiceCatalog />} />
                 <Route path="matching" element={<MatchingOperations />} />
                 <Route path="vetting" element={<VettingQueue />} />
                 <Route path="clinics" element={<ClinicReview />} />

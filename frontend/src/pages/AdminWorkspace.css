@@ -69,3 +69,12 @@
 .application-review-page .application-review-panel dt {color:var(--muted);}
 .application-review-page .application-review-panel dd {margin:0;font-weight:600;text-align:right;overflow-wrap:anywhere;}
 @media(max-width:650px){.application-review-page .application-review-panel {padding:22px;}.application-review-page .application-review-panel dl>div {grid-template-columns:1fr;gap:6px;}.application-review-page .application-review-panel dd {text-align:left;}}
+
+/* I07 catalog list and I08 focused definition use distinct reference compositions. */
+.catalog-table-wrap{overflow:auto;border:1px solid var(--border);border-radius:12px;background:white}
+.catalog-definition-table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+.catalog-definition-table th,.catalog-definition-table td{padding:16px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+.catalog-definition-table th{background:var(--subtle);font-weight:600}
+.catalog-definition-table tbody tr:last-child td{border-bottom:0}
+.catalog-definition-table a{color:var(--primary);font-weight:600;text-underline-offset:3px}
+.service-definition-workspace{max-width:1000px;margin:24px auto}

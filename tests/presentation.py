@@ -3377,6 +3377,10 @@ class Presentation(unittest.TestCase):
                 native.save()
             result = service_catalog.review_definition(key, 'Approved', 'Fictional human review decision.')
             self.assertTrue(result['active']); self.assertFalse(result['scope_granted'])
+            self.assertTrue(service_catalog.review_definition(key, 'Approved',
+                'Fictional human review decision.')['idempotent'])
+            with self.assertRaises(frappe.ValidationError):
+                service_catalog.review_definition(key, 'Approved', 'Changed retrospective decision reason.')
             self.assertFalse(journey.service_scope_is_current(fixtures.USERS['c1'], key))
             self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_audit WHERE subject=%s AND action='ServiceClinicalReview'", (key,)).n, 1)
         finally:

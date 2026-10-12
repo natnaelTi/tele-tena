@@ -288,12 +288,25 @@ def save_attribute_definition(service, payload):
 def review_definition(service, decision, reason):
     """A designated human medical lead decides terminology; no scope grant follows."""
     reviewer = journey.actor('Tele Tena Medical Lead')
+    journey.actor('Tele Tena Approver')
     reason = journey.text(reason, 1000)
     if decision not in ('Approved', 'Needs information'):
         journey.fail('Choose approval or request more information.', 'catalog_invalid_decision')
     journey.one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     journey.one('SELECT name FROM `tabTele Tena Service` WHERE name=%s FOR UPDATE', (service,))
     doc = frappe.get_doc('Tele Tena Service', service)
+    previous_decisions = journey.rows('''SELECT actor,evidence FROM tt_audit
+        WHERE subject=%s AND action='ServiceClinicalReview' ORDER BY created DESC,id DESC LIMIT 1''', (service,))
+    if previous_decisions:
+        import json
+        previous = json.loads(previous_decisions[0].evidence)
+        expected_status = 'Approved' if decision == 'Approved' else 'Not reviewed'
+        if (doc.clinical_review_status == expected_status
+                and previous_decisions[0].actor == reviewer and previous.get('decision') == decision
+                and previous.get('reason') == reason
+                and previous.get('definition_version') == doc.definition_version):
+            return {'id': service, 'status': doc.clinical_review_status,
+                    'active': bool(doc.active), 'scope_granted': False, 'idempotent': True}
     if doc.catalog_status != 'Draft' or doc.clinical_review_status != 'In review' or doc.active:
         journey.fail('Only a submitted draft definition can receive this decision.', 'catalog_review_state')
     if decision == 'Approved':

@@ -1,5 +1,5 @@
 import "./AdminWorkspace.css";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api } from "../api";
 import { journeyApi } from "../journey-api";
 import { PageTitle, date, money } from "../components/Domain";
@@ -234,6 +234,11 @@ const emptyAttribute = () => ({field_key:"",label_en:"",label_am:"",label_om:"",
 export function ServiceCatalog() {
   const {w}=useLocale();
   const catalog=useResource(journeyApi.serviceCatalog);
+  const navigate=useNavigate();
+  const {serviceId}=useParams();
+  const isCreate=useLocation().pathname.endsWith("/services/new");
+  const [catalogSearch,setCatalogSearch]=useState("");
+  const [catalogCategory,setCatalogCategory]=useState("");
   const action=useAction();
   const [form,setForm]=useState<ServiceDraft>(emptyServiceDraft);
   const [selected,setSelected]=useState("");
@@ -244,7 +249,7 @@ export function ServiceCatalog() {
   const chosen=definitions.find((item:any)=>item.id===selected);
   const editable=!chosen||(chosen.catalog_status==="Draft"&&chosen.clinical_review_status==="Not reviewed"&&!chosen.active);
   const set=(key:keyof ServiceDraft,value:string)=>setForm(previous=>({...previous,[key]:value}));
-  const startNew=()=>{setSelected("");setForm(emptyServiceDraft());setAttribute(emptyAttribute());setSaved("");};
+  const startNew=()=>{setSelected("");setForm(emptyServiceDraft());setAttribute(emptyAttribute());setSaved("");navigate("/admin/services/new");};
   const choose=(id:string)=>{
     setSelected(id);setSaved("");setAttribute(emptyAttribute());
     const item=definitions.find((value:any)=>value.id===id);
@@ -260,9 +265,10 @@ export function ServiceCatalog() {
       effective_from:item.effective_from||"",effective_until:item.effective_until||"",
       min_duration_minutes:String(item.min_duration_minutes||""),max_duration_minutes:String(item.max_duration_minutes||"")});
   };
+  useEffect(()=>{if(catalog.data&&serviceId&&!isCreate)choose(serviceId);},[catalog.data,serviceId,isCreate]);
   const save=()=>void action.run(async()=>{
     const result=await journeyApi.saveServiceDraft(form as unknown as Record<string,unknown>);
-    setSelected(result.id);setSaved(result.id);await catalog.refresh();
+    setSelected(result.id);setSaved(result.id);await catalog.refresh();navigate(`/admin/services/${encodeURIComponent(result.id)}/edit`);
   },w("Draft definition saved. It is not bookable."));
   const saveAttribute=()=>void action.run(async()=>{
     if(!selected)throw new Error(w("Save the service draft before adding attributes."));
@@ -273,22 +279,20 @@ export function ServiceCatalog() {
     if(!selected)throw new Error(w("Save the service draft before requesting review."));
     await journeyApi.submitServiceForReview(selected);await catalog.refresh();
   },w("Sent for clinical terminology review. This does not activate bookings."));
+  if(!serviceId&&!isCreate)return <>
+    <PageTitle eyebrow={w("REVIEW WORKSPACE")} title={w("Service catalog")} description={w("A structured catalog of services, separate from clinician-specific offerings.")} action={<Button onClick={startNew}>{w("Add service definition")}</Button>}/>
+    <div className="review-queue-filters"><TextField label={w("Search service or category")} value={catalogSearch} onChange={e=>setCatalogSearch(e.target.value)}/><Select label={w("Category")} value={catalogCategory} onChange={e=>setCatalogCategory(e.target.value)}><option value="">{w("All categories")}</option>{(catalog.data?.categories||[]).map((item:any)=><option key={item.id} value={item.id}>{item.label}</option>)}</Select></div>
+    {catalog.error?<InlineNotice tone="danger">{w("Service catalog could not be loaded.")} <Button onClick={()=>void catalog.refresh()}>{w("Retry")}</Button></InlineNotice>:!catalog.data?<Skeleton/>:<div className="catalog-table-wrap"><table className="catalog-definition-table"><thead><tr>{["Service","Category","Population","Required profession","Status"].map(label=><th key={label}>{w(label)}</th>)}</tr></thead><tbody>{definitions.filter((item:any)=>(!catalogCategory||item.category===catalogCategory)&&(!catalogSearch||`${item.service_label} ${item.category}`.toLocaleLowerCase().includes(catalogSearch.toLocaleLowerCase()))).map((item:any)=><tr key={item.id}><td><Link to={`/admin/services/${encodeURIComponent(item.id)}/edit`}>{item.service_label}</Link></td><td>{catalog.data.categories.find((category:any)=>category.id===item.category)?.label||w("Not provided")}</td><td>{w(item.population_restriction||"Not specified")}</td><td>{item.professional_categories||w("Clinical definition review pending")}</td><td><StatusBadge>{w(item.catalog_status)}</StatusBadge></td></tr>)}</tbody></table>{!definitions.length&&<EmptyState title={w("No service definitions yet.")}/>}</div>}
+  </>;
+  if(catalog.data&&!isCreate&&!chosen)return <EmptyState title={w("Service definition unavailable")}><Link to="/admin/services">{w("Back to service catalog")}</Link></EmptyState>;
   return <>
-    <PageTitle eyebrow={w("REVIEW WORKSPACE")} title={w("Service catalog")} description={w("Maintain typed service definitions and versioned attributes. Patient concerns remain navigation terms, not diagnoses.")} />
+    <Link className="button quiet" to="/admin/services">{w("Back to service catalog")}</Link>
+    <PageTitle eyebrow={w("REVIEW WORKSPACE")} title={w("Service definition")} description={w("Maintain typed service definitions and versioned attributes. Patient concerns remain navigation terms, not diagnoses.")} />
     <InlineNotice tone="info">{w("Definitions remain drafts until medical-lead review. Clinician scope approval is a separate decision.")}</InlineNotice>
     {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
     {action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
     {catalog.error&&<InlineNotice tone="danger">{w("Service catalog could not be loaded.")} <Button variant="secondary" onClick={()=>void catalog.refresh()}>{w("Try again")}</Button></InlineNotice>}
-    {!catalog.data&&!catalog.error?<Skeleton/>:<div className="service-catalog-workspace">
-      <aside className="service-catalog-list">
-        <div className="service-catalog-list-header"><h2>{w("Definitions")}</h2><Button variant="secondary" onClick={startNew}>{w("New draft")}</Button></div>
-        {definitions.map((item:any)=><button type="button" key={item.id} aria-current={selected===item.id?"true":undefined}
-          className={`service-definition-choice${selected===item.id?" selected":""}`} onClick={()=>choose(item.id)}>
-          <strong>{item.service_label||item.service_key}</strong><span>{item.service_key}</span><span>{w(item.catalog_status)} · {item.definition_version||w("Version unavailable")}</span>
-          <span>{w(item.clinical_review_status||"Not reviewed")}</span>
-        </button>)}
-        {!definitions.length&&<EmptyState title={w("No service definitions yet.")}/>}
-      </aside>
+    {!catalog.data&&!catalog.error?<Skeleton/>:<div className="service-definition-workspace">
       <section className="service-catalog-editor">
         <header><h2>{selected?form.service_label||form.service_key:w("New service definition")}</h2>
           {chosen&&<StatusBadge>{w(chosen.clinical_review_status||chosen.catalog_status)}</StatusBadge>}</header>
