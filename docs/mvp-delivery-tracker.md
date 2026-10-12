@@ -1,5 +1,12 @@
 # TeleTena delivery tracker
 
+## Latest request-outcome delta —12October2026
+
+Current package6ec7d09 on the stable8017 presentation site. Matched requests
+show recorded outcomes and appointment handoff; read-only persisted browser passes
+reload, accepted-offer detail and unknown-ID isolation with unchanged records/wallet.
+Closed state has no exact active-matching reference; full visual acceptance remains open.
+
 ## Latest matching/profile delta —12October2026
 
 C03 matching results/refinement and compact mobile toolbar now use real backend data.
@@ -20,7 +27,7 @@ No auto approval, provider delivery, all-MVP acceptance, merge or remote deploym
 
 ## Active MVP completion —2026-10-12
 
-Packaged source `1774968d6899b9b222e9514e27adb9afd2b12f48`, stable URL
+Packaged source `6ec7d09dc25d3704bb0e0fd1e4ea78bb4cb2ae3e`, stable URL
 http://127.0.0.1:8017/teletena/ on `teletena-mvp-presentation.localhost`, original
 Bench `/home/frappe/frappe/frappe-bench`. Preview reboot/PWA recovery, couples
 joint time/extension consent, recipient-specific follow-up, current owner

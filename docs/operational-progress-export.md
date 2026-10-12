@@ -1,5 +1,12 @@
 # TeleTena operational progress export
 
+## Latest request-outcome delta —12October2026
+
+Current package6ec7d09 on the stable8017 presentation site. Matched requests
+show recorded outcomes and appointment handoff; read-only persisted browser passes
+reload, accepted-offer detail and unknown-ID isolation with unchanged records/wallet.
+Closed state has no exact active-matching reference; full visual acceptance remains open.
+
 ## Latest matching/profile delta —12October2026
 
 C03 matching results/refinement and compact mobile toolbar now use real backend data.

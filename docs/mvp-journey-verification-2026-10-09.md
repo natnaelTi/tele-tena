@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **1774968d6899b9b222e9514e27adb9afd2b12f48**. Later report/evidence-only commits
+  **6ec7d09dc25d3704bb0e0fd1e4ea78bb4cb2ae3e**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -20,6 +20,21 @@ screen/completion matrix; the sections below this active checkpoint are historic
   preview. `scripts/local_review.py start/status/stop` restores it without migrations,
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Latest recorded request-outcome correction —12October
+
+Package6ec7d09dc25d3704bb0e0fd1e4ea78bb4cb2ae3e. Request details no longer
+say Live request progress after matching/closure. Matched sidebar directs to actual
+appointment; live matching instructions appear only while the request remains open.
+Real owner browser passes Matched/reload, accepted private offer → loaded authorized
+appointment, no duplicate Accept action, unknown-ID isolation and identical requests/
+wallet.390/768/1440 inspected; no exact closed-state reference exists, so full active
+D04/D09 visual acceptance remains open. Screenshots are explicitly not a paired pass.
+Build/typecheck, lint with existing warnings, asset/hash/private-credential scan pass.
+Prior1774968 matching/PWA and38ac535 onboarding evidence remains exact-source named;
+only recorded-outcome UI changed since1774968. Call/job/financial/authorization code
+unchanged; no unnecessary hosted-call or full financial suite replay. Matrix retains
+all original gates. Whole-MVP visual/state and final integrated release remain open.
 
 ## Latest connected discovery/profile continuation —12October
 

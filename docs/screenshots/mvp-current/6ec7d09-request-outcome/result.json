@@ -1,0 +1,19 @@
+{
+  "source": "6ec7d09dc25d3704bb0e0fd1e4ea78bb4cb2ae3e",
+  "site": "teletena-mvp-presentation.localhost",
+  "real_backend": true,
+  "read_only": true,
+  "closed_state": "Matched",
+  "closed_heading": true,
+  "reload": true,
+  "accepted_appointment_handoff": true,
+  "unknown_request_isolation": true,
+  "requests_wallet_unchanged": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ],
+  "visual_fidelity": false,
+  "note": "Closed operational state has no exact equivalent to the reference active matching screen; screenshot existence is not fidelity acceptance."
+}
