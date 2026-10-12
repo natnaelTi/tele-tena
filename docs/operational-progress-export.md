@@ -1,5 +1,13 @@
 # TeleTena operational progress export
 
+## Latest matching/profile delta —12October2026
+
+C03 matching results/refinement and compact mobile toolbar now use real backend data.
+C04 exact selected public offering survives profile reload and calendar handoff.
+Paired English390/768/1440 inspected; wallet/profile unchanged. Current package1774968.
+Initial structured onboarding38ac535 passes persisted recovery/private fields/Pending.
+Whole-MVP visual/state and owner acceptance remain open; no merge or remote change.
+
 ## Latest application/review delta —12October2026
 
 Initial clinician profile/qualification/language fields now persist privately
@@ -16,7 +24,7 @@ The user bounded this handover to the agreed MVP and its redesign. Preserve the 
 
 ## Current local MVP delta — 2026-10-11
 
-Draft PR44 retains PR43 ancestry; packaged8b5802d on
+Draft PR44 retains PR43 ancestry; packaged1774968 on
 teletena-mvp-presentation.localhost at http://127.0.0.1:8017/teletena/.
 Named profile/permission/navigation defects fixed; selected offering persists
 through discovery/profile/reload/calendar/disclosure. Real DB4/4 and additive

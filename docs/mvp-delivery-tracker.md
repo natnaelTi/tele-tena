@@ -1,5 +1,13 @@
 # TeleTena delivery tracker
 
+## Latest matching/profile delta —12October2026
+
+C03 matching results/refinement and compact mobile toolbar now use real backend data.
+C04 exact selected public offering survives profile reload and calendar handoff.
+Paired English390/768/1440 inspected; wallet/profile unchanged. Current package1774968.
+Initial structured onboarding38ac535 passes persisted recovery/private fields/Pending.
+Whole-MVP visual/state and owner acceptance remain open; no merge or remote change.
+
 ## Latest application/review delta —12October2026
 
 Initial clinician profile/qualification/language fields now persist privately
@@ -12,7 +20,7 @@ No auto approval, provider delivery, all-MVP acceptance, merge or remote deploym
 
 ## Active MVP completion —2026-10-12
 
-Packaged source `8b5802d5d0e2e54a6d222b0763ad47ceaafd8808`, stable URL
+Packaged source `1774968d6899b9b222e9514e27adb9afd2b12f48`, stable URL
 http://127.0.0.1:8017/teletena/ on `teletena-mvp-presentation.localhost`, original
 Bench `/home/frappe/frappe/frappe-bench`. Preview reboot/PWA recovery, couples
 joint time/extension consent, recipient-specific follow-up, current owner

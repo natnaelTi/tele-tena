@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **8b5802d5d0e2e54a6d222b0763ad47ceaafd8808**. Later report/evidence-only commits
+  **1774968d6899b9b222e9514e27adb9afd2b12f48**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -21,7 +21,35 @@ screen/completion matrix; the sections below this active checkpoint are historic
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
 
-## Latest connected application/reviewer continuation —12October
+## Latest connected discovery/profile continuation —12October
+
+- Exact package1774968d6899b9b222e9514e27adb9afd2b12f48. C03 matching workspace
+  and mobile toolbar/refinement follow actual paired reference. C04 compact approved
+  scope/offering rows preserve descriptions through existing View service.
+- Fixed real context loss: profile selection previously lived only in navigation state;
+  reload chose the first offering. Public opaque service parameter now preserves it,
+  while private care query/filters remain RAM-only and clear on full reload.
+- Real presentation browser passes filtered discovery, preview Escape/focus, public
+  projection excludes private contact/credential fields, SPA filter retention,
+  selected profile/booking reload and private request composer handoff. Wallet/profile
+  unchanged. No booking/payment mutation. English pairs390/768/1440 inspected.
+- Test-harness diagnosis separately fixed exact duplicate-offering selection and
+  bounded native-details state waits. Tests intentionally separate SPA retention from
+  full reload clearing; no server rule or assertion removed.
+- Source38ac535 registration browser and2DB regressions3.745s pass typed/private
+  fields, structured finish without duplicate narrative, legacy requirement, resume,
+  saved scopes, Pending/no clinician role and retry uniqueness. Configuration restored,
+  private captured OTPs removed, temporary8028 server stopped. No provider delivery.
+- Latest build/typecheck, lint and asset privacy/hash checks pass with existing warnings.
+  No schema/financial/job/call changes; named fresh-install, scheduler and hosted
+  consultation evidence retained without unnecessary replay. Final integrated release
+  and whole-MVP visual/state/owner gates remain open.
+- Safe comparisons: screenshots/mvp-current/1774968-matching and
+  screenshots/mvp-current/38ac535-initial-clinician. README notes retain material
+  differences; no universal fidelity or all-MVP acceptance claim.
+
+## Historical connected application/reviewer continuation —12October
+
 
 Package8b5802d5d0e2e54a6d222b0763ad47ceaafd8808; initial application browser
 source295ffdd67bb56c9bfaf2685136196671d4efc978. Later difference is reviewer
