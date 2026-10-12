@@ -186,7 +186,7 @@ async function main() {
       await desktopFit(patient,'video-call-patient');await desktopFit(clinician,'video-call-clinician')
       checkpoint='desktop audio-only viewport'
       await call(patient).getByRole('button',{name:'Audio only',exact:true}).click()
-      await call(patient).locator('.audio-participant').waitFor()
+      await call(patient).locator('.reference-audio-stage').waitFor()
       await desktopFit(patient,'audio-only-patient')
       await call(patient).getByRole('button', { name: /Leave/ }).click()
       await call(patient).getByRole('status').filter({ hasText: 'You left the consultation' }).waitFor()
@@ -295,7 +295,7 @@ async function main() {
     for (const page of [patient, clinician]) assert.match(await call(page).getByRole('status').innerText(), /Connected/)
     checkpoint = 'audio-only presentation derives from existing audio track'
     await call(patient).getByRole('button', {name: 'Audio only', exact: true}).click()
-    await call(patient).locator('.audio-participant').waitFor()
+    await call(patient).locator('.reference-audio-stage').waitFor()
     for(const width of [320,390,768,1440]){await patient.setViewportSize({width,height:960});assert.equal(await patient.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await patient.screenshot({path:`/tmp/tele-tena-presentation-review/audio-only-${width}.png`,fullPage:true})}
     await call(patient).getByRole('button', {name: 'Turn video on', exact: true}).click()
     await call(patient).getByRole('button', {name: 'Check microphone and camera', exact: true}).click()
