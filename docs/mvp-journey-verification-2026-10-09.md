@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **6ec7d09dc25d3704bb0e0fd1e4ea78bb4cb2ae3e**. Later report/evidence-only commits
+  **89631b02d385ef722151f408abb5c6f820b2060d**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -20,6 +20,32 @@ screen/completion matrix; the sections below this active checkpoint are historic
   preview. `scripts/local_review.py start/status/stop` restores it without migrations,
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Clinician setup report investigation —12October
+
+Current package89631b02d385ef722151f408abb5c6f820b2060d. Read-only actual
+presentation second-clinician inspection: one active offering, one Approved scope,
+one Draft schedule. Save was succeeding as Draft; Published selector was inside
+collapsed advanced rules. Booking-link and request-presence denial were correct.
+Moved visibility outside advanced rules, explained Draft/Paused vs Published,
+and made success messages state-specific. No automatic publication or record edit.
+
+Professional profile now prominently links to the existing private service application
+workflow. Qualifications, license/issuer/jurisdiction/expiry, experience/training and
+per-scope evidence exist there, separate from public introduction and private resume.
+This site's active catalog contains three Legacy test/Not reviewed/vetting_required0
+services and no service open for structured applications. Initial onboarding selections
+remain requested interests, not automatically submitted per-scope evidence/decisions.
+General approval/direct legacy scope grants do not prove the complete applicant-led
+journey is accessible on presentation. Medical-lead-reviewed Active catalog definitions
+are required; no auto approval, legacy relabeling or historical rewrite performed.
+The presentation applicant-led scope/competency access gate remains open, explicitly.
+
+Real read-only second-clinician browser passes persisted Draft/reload, visible selector
+outside advanced settings, disabled unpublished booking link, Account→private scope
+application entry and accurate no-open-scopes state. No Save clicked, no credential or
+application mutation. Build/typecheck and asset hash/privacy scan pass. Full publishing,
+request readiness and per-scope submission/review were not claimed by this check.
 
 ## Latest recorded request-outcome correction —12October
 
