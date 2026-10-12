@@ -1,4 +1,4 @@
-// Independent Chromium contexts against a disposable local LiveKit server.
+// Independent Chromium contexts; endpoint comes from the explicitly configured fixture site.
 // Fake audio/video devices are used; this is not human/device validation.
 const { chromium } = require('playwright')
 const fs = require('node:fs')
@@ -24,7 +24,7 @@ async function main() {
     checkpoint = 'sign in through explicit password alternative'
     await page.goto(base + '/sign-in')
     checkpoint = 'wait for configured sign-in form'
-    await page.locator('.auth-panel button[type="submit"]:not([disabled])').waitFor()
+    await page.getByRole('button', { name: /Use email instead|Use password instead|Sign in/, exact: true }).first().waitFor()
     const emailChoice = page.getByRole('button', { name: 'Use email instead', exact: true })
     checkpoint = 'choose email sign-in'
     if (await emailChoice.count()) await emailChoice.click()
