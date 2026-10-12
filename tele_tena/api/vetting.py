@@ -268,11 +268,11 @@ def _validated_form(values):
                 try:
                     result[key] = frappe.utils.getdate(value).isoformat()
                 except (TypeError, ValueError):
-                    fail('Enter a valid credential expiry date.')
+                    fail('Enter a valid credential date.', 'credential_date_invalid')
         elif key == 'approach_keys':
             keys = sorted(set(x.strip() for x in str(value or '').splitlines() if x.strip()))
             if len(keys) > 20 or any(not frappe.db.exists('Tele Tena Treatment Approach', {'catalog_key': x, 'status': 'Active'}) for x in keys):
-                fail('Choose treatment approaches from the reviewed catalog only.')
+                fail('Choose treatment approaches from the reviewed catalog only.', 'scope_approach_invalid')
             result[key] = '\n'.join(keys)
         else:
             result[key] = text(value or '', maximum, required=False)
@@ -598,9 +598,9 @@ def save_scope_application(service, values, submit=False, reverification_of=None
     renewal_ref = reverification_of or (prior.reverification_of if existing else None)
     if submit:
         if not form.get('professional_category') or not form.get('qualification') or not form.get('issuing_institution'):
-            fail('Add your professional category, qualification and issuing institution before submission.')
+            fail('Add your professional category, qualification and issuing institution before submission.', 'scope_qualification_required')
         if not form.get('population_adults'):
-            fail('Confirm that this application is limited to adult care.')
+            fail('Confirm that this application is limited to adult care.', 'scope_adult_required')
         if not rows('SELECT clinician FROM tt_resume_evidence WHERE clinician=%s', (user,)):
             fail('Upload a PDF CV before submitting for review.', 'resume_required')
         if renewal_ref:

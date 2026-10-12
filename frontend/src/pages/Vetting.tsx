@@ -6,6 +6,7 @@ import { PageTitle } from '../components/Domain';
 import { useAction } from '../hooks/useAction';
 import { useResource } from '../hooks/useResource';
 import { useLocale } from '../hooks/useLocale';
+import { ApiError } from '../api';
 
 const loadOperationalScopeReviews = () => journeyApi.scopeAppointmentReviews('All');
 
@@ -120,20 +121,29 @@ export function ClinicianScopeApplications() {
   const [reverificationOf,setReverificationOf]=useState<string|null>(null);
 
   useEffect(()=>{
-    if(!context.data||contextApplied.current||dirty)return;
+    if(!context.data||!applications.data||contextApplied.current||dirty)return;
     contextApplied.current=true;
-    const claims=context.data.professional||{};
+    const resumable=applications.data.find((item:any)=>['Draft','Clarification'].includes(item.status));
+    const claims=resumable||context.data.professional||{};
     setCategory(claims.professional_category||'');setQualification(claims.qualification||'');
     setInstitution(claims.issuing_institution||'');setLicense(claims.registration_number||'');
     setAuthority(claims.issuing_authority||'');setJurisdiction(claims.jurisdiction||'');
     setValidFrom(claims.credential_valid_from||'');setExpiry(claims.credential_expiry||'');
     setCompetencies(claims.competencies||'');setCertifications(claims.certifications||'');
     setExperience(String(claims.experience_years??''));
-    setSelectedServices(context.data.requested_services||[]);setService(context.data.requested_services?.[0]||'');
-  },[context.data,dirty]);
+    setSelectedServices(resumable?[resumable.service]:context.data.requested_services||[]);setService(resumable?.service||context.data.requested_services?.[0]||'');
+    if(resumable){
+      setReverificationOf(resumable.reverification_of||null);setStep(1);
+      setApproaches(resumable.approach_keys||'');setTraining(resumable.relevant_training||'');
+      setStatement(resumable.applicant_statement||'');setAdults(!!resumable.population_adults);
+      setIndependent(!!resumable.independent_practice);
+    }
+  },[context.data,applications.data,dirty]);
 
   const save = (submit:boolean) => void action.run(async()=>{
-    if(!service) throw new Error('Choose at least one service to apply for.');
+    if(!service) throw new ApiError('scope_selection_invalid');
+    if(submit&&(!category.trim()||!qualification.trim()||!institution.trim()))throw new ApiError('scope_qualification_required');
+    if(submit&&!adults)throw new ApiError('scope_adult_required');
     const values={professional_category:category,qualification,issuing_institution:institution,competencies,certifications,credential_valid_from:validFrom,
       registration_number:license,issuing_authority:authority,jurisdiction,credential_expiry:expiry,
       experience_years:experience||'0',approach_keys:approaches,population_adults:adults,

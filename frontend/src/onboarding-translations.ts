@@ -1,5 +1,11 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Add your professional category, qualification and issuing institution before submission.": ["ከማስገባትዎ በፊት የሙያ ዘርፍዎን፣ ብቃትዎንና የሰጠውን ተቋም ይሙሉ።", "Erguu dura gosa ogummaa, barnootaa fi dhaabbata kenne guuti."],
+  "Confirm that your service application is limited to adult care in the Relevant experience step.": ["በልምድ ደረጃው ማመልከቻዎ ለአዋቂዎች እንክብካቤ ብቻ መሆኑን ያረጋግጡ።", "Tarkaanfii muuxannoo keessatti iyyanni kee kunuunsa ga'eessotaa qofaaf ta'uu mirkaneessi."],
+  "Choose treatment approaches from the reviewed catalog only. Remove any unlisted approach and try again.": ["የሕክምና ዘዴዎችን ከተገመገመው ዝርዝር ብቻ ይምረጡ። ያልተዘረዘረ ዘዴን አስወግደው እንደገና ይሞክሩ።", "Mala yaalaa tarree gamaaggamame keessaa qofa filadhu. Mala hin tarreeffamne haqiitii irra deebi'i."],
+  "Enter a valid credential date.": ["ትክክለኛ የማስረጃ ቀን ያስገቡ።", "Guyyaa ragaa sirrii galchi."],
+  "Upload a PDF resume before submitting your application.": ["ማመልከቻዎን ከማስገባትዎ በፊት የPDF የሥራ ልምድ ሰነድ ይጫኑ።", "Iyyata kee erguu dura CV PDF olkaa'i."],
+
   "Your matching clinicians": ["የሚስማሙዎት ባለሙያዎች", "Ogeessota siif mijatan"],
   "Refine your care": ["የእንክብካቤ ምርጫዎን ያጣሩ", "Filannoo kunuunsa kee fooyyessi"],
   "Choose from approved services that fit your selections.": ["ከምርጫዎችዎ ጋር የሚስማሙ ከተፈቀዱ አገልግሎቶች ይምረጡ።", "Tajaajiloota hayyamaman filannoo keef mijatan keessaa filadhu."],

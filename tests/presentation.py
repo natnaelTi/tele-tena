@@ -3218,6 +3218,61 @@ class Presentation(unittest.TestCase):
             frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
 
+    def test_initial_professional_claims_reach_owner_reviewer_and_scope_draft(self):
+        claims = {'professional_category': 'Fictional counselor',
+                  'qualification': 'Fictional counseling degree',
+                  'issuing_institution': 'Fictional college',
+                  'experience_years': 3, 'competencies': 'Adult counseling',
+                  'certifications': 'Fictional training certificate',
+                  'credential_valid_from': '2020-01-01', 'credential_expiry': '2030-01-01'}
+        user = 'claims-' + secrets.token_hex(6) + '@example.invalid'
+        fixtures.USERS['claims'] = user
+        frappe.set_user('Administrator')
+        account = frappe.get_doc({'doctype': 'User', 'email': user, 'first_name': 'Fictional applicant',
+                                  'send_welcome_email': 0, 'user_type': 'Website User'}).insert()
+        account.add_roles('Tele Tena Clinician')
+        fixtures.login('claims')
+        journey.save_profile('clinician', 'Fictional applicant', True, languages=['en'])
+        presentation.upload_resume('fictional-claims-cv.pdf',
+                                  base64.b64encode(b'%PDF-1.4\nFictional CV\n%%EOF').decode())
+        journey.apply('Fictional applicant claims')
+        fixtures.login('admin')
+        key = fixtures.PREFIX + '-claims-roundtrip'
+        service_catalog.save_draft_definition({
+            'service_key': key, 'service_label': 'Fictional counseling intake',
+            'category': 'counseling', 'description': 'Fictional test definition.',
+            'participant_structure': 'individual', 'supported_formats': 'video',
+            'population_restriction': 'Adults only', 'definition_version': 'test-1',
+            'catalog_source': 'Fictional test source'})
+        frappe.db.sql('''INSERT INTO tt_onboarding (user,kind,step,answers,completed,modified)
+            VALUES (%s,'clinician',3,%s,UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))''',
+            (user, json.dumps({'professional': claims})))
+        try:
+            reviewed = next(row for row in journey.applications() if row.user == user)
+            self.assertEqual(reviewed.application_profile, claims)
+            fixtures.login('claims')
+            self.assertEqual(vetting.application_context()['professional'], claims)
+            self.assertEqual(journey.applications()[0].application_profile, claims)
+            values = {**claims, 'population_adults': False}
+            with self.assertRaises(frappe.ValidationError):
+                vetting.save_scope_application(key, values, True)
+            self.assertEqual(frappe.local.response.get('tele_tena_error'), 'scope_adult_required')
+            self.assertEqual(frappe.db.count('Tele Tena Vetting Scope Application',
+                                            {'clinician': user, 'service': key}), 0)
+            draft = vetting.save_scope_application(key, {**values, 'population_adults': True})
+            saved = next(row for row in vetting.my_scope_applications() if row.name == draft['name'])
+            for field in ('competencies', 'certifications', 'credential_valid_from'):
+                self.assertEqual(str(saved[field]), claims[field])
+            submitted = vetting.save_scope_application(key, {**values, 'population_adults': True}, True)
+            self.assertEqual(submitted['status'], 'Submitted')
+            repeated = vetting.save_scope_application(key, {**values, 'population_adults': True}, True)
+            self.assertTrue(repeated['idempotent'])
+            fixtures.login('p1')
+            with self.assertRaises(frappe.PermissionError):
+                journey.applications()
+        finally:
+            frappe.db.sql('DELETE FROM tt_onboarding WHERE user=%s', (user,))
+
     def test_draft_catalog_multi_scope_intake_is_atomic_private_and_retry_safe(self):
         keys = [fixtures.PREFIX + '-intake-' + suffix for suffix in ('one', 'two')]
         values = {'professional_category': 'Fictional counselor',

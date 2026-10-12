@@ -282,7 +282,8 @@ def _initial_application_profile(user):
     values = answers.get('professional', {})
     allowed = {'professional_category', 'qualification', 'issuing_institution',
                'registration_number', 'issuing_authority', 'jurisdiction',
-               'credential_expiry', 'experience_years'}
+               'credential_expiry', 'experience_years', 'credential_valid_from',
+               'competencies', 'certifications'}
     return {key: value for key, value in values.items() if key in allowed} if isinstance(values, dict) else {}
 
 
