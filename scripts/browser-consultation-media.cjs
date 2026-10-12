@@ -192,7 +192,7 @@ async function main() {
       checkpoint='patient leaves audio mode and rejoins'
       await call(patient).getByRole('button', { name: /Leave/ }).click()
       await call(patient).getByRole('status').filter({ hasText: 'You left the consultation' }).waitFor()
-      await call(patient).getByRole('checkbox',{name:'Audio only',exact:true}).uncheck()
+      await call(patient).getByRole('checkbox',{name:'Audio only (microphone; no camera)',exact:true}).uncheck()
       await prepareAndJoin(patient)
       const endButton = call(clinician).getByRole('button', { name: 'End for everyone' })
       try { await endButton.waitFor({ timeout: 10000 }) }
