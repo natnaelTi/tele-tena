@@ -136,7 +136,7 @@ export function PatientRequestDetail(){
   const validOffers=request?.offers.filter(offer=>offer.state==='Active'&&new Date(offer.valid_until).getTime()>Date.now())||[];
   return <>
     <p><Link className="text-link" to="/patient/requests">← {w('Back to requests')}</Link></p>
-    <PageTitle title={w('Live request progress')} description={w('A private request. Clear progress. Your choice.')}/>
+    <PageTitle title={w(request&&!live?'Request details':'Live request progress')} description={w('A private request. Clear progress. Your choice.')}/>
     {detail.error?<InlineNotice tone="danger">{detailErrorMessage} {detailErrorCode!=='request_unavailable'&&<Button variant="quiet" onClick={()=>void detail.refresh()}>{w('Retry')}</Button>}</InlineNotice>:!request?<Skeleton/>:<>
       <RequestStageRail state={live?'Open':request.state==='Open'?'Expired':request.state} hasOffer={validOffers.length>0}/><div className="request-detail-layout"><article className="request-card request-detail-card">
         <header><strong>{request.urgency==='immediate'?w('As soon as possible'):w('Schedule for later')} · {request.category}</strong><span>{request.state==='Open'&&!live?w('Expired'):w(request.state)}</span></header>
