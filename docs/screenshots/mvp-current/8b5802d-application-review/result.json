@@ -1,0 +1,32 @@
+{
+  "source": "8b5802d5d0e2e54a6d222b0763ad47ceaafd8808",
+  "site": "tele-tena-pr12-fresh.localhost",
+  "real_backend": true,
+  "read_only": true,
+  "reviewer_private_fields": true,
+  "guest_denied": true,
+  "opaque_deep_link": true,
+  "detail_reload": true,
+  "queue_return": true,
+  "filters_preserved": true,
+  "unknown_record_recovery": true,
+  "actual_200_percent_zoom": true,
+  "outer_width": 1440,
+  "inner_width": 720,
+  "language_layouts": [
+    "am",
+    "om"
+  ],
+  "language_widths": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "native_language_review": false,
+  "viewports": [
+    390,
+    768,
+    1440
+  ]
+}

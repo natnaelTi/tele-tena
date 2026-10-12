@@ -1,8 +1,18 @@
 # TeleTena delivery tracker
 
-## Active MVP completion —2026-10-11
+## Latest application/review delta —12October2026
 
-Packaged source `41b6cf5fc6be1952c5ac36cc38b3d1f30aa3785f`, stable URL
+Initial clinician profile/qualification/language fields now persist privately
+and resume; private IDs never enter the approved public profile projection.
+Dedicated opaque application-review page follows I03main/actions composition.
+Real registration and read-only reviewer browser passes, paired layouts, actual
+reviewer200%zoom and provisional language checks recorded in the single matrix.
+No auto approval, provider delivery, all-MVP acceptance, merge or remote deployment.
+
+
+## Active MVP completion —2026-10-12
+
+Packaged source `8b5802d5d0e2e54a6d222b0763ad47ceaafd8808`, stable URL
 http://127.0.0.1:8017/teletena/ on `teletena-mvp-presentation.localhost`, original
 Bench `/home/frappe/frappe/frappe-bench`. Preview reboot/PWA recovery, couples
 joint time/extension consent, recipient-specific follow-up, current owner

@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "41b6cf5fc6be1952c5ac36cc38b3d1f30aa3785f",
+  "source_checkpoint": "8b5802d5d0e2e54a6d222b0763ad47ceaafd8808",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -1548,7 +1548,8 @@
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
         "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
-        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt."
+        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
+        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "B06",
@@ -1564,7 +1565,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Reference heading, focused wizard and white authentication surface. Current initial step collects professional name; structured qualification/practice-language fields live in the later persisted professional-vetting page. Material difference from five-stage reference remains and needs integrated composition work; not visually complete.",
+        "current_differences": "Missing profession/years/introduction/languages corrected with actual private resumable fields and public-only introduction/languages projection. Bordered language cards match reference. Extra privacy helper/accessible language legend are intentional. Mobile heading wrapping/full-width action, other states and new-field native zoom/language comparisons remain.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -1572,19 +1573,19 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison recorded; remaining state/owner acceptance pending",
+        "correction_status": "Named paired comparison recorded; remaining states/owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-reference-390.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-reference-768.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-reference-1440.png"
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B06-reference-390.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B06-reference-768.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B06-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-application-390.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-application-768.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B06-application-1440.png"
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B06-application-390.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B06-application-768.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B06-application-1440.png"
         ],
         "comparison_notes": [
-          "Reference heading, focused wizard and white authentication surface. Current initial step collects professional name; structured qualification/practice-language fields live in the later persisted professional-vetting page. Material difference from five-stage reference remains and needs integrated composition work; not visually complete."
+          "Missing profession/years/introduction/languages corrected with actual private resumable fields and public-only introduction/languages projection. Bordered language cards match reference. Extra privacy helper/accessible language legend are intentional. Mobile heading wrapping/full-width action, other states and new-field native zoom/language comparisons remain."
         ],
         "viewports": [
           390,
@@ -1597,7 +1598,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json; real DB/browser, no provider delivery or approval inferred.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.B06",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -1626,7 +1627,7 @@
         "expected_actions": [],
         "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
         "functional_status": "Functionally verified for the named persisted browser paths; untested states pending",
-        "functional_failures": "No failure in the named new-account draft/reload/resume/submission flows at fb94c29. Other per-scope vetting/profile states require their own evidence.",
+        "functional_failures": "Named flow passes; untested state-specific requirements remain.",
         "implementation_files": [
           "frontend/src/pages/Onboarding.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -1646,11 +1647,12 @@
         "functional": "Functionally verified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Reference heading, focused wizard and white authentication surface. Current initial step collects professional name; structured qualification/practice-language fields live in the later persisted professional-vetting page. Material difference from five-stage reference remains and needs integrated composition work; not visually complete.",
+        "remaining_action": "Missing profession/years/introduction/languages corrected with actual private resumable fields and public-only introduction/languages projection. Bordered language cards match reference. Extra privacy helper/accessible language legend are intentional. Mobile heading wrapping/full-width action, other states and new-field native zoom/language comparisons remain.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B06) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
-          "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map."
+          "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
+          "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
         }
       }
     },
@@ -1670,7 +1672,8 @@
         "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
         "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
         "initial_review_current": "docs/screenshots/mvp-current/c0d911d-onboarding-review/result.json",
-        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt."
+        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
+        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "B07",
@@ -1686,7 +1689,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Structured scope form typography/width/progress now compared. Initial signup still separates general professional application from per-scope credentials. Resume in Account and evidence per persisted draft; reference inline upload/summary composition remains to finish.",
+        "current_differences": "Typed qualification/institution/license/expiry now persist privately; initial PDF resume works. Additional institution/jurisdiction and retained statement make this longer than reference. Separate per-scope credential evidence is working elsewhere, not presented as a fake initial upload. Progressive composition and other states remain.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -1694,21 +1697,19 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison recorded; remaining state/owner acceptance pending",
+        "correction_status": "Named paired comparison recorded; remaining states/owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-reference-390.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-reference-768.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-reference-1440.png"
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B07-reference-390.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B07-reference-768.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B07-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-application-390.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-application-768.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B07-application-1440.png"
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B07-application-390.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B07-application-768.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B07-application-1440.png"
         ],
         "comparison_notes": [
-          "Real private PDF upload/remove and service multi-selection. Large test catalog previously stretched this step into a very long form; searchable bounded list retains all available scopes and selected values. Search empty-state/reset selection and resume/application persistence pass. Structured primary qualification/license/evidence fields remain in professional-vetting page; exact composition not accepted.",
-          "Structured /clinician/vetting is now a focused572px three-step wizard: qualifications, experience, review. Back retains fields; saved drafts resume; repeated save and submit retain one application without approval, real backend at9254a65. Current matched screenshots use read-only existing fixture after20/20 SMS budget enforcement. Prototype has five total onboarding steps and inline uploads; operational per-scope form retains mandatory category/institution/jurisdiction and revisioned evidence below. Initial signup composition and fuller reference summary still need correction; not visually accepted.",
-          "c0d911d initial B10 professional/scope panels inspected. Actual answers and pending document icon; real two contact-proof onboarding and structured draft/submission under explicit loopback test budget100 restored20. Full typed five-stage initial application/inline evidence remains different; not native/owner accepted."
+          "Typed qualification/institution/license/expiry now persist privately; initial PDF resume works. Additional institution/jurisdiction and retained statement make this longer than reference. Separate per-scope credential evidence is working elsewhere, not presented as a fake initial upload. Progressive composition and other states remain."
         ],
         "viewports": [
           390,
@@ -1721,7 +1722,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json; real DB/browser, no provider delivery or approval inferred.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.B07",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -1749,7 +1750,7 @@
         "expected_actions": [],
         "expected_next_states": "Draft → Submitted → Assigned/UnderReview → ClarificationRequested → Resubmitted → PerScope Approved/Rejected/Suspended/Expired; profile completion never implies approval.",
         "functional_status": "Functionally verified for the named persisted browser paths; untested states pending",
-        "functional_failures": "No failure in the named new-account draft/reload/resume/submission flows at fb94c29. Other per-scope vetting/profile states require their own evidence.",
+        "functional_failures": "Named flow passes; untested state-specific requirements remain.",
         "implementation_files": [
           "frontend/src/pages/Onboarding.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -1774,12 +1775,13 @@
         "functional": "Functionally verified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Structured scope form typography/width/progress now compared. Initial signup still separates general professional application from per-scope credentials. Resume in Account and evidence per persisted draft; reference inline upload/summary composition remains to finish.",
+        "remaining_action": "Typed qualification/institution/license/expiry now persist privately; initial PDF resume works. Additional institution/jurisdiction and retained statement make this longer than reference. Separate per-scope credential evidence is working elsewhere, not presented as a fake initial upload. Progressive composition and other states remain.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B07) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
           "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
-          "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending."
+          "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
+          "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
         }
       }
     },
@@ -1905,7 +1907,8 @@
         "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
         "current_local": "Frappe 15.121.2 isolated site tele-tena-pr12-fresh.localhost: the synthetic applicant browser flow uploaded two private evidence revisions, submitted a scope application, and the authorized reviewer opened/downloaded the current revision. After v1.29, the reviewer form displayed the four provenance controls at 390/1440px; no decision was submitted. tests/presentation.py 45/45 and tests/integration.py 24/24 pass. Fresh-site v1.29 install, 320/768/200%-zoom coverage, native-language review, and Frappe 16 browser verification remain pending.",
         "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
-        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt."
+        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
+        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "B09",
@@ -1921,7 +1924,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Reference title/progress/searchable evidence cards/Review application ported. Back/Save for later, visible search label, bounded large catalog and demo/auth header retained. Test-site fixture names differ honestly; fuller language/zoom/failure/owner comparisons pending.",
+        "current_differences": "Dedicated scope-card search, save/reload and selection preserved at295ffdd; no automatic scope approval. Bounded catalog handles technical fixture volume. Language/zoom/other-state comparisons remain.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -1929,18 +1932,20 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Visually verified by Codex for named English B09 compositions; remaining states and owner acceptance pending",
+        "correction_status": "Named paired comparison recorded; remaining states/owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-reference-390.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-reference-768.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-reference-1440.png"
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B09-reference-390.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B09-reference-768.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B09-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-application-390.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-application-768.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B09-application-1440.png"
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B09-application-390.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B09-application-768.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B09-application-1440.png"
         ],
-        "comparison_notes": [],
+        "comparison_notes": [
+          "Dedicated scope-card search, save/reload and selection preserved at295ffdd; no automatic scope approval. Bounded catalog handles technical fixture volume. Language/zoom/other-state comparisons remain."
+        ],
         "viewports": [
           390,
           768,
@@ -1952,7 +1957,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
+        "functional_verification": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json; real DB/browser, no provider delivery or approval inferred.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.B09",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -1986,7 +1991,7 @@
         "expected_actions": [],
         "expected_next_states": "Draft/Clarification → append immutable evidence revision → submission/resubmission → reviewer sees evidence → decision snapshot records evidence IDs/revisions/digests; no applicant mutation after submission.",
         "functional_status": "Pending current complete journey acceptance",
-        "functional_failures": "Requires current action/state reproduction; not established by inherited checks.",
+        "functional_failures": "Named flow passes; untested state-specific requirements remain.",
         "implementation_files": [
           "frontend/src/pages/Onboarding.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -2003,15 +2008,16 @@
         ]
       },
       "completion": {
-        "functional": "Implemented but unverified",
+        "functional": "Functionally verified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Not yet compared against the rendered reference on this release. Inherited functional evidence is not visual acceptance.",
+        "remaining_action": "Dedicated scope-card search, save/reload and selection preserved at295ffdd; no automatic scope approval. Bounded catalog handles technical fixture volume. Language/zoom/other-state comparisons remain.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B09) and design-handoff.md",
           "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
           "current_local": "Frappe 15.121.2 isolated site tele-tena-pr12-fresh.localhost: the synthetic applicant browser flow uploaded two private evidence revisions, submitted a scope application, and the authorized reviewer opened/downloaded the current revision. After v1.29, the reviewer form displayed the four provenance controls at 390/1440px; no decision was submitted. tests/presentation.py 45/45 and tests/integration.py 24/24 pass. Fresh-site v1.29 install, 320/768/200%-zoom coverage, native-language review, and Frappe 16 browser verification remain pending.",
-          "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending."
+          "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
+          "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
         }
       }
     },
@@ -2031,7 +2037,8 @@
         "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
         "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
         "initial_review_current": "docs/screenshots/mvp-current/c0d911d-onboarding-review/result.json",
-        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt."
+        "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
+        "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "B10",
@@ -2047,7 +2054,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "Structured scope form typography/width/progress now compared. Initial signup still separates general professional application from per-scope credentials. Resume in Account and evidence per persisted draft; reference inline upload/summary composition remains to finish.",
+        "current_differences": "Actual professional values/care languages shown in submitted review; one Pending application, Applicant only. Additional private structured review data is operational. Other states/native zoom/languages remain.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -2055,21 +2062,19 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Comparison recorded; remaining state/owner acceptance pending",
+        "correction_status": "Named paired comparison recorded; remaining states/owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-reference-390.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-reference-768.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-reference-1440.png"
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B10-reference-390.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B10-reference-768.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B10-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-application-390.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-application-768.png",
-          "docs/screenshots/mvp-current/41b6cf5-clinician-onboarding/B10-application-1440.png"
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B10-application-390.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B10-application-768.png",
+          "docs/screenshots/mvp-current/295ffdd-initial-clinician/B10-application-1440.png"
         ],
         "comparison_notes": [
-          "Persisted application review/submission with no clinician approval or privileged role. Explicit manual-review statement and resume requirement. Exact professional/evidence summary composition remains to complete.",
-          "Structured /clinician/vetting is now a focused572px three-step wizard: qualifications, experience, review. Back retains fields; saved drafts resume; repeated save and submit retain one application without approval, real backend at9254a65. Current matched screenshots use read-only existing fixture after20/20 SMS budget enforcement. Prototype has five total onboarding steps and inline uploads; operational per-scope form retains mandatory category/institution/jurisdiction and revisioned evidence below. Initial signup composition and fuller reference summary still need correction; not visually accepted.",
-          "c0d911d initial B10 professional/scope panels inspected. Actual answers and pending document icon; real two contact-proof onboarding and structured draft/submission under explicit loopback test budget100 restored20. Full typed five-stage initial application/inline evidence remains different; not native/owner accepted."
+          "Actual professional values/care languages shown in submitted review; one Pending application, Applicant only. Additional private structured review data is operational. Other states/native zoom/languages remain."
         ],
         "viewports": [
           390,
@@ -2082,7 +2087,7 @@
           "am": "Layout pending; native review required",
           "om": "Layout pending; native review required"
         },
-        "functional_verification": "See verification_evidence; requires current state-specific backend/browser evidence.",
+        "functional_verification": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json; real DB/browser, no provider delivery or approval inferred.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.B10",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -2109,7 +2114,7 @@
         "expected_actions": [],
         "expected_next_states": "Draft/Clarification → append immutable evidence revision → submission/resubmission → reviewer sees evidence → decision snapshot records evidence IDs/revisions/digests; no applicant mutation after submission.",
         "functional_status": "Functionally verified for the named persisted browser paths; untested states pending",
-        "functional_failures": "No failure in the named new-account draft/reload/resume/submission flows at fb94c29. Other per-scope vetting/profile states require their own evidence.",
+        "functional_failures": "Named flow passes; untested state-specific requirements remain.",
         "implementation_files": [
           "frontend/src/pages/Onboarding.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -2134,12 +2139,13 @@
         "functional": "Functionally verified",
         "visual": "Implemented but unverified",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "Structured scope form typography/width/progress now compared. Initial signup still separates general professional application from per-scope credentials. Resume in Account and evidence per persisted draft; reference inline upload/summary composition remains to finish.",
+        "remaining_action": "Actual professional values/care languages shown in submitted review; one Pending application, Applicant only. Additional private structured review data is operational. Other states/native zoom/languages remain.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B10) and design-handoff.md",
           "implementation": "Source branch feat/scope-evidence, commits af1e4e4/f112e03 plus browser verification harness; packaged review app served at http://127.0.0.1:8017/teletena/",
           "current_local": "Frappe 15 isolated presentation regressions passed 27/27, including owner/reviewer authorization and assessment evidence snapshot. Built-browser reviewer queue displayed submitted applicant and evidence; authorized reviewer downloaded the newest private PDF revision successfully. Frappe 16.2.1/ERPNext 16.1.0/Python 3.14.2 disposable site was backed up, migrated v1.8→v1.16, repeat-migrated, and passed the 27-test backend suite. Screenshot: /tmp/tele-tena-presentation-review/scope-evidence/reviewer-evidence.png. Fresh-empty-site check and Frappe 16 browser journey remain pending; no external credential validation or malware scanning is claimed.",
-          "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending."
+          "scope_lifecycle": "Credential re-verification and operational review queue implementation; focused Frappe 15 and built-browser checks pending.",
+          "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json"
         }
       }
     },
@@ -10934,13 +10940,14 @@
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I03) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json; real backend, named state only; no live delivery or clinical decisions.",
-        "current_2026_10_11_onboarding_review": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json"
+        "current_2026_10_11_onboarding_review": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json",
+        "current_2026_10_12": "docs/screenshots/mvp-current/8b5802d-application-review/result.json"
       },
       "visual_acceptance": {
         "reference_screen": "I03",
         "reference_hash": "#i03",
         "reference_url": "http://127.0.0.1:8044/?embed=1#i03",
-        "product_route": "/admin/applications (review dialog); /admin/vetting (full scope evidence review)",
+        "product_route": "/admin/applications/:applicationId",
         "actor": "Approver/vetting reviewer; financial reviewers have separate scopes",
         "states": [
           "populated",
@@ -10950,7 +10957,7 @@
           "service failure",
           "permission denied"
         ],
-        "current_differences": "See paired README: real metrics/metadata and permission-limited actions, no invented credentials. I03 retains an accessible review modal; full structured vetting/rubric screen fidelity and other states remain open.",
+        "current_differences": "Queue-overlay modal replaced by dedicated opaque route and refreshable page. Main professional/private-documents and supporting action panels compared. Truthful Pending/self-reported fields replace invented verified badge/portrait. Private credential details expandable; individual gate decisions remain in native scope vetting. Named English/mobile/actual200 and provisional-language layouts pass; other states/native scope-review composition and owner review remain.",
         "shared_components": [
           "Brand",
           "Button / fields",
@@ -10958,32 +10965,32 @@
           "notices / status",
           "dialogs"
         ],
-        "correction_status": "Named compositions inspected; listed fuller-state comparisons pending",
+        "correction_status": "Named paired comparison recorded; remaining states/owner acceptance pending",
         "reference_screenshots": [
-          "docs/screenshots/mvp-current/bc20f72-reviewer/I03-reference-390.png",
-          "docs/screenshots/mvp-current/bc20f72-reviewer/I03-reference-768.png",
-          "docs/screenshots/mvp-current/bc20f72-reviewer/I03-reference-1440.png"
+          "docs/screenshots/mvp-current/8b5802d-application-review/I03-reference-390.png",
+          "docs/screenshots/mvp-current/8b5802d-application-review/I03-reference-768.png",
+          "docs/screenshots/mvp-current/8b5802d-application-review/I03-reference-1440.png"
         ],
         "implementation_screenshots": [
-          "docs/screenshots/mvp-current/bc20f72-reviewer/I03-application-390.png",
-          "docs/screenshots/mvp-current/bc20f72-reviewer/I03-application-768.png",
-          "docs/screenshots/mvp-current/bc20f72-reviewer/I03-application-1440.png"
+          "docs/screenshots/mvp-current/8b5802d-application-review/I03-application-390.png",
+          "docs/screenshots/mvp-current/8b5802d-application-review/I03-application-768.png",
+          "docs/screenshots/mvp-current/8b5802d-application-review/I03-application-1440.png"
         ],
         "comparison_notes": [
-          "Named paired images visually inspected; docs/screenshots/mvp-current/bc20f72-reviewer/README.md records operational differences and outstanding states. Not owner acceptance."
+          "Queue-overlay modal replaced by dedicated opaque route and refreshable page. Main professional/private-documents and supporting action panels compared. Truthful Pending/self-reported fields replace invented verified badge/portrait. Private credential details expandable; individual gate decisions remain in native scope vetting. Named English/mobile/actual200 and provisional-language layouts pass; other states/native scope-review composition and owner review remain."
         ],
         "viewports": [
           390,
           768,
           1440
         ],
-        "zoom_200_percent": "Not verified",
+        "zoom_200_percent": "Actual Chromium200% verified: outer1440/inner720,DPR2,scale1 at8b5802d",
         "languages": {
-          "en": "Comparison pending",
-          "am": "Layout pending; native review required",
-          "om": "Layout pending; native review required"
+          "en": "Paired named populated state compared",
+          "am": "Layout320/390/768/1440 verified; native review required",
+          "om": "Layout320/390/768/1440 verified; native review required"
         },
-        "functional_verification": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json; real backend, named state only; no live delivery or clinical decisions.",
+        "functional_verification": "docs/screenshots/mvp-current/8b5802d-application-review/result.json; real DB/browser, no provider delivery or approval inferred.",
         "expected_layout": {
           "reference_source": "inventory.js#forms.I03",
           "source_file_sha256": "671f5e70597caa94b0e87d86fe9b425fbfa300459ba0eefa2877c45625470caa",
@@ -11026,7 +11033,7 @@
         ],
         "expected_next_states": "Review assigned → evidence checked → clarification/interview → per-scope decision → audited reverification/appeal; financial exception → review → explicit resolution.",
         "functional_status": "Functionally verified",
-        "functional_failures": "Read-only queue/search/direct-selected review, résumé download, Escape/focus return and reviewer wallet403 pass; human approval/clarification decisions not exercised in this read-only browser run.",
+        "functional_failures": "Named flow passes; untested state-specific requirements remain.",
         "implementation_files": [
           "frontend/src/pages/Admin.tsx",
           "frontend/src/pages/Vetting.tsx"
@@ -11050,14 +11057,15 @@
       },
       "completion": {
         "functional": "Functionally verified",
-        "visual": "Implemented but unverified",
+        "visual": "Visually verified by Codex for named populated state; other states pending",
         "owner": "Awaiting owner acceptance",
-        "remaining_action": "See paired README: real metrics/metadata and permission-limited actions, no invented credentials. I03 retains an accessible review modal; full structured vetting/rubric screen fidelity and other states remain open.; language/200% zoom/other-state comparisons and owner review remain.",
+        "remaining_action": "Queue-overlay modal replaced by dedicated opaque route and refreshable page. Main professional/private-documents and supporting action panels compared. Truthful Pending/self-reported fields replace invented verified badge/portrait. Private credential details expandable; individual gate decisions remain in native scope vetting. Named English/mobile/actual200 and provisional-language layouts pass; other states/native scope-review composition and owner review remain.",
         "evidence": {
           "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I03) and design-handoff.md",
           "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
           "current_local": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json; real backend, named state only; no live delivery or clinical decisions.",
-          "current_onboarding_review": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json"
+          "current_onboarding_review": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json",
+          "current_2026_10_12": "docs/screenshots/mvp-current/8b5802d-application-review/result.json"
         }
       }
     },
@@ -15413,7 +15421,7 @@
     },
     "registration_browser": {
       "status": "Functionally verified",
-      "evidence": "Full real-DB random-code browser run at a001e62: wrong/expired/resend/new/returning/clinician intent. Focused fb94c29 repeats new patient/clinician recovery, private resume, searchable multi-scope persistence without approval; wrong/expiry/cooldown/returning not repeated. Site settings restored and captured codes removed; no live SMS. Structured actual draft/reload/resume/repeat-save/submission passes at9254a65; current layout-only continuation uses existing authenticated fixture after site send budget20/20, no limit reset or send. Last random-code attempt was rejected before onboarding and retained as an enforced-budget result. c0d911d focused real random-code recovery/review/draft submission passed under explicit loopback test send budget100 then restored20; no counter reset/live send. Prior full a001 wrong/expiry/cooldown/returning evidence retained. Current bc20f72 real-backend loopback transport passes both role choices, persistence/reload, optional background/default-private, clinician private PDF/submission without approval. Full wrong/expiry/resend/returning run remains prior evidence, not repeated. Native source throttle10/15min reached during repeated visual testing; no counters reset or limit bypass, final pass after normal expiry. Original config restored."
+      "evidence": "Full real-DB random-code browser run at a001e62: wrong/expired/resend/new/returning/clinician intent. Focused fb94c29 repeats new patient/clinician recovery, private resume, searchable multi-scope persistence without approval; wrong/expiry/cooldown/returning not repeated. Site settings restored and captured codes removed; no live SMS. Structured actual draft/reload/resume/repeat-save/submission passes at9254a65; current layout-only continuation uses existing authenticated fixture after site send budget20/20, no limit reset or send. Last random-code attempt was rejected before onboarding and retained as an enforced-budget result. c0d911d focused real random-code recovery/review/draft submission passed under explicit loopback test send budget100 then restored20; no counter reset/live send. Prior full a001 wrong/expiry/cooldown/returning evidence retained. Current bc20f72 real-backend loopback transport passes both role choices, persistence/reload, optional background/default-private, clinician private PDF/submission without approval. Full wrong/expiry/resend/returning run remains prior evidence, not repeated. Native source throttle10/15min reached during repeated visual testing; no counters reset or limit bypass, final pass after normal expiry. Original config restored. 12October295ffdd: initial typed private professional fields, language/public intro separation, five-stage recovery and private reviewer projection pass with random test transport. 8b5802d dedicated reviewer opaque route/refresh/filter/unknown/Guest checks pass; no provider send."
     },
     "presentation_data": {
       "status": "Functionally verified",

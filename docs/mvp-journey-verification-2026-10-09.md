@@ -1,4 +1,4 @@
-# Active MVP verification — 11 October 2026
+# Active MVP verification —12October2026
 
 PR #44 remains draft and preserves PR #43 ancestry. This is **not** a handover-ready
 candidate or owner visual acceptance. `mvp-screen-acceptance.json` is the only
@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **41b6cf5fc6be1952c5ac36cc38b3d1f30aa3785f**. Later report/evidence-only commits
+  **8b5802d5d0e2e54a6d222b0763ad47ceaafd8808**. Later report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -21,7 +21,51 @@ screen/completion matrix; the sections below this active checkpoint are historic
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
 
-## Active continuation: registration and reviewer fidelity
+## Latest connected application/reviewer continuation —12October
+
+Package8b5802d5d0e2e54a6d222b0763ad47ceaafd8808; initial application browser
+source295ffdd67bb56c9bfaf2685136196671d4efc978. Later difference is reviewer
+page/tests/evidence; initial application UI/API unchanged.
+
+- B06/B07 now collect persisted typed private professional metadata, care
+  languages and explicitly public introduction. Shared native scope validators
+  reject unsupported fields, negative experience, invalid expiry and languages.
+  Patient registration rejects clinician fields. Existing unstructured drafts
+  remain valid; no migration or inferred qualifications.
+- Two real DB regressions passed2.980s: draft/reload, incomplete typed submission
+  denial without partial profile, reviewer-only private projection/Guest denial,
+  public projection excludes private identifiers, Applicant-only submission and
+  repeat completion cannot create a second application; patient privacy unchanged.
+- Connected random-code browser passed at295ffdd: both role choices, patient
+  background/recovery, clinician B06/B07 typed fields, B09 saved selections,
+  private PDF, B10 Pending submission and authorized reviewer. Site config was
+  restored; captured codes removed; owned8028 server stopped. Wrong/expiry/resend/
+  returning-user/per-scope tests not repeated; prior named evidence retained.
+- Reviewer browser initially counted queue rows before async fetch rendered.
+  Safe stage reporting identified rows0 after a successful authorized projection.
+  Bounded visible-row wait fixed the test; no assertion removed or permission
+  changed. A subsequent visual comparison identified a genuine I03 modal/page
+  discrepancy. Dedicated page now uses existing opaque public_id and no email
+  in its URL; legacy missing identifiers use authenticated navigation state.
+- Latest8b5802d read-only reviewer browser passes private fields, opaque refresh,
+  filtered queue return, unknown-record recovery, Guest403 and identical records.
+  Paired390/768/1440 and actual200% Chromium (outer1440/inner720,DPR2,scale1), plus
+  AM/OM320/390/768/1440. No approvals, provider sends or clinical mutations.
+- Build/typecheck and lint pass with existing warnings; asset hashes/private
+  credential scan pass. PWA/offline/deep-link/password/permission/cache checks
+  passed at295ffdd. No actual build-transition flag used in that run; prior
+  explicit existing-session Refresh evidence remains separate.
+- Owned8017 web master59693 received scoped HUP for API changes; children90877/
+  90878 load matching code. Worker59687/scheduler59689/Redis10747 remain unchanged
+  because financial/job/call logic is unchanged. Original Bench/Selfmade untouched.
+- Safe pairs: `screenshots/mvp-current/295ffdd-initial-clinician/` and
+  `screenshots/mvp-current/8b5802d-application-review/`. README comparison notes
+  retain material B07 length/evidence-step differences, other states and native
+  review/owner gates. No whole-MVP acceptance or new hosted-call replay claimed.
+
+## Historical continuation evidence (exact named sources)
+
+## Prior registration and reviewer fidelity
 
 - Current package/source `bc20f722848a84b7b857284b1599bef0f8b1f451`.
   Matching web/worker/scheduler restarted through the scoped lifecycle at eb670a3;

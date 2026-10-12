@@ -1,12 +1,22 @@
 # TeleTena operational progress export
 
+## Latest application/review delta —12October2026
+
+Initial clinician profile/qualification/language fields now persist privately
+and resume; private IDs never enter the approved public profile projection.
+Dedicated opaque application-review page follows I03main/actions composition.
+Real registration and read-only reviewer browser passes, paired layouts, actual
+reviewer200%zoom and provisional language checks recorded in the single matrix.
+No auto approval, provider delivery, all-MVP acceptance, merge or remote deployment.
+
+
 ## Current MVP release priority — 2026-10-08
 
 The user bounded this handover to the agreed MVP and its redesign. Preserve the entire 142-screen reference, but use `mvp-release-scope.md` and `mvp-screen-acceptance.json` for release acceptance. Two-adult couples consultations are required; full clinic/lab/subscription/second-opinion/tourism expansion and no-show adjudication are deferred. The current release is not ready. Prior entries below are historical checkpoint evidence, not current-release completion claims.
 
 ## Current local MVP delta — 2026-10-11
 
-Draft PR44 retains PR43 ancestry; packaged41b6cf5 on
+Draft PR44 retains PR43 ancestry; packaged8b5802d on
 teletena-mvp-presentation.localhost at http://127.0.0.1:8017/teletena/.
 Named profile/permission/navigation defects fixed; selected offering persists
 through discovery/profile/reload/calendar/disclosure. Real DB4/4 and additive
