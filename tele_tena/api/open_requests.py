@@ -848,6 +848,45 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
     return {'state': 'Matched', 'appointment': appt, 'simulated': True}
 
 
+@query()
+def clinician_notifications():
+    """Persisted offer outcomes; no patient identity or clinical notification body."""
+    clinician = actor('Tele Tena Clinician')
+    profile('clinician')
+    pref = rows('SELECT notification_preferences FROM tt_preferences WHERE user=%s', (clinician,))
+    settings = json.loads(pref[0].notification_preferences or '{}') if pref else {}
+    seen = set(settings.get('accepted_offer_seen', []))
+    found = rows("""SELECT o.id,a.id appointment,r.matched_at accepted_at
+        FROM tt_request_offer o JOIN tt_open_request r ON r.id=o.request_id
+        JOIN tt_appointment a ON a.id=o.appointment AND a.clinician=o.clinician
+        WHERE o.clinician=%s AND o.state='Accepted' AND r.state='Matched'
+        ORDER BY r.matched_at DESC,o.id DESC LIMIT 50""", (clinician,))
+    for item in found:
+        item.read = item.id in seen
+        item.accepted_at = item.accepted_at.isoformat()+'Z' if item.accepted_at else None
+    return {'items': found}
+
+
+@journey.command
+def read_clinician_notification(offer_id):
+    clinician = actor('Tele Tena Clinician')
+    one('SELECT name FROM tabUser WHERE name=%s FOR UPDATE', (clinician,))
+    found = rows("""SELECT o.id FROM tt_request_offer o JOIN tt_appointment a
+        ON a.id=o.appointment AND a.clinician=o.clinician
+        WHERE o.id=%s AND o.clinician=%s AND o.state='Accepted'""", (offer_id, clinician))
+    if not found:
+        fail('Notification unavailable.', 'notification_unavailable')
+    pref = rows('SELECT notification_preferences FROM tt_preferences WHERE user=%s', (clinician,))
+    settings = json.loads(pref[0].notification_preferences or '{}') if pref else {}
+    seen = settings.get('accepted_offer_seen', [])
+    settings['accepted_offer_seen'] = ([offer_id] + [item for item in seen if item != offer_id])[:100]
+    frappe.db.sql("""INSERT INTO tt_preferences (user,locale,notification_preferences,modified)
+        VALUES (%s,'en',%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
+        notification_preferences=VALUES(notification_preferences),modified=VALUES(modified)""",
+        (clinician, json.dumps(settings)))
+    return {'read': True}
+
+
 @journey.command
 def close_request(request_id, reason='cancelled'):
     patient = actor('Tele Tena Patient')

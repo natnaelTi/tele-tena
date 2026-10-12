@@ -1,4 +1,5 @@
 import "./ProductShell.css";
+import { ClinicianNotifications } from "../components/ClinicianNotifications";
 import { Link, Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -71,6 +72,7 @@ function ClinicianRequestAvailability() {
           ? "Could not update request availability. Review the setup items and try again."
           : null;
   const recordFailure = useCallback((error: unknown) => {
+    if (error instanceof ApiError && error.code === "no_immediate_capacity") {setFailure(null);void refresh();return;}
     if (error instanceof ApiError && error.code === "session_required") setFailure("session");
     else if (error instanceof ApiError && error.code === "permission_denied") setFailure("permission");
     else if (error instanceof TypeError) setFailure("network");
@@ -109,7 +111,7 @@ function ClinicianRequestAvailability() {
     ? `${w("No full session can start within")} ${data.immediate_window_minutes || 30} ${w("minutes. Your published hours can still be used for scheduled requests.")}`
     : "Complete setup before receiving requests.";
   return <section hidden={location.pathname.includes("/consultations/")} className="request-presence-shell" aria-label={w("Request availability")}>
-    <details className="request-presence-details" open={failureMessage?true:undefined}><summary><strong>{w(failureMessage || (data?.ready ? "Available for requests" : "Requests paused"))}</strong>{!data?.ready&&!failureMessage&&<span>{w("Setup needed")}</span>}</summary><div>
+    <details className="request-presence-details" open={failureMessage?true:undefined}><summary><strong>{w(failureMessage || (data?.ready ? "Available for requests" : "Requests paused"))}</strong>{!data?.ready&&!failureMessage&&!data?.configured&&<span>{w(data?.reasons?.includes("no_immediate_capacity")?"No immediate opening":"Setup needed")}</span>}</summary><div>
       <span>{w(data?.ready ? "Ready status expires if this session disconnects." : pausedMessage)}</span>
       {data?.reasons?.includes("immediate_policy_required") && <span>{w("A reviewer must enable immediate requests for this service. Service-scope approval alone does not enable this. This does not guarantee a request or match.")}</span>}
       {!!data?.reasons?.length && <nav className="request-readiness-actions" aria-label={w("Setup needed")}>{data.reasons.filter((reason: string)=>reason!=="immediate_policy_required").map((reason: string) => {const item=guidance[reason];return item?<Link key={reason} to={item.to}>{w(item.label)}</Link>:<span key={reason}>{w("Complete setup before receiving requests.")}</span>;})}</nav>}
@@ -300,7 +302,7 @@ export function WorkspaceLayout({
     return <Navigate to="/onboarding" replace />;
   if (kind === "patient" || kind === "clinician") return <div className="reference-workspace">
     <DemoBar />
-    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}<Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button></nav><div className="product-user"><LanguageSelect /><span>{session?.profile?.display_name}</span><Button variant="quiet" aria-label={w("Sign out")} title={w("Sign out")} loading={signoutBusy} onClick={()=>void signout()}><LogOut size={20} /></Button></div></header>
+    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}<Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button></nav><div className="product-user">{kind==="clinician"&&session?.roles.includes("Tele Tena Clinician")&&<ClinicianNotifications/>}<LanguageSelect /><span>{session?.profile?.display_name}</span><Button variant="quiet" aria-label={w("Sign out")} title={w("Sign out")} loading={signoutBusy} onClick={()=>void signout()}><LogOut size={20} /></Button></div></header>
     {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
     {kind === "clinician" && session?.roles.includes("Tele Tena Clinician") && <ClinicianRequestAvailability />}
     <main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') ? 'workspace-wide' : ''}`} id="main-content"><WorkspaceTour role={kind} /><Outlet /></main>

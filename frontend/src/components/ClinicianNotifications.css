@@ -1,0 +1,6 @@
+.notification-count{min-width:20px;border-radius:20px;background:var(--brand);color:white;font-size:12px;padding:2px 5px;}
+.clinician-notification{display:grid;gap:10px;padding:16px 0;border-bottom:1px solid var(--border);}
+.clinician-notification time{color:var(--muted);font-size:14px;}
+.clinician-notification-popup{position:fixed;z-index:65;right:24px;top:140px;max-width:420px;background:white;color:var(--ink);padding:20px;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px #102a3320;display:flex;gap:12px;align-items:start;}
+.clinician-notification-popup p{font-size:14px;margin:8px 0;}
+@media(max-width:600px){.clinician-notification-popup{top:auto;bottom:88px;left:16px;right:16px;}.product-user:has(.notification-count) select{max-width:88px;}}

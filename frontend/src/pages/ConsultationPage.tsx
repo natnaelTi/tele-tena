@@ -2,7 +2,7 @@ import {BookingCalendar} from "../components/BookingCalendar";
 import { SharedCarePrivacy, ConversationFacts, DisclosureSnapshot, PreparationPanel, RecordedCallTiming } from "../components/ConsultationDetails";
 import { appointmentStatus } from "../appointment-status";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useResource } from "../hooks/useResource";
 import { useSession } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
@@ -204,9 +204,17 @@ export function ConsultationRoomPage() {
   const { t } = useLocale();
   const loadAppointments = useCallback(() => journeyApi.appointments(), []);
   const { data, error } = useResource(loadAppointments);
+  const container=useRef<HTMLElement|null>(null);
+  useEffect(()=>{
+    const ribbon=container.current?.previousElementSibling;
+    if(!ribbon)return;
+    const update=()=>container.current?.style.setProperty('--call-ribbon-height',ribbon.getBoundingClientRect().height+'px');
+    const observer=new ResizeObserver(update);observer.observe(ribbon);update();return()=>observer.disconnect();
+  },[data]);
+
   if (error) return <InlineNotice tone="danger">The consultation could not be loaded.</InlineNotice>;
   if (!data) return <Skeleton />;
   const appointment = data.find(item => item.id === id);
   if (!appointment) return <InlineNotice tone="danger">This consultation is unavailable to your account.</InlineNotice>;
-  return <main className="focused-call" data-appointment-id={id}><Consultation key={id} appointment={{...appointment,display_identity:appointment.display_identity||"Private participant"}} t={t}/></main>;
+  return <main ref={container} className="focused-call" data-appointment-id={id}><Consultation key={id} appointment={{...appointment,display_identity:appointment.display_identity||"Private participant"}} t={t}/></main>;
 }

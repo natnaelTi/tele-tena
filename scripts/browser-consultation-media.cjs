@@ -247,6 +247,14 @@ async function main() {
     for (const page of [patient, clinician]) {
       for (const width of [320, 390, 768, 1440]) {
         await page.setViewportSize({ width, height: 960 })
+        if(width>800){
+          const fit=await page.locator('.focused-call').evaluate(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,bottom:r.bottom,view:innerHeight,width:innerWidth,pageHeight:document.documentElement.scrollHeight,bodyHeight:document.body.scrollHeight};});
+          assert.ok(Math.abs(fit.left)<1&&Math.abs(fit.right-fit.width)<1,'Connected room must span desktop width');
+          assert.ok(Math.abs(fit.bottom-fit.view)<1,'Connected room must reach viewport bottom');
+          assert.ok(fit.pageHeight<=fit.view+1&&fit.bodyHeight<=fit.view+1,'Desktop call must not scroll the page');
+          const leave=await call(page).getByRole('button',{name:'Leave',exact:true}).boundingBox();assert.ok(leave&&leave.y+leave.height<=960,'Leave must remain visible');
+        }
+
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
         await page.screenshot({ path: `/tmp/tele-tena-presentation-review/video-call-${width}-${page === patient ? 'patient' : 'clinician'}.png`, fullPage: true })
       }

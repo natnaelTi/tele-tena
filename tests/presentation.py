@@ -1673,12 +1673,32 @@ class Presentation(unittest.TestCase):
         self.assertNotIn(fixtures.USERS['p1'], json.dumps(history))
         self.assertNotIn('Synthetic request for private offer regression.', json.dumps(history))
         self.assertNotIn('disclosure_snapshot', json.dumps(history))
+        notifications = open_requests.clinician_notifications()['items']
+        notification = next(item for item in notifications if item.id == winning.id)
+        self.assertEqual(notification.appointment, match['appointment'])
+        self.assertFalse(notification.read)
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(notifications, default=str))
+        self.assertNotIn('disclosure_snapshot', json.dumps(notifications, default=str))
+        self.assertTrue(open_requests.read_clinician_notification(winning.id)['read'])
+        self.assertTrue(open_requests.read_clinician_notification(winning.id)['read'])
+        self.assertTrue(next(item for item in open_requests.clinician_notifications()['items'] if item.id == winning.id).read)
+
         with self.assertRaises(frappe.ValidationError):
             open_requests.clinician_offers(-1)
         fixtures.login('c2')
         own_loser = next(item for item in open_requests.clinician_offers()['items'] if item.id == losing.id)
         self.assertEqual(own_loser.state, 'Superseded')
         self.assertIsNone(own_loser.appointment)
+        self.assertFalse(any(item.id == winning.id for item in open_requests.clinician_notifications()['items']))
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.read_clinician_notification(winning.id)
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            open_requests.clinician_notifications()
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            open_requests.clinician_notifications()
+
 
     def test_progressive_request_waves_are_due_bounded_and_deduplicated(self):
         """The scheduler widens to new eligible clinicians without repeat notices."""
