@@ -1,5 +1,9 @@
 /** Provisional interface translations; native review is a release activation gate. */
 export const patientJourneyTranslations: Record<string, [string, string]> = {
+  "Your care records could not be loaded.": ["የእንክብካቤ መዝገቦችዎን መጫን አልተቻለም።", "Galmeewwan kunuunsa keessanii fe'uun hin danda'amne."],
+  "Your shared summaries will appear here after a consultation.": ["ከምክክር በኋላ የተጋሩ ማጠቃለያዎችዎ እዚህ ይታያሉ።", "Cuunfaawwan isiniif qoodaman marii booda asitti mul'atu."],
+  "Session summary": ["የምክክር ማጠቃለያ", "Cuunfaa marii"],
+  "Follow-up": ["ክትትል", "Hordoffii"],
   "Shared care": ["የጋራ እንክብካቤ", "Kunuunsa waliinii"],
   "Two adults, separate consent and privacy.": ["ሁለት አዋቂዎች፣ የተለየ ፈቃድና ግላዊነት።", "Namoota gaʼeessa lama, hayyamaa fi dhuunfummaa adda addaa."],
   "Private invitation link": ["የግል ግብዣ አገናኝ", "Geessituu affeerraa dhuunfaa"],

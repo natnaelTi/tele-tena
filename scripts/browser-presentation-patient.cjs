@@ -73,6 +73,31 @@ async function pair(ctx, p, id, hash, width) {
         .getByRole("button", { name: "Dismiss tour invitation", exact: true })
         .click()
         .catch(() => {});
+      stage = "authorized Home care links " + width;
+      await p.locator('.patient-care-links').waitFor();
+      const owned = await p.request.get(new URL('/api/method/tele_tena.api.journey.appointments',base).href);
+      assert.equal(owned.status(),200);
+      const completed = (await owned.json()).message.filter(item=>item.state==='Completed');
+      const expected=[];
+      for(const item of completed.sort((a,b)=>b.end.localeCompare(a.end)).slice(0,5)) {
+        const response=await p.request.get(new URL('/api/method/tele_tena.api.presentation.appointment_detail?appointment='+encodeURIComponent(item.id),base).href);
+        assert.equal(response.status(),200);
+        const detail=(await response.json()).message;
+        if(detail.patient_summary_revisions.length || detail.individual_followup_revisions.length) expected.push(item.id);
+      }
+      if(expected.length) {
+        await p.locator('.patient-care-links .patient-care-link').first().waitFor();
+        for(const link of await p.locator('.patient-care-link').all()) {
+          const href=await link.getAttribute('href');
+          const id=decodeURIComponent(href.split('/').at(-1));
+          assert.ok(completed.some(item=>item.id===id), 'Care links belong to this patient’s completed encounters');
+          const response=await p.request.get(new URL('/api/method/tele_tena.api.presentation.appointment_detail?appointment='+encodeURIComponent(id),base).href);
+          assert.equal(response.status(),200);
+          const detail=(await response.json()).message;
+          assert.ok(detail.patient_summary_revisions.length || detail.individual_followup_revisions.length);
+          assert.equal(Object.hasOwn(detail,'private_note'),false);
+        }
+      }
       const search = p.getByRole("button", { name: "Find care", exact: true });
       await search.hover();
       assert.notEqual(

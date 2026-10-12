@@ -1,3 +1,4 @@
+import { PatientCareLinks } from "../components/PatientCareLinks";
 import PaymentActivity from "../components/PaymentActivity";
 import { careSearchScore } from "../care-search";
 import { AddFundsDialog } from "../components/AddFundsDialog";
@@ -128,7 +129,7 @@ export function PatientHome() {
       ) : (
         <p className="supporting">{w("Clinicians you have completed a consultation with will appear here when they have current approved services available.")}</p>
       )}
-      </section></section><aside className="patient-dashboard-aside">{wallet.data ? <WalletSummary available={wallet.data.available} reserved={wallet.data.reserved} /> : wallet.error ? <InlineNotice tone="danger">{w("Balance unavailable.")} <Button variant="secondary" onClick={() => void wallet.refresh()}>{w("Try again")}</Button></InlineNotice> : <Skeleton />}<section className="patient-dashboard-panel"><h2>{w("Your care record")}</h2><p>{w("Shared summaries are available inside your completed consultations.")}</p><Link className="text-link" to="/patient/appointments">{w("View appointments")} <ArrowRight size={16} /></Link></section></aside></div>
+      </section></section><aside className="patient-dashboard-aside">{wallet.data ? <WalletSummary available={wallet.data.available} reserved={wallet.data.reserved} /> : wallet.error ? <InlineNotice tone="danger">{w("Balance unavailable.")} <Button variant="secondary" onClick={() => void wallet.refresh()}>{w("Try again")}</Button></InlineNotice> : <Skeleton />}<PatientCareLinks appointments={appointments.data} /></aside></div>
     </>
   );
 }

@@ -173,3 +173,11 @@
 .public-profile-scopes{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0;}
 .public-profile-service .supporting{margin:8px 0 0;}
 .public-profile-price{color:var(--ink);}
+
+/* C01 recipient-authorized published record links, distinct from appointment rows. */
+.patient-care-link{display:flex;align-items:center;gap:16px;padding:20px 0;text-decoration:none;border-bottom:1px solid var(--border)}
+.patient-care-link:last-child{border-bottom:0}
+.patient-care-link>span:last-child{display:grid;gap:6px;min-width:0}
+.patient-care-link strong{color:var(--primary);text-decoration:underline;text-underline-offset:3px}
+.patient-care-link small{font-size:14px;color:var(--muted);overflow-wrap:anywhere}
+.care-record-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--subtle);flex-shrink:0;color:var(--primary)}
