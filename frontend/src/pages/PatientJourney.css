@@ -73,7 +73,7 @@
 .public-profile-identity { display:flex; gap:24px; align-items:center; margin-bottom:32px; }
 .public-profile-identity .avatar { width:96px; height:96px; font-size:36px; }
 .public-profile-identity h2 { font-size:32px; margin-bottom:12px; }
-.public-profile-service { padding:20px 0; border-bottom:1px solid var(--border); display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; align-items:start; }
+.public-profile-service { padding:16px 0; border-bottom:1px solid var(--border); display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; align-items:start; }
 .public-profile-service:last-child { border:0; padding-bottom:0; }
 .public-profile-service h3 { font-size:20px; margin:0 0 8px; }
 .public-profile-service > div { flex:1 1 220px; }
@@ -167,3 +167,9 @@
   .reference-workspace .matching-results-page .request-entry>a{grid-column:2;max-width:none;gap:8px;min-height:44px;}
   .reference-workspace .matching-results-page .request-entry p{line-height:1.5;}
 }
+
+/* C04 uses the same evidence-backed scope chips and compact service rows as
+   discovery. The full offering description remains on View service. */
+.public-profile-scopes{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0;}
+.public-profile-service .supporting{margin:8px 0 0;}
+.public-profile-price{color:var(--ink);}
