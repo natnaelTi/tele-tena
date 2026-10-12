@@ -59,7 +59,7 @@ export function ClinicianCard({ offer }: { offer: Offer }) {
       </div></div>
       <div className="card-actions"><div><strong>ETB {money(offer.price)}</strong><small>{offer.minutes} {w("minutes")} · {w("per session")}</small></div><div className="actions"><Button variant="quiet" onClick={event => { trigger.current = event.currentTarget; setPreview(true); }}>{w("View profile")}</Button><Link className="button" to={"/patient/book/" + offer.id}>{w("Choose a time")}</Link></div></div>
     </Card>
-    {preview && <ClinicianPreview offer={offer} close={() => { setPreview(false); requestAnimationFrame(() => trigger.current?.focus()); }} />}
+    {preview && <ClinicianPreview offer={offer} focusReturnTarget={trigger.current} close={() => setPreview(false)} />}
   </>;
 }
 /** Compact C01 upcoming-session row; status remains server-derived. */

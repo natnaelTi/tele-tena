@@ -248,6 +248,7 @@ export function Dialog({
   drawer = false,
   size = "default",
   className = "",
+  focusReturnTarget,
 }: {
   open: boolean;
   onOpenChange: (value: boolean) => void;
@@ -257,6 +258,7 @@ export function Dialog({
   drawer?: boolean;
   size?: "default" | "wide";
   className?: string;
+  focusReturnTarget?: HTMLElement | null;
 }) {
   const returnFocus = useRef<HTMLElement | null>(null);
   return (
@@ -267,9 +269,10 @@ export function Dialog({
           className={`${drawer ? "dialog drawer" : "dialog"} ${size === "wide" ? "dialog-wide" : ""} ${className}`}
           onOpenAutoFocus={() => { returnFocus.current = document.activeElement as HTMLElement; }}
           onCloseAutoFocus={event => {
-            if (returnFocus.current?.isConnected) {
+            const target = focusReturnTarget || returnFocus.current;
+            if (target?.isConnected) {
               event.preventDefault();
-              returnFocus.current.focus();
+              target.focus();
             }
           }}
         >

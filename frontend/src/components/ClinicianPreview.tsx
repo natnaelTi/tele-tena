@@ -8,13 +8,13 @@ import { useLocale } from "../hooks/useLocale";
 import { Dialog, InlineNotice, Skeleton, Button } from "./ui";
 import { money } from "./Domain";
 /** Patient-facing, approved backend facts only. No credentials inferred from a title. */
-export function ClinicianPreview({ offer, close }: { offer: Offer; close: () => void }) {
+export function ClinicianPreview({ offer, close, focusReturnTarget }: { offer: Offer; close: () => void; focusReturnTarget?: HTMLElement | null }) {
   const { w, t } = useLocale();
   const load = useCallback(() => journeyApi.publicClinician(offer.clinician_id), [offer.clinician_id]);
   const resource = useResource(load);
   const experience = resource.data?.trust_indicators?.session_experience;
   const currentOffering = resource.data?.services?.some((service: any) => service.offering === offer.id);
-  return <Dialog open onOpenChange={value => { if (!value) close(); }} title={offer.display_name} description={w("Review approved services and sharing choices before booking.")} className="clinician-preview-dialog">
+  return <Dialog open focusReturnTarget={focusReturnTarget} onOpenChange={value => { if (!value) close(); }} title={offer.display_name} description={w("Review approved services and sharing choices before booking.")} className="clinician-preview-dialog">
     <div className="profile-preview-identity"><div className="avatar large" aria-hidden="true">{offer.display_name.slice(0, 1)}</div><div><h3>{offer.service_category || offer.label}</h3><span className="verified"><ShieldCheck size={18} />{w("Approved for this service")}</span></div></div>
     {resource.error ? <InlineNotice tone="danger">{w("This clinician profile is unavailable or no longer approved.")} <Button variant="secondary" onClick={() => void resource.refresh()}>{w("Try again")}</Button></InlineNotice> : !resource.data ? <Skeleton /> : <>
       {offer.description && <p>{offer.description}</p>}
