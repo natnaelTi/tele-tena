@@ -155,16 +155,16 @@ body:has(.focused-call) {background:white;}
 
 /* Desktop retains the media-left / session-right workspace in every call mode. */
 @media(min-width:801px){
- .focused-call .room-connected .room-workspace{grid-template-columns:minmax(0,1fr) 280px;gap:20px;}
+ .focused-call .room-connected .room-workspace{grid-template-columns:minmax(0,1fr) 300px;gap:20px;}
  .focused-call .room-connected .room-session-details{padding:8px 0;}
  .focused-call .room-connected .room-session-details h3{margin:0 0 12px;}
  .focused-call .room-connected .room-session-details dl{margin:12px 0;}
  .focused-call .room-connected .room-session-details dd{margin:2px 0 10px;padding-bottom:8px;}
- .focused-call .room-connected .room-session-details p{margin:8px 0;}
+ .focused-call .room-connected .room-session-details p{margin:6px 0;line-height:1.45;}
  .focused-call .room-connected .room-privacy-note{padding:12px;margin-top:12px;}
  .focused-call .room-connected .room-privacy-note h4{margin:6px 0;}
  .focused-call .room-connected .extension-panel{padding:12px;margin-top:12px;}
- .focused-call .room-connected .extension-panel h3{margin:0 0 8px;}
+ .focused-call .room-connected .extension-panel h2,.focused-call .room-connected .extension-panel h3{margin:0 0 8px;}
  .focused-call .room-connected .room-session-details .button{min-height:44px;padding:8px 12px;}
  .focused-call .room-connected>.audio-session-more{display:none;}
  .focused-call .room-connected .reference-audio-stage{gap:12px;}
