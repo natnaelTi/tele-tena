@@ -149,3 +149,8 @@
 .discovery-refine-card .discovery-filters select{width:100%;border-radius:10px;min-height:50px;padding:12px 14px;font-size:16px;}
 @media(max-width:800px){.discovery-layout.discovery-matching-layout{grid-template-columns:1fr;}.discovery-matching-layout>.discovery-aside{order:-1;}.discovery-refine-card{padding:22px;}.discovery-refine-card .discovery-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}.discovery-refine-card .discovery-filters .field{margin:0;}.discovery-refine-card .inline-notice{margin-top:20px;}}
 @media(max-width:420px){.discovery-refine-card .discovery-filters{grid-template-columns:1fr;}}
+
+.discovery-refine-card summary{cursor:pointer;min-height:44px;color:var(--ink);list-style-position:inside;}
+.discovery-refine-card summary h2{display:inline;font-size:25px;}
+.discovery-refine-card details[open]>summary{margin-bottom:20px;}
+@media(max-width:800px){.discovery-refine-card summary h2{font-size:20px;}}

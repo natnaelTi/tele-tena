@@ -198,6 +198,8 @@ export function Discovery() {
   const requestDraft={request_text:query,service_label:category,language:languageFilter||undefined,format:formatFilter||undefined};
   const [resultsMode,setResultsMode]=useState(()=>Boolean(pendingCareQuery().trim()||discoveryFilters().category||discoveryFilters().language||discoveryFilters().format||discoveryFilters().availability));
   const searchInput=useRef<HTMLInputElement>(null);
+  const [refineOpen,setRefineOpen]=useState(()=>window.matchMedia("(min-width:801px)").matches);
+  useEffect(()=>{const media=window.matchMedia("(min-width:801px)");const sync=()=>setRefineOpen(media.matches);media.addEventListener("change",sync);return()=>media.removeEventListener("change",sync);},[]);
   const filterControls=(
       <div className="discovery-filters">
         <Select
@@ -260,7 +262,7 @@ export function Discovery() {
         </EmptyState>
       )}
       <p className="supporting">{w("Matching helps you find a professional. It is not a diagnosis.")}</p>
-      </section><aside className="discovery-aside">{resultsMode?<Card className="discovery-refine-card"><h2>{w("Refine your care")}</h2>{filterControls}<InlineNotice>{w("Approval, language and format determine eligible services. Open times are checked before booking.")}</InlineNotice></Card>:<><section className="discovery-request-aside"><span className="discovery-request-icon" aria-hidden="true"><MessageCircle size={24}/></span><h2>{w("Someone to talk to. A choice that’s yours.")}</h2><p>{w("Tell us what you need. Available clinicians can respond with a session time and a clear fee.")}</p><Link className="button" to="/patient/requests" state={{requestDraft}}>{w("Post a private request")}</Link><p className="supporting">{w("Your request is only shown to eligible clinicians.")}</p></section><p className="discovery-privacy supporting"><LockKeyhole size={18} aria-hidden="true"/>{w("Your name and personal details stay private until you choose to share them.")}</p></>}</aside></div>
+      </section><aside className="discovery-aside">{resultsMode?<Card className="discovery-refine-card"><details open={refineOpen} onToggle={event=>setRefineOpen(event.currentTarget.open)}><summary><h2>{w("Refine your care")}</h2></summary><div>{filterControls}<InlineNotice>{w("Approval, language and format determine eligible services. Open times are checked before booking.")}</InlineNotice></div></details></Card>:<><section className="discovery-request-aside"><span className="discovery-request-icon" aria-hidden="true"><MessageCircle size={24}/></span><h2>{w("Someone to talk to. A choice that’s yours.")}</h2><p>{w("Tell us what you need. Available clinicians can respond with a session time and a clear fee.")}</p><Link className="button" to="/patient/requests" state={{requestDraft}}>{w("Post a private request")}</Link><p className="supporting">{w("Your request is only shown to eligible clinicians.")}</p></section><p className="discovery-privacy supporting"><LockKeyhole size={18} aria-hidden="true"/>{w("Your name and personal details stay private until you choose to share them.")}</p></>}</aside></div>
     </section>
   );
 }
