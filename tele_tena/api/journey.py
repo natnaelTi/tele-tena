@@ -290,7 +290,7 @@ def _initial_application_profile(user):
 def applications():
     user = actor()
     if 'Tele Tena Approver' in frappe.get_roles(user):
-        result = rows('''SELECT a.*,p.display_name FROM tt_application a
+        result = rows('''SELECT a.*,p.display_name,p.public_id AS application_id FROM tt_application a
             JOIN tt_profile p ON p.user=a.user ORDER BY a.submitted_at IS NULL,a.submitted_at,a.user''')
         for item in result:
             item.application_profile = _initial_application_profile(item.user)

@@ -6,7 +6,6 @@ import { PageTitle, date, money } from "../components/Domain";
 import {
   Button,
   Card,
-  Dialog,
   Checkbox,
   EmptyState,
   InlineNotice,
@@ -18,7 +17,7 @@ import {
 import { useAction } from "../hooks/useAction";
 import { useResource } from "../hooks/useResource";
 import { useLocale } from "../hooks/useLocale";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ClipboardCheck, Layers, ShieldCheck, Building2, ArrowRight, FileText } from "lucide-react";
 export function AdminOverview() {
   const {w}=useLocale();
@@ -47,23 +46,17 @@ export function Applications() {
   const {w}=useLocale();
   const location=useLocation();
   const navigate=useNavigate();
+  const {applicationId}=useParams();
   const resource=useResource(journeyApi.applications);
   const action=useAction();
-  const [query,setQuery]=useState("");
-  const [status,setStatus]=useState("");
-  const [selectedUser,setSelectedUser]=useState<string|null>(() => (location.state as {applicationUser?:string}|null)?.applicationUser || null);
+  const [query,setQuery]=useState((location.state as {returnQuery?:string}|null)?.returnQuery||"");
+  const [status,setStatus]=useState((location.state as {returnStatus?:string}|null)?.returnStatus||"");
+  const selectedUser=(location.state as {applicationUser?:string}|null)?.applicationUser || null;
   const [resumeError,setResumeError]=useState("");
-  const selected=resource.data?.find(item=>item.user===selectedUser);
+  const selected=resource.data?.find(item=>applicationId?item.application_id===applicationId:item.user===selectedUser);
   const shown=resource.data?.filter(item=>(!status||item.status===status)&&(!query||item.display_name?.toLocaleLowerCase().includes(query.toLocaleLowerCase())));
-  const review=(user:string)=>{setResumeError("");setSelectedUser(user);};
-  return <>
-    <PageTitle title={w("Clinician applications")} description={w("Review people by name, with their requested scopes visible.")}/>
-    <div className="review-queue-filters"><TextField label={w("Search clinician name")} placeholder={w("Search clinician name")} value={query} onChange={event=>setQuery(event.target.value)}/><Select label={w("Application status")} value={status} onChange={event=>setStatus(event.target.value)}><option value="">{w("All statuses")}</option>{["Pending","Approved","Rejected"].map(value=><option key={value} value={value}>{w(value)}</option>)}</Select></div>
-    {resource.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice>:!resource.data?<Skeleton/>:shown?.length?<>
-      <div className="table-scroll review-queue-table"><table><thead><tr>{["Clinician","Application status","Requested services","Submitted","Evidence","Action"].map(label=><th key={label}>{w(label)}</th>)}</tr></thead><tbody>{shown.map(item=><tr key={item.user}><td><strong>{item.display_name||w("Clinician application")}</strong></td><td><StatusBadge>{w(item.status)}</StatusBadge></td><td>{item.requested_service_labels?.join(", ")||w("Not recorded")}</td><td>{item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w("Date unavailable")}</td><td>{w(item.evidence_complete?"Complete":"Incomplete")}</td><td><Button variant="quiet" onClick={()=>review(item.user)}>{w("Review")}</Button></td></tr>)}</tbody></table></div>
-      <div className="review-queue-cards">{shown.map(item=><Card key={item.user}><header><h2>{item.display_name||w("Clinician application")}</h2><StatusBadge>{w(item.status)}</StatusBadge></header><p>{item.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p><p className="supporting">{w("Evidence")}: {w(item.evidence_complete?"Complete":"Incomplete")}</p><Button variant="secondary" onClick={()=>review(item.user)}>{w("Review")}</Button></Card>)}</div>
-    </>:<EmptyState title={w("No applications to review.")}>{w("Submitted applications will appear here.")}</EmptyState>}
-    {selected&&<Dialog open onOpenChange={open=>{if(!open&&!action.busy){setSelectedUser(null);if((location.state as {applicationUser?:string}|null)?.applicationUser)navigate(location.pathname,{replace:true,state:null});}}} title={selected.display_name||w("Clinician application")} description={w("Review the application and private evidence. Decide service scopes separately.")} className="application-review-dialog">
+  const review=(user:string)=>{const item=resource.data?.find(value=>value.user===user);setResumeError("");navigate(item?.application_id?`/admin/applications/${encodeURIComponent(item.application_id)}`:"/admin/application-review",{state:{applicationUser:user,returnQuery:query,returnStatus:status}});};
+  const reviewContent=selected&&<>
       <div className="application-review-meta"><StatusBadge>{w(selected.status)}</StatusBadge><span>{w("Submitted")}: {selected.submitted_at?new Date(selected.submitted_at).toLocaleDateString():w("Date unavailable")}</span></div>
       <div className="application-review-layout"><div>
         <section className="application-review-panel"><h2>{w("Professional profile")}</h2>{selected.application_profile&&Object.keys(selected.application_profile).length>0&&<><p className="supporting">{w("Self-reported application details — verification is recorded separately.")}</p><dl>{([["professional_category","Profession"],["qualification","Primary qualification"],["issuing_institution","Issuing institution"],["experience_years","Years of practice"],["issuing_authority","Licensing authority"],["registration_number","License number"],["jurisdiction","Credential jurisdiction"],["credential_expiry","License expiry"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl></>}<h3>{w("Professional statement")}</h3><p className="prewrap">{selected.statement||w("Not provided")}</p>
@@ -81,7 +74,21 @@ export function Applications() {
         <Link className="settings-link-row" to="/admin/vetting">{w("Review scope applications")} <ArrowRight size={18} aria-hidden="true"/></Link>
         <div className="actions"><Button loading={action.busy} disabled={selected.status==='Approved'} onClick={()=>void action.run(async()=>{await journeyApi.reviewApplication(selected.user,'Approved');await resource.refresh();})}>{w("Approve application")}</Button><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.reviewApplication(selected.user,'Rejected');await resource.refresh();})}>{w("Reject application")}</Button></div>{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
       </aside></div>
-    </Dialog>}
+  </>;
+  if(applicationId||location.pathname==="/admin/application-review")return <section className="application-review-page">
+    <PageTitle title={w("Application review")} description={selected?.display_name||w("Clinician application")} action={<Link className="button secondary" to="/admin/applications" state={{returnQuery:(location.state as {returnQuery?:string}|null)?.returnQuery,returnStatus:(location.state as {returnStatus?:string}|null)?.returnStatus}}>{w("Back to applications")}</Link>}/>
+    {resource.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice>:!resource.data?<Skeleton/>:selected?reviewContent:<EmptyState title={w("Application unavailable")}>{w("Return to applications to choose an available record.")}</EmptyState>}
+  </section>;
+  if(selectedUser&&selected)return <Navigate replace to={selected.application_id?`/admin/applications/${encodeURIComponent(selected.application_id)}`:"/admin/application-review"} state={{applicationUser:selectedUser}}/>;
+  return <>
+    <PageTitle title={w("Clinician applications")} description={w("Review people by name, with their requested scopes visible.")}/>
+    <div className="review-queue-filters"><TextField label={w("Search clinician name")} placeholder={w("Search clinician name")} value={query} onChange={event=>setQuery(event.target.value)}/><Select label={w("Application status")} value={status} onChange={event=>setStatus(event.target.value)}><option value="">{w("All statuses")}</option>{["Pending","Approved","Rejected"].map(value=><option key={value} value={value}>{w(value)}</option>)}</Select></div>
+    {resource.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice>:!resource.data?<Skeleton/>:shown?.length?<>
+      <div className="table-scroll review-queue-table"><table><thead><tr>{["Clinician","Application status","Requested services","Submitted","Evidence","Action"].map(label=><th key={label}>{w(label)}</th>)}</tr></thead><tbody>{shown.map(item=><tr key={item.user}><td><strong>{item.display_name||w("Clinician application")}</strong></td><td><StatusBadge>{w(item.status)}</StatusBadge></td><td>{item.requested_service_labels?.join(", ")||w("Not recorded")}</td><td>{item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w("Date unavailable")}</td><td>{w(item.evidence_complete?"Complete":"Incomplete")}</td><td><Button variant="quiet" onClick={()=>review(item.user)}>{w("Review")}</Button></td></tr>)}</tbody></table></div>
+      <div className="review-queue-cards">{shown.map(item=><Card key={item.user}><header><h2>{item.display_name||w("Clinician application")}</h2><StatusBadge>{w(item.status)}</StatusBadge></header><p>{item.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p><p className="supporting">{w("Evidence")}: {w(item.evidence_complete?"Complete":"Incomplete")}</p><Button variant="secondary" onClick={()=>review(item.user)}>{w("Review")}</Button></Card>)}</div>
+    </>:<EmptyState title={w("No applications to review.")}>{w("Submitted applications will appear here.")}</EmptyState>}
+
+
   </>;
 }
 export function Scopes() {

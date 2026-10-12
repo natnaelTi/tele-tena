@@ -1,5 +1,8 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Back to applications": ["ወደ ማመልከቻዎች ይመለሱ", "Gara iyyataatti deebi’i"],
+  "Application unavailable": ["ማመልከቻው አይገኝም", "Iyyanni hin jiru"],
+  "Return to applications to choose an available record.": ["የሚገኝ መዝገብ ለመምረጥ ወደ ማመልከቻዎች ይመለሱ።", "Galmee jiru filachuuf gara iyyataatti deebi’i."],
   "Counseling psychologist": ["የምክር ሥነ ልቦና ባለሙያ", "Ogeessa saayikoloojii gorsaa"],
   "Clinical psychologist": ["ክሊኒካዊ ሥነ ልቦና ባለሙያ", "Ogeessa saayikoloojii klinikaa"],
   "Psychiatrist": ["የአእምሮ ጤና ሐኪም", "Doktara fayyaa sammuu"],

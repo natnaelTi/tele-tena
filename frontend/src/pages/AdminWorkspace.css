@@ -61,3 +61,11 @@
 .application-review-layout aside .actions{display:flex;flex-direction:column;align-items:stretch;margin-top:20px}
 .application-review-panel .settings-link-row{margin-top:20px;font-weight:600}
 @media(max-width:760px){.application-review-layout{grid-template-columns:1fr;gap:0}.application-review-panel{padding:20px}}
+
+.application-review-page .application-review-panel {background:var(--card);padding:26px;}
+.application-review-page .application-review-panel h2 {font-size:25px;line-height:1.25;}
+.application-review-page .application-review-panel dl {margin:20px 0;}
+.application-review-page .application-review-panel dl>div {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:16px;padding:16px 0;border-bottom:1px solid var(--border);}
+.application-review-page .application-review-panel dt {color:var(--muted);}
+.application-review-page .application-review-panel dd {margin:0;font-weight:600;text-align:right;overflow-wrap:anywhere;}
+@media(max-width:650px){.application-review-page .application-review-panel {padding:22px;}.application-review-page .application-review-panel dl>div {grid-template-columns:1fr;gap:6px;}.application-review-page .application-review-panel dd {text-align:left;}}

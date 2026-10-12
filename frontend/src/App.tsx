@@ -144,6 +144,8 @@ export default function App() {
               <Route path="/admin" element={<WorkspaceLayout kind="admin" />}>
                 <Route index element={<AdminOverview />} />
                 <Route path="applications" element={<Applications />} />
+                <Route path="applications/:applicationId" element={<Applications />} />
+                <Route path="application-review" element={<Applications />} />
                 <Route path="scopes" element={<Scopes />} />
                 <Route path="services" element={<ServiceCatalog />} />
                 <Route path="matching" element={<MatchingOperations />} />
