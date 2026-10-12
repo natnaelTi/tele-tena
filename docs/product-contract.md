@@ -21,6 +21,18 @@ in the owner-only draft and copied to private profile history only on adult-cons
 completion. It does not imply disclosure; existing global defaults and per-booking
 preview/overrides apply. Existing ready-step drafts keep their stored meaning.
 
+## Initial clinician application structure —2026-10-12
+
+B06/B07 capture self-reported professional category, relevant experience, languages,
+qualification and credential identifiers/expiry in the private resumable onboarding
+record. These fields use the existing scope-application validators; they are not
+credential verification or a substitute for individual human scope assessment.
+Only the applicant and authorized vetting reviewers can retrieve this application
+metadata. Optional introduction is explicitly intended for the approved public
+profile; qualifications and credential identifiers never follow it into discovery.
+Existing saved applications remain valid without inferred or fabricated new fields.
+No schema, approval, payment or call policy changes follow from this composition.
+
 ## First internal demonstration
 Adults 18+. English, Amharic and Afaan Oromo with native review before pilot.
 Patient and clinician portals; administrator approval; independent and multi-clinic
