@@ -180,7 +180,7 @@ async function main() {
           const details=await call(page).locator('.room-session-details').evaluate(el=>{const r=el.getBoundingClientRect();return {visible:r.width>0&&r.height>0,left:r.left,scroll:el.scrollHeight,height:el.clientHeight};})
           const stage=await call(page).locator('.media-stage').boundingBox()
           assert.ok(details.visible&&stage&&details.left>=stage.x+stage.width,'Media left and consultation details right must remain visible')
-          assert.ok(details.scroll<=details.height+1,'Default desktop consultation details must fit without scrolling')
+          assert.ok(details.scroll<=details.height+1,'Default desktop consultation details must fit without scrolling: '+JSON.stringify(details))
           console.log('Viewport PASS:',name,size.width,JSON.stringify(fit))
           const leave=await call(page).getByRole('button',{name:'Leave',exact:true}).boundingBox()
           assert.ok(leave&&leave.y+leave.height<=size.height,'Leave must remain visible')

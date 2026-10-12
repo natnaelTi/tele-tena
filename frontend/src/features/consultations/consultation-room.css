@@ -139,8 +139,9 @@ body:has(.focused-call) {background:white;}
  .focused-call .consultation.room-connected{height:100%;min-height:0;box-sizing:border-box;border:0;display:flex;flex-direction:column;padding:16px 24px;background:#10212a;color:white;overflow:hidden;}
  .focused-call .room-connected>.room-heading,.focused-call .room-connected>.light-call-header{flex-shrink:0;margin:0;padding-block:8px 12px;}
  .focused-call .room-connected .light-call-header .brand,.focused-call .room-connected .light-call-header a,.focused-call .room-connected .audio-page-title h1,.focused-call .room-connected .audio-page-title p{color:white;}
- .focused-call .room-connected>.audio-page-title{flex-shrink:0;margin:8px 0;}
- .focused-call .room-connected>.audio-page-title h1{font-size:28px;margin:0;}
+ .focused-call .room-connected>.audio-page-title{flex-shrink:0;display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 16px;margin:4px 0;}
+ .focused-call .room-connected>.audio-page-title h1{font-size:24px;line-height:1.25;margin:0;}
+ .focused-call .room-connected>.audio-page-title p{font-size:14px;line-height:1.4;margin:0;}
  .focused-call .room-connected .room-workspace{flex:1;min-height:0;align-items:stretch;}
  .focused-call .room-connected .room-main{display:flex;flex-direction:column;min-height:0;}
  .focused-call .room-connected .media-stage{flex:1;min-height:0;height:auto;max-height:none;margin:12px 0;}
