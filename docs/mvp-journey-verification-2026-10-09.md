@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **c7a62b9ca3a28cb6b46b10350122ebc640aa6ba6**. Later test/report/evidence-only commits
+  **5944566753a323bfa0f9045d47b29b4dc297471c**. Later test/report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -20,6 +20,34 @@ screen/completion matrix; the sections below this active checkpoint are historic
   preview. `scripts/local_review.py start/status/stop` restores it without migrations,
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Optional approach selection and ten-scope intake —12October2026
+
+Package `5944566753a323bfa0f9045d47b29b4dc297471c`. The previous scope form
+invited arbitrary approach text while its server validator required exact catalog
+keys. The presentation catalog has nine Draft approaches and no Active approaches;
+no valid selection was available. This was a form/contract mismatch, not a reason
+to relax review or approve the draft taxonomy. Service applications may omit approaches.
+
+Private applicant context now supplies Active catalog choices with labels, definitions
+and evidence guidance. The free-text key field is replaced by optional checkboxes,
+with an explicit empty-catalog explanation and separate training narrative. Previously
+saved approaches that are no longer usable are shown with an explicit move-to-training
+action; nothing is silently removed or converted into a catalog approval. Server
+validation remains authoritative, including retirement after a choice was loaded.
+
+Two focused real Frappe tests passed (6.162s, `/tmp/tt-approach-backend.log`):
+Active-only choice projection, optional omission, invalid/Draft/Retired rejection,
+stale retirement, and ten-scope atomic draft/submission/retry/privacy with an
+above-limit rejection. New registration -> saved claims -> select all ten services
+-> draft/reload -> explicitly reselect all ten -> submit ten distinct Submitted
+records passed in the real built-browser test (`/tmp/tt-approach-browser.log`).
+The browser asserts no obsolete approach textbox, truthful empty-choice guidance,
+and all ten submitted states; it uses controlled random-code delivery on the
+isolated test site, not a mocked frontend response. Original site settings and
+captured-code cleanup verified. Build/typecheck and lint passed with inherited
+warnings. No schema migration, live send, financial changes or automatic approval.
+No unrelated call/financial suite rerun; full MVP/owner visual acceptance still open.
 
 ## Application persistence correction —12October2026
 

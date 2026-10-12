@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "c7a62b9ca3a28cb6b46b10350122ebc640aa6ba6",
+  "source_checkpoint": "5944566753a323bfa0f9045d47b29b4dc297471c",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -1677,7 +1677,8 @@
         "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
         "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json",
         "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
-        "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance."
+        "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance.",
+        "optional_approach_choices": "5944566: optional Active catalog choices replace undocumented free-text stable keys; truthful empty state and explicit stale-entry move to training. Two Frappe tests plus real random-code backend/browser all-ten-scope draft/reload/submission pass. No auto approval; visual/owner acceptance separate. See active journey report."
       },
       "visual_acceptance": {
         "reference_screen": "B07",
@@ -1915,7 +1916,8 @@
         "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
         "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json",
         "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
-        "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance."
+        "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance.",
+        "optional_approach_choices": "5944566: optional Active catalog choices replace undocumented free-text stable keys; truthful empty state and explicit stale-entry move to training. Two Frappe tests plus real random-code backend/browser all-ten-scope draft/reload/submission pass. No auto approval; visual/owner acceptance separate. See active journey report."
       },
       "visual_acceptance": {
         "reference_screen": "B09",
@@ -2048,7 +2050,8 @@
         "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
         "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json",
         "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
-        "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance."
+        "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance.",
+        "optional_approach_choices": "5944566: optional Active catalog choices replace undocumented free-text stable keys; truthful empty state and explicit stale-entry move to training. Two Frappe tests plus real random-code backend/browser all-ten-scope draft/reload/submission pass. No auto approval; visual/owner acceptance separate. See active journey report."
       },
       "visual_acceptance": {
         "reference_screen": "B10",

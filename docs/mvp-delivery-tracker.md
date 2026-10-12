@@ -2,9 +2,11 @@
 
 ## Active checkpoint —12October2026
 
+Optional treatment-approach choices now use Active metadata; an empty catalog does not block scope applications. Real backend/browser ten-scope submission and retry passed without approval.
+
 Application-field correction: completed private claims now reach owner/reviewer; saved scope drafts recover after reload; focused database and connected test-transport browser checks pass. See the active journey report. No migration, automatic approval or live send.
 
-Current runtime package `c7a62b9ca3a28cb6b46b10350122ebc640aa6ba6` on the presentation8017 preview. Structured Draft/Active scope intake, private professional claims and reasoned Medical Lead catalog decisions are implemented. Five focused Frappe regressions, random-OTP scope draft browser, cross-page acceptance notifications, repeat-migration preservation and current patient discovery/calendar path pass for their named states. Full MVP visual/state acceptance, a continuous reviewer-browser chain and v1.37 fresh installation remain open. No automatic approvals, merge or remote change. The dated checkpoint sections below are historical; the single screen matrix and active journey report are authoritative.
+Current runtime package `5944566753a323bfa0f9045d47b29b4dc297471c` on the presentation8017 preview. Structured Draft/Active scope intake, private professional claims and reasoned Medical Lead catalog decisions are implemented. Five focused Frappe regressions, random-OTP scope draft browser, cross-page acceptance notifications, repeat-migration preservation and current patient discovery/calendar path pass for their named states. Full MVP visual/state acceptance, a continuous reviewer-browser chain and v1.37 fresh installation remain open. No automatic approvals, merge or remote change. The dated checkpoint sections below are historical; the single screen matrix and active journey report are authoritative.
 
 ## Latest accepted-offer / room delta —12October2026
 
