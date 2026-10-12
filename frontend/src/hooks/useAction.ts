@@ -3,7 +3,7 @@ import { ApiError } from "../api";
 const messages: Record<string, string> = {
   scope_qualification_required: "Add your professional category, qualification and issuing institution before submission.",
   scope_adult_required: "Confirm that your service application is limited to adult care in the Relevant experience step.",
-  scope_approach_invalid: "Choose treatment approaches from the reviewed catalog only. Remove any unlisted approach and try again.",
+  scope_approach_invalid: "An approach is no longer available. In Relevant experience, move the unlisted entry to your training description before saving.",
   credential_date_invalid: "Enter a valid credential date.",
   resume_required: "Upload a PDF resume before submitting your application.",
   scope_not_open: "This service is not accepting applications. Your other choices are still here.",

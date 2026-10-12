@@ -3274,7 +3274,7 @@ class Presentation(unittest.TestCase):
             frappe.db.sql('DELETE FROM tt_onboarding WHERE user=%s', (user,))
 
     def test_draft_catalog_multi_scope_intake_is_atomic_private_and_retry_safe(self):
-        keys = [fixtures.PREFIX + '-intake-' + suffix for suffix in ('one', 'two')]
+        keys = [fixtures.PREFIX + '-intake-' + str(number) for number in range(10)]
         values = {'professional_category': 'Fictional counselor',
                   'qualification': 'Fictional counseling degree',
                   'issuing_institution': 'Fictional college', 'experience_years': 4,
@@ -3298,6 +3298,8 @@ class Presentation(unittest.TestCase):
         journey.save_profile('clinician', 'Fictional applicant', True, languages=['en'])
         listed = {item.id for item in vetting.vetting_services()}
         self.assertTrue(set(keys) <= listed)
+        with self.assertRaises(frappe.ValidationError):
+            vetting.save_scope_applications(keys + [fixtures.PREFIX], values)
         with self.assertRaises(frappe.ValidationError):
             vetting.save_scope_applications([keys[0], fixtures.PREFIX], values)
         self.assertEqual(frappe.db.count('Tele Tena Vetting Scope Application',
@@ -3330,6 +3332,38 @@ class Presentation(unittest.TestCase):
         fixtures.login('admin')
         self.assertTrue(all(frappe.db.get_value('Tele Tena Service', key, 'active') == 0
                             for key in keys))
+
+    def test_scope_approach_choices_are_active_optional_and_revalidated(self):
+        keys = []
+        try:
+            for status in ('Active', 'Draft', 'Retired'):
+                key = fixtures.PREFIX + '-approach-' + status.lower()
+                frappe.get_doc({'doctype': 'Tele Tena Treatment Approach', 'catalog_key': key,
+                                'label_en': 'Fictional approach ' + status,
+                                'definition': 'Fictional approach for validation tests only.',
+                                'status': status, 'evidence_requirements': 'Fictional training evidence'}).insert()
+                keys.append(key)
+            fixtures.login('c1')
+            choices = vetting.application_context()['treatment_approaches']
+            self.assertIn(keys[0], {item.id for item in choices})
+            self.assertNotIn(keys[1], {item.id for item in choices})
+            self.assertNotIn(keys[2], {item.id for item in choices})
+            self.assertEqual(vetting._validated_form({'approach_keys': ''})['approach_keys'], '')
+            self.assertEqual(vetting._validated_form({'approach_keys': keys[0]})['approach_keys'], keys[0])
+            for value in (keys[1], keys[2], 'Cognitive behavioral therapy', keys[0] + '\nUnknown training'):
+                with self.assertRaises(frappe.ValidationError):
+                    vetting._validated_form({'approach_keys': value})
+                self.assertEqual(frappe.local.response.get('tele_tena_error'), 'scope_approach_invalid')
+            # An approach retired after loading cannot be submitted through a stale choice.
+            fixtures.login('admin')
+            frappe.db.set_value('Tele Tena Treatment Approach', keys[0], 'status', 'Retired')
+            fixtures.login('c1')
+            with self.assertRaises(frappe.ValidationError):
+                vetting._validated_form({'approach_keys': keys[0]})
+        finally:
+            fixtures.login('admin')
+            for key in keys:
+                frappe.delete_doc('Tele Tena Treatment Approach', key)
 
     def test_new_clinician_three_scope_decisions_to_discovery_and_immediate_inbox(self):
         services = [fixtures.PREFIX + '-chain-' + suffix for suffix in ('approved','clarify','declined')]

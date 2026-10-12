@@ -90,7 +90,7 @@ function ScopeEvidencePanel({item,canUpload,refresh}:{item:any;canUpload:boolean
 }
 
 export function ClinicianScopeApplications() {
-  const { w } = useLocale();
+  const { w, locale } = useLocale();
   const services = useResource(journeyApi.vettingServices);
   const context = useResource(journeyApi.scopeApplicationContext);
   const contextApplied=useRef(false);
@@ -120,6 +120,9 @@ export function ClinicianScopeApplications() {
   const [independent, setIndependent] = useState(false);
   const [appealStatements,setAppealStatements]=useState<Record<string,string>>({});
   const [reverificationOf,setReverificationOf]=useState<string|null>(null);
+  const approachOptions=context.data?.treatment_approaches||[];
+  const selectedApproaches=approaches.split('\n').map(value=>value.trim()).filter(Boolean);
+  const unlistedApproaches=selectedApproaches.filter(key=>!approachOptions.some((item:any)=>item.id===key));
 
   useEffect(()=>{
     if(!context.data||!applications.data||contextApplied.current||dirty)return;
@@ -146,6 +149,7 @@ export function ClinicianScopeApplications() {
     if(!service) throw new ApiError('scope_selection_invalid');
     if(submit&&(!category.trim()||!qualification.trim()||!institution.trim()))throw new ApiError('scope_qualification_required');
     if(submit&&!adults)throw new ApiError('scope_adult_required');
+    if(unlistedApproaches.length)throw new ApiError('scope_approach_invalid');
     const values={professional_category:category,qualification,issuing_institution:institution,competencies,certifications,credential_valid_from:validFrom,
       registration_number:license,issuing_authority:authority,jurisdiction,credential_expiry:expiry,
       experience_years:experience||'0',approach_keys:approaches,population_adults:adults,
@@ -194,7 +198,12 @@ export function ClinicianScopeApplications() {
           </>}
           {step===2&&<>
           <TextField label={w("Years of relevant experience")} type="number" min="0" max="60" value={experience} onChange={e=>setExperience(e.target.value)} />
-          <label className="field">{w("Treatment approaches (one per line)")}<textarea rows={3} value={approaches} onChange={e=>setApproaches(e.target.value)} /></label>
+          <fieldset className="scope-selection"><legend>{w("Treatment approaches (optional)")}</legend>
+            <p className="supporting">{w("Select only approaches you are trained to use. Your evidence is reviewed separately.")}</p>
+            {approachOptions.length?approachOptions.map((item:any)=><Checkbox key={item.id} variant="card" label={locale==='am'?item.label_am||item.label_en:locale==='om'?item.label_om||item.label_en:item.label_en} description={item.definition} checked={selectedApproaches.includes(item.id)} onChange={event=>setApproaches((event.target.checked?[...selectedApproaches,item.id]:selectedApproaches.filter(key=>key!==item.id)).join('\n'))}/>):<p>{w("No reviewed approaches are available to select yet. You can still submit your service application.")}</p>}
+            <p className="supporting">{w("If an approach is not listed, describe your training below. Selecting an approach does not grant approval.")}</p>
+          </fieldset>
+          {unlistedApproaches.length>0&&<InlineNotice tone="warning"><p>{w("These previous entries are not selectable catalog approaches. Move them to your training description or remove them before saving.")}</p><ul>{unlistedApproaches.map(key=><li key={key}>{key}</li>)}</ul><Button variant="secondary" onClick={()=>{setTraining([training,...unlistedApproaches].filter(Boolean).join('\n'));setApproaches(selectedApproaches.filter(key=>!unlistedApproaches.includes(key)).join('\n'));setDirty(true);}}>{w("Move to training description")}</Button></InlineNotice>}
           <label className="field">{w("Relevant training")}<textarea rows={3} value={training} onChange={e=>setTraining(e.target.value)} /></label>
           <label className="field">{w("Why are you prepared to provide this service?")}<textarea rows={4} value={statement} onChange={e=>setStatement(e.target.value)} /></label>
           <Checkbox label={w("My application is limited to adult care.")} checked={adults} onChange={e=>setAdults(e.target.checked)} />

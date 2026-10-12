@@ -532,6 +532,9 @@ def application_context():
         WHERE vetting_required=1 AND catalog_status IN ('Draft','Active')""")}
     return {'professional': journey._initial_application_profile(user),
             'requested_services': [key for key in requested if isinstance(key, str) and key in eligible],
+            'treatment_approaches': rows('''SELECT catalog_key AS id,label_en,label_am,label_om,
+                definition,evidence_requirements FROM `tabTele Tena Treatment Approach`
+                WHERE status='Active' ORDER BY label_en,catalog_key'''),
             'resume_uploaded': bool(rows('SELECT 1 FROM tt_resume_evidence WHERE clinician=%s', (user,)))}
 
 

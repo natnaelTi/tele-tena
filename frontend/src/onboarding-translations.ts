@@ -1,5 +1,13 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Treatment approaches (optional)": ["የሕክምና ዘዴዎች (አማራጭ)", "Maloota yaalaa (filannoo)"],
+  "Select only approaches you are trained to use. Your evidence is reviewed separately.": ["ለመጠቀም የሰለጠኑባቸውን ዘዴዎች ብቻ ይምረጡ። ማስረጃዎ በተለየ ይገመገማል።", "Maloota itti fayyadamuuf leenjite qofa filadhu. Ragaan kee addaan gamaaggamama."],
+  "No reviewed approaches are available to select yet. You can still submit your service application.": ["ለምርጫ የተገመገሙ ዘዴዎች ገና የሉም። የአገልግሎት ማመልከቻዎን ማስገባት ይችላሉ።", "Maloonni gamaaggamaman filachuuf ammatti hin jiran. Iyyata tajaajilaa kee erguu dandeessa."],
+  "If an approach is not listed, describe your training below. Selecting an approach does not grant approval.": ["ዘዴው ካልተዘረዘረ ስልጠናዎን ከታች ይግለጹ። ዘዴ መምረጥ ፈቃድ አይሰጥም።", "Malli hin tarreeffamne yoo ta'e, leenjii kee armaan gaditti ibsi. Mala filachuun hayyama hin kennu."],
+  "These previous entries are not selectable catalog approaches. Move them to your training description or remove them before saving.": ["እነዚህ የቀድሞ ግቤቶች ሊመረጡ የሚችሉ ዘዴዎች አይደሉም። ከማስቀመጥዎ በፊት ወደ ስልጠና መግለጫ ያንቀሳቅሱ ወይም ያስወግዱ።", "Galteewwan duraanii kun maloota filataman miti. Olkaa'uu dura gara ibsa leenjii geessi ykn haqi."],
+  "Move to training description": ["ወደ ስልጠና መግለጫ አንቀሳቅስ", "Gara ibsa leenjii geessi"],
+  "An approach is no longer available. In Relevant experience, move the unlisted entry to your training description before saving.": ["ዘዴው አሁን አይገኝም። በልምድ ደረጃው ከማስቀመጥዎ በፊት ያልተዘረዘረውን ወደ ስልጠና መግለጫ ያንቀሳቅሱ።", "Malli kun amma hin jiru. Tarkaanfii muuxannoo keessatti olkaa'uu dura galtee hin tarreeffamne gara ibsa leenjii geessi."],
+
   "Add your professional category, qualification and issuing institution before submission.": ["ከማስገባትዎ በፊት የሙያ ዘርፍዎን፣ ብቃትዎንና የሰጠውን ተቋም ይሙሉ።", "Erguu dura gosa ogummaa, barnootaa fi dhaabbata kenne guuti."],
   "Confirm that your service application is limited to adult care in the Relevant experience step.": ["በልምድ ደረጃው ማመልከቻዎ ለአዋቂዎች እንክብካቤ ብቻ መሆኑን ያረጋግጡ።", "Tarkaanfii muuxannoo keessatti iyyanni kee kunuunsa ga'eessotaa qofaaf ta'uu mirkaneessi."],
   "Choose treatment approaches from the reviewed catalog only. Remove any unlisted approach and try again.": ["የሕክምና ዘዴዎችን ከተገመገመው ዝርዝር ብቻ ይምረጡ። ያልተዘረዘረ ዘዴን አስወግደው እንደገና ይሞክሩ።", "Mala yaalaa tarree gamaaggamame keessaa qofa filadhu. Mala hin tarreeffamne haqiitii irra deebi'i."],
