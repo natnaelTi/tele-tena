@@ -3361,7 +3361,7 @@ class Presentation(unittest.TestCase):
             with self.assertRaises(frappe.ValidationError):
                 vetting._validated_form({'approach_keys': keys[0]})
         finally:
-            fixtures.login('admin')
+            frappe.set_user('Administrator')
             for key in keys:
                 frappe.delete_doc('Tele Tena Treatment Approach', key)
 
