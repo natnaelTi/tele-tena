@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **42cb041818613aa87dbe5d7a9aceefd23f32297d**. Later test/report/evidence-only commits
+  **fde86c3132e9af65eb88b437dca7dea2435c23a9**. Later test/report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -20,6 +20,33 @@ screen/completion matrix; the sections below this active checkpoint are historic
   preview. `scripts/local_review.py start/status/stop` restores it without migrations,
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Desktop consultation-column clarification —12October
+
+The user confirmed the preceding functionality and clarified that the original
+media-left / session-details-right composition must remain in both video/audio.
+Packagefde86c3132e9af65eb88b437dca7dea2435c23a9 restores that arrangement for
+all desktop connected modes while retaining the full-width dark outer canvas.
+Compact details/extension spacing, a300px supporting column, and an inline audio
+heading keep default contents in view. Mobile retains its existing stacked/details
+behavior. Expanded forms, unusually long content and zoom may still use the
+accessible internal overflow fallback; no controls/content are removed to fit.
+
+Focused hosted LiveKit Cloud two-role fake-device check passed at1440×960 and
+1024×768: visible right column beyond the left media stage; default sidebar content
+fits without internal scrolling; no page scrolling; visible Leave; audio-only,
+Leave/video rejoin, and clinician End close both views. The first laptop check
+caught genuine sidebar overflow; heading/text spacing and audio title row were
+corrected and the final unchanged assertions passed. Inspected final audio1024
+and video1440 captures. Evidence:`screenshots/consultation-columns-2026-10-12/`.
+
+Production build/typecheck, lint(no errors; inherited warnings), asset hashes and
+private credential scan pass. Stable presentation8017HTTP200; owned web/worker/
+scheduler remain running. Temporary isolated8028server and copied private LiveKit
+configuration removed. No changes to backend authorization, tokens, financial
+rules, notes or presentation records; unrelated suites were not rerun. This is
+not physical-device testing or renewed cached-token Cloud verification. PR44 stays
+draft; overall MVP owner acceptance and previously recorded gates remain open.
 
 ## Accepted-offer notification and desktop call delta —12October
 
