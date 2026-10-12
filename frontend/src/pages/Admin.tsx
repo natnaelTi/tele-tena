@@ -305,8 +305,6 @@ export function ServiceCatalog() {
             <Select label={w("Service category")} value={form.category} onChange={e=>set("category",e.target.value)} required>
               <option value="">{w("Choose a category")}</option>{catalog.data?.categories.map((item:any)=><option key={item.id} value={item.id}>{item.label} · {w(item.status)}</option>)}
             </Select>
-            <TextField label={w("Amharic name (provisional)")} value={form.service_label_am} onChange={e=>set("service_label_am",e.target.value)} maxLength={120}/>
-            <TextField label={w("Afaan Oromo name (provisional)")} value={form.service_label_om} onChange={e=>set("service_label_om",e.target.value)} maxLength={120}/>
           </div>
           <label className="field">{w("Professional description")}<textarea rows={4} maxLength={2000} value={form.description} onChange={e=>set("description",e.target.value)}/></label>
           <Select label={w("Participant structure")} value={form.participant_structure} onChange={e=>set("participant_structure",e.target.value)}>
@@ -317,6 +315,10 @@ export function ServiceCatalog() {
           </Select>
           <fieldset className="definition-delivery"><legend>{w("Allowed delivery formats")}</legend>{[["video","Video"],["audio","Audio"],["in_person","In person"]].map(([key,label])=><Checkbox key={key} variant="card" label={w(label)} checked={form.supported_formats.split("\n").includes(key)} onChange={event=>{const formats=form.supported_formats.split("\n").filter(Boolean);set("supported_formats",(event.target.checked?[...formats.filter(value=>value!==key),key]:formats.filter(value=>value!==key)).join("\n"));}}/>)}</fieldset>
           <TextField label={w("Definition version")} value={form.definition_version} onChange={e=>set("definition_version",e.target.value)} required maxLength={80}/>
+          <details className="service-catalog-advanced"><summary>{w("Language & translation review")}</summary>
+            <TextField label={w("Amharic name (provisional)")} value={form.service_label_am} onChange={e=>set("service_label_am",e.target.value)} maxLength={120}/>
+            <TextField label={w("Afaan Oromo name (provisional)")} value={form.service_label_om} onChange={e=>set("service_label_om",e.target.value)} maxLength={120}/>
+          </details>
           <details className="service-catalog-advanced"><summary>{w("Professional eligibility and workflow rules")}</summary>
             <TextField label={w("Stable service code")} value={form.service_key} onChange={e=>set("service_key",e.target.value)} required maxLength={80} hint={w("Lowercase letters, numbers, and hyphens; stable after creation.")}/>
             <label className="field">{w("Search names and synonyms (one per line)")}<textarea rows={2} maxLength={1000} value={form.synonyms} onChange={e=>set("synonyms",e.target.value)}/></label>
