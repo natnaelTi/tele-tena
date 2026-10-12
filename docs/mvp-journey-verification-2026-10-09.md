@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **7daf9c084dcf9982cd1ee622b7cf2c0413417a4d**. Later test/report/evidence-only commits
+  **c7a62b9ca3a28cb6b46b10350122ebc640aa6ba6**. Later test/report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -20,6 +20,41 @@ screen/completion matrix; the sections below this active checkpoint are historic
   preview. `scripts/local_review.py start/status/stop` restores it without migrations,
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Application persistence correction —12October2026
+
+Source/package `c7a62b9ca3a28cb6b46b10350122ebc640aa6ba6` fixes an
+owner-reported defect: completed onboarding already stored competencies,
+certifications and credential-valid-from, but the private owner/reviewer projection
+omitted them. The allowlist now returns all three without exposing them publicly.
+Scope editing also previously allowed input before async claims loaded, suppressing
+prefill; inputs now await initialization. An existing Draft/Clarification is restored
+with its own saved fields on reload. Original completed claims and scope-specific
+claims remain distinct; no historical data rewrite or new migration occurred.
+
+Submission now identifies missing profession/qualification/institution, adult-care
+confirmation, PDF resume, invalid credential dates and unreviewed treatment approach
+keys. The original generic error did not establish which constraint the owner's
+attempt violated; these cases now have safe dedicated error codes. Authorization,
+clinical-definition review, evidence gates and submitted-content locking remain.
+
+Actual checks: two Frappe/MariaDB regressions passed on the retained disposable site
+(`/tmp/tt-professional-claims-check.log`,6.230s): private claim projection to both
+owner and reviewer; scope save/read/valid submission/retry; invalid adult confirmation
+without partial rows; unrelated patient denial; atomic multi-scope intake/retry.
+The built-browser new patient/new clinician recovery and reviewer journey passed
+with `TELE_TENA_ONBOARDING_VISUAL=1 TELE_TENA_SCOPE_DRAFT_BROWSER=1` on the
+isolated8028 test transport (`/tmp/tt-claims-scope-browser.log`). It asserts all three
+initial fields, inherited scope fields, edited Draft save/reload, useful adult-check
+error, valid submission, two separate scopes and no clinical role grant. Original
+site configuration was restored, loopback test server stopped and captured codes
+removed. No live SMS/email sent; wrong/expired codes, returning-user cooldown,
+call and financial suites were not repeated for this correction.
+
+Build/typecheck and lint passed (inherited hook warnings and chunk-size warning
+remain). Evidence: `docs/screenshots/mvp-current/c7a62b9-application-fields/`.
+These checks close this reported private-field persistence defect, not the remaining
+MVP handover or owner visual acceptance. Translations are provisional.
 
 ## Active clinician intake correction —12October2026 (verification in progress)
 
