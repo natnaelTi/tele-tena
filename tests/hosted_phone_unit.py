@@ -1,6 +1,8 @@
 """Hosted access rules that need no site database or live SMS."""
 from types import SimpleNamespace
 import unittest
+import logging
+import io
 from unittest.mock import Mock, patch
 
 from tele_tena import review, sms
@@ -67,7 +69,7 @@ class HostedPhoneUnit(unittest.TestCase):
             with self.assertRaises(sms.SMSRejected):
                 sms.send_otp('+251911234567','123456')
             self.assertEqual(send.call_count, 1)
-            logger.return_value.warning.assert_called_once_with(
+            logger.return_value.error.assert_called_once_with(
                 'SMS send failed: category=%s http_status=%s; no automatic retry',
                 'authentication', 401)
 
@@ -86,9 +88,17 @@ class HostedPhoneUnit(unittest.TestCase):
                 with self.assertRaises(failure):
                     sms.send_otp('+251911234567', '123456')
                 self.assertEqual(send.call_count, 1)
-                logger.return_value.warning.assert_called_once_with(
+                logger.return_value.error.assert_called_once_with(
                     'SMS send failed: category=%s http_status=%s; no automatic retry',
                     category, status)
+
+    def test_diagnostic_survives_production_error_threshold(self):
+        output = io.StringIO()
+        logger = logging.Logger('safe-sms-test', level=logging.ERROR)
+        logger.addHandler(logging.StreamHandler(output))
+        with patch.object(sms.frappe, 'logger', return_value=logger):
+            sms._record_http_failure(401)
+        self.assertIn('category=authentication http_status=401', output.getvalue())
 
     def test_peer_ignores_untrusted_forwarded_header(self):
         self.fake.local.request = SimpleNamespace(remote_addr='127.0.0.1',

@@ -15,7 +15,7 @@ def _record_http_failure(status):
     category = ('authentication' if status in (401, 403) else
                 'rate_limit' if status == 429 else
                 'provider_service' if status >= 500 else 'request_rejected')
-    frappe.logger('tele_tena_sms', allow_site=True).warning(
+    frappe.logger('tele_tena_sms', allow_site=True).error(
         'SMS send failed: category=%s http_status=%s; no automatic retry', category, status)
 
 

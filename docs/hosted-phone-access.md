@@ -70,3 +70,11 @@ request headers are retained. Sending remains once per challenge; there is no
 automatic retry or header fallback. Five focused mocked unit checks passed;
 no live send was made by the agent. An operator-controlled attempt and provider
 account documentation/support are needed to resolve the actual rejection.
+
+Diagnostic correction: Frappe's production logger defaults to ERROR, so the
+first WARNING-level diagnostic was suppressed, including the operator's next
+rejected attempt. Diagnostics now use ERROR; six focused unit tests passed,
+including an actual Python logger with the production ERROR threshold. No
+HTTP status can be recovered for those earlier attempts, and no live SMS was
+sent by the agent. Account documentation/credit/recipient restrictions remain
+to be checked before another deliberate operator send.
