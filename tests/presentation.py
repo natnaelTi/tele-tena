@@ -3375,6 +3375,17 @@ class Presentation(unittest.TestCase):
             native.clinical_review_status = 'Approved'; native.active = 1; native.catalog_status = 'Active'
             with self.assertRaises(frappe.PermissionError):
                 native.save()
+            # Native back-office drafts cannot bypass typed operational checks.
+            for invalid in ({'supported_formats': 'unsupported-format'},
+                            {'min_duration_minutes': 80, 'max_duration_minutes': 30},
+                            {'participant_structure': 'couple', 'required_workflows': 'individual-consultation'}):
+                draft = frappe.get_doc('Tele Tena Service', key)
+                draft.update(invalid); draft.save()
+                with self.assertRaises(frappe.ValidationError):
+                    service_catalog.review_definition(key, 'Approved', 'Fictional invalid definition review.')
+                self.assertFalse(frappe.db.get_value('Tele Tena Service', key, 'active'))
+                draft = frappe.get_doc('Tele Tena Service', key)
+                draft.update({field: payload[field] for field in invalid}); draft.save()
             result = service_catalog.review_definition(key, 'Approved', 'Fictional human review decision.')
             self.assertTrue(result['active']); self.assertFalse(result['scope_granted'])
             self.assertTrue(service_catalog.review_definition(key, 'Approved',

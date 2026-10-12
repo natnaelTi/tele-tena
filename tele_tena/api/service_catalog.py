@@ -315,9 +315,18 @@ def review_definition(service, decision, reason):
                     'location_jurisdiction_policy', 'required_workflows', 'definition_version')
         if any(not str(doc.get(key) or '').strip() for key in required):
             journey.fail('Complete professional requirements, consent, jurisdiction and workflow rules before approval.', 'catalog_requirements_missing')
+        # Review must validate stored definitions too, including drafts created
+        # through native back-office APIs rather than the typed app command.
+        _lines(doc.supported_formats, FORMATS, 'delivery formats')
+        minimum = journey.integer(str(doc.min_duration_minutes or 0), 1, 240)
+        maximum = journey.integer(str(doc.max_duration_minutes or 0), 1, 240)
+        if minimum > maximum:
+            journey.fail('Minimum session length cannot exceed the maximum.', 'catalog_duration_invalid')
         implemented = {'individual-consultation', 'private-notes', 'patient-summary', 'couples-consent'}
         if (doc.population_restriction != 'Adults only'
                 or doc.participant_structure not in ('individual', 'couple')
+                or (doc.participant_structure == 'couple'
+                    and 'couples-consent' not in doc.required_workflows.splitlines())
                 or set(doc.required_workflows.splitlines()) - implemented
                 or not doc.min_duration_minutes or not doc.max_duration_minutes):
             journey.fail('This definition needs an adult workflow supported by the current MVP.', 'catalog_workflow_unavailable')
