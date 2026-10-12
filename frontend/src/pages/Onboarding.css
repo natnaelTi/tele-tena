@@ -16,7 +16,7 @@
 .onboarding-ready-hero dl{display:grid;grid-template-columns:minmax(100px,1fr) minmax(0,1fr);margin:0}
 .onboarding-ready-hero dt,.onboarding-ready-hero dd{margin:0;padding:16px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
 .onboarding-ready-hero dt{color:var(--muted)}.onboarding-ready-hero dd{text-align:right;font-weight:600}
-@media(max-width:650px){.guided-panel.onboarding-guided>h1{font-size:32px}.onboarding-ready-hero{grid-template-columns:1fr;padding:28px 24px;gap:24px}.onboarding-ready-hero>div>h2{font-size:36px}.onboarding-ready-hero>aside{padding:22px}}
+@media(max-width:650px){.guided-panel.onboarding-guided{width:calc(100% - 8px)}.guided-panel.onboarding-guided>h1{font-size:32px;line-height:1.12;letter-spacing:-1.1px;font-weight:720}.onboarding-guided .form-actions .button{flex:1;min-width:120px}.onboarding-ready-hero{grid-template-columns:1fr;padding:28px 24px;gap:24px}.onboarding-ready-hero>div>h2{font-size:36px}.onboarding-ready-hero>aside{padding:22px}}
 
 .onboarding-scope-picker .onboarding-scope-options{max-height:280px;overflow-y:auto;overscroll-behavior:contain;padding:4px 8px 4px 0;margin-top:12px}
 .onboarding-scope-picker .onboarding-scope-options .check-field{min-height:44px;align-items:center}
