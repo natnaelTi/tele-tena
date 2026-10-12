@@ -147,10 +147,23 @@
 .discovery-refine-card .discovery-filters .field{display:block;margin:20px 0;}
 .discovery-refine-card .discovery-filters label{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal;}
 .discovery-refine-card .discovery-filters select{width:100%;border-radius:10px;min-height:50px;padding:12px 14px;font-size:16px;}
-@media(max-width:800px){.discovery-layout.discovery-matching-layout{grid-template-columns:1fr;}.discovery-matching-layout>.discovery-aside{order:-1;}.discovery-refine-card{padding:22px;}.discovery-refine-card .discovery-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}.discovery-refine-card .discovery-filters .field{margin:0;}.discovery-refine-card .inline-notice{margin-top:20px;}}
+@media(max-width:800px){.discovery-layout.discovery-matching-layout{grid-template-columns:1fr;}.discovery-matching-layout>.discovery-aside{order:0;}.discovery-refine-card{padding:22px;}.discovery-refine-card .discovery-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}.discovery-refine-card .discovery-filters .field{margin:0;}.discovery-refine-card .inline-notice{margin-top:20px;}}
 @media(max-width:420px){.discovery-refine-card .discovery-filters{grid-template-columns:1fr;}}
 
 .discovery-refine-card summary{cursor:pointer;min-height:44px;color:var(--ink);list-style-position:inside;}
 .discovery-refine-card summary h2{display:inline;font-size:25px;}
 .discovery-refine-card details[open]>summary{margin-bottom:20px;}
 @media(max-width:800px){.discovery-refine-card summary h2{font-size:20px;}}
+
+/* Compact matching toolbar keeps actual results first on narrow screens.
+   The refinement panel follows cards, as in reference C03; no filters are removed. */
+@media(max-width:800px){
+  .matching-results-page .discovery-search{flex-wrap:nowrap;gap:8px;padding:8px;}
+  .matching-results-page .discovery-search>svg{flex-shrink:0;}
+  .matching-results-page .discovery-search input{width:auto;padding:8px 2px;}
+  .matching-results-page .discovery-search .button{width:auto;flex-shrink:0;padding-inline:12px;}
+  .reference-workspace .matching-results-page .request-entry{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px 12px;padding:14px 16px;}
+  .reference-workspace .matching-results-page .request-entry>svg{align-self:start;margin-top:2px;}
+  .reference-workspace .matching-results-page .request-entry>a{grid-column:2;max-width:none;gap:8px;min-height:44px;}
+  .reference-workspace .matching-results-page .request-entry p{line-height:1.5;}
+}
