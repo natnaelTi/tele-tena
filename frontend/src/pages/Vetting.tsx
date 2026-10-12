@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './Vetting.css';
 import { journeyApi } from '../journey-api';
 import { Button, Checkbox, EmptyState, InlineNotice, Select, Skeleton, TextField } from '../components/ui';
@@ -91,10 +91,13 @@ function ScopeEvidencePanel({item,canUpload,refresh}:{item:any;canUpload:boolean
 export function ClinicianScopeApplications() {
   const { w } = useLocale();
   const services = useResource(journeyApi.vettingServices);
+  const context = useResource(journeyApi.scopeApplicationContext);
+  const contextApplied=useRef(false);
   const applications = useResource(journeyApi.myScopeApplications);
   const action = useAction();
   const [service, setService] = useState('');
   const [selectedServices,setSelectedServices]=useState<string[]>([]);
+  const [serviceSearch,setServiceSearch]=useState('');
   const [competencies,setCompetencies]=useState('');const [certifications,setCertifications]=useState('');const [validFrom,setValidFrom]=useState('');
   const [dirty, setDirty] = useState(false);
   const [step, setStep] = useState(0);
@@ -116,6 +119,19 @@ export function ClinicianScopeApplications() {
   const [appealStatements,setAppealStatements]=useState<Record<string,string>>({});
   const [reverificationOf,setReverificationOf]=useState<string|null>(null);
 
+  useEffect(()=>{
+    if(!context.data||contextApplied.current||dirty)return;
+    contextApplied.current=true;
+    const claims=context.data.professional||{};
+    setCategory(claims.professional_category||'');setQualification(claims.qualification||'');
+    setInstitution(claims.issuing_institution||'');setLicense(claims.registration_number||'');
+    setAuthority(claims.issuing_authority||'');setJurisdiction(claims.jurisdiction||'');
+    setValidFrom(claims.credential_valid_from||'');setExpiry(claims.credential_expiry||'');
+    setCompetencies(claims.competencies||'');setCertifications(claims.certifications||'');
+    setExperience(String(claims.experience_years??''));
+    setSelectedServices(context.data.requested_services||[]);setService(context.data.requested_services?.[0]||'');
+  },[context.data,dirty]);
+
   const save = (submit:boolean) => void action.run(async()=>{
     if(!service) throw new Error('Choose at least one service to apply for.');
     const values={professional_category:category,qualification,issuing_institution:institution,competencies,certifications,credential_valid_from:validFrom,
@@ -129,7 +145,8 @@ export function ClinicianScopeApplications() {
     setDirty(false);
   });
   const continueApplication=(item:any)=>{
-    setDirty(false);setStep(0);setService(item.service);setSelectedServices([item.service]);setCompetencies(item.competencies||'');setCertifications(item.certifications||'');setValidFrom(item.credential_valid_from||'');setCategory(item.professional_category||'');
+    contextApplied.current=true;
+    setDirty(false);setStep(1);setService(item.service);setSelectedServices([item.service]);setCompetencies(item.competencies||'');setCertifications(item.certifications||'');setValidFrom(item.credential_valid_from||'');setCategory(item.professional_category||'');
     setReverificationOf(item.reverification_of||null);
     setQualification(item.qualification||'');setInstitution(item.issuing_institution||'');
     setLicense(item.registration_number||'');setAuthority(item.issuing_authority||'');
@@ -143,15 +160,15 @@ export function ClinicianScopeApplications() {
   return <>
     {applications.error&&<InlineNotice tone="danger">{w("Your scope applications could not be loaded.")} <Button onClick={()=>void applications.refresh()}>{w("Retry")}</Button></InlineNotice>}
     <section className="scope-application-workspace">
-      <div className="scope-application-form" data-tour-unsaved={dirty ? 'true' : 'false'} onChange={()=>setDirty(true)}>
-        <p className="eyebrow">{w("STEP")} {step+1} {w("OF")} 3</p>
-        <div className="step-progress" aria-hidden="true">{[0,1,2].map(index=><span key={index} data-complete={index<=step}/>)}</div>
-        <h2 ref={headingRef} tabIndex={-1}>{w(step===0?"Qualifications & résumé":step===1?"Relevant experience":"Review your application")}</h2>
+      <div className="scope-application-form" data-tour-unsaved={dirty ? 'true' : 'false'} onChange={()=>{contextApplied.current=true;setDirty(true)}}>
+        <p className="eyebrow">{w("STEP")} {step+1} {w("OF")} 4</p>
+        <div className="step-progress" aria-hidden="true">{[0,1,2,3].map(index=><span key={index} data-complete={index<=step}/>)}</div>
+        <h2 ref={headingRef} tabIndex={-1}>{w(step===0?"Choose your service scopes":step===1?"Qualifications & résumé":step===2?"Relevant experience":"Review your application")}</h2>
         <p className="supporting">{w("Documents are private to authorized reviewers.")}</p>
         {reverificationOf&&<InlineNotice>{w("A renewal request does not extend an expired approval. If the credential has expired, this service remains unavailable until a reviewer records a new approval.")}</InlineNotice>}
         {!services.data?<Skeleton/>:services.data.length===0?<EmptyState title={w("No service applications are open yet.")}>{w("The service catalog is present in draft and remains non-bookable until the medical lead approves its terminology and local credential requirements.")}</EmptyState>:<>
-          <fieldset className="scope-selection"><legend>{w("Services you want to provide")}</legend>{services.data.map((item:any)=><div key={item.id}><Checkbox label={item.label} checked={selectedServices.includes(item.id)} disabled={!!reverificationOf} onChange={event=>{const next=event.target.checked?[...selectedServices,item.id]:selectedServices.filter(id=>id!==item.id);setSelectedServices(next);setService(next[0]||'');}}/>{selectedServices.includes(item.id)&&<p className="supporting">{item.clinical_review_status!=='Approved'&&w("Clinical definition review pending. Applying does not authorize bookings.")} {item.credential_requirements}</p>}</div>)}</fieldset>
-          {step===0&&<>
+          {step===0&&<><TextField label={w("Search service scopes")} value={serviceSearch} onChange={e=>setServiceSearch(e.target.value)}/><fieldset className="scope-selection"><legend>{w("Services you want to provide")}</legend>{services.data.filter((item:any)=>item.label.toLocaleLowerCase().includes(serviceSearch.toLocaleLowerCase())).map((item:any)=><div key={item.id}><Checkbox label={item.label} checked={selectedServices.includes(item.id)} disabled={!!reverificationOf} onChange={event=>{const next=event.target.checked?[...selectedServices,item.id]:selectedServices.filter(id=>id!==item.id);setSelectedServices(next);setService(next[0]||'');}}/>{selectedServices.includes(item.id)&&<p className="supporting">{item.clinical_review_status!=='Approved'&&w("Clinical definition review pending. Applying does not authorize bookings.")} {item.credential_requirements}</p>}</div>)}</fieldset><p className="supporting">{w("Selected services")}: {selectedServices.length}</p></>}
+          {step===1&&<>
           <TextField label={w("Professional category")} value={category} onChange={e=>setCategory(e.target.value)} required />
           <TextField label={w("Relevant qualification")} value={qualification} onChange={e=>setQualification(e.target.value)} required />
           <TextField label={w("Issuing institution")} value={institution} onChange={e=>setInstitution(e.target.value)} required />
@@ -163,7 +180,7 @@ export function ClinicianScopeApplications() {
           <TextField label={w("Certifications")} value={certifications} onChange={e=>setCertifications(e.target.value)} maxLength={2000}/>
           <TextField label={w("Credential expiry, if applicable")} type="date" value={expiry} onChange={e=>setExpiry(e.target.value)} />
           </>}
-          {step===1&&<>
+          {step===2&&<>
           <TextField label={w("Years of relevant experience")} type="number" min="0" max="60" value={experience} onChange={e=>setExperience(e.target.value)} />
           <label className="field">{w("Treatment approaches (one per line)")}<textarea rows={3} value={approaches} onChange={e=>setApproaches(e.target.value)} /></label>
           <label className="field">{w("Relevant training")}<textarea rows={3} value={training} onChange={e=>setTraining(e.target.value)} /></label>
@@ -171,14 +188,14 @@ export function ClinicianScopeApplications() {
           <Checkbox label={w("My application is limited to adult care.")} checked={adults} onChange={e=>setAdults(e.target.checked)} />
           <Checkbox label={w("I practice independently (optional).")} checked={independent} onChange={e=>setIndependent(e.target.checked)} />
           </>}
-          {step===2&&<dl className="scope-application-preview"><div><dt>{w('Services you want to provide')}</dt><dd>{services.data.filter((item:any)=>selectedServices.includes(item.id)).map((item:any)=>item.label).join(', ')}</dd></div>
+          {step===3&&<dl className="scope-application-preview"><div><dt>{w('Services you want to provide')}</dt><dd>{services.data.filter((item:any)=>selectedServices.includes(item.id)).map((item:any)=>item.label).join(', ')}</dd></div>
             {[['Professional competencies',competencies],['Certifications',certifications],['Credential valid from, if applicable',validFrom],['Professional category',category],['Relevant qualification',qualification],['Issuing institution',institution],['Registration or license number',license],['Issuing authority',authority],['Jurisdiction',jurisdiction],['Credential expiry, if applicable',expiry],['Years of relevant experience',experience],['Relevant training',training],['Why are you prepared to provide this service?',statement]].map(([label,value])=><div key={label}><dt>{w(label)}</dt><dd>{value||w('Not provided')}</dd></div>)}
             <div><dt>{w('My application is limited to adult care.')}</dt><dd>{w(adults?'Yes':'No')}</dd></div>
           </dl>}
           <div className="scope-form-actions">
             {step>0&&<Button variant="quiet" disabled={action.busy} onClick={()=>changeStep(step-1)}>{w('Back')}</Button>}
             <Button variant="secondary" disabled={!service||action.busy} loading={action.busy} onClick={()=>save(false)}>{w('Save draft')}</Button>
-            {step<2?<Button disabled={action.busy} onClick={()=>changeStep(step+1)}>{w('Continue')}</Button>:<Button disabled={action.busy} loading={action.busy} onClick={()=>save(true)}>{w('Submit for review')}</Button>}
+            {step<3?<Button disabled={action.busy||(step===0&&!selectedServices.length)} onClick={()=>changeStep(step+1)}>{w('Continue')}</Button>:<Button disabled={action.busy} loading={action.busy} onClick={()=>save(true)}>{w('Submit for review')}</Button>}
           </div>
         </>}
         {action.error&&<InlineNotice tone="danger">{w(action.error)}</InlineNotice>}

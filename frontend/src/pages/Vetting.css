@@ -28,3 +28,6 @@
 .scope-selection legend{padding:0 8px;font-weight:600}
 .scope-selection>div+div{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
 .scope-selection .supporting{margin:6px 0 0 32px;overflow-wrap:anywhere}
+
+.scope-selection{max-height:360px;overflow:auto;scrollbar-gutter:stable}
+.scope-selection:focus-within{outline:2px solid var(--focus);outline-offset:2px}

@@ -3262,6 +3262,9 @@ class Presentation(unittest.TestCase):
             journey.publish(keys[0], 30000, 30)
         saved = next(r for r in vetting.my_scope_applications() if r.service == keys[0])
         self.assertEqual(saved.competencies, values['competencies'])
+        self.assertEqual(vetting.application_context()['requested_services'], [])
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError): vetting.application_context()
         fixtures.login('c2')
         self.assertFalse(any(r.service in keys for r in vetting.my_scope_applications()))
         doc = frappe.get_doc('Tele Tena Vetting Scope Application', submitted[0]['name'])
@@ -3272,6 +3275,76 @@ class Presentation(unittest.TestCase):
         fixtures.login('admin')
         self.assertTrue(all(frappe.db.get_value('Tele Tena Service', key, 'active') == 0
                             for key in keys))
+
+    def test_new_clinician_three_scope_decisions_to_discovery_and_immediate_inbox(self):
+        services = [fixtures.PREFIX + '-chain-' + suffix for suffix in ('approved','clarify','declined')]
+        for service in services:
+            reviewed_test_service({'doctype': 'Tele Tena Service', 'service_key': service,
+                'service_label': 'Fictional counseling ' + service.rsplit('-',1)[-1],
+                'category': 'counseling', 'description': 'Fictional operational chain test.',
+                'population_restriction': 'Adults only', 'participant_structure': 'individual',
+                'vetting_required': 1, 'definition_version': 'test-1'})
+        email = 'scope-chain-' + secrets.token_hex(6) + '@example.invalid'
+        fixtures.USERS['chain'] = email
+        frappe.set_user('Administrator')
+        user = frappe.get_doc({'doctype': 'User', 'email': email, 'first_name': 'Fictional counselor',
+                              'send_welcome_email': 0, 'user_type': 'Website User'}).insert()
+        user.add_roles('Tele Tena Clinician')
+        fixtures.login('chain')
+        journey.save_profile('clinician', 'Fictional counselor', True, languages=['en'])
+        presentation.upload_resume('fictional-scope-chain-cv.pdf',
+                                  base64.b64encode(b'%PDF-1.4\nFictional CV\n%%EOF').decode())
+        journey.apply('Fictional application with three individually reviewed scopes.', services)
+        fixtures.login('admin'); journey.review(email, 'Approved')
+        self.assertFalse(any(journey.service_scope_is_current(email, key) for key in services))
+        fixtures.login('chain')
+        form = {'professional_category': 'Synthetic clinician', 'qualification': 'Fictional counseling degree',
+                'issuing_institution': 'Fictional college', 'registration_number': 'TEST-CHAIN-LICENSE',
+                'issuing_authority': 'Fictional licensing authority', 'jurisdiction': 'Synthetic jurisdiction',
+                'credential_valid_from': '2020-01-01', 'credential_expiry': '2030-01-01',
+                'experience_years': 4, 'population_adults': True}
+        applications = vetting.save_scope_applications(services, form)['applications']
+        evidence = vetting.upload_scope_evidence(applications[0]['name'], 'License or registration',
+            'fictional-license.pdf', base64.b64encode(b'%PDF-1.4\nFictional license\n%%EOF').decode())
+        vetting.save_scope_applications(services, form, True)
+        fixtures.login('admin')
+        vetting.review_scope_application(applications[1]['name'], 'Clarification',
+                                         findings='Add scope-specific supervised experience evidence.')
+        vetting.review_scope_application(applications[2]['name'], 'Rejected',
+                                         findings='Scope-specific mandatory training is not supported by evidence.')
+        vetting.review_scope_application(applications[0]['name'], 'Approved',
+            identity_reviewed=True, credential_verified=True, qualification_relevant=True,
+            experience_adequate=True, approach_evidence_reviewed=True,
+            adult_scope_appropriate=True, interview_completed=True,
+            findings='Fictional human reviewer assessment; not external credential verification.',
+            scored_criteria=proposed_rubric_scores(evidence['id']),
+            **credential_source_payload(evidence['id']))
+        service_policy.set_immediate_policy(services[0], True,
+            'Fictional review enables immediate requests for this isolated operational test.', secrets.token_hex(12))
+        fixtures.login('chain')
+        states = {row.service: row.status for row in vetting.my_scope_applications()}
+        self.assertEqual([states[key] for key in services], ['Approved','Clarification','Rejected'])
+        for key in services[1:]:
+            with self.assertRaises(frappe.ValidationError): journey.publish(key, 30000, 30)
+        published = journey.publish(services[0], 30000, 30, 'Fictional individual counseling',
+                                     'Fictional presentation for the scope chain.', retry_key=secrets.token_hex(12))
+        offering = published['offering']
+        today = datetime.now(ZoneInfo('Africa/Addis_Ababa')).date()
+        payload = schedule_payload(offering, today, mode='automatic')
+        payload.update(intervals=[{'weekday':today.weekday(), 'start':'00:00','end':'23:59'}],
+                       buffer_before=0, buffer_after=0)
+        scheduling.save_schedule(**payload)
+        self.assertTrue(open_requests.set_request_presence(True)['ready'])
+        fixtures.login('p1')
+        self.assertTrue(any(row.id == offering for row in journey.discover(service=services[0])))
+        request = open_requests.publish_request(services[0], 'Fictional adult care request.',
+            'immediate', 'en', 'video', {'name':False,'history':False}, secrets.token_hex(12))
+        fixtures.login('chain')
+        self.assertTrue(any(row.id == request['id'] for row in open_requests.clinician_requests()))
+        # A reviewer decision affects only its own scope; no cross-scope authorization.
+        self.assertTrue(journey.service_scope_is_current(email, services[0]))
+        self.assertFalse(journey.service_scope_is_current(email, services[1]))
+        self.assertFalse(journey.service_scope_is_current(email, services[2]))
 
     def test_clinical_catalog_review_requires_lead_and_cannot_grant_scopes(self):
         key = fixtures.PREFIX + '-clinical-review'

@@ -99,6 +99,7 @@ export const journeyApi = {
   withdrawOffer: (offer_id: string) => api<any>('tele_tena.api.open_requests.withdraw_offer', {offer_id}, true),
   recordOfferAcceptFailure: (request_id:string,offer_id:string,attempt_key:string,reason:string) => api<any>('tele_tena.api.open_requests.record_accept_failure',{request_id,offer_id,attempt_key,reason},true),
   publicClinician: (clinician_id:string) => api<any>('tele_tena.api.open_requests.clinician_profile',{clinician_id}),
+  scopeApplicationContext: () => api<any>('tele_tena.api.vetting.application_context'),
   saveScopeApplications: (services:string[], values:Record<string,unknown>, submit=false) => api<any>('tele_tena.api.vetting.save_scope_applications',{services,values,submit:submit?1:0},true),
   reviewServiceDefinition: (service:string,decision:string,reason:string) => api<any>('tele_tena.api.service_catalog.review_definition',{service,decision,reason},true),
   vettingServices: () => api<any[]>('tele_tena.api.vetting.vetting_services'),

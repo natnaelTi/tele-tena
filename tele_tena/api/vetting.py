@@ -520,6 +520,22 @@ def download_scope_evidence(evidence):
 
 
 @journey.query()
+def application_context():
+    """Reuse only the applicant's own private general-application claims."""
+    user = _applicant()
+    applications = rows('SELECT requested_services FROM tt_application WHERE user=%s', (user,))
+    try:
+        requested = json.loads(applications[0].requested_services or '[]') if applications else []
+    except (ValueError, TypeError):
+        requested = []
+    eligible = {item.name for item in rows("""SELECT name FROM `tabTele Tena Service`
+        WHERE vetting_required=1 AND catalog_status IN ('Draft','Active')""")}
+    return {'professional': journey._initial_application_profile(user),
+            'requested_services': [key for key in requested if isinstance(key, str) and key in eligible],
+            'resume_uploaded': bool(rows('SELECT 1 FROM tt_resume_evidence WHERE clinician=%s', (user,)))}
+
+
+@journey.query()
 def vetting_services():
     user = actor()
     if not set(frappe.get_roles(user)).intersection({'Tele Tena Applicant', 'Tele Tena Clinician'}):
