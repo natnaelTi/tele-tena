@@ -1,5 +1,22 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Profession": ["ሙያ", "Ogummaa"],
+  "Choose your profession": ["ሙያዎን ይምረጡ", "Ogummaa kee filadhu"],
+  "Years of practice": ["የስራ ልምድ ዓመታት", "Waggoota muuxannoo hojii"],
+  "Professional introduction": ["የሙያ መግቢያ", "Seensa ogummaa"],
+  "Consultation languages": ["የምክክር ቋንቋዎች", "Afaanota marii"],
+  "Primary qualification": ["ዋና የትምህርት ብቃት", "Ulaagaa barnootaa ijoo"],
+  "Issuing institution": ["ማስረጃ የሰጠው ተቋም", "Dhaabbata ragaa kenne"],
+  "Licensing authority": ["ፈቃድ ሰጪ ባለስልጣን", "Qaama hayyama kennu"],
+  "License number": ["የፈቃድ ቁጥር", "Lakkoofsa hayyamaa"],
+  "License expiry": ["የፈቃድ ማብቂያ", "Guyyaa hayyamni itti xumuramu"],
+  "Credential jurisdiction": ["የማስረጃ የስልጣን ክልል", "Daangaa aangoo ragaa"],
+  "Choose at least one consultation language.": ["ቢያንስ አንድ የምክክር ቋንቋ ይምረጡ።", "Afaan marii tokko yoo xiqqaate filadhu."],
+  "Documents and credential identifiers are private to you and authorized reviewers.": ["ሰነዶችና የማስረጃ መለያዎች ለእርስዎና ለተፈቀዱ ገምጋሚዎች ብቻ ናቸው።", "Sanadoonni fi eenyummeessitoonni ragaa siifi gamaaggamtoota hayyamamaniif qofa mul’atu."],
+  "This introduction may appear on your approved public profile. Keep credential identifiers in the private application fields.": ["ይህ መግቢያ በተፈቀደው የህዝብ መገለጫዎ ላይ ሊታይ ይችላል። የማስረጃ መለያዎችን በግል ማመልከቻ መስኮች ውስጥ ያስቀምጡ።", "Seensi kun piroofaayilii uummataa hayyamame irratti mul’achuu danda’a. Eenyummeessitoota ragaa dirreewwan iyyata dhuunfaa keessa kaa’i."],
+  "Complete your profession, qualification, institution and care languages before submission.": ["ከማቅረብዎ በፊት ሙያ፣ ብቃት፣ ተቋምና የእንክብካቤ ቋንቋዎችን ይሙሉ።", "Dhiyeessuu dura ogummaa, ulaagaa, dhaabbataa fi afaanota kunuunsaa guuti."],
+  "Self-reported application details — verification is recorded separately.": ["በአመልካቹ የተሰጡ ዝርዝሮች — ማረጋገጫ ለብቻው ይመዘገባል።", "Odeeffannoo iyyataa ofiin ibsame — mirkaneessi addaan galmaa’a."],
+
   "Choose your service scopes": ["የአገልግሎት ወሰኖችዎን ይምረጡ", "Daangaawwan tajaajilaa kee filadhu"],
   "Evidence and approved scope are required.": ["ማስረጃና የተፈቀደ የአገልግሎት ወሰን ያስፈልጋሉ።", "Ragaa fi daangaan hayyamame barbaachisu."],
   "Review application": ["ማመልከቻውን ይገምግሙ", "Iyyata ilaali"],

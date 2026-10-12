@@ -17,6 +17,9 @@ import WorkspaceTour from "../components/WorkspaceTour";
 import { FileText, ShieldCheck, UserRound, Users } from "lucide-react";
 import "./Onboarding.css";
 type Answers = {
+  professional?: {professional_category?:string; qualification?:string; issuing_institution?:string; registration_number?:string; issuing_authority?:string; jurisdiction?:string; credential_expiry?:string; experience_years?:number};
+  care_languages?: string[];
+  introduction?: string;
   name?: string;
   history?: string;
   adult?: boolean;
@@ -123,6 +126,8 @@ export default function Onboarding() {
       const code = failure instanceof ApiError ? failure.code : "network_error";
       setError(code === "adult_required"
         ? "Please check this step and try again. Adult eligibility and consent are required to finish."
+        : code === "professional_required"
+          ? "Complete your profession, qualification, institution and care languages before submission."
         : code === "resume_required"
           ? "Upload a resume and select at least one service to request before submitting."
           : code === "session_required" || code === "contact_required"
@@ -182,6 +187,7 @@ export default function Onboarding() {
               setError("Choose at least one service for review.");
               return;
             }
+            if (clinician && step === 0 && !(answers.care_languages||[]).length) {setError("Choose at least one consultation language.");return;}
             void save(steps[Math.min(position + 1, steps.length - 1)], step === 3);
           }}
         >
@@ -199,12 +205,24 @@ export default function Onboarding() {
                 required
                 onChange={(e) => update({ name: e.target.value })}
               /></div>
+              {clinician && <>
+                <Select label={w("Profession")} value={answers.professional?.professional_category || ""} required onChange={e=>update({professional:{...answers.professional,professional_category:e.target.value}})}>
+                  <option value="">{w("Choose your profession")}</option>
+                  {["Counseling psychologist","Psychiatrist","Clinical psychologist","Counselor","Other"].map(value=><option key={value} value={value}>{w(value)}</option>)}
+                </Select>
+                <TextField label={w("Years of practice")} type="number" min={0} max={60} value={answers.professional?.experience_years ?? ""} onChange={e=>update({professional:{...answers.professional,experience_years:Number(e.target.value)}})}/>
+                <div className="field"><label htmlFor="onboarding-introduction">{w("Professional introduction")}</label><textarea id="onboarding-introduction" rows={3} maxLength={2000} value={answers.introduction||""} onChange={e=>update({introduction:e.target.value})}/><p className="field-hint">{w("This introduction may appear on your approved public profile. Keep credential identifiers in the private application fields.")}</p></div>
+                <fieldset className="onboarding-language-options"><legend>{w("Consultation languages")}</legend>{[["en","English"],["am","Amharic"],["om","Afaan Oromo"]].map(([code,label])=><Checkbox key={code} label={w(label)} checked={(answers.care_languages||[]).includes(code)} onChange={e=>update({care_languages:e.target.checked?[...(answers.care_languages||[]),code]:(answers.care_languages||[]).filter(value=>value!==code)})}/>)}</fieldset>
+              </>}
             </>
           )}
           {step === 1 && !clinician && <p className="supporting">{w("For a shared session, every participating adult completes their own registration and consent.")}</p>}
           {step === 1 &&
             (clinician ? (
               <>
+                <p className="supporting">{w("Documents and credential identifiers are private to you and authorized reviewers.")}</p>
+                {([["qualification","Primary qualification",180,true],["issuing_institution","Issuing institution",180,true],["issuing_authority","Licensing authority",180,false],["registration_number","License number",100,false],["jurisdiction","Credential jurisdiction",120,false]] as const).map(([key,label,maximum,required])=><TextField key={key} label={w(label)} required={required} maxLength={maximum} value={answers.professional?.[key]||""} onChange={e=>update({professional:{...answers.professional,[key]:e.target.value}})}/>)}
+                <TextField label={w("License expiry")} type="date" value={answers.professional?.credential_expiry||""} onChange={e=>update({professional:{...answers.professional,credential_expiry:e.target.value}})}/>
                 <div className="field">
                   <label htmlFor="onboarding-credentials">{w("Qualifications and experience")}</label>
                   <textarea
@@ -330,6 +348,10 @@ export default function Onboarding() {
                 <h2>{w("Professional details")}</h2>
                 <dl>
                   <div><dt>{w("Professional name")}</dt><dd>{answers.name}</dd></div>
+                  <div><dt>{w("Profession")}</dt><dd>{w(answers.professional?.professional_category||"Not provided")}</dd></div>
+                  <div><dt>{w("Primary qualification")}</dt><dd>{answers.professional?.qualification||w("Not provided")}</dd></div>
+                  <div><dt>{w("Issuing institution")}</dt><dd>{answers.professional?.issuing_institution||w("Not provided")}</dd></div>
+                  <div><dt>{w("Consultation languages")}</dt><dd>{(answers.care_languages||[]).map(code=>w(code==="en"?"English":code==="am"?"Amharic":"Afaan Oromo")).join(", ")||w("Not provided")}</dd></div>
                   <div><dt>{w("Credentials & scope")}</dt><dd>{answers.statement}</dd></div>
                   <div><dt>{w("Résumé")}</dt><dd>{w(resumeUploaded?"Resume uploaded for authorized review.":"Not provided")}</dd></div>
                   <div><dt>{w("Clinic affiliations (optional)")}</dt><dd>{answers.affiliations||w("Not provided")}</dd></div>
