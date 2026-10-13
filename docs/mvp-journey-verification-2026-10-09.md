@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **5944566753a323bfa0f9045d47b29b4dc297471c**. Later test/report/evidence-only commits
+  **b004f8d75e7866e42731bada6f3fc7bd7f308e48**. Later test/report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -20,6 +20,39 @@ screen/completion matrix; the sections below this active checkpoint are historic
   preview. `scripts/local_review.py start/status/stop` restores it without migrations,
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Service-definition booking validation —13October2026
+
+Package `b004f8d75e7866e42731bada6f3fc7bd7f308e48`. The owner-provided grief
+form put platform-workflow keys into booking_rules. The same mismatch is
+reproduced in a real backend regression: save rejects it without changing the
+existing definition. Booking rules accept direct-booking, scheduled and
+immediate-request; individual-consultation/private-notes/patient-summary belong
+in required_workflows. The former generic error concealed the field distinction.
+
+Booking rules now use labelled checkboxes and a dedicated safe validation error.
+Selection does not activate immediate care or grant a clinician scope. Request
+clinical review first saves the currently entered draft, then requests review;
+a validation failure prevents review and retains the form values. No founder
+policy, catalog activation, scope decision, or existing definition was changed
+by the agent.
+
+Checks run: the focused typed-catalog Frappe regression passed (11.291s,
+`/tmp/tt-booking-rules-backend.log`). Read-only reviewer browser on the actual
+presentation grief definition verified checkbox interaction/no old textbox at
+390/768/1440 and exact unchanged saved definition (`/tmp/tt-catalog-booking-controls.log`,
+reproducible `scripts/browser-catalog-booking-rules.cjs`). A separate loopback
+8028 browser on the disposable site created a fictional draft, changed its
+professional description after saving, requested review, and verified the new
+text persisted and state In review remained inactive (`/tmp/tt-catalog-review-save.log`).
+Initial handoff test attempts timed out because an exact nested textarea-label
+locator included its populated default text; using the labelled field's textarea
+resolved the test locator without removing the persisted-content assertion.
+The owned temporary server stopped afterward; no site access flags were changed.
+Build/typecheck and lint pass with inherited warnings. Presentation screenshots
+at `/tmp/tt-catalog-booking-controls/` were inspected; these focused control checks
+are not owner visual acceptance or full MVP release acceptance. No unrelated
+call/finance suites or live provider sends were repeated.
 
 ## Optional approach selection and ten-scope intake —12October2026
 

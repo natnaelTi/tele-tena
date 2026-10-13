@@ -1,12 +1,14 @@
 # TeleTena delivery tracker
 
-## Active checkpoint —12October2026
+## Active checkpoint —13October2026
+
+Service-definition booking modes use labelled choices and a field-specific error; a real backend failure-preservation check, presentation control browser, and disposable latest-edit-to-review browser pass. Existing grief definition and all approvals preserved.
 
 Optional treatment-approach choices now use Active metadata; an empty catalog does not block scope applications. Real backend/browser ten-scope submission and retry passed without approval.
 
 Application-field correction: completed private claims now reach owner/reviewer; saved scope drafts recover after reload; focused database and connected test-transport browser checks pass. See the active journey report. No migration, automatic approval or live send.
 
-Current runtime package `5944566753a323bfa0f9045d47b29b4dc297471c` on the presentation8017 preview. Structured Draft/Active scope intake, private professional claims and reasoned Medical Lead catalog decisions are implemented. Five focused Frappe regressions, random-OTP scope draft browser, cross-page acceptance notifications, repeat-migration preservation and current patient discovery/calendar path pass for their named states. Full MVP visual/state acceptance, a continuous reviewer-browser chain and v1.37 fresh installation remain open. No automatic approvals, merge or remote change. The dated checkpoint sections below are historical; the single screen matrix and active journey report are authoritative.
+Current runtime package `b004f8d75e7866e42731bada6f3fc7bd7f308e48` on the presentation8017 preview. Structured Draft/Active scope intake, private professional claims and reasoned Medical Lead catalog decisions are implemented. Five focused Frappe regressions, random-OTP scope draft browser, cross-page acceptance notifications, repeat-migration preservation and current patient discovery/calendar path pass for their named states. Full MVP visual/state acceptance, a continuous reviewer-browser chain and v1.37 fresh installation remain open. No automatic approvals, merge or remote change. The dated checkpoint sections below are historical; the single screen matrix and active journey report are authoritative.
 
 ## Latest accepted-offer / room delta —12October2026
 
