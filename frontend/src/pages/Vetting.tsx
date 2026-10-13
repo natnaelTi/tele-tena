@@ -135,7 +135,7 @@ export function ClinicianScopeApplications() {
     setValidFrom(claims.credential_valid_from||'');setExpiry(claims.credential_expiry||'');
     setCompetencies(claims.competencies||'');setCertifications(claims.certifications||'');
     setExperience(String(claims.experience_years??''));
-    setSelectedServices(resumable?[resumable.service]:(context.data.requested_services||[]).filter((key:string)=>!applications.data.some((item:any)=>item.service===key&&!['Draft','Clarification'].includes(item.status))));setService(resumable?.service||(context.data.requested_services||[]).find((key:string)=>!applications.data.some((item:any)=>item.service===key&&!['Draft','Clarification'].includes(item.status)))||'');
+    setSelectedServices(resumable?[resumable.service]:(context.data.requested_services||[]).filter((key:string)=>!applications.data?.some((item:any)=>item.service===key&&!['Draft','Clarification'].includes(item.status))));setService(resumable?.service||(context.data.requested_services||[]).find((key:string)=>!applications.data?.some((item:any)=>item.service===key&&!['Draft','Clarification'].includes(item.status)))||'');
     if(resumable){
       setReverificationOf(resumable.reverification_of||null);setStep(1);
       setApproaches(resumable.approach_keys||'');setTraining(resumable.relevant_training||'');
