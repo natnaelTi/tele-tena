@@ -235,3 +235,23 @@ Fontsource. No Google Fonts runtime calls.
 The packaged release runs at `/teletena/` with the existing design and persistent
 demonstration ribbon. Use router links within its basename and `BASE_URL` for
 public assets; do not hardcode development hosts or expose provider secrets.
+
+## Guided vetting and shared help island —13October2026
+
+The owner explicitly requested a clearer, stepped application and review UX.
+Preserve the existing tokens, privacy and native authorization. Reviewer I04 now
+uses a compact queue and one selected scope, with four stages: application/documents,
+credential verification, assessment, and decision/readiness. Scores organize evidence;
+mandatory requirements remain server-enforced. Secondary operational/appeal queues
+are expandable. Unsubmitted reviewer inputs remain in component memory between
+steps, not localStorage; refreshing loses these unsaved inputs.
+
+Clinician scope intake collects evidence in the Experience stage after saving a
+draft, grouped by requested service, while retaining separate individual decisions.
+General onboarding and scope authorization remain distinct. The Help & tours icon
+is one global bottom-right island in the React shell, present for guest and signed-in
+roles; on mobile it sits above bottom navigation/safe areas. It opens an accessible
+modal containing role-appropriate guidance, replay and a reviewer reference wiki.
+No tour starts automatically in sign-in, calls or other protected steps. Guide/tour
+navigation must preserve unsaved forms and never perform approvals, bookings or
+payments. This is an owner-authorized extension to I04/B07/B09, not a new palette.

@@ -1,3 +1,4 @@
+import HelpTools from './components/HelpTools';
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LocaleProvider } from "./hooks/useLocale";
 import { SessionProvider } from "./hooks/useSession";
@@ -167,6 +168,7 @@ export default function App() {
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <HelpTools/>
         </LocaleProvider>
       </SessionProvider>
     </BrowserRouter>

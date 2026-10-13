@@ -286,6 +286,7 @@ def my_scope_applications():
     user = actor()
     if 'Tele Tena Approver' in frappe.get_roles(user):
         result = rows('''SELECT a.*,p.display_name,s.service_label,
+            s.clinical_review_status AS definition_review_status,s.active AS definition_active,
             (SELECT d.name FROM `tabTele Tena Vetting Assessment` d WHERE d.scope_application=a.name
              ORDER BY d.decided_at DESC,d.creation DESC LIMIT 1) AS latest_assessment
             FROM `tabTele Tena Vetting Scope Application` a

@@ -22,7 +22,6 @@ import { Button, Dialog, InlineNotice, Skeleton } from "../components/ui";
 import { LanguageSelect, useLocale } from "../hooks/useLocale";
 import { useSession } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
-import WorkspaceTour from "../components/WorkspaceTour";
 import { useResource } from "../hooks/useResource";
 import { ApiError } from "../api";
 export function DemoBar() {
@@ -305,7 +304,7 @@ export function WorkspaceLayout({
     <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}<Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button></nav><div className="product-user">{kind==="clinician"&&session?.roles.includes("Tele Tena Clinician")&&<ClinicianNotifications/>}<LanguageSelect /><span>{session?.profile?.display_name}</span><Button variant="quiet" aria-label={w("Sign out")} title={w("Sign out")} loading={signoutBusy} onClick={()=>void signout()}><LogOut size={20} /></Button></div></header>
     {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
     {kind === "clinician" && session?.roles.includes("Tele Tena Clinician") && <ClinicianRequestAvailability />}
-    <main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') ? 'workspace-wide' : ''}`} id="main-content"><WorkspaceTour role={kind} /><Outlet /></main>
+    <main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') ? 'workspace-wide' : ''}`} id="main-content"><Outlet /></main>
     <nav className="product-mobile-nav" aria-label={w("Mobile workspace")}>{mobilePrimary.map(item => renderNavLink(item))}<Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} /><span>{w("More")}</span></Button></nav>
     <Dialog open={moreOpen} onOpenChange={open => { setMoreOpen(open); if (!open) requestAnimationFrame(() => moreTrigger.current?.focus()); }} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer><nav className="workspace-more-links" aria-label={w("Additional workspace links")}>{mobileMore.map(item => renderNavLink(item, true))}</nav><TranslationNote /></Dialog>
   </div>;
@@ -357,7 +356,7 @@ export function WorkspaceLayout({
         </header>
 
         {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
-        {kind !== "clinic" && <WorkspaceTour role={kind} />}
+
         <main className="workspace-main" id="main-content">
           <Outlet />
         </main>

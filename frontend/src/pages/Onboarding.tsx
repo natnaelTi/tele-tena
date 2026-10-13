@@ -13,7 +13,6 @@ import {
 import { destination, useSession } from "../hooks/useSession";
 import { useLocale } from "../hooks/useLocale";
 import { journeyApi } from "../journey-api";
-import WorkspaceTour from "../components/WorkspaceTour";
 import { FileText, ShieldCheck, UserRound, Users } from "lucide-react";
 import "./Onboarding.css";
 type Answers = {
@@ -398,7 +397,7 @@ export default function Onboarding() {
           )}
         </form>
       )}
-    </section>{clinician&&saved&&<WorkspaceTour role="applicant"/>}
+    </section>
     </>
   );
 }
