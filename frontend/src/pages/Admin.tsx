@@ -53,27 +53,31 @@ export function Applications() {
   const [status,setStatus]=useState((location.state as {returnStatus?:string}|null)?.returnStatus||"");
   const selectedUser=(location.state as {applicationUser?:string}|null)?.applicationUser || null;
   const [resumeError,setResumeError]=useState("");
+  const [applicationStep,setApplicationStep]=useState(0);
+  const applicationSteps=["Professional profile","Private documents","General application decision"];
   const selected=resource.data?.find(item=>applicationId?item.application_id===applicationId:item.user===selectedUser);
   const shown=resource.data?.filter(item=>(!status||item.status===status)&&(!query||item.display_name?.toLocaleLowerCase().includes(query.toLocaleLowerCase())));
   const review=(user:string)=>{const item=resource.data?.find(value=>value.user===user);setResumeError("");navigate(item?.application_id?`/admin/applications/${encodeURIComponent(item.application_id)}`:"/admin/application-review",{state:{applicationUser:user,returnQuery:query,returnStatus:status}});};
   const reviewContent=selected&&<>
       <div className="application-review-meta"><StatusBadge>{w(selected.status)}</StatusBadge><span>{w("Submitted")}: {selected.submitted_at?new Date(selected.submitted_at).toLocaleDateString():w("Date unavailable")}</span></div>
+      <nav className="guided-step-nav" aria-label={w("Application review progress")}>{applicationSteps.map((label,index)=><button key={label} type="button" aria-current={applicationStep===index?"step":undefined} onClick={()=>setApplicationStep(index)}><span>{index+1}</span>{w(label)}</button>)}</nav>
       <div className="application-review-layout"><div>
+        <div hidden={applicationStep!==0}>
         <section className="application-review-panel"><h2>{w("Professional profile")}</h2>{selected.application_profile&&Object.keys(selected.application_profile).length>0&&<><p className="supporting">{w("Self-reported application details — verification is recorded separately.")}</p><dl>{([["professional_category","Profession"],["qualification","Primary qualification"],["issuing_institution","Issuing institution"],["experience_years","Years of practice"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl><details className="application-credential-details"><summary>{w("Credential details")}</summary><dl>{([["issuing_authority","Licensing authority"],["registration_number","License number"],["jurisdiction","Credential jurisdiction"],["credential_valid_from","License valid from"],["credential_expiry","License expiry"],["competencies","Professional competencies"],["certifications","Certifications"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl></details></>}<h3>{w("Professional statement")}</h3><p className="prewrap">{selected.statement||w("Not provided")}</p>
           <h3>{w("Requested service scopes")}</h3><ul>{(selected.requested_service_labels||[]).map(label=><li key={label}>{label}</li>)}</ul>{!selected.requested_service_labels?.length&&<p>{w("No requested scopes recorded")}</p>}
           <details><summary>{w("Contact / account reference")}</summary><p className="supporting">{selected.user}</p></details>
         </section>
-        <section className="application-review-panel"><h2>{w("Private documents")}</h2><div className="application-document-row"><FileText size={24} aria-hidden="true"/><div><strong>{w("Resume")}</strong><p>{w(selected.resume_uploaded?"Uploaded":"Not uploaded")}</p></div></div>
+        </div><div hidden={applicationStep!==1}><section className="application-review-panel"><h2>{w("Private documents")}</h2><div className="application-document-row"><FileText size={24} aria-hidden="true"/><div><strong>{w("Resume")}</strong><p>{w(selected.resume_uploaded?"Uploaded":"Not uploaded")}</p></div></div>
       {selected.resume_uploaded&&<Button variant="secondary" onClick={async()=>{setResumeError("");try{const response=await fetch(`/api/method/tele_tena.api.presentation.download_resume?clinician=${encodeURIComponent(selected.user)}`,{credentials:"same-origin",cache:"no-store"});if(!response.ok)throw new Error();const blob=await response.blob();const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="clinician-resume.pdf";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch{setResumeError(w("Resume could not be opened. Check your reviewer access and try again."));}}}>{w("Open resume")}</Button>}
       {resumeError&&<InlineNotice tone="danger">{resumeError}</InlineNotice>}
 
         </section>
-      </div><aside className="application-review-panel"><h2>{w("Review actions")}</h2>
+      </div></div><aside className="application-review-panel" hidden={applicationStep!==2}><h2>{w("General application decision")}</h2>
         <p>{w("Evidence")}: {w(selected.evidence_complete?"Complete":"Incomplete")}</p>
         <InlineNotice>{w("Application approval does not approve every requested service. Review each scope and its evidence separately.")}</InlineNotice>
         <Link className="settings-link-row" to="/admin/vetting">{w("Review scope applications")} <ArrowRight size={18} aria-hidden="true"/></Link>
         <div className="actions"><Button loading={action.busy} disabled={selected.status==='Approved'} onClick={()=>void action.run(async()=>{await journeyApi.reviewApplication(selected.user,'Approved');await resource.refresh();})}>{w("Approve application")}</Button><Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.reviewApplication(selected.user,'Rejected');await resource.refresh();})}>{w("Reject application")}</Button></div>{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
-      </aside></div>
+      </aside></div><div className="guided-review-footer"><Button variant="quiet" disabled={applicationStep===0} onClick={()=>setApplicationStep(applicationStep-1)}>{w("Back")}</Button>{applicationStep<2&&<Button onClick={()=>setApplicationStep(applicationStep+1)}>{w("Continue")}</Button>}<span>{w("General application approval does not grant service-scope approval.")}</span></div>
   </>;
   if(applicationId||location.pathname==="/admin/application-review")return <section className="application-review-page">
     <PageTitle title={w("Application review")} description={selected?.display_name||w("Clinician application")} action={<Link className="button secondary" to="/admin/applications" state={{returnQuery:(location.state as {returnQuery?:string}|null)?.returnQuery,returnStatus:(location.state as {returnStatus?:string}|null)?.returnStatus}}>{w("Back to applications")}</Link>}/>

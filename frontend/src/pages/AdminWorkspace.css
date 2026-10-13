@@ -91,3 +91,4 @@
 @media(max-width:600px){.definition-core,.definition-panel-grid>.service-attribute-editor{padding:16px}.catalog-definition-table th,.catalog-definition-table td{padding:12px}}
 
 .service-definition-workspace>.service-catalog-editor{padding:0;border:0;background:transparent}
+.application-review-page [hidden]{display:none!important}.application-review-page .application-review-layout{display:block;max-width:800px;margin:auto}.application-review-page .guided-step-nav{max-width:800px;margin:24px auto}.application-review-page .guided-review-footer{max-width:800px;margin:24px auto}.guided-step-nav{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
