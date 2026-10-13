@@ -50,7 +50,7 @@ export function MedicalLeadLayout(){
     <NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>
     {session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}
   </nav><div className="sidebar-bottom"><TranslationNote/><Button variant="quiet" onClick={()=>void journeyApi.logout().then(refresh).catch(()=>undefined)}><LogOut size={20}/>{w('Sign out')}</Button></div></aside>
-    <div className="workspace-body"><DemoBar/><header className="workspace-header"><span>{w('Clinical standards')}</span><LanguageSelect/></header><main className="workspace-main" id="main-content"><Outlet/></main></div></div>;
+    <div className="workspace-body"><DemoBar/><header className="workspace-header"><Avatar url={session?.photo?.url} name={session?.profile?.display_name||session?.user||""}/><span>{w('Clinical standards')}</span><LanguageSelect/></header><main className="workspace-main" id="main-content"><Outlet/></main></div></div>;
 }
 
 function ClinicianRequestAvailability() {
@@ -346,7 +346,7 @@ export function WorkspaceLayout({
       </aside>
       <div className="workspace-body">
         <DemoBar />
-        <header className="workspace-header">
+        <header className="workspace-header"><Avatar url={session?.photo?.url} name={session?.profile?.display_name||session?.user||""}/>
           <span>
             {kind === "admin"
               ? "Administration"
