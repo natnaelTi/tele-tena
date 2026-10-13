@@ -35,6 +35,7 @@ import {
 import ServiceDetails from "./pages/ServiceDetails";
 import MatchingOperations from "./pages/MatchingOperations";
 import Account from "./pages/Account";
+import ReviewerAccount from "./pages/ReviewerAccount";
 import { AdminOverview, Applications, FinancialDisputes, Scopes, ServiceCatalog } from "./pages/Admin";
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
 import Showcase from "./pages/Showcase";
@@ -144,6 +145,7 @@ export default function App() {
               </Route>
               <Route path="/admin" element={<WorkspaceLayout kind="admin" />}>
                 <Route index element={<AdminOverview />} />
+                <Route path="account" element={<ReviewerAccount />} />
                 <Route path="applications" element={<Applications />} />
                 <Route path="applications/:applicationId" element={<Applications />} />
                 <Route path="application-review" element={<Applications />} />

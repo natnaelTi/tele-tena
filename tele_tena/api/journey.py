@@ -185,7 +185,8 @@ def _clinic_schedule_workspace_available(user):
 def session():
     user = actor()
     p = rows('SELECT * FROM tt_profile WHERE user=%s', (user,))
-    return {'user': user, 'roles': frappe.get_roles(user), 'profile': p[0] if p else None,
+    from tele_tena.api.profile_photos import owner_photo
+    return {'user': user, 'photo': owner_photo(user), 'roles': frappe.get_roles(user), 'profile': p[0] if p else None,
             'clinic_workspace': _clinic_workspace_available(user),
             'clinic_schedule_workspace': _clinic_schedule_workspace_available(user),
             'csrf_token': get_csrf_token(), 'simulation': simulation_enabled()}
@@ -574,6 +575,8 @@ def discover(service=None):
         item.care_languages = sorted({value for value in languages if value in {'en', 'am', 'om'}})
         # The account key is needed only for the server-side eligibility
         # filter. Never serialize an account email to patient discovery.
+        from tele_tena.api.profile_photos import public_photo
+        item.photo_url = public_photo(item.clinician)
         item.pop('clinician', None)
         visible.append(item)
     return visible

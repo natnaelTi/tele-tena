@@ -268,3 +268,9 @@ contact information, health history, request narrative, notes, and price. No
 schema migration is needed. This projection is not a clinic-owned calendar,
 resource scheduler, or booking authority; Care Coordination and Billing do not
 receive the schedule query.
+
+Profile-photo v1.38 uses one private command-storage blob table, outside Frappe
+File/public routes. Authenticated opaque download endpoints enforce owner access
+or explicit clinician publication plus current discovery eligibility. Raster
+re-encoding removes EXIF; no patient photo enters clinical/disclosure/call models.
+Existing sites awaiting migration retain session/discovery without photos.

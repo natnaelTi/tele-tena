@@ -255,3 +255,9 @@ modal containing role-appropriate guidance, replay and a reviewer reference wiki
 No tour starts automatically in sign-in, calls or other protected steps. Guide/tour
 navigation must preserve unsaved forms and never perform approvals, bookings or
 payments. This is an owner-authorized extension to I04/B07/B09, not a new palette.
+
+Profile-photo extension13October2026: reusable Avatar preserves initials when
+photos are absent or inaccessible. Account includes one compact photo editor;
+reviewers use `/admin/account`. Clinician publication is an explicit checkbox.
+No patient encounter avatar is replaced with an account photo. Existing component
+sizes, tokens, keyboard controls and mobile wrapping are retained.

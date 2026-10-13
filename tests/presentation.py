@@ -129,6 +129,62 @@ class Presentation(unittest.TestCase):
     def setUp(self):
         fixtures.login('admin')
 
+    def test_profile_photo_owner_visibility_validation_and_revocation(self):
+        import io
+        from PIL import Image
+        from tele_tena.api import profile_photos as photos
+        from tele_tena.patches.v1_38_profile_photos import execute
+        execute()
+        execute()  # Fresh creation and repeat migration retain records.
+        stream = io.BytesIO()
+        Image.new('RGB', (80, 80), '#126b64').save(stream, format='PNG')
+        encoded = base64.b64encode(stream.getvalue()).decode()
+        try:
+            fixtures.login('p1')
+            private = photos.upload('photo.png', encoded)
+            photo_id = private['url'].split('=')[-1]
+            self.assertEqual(photos.download(photo_id).mimetype, 'image/jpeg')
+            with self.assertRaises(frappe.PermissionError):
+                photos.set_visibility(1)
+            for role in ('p2', 'c1', 'admin'):
+                fixtures.login(role)
+                with self.assertRaises(frappe.PermissionError):
+                    photos.download(photo_id)
+            fixtures.login('p1')
+            for filename, payload in [('unsafe.svg', encoded), ('fake.png', base64.b64encode(b'not an image').decode()),
+                                      ('large.png', 'A' * (photos.MAX_BYTES * 2))]:
+                with self.assertRaises(frappe.ValidationError):
+                    photos.upload(filename, payload)
+            self.assertEqual(photos.status()['url'], private['url'])
+            replacement = photos.upload('new.png', encoded)
+            with self.assertRaises(frappe.PermissionError):
+                photos.download(photo_id)
+            execute()
+            self.assertEqual(photos.status()['url'], replacement['url'])
+            fixtures.login('c1')
+            public = photos.upload('photo.png', encoded, published=1)
+            public_id = public['url'].split('=')[-1]
+            fixtures.login('p1')
+            self.assertEqual(photos.download(public_id).headers['Cache-Control'], 'private, no-store')
+            offers = journey.discover()
+            self.assertTrue(any(item.photo_url == public['url'] for item in offers))
+            self.assertNotIn(private['url'], json.dumps(offers))
+            fixtures.login('c1')
+            photos.set_visibility(0)
+            fixtures.login('p1')
+            with self.assertRaises(frappe.PermissionError):
+                photos.download(public_id)
+            fixtures.login('c1')
+            photos.remove()
+            self.assertIsNone(photos.status()['url'])
+            frappe.set_user('Guest')
+            with self.assertRaises(frappe.PermissionError):
+                photos.download(public_id)
+        finally:
+            fixtures.login('admin')
+            frappe.db.sql('DELETE FROM tt_profile_photo WHERE user IN %s', (tuple(fixtures.USERS.values()),))
+            frappe.db.commit()
+
     def test_appointment_list_cancellation_actor_does_not_unmask_patient(self):
         self.fund_patient('p1', 1000)
         day, _, _ = self.make_schedule(mode='automatic')

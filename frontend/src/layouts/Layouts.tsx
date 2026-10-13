@@ -1,3 +1,4 @@
+import {Avatar} from "../components/ProfilePhoto";
 import "./ProductShell.css";
 import { ClinicianNotifications } from "../components/ClinicianNotifications";
 import { Link, Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
@@ -226,6 +227,7 @@ const adminNav = [
   ["/admin/financial-disputes", "Financial disputes", Wallet],
   ["/admin/matching", "Matching operations", Settings2],
   ["/admin/exceptions", "Exceptions", Settings2],
+  ["/admin/account", "Account", Settings2],
 ] as const;
 const clinicHomeNav = [["/clinic", "Clinic workspace", Building2]] as const;
 const clinicNav = [
@@ -301,7 +303,7 @@ export function WorkspaceLayout({
     return <Navigate to="/onboarding" replace />;
   if (kind === "patient" || kind === "clinician") return <div className="reference-workspace">
     <DemoBar />
-    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}<Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button></nav><div className="product-user">{kind==="clinician"&&session?.roles.includes("Tele Tena Clinician")&&<ClinicianNotifications/>}<LanguageSelect /><span>{session?.profile?.display_name}</span><Button variant="quiet" aria-label={w("Sign out")} title={w("Sign out")} loading={signoutBusy} onClick={()=>void signout()}><LogOut size={20} /></Button></div></header>
+    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}<Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button></nav><div className="product-user"><Avatar url={session?.photo?.url} name={session?.profile?.display_name||session?.user||""}/>{kind==="clinician"&&session?.roles.includes("Tele Tena Clinician")&&<ClinicianNotifications/>}<LanguageSelect /><span>{session?.profile?.display_name}</span><Button variant="quiet" aria-label={w("Sign out")} title={w("Sign out")} loading={signoutBusy} onClick={()=>void signout()}><LogOut size={20} /></Button></div></header>
     {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
     {kind === "clinician" && session?.roles.includes("Tele Tena Clinician") && <ClinicianRequestAvailability />}
     <main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') ? 'workspace-wide' : ''}`} id="main-content"><Outlet /></main>

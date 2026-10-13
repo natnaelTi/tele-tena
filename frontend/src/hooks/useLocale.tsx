@@ -11,6 +11,21 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  // Profile photo translations are provisional, pending native review.
+  "Profile picture": ["የመገለጫ ፎቶ", "Suuraa piroofaayilii"],
+  "JPEG, PNG or WebP. Up to 3 MB.": ["JPEG፣ PNG ወይም WebP። እስከ 3 MB።", "JPEG, PNG ykn WebP. Hanga 3 MB."],
+  "Upload or replace photo": ["ፎቶ ጫን ወይም ቀይር", "Suuraa fe’i ykn bakka buusi"],
+  "Remove photo": ["ፎቶ አስወግድ", "Suuraa haqi"],
+  "Profile picture saved.": ["የመገለጫ ፎቶ ተቀምጧል።", "Suuraan piroofaayilii ol kaa’ame."],
+  "Profile picture removed.": ["የመገለጫ ፎቶ ተወግዷል።", "Suuraan piroofaayilii haqame."],
+  "Photo visibility saved.": ["የፎቶ ታይነት ተቀምጧል።", "Mul’achuun suuraa ol kaa’ame."],
+  "Show this photo on my approved clinician profile": ["ይህን ፎቶ በተፈቀደው የባለሙያ መገለጫዬ አሳይ", "Suuraa kana piroofaayilii ogeessaa koo hayyamame irratti agarsiisi"],
+  "Only you can see your photo. It is not shared in requests or consultations.": ["ፎቶዎን እርስዎ ብቻ ያያሉ። በጥያቄዎች ወይም ምክክሮች አይጋራም።", "Suuraa kee kan argu si qofa. Gaaffii ykn marii keessatti hin qoodamu."],
+  "A public photo is visible only while your clinician profile is eligible for discovery.": ["ይፋዊ ፎቶ የባለሙያ መገለጫዎ ለፍለጋ ብቁ ሲሆን ብቻ ይታያል።", "Suuraan uummataa yeroo piroofaayiliin ogeessaa kee barbaachaaf ulaagaa guutu qofa mul’ata."],
+  "Saving photo…": ["ፎቶ በማስቀመጥ ላይ…", "Suuraa ol kaa’aa…"],
+  "Your photo could not be loaded. Try again.": ["ፎቶዎን መጫን አልተቻለም። እንደገና ይሞክሩ።", "Suuraa kee fe’uun hin danda’amne. Irra deebi’i."],
+  "Choose a valid image up to 3 MB.": ["እስከ 3 MB የሆነ ትክክለኛ ምስል ይምረጡ።", "Suuraa sirrii hanga 3 MB filadhu."],
+  "Your photo could not be saved. Try again.": ["ፎቶዎን ማስቀመጥ አልተቻለም። እንደገና ይሞክሩ።", "Suuraa kee ol kaa’uun hin danda’amne. Irra deebi’i."],
   // Provisional additions; native review remains required.
   "Manage relationship links": ["የግንኙነት ማገናኛዎችን ያስተዳድሩ", "Hidhannoo walitti dhufeenyaa bulchi"],
   "Care, together": ["እንክብካቤ፣ በጋራ", "Kunuunsa, waliin"],

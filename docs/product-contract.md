@@ -404,3 +404,11 @@ authorized approver, a reason, and an append-only audit event. Legacy test
 services are eligible only on a site explicitly bound to review mode; migration
 does not enable immediate care. The three-minute target is measured, not
 promised.
+
+## Owner profile photos — 13October2026
+Patients, clinicians and reviewers can upload/replace/remove a personal raster
+photo. Patient/reviewer photos are owner-only and never follow name/history
+sharing into encounters or requests. Clinicians choose public-profile visibility;
+current discovery eligibility is enforced again on photo download. A photo
+provides no credential verification. See `profile-photos.md` for limits, storage,
+fictional presentation setup and revocation limitations.

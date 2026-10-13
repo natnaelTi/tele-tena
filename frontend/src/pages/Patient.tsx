@@ -1,3 +1,4 @@
+import {Avatar} from "../components/ProfilePhoto";
 import { PatientCareLinks } from "../components/PatientCareLinks";
 import PaymentActivity from "../components/PaymentActivity";
 import { careSearchScore } from "../care-search";
@@ -117,7 +118,7 @@ export function PatientHome() {
         <div className="previous-clinician-list">
           {previousClinicians.data.map((clinician) => (
             <article className="previous-clinician-row" key={clinician.clinician_id}>
-              <div className="avatar" aria-hidden="true">{clinician.display_name.slice(0, 1).toUpperCase()}</div>
+              <Avatar url={clinician.photo_url} name={clinician.display_name}/>
               <div className="previous-clinician-copy">
                 <h3>{clinician.display_name}</h3>
                 <p className="supporting">{w("Last session")} {date(clinician.last_consultation)} · {clinician.completed_sessions} {w(clinician.completed_sessions === 1 ? "completed session" : "completed sessions")}</p>
@@ -386,7 +387,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
         )}
         {step === 0 && (
           <>
-            <section className="booking-selection-panel"><div className="booking-selection-heading"><div className="avatar" aria-hidden="true">{offer.display_name.slice(0,1)}</div><div><span className="verified">{w("Approved for this service")}</span><h2>{offer.display_name}</h2><p>{offer.label} · {offer.minutes} {w("minutes")} · ETB {money(offer.price)}</p></div></div>
+            <section className="booking-selection-panel"><div className="booking-selection-heading"><Avatar url={offer.photo_url} name={offer.display_name}/><div><span className="verified">{w("Approved for this service")}</span><h2>{offer.display_name}</h2><p>{offer.label} · {offer.minutes} {w("minutes")} · ETB {money(offer.price)}</p></div></div>
             <Select label="Show times in timezone" value={displayZone} onChange={e=>{setDisplayZone(e.target.value);setStart("");setSelectedDate("");}}><option value="Africa/Addis_Ababa">Addis Ababa (EAT)</option><option value="UTC">UTC</option><option value="Africa/Nairobi">Nairobi (EAT)</option></Select>
             <BookingCalendar days={data.calendar.days} fromDate={calendarFrom || data.calendar.days[0]?.date || new Date().toISOString().slice(0,10)} selectedDate={selectedDate} selectedStart={start} duration={offer.minutes}
               onMonth={date => { setCalendarFrom(date); setSelectedDate(""); setStart(""); }}

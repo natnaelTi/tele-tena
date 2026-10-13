@@ -1,3 +1,4 @@
+import {Avatar} from "./ProfilePhoto";
 import type { AppointmentView } from "../appointment-groups";
 import { appointmentStatus } from "../appointment-status";
 import { useRef, useState } from "react";
@@ -51,7 +52,7 @@ export function ClinicianCard({ offer }: { offer: Offer }) {
   const trigger = useRef<HTMLButtonElement | null>(null);
   return <>
     <Card className="clinician-card reference-clinician-card">
-      <div className="clinician-body"><div className="avatar" aria-hidden="true">{offer.display_name.slice(0, 1).toUpperCase()}</div><div className="clinician-card-copy">
+      <div className="clinician-body"><Avatar url={offer.photo_url} name={offer.display_name}/><div className="clinician-card-copy">
         <h3>{offer.display_name}</h3><p>{offer.label}</p>
         <span className="verified"><ShieldCheck size={16} />{w("Approved for this service")}</span>
         {offer.description && <p className="clinician-description">{offer.description}</p>}

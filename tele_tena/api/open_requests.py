@@ -492,7 +492,8 @@ def clinician_profile(clinician_id):
             OR (a.state='Cancelled' AND a.cancelled_by=%s
                 AND a.cancelled_at>=UTC_TIMESTAMP(6)-INTERVAL 365 DAY))''',
         (clinician.user, clinician.user, clinician.user))
-    return {'display_name': clinician.display_name, 'introduction': clinician.introduction or '', 'services': services,
+    from tele_tena.api.profile_photos import public_photo
+    return {'photo_url': public_photo(clinician.user), 'display_name': clinician.display_name, 'introduction': clinician.introduction or '', 'services': services,
             'approval_meaning': 'Application and listed service scopes are manually approved.',
             'trust_indicators': {
                 'credential_status': 'Manually reviewed application and listed scopes',

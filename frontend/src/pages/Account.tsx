@@ -1,4 +1,5 @@
 import "./Account.css";
+import ProfilePhoto from "../components/ProfilePhoto";
 import { api } from "../api";
 import { WalletSummary } from "../components/WalletSummary";
 import { useNavigate } from "react-router-dom";
@@ -72,6 +73,7 @@ export default function Account() {
     <PageTitle title={w(title)} description={w(description)} />
     {tab !== "Overview" && <nav ref={sectionNavigation} className="account-tabs" aria-label={w("Account settings")}>{tabs.map(label=><button type="button" key={label} className={tab===label?"selected":""} onClick={()=>setTab(label)} aria-current={tab===label?"page":undefined}>{w(label)}</button>)}</nav>}
     <div className="account-sections" data-tour-unsaved={dirty?"true":"false"} onChange={()=>setDirty(true)}>
+    {(tab === "Overview" || tab === "Personal profile") && <ProfilePhoto/>}
     {tab === "Overview" && <div className="account-overview"><div>{personalEditor}<section className="settings-section"><h2>{w("Your settings")}</h2>{sections.filter(label => label !== "Personal profile").map(label => <button type="button" className="settings-link-row" aria-label={w(label)} key={label} onClick={() => setTab(label)}>{label === "Privacy & sharing" ? <ShieldCheck size={20}/> : label === "Contact & sign-in" ? <LockKeyhole size={20}/> : <Settings2 size={20}/>}<span><strong>{w(label)}</strong><small>{w(label === "Privacy & sharing" ? "Defaults and encounter-level control" : label === "Language & timezone" ? "Language and appointment timezone" : label === "Contact & sign-in" ? "Sign-in methods" : "Profile, languages and evidence")}</small></span><ArrowRight size={18}/></button>)}</section></div><aside>{profile.kind === "patient" ? <>{wallet.data ? <WalletSummary available={wallet.data.available} reserved={wallet.data.reserved} /> : wallet.error ? <InlineNotice tone="danger">{w("Balance unavailable.")} <Button variant="secondary" onClick={()=>void wallet.refresh()}>{w("Try again")}</Button></InlineNotice> : <p role="status">{w("Loading balance…")}</p>}<section className="settings-section"><h2>{w("People in your care")}</h2><Link className="settings-link-row" to="/patient/couples"><Users size={20}/><span><strong>{w("Shared care")}</strong><small>{w("Manage invitations and consent")}</small></span><ArrowRight size={18}/></Link><InlineNotice>{w("Relationships are private. Being linked never automatically shares records.")}</InlineNotice></section></> : practiceSettings}</aside></div>}
 
     {tab==="Personal profile" && personalEditor}

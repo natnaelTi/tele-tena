@@ -42,3 +42,5 @@ tele_tena.patches.v1_35_individual_followup
 tele_tena.patches.v1_36_public_introduction
 
 tele_tena.patches.v1_37_scope_intake
+
+tele_tena.patches.v1_38_profile_photos

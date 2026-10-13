@@ -875,3 +875,8 @@ application queue now have paired reference comparisons and actual persisted
 backend action/permission checks at390/768/1440. Pagination avoids a history wall;
 mobile tour no longer covers Review. Owner approval, other route/state comparisons
 and current language/200%zoom checks remain open. See sole matrix/current report.
+
+Owner profile-photo upload/replace/remove and four fictional demo portraits added
+13October2026. Patient/reviewer images are private; clinician publication is
+opt-in and eligibility-gated. See `profile-photos.md` for focused verification;
+this addition does not close earlier full-MVP acceptance gates.

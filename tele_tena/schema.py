@@ -142,3 +142,6 @@ def install():
     public_introduction()
     from tele_tena.patches.v1_37_scope_intake import execute as scope_intake
     scope_intake()
+
+    from tele_tena.patches.v1_38_profile_photos import execute as profile_photos
+    profile_photos()

@@ -1,3 +1,4 @@
+import {Avatar} from "./ProfilePhoto";
 import { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
@@ -15,7 +16,7 @@ export function ClinicianPreview({ offer, close, focusReturnTarget }: { offer: O
   const experience = resource.data?.trust_indicators?.session_experience;
   const currentOffering = resource.data?.services?.some((service: any) => service.offering === offer.id);
   return <Dialog open focusReturnTarget={focusReturnTarget} onOpenChange={value => { if (!value) close(); }} title={offer.display_name} description={w("Review approved services and sharing choices before booking.")} className="clinician-preview-dialog">
-    <div className="profile-preview-identity"><div className="avatar large" aria-hidden="true">{offer.display_name.slice(0, 1)}</div><div><h3>{offer.service_category || offer.label}</h3><span className="verified"><ShieldCheck size={18} />{w("Approved for this service")}</span></div></div>
+    <div className="profile-preview-identity"><Avatar className="large" url={offer.photo_url} name={offer.display_name}/><div><h3>{offer.service_category || offer.label}</h3><span className="verified"><ShieldCheck size={18} />{w("Approved for this service")}</span></div></div>
     {resource.error ? <InlineNotice tone="danger">{w("This clinician profile is unavailable or no longer approved.")} <Button variant="secondary" onClick={() => void resource.refresh()}>{w("Try again")}</Button></InlineNotice> : !resource.data ? <Skeleton /> : <>
       {offer.description && <p>{offer.description}</p>}
       <dl className="profile-preview-facts"><div><dt>{w("Approved service")}</dt><dd>{offer.label}</dd></div><div><dt>{w("Care language")}</dt><dd>{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Not listed")}</dd></div><div><dt>{w("Consultation")}</dt><dd>{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')} · {offer.minutes} {w("minutes")}</dd></div><div><dt>{w("Published fee")}</dt><dd>ETB {money(offer.price)}</dd></div><div><dt>{t("sessionExperienceMetric")}</dt><dd>{experience?.average == null ? t(experience?.status === "new" ? "sessionExperienceNew" : "sessionExperienceMore") : `${experience.average} / 5`} · {experience?.sample_count ?? 0} {t("evidenceCount")}</dd></div></dl>
