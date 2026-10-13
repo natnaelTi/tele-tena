@@ -1,5 +1,15 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "General application decision": ["አጠቃላይ የማመልከቻ ውሳኔ", "Murtii iyyataa waliigalaa"],
+  "Application review progress": ["የማመልከቻ ግምገማ ሂደት", "Adeemsa gamaaggama iyyataa"],
+  "General application approval does not grant service-scope approval.": ["አጠቃላይ የማመልከቻ ፈቃድ የአገልግሎት ፈቃድ አይሰጥም።", "Hayyamni iyyataa waliigalaa hayyama tajaajilaa hin kennu."],
+  "Clinicians apply for each service separately. Upload private documents in Professional review, save the draft, then submit. If information is requested, open the application, correct it and resubmit. Approval is always manual.": ["ባለሙያዎች ለእያንዳንዱ አገልግሎት ለየብቻ ያመለክታሉ። በሙያ ግምገማ የግል ሰነዶችን ጫኑ፣ ረቂቁን አስቀምጡና አስገቡ። መረጃ ከተጠየቀ ማመልከቻውን ክፈቱ፣ አስተካክሉና እንደገና አስገቡ። ፈቃድ ሁልጊዜ በሰው ይወሰናል።", "Ogeessonni tajaajila tokkoon tokkoof addaan iyyatu. Gamaaggama ogummaa keessatti galmee dhuunfaa olkaa’i, wixinee olkaa’iitii ergi. Odeeffannoon yoo gaafatame iyyata bani, sirreessiitii deebi’ii ergi. Hayyamni yeroo hunda namaan murtaa’a."],
+  "For sign-in, use an enabled code-delivery method or choose password access. A code proves contact possession, not professional approval.": ["ለመግባት የተነቃ የኮድ መላኪያ ዘዴ ወይም የይለፍ ቃል ይምረጡ። ኮድ የመገናኛ ባለቤትነትን ያረጋግጣል፤ የሙያ ፈቃድ አይደለም።", "Seenuuf mala koodii ergamuu baname fayyadami ykn jecha iccitii filadhu. Koodiin abbummaa quunnamtii mirkaneessa; hayyama ogummaa miti."],
+  "Add a rationale for each score you entered. Complete or clear unfinished scores before recording a decision.": ["ለእያንዳንዱ ነጥብ ምክንያት ያስገቡ። ውሳኔ ከመመዝገብዎ በፊት ያልተጠናቀቁ ነጥቦችን ያጠናቅቁ ወይም ያጽዱ።", "Qabxii galchite tokkoon tokkoof sababaa ibsi. Murtii galmeessuu dura qabxii hin xumuramne xumuri ykn qulqulleessi."],
+  "Enter a specific decision reason, up to 2000 characters.": ["እስከ 2000 ቁምፊዎች ድረስ ግልጽ የውሳኔ ምክንያት ያስገቡ።", "Sababaa murtii ifaa hanga arfiilee2000 galchi."],
+  "Choose whether to approve, request information or decline this application.": ["ይህን ማመልከቻ ለማጽደቅ፣ መረጃ ለመጠየቅ ወይም ውድቅ ለማድረግ ይምረጡ።", "Iyyata kana hayyamuu, odeeffannoo gaafachuu ykn diduu filadhu."],
+  "Save your changes before starting a tour. Help articles remain available.": ["ጉብኝት ከመጀመርዎ በፊት ለውጦችዎን ያስቀምጡ። የእገዛ መመሪያዎች ይገኛሉ።", "Daawwannaa jalqabuu dura jijjiirama kee olkaa’i. Qajeelfamni gargaarsaa ni jira."],
+
   "1. General application": ["1. አጠቃላይ ማመልከቻ", "1. Iyyata waliigalaa"],
   "Review professional identity, qualifications and the private resume. General approval creates clinician access; it does not approve any service scope.": ["የሙያ ማንነት፣ ብቃቶችና የግል የሥራ ልምድ ሰነድ ይገምግሙ። አጠቃላይ ፈቃድ የባለሙያ መዳረሻን ይሰጣል፤ ማንኛውንም አገልግሎት አያጸድቅም።", "Eenyummaa ogummaa, barnootaa fi CV dhuunfaa gamaaggami. Hayyamni waliigalaa qaqqabummaa ogeessaa kenna; tajaajila tokko illee hin hayyamu."],
   "2. Service definition": ["2. የአገልግሎት መግለጫ", "2. Hiika tajaajilaa"],

@@ -18,17 +18,17 @@ const reviewerGuide = [
 ];
 export default function HelpTools() {
   const {session}=useSession();const {w}=useLocale();const location=useLocation();
-  const [open,setOpen]=useState(false);const [guide,setGuide]=useState(false);
+  const [open,setOpen]=useState(false);const [guide,setGuide]=useState(false);const [tourBlocked,setTourBlocked]=useState(false);
   const opener=useRef<HTMLButtonElement>(null);
   const reviewer=!!session?.roles.includes('Tele Tena Approver');
   const role=reviewer?'admin':session?.profile?.kind==='clinician'?'clinician':session?.profile?.kind==='patient'?'patient':'applicant';
   const protectedWork=/consultation|sign-in|onboarding|payments/.test(location.pathname);
   return <>
-    <button ref={opener} className="help-island" type="button" aria-label={w('Help & tours')} title={w('Help & tours')} aria-haspopup="dialog" onClick={()=>{setGuide(false);setOpen(true);}}><CircleHelp size={24}/></button>
+    <button ref={opener} className="help-island" type="button" aria-label={w('Help & tours')} title={w('Help & tours')} aria-haspopup="dialog" onClick={()=>{setGuide(false);setTourBlocked(false);setOpen(true);}}><CircleHelp size={24}/></button>
     {session&&<WorkspaceTour role={role}/>}
     <Dialog open={open} onOpenChange={setOpen} title={w('Help & tours')} description={w('Guidance for this workspace. Help never submits a form or records a decision.')} focusReturnTarget={opener.current} size={guide?'wide':'default'}>
       {guide&&reviewer?<div className="help-guide" tabIndex={0} aria-label={w('Reviewer guide')}><Button variant="quiet" onClick={()=>setGuide(false)}>{w('Back to help')}</Button><h3>{w('Reviewer guide')}</h3><p>{w('Use this guide while reviewing. All final decisions remain human decisions.')}</p>{reviewerGuide.map(([title,body])=><section key={title}><h4>{w(title)}</h4><p>{w(body)}</p></section>)}</div>:<div className="help-menu">
-        {session&&<section><Route size={24}/><h3>{w('Guided workspace tour')}</h3><p>{w('Learn the main controls without changing any records.')}</p><Button disabled={protectedWork} onClick={()=>{setOpen(false);window.setTimeout(()=>window.dispatchEvent(new Event('teletena-start-tour')),100);}}>{w('Start guided tour')}</Button>{protectedWork&&<p className="supporting">{w('Finish the current protected step before starting a tour. You can still read help here.')}</p>}</section>}
+        {session&&<section><Route size={24}/><h3>{w('Guided workspace tour')}</h3><p>{w('Learn the main controls without changing any records.')}</p><Button disabled={protectedWork} onClick={()=>{if(document.querySelector('[data-tour-unsaved="true"]')){setTourBlocked(true);return;}setOpen(false);window.setTimeout(()=>window.dispatchEvent(new Event('teletena-start-tour')),100);}}>{w('Start guided tour')}</Button>{tourBlocked&&<p role="status">{w("Save your changes before starting a tour. Help articles remain available.")}</p>}{protectedWork&&<p className="supporting">{w('Finish the current protected step before starting a tour. You can still read help here.')}</p>}</section>}
         {reviewer&&<section><BookOpen size={24}/><h3>{w('Reviewer guide')}</h3><p>{w('Application review, private evidence, credential checks, scope decisions and correction workflows.')}</p><Button variant="secondary" onClick={()=>setGuide(true)}>{w('Open reviewer guide')}</Button></section>}
         {!reviewer&&<section><h3>{w('Applications and access')}</h3><p>{w('Clinicians apply for each service separately. Upload private documents in Professional review, save the draft, then submit. If information is requested, open the application, correct it and resubmit. Approval is always manual.')}</p><p>{w('For sign-in, use an enabled code-delivery method or choose password access. A code proves contact possession, not professional approval.')}</p></section>}
       </div>}
