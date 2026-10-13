@@ -1,5 +1,17 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "License evidence is missing for this scope. A resume is not license evidence. Choose Request information so the applicant can upload a License or registration PDF and resubmit.": ["ለዚህ አገልግሎት የፈቃድ ማስረጃ ጎድሏል። የሥራ ልምድ ሰነድ የፈቃድ ማስረጃ አይደለም። አመልካቹ የፈቃድ PDF እንዲጫንና እንደገና እንዲያስገባ መረጃ ይጠይቁ።", "Ragaan hayyamaa tajaajila kanaaf hin jiru. CV ragaa hayyamaa miti. Iyyataan PDF hayyamaa olkaa'ee deebi'ee akka ergu odeeffannoo gaafadhu."],
+  "Evidence references beside assessment scores are optional. License evidence for credential verification is required before approval.": ["ከነጥቦች ጎን ያሉ የማስረጃ ማጣቀሻዎች አማራጭ ናቸው። ከማጽደቅ በፊት የፈቃድ ማስረጃ ያስፈልጋል።", "Wabiiwwan ragaa qabxii biratti filannoo dha. Mirkaneessa hayyamaaf ragaan hayyamaa hayyama dura barbaachisa."],
+  "Clear unfinished credential check": ["ያልተጠናቀቀ የፈቃድ ማረጋገጫን አጽዳ", "Sakatta'iinsa ragaa hin xumuramne qulqulleessi"],
+  "Approval needs a license document attached to this scope, a verification source, check date and source reference. Request information if the document is missing.": ["ለማጽደቅ ከዚህ ማመልከቻ ጋር የተያያዘ የፈቃድ ሰነድ፣ ምንጭ፣ የማረጋገጫ ቀንና ማጣቀሻ ያስፈልጋሉ። ሰነዱ ከጎደለ መረጃ ይጠይቁ።", "Hayyamaaf galmee hayyamaa iyyata kanatti maxxane, madda mirkaneessaa, guyyaa sakatta'iinsaa fi wabii barbaachisa. Galmeen yoo dhabame odeeffannoo gaafadhu."],
+  "Choose a License or registration document uploaded to this service application.": ["ወደዚህ ማመልከቻ የተጫነ የፈቃድ ወይም ምዝገባ ሰነድ ይምረጡ።", "Galmee hayyamaa ykn galmee iyyata kanaaf olkaa'ame filadhu."],
+  "Clear the unfinished credential check before requesting information, or complete it and confirm verification after checking the source.": ["መረጃ ከመጠየቅ በፊት ያልተጠናቀቀውን ማረጋገጫ ያጽዱ፤ ወይም ምንጩን ፈትሸው ማረጋገጫውን ያጠናቅቁ።", "Odeeffannoo gaafachuu dura sakatta'iinsa hin xumuramne qulqulleessi; ykn madda sakatta'uun mirkaneessa xumuri."],
+  "Enter a valid credential check date that is not in the future.": ["የወደፊት ያልሆነ ትክክለኛ የማረጋገጫ ቀን ያስገቡ።", "Guyyaa sakatta'iinsaa sirrii kan gara fuulduraa hin taane galchi."],
+  "Complete every assessment score and rationale before approving this scope.": ["ይህን አገልግሎት ከማጽደቅ በፊት ሁሉንም ነጥቦችና ምክንያቶች ይሙሉ።", "Tajaajila kana hayyamuu dura qabxii fi sababoota madaallii hunda guuti."],
+  "A mandatory assessment has not passed. Request information or decline; scores cannot replace required evidence.": ["አስፈላጊ መስፈርት አልተሟላም። መረጃ ይጠይቁ ወይም ውድቅ ያድርጉ፤ ነጥቦች አስፈላጊ ማስረጃን አይተኩም።", "Madaalliin dirqamaa hin darbine. Odeeffannoo gaafadhu ykn didi; qabxiin ragaa barbaachisaa hin bakka bu'u."],
+  "The service definition needs medical-lead approval before a clinician can be approved for it.": ["ባለሙያው ከመፈቀዱ በፊት የአገልግሎት መግለጫው የሕክምና መሪ ፈቃድ ያስፈልገዋል።", "Ogeessi hayyamamuu dura hiikni tajaajilaa hayyama hoogganaa yaalaa barbaada."],
+  "The credential has expired. Request current evidence before approval.": ["የማስረጃው ጊዜ አልፏል። ከማጽደቅ በፊት ወቅታዊ ማስረጃ ይጠይቁ።", "Yeroon ragaa darbeera. Hayyama dura ragaa yeroo ammaa gaafadhu."],
+
   "Patients choose a published appointment time": ["ታካሚዎች የታተመ የቀጠሮ ጊዜ ይመርጣሉ", "Dhukkubsattoonni yeroo beellamaa maxxanfame filatu"],
   "Appointments scheduled for later": ["ለኋላ የተያዙ ቀጠሮዎች", "Beellamoota yeroo boodaa"],
   "As-soon-as-possible care requests": ["በተቻለ ፍጥነት የእንክብካቤ ጥያቄዎች", "Gaaffii kunuunsaa dafanii"],

@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { ApiError } from "../api";
 const messages: Record<string, string> = {
+  credential_provenance_required: "Approval needs a license document attached to this scope, a verification source, check date and source reference. Request information if the document is missing.",
+  credential_evidence_invalid: "Choose a License or registration document uploaded to this service application.",
+  credential_verification_flag_required: "Clear the unfinished credential check before requesting information, or complete it and confirm verification after checking the source.",
+  credential_check_date_invalid: "Enter a valid credential check date that is not in the future.",
+  vetting_scores_incomplete: "Complete every assessment score and rationale before approving this scope.",
+  vetting_mandatory_criterion_failed: "A mandatory assessment has not passed. Request information or decline; scores cannot replace required evidence.",
+  catalog_not_approved: "The service definition needs medical-lead approval before a clinician can be approved for it.",
+  credential_expired: "The credential has expired. Request current evidence before approval.",
   catalog_booking_rules_invalid: "Choose how appointments can be booked. Consultation, notes and summary requirements belong under Required platform workflows.",
   catalog_duration_range: "Set both session length limits, with the minimum no greater than the maximum.",
   catalog_date_range: "The end date must be on or after the effective date.",
