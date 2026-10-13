@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "45159455eaaba103f019a0142481172ccd8d37e6",
+  "source_checkpoint": "834ed2d0c6a1600c0a5d0c4d01c97e0f564dda15",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -1678,7 +1678,8 @@
         "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json",
         "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
         "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance.",
-        "optional_approach_choices": "5944566: optional Active catalog choices replace undocumented free-text stable keys; truthful empty state and explicit stale-entry move to training. Two Frappe tests plus real random-code backend/browser all-ten-scope draft/reload/submission pass. No auto approval; visual/owner acceptance separate. See active journey report."
+        "optional_approach_choices": "5944566: optional Active catalog choices replace undocumented free-text stable keys; truthful empty state and explicit stale-entry move to training. Two Frappe tests plus real random-code backend/browser all-ten-scope draft/reload/submission pass. No auto approval; visual/owner acceptance separate. See active journey report.",
+        "guided_vetting_help": "834ed2d: owner-authorized stepped general/scope review, clinician evidence stage and global help/wiki. Two real Frappe regressions, four-role browser390/768/1440, locale layout, tour Next/Back and actual200% help pass. docs/screenshots/mvp-current/834ed2d-guided-review-help/. No presentation decision/upload; native and owner approval pending. Reviewer unsaved fields not retained across reload."
       },
       "visual_acceptance": {
         "reference_screen": "B07",
@@ -1917,7 +1918,8 @@
         "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json",
         "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
         "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance.",
-        "optional_approach_choices": "5944566: optional Active catalog choices replace undocumented free-text stable keys; truthful empty state and explicit stale-entry move to training. Two Frappe tests plus real random-code backend/browser all-ten-scope draft/reload/submission pass. No auto approval; visual/owner acceptance separate. See active journey report."
+        "optional_approach_choices": "5944566: optional Active catalog choices replace undocumented free-text stable keys; truthful empty state and explicit stale-entry move to training. Two Frappe tests plus real random-code backend/browser all-ten-scope draft/reload/submission pass. No auto approval; visual/owner acceptance separate. See active journey report.",
+        "guided_vetting_help": "834ed2d: owner-authorized stepped general/scope review, clinician evidence stage and global help/wiki. Two real Frappe regressions, four-role browser390/768/1440, locale layout, tour Next/Back and actual200% help pass. docs/screenshots/mvp-current/834ed2d-guided-review-help/. No presentation decision/upload; native and owner approval pending. Reviewer unsaved fields not retained across reload."
       },
       "visual_acceptance": {
         "reference_screen": "B09",
@@ -2051,7 +2053,8 @@
         "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json",
         "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
         "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance.",
-        "optional_approach_choices": "5944566: optional Active catalog choices replace undocumented free-text stable keys; truthful empty state and explicit stale-entry move to training. Two Frappe tests plus real random-code backend/browser all-ten-scope draft/reload/submission pass. No auto approval; visual/owner acceptance separate. See active journey report."
+        "optional_approach_choices": "5944566: optional Active catalog choices replace undocumented free-text stable keys; truthful empty state and explicit stale-entry move to training. Two Frappe tests plus real random-code backend/browser all-ten-scope draft/reload/submission pass. No auto approval; visual/owner acceptance separate. See active journey report.",
+        "guided_vetting_help": "834ed2d: owner-authorized stepped general/scope review, clinician evidence stage and global help/wiki. Two real Frappe regressions, four-role browser390/768/1440, locale layout, tour Next/Back and actual200% help pass. docs/screenshots/mvp-current/834ed2d-guided-review-help/. No presentation decision/upload; native and owner approval pending. Reviewer unsaved fields not retained across reload."
       },
       "visual_acceptance": {
         "reference_screen": "B10",
@@ -10979,7 +10982,8 @@
         "current_2026_10_11_onboarding_review": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json",
         "current_2026_10_12": "docs/screenshots/mvp-current/8b5802d-application-review/result.json",
         "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
-        "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance."
+        "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance.",
+        "guided_vetting_help": "834ed2d: owner-authorized stepped general/scope review, clinician evidence stage and global help/wiki. Two real Frappe regressions, four-role browser390/768/1440, locale layout, tour Next/Back and actual200% help pass. docs/screenshots/mvp-current/834ed2d-guided-review-help/. No presentation decision/upload; native and owner approval pending. Reviewer unsaved fields not retained across reload."
       },
       "visual_acceptance": {
         "reference_screen": "I03",
@@ -11120,7 +11124,8 @@
       "verification_evidence": {
         "implementation": "Immutable v1.28 registry and Medical Lead role; reviewer APIs expose digest-verified definitions; only Medical Lead approves. v1.29 requires issuer/source, check date, registry reference, and same-application license evidence for credential verification, then stores a digest-checked provenance snapshot. Applicant/patient responses omit this data.",
         "current_local": "Frappe 15 isolated site v1.29 first/repeat migration passed; tests/presentation.py 45/45 and tests/integration.py 24/24. Production-built /teletena/admin/vetting reviewer controls were rendered at 390/1440px against a synthetic submitted application; evidence screenshots are docs/screenshots/vetting-rubric/credential-source-reviewer-{390,1440}.png. Fresh-site install, Frappe 16, Medical Lead approval and native-language/accessibility review remain pending.",
-        "missing_scope_license_feedback": "4515945: real Submitted/no-evidence diagnosis; specific safe verification messages, explanatory notice and explicit local clear control. Existing isolated backend clarification/evidence/resubmission/provenance regression passes; actual reviewer readonly controls pass. No decision/upload/approval; see active report."
+        "missing_scope_license_feedback": "4515945: real Submitted/no-evidence diagnosis; specific safe verification messages, explanatory notice and explicit local clear control. Existing isolated backend clarification/evidence/resubmission/provenance regression passes; actual reviewer readonly controls pass. No decision/upload/approval; see active report.",
+        "guided_vetting_help": "834ed2d: owner-authorized stepped general/scope review, clinician evidence stage and global help/wiki. Two real Frappe regressions, four-role browser390/768/1440, locale layout, tour Next/Back and actual200% help pass. docs/screenshots/mvp-current/834ed2d-guided-review-help/. No presentation decision/upload; native and owner approval pending. Reviewer unsaved fields not retained across reload."
       },
       "visual_acceptance": {
         "reference_screen": "I04",

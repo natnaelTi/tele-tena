@@ -1,0 +1,9 @@
+# Guided review and help island
+
+Runtime package834ed2d0c6a1600c0a5d0c4d01c97e0f564dda15. Fictional presentation accounts; reviewer inputs in captures are unsaved test text. No decision or evidence upload was made by the browser check. Private document/credential-detail screenshots are intentionally not published.
+
+The owner requested a new guided review UX on13October. I04 remains the reference for typography, palette and assessment hierarchy; the four-stage workbench, one-at-a-time accordion assessment and readiness checklist are intentional authorized changes from the prototype's single-page rubric. I03 becomes a separate three-stage general review; B07/B09 retain the clinician wizard with evidence collection inside the experience stage. The original prototype's I04 fixed desktop composition clips at narrow/zoomed widths; the implementation reflows and keeps content accessible. This is not a pixel-match or owner-acceptance claim.
+
+Inspected: desktop assessment hierarchy, mobile guide bounds/scrolling, desktop decision grouping, language guide wrapping and real200% zoom help. Matching390/1440 reference captures are included. Additional768px captures and transient queue/document screenshots remain local under /tmp/tt-guided-vetting-help. Reviewer-guide-200 is a real browser zoom capture, not a resized viewport approximation.
+
+Functional logs: /tmp/tt-guided-final-backend.log (2/2); /tmp/tt-guided-vetting-browser.log (four roles, step inputs, role-specific wiki, tour Next/Back, locale layouts); /tmp/tt-guided-help-zoom.log. Source call/finance behavior was not changed or broadly retested. Native translations and owner visual acceptance remain pending. Reviewer inputs are held in page memory; refreshing does not autosave them. Clinician scope drafts remain server-persisted.

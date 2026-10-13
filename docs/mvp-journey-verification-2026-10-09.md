@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **45159455eaaba103f019a0142481172ccd8d37e6**. Later test/report/evidence-only commits
+  **834ed2d0c6a1600c0a5d0c4d01c97e0f564dda15**. Later test/report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -20,6 +20,54 @@ screen/completion matrix; the sections below this active checkpoint are historic
   preview. `scripts/local_review.py start/status/stop` restores it without migrations,
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Guided application/reviewer UX and help island —13October2026
+
+Current package `834ed2d0c6a1600c0a5d0c4d01c97e0f564dda15`. Owner-requested UX
+changes keep the same server authorization, rubric, scope decisions and evidence
+requirements. General application review is profile -> private documents -> general
+decision. Scope review chooses one application, then documents -> credentials ->
+assessment -> decision/readiness. Secondary operations/appeals are expandable.
+Assessment dimensions open individually and show completion; stage focus and
+scroll position follow navigation. Safe feedback identifies incomplete scores,
+rationales and findings. Existing mandatory gates and credential provenance are
+unchanged. Missing documents are distinguished from an optional unselected reference.
+
+Clinician evidence collection is now inside the experience stage: save a draft,
+then attach private documents grouped by selected service. Locked submitted/approved
+applications cannot accidentally be included in a new-scope batch; clarification,
+renewal and reconsideration retain their existing routes. No automatic scope grant.
+
+Help & tours is one global bottom-right icon for all React routes/roles. Role-aware
+workspace tours remain authenticated and server-persisted. The reviewer wiki has
+seven sections and the walkthrough has seven steps. Tour launch does not navigate
+away from unsaved input or protected calls/sign-in/onboarding/payment steps. The
+static offline fallback has a generic help modal, with role-specific tours available
+after reconnecting. No private data is cached. Reviewer entries remain in page
+memory between steps/queue selections, not localStorage; reload loses unsaved
+review fields. Clinician draft persistence is unchanged. See `reviewer-guide.md`.
+
+Actual evidence: two real Frappe tests passed6.205s on the disposable site
+(`/tmp/tt-guided-final-backend.log`): clarification/private evidence/resubmission/
+credential-provenance/decision, plus resume/privacy and tour preferences/permissions.
+Built-browser real-backend inspection passes for guest, patient, clinician and
+reviewer at390/768/1440: global icon, role-specific guide, modal focus return,
+four-stage scope input preservation, general review stages, clinician evidence
+entry, and tour Next/Back. No approval, rejection, file upload or dismissal was
+recorded in the presentation browser check. Amharic/Oromo guide layout captures
+pass; translations are provisional, not native-approved. Actual Chromium200%
+zoom verifies720CSS-pixel width, queue/help keyboard scrolling, close and focus
+return (`/tmp/tt-guided-help-zoom.log`, unchanged queue/guide layout from4b6f155).
+Offline generic help opens/closes without API actions. Build/typecheck and lint
+pass with inherited warnings. Evidence/comparison notes:
+`docs/screenshots/mvp-current/834ed2d-guided-review-help/`.
+
+These are explicit owner-authorized composition changes to I03/I04/B07/B09,
+not a claim of matching the old single-page prototype or owner visual acceptance.
+No schema migration, financial repair, provider send, framework edit, merge or
+remote change. Existing consultation media/End source is unchanged; hosted calls,
+financial suites, fresh install and physical-device testing were not rerun for
+this UX-only workflow presentation change. The wider MVP release gates remain.
 
 ## Missing scope-license evidence feedback —13October2026
 
