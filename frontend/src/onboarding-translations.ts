@@ -1,5 +1,6 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Clear unfinished assessment": ["ያልተጠናቀቀ ግምገማን አጽዳ", "Madaallii hin xumuramne qulqulleessi"],
   "General application decision": ["አጠቃላይ የማመልከቻ ውሳኔ", "Murtii iyyataa waliigalaa"],
   "Application review progress": ["የማመልከቻ ግምገማ ሂደት", "Adeemsa gamaaggama iyyataa"],
   "General application approval does not grant service-scope approval.": ["አጠቃላይ የማመልከቻ ፈቃድ የአገልግሎት ፈቃድ አይሰጥም።", "Hayyamni iyyataa waliigalaa hayyama tajaajilaa hin kennu."],
