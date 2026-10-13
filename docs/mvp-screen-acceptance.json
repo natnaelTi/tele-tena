@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "834ed2d0c6a1600c0a5d0c4d01c97e0f564dda15",
+  "source_checkpoint": "a128a7d8bf95fdabe67a757628f28e5e970eff4c",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
   "screens": [
@@ -9831,7 +9831,15 @@
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
         "presentation_checkpoint": "Current authenticated query/capture only; older account edit/privacy evidence retained separately. Full state acceptance pending. See docs/mvp-journey-verification-2026-10-09.md.",
-        "account_current": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence."
+        "account_current": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence.",
+        "profile_photo_extension": {
+          "source": "a128a7d8bf95fdabe67a757628f28e5e970eff4c",
+          "functional": "Real-backend upload, replace, remove, invalid image preservation, visibility and reload browser checks plus native permission/validation/repeat migration test pass.",
+          "visual": "Account controls inspected at390/768/1440; retained account tokens/variants. New owner-requested extension, not present in original reference; no whole-screen fidelity/owner acceptance inferred.",
+          "evidence": "docs/screenshots/mvp-current/a128a7d-profile-photos/",
+          "reviewer_route": "/admin/account",
+          "remaining": "Native translation/owner review; Frappe16/fresh full installation not rerun for this addition."
+        }
       },
       "visual_acceptance": {
         "reference_screen": "H01",
@@ -9986,7 +9994,15 @@
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
         "profile_current": "docs/screenshots/mvp-current/191762a-professional-profile/result.json",
         "profile_accessibility": "docs/screenshots/mvp-current/9308b30-profile-accessibility/result.json",
-        "account_current": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence."
+        "account_current": "scripts/browser-presentation-account.cjs PASS on067b450: two real roles390/768/1440, private draft label/navigation, capabilities match server, profiles/privacy/funds unchanged. Readonly; not persisted-save evidence.",
+        "profile_photo_extension": {
+          "source": "a128a7d8bf95fdabe67a757628f28e5e970eff4c",
+          "functional": "Real-backend upload, replace, remove, invalid image preservation, visibility and reload browser checks plus native permission/validation/repeat migration test pass.",
+          "visual": "Account controls inspected at390/768/1440; retained account tokens/variants. New owner-requested extension, not present in original reference; no whole-screen fidelity/owner acceptance inferred.",
+          "evidence": "docs/screenshots/mvp-current/a128a7d-profile-photos/",
+          "reviewer_route": "/admin/account",
+          "remaining": "Native translation/owner review; Frappe16/fresh full installation not rerun for this addition."
+        }
       },
       "visual_acceptance": {
         "reference_screen": "H02",

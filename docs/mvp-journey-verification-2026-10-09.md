@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **834ed2d0c6a1600c0a5d0c4d01c97e0f564dda15**. Later test/report/evidence-only commits
+  **a128a7d8bf95fdabe67a757628f28e5e970eff4c**. Later test/report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -20,6 +20,43 @@ screen/completion matrix; the sections below this active checkpoint are historic
   preview. `scripts/local_review.py start/status/stop` restores it without migrations,
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Owner profile photos —13October2026
+
+Current runtime/package `a128a7d8bf95fdabe67a757628f28e5e970eff4c` adds Account
+upload/replace/remove for patients, clinicians and reviewers (`/admin/account`).
+Four separately AI-generated fictional portraits are assigned to existing seeded
+accounts only. Publication is explicit and rechecks clinician eligibility on each
+download; patient/reviewer photos are owner-only and never added to encounters,
+requests, care records or LiveKit metadata. No original credentials or records
+were reset. A site/database/private-files backup preceded the v1.38 table creation.
+The existing web alone was HUP-reloaded; worker/queue/scheduler PIDs3044/3029/3038/
+3039 status passed and were not otherwise restarted. No background-job execution
+claim follows from this status check.
+
+Checks actually run:
+- Native Frappe15 test `Presentation.test_profile_photo_owner_visibility_validation_and_revocation`
+  passed1/1 in3.129s: owner/other actor/guest denial, current discovery projection,
+  withdrawal, replacement invalidation, malformed/SVG/oversized rejection,
+  initial table creation and repeat patch preservation.
+- `scripts/browser-profile-photos.cjs` passed on this production package with real
+  persisted accounts: patient/clinician/reviewer uploads, patient replace/remove/
+  reload, invalid upload preserving previous photo, clinician visibility change,
+  guest/reviewer download denial and actual discovery photo rendering.
+- Account screenshots captured390/768/1440; patient390, clinician1440,
+  reviewer1440 and discovery1440 visually inspected. Compact controls follow
+  retained Account components. This is an owner-requested reference extension;
+  no universal pixel-match or owner approval claimed. Committed evidence:
+  `docs/screenshots/mvp-current/a128a7d-profile-photos/`.
+- Locked production build/typecheck passed; lint exit0 with pre-existing hook
+  warnings; diff whitespace check passed. Served release identity matches above.
+- Explicit seed first run added4; repeat added0/preserved4. Repeat patch on
+  presentation site retained photos. Neither operation touches funding/approval.
+
+Full fresh-install, Frappe16, hosted media, OTP delivery and financial suites were
+not repeated: this focused addition changes no media/auth/funds workflow. Full MVP
+acceptance gates remain as recorded below; provisional photo translations require
+native review. Photo security/storage/setup details: `profile-photos.md`.
 
 ## Guided application/reviewer UX and help island —13October2026
 
