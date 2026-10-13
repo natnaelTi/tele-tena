@@ -1,5 +1,8 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "No reference selected (optional)": ["ማጣቀሻ አልተመረጠም (አማራጭ)", "Wabiin hin filatamne (filannoo)"],
+  "No documents attached to this scope": ["ከዚህ ማመልከቻ ጋር ሰነዶች አልተያያዙም", "Galmeen iyyata kanaaf hin maxxanfamne"],
+  "No license document attached": ["የፈቃድ ሰነድ አልተያያዘም", "Galmeen hayyamaa hin maxxanfamne"],
   "Clear unfinished assessment": ["ያልተጠናቀቀ ግምገማን አጽዳ", "Madaallii hin xumuramne qulqulleessi"],
   "General application decision": ["አጠቃላይ የማመልከቻ ውሳኔ", "Murtii iyyataa waliigalaa"],
   "Application review progress": ["የማመልከቻ ግምገማ ሂደት", "Adeemsa gamaaggama iyyataa"],

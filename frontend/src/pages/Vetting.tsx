@@ -280,7 +280,7 @@ export function VettingQueue() {
         <TextField label={w('Verification source')} value={credentialVerification[item.name]?.source||''} maxLength={180} onChange={event=>updateCredential(item.name,'source',event.target.value)}/>
         <TextField label={w('Checked on')} type="date" value={credentialVerification[item.name]?.checked_on||''} onChange={event=>updateCredential(item.name,'checked_on',event.target.value)}/>
         <TextField label={w('Source reference')} value={credentialVerification[item.name]?.reference||''} maxLength={180} hint={w('Use a registry record or reviewer reference; do not enter a password or access token.')} onChange={event=>updateCredential(item.name,'reference',event.target.value)}/>
-        <Select label={w('License evidence reviewed')} value={credentialVerification[item.name]?.evidence||''} onChange={event=>updateCredential(item.name,'evidence',event.target.value)}><option value="">{w('Choose license evidence')}</option>{(item.scope_evidence||[]).filter((evidence:any)=>evidence.evidence_type==='License or registration').map((evidence:any)=><option key={evidence.id} value={evidence.id}>{w(evidence.evidence_type)} · v{evidence.revision}</option>)}</Select>
+        <Select disabled={!(item.scope_evidence||[]).some((e:any)=>e.evidence_type==='License or registration')} label={w('License evidence reviewed')} value={credentialVerification[item.name]?.evidence||''} onChange={event=>updateCredential(item.name,'evidence',event.target.value)}><option value="">{w((item.scope_evidence||[]).some((e:any)=>e.evidence_type==='License or registration')?'Choose license evidence':'No license document attached')}</option>{(item.scope_evidence||[]).filter((evidence:any)=>evidence.evidence_type==='License or registration').map((evidence:any)=><option key={evidence.id} value={evidence.id}>{w(evidence.evidence_type)} · v{evidence.revision}</option>)}</Select>
       </fieldset>
       </div><div hidden={reviewStep!==2}>
       <Button variant="quiet" disabled={action.busy} onClick={()=>setScoredCriteria(current=>({...current,[item.name]:Object.fromEntries(Object.entries(current[item.name]||{}).filter(([,value])=>['0','1','2','3'].includes(value.score)&&value.rationale.trim()))}))}>{w("Clear unfinished assessment")}</Button>
@@ -292,7 +292,7 @@ export function VettingQueue() {
           </Select>
           <TextField label={w('Reviewer rationale for this dimension')} required value={scoredCriteria[item.name]?.[criterion.key]?.rationale||''} onChange={event=>updateScored(item.name,criterion.key,'rationale',event.target.value)} maxLength={800}/>
           <Select label={w('Private evidence reference (optional)')} value={scoredCriteria[item.name]?.[criterion.key]?.evidence||''} onChange={event=>updateScored(item.name,criterion.key,'evidence',event.target.value)}>
-            <option value="">{w('No uploaded reference')}</option>{(item.scope_evidence||[]).map((evidence:any)=><option key={evidence.id} value={evidence.id}>{w(evidence.evidence_type)} · v{evidence.revision}</option>)}
+            <option value="">{w(item.scope_evidence?.length?'No reference selected (optional)':'No documents attached to this scope')}</option>{(item.scope_evidence||[]).map((evidence:any)=><option key={evidence.id} value={evidence.id}>{w(evidence.evidence_type)} · v{evidence.revision}</option>)}
           </Select>
         </fieldset></details>)}
       </details>}
