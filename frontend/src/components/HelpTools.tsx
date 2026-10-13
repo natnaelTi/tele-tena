@@ -24,7 +24,7 @@ export default function HelpTools() {
   const role=reviewer?'admin':session?.profile?.kind==='clinician'?'clinician':session?.profile?.kind==='patient'?'patient':'applicant';
   const protectedWork=/consultation|sign-in|onboarding|payments/.test(location.pathname);
   return <>
-    <button ref={opener} className="help-island" type="button" aria-label={w('Help & tours')} title={w('Help & tours')} aria-haspopup="dialog" onClick={()=>setOpen(true)}><CircleHelp size={24}/></button>
+    <button ref={opener} className="help-island" type="button" aria-label={w('Help & tours')} title={w('Help & tours')} aria-haspopup="dialog" onClick={()=>{setGuide(false);setOpen(true);}}><CircleHelp size={24}/></button>
     {session&&<WorkspaceTour role={role}/>}
     <Dialog open={open} onOpenChange={setOpen} title={w('Help & tours')} description={w('Guidance for this workspace. Help never submits a form or records a decision.')} focusReturnTarget={opener.current} size={guide?'wide':'default'}>
       {guide&&reviewer?<div className="help-guide" tabIndex={0} aria-label={w('Reviewer guide')}><Button variant="quiet" onClick={()=>setGuide(false)}>{w('Back to help')}</Button><h3>{w('Reviewer guide')}</h3><p>{w('Use this guide while reviewing. All final decisions remain human decisions.')}</p>{reviewerGuide.map(([title,body])=><section key={title}><h4>{w(title)}</h4><p>{w(body)}</p></section>)}</div>:<div className="help-menu">
