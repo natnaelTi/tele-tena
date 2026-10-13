@@ -10,7 +10,7 @@ screen/completion matrix; the sections below this active checkpoint are historic
   **teletena-mvp-presentation.localhost**; Bench **/home/frappe/frappe/frappe-bench**,
   WSL **Ubuntu-24.04**. The compatibility Bench is not serving this preview.
 - Branch **feat/mvp-release-handover**; packaged runtime source
-  **b004f8d75e7866e42731bada6f3fc7bd7f308e48**. Later test/report/evidence-only commits
+  **45159455eaaba103f019a0142481172ccd8d37e6**. Later test/report/evidence-only commits
   must have an empty frontend/backend runtime diff from this build.
 - Production package, no Vite. Status verifies owned web/scheduler/worker PIDs,
   working directories, selected site and served asset identity. Web at8017,
@@ -20,6 +20,37 @@ screen/completion matrix; the sections below this active checkpoint are historic
   preview. `scripts/local_review.py start/status/stop` restores it without migrations,
   seeds or unrelated signals. Stop/start and Windows `curl.exe`200 passed. See
   [local-preview.md](local-preview.md). No Selfmade/original erp-site change.
+
+## Missing scope-license evidence feedback —13October2026
+
+Package `45159455eaaba103f019a0142481172ccd8d37e6`. Read-only inspection of the
+owner-reported Submitted application confirmed no scope evidence documents;
+the parent definition is Approved/active. Optional scoring references therefore
+have no entries, and mandatory credential provenance cannot select a license.
+A general resume is not a scope-specific License or registration document.
+The server correctly fails credential_provenance_required; useAction previously
+fell back to a generic417 error and concealed that requirement.
+
+Reviewer cards now explain missing license evidence, optional score references,
+and Request information -> owner upload/resubmit. Credential provenance/date,
+mandatory assessment, score completeness, catalog review and expiry errors have
+safe localized messages. An explicit Clear unfinished credential check resets
+only the local unsaved source/date/reference/evidence fields and verified flag;
+it makes no decision or database change and avoids the existing source-without-
+verified-flag rejection when requesting clarification. The reviewer still chooses
+Request information and records a meaningful reason; the applicant can upload
+only in Draft/Clarification. Approval gates, private evidence access and all
+existing records remain unchanged. No automatic verification or approval.
+
+Checks run: existing real Frappe clarification/private evidence/resubmission/
+credential-provenance/scope-decision regression passed7.704s on the isolated
+fixture site (`/tmp/tt-evidence-review-regression.log`). The actual presentation
+reviewer browser verified the missing-evidence explanation, empty license selector
+and explicit unfinished-check clearing (`/tmp/tt-scope-missing-evidence.log`);
+no Record human decision click or upload was made. Build/typecheck and lint
+passed with inherited warnings. No migration, clinical decision, live send or
+unrelated financial/call-suite rerun; no private applicant screenshot captured.
+Native-language and owner visual approval remain separate pending gates.
 
 ## Service-definition booking validation —13October2026
 
