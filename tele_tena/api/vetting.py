@@ -208,10 +208,12 @@ def _scored_criteria_snapshot(raw, application, rubric_version, require_all=Fals
         if not isinstance(value, dict) or set(value) - {'score', 'rationale', 'evidence'}:
             fail('Each scored dimension needs a score, rationale and evidence references.')
         score = value.get('score')
-        if isinstance(score, bool):
-            fail('Choose a whole-number score from 0 to 3 for each assessed dimension.')
+        if isinstance(score, bool) or str(score) not in ('0','1','2','3'):
+            fail('Choose a score from 0 to 3 for each assessment.', 'vetting_scores_incomplete')
         score = integer(score, rubric['score_min'], rubric['score_max'])
-        rationale = text(value.get('rationale') or '', 800)
+        if not isinstance(value.get('rationale'), str) or not value['rationale'].strip() or len(value['rationale'].strip()) > 800:
+            fail('Add a rationale of up to 800 characters for each score.', 'vetting_rationale_required')
+        rationale = text(value['rationale'], 800)
         refs = value.get('evidence', [])
         if not isinstance(refs, list) or len(refs) > 12 or any(not isinstance(ref, str) for ref in refs):
             fail('Choose evidence references from this scope application only.')
@@ -668,6 +670,8 @@ def review_scope_application(application, decision, identity_reviewed=False,
     doc = locked[0]
     if doc.status not in ('Submitted', 'Resubmitted', 'Clarification', 'Approved'):
         fail('Only submitted scope applications can be reviewed.')
+    if not isinstance(findings, str) or not findings.strip() or len(findings.strip()) > 2000:
+        fail('Record a decision reason of up to 2000 characters.', 'vetting_findings_required')
     findings = text(findings, 2000)
     restrictions = text(restrictions or '', 1000, required=False)
     flags = {key: int(journey.boolean(value)) for key, value in {

@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { ApiError } from "../api";
 const messages: Record<string, string> = {
+  vetting_rationale_required: "Add a rationale for each score you entered. Complete or clear unfinished scores before recording a decision.",
+  vetting_findings_required: "Enter a specific decision reason, up to 2000 characters.",
+  review_decision_required: "Choose whether to approve, request information or decline this application.",
   credential_provenance_required: "Approval needs a license document attached to this scope, a verification source, check date and source reference. Request information if the document is missing.",
   credential_evidence_invalid: "Choose a License or registration document uploaded to this service application.",
   credential_verification_flag_required: "Clear the unfinished credential check before requesting information, or complete it and confirm verification after checking the source.",
