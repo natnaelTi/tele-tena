@@ -1,5 +1,14 @@
 // Provisional strings; native Amharic and Afaan Oromo review remains required.
 export const onboardingTranslations:Record<string,[string,string]>={
+  "Patients choose a published appointment time": ["ታካሚዎች የታተመ የቀጠሮ ጊዜ ይመርጣሉ", "Dhukkubsattoonni yeroo beellamaa maxxanfame filatu"],
+  "Appointments scheduled for later": ["ለኋላ የተያዙ ቀጠሮዎች", "Beellamoota yeroo boodaa"],
+  "As-soon-as-possible care requests": ["በተቻለ ፍጥነት የእንክብካቤ ጥያቄዎች", "Gaaffii kunuunsaa dafanii"],
+  "Choose how appointments can be booked. These choices do not enable immediate care without its separate review.": ["ቀጠሮዎች እንዴት እንደሚያዙ ይምረጡ። እነዚህ ምርጫዎች ያለ ተለየ ግምገማ ፈጣን እንክብካቤን አያነቁም።", "Beellamni akkamitti qabamu filadhu. Filannoowwan kun gamaaggama addaatiin alatti kunuunsa hatattamaa hin banan."],
+  "Choose how appointments can be booked. Consultation, notes and summary requirements belong under Required platform workflows.": ["ቀጠሮዎች እንዴት እንደሚያዙ ይምረጡ። የምክክር፣ ማስታወሻና ማጠቃለያ መስፈርቶች በመድረክ የሥራ ሂደቶች ስር ናቸው።", "Beellamni akkamitti qabamu filadhu. Ulaagaaleen marii, yaadannoo fi cuunfaa adeemsa waltajjii keessatti galmaa’u."],
+  "Set both session length limits, with the minimum no greater than the maximum.": ["ሁለቱንም የምክክር ርዝመት ገደቦች ያስገቡ፤ ዝቅተኛው ከከፍተኛው መብለጥ የለበትም።", "Daangaa dheerina marii lamaan kaa’i; xiqqaan guddaa caaluu hin qabu."],
+  "The end date must be on or after the effective date.": ["የመጨረሻ ቀን ከመጀመሪያ ቀን ጋር እኩል ወይም ከዚያ በኋላ መሆን አለበት።", "Guyyaan xumuraa guyyaa jalqabaa irratti ykn booda ta’uu qaba."],
+  "Enter a valid effective date or leave the optional date empty.": ["ትክክለኛ የመጀመሪያ ቀን ያስገቡ ወይም አማራጭ ቀኑን ባዶ ይተዉ።", "Guyyaa jalqabaa sirrii galchi ykn guyyaa filannoo duwwaa dhiisi."],
+
   "Treatment approaches (optional)": ["የሕክምና ዘዴዎች (አማራጭ)", "Maloota yaalaa (filannoo)"],
   "Select only approaches you are trained to use. Your evidence is reviewed separately.": ["ለመጠቀም የሰለጠኑባቸውን ዘዴዎች ብቻ ይምረጡ። ማስረጃዎ በተለየ ይገመገማል።", "Maloota itti fayyadamuuf leenjite qofa filadhu. Ragaan kee addaan gamaaggamama."],
   "No reviewed approaches are available to select yet. You can still submit your service application.": ["ለምርጫ የተገመገሙ ዘዴዎች ገና የሉም። የአገልግሎት ማመልከቻዎን ማስገባት ይችላሉ።", "Maloonni gamaaggamaman filachuuf ammatti hin jiran. Iyyata tajaajilaa kee erguu dandeessa."],

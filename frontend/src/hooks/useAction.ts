@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { ApiError } from "../api";
 const messages: Record<string, string> = {
+  catalog_booking_rules_invalid: "Choose how appointments can be booked. Consultation, notes and summary requirements belong under Required platform workflows.",
+  catalog_duration_range: "Set both session length limits, with the minimum no greater than the maximum.",
+  catalog_date_range: "The end date must be on or after the effective date.",
+  catalog_invalid_date: "Enter a valid effective date or leave the optional date empty.",
   scope_qualification_required: "Add your professional category, qualification and issuing institution before submission.",
   scope_adult_required: "Confirm that your service application is limited to adult care in the Relevant experience step.",
   scope_approach_invalid: "An approach is no longer available. In Relevant experience, move the unlisted entry to your training description before saving.",

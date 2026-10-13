@@ -34,10 +34,10 @@ SERVICE_FIELDS = (
 )
 
 
-def _lines(value, allowed, label):
+def _lines(value, allowed, label, error_code='catalog_invalid_value'):
     values = [item.strip() for item in str(value or '').splitlines() if item.strip()]
     if len(values) != len(set(values)) or any(item not in allowed for item in values):
-        journey.fail(f'Choose supported {label}.', 'catalog_invalid_value')
+        journey.fail(f'Choose supported {label}.', error_code)
     return '\n'.join(values)
 
 
@@ -130,7 +130,7 @@ def save_draft_definition(payload):
         journey.fail('Choose a supported population restriction.', 'catalog_invalid_value')
     formats = _lines(payload.get('supported_formats'), FORMATS, 'delivery formats')
     workflows = _lines(payload.get('required_workflows'), WORKFLOWS, 'required workflows')
-    rules = _lines(payload.get('booking_rules'), BOOKING_RULES, 'booking rules')
+    rules = _lines(payload.get('booking_rules'), BOOKING_RULES, 'booking rules', 'catalog_booking_rules_invalid')
     min_duration = journey.integer(str(payload.get('min_duration_minutes') or 0), 0, 240)
     max_duration = journey.integer(str(payload.get('max_duration_minutes') or 0), 0, 240)
     if bool(min_duration) != bool(max_duration) or (min_duration and min_duration > max_duration):

@@ -3509,6 +3509,11 @@ class Presentation(unittest.TestCase):
             self.assertEqual(frappe.db.get_value('Tele Tena Service', key,
                                                  ['active', 'catalog_status', 'vetting_required']),
                              (0, 'Draft', 1))
+            with self.assertRaises(frappe.ValidationError):
+                service_catalog.save_draft_definition(dict(payload, description='Unsaved change',
+                    booking_rules='individual-consultation\nprivate-notes\npatient-summary'))
+            self.assertEqual(frappe.local.response.get('tele_tena_error'), 'catalog_booking_rules_invalid')
+            self.assertEqual(frappe.db.get_value('Tele Tena Service', key, 'description'), payload['description'])
             changed = dict(payload, service_label='Synthetic edited definition')
             service_catalog.save_draft_definition(changed)
             self.assertEqual(frappe.db.get_value('Tele Tena Service', key, 'service_label'),

@@ -230,6 +230,11 @@ const emptyServiceDraft = ():ServiceDraft => ({service_key:"",service_label:"",c
 const emptyAttribute = () => ({field_key:"",label_en:"",label_am:"",label_om:"",data_type:"Text",allowed_values:"",
   required:false,minimum_value:"",maximum_value:"",visibility:"Reviewer only",sensitivity:"Sensitive",
   applicability:"always",filterable:false,matching_field:false,active:true});
+const bookingRuleChoices = [
+  ["direct-booking", "Patients choose a published appointment time"],
+  ["scheduled", "Appointments scheduled for later"],
+  ["immediate-request", "As-soon-as-possible care requests"],
+] as const;
 
 export function ServiceCatalog() {
   const {w}=useLocale();
@@ -278,6 +283,8 @@ export function ServiceCatalog() {
   },w("Versioned attribute saved."));
   const submit=()=>void action.run(async()=>{
     if(!selected)throw new Error(w("Save the service draft before requesting review."));
+    // Review the entered definition, never silently submit the previous saved version.
+    await journeyApi.saveServiceDraft(form as unknown as Record<string,unknown>);
     await journeyApi.submitServiceForReview(selected);await catalog.refresh();
   },w("Sent for clinical terminology review. This does not activate bookings."));
   if(!serviceId&&!isCreate)return <>
@@ -325,7 +332,7 @@ export function ServiceCatalog() {
             <label className="field">{w("Search names and synonyms (one per line)")}<textarea rows={2} maxLength={1000} value={form.synonyms} onChange={e=>set("synonyms",e.target.value)}/></label>
             <label className="field">{w("Eligible professional categories")}<textarea rows={3} value={form.professional_categories} onChange={e=>set("professional_categories",e.target.value)}/></label>
             <label className="field">{w("Credential requirements")}<textarea rows={3} value={form.credential_requirements} onChange={e=>set("credential_requirements",e.target.value)}/></label>
-            <label className="field">{w("Booking rules")}<textarea rows={2} value={form.booking_rules} onChange={e=>set("booking_rules",e.target.value)}/><span className="field-hint">{w("Controlled keys: direct-booking, scheduled, immediate-request.")}</span></label>
+            <fieldset className="catalog-format-options"><legend>{w("Booking rules")}</legend><p className="field-hint">{w("Choose how appointments can be booked. These choices do not enable immediate care without its separate review.")}</p>{bookingRuleChoices.map(([key,label])=><Checkbox key={key} label={w(label)} checked={form.booking_rules.split('\n').includes(key)} onChange={event=>set("booking_rules",(event.target.checked?[...form.booking_rules.split('\n').filter(Boolean),key]:form.booking_rules.split('\n').filter(value=>value!==key)).join('\n'))}/>)}</fieldset>
             <label className="field">{w("Required platform workflows")}<textarea rows={3} value={form.required_workflows} onChange={e=>set("required_workflows",e.target.value)}/><span className="field-hint">{w("Only known workflow keys are accepted; this does not implement new workflows.")}</span></label>
             <TextField label={w("Consent schema version")} value={form.required_consent_schema} onChange={e=>set("required_consent_schema",e.target.value)}/>
             <TextField label={w("Location/jurisdiction policy key")} value={form.location_jurisdiction_policy} onChange={e=>set("location_jurisdiction_policy",e.target.value)}/>
