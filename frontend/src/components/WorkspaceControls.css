@@ -24,3 +24,14 @@
 .reference-workspace details>summary:focus-visible,.workspace details>summary:focus-visible{outline:3px solid var(--brand-teal);outline-offset:3px;}
 @media(max-width:800px){.product-user .account-menu-trigger>span:not(.avatar){display:none;}.account-menu-trigger{padding:4px;}.product-user{gap:6px;}.account-menu-panel{right:0;}.workspace-header>.account-menu{margin-left:auto;}}
 @media(prefers-reduced-motion:reduce){.reference-workspace details>summary::after,.workspace details>summary::after{transition:none;}}
+/* Keep every header control reachable on narrow phones; wrap as a group rather
+   than allowing the brand, language and account trigger to overlap. */
+@media(max-width:420px){
+ .reference-workspace .product-header{padding:12px 16px;gap:8px;flex-wrap:wrap;}
+ .reference-workspace .product-header>.brand{flex-shrink:0;}
+ .reference-workspace .product-user{gap:4px;flex-shrink:0;}
+ .reference-workspace .product-user .language-select{padding-inline:6px;max-width:112px;}
+ .workspace .workspace-header{flex-wrap:wrap;gap:8px;}
+ .workspace .workspace-header>.account-menu{margin-left:auto;}
+ .workspace .account-menu-trigger>span:not(.avatar){display:none;}
+}
