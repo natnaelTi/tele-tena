@@ -1,0 +1,1 @@
+PASS: patient/clinician/reviewer account menu and drawer at actual200% zoom;720CSS viewport; controls/dismissal/scroll accessible.

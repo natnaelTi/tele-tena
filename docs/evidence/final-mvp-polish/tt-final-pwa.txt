@@ -1,0 +1,1 @@
+PASS: built app detects a waiting worker, waits for explicit refresh, and reloads after activation

@@ -1,0 +1,1 @@
+PASS: artifact hashes, application scope, no source maps/config files; exact private credential scan count: 20

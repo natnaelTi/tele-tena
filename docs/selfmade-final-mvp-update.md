@@ -103,6 +103,9 @@ cp -a sites/teletena.selfmadecs.com/private/backups "$UPDATE_BACKUP/site-backups
 find "$UPDATE_BACKUP/site-backups" -maxdepth 1 -type f -printf '%f\n'
 find "$UPDATE_BACKUP/site-backups" -maxdepth 1 -type f -exec sha256sum {} \; > "$UPDATE_BACKUP/backup.sha256"
 printf 'Private backup bundle: %s\n' "$UPDATE_BACKUP"
+sha256sum --check "$UPDATE_BACKUP/backup.sha256"
+find "$UPDATE_BACKUP/site-backups" -maxdepth 1 -name '*database.sql.gz' -type f -exec gzip -t {} \;
+find "$UPDATE_BACKUP/site-backups" -maxdepth 1 -name '*.tar' -type f -exec tar -tf {} \; > "$UPDATE_BACKUP/archive-file-list.txt"
 ```
 
 Expected: named services STOPPED, newest database/public/private archives present
