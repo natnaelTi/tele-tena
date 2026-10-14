@@ -117,6 +117,8 @@ def main():
   else:
    if not a.amazon_commit:raise ValueError('Pinned Amazon patch commit required')
    approved=read_private(a.directory/'approved.json');check_preserved(before,installed_details(),approved)
+   launchers=read_private(a.directory/'launchers.json');link=Path(sys.prefix)/'bin/bench'
+   if not link.is_symlink() or link.resolve()!=Path(launchers['external_cli']).resolve():raise ValueError('Application/staging Bench compatibility link must point to the healthy external CLI')
    expected=read_private(a.directory/'app-commits.json');expected['ecommerce_integrations']=SOURCE if a.stage else a.amazon_commit
    if subprocess.check_output(['git','-C',str(app),'rev-parse','HEAD'],text=True).strip()!=a.amazon_commit:raise ValueError('Amazon worktree does not contain reviewed patch commit')
    if source_commits(bench)!=expected:raise ValueError('App commit changed outside approved Amazon patch')

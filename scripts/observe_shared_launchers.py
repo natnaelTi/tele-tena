@@ -25,7 +25,7 @@ for name in NAMES:
   status=(proc/'status').read_text();pid=int(re.search(r'^PPid:\s+(\d+)',status,re.M).group(1))
  rows.append({'name':name,'process_chain':chain,'frappe_module_loaded':loaded})
 # Distinguish runtime dependency imports from dev/test helpers. No source text is emitted.
-imports=[];syntax=[]
+imports=[];syntax=[];command_references=[]
 for app in (bench/'sites/apps.txt').read_text().split():
  root=bench/'apps'/app/app
  if not root.is_dir():root=bench/'apps'/app
@@ -37,6 +37,8 @@ for app in (bench/'sites/apps.txt').read_text().split():
    try:tree=ast.parse(file.read_text())
    except (SyntaxError,UnicodeError):syntax.append(str(file.relative_to(bench/'apps')));continue
    for node in ast.walk(tree):
+    if isinstance(node,ast.Constant) and isinstance(node.value,str) and ('env/bin/bench' in node.value or re.search(r'(^|\s)bench\s+(--site|worker|schedule|execute|new-site|backup|migrate)',node.value)):
+     command_references.append({'file':str(file.relative_to(bench/'apps')),'line':node.lineno})
     names=[alias.name for alias in node.names] if isinstance(node,ast.Import) else [node.module or ''] if isinstance(node,ast.ImportFrom) else []
     if any(name.split('.')[0] in ('bench','frappe_bench') for name in names):imports.append(str(file.relative_to(bench/'apps')))
 if imports or syntax:failures.append('Runtime Bench imports or unparsed Python source require review')
@@ -47,7 +49,7 @@ if str(python).startswith(str(bench/'env')):failures.append('External CLI uses a
 version=subprocess.check_output([str(python),'-c','import importlib.metadata as m; print(m.version("frappe-bench"))'],text=True).strip()
 health=subprocess.run([str(python),'-m','pip','check'],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
 if version!='5.29.0' or health.returncode:failures.append('External CLI version/environment is not the observed healthy5.29.0')
-result={'bench':str(bench),'external_cli':str(external),'external_python':str(python),'external_version':version,'external_pip_check':health.returncode==0,'services':rows,'supervisor_rpc':loaded_config,'no_pending_config_changes':a.no_pending_config_changes,'runtime_bench_imports':sorted(set(imports)),'unparsed_files':syntax,'safe_to_remove_duplicate':not failures,'failures':failures}
+result={'bench':str(bench),'external_cli':str(external),'external_python':str(python),'external_version':version,'external_pip_check':health.returncode==0,'services':rows,'supervisor_rpc':loaded_config,'no_pending_config_changes':a.no_pending_config_changes,'runtime_bench_imports':sorted(set(imports)),'unparsed_files':syntax,'possible_shell_bench_references':command_references,'compatibility_link_required':True,'safe_to_remove_duplicate':not failures,'failures':failures}
 fd=os.open(a.output,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
 with os.fdopen(fd,'w') as out:json.dump(result,out,indent=2)
 if failures:raise SystemExit('FAIL: launcher/runtime review needed; private report retained')
