@@ -2462,6 +2462,13 @@ class Presentation(unittest.TestCase):
                 (booked['id'], str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex,
                  uuid.uuid4().hex, now, now))
             fixtures.login('c1')
+            # This older fixture represented Ended without transport closure.
+            # Exercise the actual closure retry before financial finalization.
+            from tele_tena.api import consultations
+            with patch('tele_tena.livekit.close_room') as closed:
+                consultations.end(booked['id'])
+                closed.assert_called_once()
+            self.assertEqual(journey.one('SELECT room_closed FROM tt_consultation WHERE appointment=%s', (booked['id'],)).room_closed, 1)
             presentation.save_note_draft(booked['id'], 'Synthetic private note', 'Synthetic patient summary')
             with patch.dict(frappe.conf, {'tele_tena_demo_platform_fee_bps': 5000,
                                          'tele_tena_demo_dispute_window_minutes': 100}):
