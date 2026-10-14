@@ -1,9 +1,9 @@
 {
   "version": 3,
   "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "a128a7d8bf95fdabe67a757628f28e5e970eff4c",
+  "source_checkpoint": "105cd15af1d1432e37b95de583f151d3056f6950",
   "scope_document": "docs/mvp-release-scope.md",
-  "note": "Inherited status is not a current release pass. Every original inventory ID is retained. Shared loading/error/mobile/localization/tour/PWA states apply to every MVP entry.",
+  "note": "Single authoritative MVP matrix. Current bounded polish/portable dataset evidence is in final-mvp-polish-verification.md. Historical per-screen evidence is retained. Owner visual acceptance and external device/provider/native-language checks remain separate.",
   "screens": [
     {
       "id": "A01",
@@ -2444,7 +2444,8 @@
         "current_local": "Backend integration test covers a completed patient-owned appointment, another patient sees no row, clinician role is denied, and account email is absent. Pending execution on the disposable Frappe site; browser rendering pending.",
         "mvp_private_query": "Built-app 390px password-flow check passes on 42574c4; no URL/history/storage query, clear on sign-out. Full visual and OTP/onboarding acceptance still pending; see mvp-release-verification.md.",
         "presentation_checkpoint": "Actual patient password→Home→search/discovery; real reserved balance. Complete populated history/state acceptance pending. See docs/mvp-journey-verification-2026-10-09.md.",
-        "home_published_records": "32068b7 real backend browser at390/768/1440 verifies recipient-authorized record links against completed appointment details, with no private_note field or mutations. Actual Chrome200% paired capture passes; C01desktop comparison inspected. See docs/screenshots/mvp-current/32068b7-home-care/ and 32068b7-actual-zoom/."
+        "home_published_records": "32068b7 real backend browser at390/768/1440 verifies recipient-authorized record links against completed appointment details, with no private_note field or mutations. Actual Chrome200% paired capture passes; C01desktop comparison inspected. See docs/screenshots/mvp-current/32068b7-home-care/ and 32068b7-actual-zoom/.",
+        "final_polish": "docs/final-mvp-polish-verification.md: owner account menu, grouped role-filtered More drawer, native accordion states; real seeded accounts on Frappe15/16,320/390/768/1440, actual200% zoom. These shared-control checks do not replace whole-screen/owner acceptance."
       },
       "visual_acceptance": {
         "reference_screen": "C01",
@@ -2613,7 +2614,8 @@
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
         "mvp_private_query": "Built-app 390px password-flow check passes on 42574c4; no URL/history/storage query, clear on sign-out. Full visual and OTP/onboarding acceptance still pending; see mvp-release-verification.md.",
-        "presentation_checkpoint": "Actual queries/preview/Escape focus/full profile/calendar navigation at 390/768/1440; no bookings during read-only suite. See docs/mvp-journey-verification-2026-10-09.md."
+        "presentation_checkpoint": "Actual queries/preview/Escape focus/full profile/calendar navigation at 390/768/1440; no bookings during read-only suite. See docs/mvp-journey-verification-2026-10-09.md.",
+        "final_polish": "docs/final-mvp-polish-verification.md: owner account menu, grouped role-filtered More drawer, native accordion states; real seeded accounts on Frappe15/16,320/390/768/1440, actual200% zoom. These shared-control checks do not replace whole-screen/owner acceptance."
       },
       "visual_acceptance": {
         "reference_screen": "C02",
@@ -7066,7 +7068,8 @@
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Pending disposable Frappe 15 integration/browser run; no UI screen is marked locally verified in this acceptance map.",
         "presentation_checkpoint": "390/768/1440 real queries, keyboard row link to loaded details/reload; no financial mutation. Continuous jobs not tested. See docs/mvp-journey-verification-2026-10-09.md.",
-        "workspace_2026_10_11": "docs/screenshots/mvp-current/20172f3-overview/result.json"
+        "workspace_2026_10_11": "docs/screenshots/mvp-current/20172f3-overview/result.json",
+        "final_polish": "docs/final-mvp-polish-verification.md: owner account menu, grouped role-filtered More drawer, native accordion states; real seeded accounts on Frappe15/16,320/390/768/1440, actual200% zoom. These shared-control checks do not replace whole-screen/owner acceptance."
       },
       "visual_acceptance": {
         "reference_screen": "F01",
@@ -9839,7 +9842,8 @@
           "evidence": "docs/screenshots/mvp-current/a128a7d-profile-photos/",
           "reviewer_route": "/admin/account",
           "remaining": "Native translation/owner review; Frappe16/fresh full installation not rerun for this addition."
-        }
+        },
+        "final_polish": "docs/final-mvp-polish-verification.md: owner account menu, grouped role-filtered More drawer, native accordion states; real seeded accounts on Frappe15/16,320/390/768/1440, actual200% zoom. These shared-control checks do not replace whole-screen/owner acceptance."
       },
       "visual_acceptance": {
         "reference_screen": "H01",
@@ -10002,7 +10006,8 @@
           "evidence": "docs/screenshots/mvp-current/a128a7d-profile-photos/",
           "reviewer_route": "/admin/account",
           "remaining": "Native translation/owner review; Frappe16/fresh full installation not rerun for this addition."
-        }
+        },
+        "final_polish": "docs/final-mvp-polish-verification.md: owner account menu, grouped role-filtered More drawer, native accordion states; real seeded accounts on Frappe15/16,320/390/768/1440, actual200% zoom. These shared-control checks do not replace whole-screen/owner acceptance."
       },
       "visual_acceptance": {
         "reference_screen": "H02",
@@ -10724,7 +10729,8 @@
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (I01) and design-handoff.md",
         "implementation": "Existing reviewer application/scope workflows plus the focused `/admin/clinics` route. Clinic identity and affiliation decisions are audited separately from clinical scope; no patient-record access is implied.",
         "current_local": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json; real backend, named state only; no live delivery or clinical decisions.",
-        "current_2026_10_11_onboarding_review": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json"
+        "current_2026_10_11_onboarding_review": "docs/screenshots/mvp-current/bc20f72-reviewer/result.json",
+        "final_polish": "docs/final-mvp-polish-verification.md: owner account menu, grouped role-filtered More drawer, native accordion states; real seeded accounts on Frappe15/16,320/390/768/1440, actual200% zoom. These shared-control checks do not replace whole-screen/owner acceptance."
       },
       "visual_acceptance": {
         "reference_screen": "I01",
@@ -15429,8 +15435,8 @@
     },
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
-  "current_verification_report": "docs/mvp-journey-verification-2026-10-09.md",
-  "current_packaged_source": "7daf9c084dcf9982cd1ee622b7cf2c0413417a4d",
+  "current_verification_report": "docs/final-mvp-polish-verification.md",
+  "current_packaged_source": "105cd15af1d1432e37b95de583f151d3056f6950",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,

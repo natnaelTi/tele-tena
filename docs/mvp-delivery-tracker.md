@@ -1,5 +1,9 @@
 # TeleTena delivery tracker
 
+## Active final bounded checkpoint —14October2026
+
+Runtime/package105cd15. Shared native accordion states, role-grouped More drawers and owner avatar/name Account menu are checked on Frappe15/16,320/390/768/1440 and actual200% zoom; real sign-out invalidates the session. Portable tt-demo-mvp-v2 data covers10 fictional accounts, individual scope/evidence decisions, clinic affiliation, separate couples consent, scheduling, private offers, notes/summary/feedback and balanced demo financial scenarios. Standalone Frappe16 fresh install, repeat migration, twice-seed/no-outbound/preservation/owner reconciliation pass. See final-mvp-polish-verification.md and selfmade-final-mvp-update.md. PR44/43 remain draft; owner visual acceptance, physical devices, live SMS and native-language review remain separate. Older dated sections below are historical.
+
 ## Active checkpoint —13October2026
 
 Guided general/scope review, in-wizard clinician evidence collection and a shared help island/wiki are implemented and locally checked. Two focused Frappe regressions, four-role responsive browser, locale layouts and actual200% zoom pass. Reviewer fields are not autosaved across refresh; owner visual acceptance remains pending.

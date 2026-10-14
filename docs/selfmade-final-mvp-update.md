@@ -9,7 +9,7 @@ nginx1.18, Supervisor. The domain reportedly has no Cloudflare proxy.
 Current version differences are a stop for investigation, not permission to
 upgrade/downgrade shared frameworks, Node/Python or `bench update`.
 
-Release pin: **RELEASE_PIN_PENDING_FINAL_CHECKS** on `feat/mvp-release-handover`.
+Release pin: **105cd15af1d1432e37b95de583f151d3056f6950** on `feat/mvp-release-handover`.
 PR44 remains draft, depending on PR43 (`feat/adult-relationship-links`); this
 branch contains its ancestry. Installing a pinned unmerged commit does not merge
 any PR. Owner acceptance is still separate from automated verification.
@@ -25,7 +25,7 @@ stop on any failed command or unexpected result.
 set -euo pipefail
 umask 077
 cd /home/smcs/frappe-bench
-RELEASE_SHA='RELEASE_PIN_PENDING_FINAL_CHECKS'
+RELEASE_SHA='105cd15af1d1432e37b95de583f151d3056f6950'
 SITE='teletena.selfmadecs.com'
 CURRENT_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena commit: %s\n' "$CURRENT_SHA"

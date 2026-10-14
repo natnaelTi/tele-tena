@@ -1,3 +1,13 @@
+# Active final MVP polish verification —14October2026
+
+Current runtime and packaged frontend: **105cd15af1d1432e37b95de583f151d3056f6950**.
+The authoritative current result is [final-mvp-polish-verification.md](final-mvp-polish-verification.md),
+with the existing [screen matrix](mvp-screen-acceptance.json). PR44 remains draft
+with PR43 ancestry. Owner acceptance is pending; no remote deployment occurred.
+Reports and source references below are historical evidence, not the current preview identity.
+
+---
+
 # Active MVP verification —12October2026
 
 PR #44 remains draft and preserves PR #43 ancestry. This is **not** a handover-ready
