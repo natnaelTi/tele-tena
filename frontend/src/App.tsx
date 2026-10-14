@@ -82,7 +82,7 @@ export default function App() {
             </Route>
             </Route>
             <Route element={<RequireSession />}>
-              <Route path="/admin/rubrics" element={<MedicalLeadLayout />}><Route index element={<VettingRubricManagementPage />} /></Route>
+              <Route path="/admin/rubrics" element={<MedicalLeadLayout />}><Route index element={<VettingRubricManagementPage />} /><Route path="account" element={<ReviewerAccount/>}/></Route>
               <Route path="/consultation/:id/room" element={<><div className="demo-bar" role="note">Demonstration environment — no real payments or clinical care.</div><ConsultationRoomPage /></>} />
               <Route path="/clinic" element={<WorkspaceLayout kind="clinic" />}>
                 <Route index element={<ClinicMembershipPortal workspace />} />
