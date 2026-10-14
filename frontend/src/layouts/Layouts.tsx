@@ -7,7 +7,6 @@ import {
   CalendarDays,
   ClipboardCheck,
   Home,
-  LogOut,
   Search,
   Settings2,
   Stethoscope,
@@ -342,14 +341,6 @@ export function WorkspaceLayout({
         </nav>
         <div className="sidebar-bottom">
           <TranslationNote />
-          <Button
-            variant="quiet"
-            loading={signoutBusy}
-            onClick={()=>void signout()}
-          >
-            <LogOut size={20} />
-            {w("Sign out")}
-          </Button>
         </div>
       </aside>
       <div className="workspace-body">
