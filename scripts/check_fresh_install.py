@@ -206,7 +206,7 @@ try:
     from tele_tena.schema import TABLES
     from tele_tena.patches.v1_6_presentation_release import TABLES as PRESENTATION_TABLES
     from tele_tena.patches.v1_7_demo_subledger import TABLES as SUBLEDGER_TABLES
-    expected_tables = (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'financial_reconciliation', 'session_feedback', 'couple_plan', 'couple_participant', 'note_recipient', 'shared_change_consent', 'note_followup')
+    expected_tables = (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'financial_reconciliation', 'session_feedback', 'couple_plan', 'couple_participant', 'note_recipient', 'shared_change_consent', 'note_followup', 'history_document')
     missing_tables = sorted('tt_' + table for table in expected_tables
                             if 'tt_' + table not in frappe.db.get_tables(cached=False))
     assert not missing_tables, 'Missing app tables: ' + ', '.join(missing_tables)

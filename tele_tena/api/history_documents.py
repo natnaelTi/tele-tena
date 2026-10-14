@@ -42,7 +42,9 @@ def validated(filename,encoded):
             reader=PdfReader(io.BytesIO(content))
             if reader.is_encrypted or pdf_contains_js(content):raise ValueError()
             root=reader.trailer['/Root']
-            if any(key in root for key in ('/OpenAction','/AA','/AcroForm','/Collection')) or '/EmbeddedFiles' in root.get('/Names',{}):raise ValueError()
+            names=root.get('/Names',{})
+            if hasattr(names,'get_object'):names=names.get_object()
+            if any(key in root for key in ('/OpenAction','/AA','/AcroForm','/Collection')) or '/EmbeddedFiles' in names:raise ValueError()
             if not 0<len(reader.pages)<=300:raise ValueError()
             mime='application/pdf'
         else:
