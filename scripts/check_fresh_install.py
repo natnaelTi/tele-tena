@@ -252,7 +252,10 @@ try:
             env=dict(os.environ, TELE_TENA_TEST_SITE=SITE, TELE_TENA_TEST_BENCH=str(BENCH)),
             cwd=APP, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=180)
         if result.returncode:
-            raise RuntimeError('Fresh dataset acceptance failed; output retained in private install log')
+            failure_log=SITE_PATH / 'private/fresh-demo-acceptance.log'
+            failure_log.write_text(result.stdout)
+            failure_log.chmod(0o600)
+            raise RuntimeError('Fresh dataset acceptance failed; output retained privately on test site')
         print(result.stdout.strip())
     frappe.destroy()
     assert retained_fingerprint() == retained_before, 'Retained development records changed'
