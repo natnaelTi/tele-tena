@@ -21,7 +21,7 @@ The supplied transcript ended after code checkout, before actual pip installatio
 or migration. Web/workers/scheduler were STOPPED and maintenance was on. If no
 further install/migration occurred and TeleTena is clean, return it to
 `8f7ab9cd8d5e779d17b632dc9afdae3e700ab3c6`, start the exact three worker/scheduler
-and web names below, then `bench --site teletena.selfmadecs.com set-maintenance-mode off`.
+and web names below, then `"$BENCH_CLI" --site teletena.selfmadecs.com set-maintenance-mode off`.
 This is pre-migration recovery, **not** a database rollback. Do not restore an
 incomplete backup or discard the modified Frappe lockfile. If anything changed
 after the transcript, inspect it before choosing recovery. Keep
@@ -29,7 +29,7 @@ after the transcript, inspect it before choosing recovery. Keep
 
 ## 1. Inspect, preserve and stop conditions
 
-Run as `smcs` with the existing Bench executable, not root. Do not paste output
+Run as `smcs` with the retained healthy external Bench5.29.0 executable, not root. Complete the separately guarded shared-environment repair first; never install a duplicate CLI into the application environment. Do not paste output
 containing credentials/configuration into chat. Execute blocks separately and
 stop on any failed command or unexpected result.
 
@@ -37,6 +37,7 @@ stop on any failed command or unexpected result.
 set -euo pipefail
 umask 077
 cd /home/smcs/frappe-bench
+BENCH_CLI='/home/smcs/.pyenv/versions/3.14.2/bin/bench'
 RELEASE_SHA='800a591ac6af9c6c3b4afd61ed4353be4ff0826e'
 SITE='teletena.selfmadecs.com'
 CURRENT_SHA=$(git -C apps/tele_tena rev-parse HEAD)
@@ -44,13 +45,13 @@ test "$CURRENT_SHA" = 8f7ab9cd8d5e779d17b632dc9afdae3e700ab3c6
 printf 'Installed TeleTena commit: %s\n' "$CURRENT_SHA"
 test -z "$(git -C apps/tele_tena status --porcelain)"
 test -z "$(git -C apps/erpnext status --porcelain)"
-bench --site "$SITE" list-apps
+"$BENCH_CLI" --site "$SITE" list-apps
 env/bin/python --version
 node --version
 env/bin/python -m pip check
 sudo supervisorctl status
 sudo nginx -t
-bench --site "$SITE" doctor
+"$BENCH_CLI" --site "$SITE" doctor
 ```
 
 If a checkout is dirty, **stop**. Commit or copy changes to protected backup
@@ -60,8 +61,8 @@ apps; incompatible schemas on another TeleTena site are a shared-code stop.
 Existing non-TeleTena sites still share dependencies/assets/services.
 
 Before any outage or checkout, `env/bin/python -m pip check` must pass. The supplied
-14October baseline has eight conflicts: **stop here until the separate, staged
-[shared-environment repair proposal](selfmade-shared-environment-repair.md) is resolved**.
+14October baseline had eight conflicts: **stop here until the separate, staged
+[shared-environment repair proposal](selfmade-shared-environment-repair.md) has passed its staged repair,identity preservation and live-launcher gates**.
 A TeleTena update must not repair these by relaxing its guard.
 
 Fetch the release without switching yet, then extract the tools outside the app so
@@ -75,6 +76,8 @@ chmod 700 "$TOOLS"
 for TOOL in release_preflight.py dependency_checkpoint.py shared_dependency_audit.py check_frappe_lock.py backup_review_release.py verify_release_backup.py; do
   git -C apps/tele_tena show "$RELEASE_SHA:scripts/$TOOL" > "$TOOLS/$TOOL"
 done
+git -C apps/tele_tena fetch origin fix/selfmade-shared-dependency-repair
+git -C apps/tele_tena show 53dd0df81342eedd8f7785a732f97827316159cb:scripts/restore_review_release.py > "$TOOLS/restore_review_release.py"
 PREFLIGHT="$TOOLS/release_preflight.py"
 env/bin/python "$TOOLS/check_frappe_lock.py" apps/frappe
 env/bin/python "$TOOLS/shared_dependency_audit.py" --bench /home/smcs/frappe-bench > "$TOOLS/all-app-dependencies.json"
@@ -120,8 +123,15 @@ git -C apps/frappe diff HEAD --binary -- yarn.lock > "$UPDATE_BACKUP/frappe-yarn
 cp apps/frappe/yarn.lock "$UPDATE_BACKUP/frappe-yarn.lock"
 env/bin/python -m pip list --format=json > "$UPDATE_BACKUP/packages.json"
 cp -a apps/tele_tena/tele_tena/public/review "$UPDATE_BACKUP/review-assets"
+# Credentials/seed manifests live outside private/files; preserve that private root too.
+tar --create --file "$UPDATE_BACKUP/private-state.tar" --exclude='./files' --exclude='./backups' \
+  -C "sites/$SITE/private" .
+test -s "$UPDATE_BACKUP/private-state.tar"
+tar --list --file "$UPDATE_BACKUP/private-state.tar" > "$UPDATE_BACKUP/private-state-files.txt"
+sha256sum "$UPDATE_BACKUP/private-state.tar" > "$UPDATE_BACKUP/private-state.sha256"
+sha256sum --check "$UPDATE_BACKUP/private-state.sha256"
 env/bin/python "$TOOLS/dependency_checkpoint.py" snapshot "$UPDATE_BACKUP/dependencies-update" --mode update --app-path /home/smcs/frappe-bench/apps/tele_tena
-bench --site "$SITE" set-maintenance-mode on
+"$BENCH_CLI" --site "$SITE" set-maintenance-mode on
 sudo supervisorctl stop frappe-bench-workers:frappe-bench-frappe-schedule
 sudo supervisorctl stop frappe-bench-workers:frappe-bench-frappe-long-worker-0 frappe-bench-workers:frappe-bench-frappe-short-worker-0
 sudo supervisorctl stop frappe-bench-web:frappe-bench-frappe-web
@@ -167,7 +177,7 @@ env/bin/python -m pip install --constraint "$UPDATE_BACKUP/dependencies-update/c
 env/bin/python apps/tele_tena/scripts/dependency_checkpoint.py verify "$UPDATE_BACKUP/dependencies-update" --mode update --app-path /home/smcs/frappe-bench/apps/tele_tena
 env/bin/python -m pip check
 env/bin/python apps/tele_tena/scripts/build_review.py
-bench build --app tele_tena
+"$BENCH_CLI" build --app tele_tena
 env/bin/python "$TOOLS/check_frappe_lock.py" apps/frappe
 cmp apps/frappe/yarn.lock "$UPDATE_BACKUP/frappe-yarn.lock"
 env/bin/python apps/tele_tena/scripts/check_review_assets.py --site-private sites/teletena.selfmadecs.com/private
@@ -188,9 +198,9 @@ app dependencies are shared. Ensure the generated `release.json` matches the pin
 ## 4. Target-only migration and cache maintenance
 
 ```bash
-bench --site "$SITE" migrate
-bench --site "$SITE" clear-cache
-bench --site "$SITE" clear-website-cache
+"$BENCH_CLI" --site "$SITE" migrate
+"$BENCH_CLI" --site "$SITE" clear-cache
+"$BENCH_CLI" --site "$SITE" clear-website-cache
 ```
 
 Stop on migration/reconciliation failure. Existing wallet snapshots and unknown
@@ -207,12 +217,12 @@ sudo supervisorctl start frappe-bench-web:frappe-bench-frappe-web
 sudo supervisorctl start frappe-bench-workers:frappe-bench-frappe-long-worker-0 frappe-bench-workers:frappe-bench-frappe-short-worker-0
 sudo supervisorctl start frappe-bench-workers:frappe-bench-frappe-schedule
 sudo supervisorctl status
-bench --site "$SITE" set-maintenance-mode off
-bench --site "$SITE" doctor
+"$BENCH_CLI" --site "$SITE" set-maintenance-mode off
+"$BENCH_CLI" --site "$SITE" doctor
 env/bin/python "$PREFLIGHT" --bench /home/smcs/frappe-bench --site "$SITE"
-bench --site "$SITE" execute tele_tena.demo_dataset.setup
-bench --site "$SITE" execute tele_tena.demo_dataset.setup --kwargs '{"dry_run":False}'
-bench --site "$SITE" execute tele_tena.demo_dataset.setup --kwargs '{"dry_run":False}'
+"$BENCH_CLI" --site "$SITE" execute tele_tena.demo_dataset.setup
+"$BENCH_CLI" --site "$SITE" execute tele_tena.demo_dataset.setup --kwargs '{"dry_run":False}'
+"$BENCH_CLI" --site "$SITE" execute tele_tena.demo_dataset.setup --kwargs '{"dry_run":False}'
 ```
 
 Read the first dry-run. Stop if review binding/configuration, positive-net fee
@@ -237,7 +247,7 @@ it creates request/offer records only, never fresh money or new approvals.
 env/bin/python apps/tele_tena/scripts/check_review_url.py https://teletena.selfmadecs.com
 curl --fail --silent --show-error https://teletena.selfmadecs.com/assets/tele_tena/review/release.json \
   | env/bin/python -c 'import json,sys;print(json.load(sys.stdin)["source_commit"])'
-bench --site "$SITE" doctor
+"$BENCH_CLI" --site "$SITE" doctor
 ```
 
 Expected HTTPS built landing/sign-in/deep links, no-store app/API/SW headers,
@@ -252,8 +262,8 @@ If the site scheduler is disabled, decide explicitly to enable **this review
 site's** required jobs; this is not a seed side effect or an enrollment change:
 
 ```bash
-bench --site "$SITE" enable-scheduler
-bench --site "$SITE" doctor
+"$BENCH_CLI" --site "$SITE" enable-scheduler
+"$BENCH_CLI" --site "$SITE" doctor
 ```
 
 Confirm subscribed default queue first. Observe later `Scheduled Job Log` Complete
@@ -284,13 +294,38 @@ reliable rollback normally restores the matching database + public/private files
 does not reverse schema, journal entries, scope decisions or users.
 
 Choose the exact matching database/public/private archive paths from step2,
-confirm privately, then run (passwords stay in terminal prompts):
+confirm privately, then run. The same-site restore helper uses the current matching
+site DB credentials through a temporary private client file, never command arguments.
+It requires maintenance mode, the verified checksum manifest and matching database/
+encryption identity; it does not recreate users, change grants or run migrations:
 
 ```bash
+# Preserve the failed/current database and files before restoring an earlier snapshot.
+# Stop if legitimate later activity needs selective recovery instead of full restore.
+RECOVERY_STATE=$(mktemp -d "$UPDATE_BACKUP/pre-restore.XXXXXXXX")
+env/bin/python "$TOOLS/backup_review_release.py" --bench /home/smcs/frappe-bench \
+  --site "$SITE" --destination "$RECOVERY_STATE/site-backups"
+env/bin/python "$TOOLS/verify_release_backup.py" "$RECOVERY_STATE/site-backups"
+sha256sum --check "$UPDATE_BACKUP/private-state.sha256"
+# Move aside only this site's current uploads/private metadata; never discard them.
+env/bin/python - "$SITE" "$RECOVERY_STATE" <<'PYRESTORE'
+from pathlib import Path
+import shutil,sys
+assert sys.argv[1] == 'teletena.selfmadecs.com'
+root=Path('sites')/sys.argv[1];saved=Path(sys.argv[2])
+for kind in ('public','private'):
+    current=root/kind/'files'
+    if current.exists():shutil.move(str(current),str(saved/(kind+'-files')))
+    current.mkdir(parents=True,exist_ok=True,mode=0o700 if kind=='private' else 0o755)
+(saved/'private-state').mkdir(mode=0o700)
+for current in (root/'private').iterdir():
+    if current.name not in ('files','backups'):
+        shutil.move(str(current),str(saved/'private-state'/current.name))
+PYRESTORE
 git -C apps/tele_tena checkout --detach "$(cat "$UPDATE_BACKUP/tele_tena.sha")"
-bench --site "$SITE" restore "$UPDATE_BACKUP/site-backups/database.sql.gz" \
-  --with-public-files "$UPDATE_BACKUP/site-backups/public-files.tar" \
-  --with-private-files "$UPDATE_BACKUP/site-backups/private-files.tar"
+env/bin/python "$TOOLS/restore_review_release.py" --bench /home/smcs/frappe-bench \
+  --site "$SITE" --confirm-restore-site "$SITE" --backup "$UPDATE_BACKUP/site-backups"
+tar --extract --file "$UPDATE_BACKUP/private-state.tar" -C "sites/$SITE/private"
 cp "$UPDATE_BACKUP/site_config.json" sites/teletena.selfmadecs.com/site_config.json
 chmod 600 sites/teletena.selfmadecs.com/site_config.json
 ```
@@ -315,5 +350,25 @@ checks. Keep both backups until the rollback/update is accepted.
 covers actual installed baseline8f7ab9c, guarded pip installation, all original
 operational rows/private credentials/config fields, repeat migration, LegacyHold,
 and demonstration seeding twice. This differs from the older fresh-only evidence.
-Shared-environment repair is separate; its44-app compatibility is not asserted
-from the local three-app test environment.
+The original report used a three-app environment. Additional44-app requirement
+intersection,201 pinned third-party runtime and Amazon tests are recorded in
+shared-repair-verification.md;the full remote copied-environment gate is still required.
+
+## Shared-repair integration note —14October2026
+
+The shared-environment procedure now has a tested seven-package plan and a
+separate Amazon source patch. Retain the healthy external5.29.0 CLI and its
+app-env compatibility link;do not install a second distribution or change global
+Python/Node/framework versions. Finish repair,verify/start the exact shared Python
+services,then run this update's live preflight. This guide stops them again before
+migration;both pauses affect all Bench sites. Site migration/seeding remains only
+teletena.selfmadecs.com. Do not use the conflicted pre-repair dependency snapshot.
+
+Under the repaired201-third-party-package graph,the exact800a591 update-mode
+installation,old8f database migration,preservation checks,demonstration setup twice
+and repeat migration were rerun successfully. Original26 tables/41 rows,private
+files/passwords and completed reserved LegacyHold survived;all six resulting
+patient wallets reconcile. Evidence:shared-repair-verification.md. Backup test
+again verified explicit database/public/private/config archives;missing selections
+are not accepted. The source/build pin remains800a591;later local UI changes such
+as country selection/private history attachments are not included by this pin.
