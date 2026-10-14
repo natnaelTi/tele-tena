@@ -129,6 +129,21 @@ class Presentation(unittest.TestCase):
     def setUp(self):
         fixtures.login('admin')
 
+    def test_binary_pdf_storage_preserves_bytes_for_frappe16(self):
+        from tele_tena.api import vetting
+        fixtures.login('c3')
+        pdf=b'%PDF-1.4\nFictional non-UTF8 binary evidence: \xff\x80\xfe\n%%EOF'
+        presentation.upload_resume('fictional-binary.pdf',base64.b64encode(pdf).decode())
+        saved=journey.one('SELECT content FROM tt_resume_evidence WHERE clinician=%s',(fixtures.USERS['c3'],))
+        self.assertEqual(bytes(saved.content),pdf)
+        fixtures.login('admin')
+        service=fixtures.PREFIX+'-binary-doc'
+        reviewed_test_service(dict(doctype='Tele Tena Service',service_key=service,service_label='Fictional binary evidence service',category='counseling',participant_structure='individual',vetting_required=1,definition_version='binary-test-1'))
+        fixtures.login('c3')
+        application=vetting.save_scope_application(service,{'professional_category':'Synthetic clinician'},False)
+        evidence=vetting.upload_scope_evidence(application['name'],'Qualification','fictional-binary.pdf',base64.b64encode(pdf).decode())
+        self.assertEqual(bytes(journey.one('SELECT content FROM tt_scope_evidence_content WHERE evidence=%s',(evidence['id'],)).content),pdf)
+
     def test_profile_photo_owner_visibility_validation_and_revocation(self):
         import io
         from PIL import Image

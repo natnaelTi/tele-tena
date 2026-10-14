@@ -494,8 +494,8 @@ def upload_scope_evidence(application, evidence_type, filename, content_base64):
         doc.insert()
     finally:
         frappe.local.tele_tena_scope_evidence_action = False
-    frappe.db.sql('INSERT INTO tt_scope_evidence_content (evidence,content) VALUES (%s,%s)',
-                  (doc.name, content))
+    frappe.db.sql('INSERT INTO tt_scope_evidence_content (evidence,content) VALUES (%s,FROM_BASE64(%s))',
+                  (doc.name, base64.b64encode(content).decode("ascii")))
     journey.audit(user, 'ScopeEvidenceUploaded', {'application': scope.name,
         'evidence': doc.name, 'type': evidence_type, 'revision': revision, 'size': len(content)})
     return {'id': doc.name, 'revision': revision, 'uploaded': True}

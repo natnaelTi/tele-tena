@@ -83,9 +83,9 @@ def upload(filename, content_base64, published=0):
     # Serialize replace/remove for this owner. Never accept a caller-supplied owner.
     frappe.db.sql('SELECT name FROM tabUser WHERE name=%s FOR UPDATE', (user,))
     frappe.db.sql('''INSERT INTO tt_profile_photo (user,id,content,published,modified)
-        VALUES (%s,%s,%s,%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
+        VALUES (%s,%s,FROM_BASE64(%s),%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
         id=VALUES(id),content=VALUES(content),published=VALUES(published),modified=VALUES(modified)''',
-        (user, str(uuid.uuid4()), content, int(publish)))
+        (user, str(uuid.uuid4()), base64.b64encode(content).decode("ascii"), int(publish)))
     return owner_photo(user)
 
 

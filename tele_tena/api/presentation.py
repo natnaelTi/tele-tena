@@ -991,11 +991,11 @@ def upload_resume(filename, content_base64):
     revision = int(old[0].revision) + 1 if old else 1
     frappe.db.sql('''INSERT INTO tt_resume_evidence
         (clinician,filename,content,content_size,content_sha256,revision,uploaded_by,uploaded_at)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
+        VALUES (%s,%s,FROM_BASE64(%s),%s,%s,%s,%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
         filename=VALUES(filename),content=VALUES(content),content_size=VALUES(content_size),
         content_sha256=VALUES(content_sha256),revision=VALUES(revision),uploaded_by=VALUES(uploaded_by),
         uploaded_at=VALUES(uploaded_at)''',
-        (user, filename, content, len(content), hashlib.sha256(content).hexdigest(), revision, user))
+        (user, filename, base64.b64encode(content).decode("ascii"), len(content), hashlib.sha256(content).hexdigest(), revision, user))
     return {'uploaded': True, 'filename': filename, 'size': len(content), 'revision': revision}
 
 
