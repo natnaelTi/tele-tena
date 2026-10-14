@@ -23,6 +23,7 @@ def main():
     from frappe.utils.backups import BackupGenerator
     frappe.init(site=args.site,sites_path=str(bench/'sites'));frappe.connect();frappe.set_user('Administrator')
     assert 'tele_tena' in frappe.get_installed_apps(),'Expected TeleTena site'
+    assert not frappe.get_system_settings('encrypt_backup'),'Encrypted backup policy enabled: stop for a verified encrypted backup procedure; do not disable encryption'
     assert frappe.conf.db_type in (None,'mariadb'),'Only tested MariaDB backup path supported'
     original=frappe.database.get_command
     try:

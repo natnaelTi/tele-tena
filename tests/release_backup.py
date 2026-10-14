@@ -9,6 +9,10 @@ class RequiredArchives(unittest.TestCase):
    with gzip.open(p/'database.sql.gz','wb') as f:f.write(b'CREATE TABLE example (id int);')
    (p/'site-config.json').write_text(json.dumps({'db_name':'fictional'}))
    with self.assertRaises(ValueError):b.verify(p)
+   (p/'public-files.tar').write_bytes(b'')
+   with self.assertRaises(ValueError):b.verify(p)
+   with tarfile.open(p/'public-files.tar','w'):pass
+   with self.assertRaises(ValueError):b.verify(p)
    for name in ['public-files.tar','private-files.tar']:
     with tarfile.open(p/name,'w'):pass
    self.assertEqual(len(b.verify(p)),4)
