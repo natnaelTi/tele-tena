@@ -31,3 +31,4 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m compileall -q tele_tena scripts tests
       - run: python tests/dependency_checkpoint.py
+      - run: python -m unittest tests.release_backup tests.frappe_lock

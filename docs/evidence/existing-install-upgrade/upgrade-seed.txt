@@ -1,0 +1,1 @@
+{"site": "teletena-existing-upgrade.localhost", "checks": "seed twice, dry-run, unrelated preservation, no outbound delivery, private notes/evidence/request/offer denial, couples consent, real-money guard, owner reconciliation", "result": "PASS", "reconciliation": {"patient_owners": 5, "clinician_owners": 4, "balanced": true}, "initial_seed": true}

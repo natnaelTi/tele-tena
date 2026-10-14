@@ -1,0 +1,1 @@
+PASS: accepted target and every protected version/editable identity preserved

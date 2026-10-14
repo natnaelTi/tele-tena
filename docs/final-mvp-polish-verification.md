@@ -1,3 +1,7 @@
+# Deployment correction supersedes the original installation pin
+
+Use [existing-install upgrade verification](existing-install-upgrade-verification.md) and the corrected latest PR [update guide](selfmade-final-mvp-update.md). Original UI evidence below remains valid; the105cd15 deployment guard was first-install-only and is superseded by800a591.
+
 # Final bounded MVP polish and portable dataset —14October2026
 
 ## Candidate identity and review
