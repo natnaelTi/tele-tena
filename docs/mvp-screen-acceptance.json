@@ -437,7 +437,8 @@
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "Built /teletena/ invited-review browser check passed at 390/1440: phone-first screen remains visible, Continue is disabled by site policy, email/password remains available, and existing patient/clinician accounts sign in. Auth source commit 0b3d1bd; packaged manifest source 0b1da5c89644dcff4d72fbe56a6d1ed979c5a4ee. Phone OTP/public registration flags restored false. No live provider call.",
         "mvp_private_query": "Built-app 390px password-flow check passes on 42574c4; no URL/history/storage query, clear on sign-out. Full visual and OTP/onboarding acceptance still pending; see mvp-release-verification.md.",
-        "presentation_checkpoint": "Invited-review method availability and password alternative passed; returning-phone/resend/expiry and complete abuse gate remain open. See docs/mvp-journey-verification-2026-10-09.md."
+        "presentation_checkpoint": "Invited-review method availability and password alternative passed; returning-phone/resend/expiry and complete abuse gate remain open. See docs/mvp-journey-verification-2026-10-09.md.",
+        "history_country_v139": "docs/history-country-verification.md; additive country selector, shared native-picker/drop component and owner-only patient history files. Profile multi-upload/drop/reload/download/removal verified against built real backend; onboarding owner gate verified Frappe16. Existing owner/medical-lead acceptance not replaced."
       },
       "visual_acceptance": {
         "reference_screen": "A04",
@@ -1298,7 +1299,8 @@
         "design": "Extracted approved source /home/frappe/teletena-design-reference/screen-inventory.json (B04) and design-handoff.md",
         "implementation": "PR #15 integrated source 3e0965c5fdf6485d945756b382c0a3c008450058; exact route/backend assertion remains screen-specific",
         "current_local": "docs/screenshots/mvp-current/bc20f72-onboarding/result.json; real backend, named state only; no live delivery or clinical decisions.",
-        "current_2026_10_11_onboarding_review": "docs/screenshots/mvp-current/bc20f72-onboarding/result.json"
+        "current_2026_10_11_onboarding_review": "docs/screenshots/mvp-current/bc20f72-onboarding/result.json",
+        "history_country_v139": "docs/history-country-verification.md; additive country selector, shared native-picker/drop component and owner-only patient history files. Profile multi-upload/drop/reload/download/removal verified against built real backend; onboarding owner gate verified Frappe16. Existing owner/medical-lead acceptance not replaced."
       },
       "visual_acceptance": {
         "reference_screen": "B04",
@@ -1550,7 +1552,8 @@
         "current_2026_10_11": "docs/screenshots/mvp-current/fb94c29-onboarding/result.json",
         "current_initial_clinician": "41b6cf5 connected real DB/browser: five initial stages; dedicated B09 scope picker save/reload; private PDF; Pending submission with no clinician/reviewer roles. Patient path still passes. Test-only transport/config restored, not live receipt.",
         "current_2026_10_12": "docs/screenshots/mvp-current/295ffdd-initial-clinician/result.json",
-        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed."
+        "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
+        "history_country_v139": "docs/history-country-verification.md; additive country selector, shared native-picker/drop component and owner-only patient history files. Profile multi-upload/drop/reload/download/removal verified against built real backend; onboarding owner gate verified Frappe16. Existing owner/medical-lead acceptance not replaced."
       },
       "visual_acceptance": {
         "reference_screen": "B06",
@@ -1679,7 +1682,8 @@
         "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
         "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance.",
         "optional_approach_choices": "5944566: optional Active catalog choices replace undocumented free-text stable keys; truthful empty state and explicit stale-entry move to training. Two Frappe tests plus real random-code backend/browser all-ten-scope draft/reload/submission pass. No auto approval; visual/owner acceptance separate. See active journey report.",
-        "guided_vetting_help": "834ed2d: owner-authorized stepped general/scope review, clinician evidence stage and global help/wiki. Two real Frappe regressions, four-role browser390/768/1440, locale layout, tour Next/Back and actual200% help pass. docs/screenshots/mvp-current/834ed2d-guided-review-help/. No presentation decision/upload; native and owner approval pending. Reviewer unsaved fields not retained across reload."
+        "guided_vetting_help": "834ed2d: owner-authorized stepped general/scope review, clinician evidence stage and global help/wiki. Two real Frappe regressions, four-role browser390/768/1440, locale layout, tour Next/Back and actual200% help pass. docs/screenshots/mvp-current/834ed2d-guided-review-help/. No presentation decision/upload; native and owner approval pending. Reviewer unsaved fields not retained across reload.",
+        "history_country_v139": "docs/history-country-verification.md; additive country selector, shared native-picker/drop component and owner-only patient history files. Profile multi-upload/drop/reload/download/removal verified against built real backend; onboarding owner gate verified Frappe16. Existing owner/medical-lead acceptance not replaced."
       },
       "visual_acceptance": {
         "reference_screen": "B07",
@@ -9843,7 +9847,8 @@
           "reviewer_route": "/admin/account",
           "remaining": "Native translation/owner review; Frappe16/fresh full installation not rerun for this addition."
         },
-        "final_polish": "docs/final-mvp-polish-verification.md: owner account menu, grouped role-filtered More drawer, native accordion states; real seeded accounts on Frappe15/16,320/390/768/1440, actual200% zoom. These shared-control checks do not replace whole-screen/owner acceptance."
+        "final_polish": "docs/final-mvp-polish-verification.md: owner account menu, grouped role-filtered More drawer, native accordion states; real seeded accounts on Frappe15/16,320/390/768/1440, actual200% zoom. These shared-control checks do not replace whole-screen/owner acceptance.",
+        "history_country_v139": "docs/history-country-verification.md; additive country selector, shared native-picker/drop component and owner-only patient history files. Profile multi-upload/drop/reload/download/removal verified against built real backend; onboarding owner gate verified Frappe16. Existing owner/medical-lead acceptance not replaced."
       },
       "visual_acceptance": {
         "reference_screen": "H01",
@@ -10007,7 +10012,8 @@
           "reviewer_route": "/admin/account",
           "remaining": "Native translation/owner review; Frappe16/fresh full installation not rerun for this addition."
         },
-        "final_polish": "docs/final-mvp-polish-verification.md: owner account menu, grouped role-filtered More drawer, native accordion states; real seeded accounts on Frappe15/16,320/390/768/1440, actual200% zoom. These shared-control checks do not replace whole-screen/owner acceptance."
+        "final_polish": "docs/final-mvp-polish-verification.md: owner account menu, grouped role-filtered More drawer, native accordion states; real seeded accounts on Frappe15/16,320/390/768/1440, actual200% zoom. These shared-control checks do not replace whole-screen/owner acceptance.",
+        "history_country_v139": "docs/history-country-verification.md; additive country selector, shared native-picker/drop component and owner-only patient history files. Profile multi-upload/drop/reload/download/removal verified against built real backend; onboarding owner gate verified Frappe16. Existing owner/medical-lead acceptance not replaced."
       },
       "visual_acceptance": {
         "reference_screen": "H02",
@@ -11005,7 +11011,8 @@
         "current_2026_10_12": "docs/screenshots/mvp-current/8b5802d-application-review/result.json",
         "scope_intake_2026_10_12": "v1.37: five persisted Frappe regressions pass; new clinician three independent scope decisions reaches approved offering/published schedule/discovery/immediate inbox. Real-backend registration/draft scope reload and submission pass separately; not one continuous reviewer-browser journey. Current paired intake/catalog captures at390/768/1440 remain separately visually assessed.",
         "private_application_field_correction": "c7a62b9: two real Frappe regressions plus new clinician random-OTP/browser -> initial persisted three claims -> scope draft/reload -> validation error -> valid submission -> authorized reviewer projection. docs/screenshots/mvp-current/c7a62b9-application-fields/. No live delivery, no new approval, no full visual acceptance.",
-        "guided_vetting_help": "834ed2d: owner-authorized stepped general/scope review, clinician evidence stage and global help/wiki. Two real Frappe regressions, four-role browser390/768/1440, locale layout, tour Next/Back and actual200% help pass. docs/screenshots/mvp-current/834ed2d-guided-review-help/. No presentation decision/upload; native and owner approval pending. Reviewer unsaved fields not retained across reload."
+        "guided_vetting_help": "834ed2d: owner-authorized stepped general/scope review, clinician evidence stage and global help/wiki. Two real Frappe regressions, four-role browser390/768/1440, locale layout, tour Next/Back and actual200% help pass. docs/screenshots/mvp-current/834ed2d-guided-review-help/. No presentation decision/upload; native and owner approval pending. Reviewer unsaved fields not retained across reload.",
+        "history_country_v139": "docs/history-country-verification.md; additive country selector, shared native-picker/drop component and owner-only patient history files. Profile multi-upload/drop/reload/download/removal verified against built real backend; onboarding owner gate verified Frappe16. Existing owner/medical-lead acceptance not replaced."
       },
       "visual_acceptance": {
         "reference_screen": "I03",
@@ -11147,7 +11154,8 @@
         "implementation": "Immutable v1.28 registry and Medical Lead role; reviewer APIs expose digest-verified definitions; only Medical Lead approves. v1.29 requires issuer/source, check date, registry reference, and same-application license evidence for credential verification, then stores a digest-checked provenance snapshot. Applicant/patient responses omit this data.",
         "current_local": "Frappe 15 isolated site v1.29 first/repeat migration passed; tests/presentation.py 45/45 and tests/integration.py 24/24. Production-built /teletena/admin/vetting reviewer controls were rendered at 390/1440px against a synthetic submitted application; evidence screenshots are docs/screenshots/vetting-rubric/credential-source-reviewer-{390,1440}.png. Fresh-site install, Frappe 16, Medical Lead approval and native-language/accessibility review remain pending.",
         "missing_scope_license_feedback": "4515945: real Submitted/no-evidence diagnosis; specific safe verification messages, explanatory notice and explicit local clear control. Existing isolated backend clarification/evidence/resubmission/provenance regression passes; actual reviewer readonly controls pass. No decision/upload/approval; see active report.",
-        "guided_vetting_help": "834ed2d: owner-authorized stepped general/scope review, clinician evidence stage and global help/wiki. Two real Frappe regressions, four-role browser390/768/1440, locale layout, tour Next/Back and actual200% help pass. docs/screenshots/mvp-current/834ed2d-guided-review-help/. No presentation decision/upload; native and owner approval pending. Reviewer unsaved fields not retained across reload."
+        "guided_vetting_help": "834ed2d: owner-authorized stepped general/scope review, clinician evidence stage and global help/wiki. Two real Frappe regressions, four-role browser390/768/1440, locale layout, tour Next/Back and actual200% help pass. docs/screenshots/mvp-current/834ed2d-guided-review-help/. No presentation decision/upload; native and owner approval pending. Reviewer unsaved fields not retained across reload.",
+        "history_country_v139": "docs/history-country-verification.md; additive country selector, shared native-picker/drop component and owner-only patient history files. Profile multi-upload/drop/reload/download/removal verified against built real backend; onboarding owner gate verified Frappe16. Existing owner/medical-lead acceptance not replaced."
       },
       "visual_acceptance": {
         "reference_screen": "I04",

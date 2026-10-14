@@ -34,6 +34,23 @@ class Uploads(unittest.TestCase):
    with self.assertRaises(frappe.ValidationError):documents.upload('quota.pdf',document('quota'))
   finally:frappe.conf.tele_tena_history_storage_mb=old
   self.assertEqual(len(documents.list_documents()['documents']),before)
+ def test_verified_onboarding_gate(self):
+  from tele_tena.api.contact_auth import _identity,save_onboarding
+  import uuid
+  keys=('tele_tena_review_site','tele_tena_review_enabled','tele_tena_patient_registration_enabled')
+  old={key:frappe.conf.get(key) for key in keys};frappe.db.savepoint('history_onboarding')
+  try:
+   frappe.conf.update(dict(tele_tena_review_site=SITE,tele_tena_review_enabled=True,tele_tena_patient_registration_enabled=True))
+   # Internal post-verification identity helper; no SMS/email or fixed public OTP.
+   user=_identity('email','history-'+uuid.uuid4().hex+'@example.invalid');frappe.set_user(user)
+   with self.assertRaises(frappe.PermissionError):documents.list_documents()
+   frappe.db.sql("UPDATE tt_onboarding SET answers=%s WHERE user=%s",(json.dumps({'adult':True,'consent':True}),user))
+   result=documents.upload('onboarding.pdf',document('fictional onboarding history'))
+   self.assertEqual(documents.list_documents()['documents'][0].id,result['id'])
+   frappe.conf.tele_tena_patient_registration_enabled=False
+   with self.assertRaises(frappe.PermissionError):documents.download(result['id'])
+  finally:
+   frappe.db.rollback(save_point='history_onboarding');frappe.conf.update(old);frappe.set_user(patient)
  def test_proxy_chain_and_database(self):
   old=frappe.conf.get('tele_tena_country_trusted_proxies');frappe.conf.tele_tena_country_trusted_proxies=['127.0.0.1/32']
   try:

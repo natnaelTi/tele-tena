@@ -884,3 +884,14 @@ Owner profile-photo upload/replace/remove and four fictional demo portraits adde
 13October2026. Patient/reviewer images are private; clinician publication is
 opt-in and eligibility-gated. See `profile-photos.md` for focused verification;
 this addition does not close earlier full-MVP acceptance gates.
+
+### October14: country selection and private history files (v1.39)
+
+Phone sign-in/signup has a manual country selector and best-effort offline IP
+default, with explicit trusted-proxy configuration. Existing Ethiopian SMS
+provider restriction remains truthful. Shared drop/picker controls replace the
+four bare inputs (photo, onboarding/account resume, scope evidence). Patients
+retain the history textarea and can save multiple private PDF/JPEG/PNG files
+during eligible onboarding and in Personal profile. These files are not
+automatically shared with clinicians. Evidence: history-country-verification.md.
+Native-language approval and live delivery remain external, not claimed.
