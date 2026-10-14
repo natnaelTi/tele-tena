@@ -46,12 +46,13 @@ class Tests(unittest.TestCase):
  def test_http_signature_cryptography(self):
   import requests
   from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+  from cryptography.hazmat.primitives.asymmetric.rsa import generate_private_key
   from http_message_signatures import HTTPMessageSigner,HTTPMessageVerifier,HTTPSignatureKeyResolver,algorithms
-  key=Ed25519PrivateKey.generate()
-  class Keys(HTTPSignatureKeyResolver):
-   def resolve_private_key(self,key_id):return key
-   def resolve_public_key(self,key_id):return key.public_key()
-  request=requests.Request('POST','https://example.invalid/fictional-signature',data=b'fictional').prepare()
-  HTTPMessageSigner(signature_algorithm=algorithms.ED25519,key_resolver=Keys()).sign(request,key_id='fictional')
-  self.assertEqual(len(HTTPMessageVerifier(signature_algorithm=algorithms.ED25519,key_resolver=Keys()).verify(request)),1)
+  for algorithm,key in [(algorithms.ED25519,Ed25519PrivateKey.generate()),(algorithms.RSA_PSS_SHA512,generate_private_key(public_exponent=65537,key_size=2048))]:
+   class Keys(HTTPSignatureKeyResolver):
+    def resolve_private_key(self,key_id):return key
+    def resolve_public_key(self,key_id):return key.public_key()
+   request=requests.Request('POST','https://example.invalid/fictional-signature',data=b'fictional').prepare()
+   HTTPMessageSigner(signature_algorithm=algorithm,key_resolver=Keys()).sign(request,key_id='fictional')
+   self.assertEqual(len(HTTPMessageVerifier(signature_algorithm=algorithm,key_resolver=Keys()).verify(request)),1)
 if __name__=='__main__':unittest.main(verbosity=2)

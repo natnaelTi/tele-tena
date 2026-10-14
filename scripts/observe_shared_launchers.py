@@ -40,7 +40,7 @@ for app in (bench/'sites/apps.txt').read_text().split():
     if isinstance(node,ast.Constant) and isinstance(node.value,str) and ('env/bin/bench' in node.value or re.search(r'(^|\s)bench\s+(--site|worker|schedule|execute|new-site|backup|migrate)',node.value)):
      command_references.append({'file':str(file.relative_to(bench/'apps')),'line':node.lineno})
     names=[alias.name for alias in node.names] if isinstance(node,ast.Import) else [node.module or ''] if isinstance(node,ast.ImportFrom) else []
-    if any(name.split('.')[0] in ('bench','frappe_bench') for name in names):imports.append(str(file.relative_to(bench/'apps')))
+    if any(name.split('.')[0] in ('bench','frappe_bench') for name in names) or (isinstance(node,ast.Constant) and isinstance(node.value,str) and re.match(r'^(bench|frappe_bench)\.',node.value.strip())):imports.append(str(file.relative_to(bench/'apps')))
 if imports or syntax:failures.append('Runtime Bench imports or unparsed Python source require review')
 shebang=external.read_text().splitlines()[0]
 if not shebang.startswith('#!/') or ' ' in shebang[2:]:raise SystemExit('FAIL: inspect external CLI interpreter manually')

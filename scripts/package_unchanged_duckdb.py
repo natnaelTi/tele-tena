@@ -11,7 +11,7 @@ with WheelFile(filename,'w') as wheel:
  for entry in d.files or []:
   rel=Path(str(entry));top=rel.parts[0]
   if rel.name.startswith('RECORD') or '__pycache__' in rel.parts:continue
-  if rel.is_absolute() or '..' in rel.parts or not (top=='duckdb' or top=='duckdb.libs' or top.startswith('_duckdb.') or top.startswith('duckdb-1.3.2.dist-info')):raise SystemExit('STOP: unexpected package path; no unrelated files copied')
+  if rel.is_absolute() or '..' in rel.parts or not (top in ('duckdb','duckdb.libs','duckdb-stubs','adbc_driver_duckdb') or top.startswith('_duckdb.') or top.startswith('duckdb-1.3.2.dist-info')):raise SystemExit('STOP: unexpected package path; no unrelated files copied')
   source=Path(d.locate_file(entry));assert source.is_file() and not source.is_symlink()
   wheel.write(source,str(rel))
 os.chmod(filename,0o600);digest=hashlib.sha256(filename.read_bytes()).hexdigest();manifest=a.destination/'SHA256SUMS';manifest.write_text(digest+'  '+filename.name+'\n');manifest.chmod(0o600)
