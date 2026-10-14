@@ -1,0 +1,14 @@
+{
+  "source": "20172f3356e239ffd801b71d8690dd712ee99b11",
+  "site": "teletena-mvp-presentation.localhost",
+  "real_backend": true,
+  "keyboard_detail_navigation": true,
+  "generated_slot_keyboard_selection_without_submission": true,
+  "audit_history_keyboard_expand_collapse": true,
+  "wallets_unchanged_during_journey": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ]
+}

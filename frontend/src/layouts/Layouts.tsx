@@ -1,10 +1,12 @@
+import {AccountMenu} from "../components/AccountMenu";
+import "./ProductShell.css";
+import { ClinicianNotifications } from "../components/ClinicianNotifications";
 import { Link, Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
   ClipboardCheck,
   Home,
-  LogOut,
   Search,
   Settings2,
   Stethoscope,
@@ -20,7 +22,6 @@ import { Button, Dialog, InlineNotice, Skeleton } from "../components/ui";
 import { LanguageSelect, useLocale } from "../hooks/useLocale";
 import { useSession } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
-import WorkspaceTour from "../components/WorkspaceTour";
 import { useResource } from "../hooks/useResource";
 import { ApiError } from "../api";
 export function DemoBar() {
@@ -43,15 +44,18 @@ export function TranslationNote() {
 
 export function MedicalLeadLayout(){
   const {session,refresh}=useSession();const {w}=useLocale();
+  const [busy,setBusy]=useState(false),[error,setError]=useState(false);
+  const signout=async()=>{setBusy(true);setError(false);try{await journeyApi.logout();await refresh();}catch{setError(true);}finally{setBusy(false);}};
   if(!session?.roles.includes('Tele Tena Medical Lead'))return <main className="container"><InlineNotice tone="danger">{w('You do not have access to clinical rubric governance.')}</InlineNotice></main>;
-  return <div className="workspace"><aside className="sidebar"><Brand/><div className="workspace-label">{w('Clinical standards')}</div><nav className="workspace-nav" aria-label={w('Clinical standards')}>
+  return <div className="workspace workspace-medical-lead"><aside className="sidebar"><Brand/><div className="workspace-label">{w('Clinical standards')}</div><nav className="workspace-nav" aria-label={w('Clinical standards')}>
     <NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>
     {session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}
-  </nav><div className="sidebar-bottom"><TranslationNote/><Button variant="quiet" onClick={()=>void journeyApi.logout().then(refresh).catch(()=>undefined)}><LogOut size={20}/>{w('Sign out')}</Button></div></aside>
-    <div className="workspace-body"><DemoBar/><header className="workspace-header"><span>{w('Clinical standards')}</span><LanguageSelect/></header><main className="workspace-main" id="main-content"><Outlet/></main></div></div>;
+  </nav><div className="sidebar-bottom"><TranslationNote/></div></aside>
+    <div className="workspace-body"><DemoBar/><header className="workspace-header"><span>{w('Clinical standards')}</span><LanguageSelect/><AccountMenu accountPath={session.roles.includes('Tele Tena Approver')?'/admin/account':'/admin/rubrics/account'} onSignout={()=>void signout()} busy={busy}/></header>{error&&<InlineNotice tone="danger">{w('We could not sign you out. Try again.')}</InlineNotice>}<nav className="workspace-mobile-nav" aria-label={w('Clinical standards')}><NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>{session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}</nav><main className="workspace-main" id="main-content"><Outlet/></main></div></div>;
 }
 
 function ClinicianRequestAvailability() {
+  const location = useLocation();
   const {w} = useLocale();
   const load = useCallback(() => journeyApi.requestPresence(), []);
   const presence = useResource<any>(load);
@@ -69,6 +73,7 @@ function ClinicianRequestAvailability() {
           ? "Could not update request availability. Review the setup items and try again."
           : null;
   const recordFailure = useCallback((error: unknown) => {
+    if (error instanceof ApiError && error.code === "no_immediate_capacity") {setFailure(null);void refresh();return;}
     if (error instanceof ApiError && error.code === "session_required") setFailure("session");
     else if (error instanceof ApiError && error.code === "permission_denied") setFailure("permission");
     else if (error instanceof TypeError) setFailure("network");
@@ -106,25 +111,28 @@ function ClinicianRequestAvailability() {
   const pausedMessage = data?.reasons?.includes("no_immediate_capacity")
     ? `${w("No full session can start within")} ${data.immediate_window_minutes || 30} ${w("minutes. Your published hours can still be used for scheduled requests.")}`
     : "Complete setup before receiving requests.";
-  return <section className="request-presence-shell" aria-label={w("Request availability")}>
-    <div><strong>{w(data?.ready ? "Available for requests" : "Requests paused")}</strong>
-      <span>{w(failureMessage || (data?.ready ? "Ready status expires if this session disconnects." : pausedMessage))}</span>
+  return <section hidden={location.pathname.includes("/consultations/")} className="request-presence-shell" aria-label={w("Request availability")}>
+    <details className="request-presence-details" open={failureMessage?true:undefined}><summary><strong>{w(failureMessage || (data?.ready ? "Available for requests" : "Requests paused"))}</strong>{!data?.ready&&!failureMessage&&!data?.configured&&<span>{w(data?.reasons?.includes("no_immediate_capacity")?"No immediate opening":"Setup needed")}</span>}</summary><div>
+      <span>{w(data?.ready ? "Ready status expires if this session disconnects." : pausedMessage)}</span>
       {data?.reasons?.includes("immediate_policy_required") && <span>{w("A reviewer must enable immediate requests for this service. Service-scope approval alone does not enable this. This does not guarantee a request or match.")}</span>}
       {!!data?.reasons?.length && <nav className="request-readiness-actions" aria-label={w("Setup needed")}>{data.reasons.filter((reason: string)=>reason!=="immediate_policy_required").map((reason: string) => {const item=guidance[reason];return item?<Link key={reason} to={item.to}>{w(item.label)}</Link>:<span key={reason}>{w("Complete setup before receiving requests.")}</span>;})}</nav>}
-    </div>
+    </div></details>
     <Button className="compact-button" variant={data?.ready ? "secondary" : "primary"} loading={busy} disabled={!data?.configured && !data?.ready} onClick={() => void toggle()}>{w(data?.ready ? "Pause" : "Go available")}</Button>
     {failureMessage && <InlineNotice tone="danger">{w(failureMessage)}</InlineNotice>}
   </section>;
 }
 export function PublicLayout() {
   const { w } = useLocale();
+  const location=useLocation();
+  const informationPage=["/how-it-works","/for-clinicians"].includes(location.pathname);
   return (
     <>
       <DemoBar />
-      <header className="public-header container">
+      <header className={`public-header reference-public-header ${informationPage?"reference-information-header":""}`}>
         <Brand />
         <nav aria-label="Main navigation">
-          <a href={(import.meta.env.PROD ? "/teletena/" : "/") + "#how-it-works"}>{w("How it works")}</a>
+          {!informationPage&&<Link to="/patient/discovery">{w("Find care")}</Link>}
+          <Link to="/how-it-works">{w("How it works")}</Link>
           <Link to="/for-clinicians">{w("For clinicians")}</Link>
           <LanguageSelect />
           <Link className="button secondary" to="/sign-in">
@@ -133,9 +141,9 @@ export function PublicLayout() {
         </nav>
       </header>
       <Outlet />
-      <footer className="public-footer container">
+      <footer className="public-footer reference-public-footer">
         <Brand />
-        <p>A little more space for you.</p>
+        <p>{w("Personal care, connected. Adults 18+ · Not an emergency service.")}</p>
         <Link to="/sign-in">{w("Find care")}</Link>
         <TranslationNote />
       </footer>
@@ -144,7 +152,7 @@ export function PublicLayout() {
 }
 export function AuthLayout() {
   return (
-    <>
+    <div className="auth-layout">
       <DemoBar />
       <header className="auth-header">
         <Brand />
@@ -156,7 +164,7 @@ export function AuthLayout() {
       <div className="auth-footer">
         <TranslationNote />
       </div>
-    </>
+    </div>
   );
 }
 export function RequireSession() {
@@ -179,20 +187,22 @@ export function RequireSession() {
         </InlineNotice>
       </main>
     );
-  return session ? <Outlet /> : <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname + location.search)}`} state={location.state} replace />;
+  return session ? <Outlet /> : <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname)}`} state={location.state} replace />;
 }
 const patientNav = [
   ["/patient", "Home", Home],
   ["/patient/discovery", "Find care", Search],
   ["/patient/appointments", "Appointments", CalendarDays],
+  ["/patient/requests", "My requests", ClipboardCheck],
   ["/patient/account", "Account", Settings2],
   ["/patient/clinic-access", "Clinic access", Building2],
-  ["/patient/relationships", "Shared care", HeartHandshake],
+  ["/patient/couples", "Shared care", HeartHandshake],
 ] as const;
 const clinicianNav = [
   ["/clinician", "Today", Home],
   ["/clinician/appointments", "Appointments", CalendarDays],
   ["/clinician/requests", "Requests", ClipboardCheck],
+  ["/clinician/offers", "Your offers", ClipboardCheck],
   ["/clinician/availability", "Availability", Clock3],
   ["/clinician/services", "Services & pricing", Stethoscope],
   ["/clinician/vetting", "Professional review", ClipboardCheck],
@@ -202,14 +212,23 @@ const clinicianNav = [
   ["/clinician/earnings", "Earnings", Wallet],
   ["/clinician/account", "Account", Settings2],
 ] as const;
+// Applicants can continue profile/review work, without approved-only workspace links.
+const applicantNav = [
+  ["/clinician", "Your application", Home],
+  ["/clinician/vetting", "Professional review", ClipboardCheck],
+  ["/clinician/account", "Account", Settings2],
+] as const;
 const adminNav = [
-  ["/admin", "Applications", ClipboardCheck],
+  ["/admin", "Overview", Home],
+  ["/admin/applications", "Applications", ClipboardCheck],
   ["/admin/scopes", "Service scopes", Stethoscope],
   ["/admin/services", "Service catalog", Stethoscope],
   ["/admin/vetting", "Scope vetting", ClipboardCheck],
   ["/admin/clinics", "Clinics", Building2],
   ["/admin/financial-disputes", "Financial disputes", Wallet],
+  ["/admin/matching", "Matching operations", Settings2],
   ["/admin/exceptions", "Exceptions", Settings2],
+  ["/admin/account", "Account", Settings2],
 ] as const;
 const clinicHomeNav = [["/clinic", "Clinic workspace", Building2]] as const;
 const clinicNav = [
@@ -221,15 +240,19 @@ export function WorkspaceLayout({
 }: {
   kind: "patient" | "clinician" | "admin" | "clinic";
 }) {
+  const location = useLocation();
   const { session, refresh } = useSession();
   const { w } = useLocale();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [signoutBusy,setSignoutBusy]=useState(false);
+  const [signoutError,setSignoutError]=useState("");
+  const signout=async()=>{if(signoutBusy)return;setSignoutBusy(true);setSignoutError("");try{await journeyApi.logout();await refresh();}catch{setSignoutError(w("We could not sign you out. Try again."));}finally{setSignoutBusy(false);}};
   const moreTrigger = useRef<HTMLButtonElement | null>(null);
   const roleItems =
     kind === "patient"
       ? patientNav
       : kind === "clinician"
-        ? clinicianNav
+        ? session?.roles.includes("Tele Tena Clinician") ? clinicianNav : applicantNav
         : kind === "clinic"
           ? session?.clinic_schedule_workspace ? clinicNav : clinicHomeNav
           : adminNav;
@@ -237,27 +260,36 @@ export function WorkspaceLayout({
     ? [...roleItems, ["/clinic", "Clinic workspace", Building2] as const]
     : roleItems;
   const mobilePrimaryRoutes = kind === "clinician"
-    ? ["/clinician", "/clinician/requests", "/clinician/availability"]
+    ? session?.roles.includes("Tele Tena Clinician")
+      ? ["/clinician", "/clinician/requests", "/clinician/availability"]
+      : ["/clinician", "/clinician/vetting", "/clinician/account"]
     : kind === "patient"
       ? ["/patient", "/patient/discovery", "/patient/appointments"]
       : kind === "admin"
-        ? ["/admin", "/admin/scopes", "/admin/exceptions"]
+        ? ["/admin", "/admin/applications"]
         : ["/clinic"];
   const mobilePrimary = items.filter(([to]) => mobilePrimaryRoutes.includes(to));
-  const mobileMore = items.filter(([to]) => !mobilePrimaryRoutes.includes(to));
+  const mobileMore = items.filter(([to]) => !mobilePrimaryRoutes.includes(to) && !to.endsWith("/account"));
   const tourTargets: Record<string, string> = {
     "/patient": "patient-home", "/patient/discovery": "patient-discovery",
     "/patient/appointments": "patient-appointments", "/patient/account": "patient-account",
     "/clinician": "clinician-today", "/clinician/availability": "clinician-availability",
     "/clinician/appointments": "clinician-appointments", "/clinician/care": "clinician-care",
-    "/admin": "reviewer-applications", "/admin/scopes": "reviewer-scopes",
+    "/clinician/account": "clinician-account", "/clinician/vetting": "clinician-professional-review",
+    "/admin": "reviewer-overview", "/admin/applications": "reviewer-applications", "/admin/scopes": "reviewer-scopes",
   };
   const renderNavLink = (item: (typeof items)[number], closeMore = false) => {
     const [to, label, Icon] = item;
-    return <NavLink key={to} to={to} end data-tour={tourTargets[to]} onClick={closeMore ? () => setMoreOpen(false) : undefined}>
+    return <NavLink key={to} to={to} end={to === "/"+kind} data-tour={tourTargets[to]} onClick={closeMore ? () => setMoreOpen(false) : undefined}>
       <Icon size={20} /><span>{w(label)}</span>
     </NavLink>;
   };
+  const groups = [
+    {name:kind === "admin"?"Applications & approval":"Care & appointments", items:mobileMore.filter(([to])=> /appointments|care$|requests$|offers$|couples$|applications|scopes$|vetting$/.test(to))},
+    {name:kind === "admin"?"Services & operations":"Practice & affiliations", items:mobileMore.filter(([to])=> /availability$|services$|affiliations$|clinics$|clinic-access$|matching$|exceptions$|clinic$|calendar$/.test(to))},
+    {name:"Payments",items:mobileMore.filter(([to])=> /payments$|earnings$|financial-disputes$/.test(to))},
+  ];
+  const groupedMore = <nav className="workspace-more-links" aria-label={w("Additional workspace links")}>{groups.filter(group=>group.items.length).map(group=><section key={group.name} className="workspace-more-group"><h3>{w(group.name)}</h3>{group.items.map(item=>renderNavLink(item,true))}</section>)}</nav>;
   if (kind === "admin" && !session?.roles.includes("Tele Tena Approver"))
     return (
       <main className="container">
@@ -276,8 +308,17 @@ export function WorkspaceLayout({
     );
   if (kind !== "admin" && kind !== "clinic" && session?.profile?.kind !== kind)
     return <Navigate to="/onboarding" replace />;
+  if (kind === "patient" || kind === "clinician") return <div className="reference-workspace">
+    <DemoBar />
+    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button>}</nav><div className="product-user">{kind==="clinician"&&session?.roles.includes("Tele Tena Clinician")&&<ClinicianNotifications/>}<LanguageSelect /><AccountMenu accountPath={'/'+kind+'/account'} onSignout={()=>void signout()} busy={signoutBusy}/></div></header>
+    {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
+    {kind === "clinician" && session?.roles.includes("Tele Tena Clinician") && <ClinicianRequestAvailability />}
+    <main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') ? 'workspace-wide' : ''}`} id="main-content"><Outlet /></main>
+    <nav className="product-mobile-nav" aria-label={w("Mobile workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} /><span>{w("More")}</span></Button>}</nav>
+    <Dialog open={moreOpen} onOpenChange={open => { setMoreOpen(open); if (!open) requestAnimationFrame(() => moreTrigger.current?.focus()); }} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer>{groupedMore}<TranslationNote /></Dialog>
+  </div>;
   return (
-    <div className="workspace">
+    <div className={`workspace workspace-${kind}`}>
       <aside className="sidebar">
         <Brand />
         <div className="workspace-label">
@@ -300,18 +341,6 @@ export function WorkspaceLayout({
         </nav>
         <div className="sidebar-bottom">
           <TranslationNote />
-          <Button
-            variant="quiet"
-            onClick={() =>
-              void journeyApi
-                .logout()
-                .then(refresh)
-                .catch(() => undefined)
-            }
-          >
-            <LogOut size={20} />
-            {w("Sign out")}
-          </Button>
         </div>
       </aside>
       <div className="workspace-body">
@@ -325,9 +354,11 @@ export function WorkspaceLayout({
                 : session?.profile?.display_name}
           </span>
           <LanguageSelect />
+          <AccountMenu accountPath={"/"+kind+"/account"} onSignout={()=>void signout()} busy={signoutBusy}/>
         </header>
-        {kind === "clinician" && session?.roles.includes("Tele Tena Clinician") && <ClinicianRequestAvailability />}
-        {kind !== "clinic" && <WorkspaceTour role={kind} />}
+
+        {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
+
         <main className="workspace-main" id="main-content">
           <Outlet />
         </main>
@@ -336,9 +367,7 @@ export function WorkspaceLayout({
         setMoreOpen(open);
         if (!open) window.requestAnimationFrame(() => moreTrigger.current?.focus());
       }} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer>
-        <nav className="workspace-more-links" aria-label={w("Additional workspace links")}>
-          {mobileMore.map((item) => renderNavLink(item, true))}
-        </nav>
+        {groupedMore}
       </Dialog>}
     </div>
   );

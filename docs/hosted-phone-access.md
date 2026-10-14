@@ -52,3 +52,29 @@ wrong/expired/consumed code rejection; phone/peer/site send limits; provider rej
 uncertain and accepted outcomes without duplicate sends; review password login,
 privacy permissions and booking regressions unchanged. Automated delivery is mocked;
 any live SMS is an operator-controlled, consenting-number test after private setup.
+
+## Rejected live-send diagnosis (12 October 2026)
+
+The local presentation site's two reported phone challenges were Rejected;
+its private configuration passed validation with KEY/raw. Earlier challenges
+from controlled automated transport are not live-delivery evidence. The original
+adapter discarded HTTP status, so the historical rejection cannot establish a
+specific provider cause. Do not switch authentication headers speculatively.
+
+Non-2xx sends now record only HTTP status and a coarse category in the site
+`logs/tele_tena_sms.log`: authentication (401/403), rate limit (429), provider
+service (5xx), or other request rejection. These categories are diagnostic clues,
+not proof of the provider's underlying reason (for example 403 can also reflect
+account/recipient restrictions). No response body, contact, OTP, credential or
+request headers are retained. Sending remains once per challenge; there is no
+automatic retry or header fallback. Five focused mocked unit checks passed;
+no live send was made by the agent. An operator-controlled attempt and provider
+account documentation/support are needed to resolve the actual rejection.
+
+Diagnostic correction: Frappe's production logger defaults to ERROR, so the
+first WARNING-level diagnostic was suppressed, including the operator's next
+rejected attempt. Diagnostics now use ERROR; six focused unit tests passed,
+including an actual Python logger with the production ERROR threshold. No
+HTTP status can be recovered for those earlier attempts, and no live SMS was
+sent by the agent. Account documentation/credit/recipient restrictions remain
+to be checked before another deliberate operator send.

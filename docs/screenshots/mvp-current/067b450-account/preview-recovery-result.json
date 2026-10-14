@@ -1,0 +1,11 @@
+{
+  "source": "067b450052d11c4ad3fcf83902ab8c5b8de389d4",
+  "site": "teletena-mvp-presentation.localhost",
+  "offline_fallback_recovery": true,
+  "existing_session_release_update": false,
+  "authenticated_deep_link_refresh": true,
+  "guest_private_denied": true,
+  "unrelated_role_denied": true,
+  "asset_hashes_verified": true,
+  "sensitive_cache_exclusion": true
+}

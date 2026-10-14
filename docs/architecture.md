@@ -10,6 +10,15 @@ Python3.14.2, Node24.13.0, MariaDB10.6.22 and Redis6.0.16. See
 differences. This does not authorize upgrading the retained development bench or
 changing shared remote dependencies.
 
+Profile v1.36 adds one nullable introduction column in versioned command storage;
+owner commands validate type/length and retain existing content when omitted.
+The patient-facing approved-profile projection exposes only explicit public
+content. Fresh bootstrap now invokes v1.34/v1.35/v1.36 routines; native migration
+preservation passed on the named local sites. Latest v1.36 fresh installation
+passed on11October on a disposable Frappe15/ERPNext15 site with temporary
+DB-administrator and site cleanup verified; this does not establish latest Frappe16
+workflow compatibility.
+
 React + TypeScript + Vite talks to a dedicated custom Frappe application. ERPNext
 provides accounting. Frappe RQ workers and scheduler handle jobs. No Django or Celery.
 MariaDB and framework versions must match the user's isolated WSL bench; do not upgrade
@@ -259,3 +268,9 @@ contact information, health history, request narrative, notes, and price. No
 schema migration is needed. This projection is not a clinic-owned calendar,
 resource scheduler, or booking authority; Care Coordination and Billing do not
 receive the schedule query.
+
+Profile-photo v1.38 uses one private command-storage blob table, outside Frappe
+File/public routes. Authenticated opaque download endpoints enforce owner access
+or explicit clinician publication plus current discovery eligibility. Raster
+re-encoding removes EXIF; no patient photo enters clinical/disclosure/call models.
+Existing sites awaiting migration retain session/discovery without photos.

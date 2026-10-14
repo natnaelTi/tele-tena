@@ -1,0 +1,29 @@
+{
+  "source": "c0d911d149c43926ce1494b4e582d29c8e37eea4",
+  "site": "tele-tena-pr12-fresh.localhost",
+  "real_backend": true,
+  "test_transport_only": true,
+  "wrong_expired_code": false,
+  "resend_cooldown": false,
+  "patient_recovery": true,
+  "returning_same_account": false,
+  "clinician_intent_manual_approval": true,
+  "structured_scope_draft_submission": true,
+  "initial_review_panels": true,
+  "isolated_test_budget": 100,
+  "viewports": [
+    390,
+    768,
+    1440
+  ],
+  "screens": [
+    "A05",
+    "B01",
+    "B02",
+    "B03",
+    "B05",
+    "B06",
+    "B07",
+    "B10"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "site": "teletena-mvp-presentation.localhost",
+  "read_only": true,
+  "patient_owners_checked": 3,
+  "clinician_owners_checked": 1,
+  "accounts_checked": 6,
+  "patient_projection_mismatches": 0,
+  "clinician_obligation_mismatches": 0,
+  "account_journal_mismatches": 0,
+  "unbalanced_journals": 0
+}

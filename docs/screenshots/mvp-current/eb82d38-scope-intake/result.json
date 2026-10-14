@@ -1,0 +1,25 @@
+{
+  "source": "eb82d388029e2116f46cccf251382fde4f5b988b",
+  "site": "teletena-mvp-presentation.localhost",
+  "real_backend": true,
+  "read_only": true,
+  "scope_selection": true,
+  "private_professional_fields": true,
+  "medical_lead_controls": true,
+  "catalog_search_deep_link_reload": true,
+  "unknown_definition_recovery": true,
+  "no_applications_or_definitions_changed": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ],
+  "reference_ids": [
+    "B07",
+    "B09",
+    "B10",
+    "I07",
+    "I08"
+  ],
+  "visual_comparison_requires_inspection": true
+}

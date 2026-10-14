@@ -1,3 +1,21 @@
+## Current MVP intake correction —12October2026
+
+Structured draft definitions are available in initial and per-scope application
+selection. They remain non-bookable. `/admin/services` supports a separate,
+audited Medical Lead definition decision after required professional, credential,
+consent, jurisdiction, duration and workflow requirements are complete. The reviewer
+must also hold Approver permissions. Generic writes cannot grant this approval or
+alter approved definition metadata. This supersedes older statements below that no
+clinical-definition decision UI exists; it does not approve the proposed taxonomy.
+
+Supported adult individual and jointly consented couple workflows can be reviewed;
+family/group, diagnostics and other deferred workflows cannot be activated by this
+command. Existing Legacy test definitions, offerings, scope decisions and appointment
+snapshots are preserved. No broad catalog rename, migration activation or scope grant
+occurs. The ten sourced definitions still need medical-lead input for their missing
+local requirements. New optional private scope fields use v1.37; repeat migration
+reloads nullable native fields and does not transform application decisions/data.
+
 # Service catalog and data dictionary (draft for clinical review)
 
 Status: structurally implemented in this branch; all newly curated definitions remain non-bookable drafts until the medical lead approves terminology, eligibility, professional-category requirements, jurisdiction rules, and workflow capability. This catalog is a starting set, not an exhaustive clinical taxonomy. Patient support topics are not diagnoses.

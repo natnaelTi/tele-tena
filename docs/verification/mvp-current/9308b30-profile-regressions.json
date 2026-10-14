@@ -1,0 +1,16 @@
+{
+  "source": "9308b303ca5a7c243eed84aa063960dd76f8c69d",
+  "site": "tele-tena-pr12-fresh.localhost",
+  "real_database": true,
+  "tests_passed": 4,
+  "duration_seconds": 9.029,
+  "tests": [
+    "owner public introduction / validation / private-field omission / pending and guest denial",
+    "pending applicant own existing profile only; no role/scope grant",
+    "original successful booking retry precedes mutable profile validation",
+    "request overrides never mutate global defaults"
+  ],
+  "http_fixture_site_matches_database": true,
+  "temporary_server_stopped": true,
+  "backend_api_unchanged_since": "467f755aab0bee51603cde1747ebccb5253e348a"
+}

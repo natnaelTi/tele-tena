@@ -1,0 +1,19 @@
+{
+  "source": "067b450052d11c4ad3fcf83902ab8c5b8de389d4",
+  "site": "teletena-mvp-presentation.localhost",
+  "widths": [
+    390,
+    768,
+    1440
+  ],
+  "roles": [
+    "patient",
+    "clinician"
+  ],
+  "site_capabilities_truthful": true,
+  "stable_private_field_label": true,
+  "draft_navigation_preserved": true,
+  "profile_and_money_unchanged": true,
+  "english_only": true,
+  "zoom_200_verified": false
+}

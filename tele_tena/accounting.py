@@ -373,11 +373,22 @@ def open_disputes():
         WHERE d.status='Open' AND e.state='Disputed' ORDER BY d.opened_at LIMIT 100''', as_dict=True)
 
 
-def release_eligible_earnings():
+def release_eligible_earnings(appointments=None):
     """Retry-safe simulated release; no banking or ERPNext provider is invoked."""
+    filters = ''
+    values = ()
+    if appointments is not None:
+        # Explicit local demo/operations invocation can target its own records.
+        # Scheduled execution retains the existing bounded all-eligible scan.
+        if getattr(frappe.local, 'request', None) or frappe.session.user != 'Administrator':
+            frappe.throw('Local administrator required', frappe.PermissionError)
+        if not isinstance(appointments, list) or not 1 <= len(appointments) <= 100:
+            raise ValueError('Supply a bounded appointment list')
+        filters = ' AND appointment IN %s'
+        values = (tuple(appointments),)
     candidates = frappe.db.sql("""SELECT appointment FROM tt_earning
-        WHERE state='Pending' AND release_at<=UTC_TIMESTAMP(6) ORDER BY release_at LIMIT 100""",
-        as_dict=True)
+        WHERE state='Pending' AND release_at<=UTC_TIMESTAMP(6)""" + filters +
+        ' ORDER BY release_at LIMIT 100', values, as_dict=True)
     for candidate in candidates:
         frappe.db.sql('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
         rows = frappe.db.sql('SELECT * FROM tt_earning WHERE appointment=%s FOR UPDATE',

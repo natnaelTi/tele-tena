@@ -1,4 +1,4 @@
-// Independent Chromium contexts against a disposable local LiveKit server.
+// Independent Chromium contexts; endpoint comes from the explicitly configured fixture site.
 // Fake audio/video devices are used; this is not human/device validation.
 const { chromium } = require('playwright')
 const fs = require('node:fs')
@@ -24,7 +24,7 @@ async function main() {
     checkpoint = 'sign in through explicit password alternative'
     await page.goto(base + '/sign-in')
     checkpoint = 'wait for configured sign-in form'
-    await page.locator('.auth-panel button[type="submit"]:not([disabled])').waitFor()
+    await page.getByRole('button', { name: /Use email instead|Use password instead|Sign in/, exact: true }).first().waitFor()
     const emailChoice = page.getByRole('button', { name: 'Use email instead', exact: true })
     checkpoint = 'choose email sign-in'
     if (await emailChoice.count()) await emailChoice.click()
@@ -52,7 +52,7 @@ async function main() {
     for(const width of widths){await page.setViewportSize({width,height:960});await page.evaluate(()=>document.fonts.ready);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,`${name} overflows at ${width}`);await page.screenshot({path:`/tmp/tele-tena-presentation-review/${name}-${width}.png`,fullPage:true})}
   }
   async function prepareAndJoin(page) {
-    await call(page).getByRole('button', { name: 'Check microphone and camera' }).click()
+    await call(page).getByRole('button', { name: /^Check microphone(?: and camera)?$/ }).click()
     let joinResponses = 0
     page.on('response', response => { if (response.url().includes('tele_tena.api.consultations.join')) joinResponses++ })
     const button = call(page).getByRole('button', { name: 'Join consultation' })
@@ -72,7 +72,7 @@ async function main() {
   }
   async function failPublicationAndCheckCleanup(page) {
     checkpoint = 'publication recovery preflight'
-    await call(page).getByRole('button', { name: 'Check microphone and camera' }).click()
+    await call(page).getByRole('button', { name: /^Check microphone(?: and camera)?$/ }).click()
     await call(page).getByRole('status').filter({ hasText: 'Devices checked' }).waitFor()
     await call(page).locator('.call-video').evaluate(video => { window.__testFailedPreview = video.srcObject })
     await page.evaluate(() => {
@@ -101,7 +101,7 @@ async function main() {
     })
   }
   async function failConnectionAndCheckCleanup(page) {
-    await call(page).getByRole('button', { name: 'Check microphone and camera' }).click()
+    await call(page).getByRole('button', { name: /^Check microphone(?: and camera)?$/ }).click()
     await call(page).getByRole('status').filter({ hasText: 'Devices checked' }).waitFor()
     await call(page).locator('.call-video').evaluate(video => { video.__testConnectionPreview = video.srcObject })
     await page.route('**/api/method/tele_tena.api.consultations.join', async route => {
@@ -118,7 +118,7 @@ async function main() {
   }
   async function doubleJoinAndUnmountBeforeToken(page) {
     checkpoint='duplicate join preflight check'
-    await call(page).getByRole('button', { name: 'Check microphone and camera' }).click()
+    await call(page).getByRole('button', { name: /^Check microphone(?: and camera)?$/ }).click()
     checkpoint='duplicate join media preview ready'
     await call(page).getByRole('status').filter({ hasText: 'Devices checked' }).waitFor()
     await call(page).locator('.call-video').evaluate(video => { window.__lateJoinPreview = video.srcObject })
@@ -170,8 +170,33 @@ async function main() {
     if (process.env.TELE_TENA_MEDIA_PHASE === 'end') {
       await prepareAndJoin(patient)
       await prepareAndJoin(clinician)
+      async function desktopFit(page, name) {
+        for (const size of [{width:1440,height:960},{width:1024,height:768}]) {
+          await page.setViewportSize(size)
+          const fit=await page.locator('.focused-call').evaluate(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,bottom:r.bottom,view:innerHeight,width:innerWidth,pageHeight:document.documentElement.scrollHeight,bodyHeight:document.body.scrollHeight};})
+          assert.ok(Math.abs(fit.left)<1&&Math.abs(fit.right-fit.width)<1,'Connected room must span desktop width')
+          assert.ok(Math.abs(fit.bottom-fit.view)<1,'Connected room must reach viewport bottom')
+          assert.ok(fit.pageHeight<=fit.view+1&&fit.bodyHeight<=fit.view+1,'Desktop call must not scroll the page')
+          const details=await call(page).locator('.room-session-details').evaluate(el=>{const r=el.getBoundingClientRect();return {visible:r.width>0&&r.height>0,left:r.left,scroll:el.scrollHeight,height:el.clientHeight};})
+          const stage=await call(page).locator('.media-stage').boundingBox()
+          assert.ok(details.visible&&stage&&details.left>=stage.x+stage.width,'Media left and consultation details right must remain visible')
+          assert.ok(details.scroll<=details.height+1,'Default desktop consultation details must fit without scrolling: '+JSON.stringify(details))
+          console.log('Viewport PASS:',name,size.width,JSON.stringify(fit))
+          const leave=await call(page).getByRole('button',{name:'Leave',exact:true}).boundingBox()
+          assert.ok(leave&&leave.y+leave.height<=size.height,'Leave must remain visible')
+          await page.screenshot({path:`/tmp/tele-tena-presentation-review/${name}-${size.width}.png`,fullPage:true})
+        }
+      }
+      checkpoint='desktop video viewport and accessible controls'
+      await desktopFit(patient,'video-call-patient');await desktopFit(clinician,'video-call-clinician')
+      checkpoint='desktop audio-only viewport'
+      await call(patient).getByRole('button',{name:'Audio only',exact:true}).click()
+      await call(patient).locator('.reference-audio-stage').waitFor()
+      await desktopFit(patient,'audio-only-patient')
+      checkpoint='patient leaves audio mode and rejoins'
       await call(patient).getByRole('button', { name: /Leave/ }).click()
       await call(patient).getByRole('status').filter({ hasText: 'You left the consultation' }).waitFor()
+      await call(patient).getByRole('checkbox',{name:'Audio only (microphone; no camera)',exact:true}).uncheck()
       await prepareAndJoin(patient)
       const endButton = call(clinician).getByRole('button', { name: 'End for everyone' })
       try { await endButton.waitFor({ timeout: 10000 }) }
@@ -207,7 +232,7 @@ async function main() {
     await clinicianCard().waitFor()
     checkpoint = 'patient joins'
     checkpoint = 'patient preflight button'
-    try { await call(patient).getByRole('button', { name: 'Check microphone and camera' }).click() }
+    try { await call(patient).getByRole('button', { name: /^Check microphone(?: and camera)?$/ }).click() }
     catch {
       diagnostic = await call(patient).evaluate(node => JSON.stringify({
         statusText: [...node.querySelectorAll('[role=status]')].map(item => item.innerText),
@@ -247,6 +272,14 @@ async function main() {
     for (const page of [patient, clinician]) {
       for (const width of [320, 390, 768, 1440]) {
         await page.setViewportSize({ width, height: 960 })
+        if(width>800){
+          const fit=await page.locator('.focused-call').evaluate(el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,bottom:r.bottom,view:innerHeight,width:innerWidth,pageHeight:document.documentElement.scrollHeight,bodyHeight:document.body.scrollHeight};});
+          assert.ok(Math.abs(fit.left)<1&&Math.abs(fit.right-fit.width)<1,'Connected room must span desktop width');
+          assert.ok(Math.abs(fit.bottom-fit.view)<1,'Connected room must reach viewport bottom');
+          assert.ok(fit.pageHeight<=fit.view+1&&fit.bodyHeight<=fit.view+1,'Desktop call must not scroll the page');
+          const leave=await call(page).getByRole('button',{name:'Leave',exact:true}).boundingBox();assert.ok(leave&&leave.y+leave.height<=960,'Leave must remain visible');
+        }
+
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false)
         await page.screenshot({ path: `/tmp/tele-tena-presentation-review/video-call-${width}-${page === patient ? 'patient' : 'clinician'}.png`, fullPage: true })
       }
@@ -269,7 +302,7 @@ async function main() {
     for (const page of [patient, clinician]) assert.match(await call(page).getByRole('status').innerText(), /Connected/)
     checkpoint = 'audio-only presentation derives from existing audio track'
     await call(patient).getByRole('button', {name: 'Audio only', exact: true}).click()
-    await call(patient).locator('.audio-participant').waitFor()
+    await call(patient).locator('.reference-audio-stage').waitFor()
     for(const width of [320,390,768,1440]){await patient.setViewportSize({width,height:960});assert.equal(await patient.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await patient.screenshot({path:`/tmp/tele-tena-presentation-review/audio-only-${width}.png`,fullPage:true})}
     await call(patient).getByRole('button', {name: 'Turn video on', exact: true}).click()
     await call(patient).getByRole('button', {name: 'Check microphone and camera', exact: true}).click()

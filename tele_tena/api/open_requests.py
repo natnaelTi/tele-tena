@@ -1,6 +1,7 @@
 """Private, bounded open-request delivery and patient-only offer acceptance."""
 import hashlib
 import json
+import re
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -445,7 +446,7 @@ def clinician_profile(clinician_id):
     actor('Tele Tena Patient')
     if not isinstance(clinician_id, str) or len(clinician_id) != 36:
         fail('Clinician profile unavailable', 'clinician_profile_unavailable')
-    clinician = rows('''SELECT p.user,p.display_name FROM tt_profile p
+    clinician = rows('''SELECT p.user,p.display_name,p.introduction FROM tt_profile p
         JOIN tt_application a ON a.user=p.user AND a.status='Approved'
         JOIN `tabHas Role` r ON r.parent=p.user AND r.role='Tele Tena Clinician'
         JOIN tabUser u ON u.name=p.user AND u.enabled=1
@@ -453,13 +454,17 @@ def clinician_profile(clinician_id):
     if not clinician:
         fail('Clinician profile unavailable', 'clinician_profile_unavailable')
     clinician = clinician[0]
-    services = rows('''SELECT o.id offering,s.service_label label,o.price,o.minutes,schedule.consultation_format,
+    services = rows('''SELECT o.id offering,o.service,COALESCE(NULLIF(o.title,''),s.service_label) label,
+        o.description,s.service_label service_category,o.price,o.minutes,schedule.consultation_format,
         schedule.timezone FROM tt_offering o
         JOIN `tabTele Tena Service Scope` scope ON scope.clinician=o.clinician
             AND scope.service=o.service AND scope.status='Approved'
         JOIN `tabTele Tena Service` s ON s.name=o.service AND s.active=1
         JOIN tt_schedule schedule ON schedule.offering=o.id AND schedule.status='Published'
         WHERE o.clinician=%s AND o.active=1 ORDER BY s.service_label''', (clinician.user,))
+    services = [item for item in services if journey.service_scope_is_current(clinician.user, item.service)]
+    for item in services:
+        item.pop('service', None)
     from tele_tena.trust_metrics import (
         summarize_clinician_cancellations,
         summarize_response_behavior,
@@ -487,7 +492,8 @@ def clinician_profile(clinician_id):
             OR (a.state='Cancelled' AND a.cancelled_by=%s
                 AND a.cancelled_at>=UTC_TIMESTAMP(6)-INTERVAL 365 DAY))''',
         (clinician.user, clinician.user, clinician.user))
-    return {'display_name': clinician.display_name, 'services': services,
+    from tele_tena.api.profile_photos import public_photo
+    return {'photo_url': public_photo(clinician.user), 'display_name': clinician.display_name, 'introduction': clinician.introduction or '', 'services': services,
             'approval_meaning': 'Application and listed service scopes are manually approved.',
             'trust_indicators': {
                 'credential_status': 'Manually reviewed application and listed scopes',
@@ -536,6 +542,14 @@ def clinician_requests():
             if not immediate_service_enabled(service):
                 continue
         req.disclosure_snapshot = json.loads(req.disclosure_snapshot)
+        # Offering titles are clinician-owned copy, not authorization keys.
+        # Return only this clinician's currently published offerings within
+        # the exact request scope/format; submission still revalidates the slot.
+        req.eligible_offering_ids = [item.id for item in rows('''
+            SELECT o.id FROM tt_offering o JOIN tt_schedule schedule ON schedule.offering=o.id
+            WHERE o.clinician=%s AND o.service=%s AND o.active=1
+                AND schedule.status='Published' AND schedule.consultation_format=%s
+            ORDER BY o.id''', (clinician, req._routing_service, req.consultation_format))]
         req.suggested_start = None
         if req.urgency == 'immediate':
             offerings = rows('''SELECT o.id FROM tt_offering o
@@ -569,7 +583,7 @@ def clinician_requests():
 
 
 @query()
-def clinician_offers(page=0):
+def clinician_offers(page=0, view=None, offer_id=None):
     """Own quotes and outcomes, including closed requests, with bounded paging.
 
     No request narrative, patient account identity, competitor quote, or new
@@ -580,20 +594,33 @@ def clinician_offers(page=0):
     clinician = actor('Tele Tena Clinician')
     profile('clinician')
     page_number = integer(page, 0, 10000)
+    if view not in (None, 'Active', 'History'):
+        fail('Choose an offer view.', 'request_offer_view_invalid')
+    active_condition = "(o.state='Active' AND r.state='Open' AND o.valid_until>UTC_TIMESTAMP(6) AND r.expires_at>UTC_TIMESTAMP(6))"
+    view_filter = '' if view is None else ' AND ' + (active_condition if view == 'Active' else 'NOT ' + active_condition)
+    if offer_id is not None and (not isinstance(offer_id, str) or not re.fullmatch(r'[a-f0-9-]{36}', offer_id)):
+        fail('Offer unavailable.', 'request_offer_unavailable')
+    own_filter = ' AND o.id=%s' if offer_id else ''
+    parameters = (clinician, clinician) + ((offer_id,) if offer_id else ()) + (page_number * 50,)
     offers = rows('''SELECT o.id,o.start,o.duration_minutes,o.consultation_format,
         o.price_minor,o.price_source,o.state,o.valid_until,o.created_at,o.timezone,
-        r.state AS request_state,r.disclosure_snapshot,s.service_label AS category,
+        r.state AS request_state,r.expires_at AS request_expires_at,r.disclosure_snapshot,s.service_label AS category,
         a.id AS appointment
         FROM tt_request_offer o JOIN tt_open_request r ON r.id=o.request_id
         JOIN tt_offering off ON off.id=o.offering
         JOIN `tabTele Tena Service` s ON s.name=off.service
         LEFT JOIN tt_appointment a ON a.id=o.appointment AND a.clinician=%s
-        WHERE o.clinician=%s ORDER BY o.created_at DESC,o.id DESC
-        LIMIT 51 OFFSET %s''', (clinician, clinician, page_number * 50))
+        WHERE o.clinician=%s''' + view_filter + own_filter + ''' ORDER BY o.created_at DESC,o.id DESC
+        LIMIT 51 OFFSET %s''', parameters)
+    if offer_id and not offers:
+        fail('Offer unavailable.', 'request_offer_unavailable')
     has_more = len(offers) > 50
     result = []
     current_time = now()
     for offer in offers[:50]:
+        if offer.request_state == "Open" and offer.request_expires_at <= current_time:
+            offer.request_state = "Expired"
+        del offer["request_expires_at"]
         offer.state = effective_offer_state(offer.state, offer.request_state,
                                              offer.valid_until, current_time)
         offer.patient_label = offer_patient_label(json.loads(offer.disclosure_snapshot))
@@ -822,6 +849,45 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
     return {'state': 'Matched', 'appointment': appt, 'simulated': True}
 
 
+@query()
+def clinician_notifications():
+    """Persisted offer outcomes; no patient identity or clinical notification body."""
+    clinician = actor('Tele Tena Clinician')
+    profile('clinician')
+    pref = rows('SELECT notification_preferences FROM tt_preferences WHERE user=%s', (clinician,))
+    settings = json.loads(pref[0].notification_preferences or '{}') if pref else {}
+    seen = set(settings.get('accepted_offer_seen', []))
+    found = rows("""SELECT o.id,a.id appointment,r.matched_at accepted_at
+        FROM tt_request_offer o JOIN tt_open_request r ON r.id=o.request_id
+        JOIN tt_appointment a ON a.id=o.appointment AND a.clinician=o.clinician
+        WHERE o.clinician=%s AND o.state='Accepted' AND r.state='Matched'
+        ORDER BY r.matched_at DESC,o.id DESC LIMIT 50""", (clinician,))
+    for item in found:
+        item.read = item.id in seen
+        item.accepted_at = item.accepted_at.isoformat()+'Z' if item.accepted_at else None
+    return {'items': found}
+
+
+@journey.command
+def read_clinician_notification(offer_id):
+    clinician = actor('Tele Tena Clinician')
+    one('SELECT name FROM tabUser WHERE name=%s FOR UPDATE', (clinician,))
+    found = rows("""SELECT o.id FROM tt_request_offer o JOIN tt_appointment a
+        ON a.id=o.appointment AND a.clinician=o.clinician
+        WHERE o.id=%s AND o.clinician=%s AND o.state='Accepted'""", (offer_id, clinician))
+    if not found:
+        fail('Notification unavailable.', 'notification_unavailable')
+    pref = rows('SELECT notification_preferences FROM tt_preferences WHERE user=%s', (clinician,))
+    settings = json.loads(pref[0].notification_preferences or '{}') if pref else {}
+    seen = settings.get('accepted_offer_seen', [])
+    settings['accepted_offer_seen'] = ([offer_id] + [item for item in seen if item != offer_id])[:100]
+    frappe.db.sql("""INSERT INTO tt_preferences (user,locale,notification_preferences,modified)
+        VALUES (%s,'en',%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
+        notification_preferences=VALUES(notification_preferences),modified=VALUES(modified)""",
+        (clinician, json.dumps(settings)))
+    return {'read': True}
+
+
 @journey.command
 def close_request(request_id, reason='cancelled'):
     patient = actor('Tele Tena Patient')
@@ -918,9 +984,11 @@ def request_metrics():
     immediate = [req for req in requests if req.urgency == 'immediate']
     first_offer, confirmed, both_joined = [], [], []
     counts = {'matched': 0, 'unmatched': 0, 'expired': 0, 'cancelled': 0, 'open': 0,
-              'failed_acceptance': 0, 'matched_under_3_minutes': 0, 'eligible_supply_total': 0}
+              'failed_acceptance': 0, 'matched_under_3_minutes': 0, 'eligible_supply_total': 0, 'no_eligible_supply': 0}
     for req in immediate:
         supply = rows("SELECT eligible_supply FROM tt_request_metric WHERE request_id=%s AND event='Published' LIMIT 1", (req.id,))
+        if supply and supply[0].eligible_supply is not None and int(supply[0].eligible_supply) == 0:
+            counts['no_eligible_supply'] += 1
         counts['eligible_supply_total'] += int(supply[0].eligible_supply or 0) if supply else 0
         metrics = rows('SELECT event,occurred_at FROM tt_request_metric WHERE request_id=%s', (req.id,))
         events = {item.event: item.occurred_at for item in metrics}
@@ -1007,3 +1075,42 @@ def livekit_webhook():
         # record the untrusted body, signature, aliases or exception text.
         frappe.local.response['http_status_code'] = 401
         return {'received': False}
+
+
+@query()
+def matching_operations(state='', page=1, page_size=20):
+    """Logistics-only reviewer projection; never select narrative or identity.
+
+    Enqueue and inbox fetch are observable transport events, not proof that a
+    clinician read a request. Quote prices and encounter records are excluded.
+    """
+    actor('Tele Tena Approver')
+    page, page_size = integer(page, 1, 100000), integer(page_size, 5, 50)
+    if state not in ('', 'Open', 'Matched', 'Cancelled', 'Expired'):
+        fail('Choose a supported request status')
+    where = 'r.published_at>=UTC_TIMESTAMP(6)-INTERVAL 90 DAY'
+    values = []
+    if state:
+        where += ' AND r.state=%s'
+        values.append(state)
+    total = int(one('SELECT COUNT(*) n FROM tt_open_request r WHERE ' + where, tuple(values)).n)
+    requests = rows('''SELECT r.id,r.state,r.urgency,r.published_at,r.current_wave,
+        (SELECT m.eligible_supply FROM tt_request_metric m
+         WHERE m.request_id=r.id AND m.event='Published' ORDER BY m.occurred_at LIMIT 1) eligible_supply,
+        (SELECT COUNT(*) FROM tt_request_recipient rr WHERE rr.request_id=r.id AND rr.enqueued_at IS NOT NULL) enqueued,
+        (SELECT COUNT(*) FROM tt_request_recipient rr WHERE rr.request_id=r.id AND rr.inbox_fetched_at IS NOT NULL) fetched,
+        (SELECT COUNT(*) FROM tt_request_offer o WHERE o.request_id=r.id) offers
+        FROM tt_open_request r WHERE ''' + where + ' ORDER BY r.published_at DESC,r.id LIMIT %s OFFSET %s',
+        (*values,page_size,(page-1)*page_size))
+    items = []
+    for req in requests:
+        reasons = rows('''SELECT event,reason_code,COUNT(*) occurrences,MAX(created_at) last_at
+            FROM tt_request_route_log WHERE request_id=%s
+            GROUP BY event,reason_code ORDER BY last_at DESC LIMIT 30''', (req.id,))
+        items.append({'reference':req.id[:8], 'state':req.state, 'urgency':req.urgency,
+                      'published_at':req.published_at.isoformat()+'Z', 'wave':int(req.current_wave),
+                      'eligible_supply':req.eligible_supply, 'enqueued':int(req.enqueued),
+                      'inbox_fetched':int(req.fetched), 'offers':int(req.offers),
+                      'routing_events':[{'event':r.event, 'reason_code':r.reason_code,
+                                         'occurrences':int(r.occurrences), 'at':r.last_at.isoformat()+'Z'} for r in reasons]})
+    return {'items':items,'page':page,'page_size':page_size,'total':total,'metrics':request_metrics()}

@@ -1,6 +1,58 @@
 # TeleTena operational progress export
 
-## Current verification delta — 2026-10-08
+## Latest accepted-offer / room delta —12October2026
+
+Package42cb041 at the stable8017 presentation preview. Cross-page clinician
+accepted-offer popup/inbox and private persisted read receipts passed a two-session
+real-backend browser. No-immediate-capacity is a paused readiness condition, not a
+setup failure. Desktop video/audio viewport work uses existing media/auth/End core.
+See active `mvp-journey-verification-2026-10-09.md`; full MVP/owner acceptance remains
+open, including the previously reported reviewed-catalog application gate.
+No merge, migration, reseed or remote deployment.
+
+
+## Latest request-outcome delta —12October2026
+
+Current package6ec7d09 on the stable8017 presentation site. Matched requests
+show recorded outcomes and appointment handoff; read-only persisted browser passes
+reload, accepted-offer detail and unknown-ID isolation with unchanged records/wallet.
+Closed state has no exact active-matching reference; full visual acceptance remains open.
+
+## Latest matching/profile delta —12October2026
+
+C03 matching results/refinement and compact mobile toolbar now use real backend data.
+C04 exact selected public offering survives profile reload and calendar handoff.
+Paired English390/768/1440 inspected; wallet/profile unchanged. Current package1774968.
+Initial structured onboarding38ac535 passes persisted recovery/private fields/Pending.
+Whole-MVP visual/state and owner acceptance remain open; no merge or remote change.
+
+## Latest application/review delta —12October2026
+
+Initial clinician profile/qualification/language fields now persist privately
+and resume; private IDs never enter the approved public profile projection.
+Dedicated opaque application-review page follows I03main/actions composition.
+Real registration and read-only reviewer browser passes, paired layouts, actual
+reviewer200%zoom and provisional language checks recorded in the single matrix.
+No auto approval, provider delivery, all-MVP acceptance, merge or remote deployment.
+
+
+## Current MVP release priority — 2026-10-08
+
+The user bounded this handover to the agreed MVP and its redesign. Preserve the entire 142-screen reference, but use `mvp-release-scope.md` and `mvp-screen-acceptance.json` for release acceptance. Two-adult couples consultations are required; full clinic/lab/subscription/second-opinion/tourism expansion and no-show adjudication are deferred. The current release is not ready. Prior entries below are historical checkpoint evidence, not current-release completion claims.
+
+## Current local MVP delta — 2026-10-11
+
+Draft PR44 retains PR43 ancestry; packaged1774968 on
+teletena-mvp-presentation.localhost at http://127.0.0.1:8017/teletena/.
+Named profile/permission/navigation defects fixed; selected offering persists
+through discovery/profile/reload/calendar/disclosure. Real DB4/4 and additive
+repeat migrations preserve existing records. Profile paired/reference, narrow
+language and actual200% zoom evidence is recorded. Whole-MVP visual/state,
+owner acceptance remain open. Freshv1.36 installation and scoped cleanup passed on11October. Live delivery, physical devices,
+clinical/native review and real-money activation are external gates. No merge or
+remote deployment. See mvp-screen-acceptance.json and the active journey report.
+
+## Historical verification delta — 2026-10-08
 
 - Draft PR #42 (`feat/clinic-shared-calendar`) is stacked on PR #41 → PR #40;
   all PR #42 checks passed. No merge or deployment occurred.

@@ -25,12 +25,15 @@ def _event(appointment, event_type, event_actor=None, reason=None):
 
 def _authorized(appointment, lock=False):
     user = actor()
-    item = rows('''SELECT * FROM tt_appointment WHERE id=%s AND (patient=%s OR clinician=%s)''',
-                (appointment, user, user))
+    item = rows('''SELECT * FROM tt_appointment WHERE id=%s AND (patient=%s OR clinician=%s OR EXISTS (SELECT 1 FROM tt_couple_plan cp JOIN tt_couple_participant p ON p.plan=cp.id WHERE cp.appointment=tt_appointment.id AND p.user=%s AND p.state='Consented'))''',
+                (appointment, user, user, user))
     if not item:
         frappe.throw('Appointment unavailable', frappe.PermissionError)
     item = item[0]
-    if user == item.patient:
+    if user != item.clinician:
+        from tele_tena.api.couples import plan_for, participant
+        if plan_for(item.id):
+            participant(item.id,user)
         if 'Tele Tena Patient' not in frappe.get_roles(user):
             frappe.throw('Appointment unavailable', frappe.PermissionError)
         role = 'patient'
@@ -39,8 +42,10 @@ def _authorized(appointment, lock=False):
             frappe.throw('Appointment unavailable', frappe.PermissionError)
         role = 'clinician'
     if lock:
-        item = one('''SELECT * FROM tt_appointment WHERE id=%s
-            AND (patient=%s OR clinician=%s) FOR UPDATE''', (appointment, user, user))
+        item = one('SELECT * FROM tt_appointment WHERE id=%s FOR UPDATE', (appointment,))
+        if role == 'patient':
+            from tele_tena.api.couples import participant
+            participant(item.id, user)
     return item, user, role
 
 
@@ -137,6 +142,9 @@ def _reschedule_expiry():
 
 
 def _can_change_time(item):
+    from tele_tena.api.couples import plan_for, ready
+    if plan_for(item.id) and not ready(item.id):
+        return False
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     return (item.state == 'Booked' and item.start > now and
             not rows('SELECT appointment FROM tt_consultation WHERE appointment=%s', (item.id,)) and
@@ -187,6 +195,9 @@ def propose_reschedule(appointment, start, retry_key):
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Pending',%s,%s)''',
         (proposal_id, item.id, user, start, start + timedelta(minutes=int(item.minutes)),
          schedule.timezone if schedule else item.timezone, key, payload_hash, now, expires))
+    from tele_tena.api.couples import plan_for, change_vote
+    if plan_for(item.id):
+        change_vote(item, 'reschedule', proposal_id, user, 'accept')
     _event(item.id, 'RescheduleProposed', user, 'A new appointment time was proposed')
     return {'id': proposal_id, 'state': 'Pending', 'expires_at': iso(expires),
             'start': iso(start), 'timezone': schedule.timezone if schedule else item.timezone}
@@ -199,6 +210,8 @@ def journey_instant(value):
 
 @command
 def respond_to_reschedule(appointment, proposal, decision):
+    from tele_tena.api.couples import plan_for, change_vote, participants
+    shared = bool(plan_for(appointment))
     if decision not in ('accept', 'decline'):
         fail('Choose whether to accept or decline the proposed time')
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
@@ -214,7 +227,7 @@ def respond_to_reschedule(appointment, proposal, decision):
         if decision == 'decline' and record.state == 'Declined' and record.responded_by == user:
             return {'state': 'Declined', 'idempotent': True}
         fail('This time-change request is already resolved', 'reschedule_resolved')
-    if record.proposer == user:
+    if record.proposer == user and not shared:
         frappe.throw('Only the other appointment participant may respond', frappe.PermissionError)
     if record.state != 'Pending':
         fail('This time-change request is no longer available', 'reschedule_resolved')
@@ -225,10 +238,14 @@ def respond_to_reschedule(appointment, proposal, decision):
         _event(item.id, 'RescheduleExpired', 'System')
         return {'state': 'Expired'}
     if decision == 'decline':
+        if shared:
+            change_vote(item, 'reschedule', record.id, user, decision)
         frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Declined',responded_by=%s,responded_at=%s WHERE id=%s",
                       (user, now, record.id))
         _event(item.id, 'RescheduleDeclined', user)
         return {'state': 'Declined'}
+    if shared and not change_vote(item, 'reschedule', record.id, user, decision):
+        return {'state': 'Pending', 'awaiting_participants': True}
     if not _can_change_time(item):
         frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Superseded',responded_by=%s,responded_at=%s WHERE id=%s",
                       (user, now, record.id))
@@ -262,6 +279,13 @@ def respond_to_reschedule(appointment, proposal, decision):
         _event(item.id, 'RescheduleSlotUnavailable', 'System')
         return {'state': 'Unavailable', 'message': 'That time is no longer available. Ask for another time.'}
     end = record.start + timedelta(minutes=int(item.minutes))
+    if shared:
+        from tele_tena.api.couples import conflicts
+        try:
+            conflicts([p.user for p in participants(plan_for(item.id)[0].id)], record.start, end, exclude_appointment=item.id)
+        except frappe.ValidationError:
+            frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Unavailable',responded_at=%s WHERE id=%s", (now, record.id))
+            return {'state': 'Unavailable', 'message': 'A participant is no longer available at that time.'}
     # The original reservation and immutable price/disclosure/policy remain on
     # this same appointment. No financial posting is created by rescheduling.
     frappe.db.sql('''UPDATE tt_appointment SET start=%s,end=%s,timezone=%s,schedule_id=%s,
@@ -274,6 +298,8 @@ def respond_to_reschedule(appointment, proposal, decision):
                   (user, now, record.id))
     frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Superseded',responded_at=%s WHERE appointment=%s AND id<>%s AND state='Pending'",
                   (now, item.id, record.id))
+    if shared:
+        frappe.db.sql('UPDATE tt_couple_plan SET start=%s,timezone=%s WHERE appointment=%s', (record.start, record.timezone, item.id))
     _event(item.id, 'RescheduleAccepted', user)
     return {'state': 'Accepted', 'start': iso(record.start), 'end': iso(end),
             'timezone': schedule.timezone if schedule else record.timezone}
@@ -351,7 +377,7 @@ def expire_pending_appointments():
 def appointment_detail(appointment):
     item, user, role = _authorized(appointment)
     from tele_tena.api.consultations import _window
-    call = rows('SELECT state,created,ended FROM tt_consultation WHERE appointment=%s', (item.id,))
+    call = rows('SELECT state,created,ended,room_closed FROM tt_consultation WHERE appointment=%s', (item.id,))
     note = rows('SELECT status,current_revision FROM tt_consultation_note WHERE appointment=%s', (item.id,))
     events = rows('''SELECT event_type,actor,reason,created FROM tt_appointment_event
         WHERE appointment=%s ORDER BY created,id''', (item.id,))
@@ -359,8 +385,8 @@ def appointment_detail(appointment):
         'Booked': 'Appointment booked', 'Requested': 'Confirmation requested',
         'Confirmed': 'Appointment confirmed', 'Declined': 'Appointment declined',
         'Cancelled': 'Appointment cancelled', 'Expired': 'Appointment expired',
-        'Completed': 'Consultation finalized', 'DocumentationDraftSaved': 'Notes draft saved',
-        'DocumentationFinalized': 'Consultation finalized',
+        'Completed': 'Consultation completed', 'DocumentationDraftSaved': 'Notes draft saved',
+        'DocumentationFinalized': 'Documentation published',
         'RescheduleProposed': 'New time proposed', 'RescheduleAccepted': 'New time accepted',
         'RescheduleDeclined': 'New time declined', 'RescheduleWithdrawn': 'Time request withdrawn',
         'RescheduleExpired': 'Time request expired', 'RescheduleUnavailable': 'Time change unavailable',
@@ -372,7 +398,9 @@ def appointment_detail(appointment):
     reschedule = rows('''SELECT id,proposer,start,timezone,state,expires_at FROM tt_reschedule_proposal
         WHERE appointment=%s AND state='Pending' AND expires_at>UTC_TIMESTAMP(6)
         ORDER BY created_at DESC LIMIT 1''', (item.id,))
-    disclosure = json.loads(item.disclosure)
+    from tele_tena.api.couples import plan_for, participant, participants
+    shared_plan = plan_for(item.id)
+    disclosure = json.loads(participant(item.id,user).disclosure) if shared_plan and role == 'patient' else json.loads(item.disclosure)
     selected = {
         'id': item.id,
         'status': item.state,
@@ -388,6 +416,7 @@ def appointment_detail(appointment):
         'expires_at': iso(item.expires_at) if item.expires_at else None,
         'disclosure': disclosure,
         'call_state': call[0].state if call else 'NotStarted',
+        'call_room_close_pending': bool(call and call[0].state == 'Ended' and not call[0].room_closed),
         'can_join': item.state == 'Booked' and _window(item) and not (call and call[0].state == 'Ended'),
         'call_room_created_at': iso(call[0].created) if call else None,
         'call_ended_at': iso(call[0].ended) if call and call[0].ended else None,
@@ -415,12 +444,44 @@ def appointment_detail(appointment):
                         'expires_at': iso(reschedule[0].expires_at)} if reschedule else None),
         'can_propose_reschedule': _can_change_time(item) and not bool(reschedule),
     }
+    selected['is_couple'] = bool(shared_plan)
+    selected['you_pay'] = user == item.patient
+    selected['supports_clinic_sharing'] = not bool(shared_plan)
+    if shared_plan and role == 'clinician':
+        selected['couple_participants'] = [{'id':p.id,'label':json.loads(p.disclosure).get('name') or 'Participant '+str(index),'disclosure':json.loads(p.disclosure),'state':p.state} for index,p in enumerate(participants(shared_plan[0].id),1)]
+    if shared_plan:
+        from tele_tena.api.couples import ready
+        selected['can_join'] = selected['can_join'] and ready(item.id)
+        selected['couple_plan_id'] = shared_plan[0].id
+        selected['can_propose_reschedule'] = _can_change_time(item) and not bool(reschedule)
+        if reschedule:
+            from tele_tena.api.couples import change_response
+            selected['reschedule'].update(change_response(item, 'reschedule', reschedule[0].id, user))
+        selected['can_cancel'] = selected['can_cancel'] and user == item.patient
     earning = rows('SELECT state,release_at FROM tt_earning WHERE appointment=%s', (item.id,))
     if earning:
         selected['financial_state'] = earning[0].state
         selected['dispute_release_at'] = iso(earning[0].release_at) if earning[0].release_at else None
-        selected['can_open_financial_dispute'] = (role == 'patient' and earning[0].state == 'Pending' and
+        selected['can_open_financial_dispute'] = (role == 'patient' and user == item.patient and earning[0].state == 'Pending' and
             earning[0].release_at and earning[0].release_at > datetime.now(timezone.utc).replace(tzinfo=None))
+    # Appointment status is not proof of consumption. Legacy completed records
+    # may still hold funds; only immutable postings establish this display state.
+    postings = rows('SELECT event_type FROM tt_journal WHERE event_ref IN (%s,%s,%s)',
+                    ('booking:' + item.id, 'release:' + item.id, 'completion:' + item.id))
+    kinds = {entry.event_type for entry in postings}
+    if earning and earning[0].state == 'LegacyHold':
+        selected['reservation_state'] = 'Review required'
+    elif 'ReservationRelease' in kinds and 'ConsultationFinalized' in kinds:
+        selected['reservation_state'] = 'Review required'
+    elif 'ReservationRelease' in kinds:
+        selected['reservation_state'] = 'Released'
+    elif 'ConsultationFinalized' in kinds:
+        selected['reservation_state'] = 'Consumed'
+    elif 'Reservation' in kinds:
+        selected['reservation_state'] = 'Reserved'
+    else:
+        selected['reservation_state'] = 'Unavailable'
+    selected['individual_followup_revisions'] = []
     if role == 'patient':
         clinician = one('SELECT display_name FROM tt_profile WHERE user=%s AND kind=%s',
                         (item.clinician, 'clinician'))
@@ -432,11 +493,25 @@ def appointment_detail(appointment):
                                         if feedback else {'submitted': False, 'rating': None,
                                                           'submitted_at': None})
         call_ended = bool(call and call[0].state == 'Ended')
-        selected['can_submit_feedback'] = (item.state == 'Completed' and call_ended and
+        selected['can_submit_feedback'] = (user == item.patient and item.state == 'Completed' and call_ended and
                                            not feedback)
         # Critically, this SELECT never reads private_note.
         revisions = rows('''SELECT revision,patient_summary,created FROM tt_note_revision
-            WHERE appointment=%s AND summary_published=1 ORDER BY revision''', (item.id,))
+            WHERE appointment=%s AND summary_published=1 AND (%s=0 OR EXISTS (SELECT 1 FROM tt_note_recipient nr JOIN tt_couple_participant cp ON cp.id=nr.participant WHERE nr.appointment=tt_note_revision.appointment AND nr.revision=tt_note_revision.revision AND cp.user=%s AND cp.state='Consented')) ORDER BY revision''', (item.id,int(bool(shared_plan)),user))
+        selected['individual_followup_revisions'] = [
+            {'revision': r.revision, 'text': r.content, 'published_at': iso(r.created)}
+            for r in rows('''SELECT f.revision,f.content,n.created
+                FROM tt_note_followup f JOIN tt_note_revision n
+                ON n.appointment=f.appointment AND n.revision=f.revision
+                JOIN tt_couple_participant cp ON cp.id=f.recipient
+                WHERE f.appointment=%s AND f.published=1 AND cp.user=%s
+                AND cp.state='Consented' ORDER BY f.revision''', (item.id,user))]
+        # Only explicitly published revision text crosses the patient boundary.
+        shared_notes = rows('''SELECT revision,private_note AS shared_text,created FROM tt_note_revision
+            WHERE appointment=%s AND note_published=1 AND (%s=0 OR EXISTS (SELECT 1 FROM tt_note_recipient nr JOIN tt_couple_participant cp ON cp.id=nr.participant WHERE nr.appointment=tt_note_revision.appointment AND nr.revision=tt_note_revision.revision AND cp.user=%s AND cp.state='Consented')) ORDER BY revision''', (item.id,int(bool(shared_plan)),user))
+        selected['shared_consultation_notes'] = [
+            {'revision': r.revision, 'text': r.shared_text, 'published_at': iso(r.created)}
+            for r in shared_notes]
         selected['patient_summary_revisions'] = [
             {'revision': r.revision, 'summary': r.patient_summary, 'published_at': iso(r.created)}
             for r in revisions]
@@ -444,7 +519,7 @@ def appointment_detail(appointment):
         selected['patient_identity'] = disclosure.get('name') or 'Private patient'
         selected['sharing_snapshot'] = disclosure
         if note:
-            current = rows('''SELECT revision,private_note,patient_summary,summary_published,author,created
+            current = rows('''SELECT revision,private_note,patient_summary,summary_published,note_published,note_share_selected,recipient_ids,author,created
                 FROM tt_note_revision WHERE appointment=%s AND revision=%s''',
                 (item.id, note[0].current_revision))
             if current:
@@ -453,18 +528,36 @@ def appointment_detail(appointment):
                     'text': current[0].private_note,
                     'patient_summary': current[0].patient_summary,
                     'summary_published': bool(current[0].summary_published),
+                    'note_published': bool(current[0].note_published),
+                    'note_share_selected': bool(current[0].note_share_selected),
+                    'summary_recipients': json.loads(current[0].recipient_ids or '[]'),
                     'author': 'You' if current[0].author == user else 'Treating clinician',
                 }
+        if selected.get('private_note'):
+            followup = rows('SELECT recipient,content FROM tt_note_followup WHERE appointment=%s AND revision=%s',
+                            (item.id,note[0].current_revision))
+            selected['private_note']['individual_followup'] = (
+                {'recipient': followup[0].recipient, 'text': followup[0].content} if followup else None)
+        selected['individual_followup_history'] = [
+            {'revision': r.revision, 'recipient': r.recipient, 'text': r.content, 'published_at': iso(r.created)}
+            for r in rows('''SELECT f.revision,f.recipient,f.content,n.created
+                FROM tt_note_followup f JOIN tt_note_revision n
+                ON n.appointment=f.appointment AND n.revision=f.revision
+                WHERE f.appointment=%s AND f.published=1 ORDER BY f.revision''', (item.id,))]
         selected['prior_shared_revisions'] = [
-            {'revision': r.revision, 'published_at': iso(r.created)}
-            for r in rows('''SELECT revision,created FROM tt_note_revision
-                WHERE appointment=%s AND summary_published=1 ORDER BY revision''', (item.id,))]
+            {'revision': r.revision, 'published_at': iso(r.created),
+             'note_published': bool(r.note_published), 'summary_published': bool(r.summary_published)}
+            for r in rows('''SELECT revision,created,note_published,summary_published FROM tt_note_revision
+                WHERE appointment=%s AND (summary_published=1 OR note_published=1) ORDER BY revision''', (item.id,))]
     return selected
 
 
 @frappe.whitelist(methods=['POST'])
-def save_note_draft(appointment, private_note, patient_summary):
+def save_note_draft(appointment, private_note, patient_summary, share_note=0, summary_recipients=None, followup_text=None, followup_recipient=None):
     clinician = actor('Tele Tena Clinician')
+    if share_note not in (True, False, 0, 1, '0', '1'):
+        fail('Choose whether to share the consultation note')
+    share_selected = share_note in (True, 1, '1')
     private_note = text(private_note, 12000, required=False)
     patient_summary = text(patient_summary, 6000, required=False)
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
@@ -474,14 +567,40 @@ def save_note_draft(appointment, private_note, patient_summary):
     call = rows("SELECT state FROM tt_consultation WHERE appointment=%s", (item.id,))
     if not call or call[0].state != 'Ended' or item.state not in ('Booked', 'Completed'):
         fail('End the consultation before documenting it', 'documentation_not_ready')
+    from tele_tena.api.couples import recipient_ids
+    recipients = recipient_ids(item.id, [] if summary_recipients is None else summary_recipients)
     existing = rows('SELECT status,current_revision FROM tt_consultation_note WHERE appointment=%s FOR UPDATE',
                      (item.id,))
+    previous_followup = rows('SELECT recipient,content FROM tt_note_followup WHERE appointment=%s AND revision=%s',
+                             (item.id,existing[0].current_revision)) if existing else []
+    # Older clients omit these optional fields; preserve an existing draft rather
+    # than silently removing independently recipient-scoped content.
+    followup_text = text(previous_followup[0].content if followup_text is None and previous_followup else followup_text or '', 6000, required=False)
+    followup_recipient = previous_followup[0].recipient if followup_recipient is None and previous_followup else followup_recipient or ''
+    if followup_text:
+        if not followup_recipient:
+            fail('Choose the adult who will receive the follow-up.', 'followup_recipient_required')
+        recipient_ids(item.id,[followup_recipient])
+    else:
+        followup_recipient = ''
+    if existing:
+        previous = one('SELECT private_note,patient_summary,note_share_selected,recipient_ids FROM tt_note_revision WHERE appointment=%s AND revision=%s',
+                       (item.id, existing[0].current_revision))
+        if (previous.private_note == private_note and previous.patient_summary == patient_summary
+                and bool(previous.note_share_selected) == share_selected
+                and json.loads(previous.recipient_ids or '[]') == recipients
+                and (previous_followup[0].content if previous_followup else '') == followup_text
+                and (previous_followup[0].recipient if previous_followup else '') == followup_recipient):
+            return {'status': existing[0].status, 'revision': int(existing[0].current_revision), 'idempotent': True}
     revision = (int(existing[0].current_revision) if existing else 0) + 1
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_note_revision
-        (id,appointment,clinician,revision,private_note,patient_summary,summary_published,author,created)
-        VALUES (%s,%s,%s,%s,%s,%s,0,%s,%s)''',
-        (str(uuid.uuid4()), item.id, clinician, revision, private_note, patient_summary, clinician, now))
+        (id,appointment,clinician,revision,private_note,patient_summary,summary_published,note_share_selected,recipient_ids,author,created)
+        VALUES (%s,%s,%s,%s,%s,%s,0,%s,%s,%s,%s)''',
+        (str(uuid.uuid4()), item.id, clinician, revision, private_note, patient_summary, int(share_selected), json.dumps(recipients), clinician, now))
+    if followup_text:
+        frappe.db.sql('INSERT INTO tt_note_followup (appointment,revision,recipient,content,published) VALUES (%s,%s,%s,%s,0)',
+                      (item.id,revision,followup_recipient,followup_text))
     if existing:
         frappe.db.sql("UPDATE tt_consultation_note SET status='Draft',current_revision=%s,modified=%s WHERE appointment=%s",
                       (revision, now, item.id))
@@ -498,47 +617,79 @@ def preview_patient_summary(appointment, summary=None):
     item, _, role = _authorized(appointment)
     if role != 'clinician' or item.clinician != clinician:
         frappe.throw('Consultation record unavailable', frappe.PermissionError)
-    note = one('SELECT current_revision,status FROM tt_consultation_note WHERE appointment=%s', (item.id,))
-    revision = one('''SELECT revision,patient_summary FROM tt_note_revision
-        WHERE appointment=%s AND revision=%s''', (item.id, note.current_revision))
-    visible = text(summary, 6000, required=False) if summary is not None else revision.patient_summary
-    return {'revision': revision.revision, 'summary': visible,
-            'note_status': note.status, 'preview_only': True}
+    call = rows('SELECT state FROM tt_consultation WHERE appointment=%s', (item.id,))
+    if not call or call[0].state != 'Ended' or item.state not in ('Booked', 'Completed'):
+        fail('End the consultation before documenting it', 'documentation_not_ready')
+    notes = rows('SELECT current_revision,status FROM tt_consultation_note WHERE appointment=%s', (item.id,))
+    note = notes[0] if notes else None
+    # Preview entered content without silently saving a draft or publishing it.
+    # The first preview must work before a note revision exists.
+    if summary is not None:
+        visible = text(summary, 6000, required=False)
+    elif note:
+        visible = one('''SELECT patient_summary FROM tt_note_revision
+            WHERE appointment=%s AND revision=%s''', (item.id, note.current_revision)).patient_summary
+    else:
+        visible = ''
+    return {'revision': note.current_revision if note else 0, 'summary': visible,
+            'note_status': note.status if note else 'None', 'preview_only': True}
 
 
 @command
-def finalize_consultation(appointment, publish_summary=0):
+def finalize_consultation(appointment, publish_summary=0, publish_note=0):
     clinician = actor('Tele Tena Clinician')
     publish = publish_summary in (True, 1, '1')
+    share_note = publish_note in (True, 1, '1')
+    if publish_note not in (True, False, 0, 1, '0', '1'):
+        fail('Choose whether to publish the consultation note')
     if publish_summary not in (True, False, 0, 1, '0', '1'):
         fail('Choose whether to publish the patient summary')
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role != 'clinician' or item.clinician != clinician:
         frappe.throw('Consultation record unavailable', frappe.PermissionError)
-    call = rows("SELECT state FROM tt_consultation WHERE appointment=%s", (item.id,))
+    call = rows("SELECT state,room_closed FROM tt_consultation WHERE appointment=%s", (item.id,))
     note = one('SELECT current_revision,status FROM tt_consultation_note WHERE appointment=%s FOR UPDATE', (item.id,))
     if item.state == 'Completed' and note.status == 'Finalized':
         earnings = rows('SELECT state,net_minor,release_at FROM tt_earning WHERE appointment=%s', (item.id,))
         return {'status': 'Finalized', 'revision': note.current_revision,
                 'idempotent': True, 'earning_state': earnings[0].state if earnings else 'LegacyHold'}
+    from tele_tena.api.couples import ready
+    if not ready(item.id):
+        fail('A participant withdrew consent. Financial resolution requires review.', 'couple_consent_required')
     if not call or call[0].state != 'Ended' or note.status != 'Draft':
         fail('Save a documentation draft after ending the call', 'documentation_not_ready')
+    if not call[0].room_closed:
+        fail('Close the consultation room before finalizing; retry End for everyone', 'consultation_close_pending')
     current = one('''SELECT * FROM tt_note_revision WHERE appointment=%s AND revision=%s''',
                   (item.id, note.current_revision))
+    from tele_tena.api.couples import recipient_ids, plan_for
+    recipients = recipient_ids(item.id,json.loads(current.recipient_ids or '[]'))
+    if plan_for(item.id) and (publish or share_note) and not recipients:
+        fail('Choose who will receive the published content.', 'summary_recipients_required')
+    if share_note and not current.private_note.strip():
+        fail('Add a consultation note before publishing it', 'note_required')
     if publish and not current.patient_summary.strip():
         fail('Add a patient summary before publishing it', 'summary_required')
+    followup = rows('SELECT recipient,content FROM tt_note_followup WHERE appointment=%s AND revision=%s',
+                    (item.id,note.current_revision))
+    if followup:
+        recipient_ids(item.id,[followup[0].recipient])
     finalized_revision = int(note.current_revision) + 1
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_note_revision
-        (id,appointment,clinician,revision,private_note,patient_summary,summary_published,author,created)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
+        (id,appointment,clinician,revision,private_note,patient_summary,summary_published,note_published,note_share_selected,recipient_ids,author,created)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
         (str(uuid.uuid4()), item.id, clinician, finalized_revision, current.private_note,
-         current.patient_summary, int(publish), clinician, now))
+         current.patient_summary, int(publish), int(share_note), int(share_note), json.dumps(recipients), clinician, now))
+    if followup:
+        frappe.db.sql('INSERT INTO tt_note_followup (appointment,revision,recipient,content,published) VALUES (%s,%s,%s,%s,1)',
+                      (item.id,finalized_revision,followup[0].recipient,followup[0].content))
+    for recipient in recipients if (publish or share_note) else []:
+        frappe.db.sql('INSERT INTO tt_note_recipient (appointment,revision,participant,published_at) VALUES (%s,%s,%s,%s)', (item.id,finalized_revision,recipient,now))
     frappe.db.sql("UPDATE tt_consultation_note SET status='Finalized',current_revision=%s,modified=%s WHERE appointment=%s",
                   (finalized_revision, now, item.id))
     if item.state != 'Completed':
-        import json
         from tele_tena.accounting import account_id, check_wallet_projection, post
         extensions = rows('''SELECT id,duration_minutes,amount_minor,price_snapshot,policy_snapshot
             FROM tt_consultation_extension WHERE appointment=%s AND state='Started'
@@ -588,7 +739,7 @@ def finalize_consultation(appointment, publish_summary=0):
         _event(item.id, 'Completed', clinician)
     _event(item.id, 'DocumentationFinalized', clinician)
     return {'status': 'Finalized', 'revision': finalized_revision,
-            'patient_summary_published': publish}
+            'patient_summary_published': publish, 'consultation_note_published': share_note}
 
 
 @query()
@@ -624,35 +775,41 @@ def care_directory(search='', service='', status='', from_date='', to_date='', p
         where.append("JSON_UNQUOTE(JSON_EXTRACT(a.disclosure,'$.name')) LIKE %s")
         params.append('%' + search.replace('%', '\\%').replace('_', '\\_') + '%')
     sql_where = ' AND '.join(where)
-    found = rows('''SELECT a.id,a.start,a.end,a.state,a.service_label,a.disclosure,a.timezone,a.minutes,
+    found = rows('''SELECT a.id,a.patient,a.start,a.end,a.state,a.service_label,a.disclosure,a.timezone,a.minutes,
         a.price,c.state call_state,n.status documentation_state
         FROM tt_appointment a LEFT JOIN tt_consultation c ON c.appointment=a.id
         LEFT JOIN tt_consultation_note n ON n.appointment=a.id WHERE ''' + sql_where +
         ' ORDER BY a.start DESC,a.id', tuple(params))
     groups = {}
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
     for item in found:
         disclosure = json.loads(item.disclosure)
         name = disclosure.get('name')
-        key = 'shared:' + name if name else 'encounter:' + item.id
+        # Equal disclosed names never establish that two people are one patient.
+        # The account key stays server-side and never enters the directory response.
+        key = ('shared', item.patient, name) if name else ('encounter', item.id)
         group = groups.setdefault(key, {'id': item.id, 'patient_label': name or 'Private patient',
                                         'encounters': [], 'last_consultation': None,
                                         'next_appointment': None, 'service_label': item.service_label,
                                         'state': item.state, 'disclosure': disclosure,
-                                        'start': item.start, 'timezone': item.timezone})
+                                        'start': item.start, 'end': item.end, 'timezone': item.timezone,
+                                        'call_state': item.call_state, 'documentation_state': item.documentation_state})
         group['encounters'].append(item.id)
-        if item.start < datetime.now(timezone.utc).replace(tzinfo=None) and (
+        if item.start < now and (
                 item.state == 'Completed' or item.call_state == 'Ended'):
             if not group['last_consultation'] or item.start > group['last_consultation']:
                 group['last_consultation'] = item.start
-        elif item.state in ('Booked', 'PendingConfirmation') and (
+        elif item.start >= now and item.state in ('Booked', 'PendingConfirmation') and (
                 not group['next_appointment'] or item.start < group['next_appointment']):
             group['next_appointment'] = item.start
         if item.start > group['start']:
             group.update(id=item.id, service_label=item.service_label, state=item.state,
-                         disclosure=disclosure, start=item.start, timezone=item.timezone)
+                         disclosure=disclosure, start=item.start, end=item.end, timezone=item.timezone,
+                         call_state=item.call_state, documentation_state=item.documentation_state)
     found = list(groups.values())
     for item in found:
         item['start'] = iso(item['start'])
+        item['end'] = iso(item['end'])
         item['last_consultation'] = iso(item['last_consultation']) if item['last_consultation'] else None
         item['next_appointment'] = iso(item['next_appointment']) if item['next_appointment'] else None
         item['encounter_count'] = len(item['encounters'])
@@ -670,9 +827,9 @@ def care_patient_record(appointment):
     disclosure = json.loads(item.disclosure)
     shared_name = disclosure.get('name')
     if shared_name:
-        matches = rows('''SELECT id FROM tt_appointment WHERE clinician=%s
+        matches = rows('''SELECT id FROM tt_appointment WHERE clinician=%s AND patient=%s
             AND JSON_UNQUOTE(JSON_EXTRACT(disclosure,'$.name'))=%s ORDER BY start DESC''',
-            (clinician, shared_name))
+            (clinician, item.patient, shared_name))
     else:
         matches = [{'id': item.id}]
     return {'patient_label': shared_name or 'Private patient',
@@ -834,11 +991,11 @@ def upload_resume(filename, content_base64):
     revision = int(old[0].revision) + 1 if old else 1
     frappe.db.sql('''INSERT INTO tt_resume_evidence
         (clinician,filename,content,content_size,content_sha256,revision,uploaded_by,uploaded_at)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
+        VALUES (%s,%s,FROM_BASE64(%s),%s,%s,%s,%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
         filename=VALUES(filename),content=VALUES(content),content_size=VALUES(content_size),
         content_sha256=VALUES(content_sha256),revision=VALUES(revision),uploaded_by=VALUES(uploaded_by),
         uploaded_at=VALUES(uploaded_at)''',
-        (user, filename, content, len(content), hashlib.sha256(content).hexdigest(), revision, user))
+        (user, filename, base64.b64encode(content).decode("ascii"), len(content), hashlib.sha256(content).hexdigest(), revision, user))
     return {'uploaded': True, 'filename': filename, 'size': len(content), 'revision': revision}
 
 

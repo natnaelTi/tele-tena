@@ -1,6 +1,9 @@
+import {FileUpload} from "../components/FileUpload";
+import HistoryDocuments from "../components/HistoryDocuments";
 import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { api } from "../api";
+import { pendingCareQuery } from "../care-intent";
+import { api, ApiError } from "../api";
 import {
   Button,
   Checkbox,
@@ -12,9 +15,14 @@ import {
 import { destination, useSession } from "../hooks/useSession";
 import { useLocale } from "../hooks/useLocale";
 import { journeyApi } from "../journey-api";
-import WorkspaceTour from "../components/WorkspaceTour";
+import { FileText, ShieldCheck, UserRound, Users } from "lucide-react";
+import "./Onboarding.css";
 type Answers = {
+  professional?: {competencies?:string; certifications?:string; credential_valid_from?:string; professional_category?:string; qualification?:string; issuing_institution?:string; registration_number?:string; issuing_authority?:string; jurisdiction?:string; credential_expiry?:string; experience_years?:number};
+  care_languages?: string[];
+  introduction?: string;
   name?: string;
+  history?: string;
   adult?: boolean;
   consent?: boolean;
   language?: string;
@@ -40,6 +48,9 @@ export default function Onboarding() {
   const [catalog, setCatalog] = useState<{id:string;label:string}[]>([]);
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [resumeBusy, setResumeBusy] = useState(false);
+  const [scopeSearch, setScopeSearch] = useState("");
+  const [chooseRole, setChooseRole] = useState(false);
+  const [access, setAccess] = useState<{patient_registration:boolean;clinician_registration:boolean}|null>(null);
   useEffect(() => {
     api<{ kind: string; step: number; answers: Answers }>(
       "tele_tena.api.contact_auth.onboarding",
@@ -48,6 +59,7 @@ export default function Onboarding() {
         setKind(
           params.get("intent") === "clinician" ? "clinician" : draft.kind,
         );
+        setChooseRole(!["patient", "clinician"].includes(params.get("intent") || "") && draft.step === 0 && Object.keys(draft.answers).length === 0);
         setStep(draft.step);
         setAnswers(draft.answers);
         setReady(true);
@@ -57,23 +69,32 @@ export default function Onboarding() {
           "Your saved progress could not be loaded. Reload to try again.",
         ),
       );
-    void api<{id:string;label:string}[]>("services").then(setCatalog).catch(()=>undefined);
+    void api<{patient_registration:boolean;clinician_registration:boolean}>("tele_tena.api.contact_auth.sign_in_options")
+      .then(setAccess).catch(() => setError("Your saved progress could not be loaded. Reload to try again."));
+    void api<{id:string;label:string}[]>("tele_tena.api.contact_auth.application_services").then(setCatalog).catch(()=>undefined);
     void journeyApi.resumeStatus().then(value=>setResumeUploaded(value.uploaded)).catch(()=>undefined);
   }, [params]);
-  if (session?.profile) return <Navigate to={destination(session)} replace />;
+  if (session?.profile) return <Navigate to={session.profile.kind === "patient" && pendingCareQuery() ? "/patient/discovery" : destination(session)} replace />;
   const clinician = kind === "clinician";
+  // Retain stored step 3 as the ready screen for existing saved journeys.
+  // Patient-only step 4 is inserted before it without reinterpreting old drafts.
+  const steps = clinician ? [0, 1, 2, 5, 3] : [0, 1, 2, 4, 3];
+  const position = Math.max(0, steps.indexOf(step));
   const titles = clinician
     ? [
-        "Your professional identity",
-        "Your experience and service scope",
-        "A few final details",
+        "Your professional profile",
+        "Qualifications & résumé",
+        "Clinic affiliations",
         "Review your application",
+        "",
+        "Choose your service scopes",
       ]
     : [
-        "What should we call you?",
-        "A thoughtful start",
-        "Your language. Your privacy.",
-        "You’re ready to find care.",
+        "A little about you",
+        "Adult eligibility",
+        "Your privacy defaults",
+        "You’re ready",
+        "Care background",
       ];
   const update = (value: Partial<Answers>) => {
     setAnswers({ ...answers, ...value });
@@ -96,95 +117,147 @@ export default function Onboarding() {
       setSaved(true);
       if (complete) {
         const current = await refresh();
+        const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken;
+        if(coupleToken&&kind==="patient"){navigate("/couple-invitation",{replace:true,state:{coupleInvitationToken:coupleToken}});return;}
         const invitationToken=(routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken;
-        navigate(invitationToken && current?.profile?.kind==='patient' ? '/relationship-invitation' : destination(current),
+        navigate(invitationToken && current?.profile?.kind==='patient' ? '/relationship-invitation' : current?.profile?.kind === 'patient' && pendingCareQuery() ? '/patient/discovery' : destination(current),
           { replace:true, state: invitationToken ? {relationshipInvitationToken:invitationToken} : undefined });
       }
-    } catch {
-      setError(
-        "Please check this step and try again. Adult eligibility and consent are required to finish.",
-      );
+    } catch (failure) {
+      const code = failure instanceof ApiError ? failure.code : "network_error";
+      setError(code === "adult_required"
+        ? "Please check this step and try again. Adult eligibility and consent are required to finish."
+        : code === "professional_required"
+          ? "Complete your profession, qualification, institution and care languages before submission."
+        : code === "resume_required"
+          ? "Upload a resume and select at least one service to request before submitting."
+          : code === "session_required" || code === "contact_required"
+            ? "Your session has expired. Sign in again to continue your saved registration."
+            : code === "registration_unavailable"
+              ? "Registration is unavailable on this site. Your saved progress has not been submitted."
+              : "We couldn’t save this step. Your entries are still here; check your connection and try again.");
     } finally {
       setBusy(false);
     }
   }
+  async function choose(kind: "patient" | "clinician") {
+    setBusy(true); setError("");
+    try {
+      await api("tele_tena.api.contact_auth.save_onboarding", {kind,step:0,answers:{}}, true);
+      setKind(kind); setChooseRole(false); setSaved(true);
+    } catch {
+      setError("We couldn’t save this step. Your entries are still here; check your connection and try again.");
+    } finally { setBusy(false); }
+  }
+  if (chooseRole) return <section className="guided-panel onboarding-guided">
+    <p className="eyebrow">{w("Contact verified")}</p><div className="step-progress" aria-hidden="true"><span data-complete="true" /></div>
+    <h1>{w("Choose your account")}</h1><p>{w("How will you use TeleTena?")}</p>
+    {error && <InlineNotice tone="danger">{w(error)}</InlineNotice>}
+    {!access ? <Skeleton /> : <div className="onboarding-account-choices">
+      <section className="onboarding-review-panel"><UserRound size={20} aria-hidden="true"/><h2>{w("I’m looking for care")}</h2><p>{w("Find clinicians, book a session, and keep your care connected.")}</p>
+        <Button loading={busy} disabled={!access.patient_registration} onClick={() => void choose("patient")}>{w("Continue as a patient")}</Button>
+        {!access.patient_registration && <p>{w("New registration is unavailable on this site. Existing invited users can still sign in.")}</p>}
+      </section>
+      <section className="onboarding-review-panel"><Users size={20} aria-hidden="true"/><h2>{w("I provide care")}</h2><p>{w("Apply, verify your expertise, and set up your practice.")}</p>
+        <Button loading={busy} disabled={!access.clinician_registration} onClick={() => void choose("clinician")}>{w("Apply as a clinician")}</Button>
+        {!access.clinician_registration && <p>{w("New registration is unavailable on this site. Existing invited users can still sign in.")}</p>}
+      </section>
+    </div>}
+  </section>;
   return (
     <>
-    <section className="guided-panel">
+    <section className={`guided-panel onboarding-guided ${!clinician&&step===3?"onboarding-ready-page":""}`}>
       <p className="eyebrow">
-        {clinician ? "CLINICIAN APPLICATION" : "YOUR SPACE FOR CARE"} · STEP{" "}
-        {step + 1} OF 4
+        {w(clinician ? "CLINICIAN APPLICATION" : "YOUR SPACE FOR CARE")} · {w("STEP")}{" "}
+        {position + 1} {w("of")} {steps.length}
       </p>
-      <div className="step-progress" aria-label={`Step ${step + 1} of 4`}>
-        {[0, 1, 2, 3].map((value) => (
-          <span key={value} data-complete={value <= step} />
+      <div className="step-progress" aria-label={`${w("Step")} ${position + 1} ${w("of")} ${steps.length}`}>
+        {steps.map((value, index) => (
+          <span key={value} data-complete={index <= position} />
         ))}
       </div>
-      <h1>{titles[step]}</h1>
-      {error && <InlineNotice tone="danger">{error}</InlineNotice>}
+      <h1>{w(titles[step])}</h1>
+      {error && <InlineNotice tone="danger">{w(error)}</InlineNotice>}
       {!ready ? (
         <Skeleton />
       ) : (
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            void save(Math.min(step + 1, 3), step === 3);
+            if (clinician && step === 5 && !(answers.requested_services || []).length) {
+              setError("Choose at least one service for review.");
+              return;
+            }
+            if (clinician && step === 0 && !(answers.care_languages||[]).length) {setError("Choose at least one consultation language.");return;}
+            void save(steps[Math.min(position + 1, steps.length - 1)], step === 3);
           }}
         >
           {step === 0 && (
             <>
               <p>
-                {clinician
+                {w(clinician
                   ? "Use the professional name your credentials are issued under."
-                  : "A preferred name or alias is enough. You choose whether to share it when you book."}
+                  : "A preferred name or alias is enough. You choose whether to share it when you book.")}
               </p>
               <div data-tour={clinician?"applicant-profile":undefined}><TextField
-                label={
-                  clinician ? "Professional name" : "Preferred name or alias"
-                }
+                label={w(clinician ? "Full professional name" : "Preferred name or alias")}
                 value={answers.name || ""}
                 maxLength={120}
                 required
                 onChange={(e) => update({ name: e.target.value })}
               /></div>
+              {clinician && <>
+                <Select label={w("Profession")} value={answers.professional?.professional_category || ""} required onChange={e=>update({professional:{...answers.professional,professional_category:e.target.value}})}>
+                  <option value="">{w("Choose your profession")}</option>
+                  {["Counseling psychologist","Psychiatrist","Clinical psychologist","Counselor","Other"].map(value=><option key={value} value={value}>{w(value)}</option>)}
+                </Select>
+                <TextField label={w("Years of practice")} type="number" min={0} max={60} value={answers.professional?.experience_years ?? ""} onChange={e=>update({professional:{...answers.professional,experience_years:Number(e.target.value)}})}/>
+                <div className="field"><label htmlFor="onboarding-introduction">{w("Professional introduction")}</label><textarea id="onboarding-introduction" rows={4} maxLength={2000} value={answers.introduction||""} onChange={e=>update({introduction:e.target.value})}/><p className="field-hint">{w("This introduction may appear on your approved public profile. Keep credential identifiers in the private application fields.")}</p></div>
+                <fieldset className="onboarding-language-options"><legend>{w("Consultation languages")}</legend>{[["en","English"],["am","Amharic"],["om","Afaan Oromo"]].map(([code,label])=><Checkbox key={code} variant="card" description={w("Consultation language")} label={w(label)} checked={(answers.care_languages||[]).includes(code)} onChange={e=>update({care_languages:e.target.checked?[...(answers.care_languages||[]),code]:(answers.care_languages||[]).filter(value=>value!==code)})}/>)}</fieldset>
+              </>}
             </>
           )}
+          {step === 1 && !clinician && <p className="supporting">{w("For a shared session, every participating adult completes their own registration and consent.")}</p>}
           {step === 1 &&
             (clinician ? (
               <>
-                <label className="field">
-                  Credentials and requested services
+                <p className="supporting">{w("Documents and credential identifiers are private to you and authorized reviewers.")}</p>
+                {([["qualification","Primary qualification",180,true],["issuing_institution","Issuing institution",180,true],["issuing_authority","Licensing authority",180,false],["registration_number","License number",100,false]] as const).map(([key,label,maximum,required])=><TextField key={key} label={w(label)} required={required} maxLength={maximum} value={answers.professional?.[key]||""} onChange={e=>update({professional:{...answers.professional,[key]:e.target.value}})}/>)}
+                <TextField label={w("License valid from")} type="date" value={answers.professional?.credential_valid_from||""} onChange={e=>update({professional:{...answers.professional,credential_valid_from:e.target.value}})}/>
+                <TextField label={w("Professional competencies")} maxLength={2000} value={answers.professional?.competencies||""} onChange={e=>update({professional:{...answers.professional,competencies:e.target.value}})}/>
+                <TextField label={w("Certifications")} maxLength={2000} value={answers.professional?.certifications||""} onChange={e=>update({professional:{...answers.professional,certifications:e.target.value}})}/>
+                <TextField label={w("License expiry")} type="date" value={answers.professional?.credential_expiry||""} onChange={e=>update({professional:{...answers.professional,credential_expiry:e.target.value}})}/>
+                <details className="onboarding-optional-credentials"><summary>{w("Additional application details (optional)")}</summary>
+                <TextField label={w("Credential jurisdiction")} maxLength={120} value={answers.professional?.jurisdiction||""} onChange={e=>update({professional:{...answers.professional,jurisdiction:e.target.value}})}/>
+                <div className="field">
+                  <label htmlFor="onboarding-credentials">{w("Qualifications and experience")}</label>
                   <textarea
-                    required
+                    id="onboarding-credentials"
                     maxLength={2000}
-                    rows={6}
+                    rows={3}
                     value={answers.statement || ""}
                     onChange={(e) => update({ statement: e.target.value })}
                   />
-                </label>
-                <p className="supporting">
-                  Describe your qualification, registration and the services you
-                  would like reviewed. This demonstration accepts synthetic
-                  information only. Upload a PDF resume (up to 5 MB); receipt
-                  does not mean your credentials are verified.
-                </p>
-                <fieldset className="scope-picker" data-tour="applicant-scopes"><legend>Services requested for approval</legend>{catalog.map(service=><Checkbox key={service.id} label={service.label} checked={(answers.requested_services||[]).includes(service.id)} onChange={e=>update({requested_services:e.target.checked?[...(answers.requested_services||[]),service.id]:(answers.requested_services||[]).filter(x=>x!==service.id)})}/>)}</fieldset>
-                <label className="field" data-tour="applicant-resume">Resume (PDF, up to 5 MB)<input type="file" accept="application/pdf,.pdf" disabled={resumeBusy} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;if(file.size>5*1024*1024){setError("Choose a PDF no larger than 5 MB.");return;}setResumeBusy(true);setError("");try{const base64=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]||"");reader.onerror=()=>reject(new Error("Read failed"));reader.readAsDataURL(file);});await journeyApi.uploadResume(file.name,base64);setResumeUploaded(true);}catch{setError("The resume could not be uploaded. Choose a valid PDF and try again.");}finally{setResumeBusy(false);e.target.value="";}}}/>{resumeUploaded&&<span role="status">Resume uploaded for authorized review. <button type="button" className="text-button" onClick={()=>void journeyApi.removeResume().then(()=>setResumeUploaded(false)).catch(()=>setError("Resume could not be removed."))}>Remove</button></span>}</label>
+                </div>
+                </details>
+                <p className="supporting">{w("Receipt does not mean your credentials are verified. Each requested scope is reviewed separately.")}</p>
+                <div className="field" data-tour="applicant-resume">{w("Resume (PDF, up to 5 MB)")}<FileUpload label={w("Upload file")} accept="application/pdf,.pdf" disabled={resumeBusy} onFiles={async files=>{const file=files[0];if(!file)return;if(file.size>5*1024*1024){setError("Choose a PDF no larger than 5 MB.");return;}setResumeBusy(true);setError("");try{const base64=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]||"");reader.onerror=()=>reject(new Error("Read failed"));reader.readAsDataURL(file);});await journeyApi.uploadResume(file.name,base64);setResumeUploaded(true);}catch{setError("The resume could not be uploaded. Choose a valid PDF and try again.");}finally{setResumeBusy(false);}}}/>{resumeUploaded&&<span role="status">{w("Resume uploaded for authorized review.")} <button type="button" className="text-button" onClick={()=>void journeyApi.removeResume().then(()=>setResumeUploaded(false)).catch(()=>setError("Resume could not be removed."))}>{w("Remove")}</button></span>}</div>
               </>
             ) : (
               <>
                 <p>
-                  This service is for adults. Please review these choices before
-                  continuing.
+                  {w("This service is for adults. Please review these choices before continuing.")}
                 </p>
                 <Checkbox
-                  label="I am 18 or older."
+                  variant="card"
+                  label={w("I am 18 or older.")}
                   checked={!!answers.adult}
                   required
                   onChange={(e) => update({ adult: e.target.checked })}
                 />
                 <Checkbox
-                  label="I consent to storing my profile and the information I choose to share for this care journey."
+                  variant="card"
+                  label={w("I consent to storing my profile and the information I choose to share for this care journey.")}
                   checked={!!answers.consent}
                   required
                   onChange={(e) => update({ consent: e.target.checked })}
@@ -195,19 +268,21 @@ export default function Onboarding() {
             (clinician ? (
               <>
                 <TextField
-                  label="Clinic affiliations (optional)"
+                  label={w("Clinic affiliations (optional)")}
                   value={answers.affiliations || ""}
                   onChange={(e) => update({ affiliations: e.target.value })}
-                  hint="Affiliation does not grant access to patient records."
+                  hint={w("Affiliation does not grant access to patient records.")}
                 />
                 <Checkbox
-                  label="I am 18 or older."
+                  variant="card"
+                  label={w("I am 18 or older.")}
                   checked={!!answers.adult}
                   required
                   onChange={(e) => update({ adult: e.target.checked })}
                 />
                 <Checkbox
-                  label="I consent to storing these details for manual application review."
+                  variant="card"
+                  label={w("I consent to storing these details for manual application review.")}
                   checked={!!answers.consent}
                   required
                   onChange={(e) => update({ consent: e.target.checked })}
@@ -216,7 +291,7 @@ export default function Onboarding() {
             ) : (
               <>
                 <Select
-                  label="Preferred language"
+                  label={w("Preferred language")}
                   value={answers.language || "en"}
                   onChange={(e) => update({ language: e.target.value })}
                 >
@@ -225,40 +300,72 @@ export default function Onboarding() {
                   <option value="om">Afaan Oromo</option>
                 </Select>
                 <p>
-                  Start with private defaults. You can change these for each
-                  booking.
+                  {w("Start with private defaults. You can change these for each booking.")}
                 </p>
                 <Checkbox
-                  label="Share my preferred name by default"
+                  variant="card"
+                  label={w("Share my preferred name by default")}
                   checked={!!answers.share_name}
                   onChange={(e) => update({ share_name: e.target.checked })}
                 />
                 <Checkbox
-                  label="Share my saved history by default"
+                  variant="card"
+                  label={w("Share my saved history by default")}
                   checked={!!answers.share_history}
                   onChange={(e) => update({ share_history: e.target.checked })}
                 />
               </>
             ))}
-          {step === 3 && (
+          {step === 5 && clinician && <>
+            <p>{w("Select each service you are qualified to provide. Each is reviewed separately.")}</p>
+                <fieldset className="scope-picker onboarding-scope-picker" aria-label={w("Services requested for approval")} data-tour="applicant-scopes">
+                  <TextField label={w("Search services")} type="search" value={scopeSearch} onChange={e=>setScopeSearch(e.target.value)}/>
+                  <div className="onboarding-scope-options" role="group" aria-label={w("Services requested for approval")}>
+                    {catalog.filter(service=>service.label.toLocaleLowerCase().includes(scopeSearch.trim().toLocaleLowerCase())).map(service=><Checkbox key={service.id} variant="card" description={w("Evidence and approved scope are required.")} label={service.label} checked={(answers.requested_services||[]).includes(service.id)} onChange={e=>update({requested_services:e.target.checked?[...(answers.requested_services||[]),service.id]:(answers.requested_services||[]).filter(x=>x!==service.id)})}/>)}
+                    {!catalog.some(service=>service.label.toLocaleLowerCase().includes(scopeSearch.trim().toLocaleLowerCase()))&&<p role="status">{w("No services match this search. Try another term.")}</p>}
+                  </div>
+                  <p className="supporting" role="status">{w("Selected services")}: {(answers.requested_services||[]).length}</p>
+                </fieldset>
+          </>}
+          {step === 4 && !clinician && <>
+            <p id="onboarding-background-help">{w("Only add what you’re comfortable sharing. This step is optional.")}</p>
+            <div className="field">
+              <label htmlFor="onboarding-background">{w("Anything you’d like your clinician to know?")}</label>
+              <textarea id="onboarding-background" rows={4} maxLength={4000}
+                value={answers.history || ""} aria-describedby="onboarding-background-help"
+                onChange={e => update({ history: e.target.value })} />
+            </div>
+            <HistoryDocuments/><Checkbox variant="card" label={w("I’ll decide what to share for each consultation")}
+              checked={!answers.share_history} onChange={e => update({ share_history: !e.target.checked })}
+              description={w(answers.share_history
+                ? "Your background is included in your default disclosure. Preview before every booking."
+                : "This background is not included in your default disclosure. Preview before every booking.")} />
+            {!answers.history && <Button variant="quiet" disabled={busy} onClick={() => void save(3)}>{w("Skip for now")}</Button>}
+          </>}
+          {step === 3 && !clinician && <section className="onboarding-ready-hero"><div><h2>{w("What’s on your mind?")}</h2><p>{w("Describe what you need, browse specialists, or ask available clinicians to respond.")}</p><Button type="submit" loading={busy}>{w("Find care")}</Button></div><aside><ShieldCheck size={26}/><h2>{w("Your choices come with you.")}</h2><dl><dt>{w("Display name")}</dt><dd>{answers.name}</dd><dt>{w("Care language")}</dt><dd>{{en:"English",am:"አማርኛ",om:"Afaan Oromo"}[answers.language as "en"|"am"|"om"]||"English"}</dd><dt>{w("Sharing")}</dt><dd>{w("Preview before every booking")}</dd></dl></aside></section>}
+          {step === 3 && clinician && (
             <>
               <p>
-                {clinician
-                  ? "Your application will be submitted for manual review. You cannot accept bookings until your professional status and service scopes are approved."
-                  : "You can explore available clinicians and choose what to share before each appointment."}
+                {w("Your application will be submitted for manual review. You cannot accept bookings until your professional status and service scopes are approved.")}
               </p>
-              <dl className="summary-list">
-                <dt>Name</dt>
-                <dd>{answers.name}</dd>
-                <dt>{clinician ? "Credentials & scope" : "Default sharing"}</dt>
-                <dd>
-                  {clinician
-                    ? answers.statement
-                    : answers.share_name
-                      ? "Preferred name"
-                      : "Preferred name stays private"}
-                </dd>
-              </dl>
+              <section className="onboarding-review-panel">
+                <h2>{w("Professional details")}</h2>
+                <dl>
+                  <div><dt>{w("Professional name")}</dt><dd>{answers.name}</dd></div>
+                  <div><dt>{w("Profession")}</dt><dd>{w(answers.professional?.professional_category||"Not provided")}</dd></div>
+                  <div><dt>{w("Primary qualification")}</dt><dd>{answers.professional?.qualification||w("Not provided")}</dd></div>
+                  <div><dt>{w("Issuing institution")}</dt><dd>{answers.professional?.issuing_institution||w("Not provided")}</dd></div>
+                  <div><dt>{w("Consultation languages")}</dt><dd>{(answers.care_languages||[]).map(code=>w(code==="en"?"English":code==="am"?"Amharic":"Afaan Oromo")).join(", ")||w("Not provided")}</dd></div>
+                  <div><dt>{w("Credentials & scope")}</dt><dd>{answers.statement}</dd></div>
+                  <div><dt>{w("Résumé")}</dt><dd>{w(resumeUploaded?"Resume uploaded for authorized review.":"Not provided")}</dd></div>
+                  <div><dt>{w("Clinic affiliations (optional)")}</dt><dd>{answers.affiliations||w("Not provided")}</dd></div>
+                </dl>
+              </section>
+              <section className="onboarding-review-panel">
+                <h2>{w("Requested scopes")}</h2>
+                <ul>{(answers.requested_services||[]).map(id=><li key={id}><FileText size={22} aria-hidden="true"/><div><strong>{catalog.find(service=>service.id===id)?.label||w("Service details unavailable")}</strong><p>{w("Pending review")}</p></div></li>)}</ul>
+                <p className="supporting">{w("Each service needs its own human approval before publication.")}</p>
+              </section>
             </>
           )}
           <div className="form-actions" data-tour={step===3&&clinician?"applicant-submit":undefined}>
@@ -266,18 +373,18 @@ export default function Onboarding() {
               <Button
                 variant="secondary"
                 disabled={busy}
-                onClick={() => void save(step - 1)}
+                onClick={() => void save(steps[position - 1])}
               >
                 {w("Back")}
               </Button>
             )}
-            <Button type="submit" loading={busy}>
+            {(clinician||step!==3)&&<Button type="submit" loading={busy}>
               {step === 3
                 ? clinician
-                  ? "Submit for review"
+                  ? w("Submit for review")
                   : w("Find care")
-                : w("Continue")}
-            </Button>
+                : w(step === 5 ? "Review application" : step === 4 ? "Save and continue" : "Continue")}
+            </Button>}
           </div>
           <Button
             variant="quiet"
@@ -285,14 +392,14 @@ export default function Onboarding() {
             disabled={busy}
             onClick={() => void save(step)}
           >
-            Save for later
+            {w("Save for later")}
           </Button>
           {saved && (
-            <p role="status">Progress saved. You can return to this step.</p>
+            <p role="status">{w("Progress saved. You can return to this step.")}</p>
           )}
         </form>
       )}
-    </section>{clinician&&saved&&<WorkspaceTour role="applicant"/>}
+    </section>
     </>
   );
 }

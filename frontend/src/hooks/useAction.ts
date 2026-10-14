@@ -1,6 +1,39 @@
 import { useState } from "react";
 import { ApiError } from "../api";
 const messages: Record<string, string> = {
+  vetting_rationale_required: "Add a rationale for each score you entered. Complete or clear unfinished scores before recording a decision.",
+  vetting_findings_required: "Enter a specific decision reason, up to 2000 characters.",
+  review_decision_required: "Choose whether to approve, request information or decline this application.",
+  credential_provenance_required: "Approval needs a license document attached to this scope, a verification source, check date and source reference. Request information if the document is missing.",
+  credential_evidence_invalid: "Choose a License or registration document uploaded to this service application.",
+  credential_verification_flag_required: "Clear the unfinished credential check before requesting information, or complete it and confirm verification after checking the source.",
+  credential_check_date_invalid: "Enter a valid credential check date that is not in the future.",
+  vetting_scores_incomplete: "Complete every assessment score and rationale before approving this scope.",
+  vetting_mandatory_criterion_failed: "A mandatory assessment has not passed. Request information or decline; scores cannot replace required evidence.",
+  catalog_not_approved: "The service definition needs medical-lead approval before a clinician can be approved for it.",
+  credential_expired: "The credential has expired. Request current evidence before approval.",
+  catalog_booking_rules_invalid: "Choose how appointments can be booked. Consultation, notes and summary requirements belong under Required platform workflows.",
+  catalog_duration_range: "Set both session length limits, with the minimum no greater than the maximum.",
+  catalog_date_range: "The end date must be on or after the effective date.",
+  catalog_invalid_date: "Enter a valid effective date or leave the optional date empty.",
+  scope_qualification_required: "Add your professional category, qualification and issuing institution before submission.",
+  scope_adult_required: "Confirm that your service application is limited to adult care in the Relevant experience step.",
+  scope_approach_invalid: "An approach is no longer available. In Relevant experience, move the unlisted entry to your training description before saving.",
+  credential_date_invalid: "Enter a valid credential date.",
+  resume_required: "Upload a PDF resume before submitting your application.",
+  scope_not_open: "This service is not accepting applications. Your other choices are still here.",
+  scope_selection_invalid: "Choose between one and ten different services.",
+  scope_application_locked: "This application is awaiting review. Respond to a clarification request to change it.",
+  credential_date_range: "The license expiry must be on or after its validity start date.",
+  credential_not_current: "This credential is not valid yet and cannot authorize current practice.",
+  catalog_requirements_missing: "Complete the professional, credential, consent and jurisdiction requirements before approval.",
+  catalog_review_state: "Only a submitted draft definition can receive a clinical review decision.",
+  catalog_workflow_unavailable: "This service requires a workflow outside the current adult MVP.",
+
+  note_required: "Enter a consultation note or turn off note sharing.",
+  summary_required: "Enter a patient summary before publishing.",
+  consultation_close_pending: "Room closure is still pending. Return to the room and retry End for everyone before finalizing. Your draft can be saved.",
+  documentation_not_ready: "End the consultation before saving or finalizing notes.",
   adult_required: "Confirm that you are 18 or older before continuing.",
   relationship_retry_changed: "This invitation submission changed. Start a new invitation.",
   relationship_invitation_rate_limited: "You have reached the invitation limit. Try again later.",
@@ -29,8 +62,8 @@ const messages: Record<string, string> = {
   schedule_exception_start_invalid: "Enter a valid exception start time.",
   schedule_exception_end_invalid: "Enter a valid exception end time.",
   schedule_exception_order: "An exception must end after it starts.",
-  session_required: "Your session has expired. Sign in again to save this schedule.",
-  permission_denied: "You don’t have permission to change this schedule.",
+  session_required: "Your session has expired. Sign in again before continuing.",
+  permission_denied: "You don’t have permission to make this change.",
   preview_changed: "Your profile changed. Review your sharing choices again.",
   offering_changed:
     "The price or duration changed. Review this offering again.",
@@ -73,7 +106,7 @@ export function useAction() {
         : e instanceof ApiError && e.status >= 500
           ? "The service is temporarily unavailable. Your changes are still here; try saving again."
           : e instanceof ApiError && e.status === 417
-            ? "The schedule could not be saved. Review the time fields and schedule requirements."
+            ? "Some details need your attention. Review your inputs and try again."
             : "We couldn’t save this change. Check your connection and inputs, then try again.");
     } finally {
       setBusy(false);

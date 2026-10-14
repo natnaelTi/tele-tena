@@ -13,7 +13,7 @@ Calm, human, precise, mobile-first. The extracted source at
 `/home/frappe/teletena-design-reference` is the current visual and interaction
 reference; its HTML is not operational code. Port composition and interaction
 patterns into the existing React application and connect actions to Frappe APIs.
-Keep the TeleTena mark already in `Brand.tsx` and the existing product rules.
+Use the supplied `assets/teletena-logo.jpeg` in the current extracted reference for the visible brand. Preserve existing product rules. The user’s 2026-10-09 design-fidelity correction supersedes the earlier original SVG instruction below; retain historical SVG variants until favicon/maskable review is complete.
 Use task-focused hierarchy and a blue–teal identity. Avoid giant generic cards,
 excessively wide forms, repeated banners, and dashboard-as-one-long-form.
 
@@ -235,3 +235,36 @@ Fontsource. No Google Fonts runtime calls.
 The packaged release runs at `/teletena/` with the existing design and persistent
 demonstration ribbon. Use router links within its basename and `BASE_URL` for
 public assets; do not hardcode development hosts or expose provider secrets.
+
+## Guided vetting and shared help island —13October2026
+
+The owner explicitly requested a clearer, stepped application and review UX.
+Preserve the existing tokens, privacy and native authorization. Reviewer I04 now
+uses a compact queue and one selected scope, with four stages: application/documents,
+credential verification, assessment, and decision/readiness. Scores organize evidence;
+mandatory requirements remain server-enforced. Secondary operational/appeal queues
+are expandable. Unsubmitted reviewer inputs remain in component memory between
+steps, not localStorage; refreshing loses these unsaved inputs.
+
+Clinician scope intake collects evidence in the Experience stage after saving a
+draft, grouped by requested service, while retaining separate individual decisions.
+General onboarding and scope authorization remain distinct. The Help & tours icon
+is one global bottom-right island in the React shell, present for guest and signed-in
+roles; on mobile it sits above bottom navigation/safe areas. It opens an accessible
+modal containing role-appropriate guidance, replay and a reviewer reference wiki.
+No tour starts automatically in sign-in, calls or other protected steps. Guide/tour
+navigation must preserve unsaved forms and never perform approvals, bookings or
+payments. This is an owner-authorized extension to I04/B07/B09, not a new palette.
+
+Profile-photo extension13October2026: reusable Avatar preserves initials when
+photos are absent or inaccessible. Account includes one compact photo editor;
+reviewers use `/admin/account`. Clinician publication is an explicit checkbox.
+No patient encounter avatar is replaced with an account photo. Existing component
+sizes, tokens, keyboard controls and mobile wrapping are retained.
+
+Final MVP navigation polish14October2026: own avatar/display name are one
+Account disclosure trigger with Account/Sign out, initials fallback, Escape,
+outside dismissal and keyboard movement. More retains the existing Radix drawer
+with role-specific Care/Practice/Payments or Applications/Operations sections.
+Native details keep their persisted form state, whole-row keyboard triggers and
+one aligned chevron. No call/notification/clinical permission design changes.

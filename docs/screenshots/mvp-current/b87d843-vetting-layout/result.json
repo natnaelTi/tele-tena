@@ -1,0 +1,17 @@
+{
+  "source": "b87d843de0827d3d4d80b8717fe0995d64346ef6",
+  "site": "tele-tena-pr12-fresh.localhost",
+  "real_backend": true,
+  "existing_private_fixture": true,
+  "otp_sent": false,
+  "saved_edits": false,
+  "original_applications_unchanged": true,
+  "local_fields_from_own_record": true,
+  "legacy_fixture_service_mismatch": true,
+  "paired_viewports": [
+    390,
+    768,
+    1440
+  ],
+  "persisted_journey_evidence": "9254a65-vetting/result.json"
+}

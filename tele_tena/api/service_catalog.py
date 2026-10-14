@@ -34,10 +34,10 @@ SERVICE_FIELDS = (
 )
 
 
-def _lines(value, allowed, label):
+def _lines(value, allowed, label, error_code='catalog_invalid_value'):
     values = [item.strip() for item in str(value or '').splitlines() if item.strip()]
     if len(values) != len(set(values)) or any(item not in allowed for item in values):
-        journey.fail(f'Choose supported {label}.', 'catalog_invalid_value')
+        journey.fail(f'Choose supported {label}.', error_code)
     return '\n'.join(values)
 
 
@@ -87,8 +87,9 @@ def definitions():
             FROM `tabTele Tena Service Category` ORDER BY label_en''', as_dict=True),
         'participant_formats': frappe.db.sql('''SELECT catalog_key AS id,label_en AS label,status
             FROM `tabTele Tena Participant Format` ORDER BY label_en''', as_dict=True),
-        'bookable_workflows': ['individual-consultation', 'private-notes', 'patient-summary'],
+        'bookable_workflows': ['individual-consultation', 'private-notes', 'patient-summary', 'couples-consent'],
         'supported_formats': sorted(FORMATS),
+        'can_review': 'Tele Tena Medical Lead' in frappe.get_roles(),
     }
 
 
@@ -129,7 +130,7 @@ def save_draft_definition(payload):
         journey.fail('Choose a supported population restriction.', 'catalog_invalid_value')
     formats = _lines(payload.get('supported_formats'), FORMATS, 'delivery formats')
     workflows = _lines(payload.get('required_workflows'), WORKFLOWS, 'required workflows')
-    rules = _lines(payload.get('booking_rules'), BOOKING_RULES, 'booking rules')
+    rules = _lines(payload.get('booking_rules'), BOOKING_RULES, 'booking rules', 'catalog_booking_rules_invalid')
     min_duration = journey.integer(str(payload.get('min_duration_minutes') or 0), 0, 240)
     max_duration = journey.integer(str(payload.get('max_duration_minutes') or 0), 0, 240)
     if bool(min_duration) != bool(max_duration) or (min_duration and min_duration > max_duration):
@@ -281,3 +282,67 @@ def save_attribute_definition(service, payload):
         frappe.get_doc({'doctype': 'Tele Tena Service Attribute Definition', **values}).insert()
     return {'service': service, 'field_key': key, 'definition_version': parent.definition_version,
             'active': bool(values['active'])}
+
+
+@journey.command
+def review_definition(service, decision, reason):
+    """A designated human medical lead decides terminology; no scope grant follows."""
+    reviewer = journey.actor('Tele Tena Medical Lead')
+    journey.actor('Tele Tena Approver')
+    reason = journey.text(reason, 1000)
+    if decision not in ('Approved', 'Needs information'):
+        journey.fail('Choose approval or request more information.', 'catalog_invalid_decision')
+    journey.one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    journey.one('SELECT name FROM `tabTele Tena Service` WHERE name=%s FOR UPDATE', (service,))
+    doc = frappe.get_doc('Tele Tena Service', service)
+    previous_decisions = journey.rows('''SELECT actor,evidence FROM tt_audit
+        WHERE subject=%s AND action='ServiceClinicalReview' ORDER BY created DESC,id DESC LIMIT 1''', (service,))
+    if previous_decisions:
+        import json
+        previous = json.loads(previous_decisions[0].evidence)
+        expected_status = 'Approved' if decision == 'Approved' else 'Not reviewed'
+        if (doc.clinical_review_status == expected_status
+                and previous_decisions[0].actor == reviewer and previous.get('decision') == decision
+                and previous.get('reason') == reason
+                and previous.get('definition_version') == doc.definition_version):
+            return {'id': service, 'status': doc.clinical_review_status,
+                    'active': bool(doc.active), 'scope_granted': False, 'idempotent': True}
+    if doc.catalog_status != 'Draft' or doc.clinical_review_status != 'In review' or doc.active:
+        journey.fail('Only a submitted draft definition can receive this decision.', 'catalog_review_state')
+    if decision == 'Approved':
+        required = ('description', 'catalog_source', 'professional_categories',
+                    'credential_requirements', 'supported_formats', 'required_consent_schema',
+                    'location_jurisdiction_policy', 'required_workflows', 'definition_version')
+        if any(not str(doc.get(key) or '').strip() for key in required):
+            journey.fail('Complete professional requirements, consent, jurisdiction and workflow rules before approval.', 'catalog_requirements_missing')
+        # Review must validate stored definitions too, including drafts created
+        # through native back-office APIs rather than the typed app command.
+        _lines(doc.supported_formats, FORMATS, 'delivery formats')
+        minimum = journey.integer(str(doc.min_duration_minutes or 0), 1, 240)
+        maximum = journey.integer(str(doc.max_duration_minutes or 0), 1, 240)
+        if minimum > maximum:
+            journey.fail('Minimum session length cannot exceed the maximum.', 'catalog_duration_invalid')
+        implemented = {'individual-consultation', 'private-notes', 'patient-summary', 'couples-consent'}
+        if (doc.population_restriction != 'Adults only'
+                or doc.participant_structure not in ('individual', 'couple')
+                or (doc.participant_structure == 'couple'
+                    and 'couples-consent' not in doc.required_workflows.splitlines())
+                or set(doc.required_workflows.splitlines()) - implemented
+                or not doc.min_duration_minutes or not doc.max_duration_minutes):
+            journey.fail('This definition needs an adult workflow supported by the current MVP.', 'catalog_workflow_unavailable')
+        doc.clinical_review_status = 'Approved'
+        doc.catalog_status = 'Active'
+        doc.active = 1
+    else:
+        doc.clinical_review_status = 'Not reviewed'
+    frappe.local.tele_tena_catalog_review_action = True
+    try:
+        doc.save()
+    finally:
+        frappe.local.tele_tena_catalog_review_action = False
+    journey.audit(service, 'ServiceClinicalReview', {
+        'decision': decision, 'reason': reason, 'definition_version': doc.definition_version,
+        'reviewer': reviewer, 'bookable_definition': bool(doc.active),
+        'external_credentials_verified': False})
+    return {'id': service, 'status': doc.clinical_review_status,
+            'active': bool(doc.active), 'scope_granted': False}

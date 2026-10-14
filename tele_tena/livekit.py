@@ -12,24 +12,30 @@ from urllib.parse import urlsplit
 import frappe
 
 
+def _configuration_error(message):
+    # Return a safe actionable category, never the credential values or path.
+    frappe.local.response['tele_tena_error'] = 'consultation_service_unconfigured'
+    frappe.throw(message, frappe.ValidationError)
+
+
 def _credentials():
     path = Path(frappe.get_site_path('private', 'tele_tena_livekit.json'))
     if path.is_symlink() or not path.is_file():
-        frappe.throw('LiveKit is not configured on this site', frappe.ValidationError)
+        _configuration_error('LiveKit is not configured on this site')
     mode = stat.S_IMODE(path.stat().st_mode)
     if mode != 0o600:
-        frappe.throw('LiveKit credential file must have mode 600', frappe.ValidationError)
+        _configuration_error('LiveKit credential file must have mode 600')
     try:
         values = json.loads(path.read_text())
         url, key, secret = values['url'], values['api_key'], values['api_secret']
     except (OSError, ValueError, KeyError, TypeError):
-        frappe.throw('LiveKit configuration is invalid', frappe.ValidationError)
+        _configuration_error('LiveKit configuration is invalid')
     parsed = urlsplit(url)
     local = parsed.hostname in ('localhost', '127.0.0.1', '::1')
     if parsed.scheme != 'wss' and not (local and parsed.scheme == 'ws'):
-        frappe.throw('LiveKit URL must use wss (ws is allowed for loopback development)', frappe.ValidationError)
+        _configuration_error('LiveKit URL must use wss (ws is allowed for loopback development)')
     if not parsed.netloc or parsed.username or parsed.password or not re.fullmatch(r'[A-Za-z0-9_-]{3,128}', key) or len(secret) < 16:
-        frappe.throw('LiveKit configuration is invalid', frappe.ValidationError)
+        _configuration_error('LiveKit configuration is invalid')
     return url, key, secret
 
 

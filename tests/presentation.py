@@ -33,6 +33,7 @@ from tele_tena.api import extensions
 from tele_tena.api import service_policy
 from tele_tena.api import service_catalog
 from tele_tena.api import financial_activity
+from tele_tena.account_context import authorized_user_change
 from tele_tena.patches import v1_23_multiple_offerings
 from tele_tena.patches import v1_24_legacy_completion_activity
 from tele_tena.patches import v1_25_legacy_refund_activity
@@ -54,6 +55,35 @@ def credential_source_payload(evidence):
             'credential_checked_on':frappe.utils.today(),
             'credential_evidence':evidence,
             'credential_source_reference':'SYNTHETIC-REGISTRY-REF'}
+
+
+def reviewed_test_service(values):
+    """Synthetic definitions still pass the real human-review command gates."""
+    user = frappe.get_doc('User', fixtures.USERS['admin'])
+    was_lead = 'Tele Tena Medical Lead' in frappe.get_roles(user.name)
+    with authorized_user_change():
+        user.add_roles('Tele Tena Medical Lead')
+    frappe.clear_cache(user=user.name)
+    values = {**values, 'catalog_status': 'Draft', 'active': 0,
+              'clinical_review_status': 'Not reviewed',
+              'professional_categories': 'Synthetic clinician',
+              'credential_requirements': 'Synthetic qualification and license evidence',
+              'supported_formats': 'video\naudio',
+              'required_consent_schema': 'adult-v1',
+              'location_jurisdiction_policy': 'synthetic-only',
+              'required_workflows': 'individual-consultation',
+              'min_duration_minutes': 15, 'max_duration_minutes': 120,
+              'catalog_source': 'Synthetic regression definition; not a clinical source'}
+    doc = frappe.get_doc(values).insert()
+    try:
+        service_catalog.submit_for_clinical_review(doc.name)
+        service_catalog.review_definition(doc.name, 'Approved', 'Synthetic human-led regression review.')
+    finally:
+        if not was_lead:
+            with authorized_user_change():
+                user.remove_roles('Tele Tena Medical Lead')
+            frappe.clear_cache(user=user.name)
+    return doc
 
 
 def day_offset(days=14, weekday=None, zone='Africa/Addis_Ababa'):
@@ -98,6 +128,229 @@ class Presentation(unittest.TestCase):
 
     def setUp(self):
         fixtures.login('admin')
+
+    def test_binary_pdf_storage_preserves_bytes_for_frappe16(self):
+        from tele_tena.api import vetting
+        fixtures.login('admin')
+        journey.review(fixtures.USERS['c3'],'Rejected')
+        fixtures.login('c3')
+        pdf=b'%PDF-1.4\nFictional non-UTF8 binary evidence: \xff\x80\xfe\n%%EOF'
+        presentation.upload_resume('fictional-binary.pdf',base64.b64encode(pdf).decode())
+        saved=journey.one('SELECT content FROM tt_resume_evidence WHERE clinician=%s',(fixtures.USERS['c3'],))
+        self.assertEqual(bytes(saved.content),pdf)
+        fixtures.login('admin')
+        service=fixtures.PREFIX+'-binary-doc'
+        reviewed_test_service(dict(doctype='Tele Tena Service',service_key=service,service_label='Fictional binary evidence service',description='Fictional adult service for binary document regression.',category='counseling',participant_structure='individual',vetting_required=1,definition_version='binary-test-1'))
+        fixtures.login('c3')
+        application=vetting.save_scope_application(service,{'professional_category':'Synthetic clinician'},False)
+        evidence=vetting.upload_scope_evidence(application['name'],'Qualification','fictional-binary.pdf',base64.b64encode(pdf).decode())
+        self.assertEqual(bytes(journey.one('SELECT content FROM tt_scope_evidence_content WHERE evidence=%s',(evidence['id'],)).content),pdf)
+
+    def test_profile_photo_owner_visibility_validation_and_revocation(self):
+        import io
+        from PIL import Image
+        from tele_tena.api import profile_photos as photos
+        from tele_tena.patches.v1_38_profile_photos import execute
+        execute()
+        execute()  # Fresh creation and repeat migration retain records.
+        stream = io.BytesIO()
+        Image.new('RGB', (80, 80), '#126b64').save(stream, format='PNG')
+        encoded = base64.b64encode(stream.getvalue()).decode()
+        try:
+            fixtures.login('p1')
+            private = photos.upload('photo.png', encoded)
+            photo_id = private['url'].split('=')[-1]
+            self.assertEqual(photos.download(photo_id).mimetype, 'image/jpeg')
+            with self.assertRaises(frappe.PermissionError):
+                photos.set_visibility(1)
+            for role in ('p2', 'c1', 'admin'):
+                fixtures.login(role)
+                with self.assertRaises(frappe.PermissionError):
+                    photos.download(photo_id)
+            fixtures.login('p1')
+            for filename, payload in [('unsafe.svg', encoded), ('fake.png', base64.b64encode(b'not an image').decode()),
+                                      ('large.png', 'A' * (photos.MAX_BYTES * 2))]:
+                with self.assertRaises(frappe.ValidationError):
+                    photos.upload(filename, payload)
+            self.assertEqual(photos.status()['url'], private['url'])
+            replacement = photos.upload('new.png', encoded)
+            with self.assertRaises(frappe.PermissionError):
+                photos.download(photo_id)
+            execute()
+            self.assertEqual(photos.status()['url'], replacement['url'])
+            fixtures.login('c1')
+            public = photos.upload('photo.png', encoded, published=1)
+            public_id = public['url'].split('=')[-1]
+            fixtures.login('p1')
+            self.assertEqual(photos.download(public_id).headers['Cache-Control'], 'private, no-store')
+            offers = journey.discover()
+            self.assertTrue(any(item.photo_url == public['url'] for item in offers))
+            self.assertNotIn(private['url'], json.dumps(offers))
+            fixtures.login('c1')
+            photos.set_visibility(0)
+            fixtures.login('p1')
+            with self.assertRaises(frappe.PermissionError):
+                photos.download(public_id)
+            fixtures.login('c1')
+            photos.remove()
+            self.assertIsNone(photos.status()['url'])
+            frappe.set_user('Guest')
+            with self.assertRaises(frappe.PermissionError):
+                photos.download(public_id)
+        finally:
+            fixtures.login('admin')
+            frappe.db.sql('DELETE FROM tt_profile_photo WHERE user IN %s', (tuple(fixtures.USERS.values()),))
+            frappe.db.commit()
+
+    def test_appointment_list_cancellation_actor_does_not_unmask_patient(self):
+        self.fund_patient('p1', 1000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        booked = self.book_slot(offering, self.slots(offering, day)[0], share_name=False)
+        fixtures.login('p1')
+        presentation.cancel_appointment(booked['id'], 'Plans changed')
+        own = next(row for row in journey.appointments() if row.id == booked['id'])
+        self.assertEqual(own.cancelled_by, 'You')
+        self.assertEqual(own.display_identity, 'Synthetic Test')
+        self.assertNotIn('clinician', own)
+        self.assertNotIn('clinician_display_name', own)
+        fixtures.login('c1')
+        visible = next(row for row in journey.appointments() if row.id == booked['id'])
+        self.assertEqual(visible.cancelled_by, 'Patient')
+        self.assertEqual(visible.display_identity, 'Private patient')
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(visible, default=str))
+        self.assertNotIn('patient', visible)
+        # Preserve the original actor for authorized internal auditing.
+        saved = journey.one('SELECT cancelled_by FROM tt_appointment WHERE id=%s', (booked['id'],))
+        self.assertEqual(saved.cancelled_by, fixtures.USERS['p1'])
+        fixtures.login('c2')
+        self.assertFalse(any(row.id == booked['id'] for row in journey.appointments()))
+        fixtures.login('p2')
+        self.assertFalse(any(row.id == booked['id'] for row in journey.appointments()))
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            journey.appointments()
+
+    def test_discovery_search_metadata_is_catalog_only(self):
+        fixtures.login('p1')
+        result = journey.services()
+        item = next(row for row in result if row.id == fixtures.PREFIX)
+        self.assertEqual(set(item), {'id', 'label', 'description', 'synonyms',
+                                     'service_label_am', 'service_label_om'})
+        for field in ('professional_categories', 'credentials', 'patient', 'user', 'email'):
+            self.assertNotIn(field, item)
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            journey.services()
+
+    def test_request_inbox_selects_tailored_offerings_by_scope_not_label(self):
+        day = day_offset(14)
+        fixtures.login('c1')
+        journey.save_profile('clinician', 'Synthetic scope-authorized clinician', 1, languages=['en'])
+        tailored = journey.publish(fixtures.PREFIX, 4900, 30,
+                                  title='Synthetic tailored session distinct from parent',
+                                  retry_key='tailored-inbox-' + secrets.token_hex(8))['offering']
+        scheduling.save_schedule(**schedule_payload(tailored, day, mode='automatic'))
+        audio = journey.publish(fixtures.PREFIX, 4900, 30,
+                                title='Synthetic audio-only session',
+                                retry_key='audio-inbox-' + secrets.token_hex(8))['offering']
+        scheduling.save_schedule(**{**schedule_payload(audio, day, mode='automatic'),
+                                    'consultation_format': 'audio'})
+        fixtures.login('p1')
+        slot = self.slots(tailored, day)[0]
+        request = open_requests.publish_request(
+            service=fixtures.PREFIX, request_text='Synthetic tailored-offer request.',
+            urgency='scheduled', language='en', consultation_format='video',
+            sharing={'name': False, 'history': False},
+            retry_key='tailored-request-' + secrets.token_hex(8),
+            timezone_name='Africa/Addis_Ababa', earliest_start=slot['start'],
+            latest_start=slot['start'])
+        fixtures.login('c1')
+        visible = next(item for item in open_requests.clinician_requests() if item.id == request['id'])
+        self.assertIn(tailored, visible.eligible_offering_ids)
+        self.assertNotIn(audio, visible.eligible_offering_ids)
+        self.assertNotIn(fixtures.Integration.offers['c2'], visible.eligible_offering_ids)
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(visible))
+        submitted = open_requests.submit_offer(request['id'], tailored, slot['start'])
+        self.assertEqual(submitted['state'], 'Active')
+        own_detail = open_requests.clinician_offers(offer_id=submitted['id'])['items']
+        self.assertEqual(len(own_detail), 1)
+        self.assertEqual(own_detail[0].id, submitted['id'])
+        self.assertNotIn('request_text', own_detail[0])
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(own_detail, default=str))
+        fixtures.login('c2')
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.clinician_offers(offer_id=submitted['id'])
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            open_requests.clinician_offers(offer_id=submitted['id'])
+        fixtures.login('c1')
+        self.assertTrue(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='Active')['items']))
+        self.assertFalse(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='History')['items']))
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.clinician_offers(view='Other')
+        open_requests.withdraw_offer(submitted['id'])
+        self.assertFalse(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='Active')['items']))
+        self.assertTrue(any(item.id == submitted['id'] for item in open_requests.clinician_offers(view='History')['items']))
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], fixtures.PREFIX, 'Revoked')
+        fixtures.login('c1')
+        self.assertFalse(any(item.id == request['id'] for item in open_requests.clinician_requests()))
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], fixtures.PREFIX, 'Approved')
+
+    def test_practice_only_lists_own_current_approved_scopes(self):
+        fixtures.login('admin')
+        own = fixtures.PREFIX + '-practice-own'
+        foreign = fixtures.PREFIX + '-practice-other'
+        unapproved = fixtures.PREFIX + '-practice-unapproved'
+        for service in (own, foreign, unapproved):
+            journey.save_service(service, 'Synthetic practice scope')
+        journey.review_service_scope(fixtures.USERS['c1'], own, 'Approved')
+        journey.review_service_scope(fixtures.USERS['c2'], foreign, 'Approved')
+        fixtures.login('c1')
+        approved = [item.id for item in journey.practice()['approved_services']]
+        self.assertIn(own, approved)
+        self.assertNotIn(foreign, approved)
+        self.assertNotIn(unapproved, approved)
+        created = journey.publish(own, 4500, 50, title='Synthetic fifty-minute session',
+                                  retry_key='practice-' + secrets.token_hex(10))
+        self.assertEqual(next(item.minutes for item in journey.practice()['offerings']
+                              if item.id == created['offering']), 50)
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], own, 'Revoked')
+        fixtures.login('c1')
+        self.assertNotIn(own, [item.id for item in journey.practice()['approved_services']])
+        self.assertIn(created['offering'], [item.id for item in journey.practice()['offerings']])
+        with self.assertRaises(frappe.ValidationError):
+            journey.publish(own, 4500, 50, title='Synthetic fifty-minute session',
+                            offering_id=created['offering'])
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            journey.practice()
+
+    def test_public_profile_uses_tailored_offerings_and_rechecks_revoked_scope(self):
+        fixtures.login('admin')
+        service = fixtures.PREFIX + '-profile-scope'
+        journey.save_service(service, 'Synthetic profile parent scope')
+        journey.review_service_scope(fixtures.USERS['c1'], service, 'Approved')
+        fixtures.login('c1')
+        created = journey.publish(service, 4200, 30, title='Synthetic tailored profile session',
+                                  description='Synthetic public description', retry_key='profile-' + secrets.token_hex(10))
+        start = (datetime.now(timezone.utc) + timedelta(days=2)).replace(hour=9, minute=0, second=0, microsecond=0)
+        scheduling.save_schedule(**schedule_payload(created['offering'], start.date()))
+        fixtures.login('p1')
+        discovered = next(item for item in journey.discover(service) if item.id == created['offering'])
+        result = open_requests.clinician_profile(discovered.clinician_id)
+        selected = next(item for item in result['services'] if item.offering == created['offering'])
+        self.assertEqual(selected.label, 'Synthetic tailored profile session')
+        self.assertEqual(selected.description, 'Synthetic public description')
+        self.assertNotIn('service', selected)
+        self.assertNotIn(fixtures.USERS['c1'], json.dumps(result, default=str))
+        fixtures.login('admin')
+        journey.review_service_scope(fixtures.USERS['c1'], service, 'Revoked')
+        fixtures.login('p1')
+        self.assertNotIn(created['offering'], [item.offering for item in open_requests.clinician_profile(discovered.clinician_id)['services']])
 
     def test_clinician_can_publish_multiple_retry_safe_offerings_within_one_scope(self):
         service = fixtures.PREFIX
@@ -276,12 +529,12 @@ class Presentation(unittest.TestCase):
     def test_structured_scope_vetting_blocks_legacy_approval_bypass(self):
         service = fixtures.PREFIX + '-vetting-scope'
         fixtures.login('admin')
-        frappe.get_doc({'doctype':'Tele Tena Service','service_key':service,
+        reviewed_test_service({'doctype':'Tele Tena Service','service_key':service,
             'service_label':'Synthetic vetted service','active':1,'catalog_status':'Active',
             'category':'psychotherapy','description':'Synthetic test definition',
             'population_restriction':'Adults only','participant_structure':'individual',
             'clinical_review_status':'Approved','vetting_required':1,
-            'definition_version':'test-v1'}).insert()
+            'definition_version':'test-v1'})
         fixtures.login('c1')
         submitted = vetting.save_scope_application(service, {
             'professional_category':'Synthetic clinician','qualification':'Synthetic qualification',
@@ -787,12 +1040,12 @@ class Presentation(unittest.TestCase):
     def test_vetting_draft_clarification_resubmission_and_scope_decision(self):
         service = fixtures.PREFIX + '-reviewed-scope'
         fixtures.login('admin')
-        frappe.get_doc({'doctype':'Tele Tena Service','service_key':service,
+        reviewed_test_service({'doctype':'Tele Tena Service','service_key':service,
             'service_label':'Synthetic adult counseling scope','active':1,'catalog_status':'Active',
             'category':'counseling','description':'Synthetic only; reviewer lifecycle regression.',
             'population_restriction':'Adults only','participant_structure':'individual',
             'clinical_review_status':'Approved','vetting_required':1,
-            'definition_version':'synthetic-v1'}).insert()
+            'definition_version':'synthetic-v1'})
         email = 'vetting-' + secrets.token_hex(6) + '@example.invalid'
         fixtures.USERS['vetting'] = email
         frappe.set_user('Administrator')
@@ -1067,12 +1320,12 @@ class Presentation(unittest.TestCase):
     def test_scope_credential_reverification_is_separate_and_expiry_fails_closed(self):
         service = fixtures.PREFIX + '-credential-renewal'
         fixtures.login('admin')
-        frappe.get_doc({'doctype':'Tele Tena Service','service_key':service,
+        reviewed_test_service({'doctype':'Tele Tena Service','service_key':service,
             'service_label':'Synthetic credential renewal scope','active':1,'catalog_status':'Active',
             'category':'counseling','description':'Synthetic renewal behavior only.',
             'population_restriction':'Adults only','participant_structure':'individual',
             'clinical_review_status':'Approved','vetting_required':1,
-            'definition_version':'synthetic-v1'}).insert()
+            'definition_version':'synthetic-v1'})
         email = 'renewal-' + secrets.token_hex(6) + '@example.invalid'
         fixtures.USERS['renewal'] = email
         frappe.set_user('Administrator')
@@ -1364,6 +1617,33 @@ class Presentation(unittest.TestCase):
             frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
 
+    def test_matching_operations_omit_identity_narrative_quotes_and_records(self):
+        fixtures.login('p1')
+        start = (datetime.now(timezone.utc) + timedelta(days=3)).isoformat()
+        request = open_requests.publish_request(service=fixtures.PREFIX,
+            request_text='Private matching operations fixture narrative', urgency='scheduled',
+            language='en',consultation_format='audio',sharing={'name':False,'history':False},
+            retry_key='operations-'+secrets.token_hex(8),timezone_name='Africa/Addis_Ababa',
+            earliest_start=start,latest_start=start)
+        for role in ('p1','p2','c1','c2'):
+            fixtures.login(role)
+            with self.assertRaises(frappe.PermissionError):
+                open_requests.matching_operations()
+        fixtures.login('admin')
+        result = open_requests.matching_operations(page_size=5)
+        self.assertGreater(result['total'],0)
+        self.assertLessEqual(len(result['items']),5)
+        encoded=json.dumps(result,default=str)
+        self.assertNotIn('Private matching operations fixture narrative',encoded)
+        self.assertNotIn(fixtures.USERS['p1'],encoded)
+        self.assertNotIn('price_minor',encoded)
+        self.assertNotIn('disclosure_snapshot',encoded)
+        self.assertTrue(any(row['reference']==request['id'][:8] for row in result['items']))
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.matching_operations(state='Unsupported')
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.matching_operations(page_size=1000)
+
     def test_patient_request_detail_is_owner_scoped_and_returns_persisted_snapshot(self):
         fixtures.login('p1')
         key = 'request-detail-' + secrets.token_hex(8)
@@ -1496,12 +1776,32 @@ class Presentation(unittest.TestCase):
         self.assertNotIn(fixtures.USERS['p1'], json.dumps(history))
         self.assertNotIn('Synthetic request for private offer regression.', json.dumps(history))
         self.assertNotIn('disclosure_snapshot', json.dumps(history))
+        notifications = open_requests.clinician_notifications()['items']
+        notification = next(item for item in notifications if item.id == winning.id)
+        self.assertEqual(notification.appointment, match['appointment'])
+        self.assertFalse(notification.read)
+        self.assertNotIn(fixtures.USERS['p1'], json.dumps(notifications, default=str))
+        self.assertNotIn('disclosure_snapshot', json.dumps(notifications, default=str))
+        self.assertTrue(open_requests.read_clinician_notification(winning.id)['read'])
+        self.assertTrue(open_requests.read_clinician_notification(winning.id)['read'])
+        self.assertTrue(next(item for item in open_requests.clinician_notifications()['items'] if item.id == winning.id).read)
+
         with self.assertRaises(frappe.ValidationError):
             open_requests.clinician_offers(-1)
         fixtures.login('c2')
         own_loser = next(item for item in open_requests.clinician_offers()['items'] if item.id == losing.id)
         self.assertEqual(own_loser.state, 'Superseded')
         self.assertIsNone(own_loser.appointment)
+        self.assertFalse(any(item.id == winning.id for item in open_requests.clinician_notifications()['items']))
+        with self.assertRaises(frappe.ValidationError):
+            open_requests.read_clinician_notification(winning.id)
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            open_requests.clinician_notifications()
+        frappe.set_user('Guest')
+        with self.assertRaises(frappe.PermissionError):
+            open_requests.clinician_notifications()
+
 
     def test_progressive_request_waves_are_due_bounded_and_deduplicated(self):
         """The scheduler widens to new eligible clinicians without repeat notices."""
@@ -2054,6 +2354,7 @@ class Presentation(unittest.TestCase):
         self.assertEqual(after, before)
 
     def test_prefunded_extension_requires_consent_and_settles_once(self):
+        from tele_tena.api import consultations
         from tele_tena import accounting
         offering = fixtures.Integration.offers['c1']
         day, _, _ = self.make_schedule(mode='automatic', offering=offering)
@@ -2102,7 +2403,8 @@ class Presentation(unittest.TestCase):
                       (proposal['id'],))
         fixtures.login('c1')
         self.assertEqual(extensions.start_extension(appointment, proposal['id'])['state'], 'Started')
-        frappe.db.sql("UPDATE tt_consultation SET state='Ended',ended=UTC_TIMESTAMP(6) WHERE appointment=%s", (appointment,))
+        with patch('tele_tena.livekit.close_room'):
+            consultations.end(appointment)
         presentation.save_note_draft(appointment, 'Synthetic private note', 'Synthetic patient summary')
         with patch.dict(frappe.conf, {'tele_tena_demo_platform_fee_bps': 0,
                                      'tele_tena_demo_dispute_window_minutes': 30}):
@@ -2177,6 +2479,13 @@ class Presentation(unittest.TestCase):
                 (booked['id'], str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex,
                  uuid.uuid4().hex, now, now))
             fixtures.login('c1')
+            # This older fixture represented Ended without transport closure.
+            # Exercise the actual closure retry before financial finalization.
+            from tele_tena.api import consultations
+            with patch('tele_tena.livekit.close_room') as closed:
+                consultations.end(booked['id'])
+                closed.assert_called_once()
+            self.assertEqual(journey.one('SELECT room_closed FROM tt_consultation WHERE appointment=%s', (booked['id'],)).room_closed, 1)
             presentation.save_note_draft(booked['id'], 'Synthetic private note', 'Synthetic patient summary')
             with patch.dict(frappe.conf, {'tele_tena_demo_platform_fee_bps': 5000,
                                          'tele_tena_demo_dispute_window_minutes': 100}):
@@ -2236,8 +2545,8 @@ class Presentation(unittest.TestCase):
             booked = self.book_slot(offering, self.slots(offering, day, who='p2')[0], 'earnings-dispute', who='p2')
             now = datetime.now(timezone.utc).replace(tzinfo=None)
             frappe.db.sql('''INSERT INTO tt_consultation
-                (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended)
-                VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s)''',
+                (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended,room_closed)
+                VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,1)''',
                 (booked['id'], str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex,
                  uuid.uuid4().hex, now, now))
             fixtures.login('c1')
@@ -2274,8 +2583,8 @@ class Presentation(unittest.TestCase):
         booked = self.book_slot(offering, self.slots(offering, day, who='p2')[0], 'release-wins', who='p2')
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         frappe.db.sql('''INSERT INTO tt_consultation
-            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended)
-            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s)''',
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,1)''',
             (booked['id'], str(uuid.uuid4()), uuid.uuid4().hex, uuid.uuid4().hex,
              uuid.uuid4().hex, now, now))
         fixtures.login('c1')
@@ -2293,6 +2602,53 @@ class Presentation(unittest.TestCase):
         self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_dispute WHERE earning=%s', (earning.id,)).n, 0)
         self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s',
                                      ('earning-refund:' + earning.id,)).n, 0)
+
+    def test_concurrent_dispute_and_release_have_one_authoritative_outcome(self):
+        from tele_tena import accounting
+        offering = fixtures.Integration.offers['c1']
+        self.fund_patient('p2', 1000)
+        day, _, _ = self.make_schedule(mode='automatic', offering=offering)
+        booked = self.book_slot(offering, self.slots(offering, day, who='p2')[0], 'dispute-release-race', who='p2')
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql("""INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,1)""",
+            (booked['id'],str(uuid.uuid4()),uuid.uuid4().hex,uuid.uuid4().hex,uuid.uuid4().hex,now,now))
+        fixtures.login('c1')
+        presentation.save_note_draft(booked['id'], 'Owned race fixture note', '')
+        presentation.finalize_consultation(booked['id'], 0)
+        frappe.db.sql('UPDATE tt_earning SET release_at=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND WHERE appointment=%s', (booked['id'],))
+        frappe.db.commit()
+        barrier = threading.Barrier(2)
+        def race(command):
+            fixtures.connect()
+            try:
+                fixtures.login('p2')
+                barrier.wait(timeout=10)
+                if command == 'dispute':
+                    try:
+                        accounting.open_earning_dispute(booked['id'], 'Owned concurrent dispute')
+                        frappe.db.commit()
+                        return 'held'
+                    except frappe.ValidationError:
+                        frappe.db.rollback()
+                        return 'release-won'
+                accounting.release_eligible_earnings()
+                frappe.db.commit()
+                return 'release-processed'
+            finally:
+                frappe.destroy()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            outcomes = list(pool.map(race, ('dispute', 'release')))
+        frappe.db.rollback()
+        earning = journey.one('SELECT id,state FROM tt_earning WHERE appointment=%s', (booked['id'],))
+        releases = journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s', ('earning-release:' + earning.id,)).n
+        disputes = journey.one("SELECT COUNT(*) n FROM tt_dispute WHERE earning=%s AND status='Open'", (earning.id,)).n
+        self.assertIn(earning.state, ('Released','Disputed'))
+        self.assertEqual((int(releases),int(disputes)), (1,0) if earning.state=='Released' else (0,1))
+        self.assertEqual(outcomes[0], 'release-won' if earning.state=='Released' else 'held')
+        accounting.release_eligible_earnings()
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s', ('earning-release:' + earning.id,)).n,releases)
 
     def test_concurrent_payouts_cannot_overreserve_earnings(self):
         from tele_tena import accounting
@@ -2396,7 +2752,184 @@ class Presentation(unittest.TestCase):
         self.assertEqual(after.start, original.start)
         self.assertEqual(after.timezone, 'Africa/Addis_Ababa')
 
+    def test_finalization_waits_for_room_closure_and_draft_retries_are_idempotent(self):
+        self.fund_patient('p1', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        appointment = self.book_slot(offering, self.slots(offering, day)[0], 'closure-before-finalize')['id']
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql("""INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended_by,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,%s,0)""",
+            (appointment, secrets.token_hex(16), secrets.token_hex(32), secrets.token_hex(24),
+             secrets.token_hex(24), now, fixtures.USERS['c1'], now))
+        fixtures.login('c1')
+        saved = presentation.save_note_draft(appointment, 'Private fictional note', 'Shared fictional summary')
+        retry = presentation.save_note_draft(appointment, 'Private fictional note', 'Shared fictional summary')
+        self.assertEqual(saved['revision'], retry['revision'])
+        self.assertTrue(retry['idempotent'])
+        with self.assertRaises(frappe.ValidationError):
+            presentation.finalize_consultation(appointment, 1)
+        self.assertEqual(frappe.local.response.get('tele_tena_error'), 'consultation_close_pending')
+        self.assertEqual(journey.one('SELECT state FROM tt_appointment WHERE id=%s', (appointment,)).state, 'Booked')
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_earning WHERE appointment=%s', (appointment,)).n, 0)
+        # Model successful provider closure, not merely elapsed scheduled time.
+        frappe.db.sql('UPDATE tt_consultation SET room_closed=1 WHERE appointment=%s', (appointment,))
+        presentation.finalize_consultation(appointment, 1)
+        retry = presentation.save_note_draft(appointment, 'Private fictional note', 'Shared fictional summary')
+        self.assertEqual(retry['status'], 'Finalized')
+        self.assertTrue(presentation.finalize_consultation(appointment, 1)['idempotent'])
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_earning WHERE appointment=%s', (appointment,)).n, 1)
+        fixtures.login('p1')
+        detail = presentation.appointment_detail(appointment)
+        self.assertEqual(sum(event['event'] == 'Consultation completed' for event in detail['timeline']), 1)
+        self.assertEqual(sum(event['event'] == 'Documentation published' for event in detail['timeline']), 1)
+        self.assertNotIn('private_note', detail)
+        self.assertNotIn('Private fictional note', str(detail))
+        from tele_tena.api import consultations
+        terminal = consultations.consultation(appointment)
+        self.assertEqual(terminal['appointment_state'], 'Completed')
+        self.assertEqual(terminal['state'], 'Ended')
+        self.assertEqual(terminal['documentation_state'], 'Finalized')
+        self.assertFalse(terminal['can_join'])
+        self.assertFalse(terminal['can_end'])
+        with self.assertRaises(frappe.ValidationError):
+            consultations.join(appointment)
+        for user in ('p2', 'admin', 'c2'):
+            fixtures.login(user)
+            with self.assertRaises(frappe.PermissionError):
+                consultations.consultation(appointment)
+        fixtures.login('c1')
+        self.assertEqual(consultations.consultation(appointment)['appointment_state'], 'Completed')
+        with self.assertRaises(frappe.ValidationError):
+            consultations.join(appointment)
+
+    def test_explicit_note_sharing_preserves_private_revisions_and_money(self):
+        self.fund_patient('p1', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        booked = self.book_slot(offering, self.slots(offering, day)[0], 'explicit-note-sharing')
+        appointment = booked['id']
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        frappe.db.sql("""INSERT INTO tt_consultation
+            (appointment,id,room_name,patient_identity,clinician_identity,state,created,ended_by,ended,room_closed)
+            VALUES (%s,%s,%s,%s,%s,'Ended',%s,%s,%s,1)""",
+            (appointment, secrets.token_hex(16), secrets.token_hex(32), secrets.token_hex(24),
+             secrets.token_hex(24), now, fixtures.USERS['c1'], now))
+        frappe.db.commit()
+        fixtures.login('c1')
+        presentation.save_note_draft(appointment, 'First private fictional note', '')
+        presentation.finalize_consultation(appointment, 0)
+        fixtures.login('p1')
+        first = presentation.appointment_detail(appointment)
+        self.assertEqual(first['shared_consultation_notes'], [])
+        self.assertNotIn('private_note', first)
+        self.assertNotIn('First private fictional note', str(first))
+        wallet_after_completion = journey.wallet()
+        fixtures.login('c1')
+        presentation.save_note_draft(appointment, 'Explicitly shared fictional note', '', 1)
+        own = presentation.appointment_detail(appointment)
+        self.assertTrue(own['private_note']['note_share_selected'])
+        self.assertFalse(own['private_note']['note_published'])
+        fixtures.login('p1')
+        self.assertEqual(presentation.appointment_detail(appointment)['shared_consultation_notes'], [])
+        fixtures.login('c1')
+        with self.assertRaises(frappe.ValidationError):
+            presentation.finalize_consultation(appointment, 0, 'yes')
+        presentation.finalize_consultation(appointment, 0, 1)
+        fixtures.login('p1')
+        published = presentation.appointment_detail(appointment)
+        self.assertEqual([r['text'] for r in published['shared_consultation_notes']],
+                         ['Explicitly shared fictional note'])
+        self.assertNotIn('private_note', published)
+        self.assertNotIn('First private fictional note', str(published))
+        fixtures.login('c1')
+        presentation.save_note_draft(appointment, 'Later private fictional amendment', '', 0)
+        presentation.finalize_consultation(appointment, 0, 0)
+        from tele_tena.patches.v1_31_explicit_note_sharing import execute as note_patch
+        from tele_tena.patches.v1_32_note_sharing_draft_choice import execute as choice_patch
+        note_patch(); choice_patch(); note_patch(); choice_patch()
+        fixtures.login('p1')
+        final = presentation.appointment_detail(appointment)
+        self.assertEqual(final['shared_consultation_notes'], published['shared_consultation_notes'])
+        self.assertNotIn('Later private fictional amendment', str(final))
+        self.assertEqual(journey.wallet(), wallet_after_completion)
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal WHERE event_ref=%s',
+                                     ('completion:' + appointment,)).n, 1)
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_earning WHERE appointment=%s',
+                                     (appointment,)).n, 1)
+        for other in ('p2', 'c2', 'admin'):
+            fixtures.login(other)
+            with self.assertRaises(frappe.PermissionError):
+                presentation.appointment_detail(appointment)
+
+    def test_reservation_display_uses_postings_not_completed_status(self):
+        self.fund_patient('p1', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        booked = self.book_slot(offering, self.slots(offering, day)[0], 'held-display')
+        fixtures.login('p1')
+        before = journey.wallet()
+        journals = frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0]
+        self.assertEqual(presentation.appointment_detail(booked['id'])['reservation_state'], 'Reserved')
+        # This owned fixture represents the historical Completed-but-held case.
+        # The query must not fabricate a financial consumption from its label.
+        frappe.db.sql("UPDATE tt_appointment SET state='Completed' WHERE id=%s", (booked['id'],))
+        self.assertEqual(presentation.appointment_detail(booked['id'])['reservation_state'], 'Reserved')
+        record = journey.one('SELECT price FROM tt_appointment WHERE id=%s', (booked['id'],))
+        frappe.db.sql("""INSERT INTO tt_earning
+            (id,appointment,patient,clinician,gross_minor,fee_minor,net_minor,policy_snapshot,state,created,modified)
+            VALUES (%s,%s,%s,%s,%s,0,%s,'{}','LegacyHold',UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))""",
+            (str(uuid.uuid4()), booked['id'], fixtures.USERS['p1'], fixtures.USERS['c1'],
+             record.price, record.price))
+        detail = presentation.appointment_detail(booked['id'])
+        self.assertEqual(detail['financial_state'], 'LegacyHold')
+        self.assertEqual(detail['reservation_state'], 'Review required')
+        self.assertEqual(journey.wallet(), before)
+        self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0], journals)
+        fixtures.login('p2')
+        with self.assertRaises(frappe.PermissionError):
+            presentation.appointment_detail(booked['id'])
+
+    def test_care_records_do_not_link_different_patients_with_equal_names(self):
+        self.fund_patient('p1', 3000)
+        self.fund_patient('p2', 3000)
+        day, _, _ = self.make_schedule(mode='automatic')
+        offering = fixtures.Integration.offers['c1']
+        for who in ('p1', 'p2'):
+            fixtures.login(who)
+            journey.save_profile('patient', 'Same fictional preferred name', 1)
+        first = self.book_slot(offering, self.slots(offering, day)[0],
+                               'same-name-first', share_name=True)
+        second = self.book_slot(offering, self.slots(offering, day, who='p2')[-1],
+                                'same-name-second', share_name=True, who='p2')
+        fixtures.login('c1')
+        directory = presentation.care_directory(search='Same fictional preferred name')
+        self.assertEqual(len(directory['rows']), 2)
+        for row in directory['rows']:
+            self.assertEqual(row['encounter_count'], 1)
+            self.assertNotIn('patient', row)
+        self.assertEqual([row['id'] for row in presentation.care_patient_record(first['id'])['encounters']], [first['id']])
+        self.assertEqual([row['id'] for row in presentation.care_patient_record(second['id'])['encounters']], [second['id']])
+        # An owned synthetic legacy record has no recorded outcome; it is not future care.
+        frappe.db.sql('UPDATE tt_appointment SET start=%s,end=%s WHERE id=%s',
+                      (datetime.now(timezone.utc).replace(tzinfo=None)-timedelta(days=2),
+                       datetime.now(timezone.utc).replace(tzinfo=None)-timedelta(days=2)+timedelta(minutes=30),
+                       first['id']))
+        past = next(row for row in presentation.care_directory()['rows'] if row['id'] == first['id'])
+        self.assertIsNone(past['next_appointment'])
+        self.assertIsNone(past['last_consultation'])
+        self.assertEqual(past['state'], 'Booked')
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            presentation.care_patient_record(first['id'])
+
     def test_04_notes_privacy_revision_completion_and_encounter_scope(self):
+        fixtures.login('p1')
+        previous_count = sum(row.completed_sessions for row in journey.previous_clinicians())
+        clinician_id = journey.one('SELECT public_id FROM tt_profile WHERE user=%s',
+                                   (fixtures.USERS['c1'],)).public_id
+        reliability_before = open_requests.clinician_profile(clinician_id)['trust_indicators']['reliability']['sample_count']
         self.fund_patient('p1', 3000)
         day, _, _ = self.make_schedule(mode='automatic')
         offering = fixtures.Integration.offers['c1']
@@ -2424,6 +2957,16 @@ class Presentation(unittest.TestCase):
             (appointment, secrets.token_hex(16), secrets.token_hex(32), secrets.token_hex(24),
              secrets.token_hex(24), now, clinician, now))
         frappe.db.commit()
+        fixtures.login('c1')
+        preview = presentation.preview_patient_summary(appointment, 'Unsaved patient-visible preview')
+        self.assertEqual(preview['summary'], 'Unsaved patient-visible preview')
+        self.assertEqual(preview['revision'], 0)
+        self.assertTrue(preview['preview_only'])
+        self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_note_revision WHERE appointment=%s',
+                                    (appointment,)).n, 0)
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError):
+            presentation.preview_patient_summary(appointment, 'Unauthorized preview')
         fixtures.login('c1')
         presentation.save_note_draft(appointment, 'Private synthetic observation', 'Helpful next steps')
         detail = presentation.appointment_detail(appointment)
@@ -2454,7 +2997,7 @@ class Presentation(unittest.TestCase):
         previous = journey.previous_clinicians()
         self.assertEqual(len(previous), 1)
         self.assertEqual(previous[0].display_name, 'Synthetic Test')
-        self.assertEqual(previous[0].completed_sessions, 1)
+        self.assertEqual(previous[0].completed_sessions, previous_count + 1)
         self.assertNotEqual(previous[0].clinician_id, fixtures.USERS['c1'])
         self.assertNotIn(fixtures.USERS['c1'], json.dumps(previous, default=str))
         fixtures.login('p2')
@@ -2504,7 +3047,7 @@ class Presentation(unittest.TestCase):
         self.assertEqual(response_metric['sample_count'], 0)
         self.assertIsNone(response_metric['rate_percent'])
         reliability_metric = public_profile['trust_indicators']['reliability']
-        self.assertEqual(reliability_metric['sample_count'], 1)
+        self.assertEqual(reliability_metric['sample_count'], reliability_before + 1)
         self.assertIsNone(reliability_metric['rate_percent'])
         fixtures.login('c1')
         presentation.save_note_draft(appointment, 'Amended private observation', 'New next steps')
@@ -2557,6 +3100,37 @@ class Presentation(unittest.TestCase):
         fixtures.login('p1')
         with self.assertRaises(frappe.PermissionError):
             presentation.tour_state('clinician-availability')
+
+    def test_legacy_unknown_event_fails_visibly_without_rewriting_owner(self):
+        from tele_tena import accounting
+        from tele_tena.patches.v1_8_legacy_event_reconciliation import reconcile_wallet_events
+        from tele_tena.patches.v1_13_financial_reconciliation_audit import audit_wallet
+        savepoint = 'tt_unknown_' + uuid.uuid4().hex[:16]
+        frappe.db.sql('SAVEPOINT ' + savepoint)
+        patient = 'unknown-' + uuid.uuid4().hex[:16] + '@example.invalid'
+        try:
+            frappe.db.sql('INSERT INTO tt_wallet (patient,available,reserved) VALUES (%s,100,0)', (patient,))
+            ref = 'opening:' + patient
+            accounting.post(ref, 'Opening', ref,
+                [(accounting.account_id('patient', patient, 'available'), 0, 100),
+                 ('demo:opening-control', 100, 0)], {'source': 'owned unknown-event regression'})
+            event_ref = 'unknown:' + uuid.uuid4().hex
+            journey.simulation_log(patient, 'UnsupportedKind', 20, event_ref)
+            before = journey.one('SELECT COUNT(*) n FROM tt_journal').n
+            for attempt in range(2):
+                with self.assertRaises(frappe.ValidationError):
+                    reconcile_wallet_events(patient)
+                result = audit_wallet(patient)
+                self.assertFalse(result['matches'])
+                self.assertEqual(result['unknown_event_count'], 1)
+                self.assertEqual(result['wallet']['available'], 100)
+                self.assertEqual(accounting.balance('patient', patient, 'available'), 100)
+            self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_journal').n, before)
+            self.assertEqual(journey.one('SELECT COUNT(*) n FROM tt_ledger WHERE reference=%s', (event_ref,)).n, 1)
+            self.assertEqual(journey.one('SELECT status FROM tt_financial_reconciliation WHERE patient=%s', (patient,)).status, 'ReviewRequired')
+        finally:
+            frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
+            frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
 
     def test_06_legacy_wallet_events_after_opening_snapshot_reconcile_once(self):
         from tele_tena import accounting
@@ -2724,6 +3298,276 @@ class Presentation(unittest.TestCase):
             frappe.db.sql('ROLLBACK TO SAVEPOINT ' + savepoint)
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
 
+    def test_initial_professional_claims_reach_owner_reviewer_and_scope_draft(self):
+        claims = {'professional_category': 'Fictional counselor',
+                  'qualification': 'Fictional counseling degree',
+                  'issuing_institution': 'Fictional college',
+                  'experience_years': 3, 'competencies': 'Adult counseling',
+                  'certifications': 'Fictional training certificate',
+                  'credential_valid_from': '2020-01-01', 'credential_expiry': '2030-01-01'}
+        user = 'claims-' + secrets.token_hex(6) + '@example.invalid'
+        fixtures.USERS['claims'] = user
+        frappe.set_user('Administrator')
+        account = frappe.get_doc({'doctype': 'User', 'email': user, 'first_name': 'Fictional applicant',
+                                  'send_welcome_email': 0, 'user_type': 'Website User'}).insert()
+        account.add_roles('Tele Tena Clinician')
+        fixtures.login('claims')
+        journey.save_profile('clinician', 'Fictional applicant', True, languages=['en'])
+        presentation.upload_resume('fictional-claims-cv.pdf',
+                                  base64.b64encode(b'%PDF-1.4\nFictional CV\n%%EOF').decode())
+        journey.apply('Fictional applicant claims')
+        fixtures.login('admin')
+        key = fixtures.PREFIX + '-claims-roundtrip'
+        service_catalog.save_draft_definition({
+            'service_key': key, 'service_label': 'Fictional counseling intake',
+            'category': 'counseling', 'description': 'Fictional test definition.',
+            'participant_structure': 'individual', 'supported_formats': 'video',
+            'population_restriction': 'Adults only', 'definition_version': 'test-1',
+            'catalog_source': 'Fictional test source'})
+        frappe.db.sql('''INSERT INTO tt_onboarding (user,kind,step,answers,completed,modified)
+            VALUES (%s,'clinician',3,%s,UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))''',
+            (user, json.dumps({'professional': claims})))
+        try:
+            reviewed = next(row for row in journey.applications() if row.user == user)
+            self.assertEqual(reviewed.application_profile, claims)
+            fixtures.login('claims')
+            self.assertEqual(vetting.application_context()['professional'], claims)
+            self.assertEqual(journey.applications()[0].application_profile, claims)
+            values = {**claims, 'population_adults': False}
+            with self.assertRaises(frappe.ValidationError):
+                vetting.save_scope_application(key, values, True)
+            self.assertEqual(frappe.local.response.get('tele_tena_error'), 'scope_adult_required')
+            self.assertEqual(frappe.db.count('Tele Tena Vetting Scope Application',
+                                            {'clinician': user, 'service': key}), 0)
+            draft = vetting.save_scope_application(key, {**values, 'population_adults': True})
+            saved = next(row for row in vetting.my_scope_applications() if row.name == draft['name'])
+            for field in ('competencies', 'certifications', 'credential_valid_from'):
+                self.assertEqual(str(saved[field]), claims[field])
+            submitted = vetting.save_scope_application(key, {**values, 'population_adults': True}, True)
+            self.assertEqual(submitted['status'], 'Submitted')
+            repeated = vetting.save_scope_application(key, {**values, 'population_adults': True}, True)
+            self.assertTrue(repeated['idempotent'])
+            fixtures.login('p1')
+            with self.assertRaises(frappe.PermissionError):
+                journey.applications()
+        finally:
+            frappe.db.sql('DELETE FROM tt_onboarding WHERE user=%s', (user,))
+
+    def test_draft_catalog_multi_scope_intake_is_atomic_private_and_retry_safe(self):
+        keys = [fixtures.PREFIX + '-intake-' + str(number) for number in range(10)]
+        values = {'professional_category': 'Fictional counselor',
+                  'qualification': 'Fictional counseling degree',
+                  'issuing_institution': 'Fictional college', 'experience_years': 4,
+                  'competencies': 'Adult counseling', 'certifications': 'Fictional training',
+                  'credential_valid_from': '2020-01-01', 'credential_expiry': '2030-01-01',
+                  'population_adults': True}
+        for key in keys:
+            service_catalog.save_draft_definition({
+                'service_key': key, 'service_label': 'Fictional counseling service',
+                'category': 'counseling', 'description': 'Fictional service test.',
+                'participant_structure': 'individual', 'supported_formats': 'audio\nvideo',
+                'population_restriction': 'Adults only', 'definition_version': 'test-1',
+                'catalog_source': 'Fictional source'})
+        email = 'intake-' + secrets.token_hex(6) + '@example.invalid'
+        fixtures.USERS['intake'] = email
+        frappe.set_user('Administrator')
+        user = frappe.get_doc({'doctype': 'User', 'email': email, 'first_name': 'Fictional applicant',
+                              'send_welcome_email': 0, 'user_type': 'Website User'}).insert()
+        user.add_roles('Tele Tena Clinician')
+        fixtures.login('intake')
+        journey.save_profile('clinician', 'Fictional applicant', True, languages=['en'])
+        listed = {item.id for item in vetting.vetting_services()}
+        self.assertTrue(set(keys) <= listed)
+        with self.assertRaises(frappe.ValidationError):
+            vetting.save_scope_applications(keys + [fixtures.PREFIX], values)
+        with self.assertRaises(frappe.ValidationError):
+            vetting.save_scope_applications([keys[0], fixtures.PREFIX], values)
+        self.assertEqual(frappe.db.count('Tele Tena Vetting Scope Application',
+                                        {'clinician': email, 'service': keys[0]}), 0)
+        draft = vetting.save_scope_applications(keys, values)['applications']
+        again = vetting.save_scope_applications(keys, values)['applications']
+        self.assertEqual([r['name'] for r in draft], [r['name'] for r in again])
+        presentation.upload_resume('fictional-intake-cv.pdf',
+                                  base64.b64encode(b'%PDF-1.4\nFictional CV\n%%EOF').decode())
+        submitted = vetting.save_scope_applications(keys, values, True)['applications']
+        repeated = vetting.save_scope_applications(keys, values, True)['applications']
+        self.assertEqual([r['name'] for r in submitted], [r['name'] for r in repeated])
+        self.assertTrue(all(r['idempotent'] for r in repeated))
+        with self.assertRaises(frappe.ValidationError):
+            vetting.save_scope_application(keys[0], {**values, 'qualification': 'Changed'}, True)
+        with self.assertRaises(frappe.ValidationError):
+            journey.publish(keys[0], 30000, 30)
+        saved = next(r for r in vetting.my_scope_applications() if r.service == keys[0])
+        self.assertEqual(saved.competencies, values['competencies'])
+        self.assertEqual(vetting.application_context()['requested_services'], [])
+        fixtures.login('p1')
+        with self.assertRaises(frappe.PermissionError): vetting.application_context()
+        fixtures.login('c2')
+        self.assertFalse(any(r.service in keys for r in vetting.my_scope_applications()))
+        doc = frappe.get_doc('Tele Tena Vetting Scope Application', submitted[0]['name'])
+        self.assertFalse(frappe.has_permission(doc.doctype, 'read', doc=doc,
+                                              user=fixtures.USERS['c2']))
+        with self.assertRaises(frappe.ValidationError):
+            vetting.save_scope_application(keys[1], {**values, 'credential_valid_from': '2031-01-01'})
+        fixtures.login('admin')
+        self.assertTrue(all(frappe.db.get_value('Tele Tena Service', key, 'active') == 0
+                            for key in keys))
+
+    def test_scope_approach_choices_are_active_optional_and_revalidated(self):
+        keys = []
+        try:
+            for status in ('Active', 'Draft', 'Retired'):
+                key = fixtures.PREFIX + '-approach-' + status.lower()
+                frappe.get_doc({'doctype': 'Tele Tena Treatment Approach', 'catalog_key': key,
+                                'label_en': 'Fictional approach ' + status,
+                                'definition': 'Fictional approach for validation tests only.',
+                                'status': status, 'evidence_requirements': 'Fictional training evidence'}).insert()
+                keys.append(key)
+            fixtures.login('c1')
+            choices = vetting.application_context()['treatment_approaches']
+            self.assertIn(keys[0], {item.id for item in choices})
+            self.assertNotIn(keys[1], {item.id for item in choices})
+            self.assertNotIn(keys[2], {item.id for item in choices})
+            self.assertEqual(vetting._validated_form({'approach_keys': ''})['approach_keys'], '')
+            self.assertEqual(vetting._validated_form({'approach_keys': keys[0]})['approach_keys'], keys[0])
+            for value in (keys[1], keys[2], 'Cognitive behavioral therapy', keys[0] + '\nUnknown training'):
+                with self.assertRaises(frappe.ValidationError):
+                    vetting._validated_form({'approach_keys': value})
+                self.assertEqual(frappe.local.response.get('tele_tena_error'), 'scope_approach_invalid')
+            # An approach retired after loading cannot be submitted through a stale choice.
+            fixtures.login('admin')
+            frappe.db.set_value('Tele Tena Treatment Approach', keys[0], 'status', 'Retired')
+            fixtures.login('c1')
+            with self.assertRaises(frappe.ValidationError):
+                vetting._validated_form({'approach_keys': keys[0]})
+        finally:
+            frappe.set_user('Administrator')
+            for key in keys:
+                frappe.delete_doc('Tele Tena Treatment Approach', key)
+
+    def test_new_clinician_three_scope_decisions_to_discovery_and_immediate_inbox(self):
+        services = [fixtures.PREFIX + '-chain-' + suffix for suffix in ('approved','clarify','declined')]
+        for service in services:
+            reviewed_test_service({'doctype': 'Tele Tena Service', 'service_key': service,
+                'service_label': 'Fictional counseling ' + service.rsplit('-',1)[-1],
+                'category': 'counseling', 'description': 'Fictional operational chain test.',
+                'population_restriction': 'Adults only', 'participant_structure': 'individual',
+                'vetting_required': 1, 'definition_version': 'test-1'})
+        email = 'scope-chain-' + secrets.token_hex(6) + '@example.invalid'
+        fixtures.USERS['chain'] = email
+        frappe.set_user('Administrator')
+        user = frappe.get_doc({'doctype': 'User', 'email': email, 'first_name': 'Fictional counselor',
+                              'send_welcome_email': 0, 'user_type': 'Website User'}).insert()
+        user.add_roles('Tele Tena Clinician')
+        fixtures.login('chain')
+        journey.save_profile('clinician', 'Fictional counselor', True, languages=['en'])
+        presentation.upload_resume('fictional-scope-chain-cv.pdf',
+                                  base64.b64encode(b'%PDF-1.4\nFictional CV\n%%EOF').decode())
+        journey.apply('Fictional application with three individually reviewed scopes.', services)
+        fixtures.login('admin'); journey.review(email, 'Approved')
+        self.assertFalse(any(journey.service_scope_is_current(email, key) for key in services))
+        fixtures.login('chain')
+        form = {'professional_category': 'Synthetic clinician', 'qualification': 'Fictional counseling degree',
+                'issuing_institution': 'Fictional college', 'registration_number': 'TEST-CHAIN-LICENSE',
+                'issuing_authority': 'Fictional licensing authority', 'jurisdiction': 'Synthetic jurisdiction',
+                'credential_valid_from': '2020-01-01', 'credential_expiry': '2030-01-01',
+                'experience_years': 4, 'population_adults': True}
+        applications = vetting.save_scope_applications(services, form)['applications']
+        evidence = vetting.upload_scope_evidence(applications[0]['name'], 'License or registration',
+            'fictional-license.pdf', base64.b64encode(b'%PDF-1.4\nFictional license\n%%EOF').decode())
+        vetting.save_scope_applications(services, form, True)
+        fixtures.login('admin')
+        vetting.review_scope_application(applications[1]['name'], 'Clarification',
+                                         findings='Add scope-specific supervised experience evidence.')
+        vetting.review_scope_application(applications[2]['name'], 'Rejected',
+                                         findings='Scope-specific mandatory training is not supported by evidence.')
+        vetting.review_scope_application(applications[0]['name'], 'Approved',
+            identity_reviewed=True, credential_verified=True, qualification_relevant=True,
+            experience_adequate=True, approach_evidence_reviewed=True,
+            adult_scope_appropriate=True, interview_completed=True,
+            findings='Fictional human reviewer assessment; not external credential verification.',
+            scored_criteria=proposed_rubric_scores(evidence['id']),
+            **credential_source_payload(evidence['id']))
+        service_policy.set_immediate_policy(services[0], True,
+            'Fictional review enables immediate requests for this isolated operational test.', secrets.token_hex(12))
+        fixtures.login('chain')
+        states = {row.service: row.status for row in vetting.my_scope_applications()}
+        self.assertEqual([states[key] for key in services], ['Approved','Clarification','Rejected'])
+        for key in services[1:]:
+            with self.assertRaises(frappe.ValidationError): journey.publish(key, 30000, 30)
+        published = journey.publish(services[0], 30000, 30, 'Fictional individual counseling',
+                                     'Fictional presentation for the scope chain.', retry_key=secrets.token_hex(12))
+        offering = published['offering']
+        today = datetime.now(ZoneInfo('Africa/Addis_Ababa')).date()
+        payload = schedule_payload(offering, today, mode='automatic')
+        payload.update(intervals=[{'weekday':today.weekday(), 'start':'00:00','end':'23:59'}],
+                       buffer_before=0, buffer_after=0)
+        scheduling.save_schedule(**payload)
+        self.assertTrue(open_requests.set_request_presence(True)['ready'])
+        fixtures.login('p1')
+        self.assertTrue(any(row.id == offering for row in journey.discover(service=services[0])))
+        request = open_requests.publish_request(services[0], 'Fictional adult care request.',
+            'immediate', 'en', 'video', {'name':False,'history':False}, secrets.token_hex(12))
+        fixtures.login('chain')
+        self.assertTrue(any(row.id == request['id'] for row in open_requests.clinician_requests()))
+        # A reviewer decision affects only its own scope; no cross-scope authorization.
+        self.assertTrue(journey.service_scope_is_current(email, services[0]))
+        self.assertFalse(journey.service_scope_is_current(email, services[1]))
+        self.assertFalse(journey.service_scope_is_current(email, services[2]))
+
+    def test_clinical_catalog_review_requires_lead_and_cannot_grant_scopes(self):
+        key = fixtures.PREFIX + '-clinical-review'
+        payload = {'service_key': key, 'service_label': 'Fictional adult counseling',
+                   'category': 'counseling', 'description': 'Fictional test definition.',
+                   'participant_structure': 'individual', 'population_restriction': 'Adults only',
+                   'supported_formats': 'audio\nvideo', 'required_workflows': 'individual-consultation',
+                   'definition_version': 'test-1', 'catalog_source': 'Fictional source',
+                   'professional_categories': 'Fictional counselor',
+                   'credential_requirements': 'Relevant qualification and license evidence',
+                   'required_consent_schema': 'adult-v1',
+                   'location_jurisdiction_policy': 'synthetic-only',
+                   'min_duration_minutes': 20, 'max_duration_minutes': 60}
+        service_catalog.save_draft_definition(payload)
+        service_catalog.submit_for_clinical_review(key)
+        with self.assertRaises(frappe.PermissionError):
+            service_catalog.review_definition(key, 'Approved', 'Not a designated medical lead.')
+        native = frappe.get_doc('Tele Tena Service', key)
+        native.clinical_review_status = 'Approved'; native.active = 1; native.catalog_status = 'Active'
+        with self.assertRaises(frappe.PermissionError):
+            native.save()
+        user = frappe.get_doc('User', fixtures.USERS['admin'])
+        with authorized_user_change():
+            user.add_roles('Tele Tena Medical Lead')
+        frappe.clear_cache(user=user.name)
+        try:
+            native = frappe.get_doc('Tele Tena Service', key)
+            native.clinical_review_status = 'Approved'; native.active = 1; native.catalog_status = 'Active'
+            with self.assertRaises(frappe.PermissionError):
+                native.save()
+            # Native back-office drafts cannot bypass typed operational checks.
+            for invalid in ({'supported_formats': 'unsupported-format'},
+                            {'min_duration_minutes': 80, 'max_duration_minutes': 30},
+                            {'participant_structure': 'couple', 'required_workflows': 'individual-consultation'}):
+                draft = frappe.get_doc('Tele Tena Service', key)
+                draft.update(invalid); draft.save()
+                with self.assertRaises(frappe.ValidationError):
+                    service_catalog.review_definition(key, 'Approved', 'Fictional invalid definition review.')
+                self.assertFalse(frappe.db.get_value('Tele Tena Service', key, 'active'))
+                draft = frappe.get_doc('Tele Tena Service', key)
+                draft.update({field: payload[field] for field in invalid}); draft.save()
+            result = service_catalog.review_definition(key, 'Approved', 'Fictional human review decision.')
+            self.assertTrue(result['active']); self.assertFalse(result['scope_granted'])
+            self.assertTrue(service_catalog.review_definition(key, 'Approved',
+                'Fictional human review decision.')['idempotent'])
+            with self.assertRaises(frappe.ValidationError):
+                service_catalog.review_definition(key, 'Approved', 'Changed retrospective decision reason.')
+            self.assertFalse(journey.service_scope_is_current(fixtures.USERS['c1'], key))
+            self.assertEqual(journey.one("SELECT COUNT(*) n FROM tt_audit WHERE subject=%s AND action='ServiceClinicalReview'", (key,)).n, 1)
+        finally:
+            with authorized_user_change():
+                user.remove_roles('Tele Tena Medical Lead')
+            frappe.clear_cache(user=user.name)
+
     def test_service_catalog_edits_are_typed_draft_only_and_reviewer_scoped(self):
         key = 'synthetic-catalog-' + secrets.token_hex(5)
         attribute_names = []
@@ -2745,6 +3589,11 @@ class Presentation(unittest.TestCase):
             self.assertEqual(frappe.db.get_value('Tele Tena Service', key,
                                                  ['active', 'catalog_status', 'vetting_required']),
                              (0, 'Draft', 1))
+            with self.assertRaises(frappe.ValidationError):
+                service_catalog.save_draft_definition(dict(payload, description='Unsaved change',
+                    booking_rules='individual-consultation\nprivate-notes\npatient-summary'))
+            self.assertEqual(frappe.local.response.get('tele_tena_error'), 'catalog_booking_rules_invalid')
+            self.assertEqual(frappe.db.get_value('Tele Tena Service', key, 'description'), payload['description'])
             changed = dict(payload, service_label='Synthetic edited definition')
             service_catalog.save_draft_definition(changed)
             self.assertEqual(frappe.db.get_value('Tele Tena Service', key, 'service_label'),

@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import {FileUpload} from "../components/FileUpload";
+import { useEffect, useRef, useState } from 'react';
+import './Vetting.css';
 import { journeyApi } from '../journey-api';
 import { Button, Checkbox, EmptyState, InlineNotice, Select, Skeleton, TextField } from '../components/ui';
 import { PageTitle } from '../components/Domain';
 import { useAction } from '../hooks/useAction';
 import { useResource } from '../hooks/useResource';
 import { useLocale } from '../hooks/useLocale';
+import { ApiError } from '../api';
 
 const loadOperationalScopeReviews = () => journeyApi.scopeAppointmentReviews('All');
 
@@ -45,7 +48,7 @@ function VettingRubricManager(){
   const useCurrent=()=>{if(!current.data)return;setTitle(current.data.title);setApprovalNote(current.data.approval_note);setDecisionRule(current.data.decision_rule);setCriteria(current.data.scored_criteria.map((item:any)=>({key:item.key,label:item.label})));};
   return <details className="vetting-rubric-manager"><summary>{w('Rubric versions and approval')}</summary>
     <p className="supporting">{w('The current rubric is proposed. Scores organize evidence only; a designated medical lead must approve a version before it is described as an approved standard.')}</p>
-    {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
+    {action.error&&<InlineNotice tone="danger">{w(action.error)}</InlineNotice>}
     {(versions.error||current.error)&&<InlineNotice tone="danger">{w('Rubric versions could not be loaded.')} <Button variant="secondary" onClick={()=>void Promise.all([versions.refresh(),current.refresh()])}>{w('Retry')}</Button></InlineNotice>}
     {!versions.data?<Skeleton/>:<div className="vetting-rubric-version-list">{versions.data.items.map((item:any)=><article className="vetting-rubric-version" key={item.version}>
       <div><strong>{item.version}</strong><span className={`status-pill status-${String(item.status).toLowerCase()}`}>{w(item.status)}</span><p className="supporting">{item.created_at?new Date(item.created_at).toLocaleString():w('Date unavailable')}</p>{item.approval_reason&&<p>{item.approval_reason}</p>}
@@ -79,20 +82,30 @@ function ScopeEvidencePanel({item,canUpload,refresh}:{item:any;canUpload:boolean
     {item.scope_evidence?.length?<ul className="scope-evidence-list">{item.scope_evidence.map((evidence:any)=><li key={evidence.id}><span>{w(evidence.evidence_type)} · {evidence.filename} · v{evidence.revision}</span><Button variant="quiet" onClick={()=>void openScopeEvidence(evidence,w)}>{w('Open private evidence')}</Button></li>)}</ul>:<p className="supporting">{w('No service-specific evidence uploaded yet.')}</p>}
     {canUpload&&<div className="scope-evidence-upload"><Select label={w('Evidence type')} value={evidenceType} onChange={e=>setEvidenceType(e.target.value)}>
       {['Qualification','License or registration','Scope training','Approach experience','Other supporting evidence'].map(value=><option key={value} value={value}>{w(value)}</option>)}
-    </Select><label className="field">{w('Upload PDF evidence')}<input type="file" accept="application/pdf,.pdf" disabled={action.busy} onChange={event=>{
-      const file=event.currentTarget.files?.[0];event.currentTarget.value='';if(!file)return;
+    </Select><div className="field"><FileUpload label={w('Upload PDF evidence')} accept="application/pdf,.pdf" disabled={action.busy} onFiles={files=>{
+      const file=files[0];if(!file)return;
       void action.run(async()=>{if(file.size>5*1024*1024)throw new Error('The PDF must be 5 MB or smaller.');await journeyApi.uploadScopeEvidence(item.name,evidenceType,file.name,await encodeFile(file));await refresh();});
-    }}/></label>
+    }}/></div>
     {action.error&&<InlineNotice tone="danger">{w(action.error)}</InlineNotice>}</div>}
   </section>;
 }
 
 export function ClinicianScopeApplications() {
-  const { w } = useLocale();
+  const { w, locale } = useLocale();
   const services = useResource(journeyApi.vettingServices);
+  const context = useResource(journeyApi.scopeApplicationContext);
+  const contextApplied=useRef(false);
+  const [initialized,setInitialized]=useState(false);
   const applications = useResource(journeyApi.myScopeApplications);
   const action = useAction();
   const [service, setService] = useState('');
+  const [selectedServices,setSelectedServices]=useState<string[]>([]);
+  const [serviceSearch,setServiceSearch]=useState('');
+  const [competencies,setCompetencies]=useState('');const [certifications,setCertifications]=useState('');const [validFrom,setValidFrom]=useState('');
+  const [dirty, setDirty] = useState(false);
+  const [step, setStep] = useState(0);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const changeStep = (next:number) => { setStep(next); requestAnimationFrame(()=>headingRef.current?.focus()); };
   const [category, setCategory] = useState('');
   const [qualification, setQualification] = useState('');
   const [institution, setInstitution] = useState('');
@@ -108,19 +121,49 @@ export function ClinicianScopeApplications() {
   const [independent, setIndependent] = useState(false);
   const [appealStatements,setAppealStatements]=useState<Record<string,string>>({});
   const [reverificationOf,setReverificationOf]=useState<string|null>(null);
+  const approachOptions=context.data?.treatment_approaches||[];
+  const selectedApproaches=approaches.split('\n').map(value=>value.trim()).filter(Boolean);
+  const unlistedApproaches=selectedApproaches.filter(key=>!approachOptions.some((item:any)=>item.id===key));
+
+  useEffect(()=>{
+    if(!context.data||!applications.data||contextApplied.current||dirty)return;
+    contextApplied.current=true;
+    const resumable=applications.data.find((item:any)=>['Draft','Clarification'].includes(item.status));
+    const claims=resumable||context.data.professional||{};
+    setCategory(claims.professional_category||'');setQualification(claims.qualification||'');
+    setInstitution(claims.issuing_institution||'');setLicense(claims.registration_number||'');
+    setAuthority(claims.issuing_authority||'');setJurisdiction(claims.jurisdiction||'');
+    setValidFrom(claims.credential_valid_from||'');setExpiry(claims.credential_expiry||'');
+    setCompetencies(claims.competencies||'');setCertifications(claims.certifications||'');
+    setExperience(String(claims.experience_years??''));
+    setSelectedServices(resumable?[resumable.service]:(context.data.requested_services||[]).filter((key:string)=>!applications.data?.some((item:any)=>item.service===key&&!['Draft','Clarification'].includes(item.status))));setService(resumable?.service||(context.data.requested_services||[]).find((key:string)=>!applications.data?.some((item:any)=>item.service===key&&!['Draft','Clarification'].includes(item.status)))||'');
+    if(resumable){
+      setReverificationOf(resumable.reverification_of||null);setStep(1);
+      setApproaches(resumable.approach_keys||'');setTraining(resumable.relevant_training||'');
+      setStatement(resumable.applicant_statement||'');setAdults(!!resumable.population_adults);
+      setIndependent(!!resumable.independent_practice);
+    }
+    setInitialized(true);
+  },[context.data,applications.data,dirty]);
 
   const save = (submit:boolean) => void action.run(async()=>{
-    if(!service) throw new Error('Choose an active reviewed service scope.');
-    const values={professional_category:category,qualification,issuing_institution:institution,
+    if(!service) throw new ApiError('scope_selection_invalid');
+    if(submit&&(!category.trim()||!qualification.trim()||!institution.trim()))throw new ApiError('scope_qualification_required');
+    if(submit&&!adults)throw new ApiError('scope_adult_required');
+    if(unlistedApproaches.length)throw new ApiError('scope_approach_invalid');
+    const values={professional_category:category,qualification,issuing_institution:institution,competencies,certifications,credential_valid_from:validFrom,
       registration_number:license,issuing_authority:authority,jurisdiction,credential_expiry:expiry,
       experience_years:experience||'0',approach_keys:approaches,population_adults:adults,
       independent_practice:independent,clinic_affiliations:'',relevant_training:training,
       applicant_statement:statement};
-    await journeyApi.saveScopeApplication(service,values,submit,reverificationOf);
+    if(!reverificationOf&&selectedServices.length>1)await journeyApi.saveScopeApplications(selectedServices,values,submit);
+    else await journeyApi.saveScopeApplication(service,values,submit,reverificationOf);
     await applications.refresh();
+    setDirty(false);
   });
   const continueApplication=(item:any)=>{
-    setService(item.service);setCategory(item.professional_category||'');
+    contextApplied.current=true;
+    setDirty(false);setStep(1);setService(item.service);setSelectedServices([item.service]);setCompetencies(item.competencies||'');setCertifications(item.certifications||'');setValidFrom(item.credential_valid_from||'');setCategory(item.professional_category||'');
     setReverificationOf(item.reverification_of||null);
     setQualification(item.qualification||'');setInstitution(item.issuing_institution||'');
     setLicense(item.registration_number||'');setAuthority(item.issuing_authority||'');
@@ -132,34 +175,58 @@ export function ClinicianScopeApplications() {
   };
   const beginReverification=(item:any)=>continueApplication({...item,reverification_of:item.name});
   return <>
-    <PageTitle title={w("Professional profile and scope review")} description={w("Apply for each service separately. Clinic affiliations do not establish competence, and approval is always decided by a human reviewer.")} />
-    <InlineNotice>{w("TeleTena’s proposed vetting rubric is versioned for medical-lead review. Credential verification is manual. Upload your PDF CV in Account and attach supporting evidence to each service application.")}</InlineNotice>
     {applications.error&&<InlineNotice tone="danger">{w("Your scope applications could not be loaded.")} <Button onClick={()=>void applications.refresh()}>{w("Retry")}</Button></InlineNotice>}
     <section className="scope-application-workspace">
-      <div className="scope-application-form">
-        <h2>{w(reverificationOf?"Update credentials for this approved scope":"Apply for a service scope")}</h2>
+      <div className="scope-application-form" data-tour-unsaved={dirty ? 'true' : 'false'} onChange={()=>{contextApplied.current=true;setDirty(true)}}>
+        <p className="eyebrow">{w("STEP")} {step+1} {w("OF")} 4</p>
+        <div className="step-progress" aria-hidden="true">{[0,1,2,3].map(index=><span key={index} data-complete={index<=step}/>)}</div>
+        <h2 ref={headingRef} tabIndex={-1}>{w(step===0?"Choose your service scopes":step===1?"Qualifications & résumé":step===2?"Relevant experience":"Review your application")}</h2>
+        <p className="supporting">{w(step===0?"Select each service you are qualified to provide. Each is reviewed separately.":"Documents are private to authorized reviewers.")}</p>
         {reverificationOf&&<InlineNotice>{w("A renewal request does not extend an expired approval. If the credential has expired, this service remains unavailable until a reviewer records a new approval.")}</InlineNotice>}
-        {!services.data?<Skeleton/>:services.data.length===0?<EmptyState title={w("No reviewed service scopes are open yet.")}>{w("The service catalog is present in draft and remains non-bookable until the medical lead approves its terminology and local credential requirements.")}</EmptyState>:<>
-          <Select label={w("Service scope")} value={service} onChange={e=>{setService(e.target.value);setReverificationOf(null)}}><option value="">{w("Choose a service")}</option>{services.data.map((item:any)=><option key={item.id} value={item.id}>{item.label}</option>)}</Select>
+        {!services.data||!initialized?<Skeleton/>:services.data.length===0?<EmptyState title={w("No service applications are open yet.")}>{w("The service catalog is present in draft and remains non-bookable until the medical lead approves its terminology and local credential requirements.")}</EmptyState>:<>
+          {step===0&&<><TextField label={w("Search service scopes")} value={serviceSearch} onChange={e=>setServiceSearch(e.target.value)}/><fieldset className="scope-selection"><legend className="sr-only">{w("Services you want to provide")}</legend>{services.data.filter((item:any)=>item.label.toLocaleLowerCase().includes(serviceSearch.toLocaleLowerCase())).map((item:any)=><div key={item.id}><Checkbox variant="card" description={w("Evidence and approved scope are required.")} label={item.label} checked={selectedServices.includes(item.id)} disabled={!!reverificationOf||applications.data?.some((application:any)=>application.service===item.id&&!['Draft','Clarification'].includes(application.status))} onChange={event=>{const next=event.target.checked?[...selectedServices,item.id]:selectedServices.filter(id=>id!==item.id);setSelectedServices(next);setService(next[0]||'');}}/>{selectedServices.includes(item.id)&&<p className="supporting">{item.clinical_review_status!=='Approved'&&w("Clinical definition review pending. Applying does not authorize bookings.")} {item.credential_requirements}</p>}</div>)}</fieldset><p className="supporting">{w("Selected services")}: {selectedServices.length}</p></>}
+          {step===1&&<>
           <TextField label={w("Professional category")} value={category} onChange={e=>setCategory(e.target.value)} required />
           <TextField label={w("Relevant qualification")} value={qualification} onChange={e=>setQualification(e.target.value)} required />
           <TextField label={w("Issuing institution")} value={institution} onChange={e=>setInstitution(e.target.value)} required />
           <TextField label={w("Registration or license number")} value={license} onChange={e=>setLicense(e.target.value)} />
           <TextField label={w("Issuing authority")} value={authority} onChange={e=>setAuthority(e.target.value)} />
           <TextField label={w("Jurisdiction")} value={jurisdiction} onChange={e=>setJurisdiction(e.target.value)} />
+          <TextField label={w("Credential valid from, if applicable")} type="date" value={validFrom} onChange={e=>setValidFrom(e.target.value)} />
+          <TextField label={w("Professional competencies")} value={competencies} onChange={e=>setCompetencies(e.target.value)} maxLength={2000}/>
+          <TextField label={w("Certifications")} value={certifications} onChange={e=>setCertifications(e.target.value)} maxLength={2000}/>
           <TextField label={w("Credential expiry, if applicable")} type="date" value={expiry} onChange={e=>setExpiry(e.target.value)} />
+          </>}
+          {step===2&&<>
           <TextField label={w("Years of relevant experience")} type="number" min="0" max="60" value={experience} onChange={e=>setExperience(e.target.value)} />
-          <label className="field">{w("Treatment approaches (one per line)")}<textarea rows={3} value={approaches} onChange={e=>setApproaches(e.target.value)} /></label>
+          <fieldset className="scope-selection"><legend>{w("Treatment approaches (optional)")}</legend>
+            <p className="supporting">{w("Select only approaches you are trained to use. Your evidence is reviewed separately.")}</p>
+            {approachOptions.length?approachOptions.map((item:any)=><Checkbox key={item.id} variant="card" label={locale==='am'?item.label_am||item.label_en:locale==='om'?item.label_om||item.label_en:item.label_en} description={item.definition} checked={selectedApproaches.includes(item.id)} onChange={event=>setApproaches((event.target.checked?[...selectedApproaches,item.id]:selectedApproaches.filter(key=>key!==item.id)).join('\n'))}/>):<p>{w("No reviewed approaches are available to select yet. You can still submit your service application.")}</p>}
+            <p className="supporting">{w("If an approach is not listed, describe your training below. Selecting an approach does not grant approval.")}</p>
+          </fieldset>
+          {unlistedApproaches.length>0&&<InlineNotice tone="info"><p>{w("These previous entries are not selectable catalog approaches. Move them to your training description or remove them before saving.")}</p><ul>{unlistedApproaches.map(key=><li key={key}>{key}</li>)}</ul><Button variant="secondary" onClick={()=>{setTraining([training,...unlistedApproaches].filter(Boolean).join('\n'));setApproaches(selectedApproaches.filter(key=>!unlistedApproaches.includes(key)).join('\n'));setDirty(true);}}>{w("Move to training description")}</Button></InlineNotice>}
           <label className="field">{w("Relevant training")}<textarea rows={3} value={training} onChange={e=>setTraining(e.target.value)} /></label>
           <label className="field">{w("Why are you prepared to provide this service?")}<textarea rows={4} value={statement} onChange={e=>setStatement(e.target.value)} /></label>
           <Checkbox label={w("My application is limited to adult care.")} checked={adults} onChange={e=>setAdults(e.target.checked)} />
           <Checkbox label={w("I practice independently (optional).")} checked={independent} onChange={e=>setIndependent(e.target.checked)} />
-          <div className="actions"><Button variant="secondary" loading={action.busy} onClick={()=>save(false)}>{w("Save draft")}</Button><Button loading={action.busy} onClick={()=>save(true)}>{w("Submit for review")}</Button></div>
+          </>}
+          {step===2&&<section className="guided-evidence"><h3>{w("Documents for each requested service")}</h3><p>{w("Your resume is shared with the reviewer. Attach a License or registration PDF to each scope for credential verification. Additional qualification or training evidence supports the individual review.")}</p><Button variant="secondary" loading={action.busy} onClick={()=>save(false)}>{w("Save draft to attach documents")}</Button>{selectedServices.map(key=>{const item=applications.data?.find((value:any)=>value.service===key);return item?<details key={key}><summary>{item.service_label} · {w((item.scope_evidence||[]).some((e:any)=>e.evidence_type==='License or registration')?"License evidence uploaded":"License evidence missing")}</summary><ScopeEvidencePanel item={item} canUpload={['Draft','Clarification'].includes(item.status)} refresh={applications.refresh}/></details>:null})}</section>}
+          {step===3&&<dl className="scope-application-preview"><div><dt>{w('Services you want to provide')}</dt><dd>{services.data.filter((item:any)=>selectedServices.includes(item.id)).map((item:any)=>item.label).join(', ')}</dd></div>
+            {[['Professional competencies',competencies],['Certifications',certifications],['Credential valid from, if applicable',validFrom],['Professional category',category],['Relevant qualification',qualification],['Issuing institution',institution],['Registration or license number',license],['Issuing authority',authority],['Jurisdiction',jurisdiction],['Credential expiry, if applicable',expiry],['Years of relevant experience',experience],['Relevant training',training],['Why are you prepared to provide this service?',statement]].map(([label,value])=><div key={label}><dt>{w(label)}</dt><dd>{value||w('Not provided')}</dd></div>)}
+            <div><dt>{w('My application is limited to adult care.')}</dt><dd>{w(adults?'Yes':'No')}</dd></div>
+          </dl>}
+          <div className="scope-form-actions">
+            {step>0&&<Button variant="quiet" disabled={action.busy} onClick={()=>changeStep(step-1)}>{w('Back')}</Button>}
+            <Button variant="secondary" disabled={!service||action.busy} loading={action.busy} onClick={()=>save(false)}>{w('Save draft')}</Button>
+            {step<3?<Button disabled={action.busy||(step===0&&!selectedServices.length)} onClick={()=>changeStep(step+1)}>{w('Continue')}</Button>:<Button disabled={action.busy} loading={action.busy} onClick={()=>save(true)}>{w('Submit for review')}</Button>}
+          </div>
         </>}
-        {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
+        {action.error&&<InlineNotice tone="danger">{w(action.error)}</InlineNotice>}
+        {action.success&&!dirty&&<InlineNotice tone="success">{w(action.success)}</InlineNotice>}
       </div>
       <section className="scope-application-list"><h2>{w("Your applications")}</h2>{!applications.data?<Skeleton/>:applications.data.length?applications.data.map((item:any)=><article className="scope-application-row" key={item.name}><strong>{item.service_label}</strong><span>{w(item.status)}</span>{item.reverification_of&&<InlineNotice>{w('Credential re-verification for an existing scope. A reviewer must approve it before expired credentials can be used.')}</InlineNotice>}{['Approved','Expired'].includes(item.status)&&(item.credential_expired||item.status==='Expired')&&!item.scope_eligible&&<InlineNotice tone="danger">{w('This credential has expired. The service is paused until a reviewer approves updated credentials.')}</InlineNotice>}{item.clarification_request&&<InlineNotice>{item.clarification_request}</InlineNotice>}{item.decision_reason&&<p>{item.decision_reason}</p>}{item.restrictions&&<p>{w("Restrictions:")} {item.restrictions}</p>}{item.appeals?.map((appeal:any)=><InlineNotice key={appeal.name}>{w('Reconsideration')}: {w(appeal.status)}{appeal.reviewer_reason?` — ${appeal.reviewer_reason}`:''}</InlineNotice>)}{['Rejected','Suspended','Expired'].includes(item.status)&&!item.appeals?.some((appeal:any)=>appeal.basis_assessment===item.latest_assessment)&&<div className="scope-appeal-form"><label className="field">{w('Request reconsideration')}<textarea rows={3} maxLength={1600} value={appealStatements[item.name]||''} onChange={e=>setAppealStatements({...appealStatements,[item.name]:e.target.value})} /></label><Button loading={action.busy} onClick={()=>void action.run(async()=>{const statement=(appealStatements[item.name]||'').trim();if(!statement)throw new Error(w('Explain why this decision should be reconsidered.'));await journeyApi.submitScopeAppeal(item.name,statement);await applications.refresh();})}>{w('Submit reconsideration')}</Button></div>}{['Draft','Clarification'].includes(item.status)&&<Button variant="secondary" onClick={()=>continueApplication(item)}>{w('Continue this application')}</Button>}{['Approved','Expired'].includes(item.status)&&['Approved','Revoked'].includes(item.service_scope_status)&&!applications.data?.some((other:any)=>other.reverification_of===item.name)&&<Button variant="secondary" onClick={()=>beginReverification(item)}>{w('Update credential details')}</Button>}<ScopeEvidencePanel item={item} canUpload={['Draft','Clarification'].includes(item.status)} refresh={applications.refresh}/>{item.status==='Approved'&&<p>{w("This specific scope is approved. Offerings still require the matching service configuration and published availability.")}</p>}</article>):<EmptyState title={w("No scope applications yet.")} />}</section>
     </section>
+    <details className="scope-review-policy"><summary>{w("Review rubric and policies")}</summary><p>{w("Apply for each service separately. Clinic affiliations do not establish competence, and approval is always decided by a human reviewer.")}</p><p>{w("TeleTena’s proposed vetting rubric is versioned for medical-lead review. Credential verification is manual. Upload your PDF CV in Account and attach supporting evidence to each service application.")}</p></details>
   </>;
 }
 
@@ -175,6 +242,11 @@ export function VettingQueue() {
   const [findings,setFindings]=useState<Record<string,string>>({});
   const [restrictions,setRestrictions]=useState<Record<string,string>>({});
   const [decision,setDecision]=useState<Record<string,string>>({});
+  const [selectedReview,setSelectedReview]=useState<string|null>(null);
+  const [reviewStep,setReviewStep]=useState(0);
+  const reviewSteps=["Application & documents","Verify credentials","Assess this scope","Decision & next steps"];
+  const reviewHeading=useRef<HTMLHeadingElement>(null);
+  useEffect(()=>{if(selectedReview){reviewHeading.current?.focus({preventScroll:true});reviewHeading.current?.scrollIntoView({block:'start'});}},[selectedReview,reviewStep]);
   const [scoredCriteria,setScoredCriteria]=useState<Record<string,Record<string,{score:string;rationale:string;evidence:string}>>>({});
   const [credentialVerification,setCredentialVerification]=useState<Record<string,{source:string;checked_on:string;evidence:string;reference:string}>>({});
   const updateCredential=(application:string,field:'source'|'checked_on'|'evidence'|'reference',value:string)=>setCredentialVerification(current=>{
@@ -186,39 +258,58 @@ export function VettingQueue() {
     return {...current,[application]:{...current[application],[key]:{...previous,[field]:value}}};
   });
   return <><PageTitle title={w("Service-scope vetting")} description={w("Review each professional scope separately. A missing mandatory criterion cannot be offset by other evidence.")} />
-    <VettingRubricManager />
-    <section className="scope-review-appeals"><h2>{w('Booked appointments needing scope review')}</h2><p className="supporting">{w('This queue contains scheduling references only. It does not grant access to patient records or private notes.')}</p>{operational.error&&<InlineNotice tone="danger">{w('Operational review items could not be loaded.')} <Button onClick={()=>void operational.refresh()}>{w('Retry')}</Button></InlineNotice>}{!operational.data?<Skeleton/>:operational.data.filter((item:any)=>item.status!=='Cleared').length?operational.data.filter((item:any)=>item.status!=='Cleared').map((item:any)=><article className="scope-review-card" key={item.name}><header><div><h3>{item.clinician_name||w('Clinician unavailable')}</h3><p className="supporting">{item.service_label} · {w(item.reason_code)} · {w(item.status)}</p></div><span>{item.scheduled_start?new Date(item.scheduled_start).toLocaleString():w('date unavailable')}</span></header><p className="supporting">{w('Appointment reference')}: {item.appointment}</p><TextField label={w('Reviewer rationale')} value={appealReasons[item.name]||''} onChange={e=>setAppealReasons({...appealReasons,[item.name]:e.target.value})}/><div className="actions">{item.status==='Open'&&<Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{const rationale=(appealReasons[item.name]||'').trim();if(!rationale)throw new Error(w('Record a rationale for this operational action.'));await journeyApi.resolveScopeAppointmentReview(item.name,'Acknowledge',rationale);await operational.refresh()})}>{w('Acknowledge')}</Button>}<Button loading={action.busy} onClick={()=>void action.run(async()=>{const rationale=(appealReasons[item.name]||'').trim();if(!rationale)throw new Error(w('Record a rationale for this operational action.'));await journeyApi.resolveScopeAppointmentReview(item.name,'Clear',rationale);await operational.refresh()})}>{w('Clear after scope is current')}</Button></div>{action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}</article>):<EmptyState title={w('No booked appointments need scope review.')} />}</section>
-    <section className="scope-review-appeals"><h2>{w('Reconsideration requests')}</h2>{appeals.error&&<InlineNotice tone="danger">{w('Reconsideration requests could not be loaded.')} <Button onClick={()=>void appeals.refresh()}>{w('Retry')}</Button></InlineNotice>}{!appeals.data?<Skeleton/>:appeals.data.length?appeals.data.map((item:any)=><article className="scope-review-card" key={item.name}><header><div><h3>{item.display_name||w('Clinician application')}</h3><p className="supporting">{item.service_label} · {w('Previously')} {w(item.basis_decision)}</p></div><span>{item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w('date unavailable')}</span></header><p><strong>{w('Applicant statement')}</strong></p><p>{item.applicant_statement}</p><details><summary>{w('Prior reviewer rationale')}</summary><p>{item.basis_reason}</p></details><TextField label={w('Reviewer rationale')} value={appealReasons[item.name]||''} onChange={e=>setAppealReasons({...appealReasons,[item.name]:e.target.value})} /><Select label={w('Reconsideration outcome')} value={appealDecisions[item.name]||''} onChange={e=>setAppealDecisions({...appealDecisions,[item.name]:e.target.value})}><option value="">{w('Choose decision')}</option><option value="Upheld">{w('Uphold previous decision')}</option><option value="Reopen">{w('Reopen for new evidence and full review')}</option></Select><Button loading={action.busy} onClick={()=>void action.run(async()=>{const reason=(appealReasons[item.name]||'').trim();if(!reason||!appealDecisions[item.name])throw new Error(w('Choose an outcome and record the reviewer rationale.'));await journeyApi.reviewScopeAppeal(item.name,appealDecisions[item.name] as 'Upheld'|'Reopen',reason);await Promise.all([appeals.refresh(),queue.refresh()]);})}>{w('Record reconsideration outcome')}</Button></article>):<EmptyState title={w('No reconsideration requests are waiting.')} />}</section>
+    <details className="review-policy-details" hidden={!!selectedReview}><summary>{w("Review rubric and policies")}</summary><VettingRubricManager /></details>
+    <details className="scope-review-appeals" hidden={!!selectedReview}><summary>{w('Booked appointments needing scope review')}</summary><p className="supporting">{w('This queue contains scheduling references only. It does not grant access to patient records or private notes.')}</p>{operational.error&&<InlineNotice tone="danger">{w('Operational review items could not be loaded.')} <Button onClick={()=>void operational.refresh()}>{w('Retry')}</Button></InlineNotice>}{!operational.data?<Skeleton/>:operational.data.filter((item:any)=>item.status!=='Cleared').length?operational.data.filter((item:any)=>item.status!=='Cleared').map((item:any)=><article className="scope-review-card" key={item.name}><header><div><h3>{item.clinician_name||w('Clinician unavailable')}</h3><p className="supporting">{item.service_label} · {w(item.reason_code)} · {w(item.status)}</p></div><span>{item.scheduled_start?new Date(item.scheduled_start).toLocaleString():w('date unavailable')}</span></header><p className="supporting">{w('Appointment reference')}: {item.appointment}</p><TextField label={w('Reviewer rationale')} value={appealReasons[item.name]||''} onChange={e=>setAppealReasons({...appealReasons,[item.name]:e.target.value})}/><div className="actions">{item.status==='Open'&&<Button variant="secondary" loading={action.busy} onClick={()=>void action.run(async()=>{const rationale=(appealReasons[item.name]||'').trim();if(!rationale)throw new Error(w('Record a rationale for this operational action.'));await journeyApi.resolveScopeAppointmentReview(item.name,'Acknowledge',rationale);await operational.refresh()})}>{w('Acknowledge')}</Button>}<Button loading={action.busy} onClick={()=>void action.run(async()=>{const rationale=(appealReasons[item.name]||'').trim();if(!rationale)throw new Error(w('Record a rationale for this operational action.'));await journeyApi.resolveScopeAppointmentReview(item.name,'Clear',rationale);await operational.refresh()})}>{w('Clear after scope is current')}</Button></div>{action.error&&<InlineNotice tone="danger">{w(action.error)}</InlineNotice>}</article>):<EmptyState title={w('No booked appointments need scope review.')} />}</details>
+    <details className="scope-review-appeals" hidden={!!selectedReview}><summary>{w('Reconsideration requests')}</summary>{appeals.error&&<InlineNotice tone="danger">{w('Reconsideration requests could not be loaded.')} <Button onClick={()=>void appeals.refresh()}>{w('Retry')}</Button></InlineNotice>}{!appeals.data?<Skeleton/>:appeals.data.length?appeals.data.map((item:any)=><article className="scope-review-card" key={item.name}><header><div><h3>{item.display_name||w('Clinician application')}</h3><p className="supporting">{item.service_label} · {w('Previously')} {w(item.basis_decision)}</p></div><span>{item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w('date unavailable')}</span></header><p><strong>{w('Applicant statement')}</strong></p><p>{item.applicant_statement}</p><details><summary>{w('Prior reviewer rationale')}</summary><p>{item.basis_reason}</p></details><TextField label={w('Reviewer rationale')} value={appealReasons[item.name]||''} onChange={e=>setAppealReasons({...appealReasons,[item.name]:e.target.value})} /><Select label={w('Reconsideration outcome')} value={appealDecisions[item.name]||''} onChange={e=>setAppealDecisions({...appealDecisions,[item.name]:e.target.value})}><option value="">{w('Choose decision')}</option><option value="Upheld">{w('Uphold previous decision')}</option><option value="Reopen">{w('Reopen for new evidence and full review')}</option></Select><Button loading={action.busy} onClick={()=>void action.run(async()=>{const reason=(appealReasons[item.name]||'').trim();if(!reason||!appealDecisions[item.name])throw new Error(w('Choose an outcome and record the reviewer rationale.'));await journeyApi.reviewScopeAppeal(item.name,appealDecisions[item.name] as 'Upheld'|'Reopen',reason);await Promise.all([appeals.refresh(),queue.refresh()]);})}>{w('Record reconsideration outcome')}</Button></article>):<EmptyState title={w('No reconsideration requests are waiting.')} />}</details>
     {queue.error&&<InlineNotice tone="danger">{w("The vetting queue could not be loaded.")} <Button onClick={()=>void queue.refresh()}>{w("Retry")}</Button></InlineNotice>}
-    {!queue.data?<Skeleton/>:queue.data.length?queue.data.map((item:any)=><article className="scope-review-card" key={item.name}>
+    {!selectedReview&&queue.data&&<section className="vetting-queue" data-tour="reviewer-vetting"><h2>{w("Choose an application to review")}</h2><p>{w("Review one clinician and one service at a time. General approval and service approval are separate.")}</p>{queue.data.map((item:any)=><div className="vetting-queue-row" key={item.name}><div><strong>{item.display_name||w('Clinician application')}</strong><p>{item.service_label} · {w(item.status)}</p><small>{w("License evidence")}: {(item.scope_evidence||[]).some((e:any)=>e.evidence_type==='License or registration')?w("Uploaded"):w("Missing")}</small></div><Button variant="secondary" disabled={!['Submitted','Resubmitted','Clarification','Approved'].includes(item.status)} onClick={()=>{setSelectedReview(item.name);setReviewStep(0);}}>{w("Review application")}</Button></div>)}</section>}
+    {selectedReview&&<Button variant="quiet" onClick={()=>setSelectedReview(null)}>{w("Back to review queue")}</Button>}
+    {!queue.data?<Skeleton/>:queue.data.length?queue.data.filter((item:any)=>item.name===selectedReview).map((item:any)=><article className="scope-review-card guided-review" key={item.name} data-tour="reviewer-vetting" data-tour-unsaved="true">
       <header><div><h2>{item.display_name||w('Clinician application')}</h2><p className="supporting">{item.service_label} · {w(item.status)} · {w('Submitted')} {item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w('date unavailable')}</p></div><span>{w('Rubric')} {item.rubric_version}</span></header>
+      <nav className="guided-step-nav" aria-label={w("Review progress")}>{reviewSteps.map((label,index)=><button key={label} type="button" aria-current={reviewStep===index?"step":undefined} onClick={()=>setReviewStep(index)}><span>{index+1}</span>{w(label)}</button>)}</nav>
+      <h3 ref={reviewHeading} tabIndex={-1}>{w(reviewSteps[reviewStep])}</h3>
+      <div hidden={reviewStep!==0}>
       {item.reverification_of&&<InlineNotice>{w('Credential renewal for a previously approved scope. Check the new credential evidence and validity dates; do not treat the earlier approval as renewed.')}</InlineNotice>}
-      <dl className="scope-review-facts"><dt>{w('Professional category')}</dt><dd>{item.professional_category}</dd><dt>{w('Qualification')}</dt><dd>{item.qualification} · {item.issuing_institution}</dd><dt>{w('Registration')}</dt><dd>{item.registration_number||w('Not provided')} · {item.issuing_authority||w('Authority not provided')}</dd><dt>{w('Jurisdiction and expiry')}</dt><dd>{item.jurisdiction||w('Not provided')} · {item.credential_expiry||w('No expiry recorded')}</dd><dt>{w('Relevant experience')}</dt><dd>{item.experience_years} {w('years')} · {w('adult scope')} {item.population_adults?w('confirmed'):w('not confirmed')}</dd><dt>{w('Approaches and training')}</dt><dd>{item.approach_keys||w('None listed')} · {item.relevant_training||w('No training summary')}</dd><dt>{w('Affiliations')}</dt><dd>{item.clinic_affiliations||w('Independent or not provided; affiliation is not competence evidence')}</dd><dt>{w('Application evidence')}</dt><dd>{item.resume_uploaded?w('Private CV uploaded'):w('CV missing')}</dd></dl>
+      <dl className="scope-review-facts"><dt>{w('Professional category')}</dt><dd>{item.professional_category}</dd><dt>{w('Qualification')}</dt><dd>{item.qualification} · {item.issuing_institution}</dd><dt>{w("Professional competencies")}</dt><dd>{item.competencies||w("Not provided")}</dd><dt>{w("Certifications")}</dt><dd>{item.certifications||w("Not provided")}</dd><dt>{w("License valid from")}</dt><dd>{item.credential_valid_from||w("Not provided")}</dd><dt>{w('Registration')}</dt><dd>{item.registration_number||w('Not provided')} · {item.issuing_authority||w('Authority not provided')}</dd><dt>{w('Jurisdiction and expiry')}</dt><dd>{item.jurisdiction||w('Not provided')} · {item.credential_expiry||w('No expiry recorded')}</dd><dt>{w('Relevant experience')}</dt><dd>{item.experience_years} {w('years')} · {w('adult scope')} {item.population_adults?w('confirmed'):w('not confirmed')}</dd><dt>{w('Approaches and training')}</dt><dd>{item.approach_keys||w('None listed')} · {item.relevant_training||w('No training summary')}</dd><dt>{w('Affiliations')}</dt><dd>{item.clinic_affiliations||w('Independent or not provided; affiliation is not competence evidence')}</dd><dt>{w('Application evidence')}</dt><dd>{item.resume_uploaded?w('Private CV uploaded'):w('CV missing')}</dd></dl>
       {item.resume_uploaded&&<Button variant="secondary" onClick={async()=>{try{const response=await fetch(`/api/method/tele_tena.api.presentation.download_resume?clinician=${encodeURIComponent(item.clinician)}`,{credentials:'same-origin',cache:'no-store'});if(!response.ok)throw new Error();const blob=await response.blob();const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='clinician-cv.pdf';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}catch{window.alert(w('Private evidence could not be opened. Check reviewer authorization and retry.'))}}}>{w('Open private CV')}</Button>}
       {!!item.scope_evidence?.length&&<ScopeEvidencePanel item={item} canUpload={false} refresh={()=>Promise.resolve()}/>}
-      {item.rubric_definition&&<details className="vetting-scored-rubric"><summary>{w('Structured evidence assessment')} · {item.rubric_definition.version} ({w(item.rubric_definition.status)})</summary>
+      {!(item.scope_evidence||[]).some((evidence:any)=>evidence.evidence_type==='License or registration')&&<InlineNotice><p>{w("License evidence is missing for this scope. A resume is not license evidence. Choose Request information so the applicant can upload a License or registration PDF and resubmit.")}</p><p>{w("Evidence references beside assessment scores are optional. License evidence for credential verification is required before approval.")}</p></InlineNotice>}
+      </div><div hidden={reviewStep!==1}>
+      {item.credential_verification&&<details className="credential-verification-history"><summary>{w('Previous credential verification source')}</summary><p><strong>{w('Verification source')}:</strong> {item.credential_verification.source}</p><p><strong>{w('Checked on')}:</strong> {item.credential_verification.checked_on}</p><p><strong>{w('Source reference')}:</strong> {item.credential_verification.source_reference}</p><p><strong>{w('Evidence revision')}:</strong> v{item.credential_verification.evidence.revision} · {item.credential_verification.evidence.sha256}</p></details>}
+      <fieldset className="credential-verification-inputs"><legend>{w('Credential source verification')}</legend><p className="supporting">{w('Mark verified only after you checked the issuing authority. Approval requires a source, date, reference, and license evidence from this scope.')}</p>
+        <Button variant="quiet" disabled={action.busy} onClick={()=>{setCredentialVerification(current=>({...current,[item.name]:{source:'',checked_on:'',evidence:'',reference:''}}));setValues(current=>({...current,[item.name]:{...current[item.name],credential_verified:false}}));}}>{w("Clear unfinished credential check")}</Button>
+        <TextField label={w('Verification source')} value={credentialVerification[item.name]?.source||''} maxLength={180} onChange={event=>updateCredential(item.name,'source',event.target.value)}/>
+        <TextField label={w('Checked on')} type="date" value={credentialVerification[item.name]?.checked_on||''} onChange={event=>updateCredential(item.name,'checked_on',event.target.value)}/>
+        <TextField label={w('Source reference')} value={credentialVerification[item.name]?.reference||''} maxLength={180} hint={w('Use a registry record or reviewer reference; do not enter a password or access token.')} onChange={event=>updateCredential(item.name,'reference',event.target.value)}/>
+        <Select disabled={!(item.scope_evidence||[]).some((e:any)=>e.evidence_type==='License or registration')} label={w('License evidence reviewed')} value={credentialVerification[item.name]?.evidence||''} onChange={event=>updateCredential(item.name,'evidence',event.target.value)}><option value="">{w((item.scope_evidence||[]).some((e:any)=>e.evidence_type==='License or registration')?'Choose license evidence':'No license document attached')}</option>{(item.scope_evidence||[]).filter((evidence:any)=>evidence.evidence_type==='License or registration').map((evidence:any)=><option key={evidence.id} value={evidence.id}>{w(evidence.evidence_type)} · v{evidence.revision}</option>)}</Select>
+      </fieldset>
+      </div><div hidden={reviewStep!==2}>
+      <Button variant="quiet" disabled={action.busy} onClick={()=>setScoredCriteria(current=>({...current,[item.name]:Object.fromEntries(Object.entries(current[item.name]||{}).filter(([,value])=>['0','1','2','3'].includes(value.score)&&value.rationale.trim()))}))}>{w("Clear unfinished assessment")}</Button>
+      {item.rubric_definition&&<details className="vetting-scored-rubric" open><summary>{w('Structured evidence assessment')} · {item.rubric_definition.version} ({w(item.rubric_definition.status)})</summary>
         <InlineNotice>{w(item.rubric_definition.approval_note)} {w('Scores organize reviewer evidence only. They do not make or replace a human scope decision.')}</InlineNotice>
-        {(item.rubric_definition.scored_criteria||[]).map((criterion:any)=><fieldset className="vetting-rubric-dimension" key={criterion.key}>
-          <legend>{w(criterion.label)}</legend>
+        {(item.rubric_definition.scored_criteria||[]).map((criterion:any,index:number)=><details className="assessment-dimension" key={criterion.key} open={index===0}><summary>{w(criterion.label)} · {w(scoredCriteria[item.name]?.[criterion.key]?.score&&scoredCriteria[item.name]?.[criterion.key]?.rationale?.trim()?"Complete":"Not assessed")}</summary><fieldset className="vetting-rubric-dimension"><legend className="sr-only">{w(criterion.label)}</legend>
           <Select label={w('Evidence score (0–3)')} value={scoredCriteria[item.name]?.[criterion.key]?.score||''} onChange={event=>updateScored(item.name,criterion.key,'score',event.target.value)}>
             <option value="">{w('Choose a score')}</option>{[0,1,2,3].map(score=><option key={score} value={score}>{score}</option>)}
           </Select>
           <TextField label={w('Reviewer rationale for this dimension')} required value={scoredCriteria[item.name]?.[criterion.key]?.rationale||''} onChange={event=>updateScored(item.name,criterion.key,'rationale',event.target.value)} maxLength={800}/>
           <Select label={w('Private evidence reference (optional)')} value={scoredCriteria[item.name]?.[criterion.key]?.evidence||''} onChange={event=>updateScored(item.name,criterion.key,'evidence',event.target.value)}>
-            <option value="">{w('No uploaded reference')}</option>{(item.scope_evidence||[]).map((evidence:any)=><option key={evidence.id} value={evidence.id}>{w(evidence.evidence_type)} · v{evidence.revision}</option>)}
+            <option value="">{w(item.scope_evidence?.length?'No reference selected (optional)':'No documents attached to this scope')}</option>{(item.scope_evidence||[]).map((evidence:any)=><option key={evidence.id} value={evidence.id}>{w(evidence.evidence_type)} · v{evidence.revision}</option>)}
           </Select>
-        </fieldset>)}
+        </fieldset></details>)}
       </details>}
-      {item.credential_verification&&<details className="credential-verification-history"><summary>{w('Previous credential verification source')}</summary><p><strong>{w('Verification source')}:</strong> {item.credential_verification.source}</p><p><strong>{w('Checked on')}:</strong> {item.credential_verification.checked_on}</p><p><strong>{w('Source reference')}:</strong> {item.credential_verification.source_reference}</p><p><strong>{w('Evidence revision')}:</strong> v{item.credential_verification.evidence.revision} · {item.credential_verification.evidence.sha256}</p></details>}
-      <fieldset className="credential-verification-inputs"><legend>{w('Credential source verification')}</legend><p className="supporting">{w('Mark verified only after you checked the issuing authority. Approval requires a source, date, reference, and license evidence from this scope.')}</p>
-        <TextField label={w('Verification source')} value={credentialVerification[item.name]?.source||''} maxLength={180} onChange={event=>updateCredential(item.name,'source',event.target.value)}/>
-        <TextField label={w('Checked on')} type="date" value={credentialVerification[item.name]?.checked_on||''} onChange={event=>updateCredential(item.name,'checked_on',event.target.value)}/>
-        <TextField label={w('Source reference')} value={credentialVerification[item.name]?.reference||''} maxLength={180} hint={w('Use a registry record or reviewer reference; do not enter a password or access token.')} onChange={event=>updateCredential(item.name,'reference',event.target.value)}/>
-        <Select label={w('License evidence reviewed')} value={credentialVerification[item.name]?.evidence||''} onChange={event=>updateCredential(item.name,'evidence',event.target.value)}><option value="">{w('Choose license evidence')}</option>{(item.scope_evidence||[]).filter((evidence:any)=>evidence.evidence_type==='License or registration').map((evidence:any)=><option key={evidence.id} value={evidence.id}>{w(evidence.evidence_type)} · v{evidence.revision}</option>)}</Select>
-      </fieldset>
       <fieldset><legend>{w('Mandatory and supporting assessment')}</legend>{checks.map(([key,label])=><Checkbox key={key} label={w(label)} checked={!!values[item.name]?.[key]} onChange={e=>setValues({...values,[item.name]:{...values[item.name],[key]:e.target.checked}})} />)}</fieldset>
-      <label className="field">{w('Structured findings and decision reason')}<textarea rows={3} value={findings[item.name]||''} onChange={e=>setFindings({...findings,[item.name]:e.target.value})}/></label><label className="field">{w('Restrictions')}<textarea rows={2} value={restrictions[item.name]||''} onChange={e=>setRestrictions({...restrictions,[item.name]:e.target.value})}/></label>
-      <div className="actions"><Select label={w('Decision')} value={decision[item.name]||''} onChange={e=>setDecision({...decision,[item.name]:e.target.value})}><option value="">{w('Choose decision')}</option><option value="Clarification">{w('Request information')}</option><option value="Approved">{w('Approve this scope')}</option><option value="Rejected">{w('Reject this scope')}</option><option value="Suspended">{w('Suspend this scope')}</option><option value="Expired">{w('Mark expired')}</option></Select><Button loading={action.busy} disabled={!item.rubric_definition||action.busy} onClick={()=>void action.run(async()=>{if(!decision[item.name])throw new Error(w('Choose a decision.'));const scored_criteria=Object.fromEntries(Object.entries(scoredCriteria[item.name]||{}).map(([key,value])=>[key,{score:value.score,rationale:value.rationale,evidence:value.evidence?[value.evidence]:[]}]));await journeyApi.reviewScopeApplication({application:item.name,decision:decision[item.name],...values[item.name],findings:findings[item.name],restrictions:restrictions[item.name],credential_source:credentialVerification[item.name]?.source,credential_checked_on:credentialVerification[item.name]?.checked_on,credential_evidence:credentialVerification[item.name]?.evidence,credential_source_reference:credentialVerification[item.name]?.reference,scored_criteria});await queue.refresh()})}>{w('Record human decision')}</Button></div>
-      {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
+      </div><div hidden={reviewStep!==3}>
+      <ul className="review-readiness" aria-label={w("Approval readiness")}>{[
+        ["License evidence attached",(item.scope_evidence||[]).some((e:any)=>e.evidence_type==='License or registration')],
+        ["Credential check recorded",!!values[item.name]?.credential_verified&&!!credentialVerification[item.name]?.source&&!!credentialVerification[item.name]?.checked_on&&!!credentialVerification[item.name]?.reference&&!!credentialVerification[item.name]?.evidence],
+        ["Mandatory checks passed",['identity_reviewed','credential_verified','qualification_relevant','experience_adequate','adult_scope_appropriate','interview_completed'].every(key=>values[item.name]?.[key])],
+        ["Assessment scores and reasons complete",(item.rubric_definition?.scored_criteria||[]).every((criterion:any)=>{const value=scoredCriteria[item.name]?.[criterion.key];return value&&['0','1','2','3'].includes(value.score)&&value.rationale.trim();})],
+        ["Service definition approved",item.definition_review_status==='Approved'&&!!item.definition_active],
+      ].map(([label,ready])=><li key={String(label)}><span>{w(String(label))}</span><strong>{w(ready?"Ready":"Needs attention")}</strong></li>)}</ul>
+      <p className="supporting">{w("Approve only when all required checks and evidence pass. Request information to let the applicant correct missing documents; decline when requirements are not met.")}</p>
+      <label className="field">{w('Structured findings and decision reason')}<textarea maxLength={2000} rows={3} value={findings[item.name]||''} onChange={e=>setFindings({...findings,[item.name]:e.target.value})}/></label><label className="field">{w('Restrictions')}<textarea maxLength={1000} rows={2} value={restrictions[item.name]||''} onChange={e=>setRestrictions({...restrictions,[item.name]:e.target.value})}/></label>
+      <div className="actions"><Select label={w('Decision')} value={decision[item.name]||''} onChange={e=>setDecision({...decision,[item.name]:e.target.value})}><option value="">{w('Choose decision')}</option><option value="Clarification">{w('Request information')}</option><option value="Approved">{w('Approve this scope')}</option><option value="Rejected">{w('Reject this scope')}</option><option value="Suspended">{w('Suspend this scope')}</option><option value="Expired">{w('Mark expired')}</option></Select><Button loading={action.busy} disabled={!item.rubric_definition||action.busy} onClick={()=>void action.run(async()=>{if(!decision[item.name])throw new ApiError('review_decision_required');const scored_criteria=Object.fromEntries(Object.entries(scoredCriteria[item.name]||{}).map(([key,value])=>[key,{score:value.score,rationale:value.rationale,evidence:value.evidence?[value.evidence]:[]}]));await journeyApi.reviewScopeApplication({application:item.name,decision:decision[item.name],...values[item.name],findings:findings[item.name],restrictions:restrictions[item.name],credential_source:credentialVerification[item.name]?.source,credential_checked_on:credentialVerification[item.name]?.checked_on,credential_evidence:credentialVerification[item.name]?.evidence,credential_source_reference:credentialVerification[item.name]?.reference,scored_criteria});await queue.refresh()})}>{w('Record human decision')}</Button></div>
+      </div><div className="guided-review-footer"><Button variant="quiet" disabled={reviewStep===0} onClick={()=>setReviewStep(reviewStep-1)}>{w("Back")}</Button>{reviewStep<3&&<Button onClick={()=>setReviewStep(reviewStep+1)}>{w("Continue")}</Button>}<span>{w("Your entries stay while you move between steps. A decision is recorded only when you confirm it.")}</span></div>
+      {action.error&&<InlineNotice tone="danger">{w(action.error)}</InlineNotice>}
     </article>):<EmptyState title={w("No scope applications are waiting for review.")} />}</>;
 }

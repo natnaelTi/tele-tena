@@ -1,0 +1,15 @@
+{
+  "source": "32068b7d2168bf04c3c29949850a5fd9e71d1af1",
+  "site": "teletena-mvp-presentation.localhost",
+  "actual_browser_zoom": 2,
+  "outer_width": 1440,
+  "inner_width": 720,
+  "real_backend": true,
+  "reference_ids": [
+    "C01",
+    "B09",
+    "I08"
+  ],
+  "no_page_overflow": true,
+  "visual_inspection_required": true
+}

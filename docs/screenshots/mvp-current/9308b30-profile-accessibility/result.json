@@ -1,0 +1,24 @@
+{
+  "source": "9308b303ca5a7c243eed84aa063960dd76f8c69d",
+  "site": "teletena-mvp-presentation.localhost",
+  "real_backend": true,
+  "read_only": true,
+  "keyboard_control_order": true,
+  "language_layouts": [
+    "am",
+    "om"
+  ],
+  "widths": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "actual_200_percent_zoom": true,
+  "outer_width": 1440,
+  "inner_width": 720,
+  "dpr": 2,
+  "visual_scale": 1,
+  "native_language_review": false,
+  "reference_language": "English; provisional language layouts have no same-language reference"
+}

@@ -21,6 +21,9 @@ def _appointment_for_patient(appointment, patient, lock=False):
                  (' FOR UPDATE' if lock else ''), (appointment, patient))
     if not found:
         frappe.throw('Appointment unavailable.', frappe.PermissionError)
+    from tele_tena.api.couples import plan_for
+    if plan_for(appointment):
+        frappe.throw('Shared sessions require each recipient’s permission; clinic sharing is unavailable.', frappe.PermissionError)
     return found[0]
 
 

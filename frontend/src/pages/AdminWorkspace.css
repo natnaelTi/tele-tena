@@ -1,0 +1,94 @@
+.review-queue-filters { display:grid; grid-template-columns:minmax(0,1fr) 184px; gap:16px; margin:24px 0; }
+.workspace-main .page-title h1 { font-size:40px; line-height:1.12; letter-spacing:-1.6px; }
+.review-queue-table table { font-size:14px; }
+.review-queue-table th { color:var(--muted); background:var(--surface); }
+.review-queue-table td { padding:20px 14px; }
+.review-queue-cards { display:none; }
+.application-review-dialog { --dialog-width:1040px; }
+.review-policy-details { padding:16px 20px; border:1px solid var(--border); border-radius:12px; margin-bottom:24px; }
+.review-policy-details > summary { min-height:44px; display:flex; align-items:center; cursor:pointer; font-weight:600; }
+.review-overview-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; margin:32px 0 24px; }
+.review-overview-metrics > section,.review-overview-panel { border:1px solid var(--border); padding:26px; border-radius:16px; background:white; min-width:0; }
+.review-overview-metrics span { color:var(--muted); }
+.review-overview-metrics strong { display:block; font-size:34px; margin:12px 0; }
+.review-overview-metrics p { margin:0; }
+.review-overview-layout { display:grid; grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr); gap:24px; align-items:start; }
+.review-overview-panel h2 { font-size:22px; }
+.review-overview-row { display:flex; align-items:center; gap:16px; padding:20px 0; border-bottom:1px solid var(--border); text-decoration:none; }
+.review-overview-row > div { min-width:0; flex:1; }
+.review-overview-row p { font-size:14px; margin:4px 0 0; }
+.review-overview-row > svg { flex-shrink:0; box-sizing:content-box; padding:10px; border-radius:12px; background:var(--subtle); }
+.review-overview-panel > .text-link { margin-top:20px; }
+@media(max-width:800px) { .review-overview-layout { grid-template-columns:1fr; } .review-overview-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } .review-overview-row { flex-wrap:wrap; } .workspace-main .page-title h1 { font-size:32px; } }
+@media(max-width:600px) { .review-overview-metrics { grid-template-columns:1fr; } }
+@media(max-width:700px) { .review-queue-table { display:none; } .review-queue-cards { display:grid; gap:16px; } .review-queue-cards header { display:flex; justify-content:space-between; gap:16px; } .review-queue-cards h2 { font-size:20px; } .review-queue-filters { grid-template-columns:1fr; } }
+
+.review-queue-table table {border:1px solid var(--border);border-radius:16px;}
+.workspace-admin .sidebar nav.workspace-nav-admin a.active {background:var(--ink);color:white;}
+.review-queue-table td:last-child .button {color:var(--brand);text-decoration:underline;font-size:14px;padding-inline:8px;}
+@media(max-width:700px){.review-queue-filters {grid-template-columns:1fr;}}
+
+/* The optional invitation must not push the review queue below the fold. */
+.workspace-admin .workspace-body > .tour-invite {position:fixed;right:24px;bottom:24px;margin:0;z-index:70;}
+.workspace-admin .workspace-body > .tour-replay {margin:0 32px 0 auto;}
+@media(max-width:800px){.workspace-admin .workspace-body > .tour-invite {position:static;bottom:auto;right:auto;left:auto;margin:8px 16px;max-width:calc(100% - 32px);width:auto;}}
+
+.matching-boundaries { margin-top:24px; }
+.review-queue-table td details { margin-top:8px; }
+.review-queue-table td details summary { cursor:pointer; min-height:44px; font-weight:600; }
+
+.review-overview-metrics.compact > section { padding:24px; }
+.review-overview-metrics.compact strong { margin:10px 0; }
+.review-overview-metrics.compact p { font-size:14px; }
+.matching-operations .review-queue-filters { grid-template-columns:minmax(220px,320px) auto; justify-content:start; align-items:end; }
+.matching-operations .review-queue-filters .button { height:48px; }
+.matching-operations .matching-table td { padding:14px; }
+.matching-operations .matching-table .supporting { margin:6px 0 0; }
+.matching-operations .matching-table td details { margin-top:0; }
+@media(max-width:600px) { .matching-operations .review-queue-filters { grid-template-columns:minmax(0,1fr) auto; } }
+
+.matching-table { display:block; overflow-x:auto; }
+.matching-table table { font-size:14px; min-width:680px; }
+.matching-table th { background:var(--canvas); color:var(--muted); }
+
+.application-review-meta{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin:20px 0 24px;font-size:14px;color:var(--muted)}
+.application-review-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(260px,1fr);gap:24px;align-items:start}
+.application-review-panel{padding:24px;border:1px solid var(--border);border-radius:16px;margin-bottom:20px;min-width:0}
+.application-review-panel h2{font-size:22px;margin:0 0 20px}.application-review-panel h3{font-size:16px;margin:20px 0 8px}
+.application-review-panel ul{padding-left:20px}.application-review-panel li{margin:8px 0}
+.application-review-panel details{margin-top:24px}.application-review-panel summary{min-height:44px;cursor:pointer;color:var(--brand);font-weight:600}
+.application-document-row{display:flex;align-items:center;gap:16px;margin-bottom:16px}.application-document-row>svg{box-sizing:content-box;padding:12px;color:var(--brand);background:var(--subtle);border-radius:12px;flex:0 0 auto}.application-document-row p{margin:6px 0 0;font-size:14px;color:var(--muted)}
+.application-review-layout aside .actions{display:flex;flex-direction:column;align-items:stretch;margin-top:20px}
+.application-review-panel .settings-link-row{margin-top:20px;font-weight:600}
+@media(max-width:760px){.application-review-layout{grid-template-columns:1fr;gap:0}.application-review-panel{padding:20px}}
+
+.application-review-page .application-review-panel {background:var(--card);padding:26px;}
+.application-review-page .application-review-panel h2 {font-size:25px;line-height:1.25;}
+.application-review-page .application-review-panel dl {margin:20px 0;}
+.application-review-page .application-review-panel dl>div {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:16px;padding:16px 0;border-bottom:1px solid var(--border);}
+.application-review-page .application-review-panel dt {color:var(--muted);}
+.application-review-page .application-review-panel dd {margin:0;font-weight:600;text-align:right;overflow-wrap:anywhere;}
+@media(max-width:650px){.application-review-page .application-review-panel {padding:22px;}.application-review-page .application-review-panel dl>div {grid-template-columns:1fr;gap:6px;}.application-review-page .application-review-panel dd {text-align:left;}}
+
+/* I07 catalog list and I08 focused definition use distinct reference compositions. */
+.catalog-table-wrap{overflow:auto;border:1px solid var(--border);border-radius:12px;background:white}
+.catalog-definition-table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+.catalog-definition-table th,.catalog-definition-table td{padding:16px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+.catalog-definition-table th{background:var(--subtle);font-weight:600}
+.catalog-definition-table tbody tr:last-child td{border-bottom:0}
+.catalog-definition-table a{color:var(--primary);font-weight:600;text-underline-offset:3px}
+.service-definition-workspace{max-width:1000px;margin:24px auto}
+
+.definition-panel-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:24px;align-items:start}
+.definition-core,.definition-panel-grid>.service-attribute-editor{min-width:0;border:1px solid var(--border);border-radius:16px;padding:24px}
+.definition-core>h3,.definition-panel-grid>.service-attribute-editor>h3{font-size:20px;margin:0 0 20px}
+.definition-core .form-grid{grid-template-columns:minmax(0,1fr);gap:0}
+.definition-core,.definition-panel-grid>.service-attribute-editor{background:var(--surface-card)}
+.definition-delivery{display:grid;gap:12px;margin:16px 0 24px!important}
+.definition-delivery legend{font-weight:600;margin-bottom:12px}
+.definition-delivery .checkbox-card{margin:0}
+@media(max-width:900px){.definition-panel-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.definition-core,.definition-panel-grid>.service-attribute-editor{padding:16px}.catalog-definition-table th,.catalog-definition-table td{padding:12px}}
+
+.service-definition-workspace>.service-catalog-editor{padding:0;border:0;background:transparent}
+.application-review-page [hidden]{display:none!important}.application-review-page .application-review-layout{display:block;max-width:800px;margin:auto}.application-review-page .guided-step-nav{max-width:800px;margin:24px auto}.application-review-page .guided-review-footer{max-width:800px;margin:24px auto}.guided-step-nav{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}

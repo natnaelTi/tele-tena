@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, useRef } from "react";
 import type {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
@@ -44,7 +44,7 @@ export function IconButton({
     <Button
       {...props}
       variant="quiet"
-      className="icon-button"
+      className={`icon-button ${props.className || ""}`}
       aria-label={label}
       title={label}
     >
@@ -81,19 +81,7 @@ export function TextField({
     </div>
   );
 }
-export function PhoneField(
-  props: Omit<Parameters<typeof TextField>[0], "type">,
-) {
-  return (
-    <TextField
-      {...props}
-      type="tel"
-      autoComplete="tel"
-      inputMode="tel"
-      placeholder="+251 9…"
-    />
-  );
-}
+export {PhoneField} from "./PhoneField";
 export function OTPInput(props: Omit<Parameters<typeof TextField>[0], "type">) {
   return (
     <TextField
@@ -126,12 +114,16 @@ export function Select({
 }
 export function Checkbox({
   label,
+  description,
+  variant = "plain",
   ...props
-}: InputHTMLAttributes<HTMLInputElement> & { label: ReactNode }) {
+}: InputHTMLAttributes<HTMLInputElement> & { label: ReactNode; description?: ReactNode; variant?: "plain" | "card" }) {
+  const id = useId();
   return (
-    <label className="check-field">
-      <input {...props} type="checkbox" />
-      <span>{label}</span>
+    <label className={`check-field${variant === "card" ? " check-card" : ""}`}>
+      <input {...props} type="checkbox" aria-labelledby={props["aria-labelledby"] || id + "-label"}
+        aria-describedby={[props["aria-describedby"], description ? id + "-description" : undefined].filter(Boolean).join(" ") || undefined} />
+      <span><span id={id + "-label"}>{label}</span>{description && <small id={id + "-description"}>{description}</small>}</span>
     </label>
   );
 }
@@ -242,6 +234,9 @@ export function Dialog({
   description,
   children,
   drawer = false,
+  size = "default",
+  className = "",
+  focusReturnTarget,
 }: {
   open: boolean;
   onOpenChange: (value: boolean) => void;
@@ -249,13 +244,25 @@ export function Dialog({
   description: string;
   children: ReactNode;
   drawer?: boolean;
+  size?: "default" | "wide";
+  className?: string;
+  focusReturnTarget?: HTMLElement | null;
 }) {
+  const returnFocus = useRef<HTMLElement | null>(null);
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="dialog-overlay" />
         <DialogPrimitive.Content
-          className={drawer ? "dialog drawer" : "dialog"}
+          className={`${drawer ? "dialog drawer" : "dialog"} ${size === "wide" ? "dialog-wide" : ""} ${className}`}
+          onOpenAutoFocus={() => { returnFocus.current = document.activeElement as HTMLElement; }}
+          onCloseAutoFocus={event => {
+            const target = focusReturnTarget || returnFocus.current;
+            if (target?.isConnected) {
+              event.preventDefault();
+              target.focus();
+            }
+          }}
         >
           <DialogPrimitive.Title>{title}</DialogPrimitive.Title>
           <DialogPrimitive.Description>

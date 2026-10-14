@@ -1,0 +1,3 @@
+# Application-field correction evidence
+
+Source/package c7a62b9ca3a28cb6b46b10350122ebc640aa6ba6. Isolated real-backend browser at8028 on tele-tena-pr12-fresh.localhost; random captured OTP transport, no live send. Fictional newly registered applicant. B07 initial/private scope form and I03 general reviewer projection are paired with the unchanged reference at390/1440. Initial date/competencies/certifications persist; scope values are intentionally edited, saved, reloaded, then submitted. These are functional correction captures, not owner approval or full design-fidelity acceptance. Tablet captures and detailed bounded execution logs remain at /tmp/tt-onboarding-pairs and /tmp/tt-claims-scope-browser.log. Existing presentation data was not rewritten.

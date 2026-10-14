@@ -1,0 +1,15 @@
+{
+  "source": "bc20f722848a84b7b857284b1599bef0f8b1f451",
+  "site": "teletena-mvp-presentation.localhost",
+  "real_backend": true,
+  "read_only": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ],
+  "reviewer_queue": true,
+  "dialog_keyboard_focus": true,
+  "authorized_resume_download": true,
+  "applications_unchanged": true
+}

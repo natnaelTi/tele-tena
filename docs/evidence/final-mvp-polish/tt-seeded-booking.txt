@@ -1,0 +1,1 @@
+PASS: seeded account, server calendar -> disclosure -> reservation -> persisted appointment detail/reload.

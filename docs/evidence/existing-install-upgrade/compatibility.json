@@ -1,0 +1,28 @@
+{
+  "baseline": "8f7ab9cd8d5e779d17b632dc9afdae3e700ab3c6",
+  "candidate": "800a591ac6af9c6c3b4afd61ed4353be4ff0826e",
+  "frappe": "16.2.1 / 8f6e24728b86b7c6427908ed6536289a41ea9cf4",
+  "erpnext": "16.1.0 / bb2bada1fde0ae7a3c3cad32bed781ebd470e27d",
+  "python": "3.14.2",
+  "node": "24.13.0",
+  "mariadb": "10.6.22",
+  "redis": "6.0.16",
+  "existing_upgrade": "PASS",
+  "original_operational_tables": 26,
+  "original_operational_rows": 41,
+  "original_private_config_files": 6,
+  "first_install_guard": "PASS in separate venv",
+  "protected_distribution_and_editable_identity_check": "PASS",
+  "unrelated_same_version_replacement_plan": "rejected",
+  "repeat_migration": "PASS",
+  "legacy_completed_obligation": "LegacyHold preserved",
+  "seed_twice_and_unrelated_preservation": "PASS",
+  "new_seed_owner_reconciliation": {
+    "patients": 5,
+    "clinicians": 4,
+    "balanced": true
+  },
+  "missing_signing_key": "Initialized only on first couples seed; original config fields and credentials preserved",
+  "isolated_Bench_CLI": "5.29.0; pip check and site list-apps pass",
+  "remote_44_app_dependency_repair": "Not applied or verified; requires all-app audit"
+}

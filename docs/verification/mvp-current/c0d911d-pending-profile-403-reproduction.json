@@ -1,0 +1,16 @@
+{
+  "source": "c0d911d149c43926ce1494b4e582d29c8e37eea4",
+  "site": "teletena-mvp-presentation.localhost",
+  "real_backend": true,
+  "pending_state": true,
+  "approved_only_navigation_absent": true,
+  "profile_reload": true,
+  "no_approval_mutation": true,
+  "pending_profile_save_status": 403,
+  "direct_appointments_denied": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "source": "20172f3356e239ffd801b71d8690dd712ee99b11",
+  "site": "teletena-mvp-presentation.localhost",
+  "real_backend": true,
+  "own_offer_history": true,
+  "accepted_reload_handoff": true,
+  "patient_api_denied": true,
+  "unrelated_clinician_api_denied": true,
+  "no_mutation": true,
+  "viewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "provisional_layout_languages": [
+    "am",
+    "om"
+  ],
+  "native_approval": false
+}

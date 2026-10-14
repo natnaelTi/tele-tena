@@ -1,0 +1,12 @@
+{
+  "source": "c09a6d3a432c7bddb152187d368d24d4f935c147",
+  "site": "teletena-mvp-presentation.localhost",
+  "public_deep_link_refresh": true,
+  "real_access_policy": true,
+  "clinician_intent": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ]
+}

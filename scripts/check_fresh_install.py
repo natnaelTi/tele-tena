@@ -42,7 +42,8 @@ assert CREDENTIALS.stat().st_uid == os.getuid()
 assert not LOG.exists() and not LOG.is_symlink(), 'Fresh-install log already exists; refusing to overwrite it'
 credentials = json.loads(CREDENTIALS.read_text())
 assert credentials['db_root_username'] == ADMIN and credentials['db_name'] == DB
-socket = next(path for path in ('/run/mysqld/mysqld.sock', '/var/run/mysqld/mysqld.sock') if Path(path).exists())
+socket = os.environ.get('TELE_TENA_FRESH_DB_SOCKET') or next(path for path in ('/run/mysqld/mysqld.sock', '/var/run/mysqld/mysqld.sock') if Path(path).exists())
+assert Path(socket).is_socket(), 'Configured local database socket unavailable'
 
 def administration():
     return pymysql.connect(unix_socket=socket, user=ADMIN, password=credentials['db_root_password'], autocommit=True)
@@ -58,7 +59,7 @@ def retained_fingerprint():
         frappe.connect()
         content = {}
         existing_tables = set(frappe.db.get_tables(cached=False))
-        for table in (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'financial_reconciliation', 'session_feedback', 'phone_identity','otp_challenge','otp_rate_limit','otp_gate','consultation','contact_identity','onboarding'):
+        for table in (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'financial_reconciliation', 'session_feedback', 'phone_identity','otp_challenge','otp_rate_limit','otp_gate','consultation','contact_identity','onboarding','couple_plan','couple_participant','note_recipient','shared_change_consent','note_followup'):
             # A retained pre-v1.7 site legitimately has none of the new subledger
             # tables yet. Fingerprint only records that existed before this check.
             if f'tt_{table}' not in existing_tables:
@@ -205,7 +206,7 @@ try:
     from tele_tena.schema import TABLES
     from tele_tena.patches.v1_6_presentation_release import TABLES as PRESENTATION_TABLES
     from tele_tena.patches.v1_7_demo_subledger import TABLES as SUBLEDGER_TABLES
-    expected_tables = (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'financial_reconciliation', 'session_feedback')
+    expected_tables = (*TABLES, *PRESENTATION_TABLES, *SUBLEDGER_TABLES, 'financial_reconciliation', 'session_feedback', 'couple_plan', 'couple_participant', 'note_recipient', 'shared_change_consent', 'note_followup', 'history_document')
     missing_tables = sorted('tt_' + table for table in expected_tables
                             if 'tt_' + table not in frappe.db.get_tables(cached=False))
     assert not missing_tables, 'Missing app tables: ' + ', '.join(missing_tables)
@@ -217,12 +218,15 @@ try:
     assert frappe.db.exists('DocType', 'Tele Tena Clinic Membership')
     assert frappe.db.exists('DocType', 'Tele Tena Clinic Encounter Access')
     assert frappe.db.sql("SHOW COLUMNS FROM tt_appointment LIKE 'policy_snapshot'")
+    assert frappe.db.sql("SHOW COLUMNS FROM tt_profile LIKE 'introduction'")
     assert frappe.db.sql("SHOW COLUMNS FROM tt_application LIKE 'requested_services'")
+    for field in ('competencies', 'certifications', 'credential_valid_from'):
+        assert frappe.db.has_column('Tele Tena Vetting Scope Application', field)
     assert frappe.db.count('Tele Tena Service Scope') == 0
     assert frappe.db.sql('SELECT COUNT(*) FROM tt_wallet')[0][0] == 0
     for role in ('Tele Tena Patient', 'Tele Tena Clinician', 'Tele Tena Approver'):
         assert frappe.db.exists('Role', role)
-    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state', 'v1_5_contact_onboarding', 'v1_6_presentation_release', 'v1_7_demo_subledger', 'v1_8_legacy_event_reconciliation', 'v1_13_financial_reconciliation_audit', 'v1_14_session_feedback', 'v1_19_scope_reverification', 'v1_20_scope_appointment_review', 'v1_21_scope_review_history', 'v1_24_legacy_completion_activity', 'v1_25_legacy_refund_activity'):
+    for version in ('v1_0_command_storage', 'v1_1_native_catalog', 'v1_2_catalog_adoption_check', 'v1_3_phone_auth', 'v1_3_consultations', 'v1_4_consultation_close_state', 'v1_5_contact_onboarding', 'v1_6_presentation_release', 'v1_7_demo_subledger', 'v1_8_legacy_event_reconciliation', 'v1_13_financial_reconciliation_audit', 'v1_14_session_feedback', 'v1_19_scope_reverification', 'v1_20_scope_appointment_review', 'v1_21_scope_review_history', 'v1_24_legacy_completion_activity', 'v1_25_legacy_refund_activity','v1_33_couples_consultations','v1_34_shared_change_consent','v1_35_individual_followup','v1_36_public_introduction','v1_37_scope_intake','v1_38_profile_photos'):
         assert frappe.db.exists('Patch Log', {'patch': 'tele_tena.patches.' + version})
     from tele_tena.api import journey
     assert not journey.simulation_enabled(), 'Simulation unexpectedly enabled on disposable site'
@@ -237,6 +241,22 @@ try:
         verify()
     if os.environ.get('TELE_TENA_REVIEW_CHECK') == 'full':
         enabled_registration_browser_check()
+    if os.environ.get('TELE_TENA_FRESH_DEMO_DATASET') == '1':
+        frappe.set_user('Administrator')
+        from frappe.installer import update_site_config
+        update_site_config('tele_tena_review_site', SITE)
+        update_site_config('tele_tena_review_enabled', True)
+        frappe.clear_cache()
+        frappe.destroy()
+        result = subprocess.run([str(BENCH / 'env/bin/python'), str(APP / 'scripts/check_demo_dataset.py')],
+            env=dict(os.environ, TELE_TENA_TEST_SITE=SITE, TELE_TENA_TEST_BENCH=str(BENCH)),
+            cwd=APP, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=180)
+        if result.returncode:
+            failure_log=SITE_PATH / 'private/fresh-demo-acceptance.log'
+            failure_log.write_text(result.stdout)
+            failure_log.chmod(0o600)
+            raise RuntimeError('Fresh dataset acceptance failed; output retained privately on test site')
+        print(result.stdout.strip())
     frappe.destroy()
     assert retained_fingerprint() == retained_before, 'Retained development records changed'
     passed = True

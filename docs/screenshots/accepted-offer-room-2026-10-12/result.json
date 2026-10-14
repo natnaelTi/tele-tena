@@ -1,0 +1,14 @@
+{
+  "source": "2784701dd09774d528322993aa485cccda9d0222",
+  "real_backend": true,
+  "two_contexts": true,
+  "patient_acceptance": true,
+  "account_page_popup": true,
+  "polling_seconds": 5,
+  "notification_consultation_handoff": true,
+  "persisted_read": true,
+  "private_payload": true,
+  "owned_offer_history": true,
+  "capacity_error_ui_fault_injection": true,
+  "site": "tele-tena-pr12-fresh.localhost"
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "v1.36",
+  "runtime_source": "467f755aab0bee51603cde1747ebccb5253e348a",
+  "harness_source": "7807bf171a5fe170d3633586167807888e03dc95",
+  "native_migrations_per_site": 2,
+  "sites": [
+    {
+      "site": "teletena-mvp-presentation.localhost",
+      "existing_app_tables": 54,
+      "existing_rows": 667,
+      "preserved": true
+    },
+    {
+      "site": "tele-tena-pr12-fresh.localhost",
+      "existing_app_tables": 54,
+      "existing_rows": 3921,
+      "preserved": true
+    }
+  ],
+  "introduction_inferred": false,
+  "owned_preview_writers_stopped_for_migration": true,
+  "backups_with_files": true,
+  "fresh_install_latest_verified": false
+}

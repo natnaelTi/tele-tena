@@ -1,0 +1,21 @@
+{
+  "source": "1774968d6899b9b222e9514e27adb9afd2b12f48",
+  "site": "teletena-mvp-presentation.localhost",
+  "real_backend": true,
+  "read_only": true,
+  "before_correction": false,
+  "navigation_filters_preserved": true,
+  "query_cleared_on_full_reload": true,
+  "preview_focus_return": true,
+  "selected_offering_calendar_refresh": true,
+  "public_profile_private_fields_absent": true,
+  "public_profile_refresh": true,
+  "query_private_request_handoff": true,
+  "mobile_filter_toggle": true,
+  "profile_wallet_unchanged": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ]
+}

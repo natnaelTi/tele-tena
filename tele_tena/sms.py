@@ -10,6 +10,15 @@ import requests
 SEND_URL = 'https://smsethiopia.com/api/sms/send'
 
 
+def _record_http_failure(status):
+    """Operator diagnosis only: never retain headers, recipient, OTP or body."""
+    category = ('authentication' if status in (401, 403) else
+                'rate_limit' if status == 429 else
+                'provider_service' if status >= 500 else 'request_rejected')
+    frappe.logger('tele_tena_sms', allow_site=True).error(
+        'SMS send failed: category=%s http_status=%s; no automatic retry', category, status)
+
+
 class SMSRejected(Exception):
     """Provider returned an explicit client-side rejection."""
 
@@ -72,8 +81,10 @@ def send_otp(phone, code):
         # A timeout/connection break may happen after the provider enqueued SMS.
         raise SMSUncertain('provider_outcome_unknown') from None
     if response.status_code >= 500:
+        _record_http_failure(response.status_code)
         raise SMSUncertain('provider_outcome_unknown')
     if not 200 <= response.status_code < 300:
+        _record_http_failure(response.status_code)
         raise SMSRejected('provider_rejected')
     try:
         result = response.json()

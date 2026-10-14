@@ -1,3 +1,4 @@
+import HelpTools from './components/HelpTools';
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LocaleProvider } from "./hooks/useLocale";
 import { SessionProvider } from "./hooks/useSession";
@@ -8,7 +9,10 @@ import {
   MedicalLeadLayout,
   WorkspaceLayout,
 } from "./layouts/Layouts";
-import Homepage, { ClinicianInvitation } from "./pages/Homepage";
+import Homepage from "./pages/Homepage";
+import PublicJourney from "./pages/PublicJourneys";
+import BookingConfirmation from "./pages/BookingConfirmation";
+import {ClinicianOffers,ClinicianOfferDetail} from "./pages/ClinicianOffers";
 import SignIn from "./pages/SignIn";
 import Onboarding from "./pages/Onboarding";
 import {
@@ -28,14 +32,18 @@ import {
   PendingFeature,
   Services,
 } from "./pages/Clinician";
+import ServiceDetails from "./pages/ServiceDetails";
+import MatchingOperations from "./pages/MatchingOperations";
 import Account from "./pages/Account";
-import { Applications, FinancialDisputes, Scopes, ServiceCatalog } from "./pages/Admin";
+import ReviewerAccount from "./pages/ReviewerAccount";
+import { AdminOverview, Applications, FinancialDisputes, Scopes, ServiceCatalog } from "./pages/Admin";
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
 import Showcase from "./pages/Showcase";
 import { ClinicianRequestInbox, PatientOpenRequests, PatientRequestDetail, PatientRequestOfferDetail, PublicClinicianProfile } from "./pages/OpenRequests";
 import { ClinicianScopeApplications, VettingQueue, VettingRubricManagementPage } from "./pages/Vetting";
 import { ClinicianAffiliations, ClinicMembershipPortal, ClinicReview } from "./pages/Clinics";
 import ClinicCalendar from "./pages/ClinicCalendar";
+import Couples, { CoupleInvitation } from './pages/Couples';
 import Relationships, { RelationshipInvitationEntry } from "./pages/Relationships";
 import FinancialActivityDetail from "./pages/FinancialActivity";
 import PWAUpdateNotice from "./components/PWAUpdateNotice";
@@ -52,7 +60,9 @@ export default function App() {
           <Routes>
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Homepage />} />
-              <Route path="/for-clinicians" element={<ClinicianInvitation />} />
+              <Route path="/for-clinicians" element={<PublicJourney clinician />} />
+              <Route path="/how-it-works" element={<PublicJourney />} />
+              <Route path="/couple-invitation" element={<CoupleInvitation />} />
               <Route path="/relationship-invitation" element={<RelationshipInvitationEntry />} />
               <Route
                 path="/showcase"
@@ -72,11 +82,12 @@ export default function App() {
             </Route>
             </Route>
             <Route element={<RequireSession />}>
-              <Route path="/admin/rubrics" element={<MedicalLeadLayout />}><Route index element={<VettingRubricManagementPage />} /></Route>
+              <Route path="/admin/rubrics" element={<MedicalLeadLayout />}><Route index element={<VettingRubricManagementPage />} /><Route path="account" element={<ReviewerAccount/>}/></Route>
               <Route path="/consultation/:id/room" element={<><div className="demo-bar" role="note">Demonstration environment — no real payments or clinical care.</div><ConsultationRoomPage /></>} />
               <Route path="/clinic" element={<WorkspaceLayout kind="clinic" />}>
                 <Route index element={<ClinicMembershipPortal workspace />} />
                 <Route path="calendar" element={<ClinicCalendar />} />
+                <Route path="account" element={<ReviewerAccount />} />
               </Route>
               <Route
                 path="/patient"
@@ -88,10 +99,13 @@ export default function App() {
                 <Route path="requests/:requestId" element={<PatientRequestDetail />} />
                 <Route path="requests/:requestId/offers/:offerId" element={<PatientRequestOfferDetail />} />
                 <Route path="clinicians/:clinicianId" element={<PublicClinicianProfile />} />
+                <Route path="services/:offering" element={<ServiceDetails />} />
                 <Route path="book/:offering" element={<Booking />} />
                 <Route path="book-link/:token" element={<BookingLink />} />
+                <Route path="booked/:id" element={<BookingConfirmation />} />
                 <Route path="appointments" element={<Appointments />} />
                 <Route path="account" element={<Account />} />
+                <Route path="couples" element={<Couples />} /><Route path="couples/:planId" element={<Couples />} />
                 <Route path="relationships" element={<Relationships />} />
                 <Route path="clinic-access" element={<ClinicMembershipPortal />} />
                 <Route path="payments" element={<Payments />} />
@@ -100,6 +114,7 @@ export default function App() {
                   path="consultations/:id"
                   element={<ConsultationPage />}
                 />
+                <Route path="consultations/:id/reschedule" element={<ConsultationPage />} />
               </Route>
               <Route
                 path="/clinician"
@@ -118,7 +133,10 @@ export default function App() {
                   path="consultations/:id"
                   element={<ConsultationPage />}
                 />
+                <Route path="consultations/:id/reschedule" element={<ConsultationPage />} />
                 <Route path="requests" element={<ClinicianRequestInbox />} />
+                <Route path="offers" element={<ClinicianOffers />} />
+                <Route path="offers/:offerId" element={<ClinicianOfferDetail />} />
                 <Route path="care" element={<CareRecords />} />
                 <Route path="care/:id" element={<CareRecordDetail />} />
                 <Route path="earnings" element={<ClinicianEarnings />} />
@@ -127,9 +145,16 @@ export default function App() {
                 <Route path="affiliations" element={<ClinicianAffiliations />} />
               </Route>
               <Route path="/admin" element={<WorkspaceLayout kind="admin" />}>
-                <Route index element={<Applications />} />
+                <Route index element={<AdminOverview />} />
+                <Route path="account" element={<ReviewerAccount />} />
+                <Route path="applications" element={<Applications />} />
+                <Route path="applications/:applicationId" element={<Applications />} />
+                <Route path="application-review" element={<Applications />} />
                 <Route path="scopes" element={<Scopes />} />
                 <Route path="services" element={<ServiceCatalog />} />
+                <Route path="services/new" element={<ServiceCatalog />} />
+                <Route path="services/:serviceId/edit" element={<ServiceCatalog />} />
+                <Route path="matching" element={<MatchingOperations />} />
                 <Route path="vetting" element={<VettingQueue />} />
                 <Route path="clinics" element={<ClinicReview />} />
                 <Route path="financial-disputes" element={<FinancialDisputes />} />
@@ -146,6 +171,7 @@ export default function App() {
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <HelpTools/>
         </LocaleProvider>
       </SessionProvider>
     </BrowserRouter>

@@ -126,3 +126,25 @@ def install():
     credential_verification_provenance()
     from tele_tena.patches.v1_30_adult_relationship_links import execute as adult_relationship_links
     adult_relationship_links()
+    from tele_tena.patches.v1_31_explicit_note_sharing import execute as explicit_note_sharing
+    explicit_note_sharing()
+    from tele_tena.patches.v1_32_note_sharing_draft_choice import execute as note_sharing_draft_choice
+    note_sharing_draft_choice()
+
+    from tele_tena.patches.v1_33_couples_consultations import execute as couples_consultations
+    couples_consultations()
+
+    from tele_tena.patches.v1_34_shared_change_consent import execute as shared_change_consent
+    shared_change_consent()
+    from tele_tena.patches.v1_35_individual_followup import execute as individual_followup
+    individual_followup()
+    from tele_tena.patches.v1_36_public_introduction import execute as public_introduction
+    public_introduction()
+    from tele_tena.patches.v1_37_scope_intake import execute as scope_intake
+    scope_intake()
+
+    from tele_tena.patches.v1_38_profile_photos import execute as profile_photos
+    profile_photos()
+
+    from tele_tena.patches.v1_39_history_documents import execute as history_documents
+    history_documents()

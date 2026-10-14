@@ -1,0 +1,1 @@
+FAIL: Plan replaces protected distributions: aiohappyeyeballs, aiohttp, aiosignal, attrs, certifi, charset-normalizer, frozenlist, idna, livekit-api, livekit-protocol, multidict, propcache, protobuf, pyjwt, requests, types-protobuf, urllib3, yarl

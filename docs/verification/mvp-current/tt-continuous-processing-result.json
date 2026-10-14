@@ -1,0 +1,164 @@
+{
+  "site": "teletena-mvp-presentation.localhost",
+  "queue": "127.0.0.1:13917 / home-frappe-frappe-frappe-bench:default",
+  "one_minute_new_booking_policy": true,
+  "automatic_release": true,
+  "dispute_blocks_release": true,
+  "release_postings": 1,
+  "jobs": [
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:32:06.334031"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:32:05.710088"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:31:05.498917"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:31:04.887996"
+    },
+    {
+      "scheduled_job_type": "tele_tena.accounting.release_eligible_earnings",
+      "status": "Complete",
+      "creation": "2026-10-10 20:30:07.210879"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:30:04.845803"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:30:04.332946"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:29:04.070892"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:29:03.760274"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:28:04.221885"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:28:03.584335"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:27:03.807758"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:27:03.534416"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:26:03.052255"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:26:02.458670"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:25:02.920860"
+    },
+    {
+      "scheduled_job_type": "tele_tena.accounting.release_eligible_earnings",
+      "status": "Complete",
+      "creation": "2026-10-10 20:25:02.644150"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:25:02.292970"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:24:02.531208"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:24:02.202658"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:23:02.062017"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:23:01.686543"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:22:00.832384"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:22:00.535055"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:21:11.000645"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:21:10.148871"
+    },
+    {
+      "scheduled_job_type": "tele_tena.accounting.release_eligible_earnings",
+      "status": "Complete",
+      "creation": "2026-10-10 20:20:10.874469"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:20:10.606139"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.couples.expire_invitations",
+      "status": "Complete",
+      "creation": "2026-10-10 20:20:09.657537"
+    },
+    {
+      "scheduled_job_type": "tele_tena.api.open_requests.expire_requests",
+      "status": "Complete",
+      "creation": "2026-10-10 20:19:09.513681"
+    }
+  ],
+  "worker_restart_recovery": true,
+  "automatically_enqueued_expiry": true,
+  "persisted_invitation_expired": true,
+  "source_commit": "51f57590cc9e6d70158c4d03122e2948a4750430"
+}

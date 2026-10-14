@@ -144,7 +144,10 @@ async function chooseEmailPassword(page) {
     }
     assert.equal(bookingResponse.status(), 200,
       `built patient booking request must succeed (status ${bookingResponse.status()}, exception ${bookingPayload.exc_type || bookingPayload.exception || 'none'})`);
-    await page.waitForURL('**/teletena/patient/appointments');
+    await page.waitForURL('**/teletena/patient/booked/*');
+    await page.getByRole('link', { name: 'View appointment', exact: true }).click();
+    await page.waitForURL('**/teletena/patient/consultations/*');
+    await page.getByRole('link', { name: 'Back to appointments', exact: true }).click();
     await page.getByRole('heading', { name: 'Appointments' }).waitFor();
     console.log('PASS: production-built availability save, request payload, reload persistence and patient booking with an isolated synthetic account');
   } finally {

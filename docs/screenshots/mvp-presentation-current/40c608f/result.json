@@ -1,0 +1,17 @@
+{
+  "source": "40c608f0de5dd7c9c92faeb11c6e45bbca3c7a49",
+  "site": "teletena-mvp-presentation.localhost",
+  "read_only": true,
+  "transaction_link": true,
+  "add_funds_no_submission": true,
+  "wallet_unchanged": true,
+  "name_status_empty_filters": true,
+  "keyboard_review_focus_return": true,
+  "reviewer_resume_access": true,
+  "patient_resume_denied": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ]
+}

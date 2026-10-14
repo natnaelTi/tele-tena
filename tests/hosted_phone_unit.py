@@ -1,6 +1,8 @@
 """Hosted access rules that need no site database or live SMS."""
 from types import SimpleNamespace
 import unittest
+import logging
+import io
 from unittest.mock import Mock, patch
 
 from tele_tena import review, sms
@@ -62,10 +64,41 @@ class HostedPhoneUnit(unittest.TestCase):
         self.assertNotIn('KEY', headers)
         response.status_code = 401
         with patch.object(sms, '_config', return_value=config), \
+             patch.object(sms.frappe, 'logger') as logger, \
              patch.object(sms.requests, 'post', return_value=response) as send:
             with self.assertRaises(sms.SMSRejected):
                 sms.send_otp('+251911234567','123456')
             self.assertEqual(send.call_count, 1)
+            logger.return_value.error.assert_called_once_with(
+                'SMS send failed: category=%s http_status=%s; no automatic retry',
+                'authentication', 401)
+
+    def test_safe_http_diagnostics_without_response_body_or_retry(self):
+        config = {'api_key':'synthetic-secret','auth_header':'KEY','auth_scheme':'raw'}
+        for status, category, failure in (
+            (400, 'request_rejected', sms.SMSRejected),
+            (403, 'authentication', sms.SMSRejected),
+            (429, 'rate_limit', sms.SMSRejected),
+            (503, 'provider_service', sms.SMSUncertain),
+        ):
+            with self.subTest(status=status), \
+                 patch.object(sms, '_config', return_value=config), \
+                 patch.object(sms.frappe, 'logger') as logger, \
+                 patch.object(sms.requests, 'post', return_value=Mock(status_code=status)) as send:
+                with self.assertRaises(failure):
+                    sms.send_otp('+251911234567', '123456')
+                self.assertEqual(send.call_count, 1)
+                logger.return_value.error.assert_called_once_with(
+                    'SMS send failed: category=%s http_status=%s; no automatic retry',
+                    category, status)
+
+    def test_diagnostic_survives_production_error_threshold(self):
+        output = io.StringIO()
+        logger = logging.Logger('safe-sms-test', level=logging.ERROR)
+        logger.addHandler(logging.StreamHandler(output))
+        with patch.object(sms.frappe, 'logger', return_value=logger):
+            sms._record_http_failure(401)
+        self.assertIn('category=authentication http_status=401', output.getvalue())
 
     def test_peer_ignores_untrusted_forwarded_header(self):
         self.fake.local.request = SimpleNamespace(remote_addr='127.0.0.1',

@@ -1,0 +1,16 @@
+{
+  "packaged_source": "fde86c3132e9af65eb88b437dca7dea2435c23a9",
+  "fake_devices": true,
+  "sizes": [
+    [
+      1440,
+      960
+    ],
+    [
+      1024,
+      768
+    ]
+  ],
+  "columns": "media left; session information and extensions right",
+  "default_sidebar_scroll": false
+}

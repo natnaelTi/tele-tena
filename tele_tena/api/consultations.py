@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 import frappe
 
-from tele_tena.api.journey import actor, fail, one, query
+from tele_tena.api.journey import actor, fail, iso, one, query
 
 
 def _minutes(config_key, default, maximum=240):
@@ -15,23 +15,12 @@ def _minutes(config_key, default, maximum=240):
     return max(0, min(maximum, value))
 
 
-def _authorized_appointment(appointment):
-    user = actor()
-    found = frappe.db.sql('''SELECT id,patient,clinician,start,end,state
-        FROM tt_appointment WHERE id=%s AND (patient=%s OR clinician=%s)''',
-        (appointment, user, user), as_dict=True)
-    if not found:
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
-    item = found[0]
-    if item.state != 'Booked':
+def _authorized_appointment(appointment, allow_completed=False):
+    from tele_tena.api.presentation import _authorized
+    item,user,role = _authorized(appointment)
+    if item.state != 'Booked' and not (allow_completed and item.state == 'Completed'):
         fail('Appointment is not active', 'appointment_inactive')
-    if user == item.patient:
-        if 'Tele Tena Patient' not in frappe.get_roles(user):
-            frappe.throw('Appointment unavailable', frappe.PermissionError)
-        return item, user, 'patient'
-    if 'Tele Tena Clinician' not in frappe.get_roles(user):
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
-    return item, user, 'clinician'
+    return item,user,role
 
 
 def _window(item):
@@ -43,13 +32,19 @@ def _window(item):
 
 @query()
 def consultation(appointment):
-    item, _, role = _authorized_appointment(appointment)
+    item, _, role = _authorized_appointment(appointment, allow_completed=True)
     session = frappe.db.sql('SELECT id,state,room_closed FROM tt_consultation WHERE appointment=%s',
                             (item.id,), as_dict=True)
     state = session[0].state if session else 'Not started'
     closed = bool(session and session[0].room_closed)
-    return {'state': state, 'role': role, 'can_join': state != 'Ended' and _window(item),
-            'can_end': role == 'clinician' and (state == 'Open' or (state == 'Ended' and not closed)),
+    from tele_tena.api.couples import ready, plan_for
+    note = frappe.db.sql('SELECT status FROM tt_consultation_note WHERE appointment=%s', (item.id,), as_dict=True)
+    return {'join_opens_at': iso(item.start - timedelta(minutes=_minutes('tele_tena_consultation_early_minutes', 15))),
+            'join_closes_at': iso(item.end + timedelta(minutes=_minutes('tele_tena_consultation_late_minutes', 30))),
+            'appointment_state': item.state, 'documentation_state': note[0].status if note else 'None',
+            'state': state, 'role': role, 'is_couple':bool(plan_for(item.id)),
+            'can_join': item.state == 'Booked' and state != 'Ended' and _window(item) and ready(item.id),
+            'can_end': item.state == 'Booked' and role == 'clinician' and (state == 'Open' or (state == 'Ended' and not closed)),
             'room_close_pending': state == 'Ended' and not closed}
 
 
@@ -65,8 +60,11 @@ def join(appointment, audio_only=0):
         if not _window(item):
             fail('Outside the consultation join window', 'outside_join_window')
         audio_only = boolean(audio_only)
-        item = one('''SELECT id,patient,clinician,start,end,state FROM tt_appointment
-            WHERE id=%s AND (patient=%s OR clinician=%s) FOR UPDATE''', (item.id, user, user))
+        from tele_tena.api.presentation import _authorized
+        item,_,_ = _authorized(item.id,lock=True)
+        from tele_tena.api.couples import ready
+        if not ready(item.id):
+            fail('Both adults must have active consent.', 'couple_consent_required')
         if item.state != 'Booked':
             fail('Appointment is not active', 'appointment_inactive')
         if not _window(item):
@@ -76,7 +74,8 @@ def join(appointment, audio_only=0):
         if not session:
             room_id = secrets.token_urlsafe(27)
             room_name = secrets.token_urlsafe(42)
-            patient_identity = secrets.token_urlsafe(32)
+            from tele_tena.api.couples import plan_for, participant
+            patient_identity = participant(item.id,item.patient).room_identity if plan_for(item.id) else secrets.token_urlsafe(32)
             clinician_identity = secrets.token_urlsafe(32)
             frappe.db.sql('''INSERT INTO tt_consultation
                 (appointment,id,room_name,patient_identity,clinician_identity,state,created)
@@ -88,12 +87,15 @@ def join(appointment, audio_only=0):
         current = session[0]
         if current.state != 'Open':
             fail('Consultation has ended', 'consultation_ended')
+        from tele_tena.api.couples import plan_for, participant, room_labels
         identity = current.patient_identity if role == 'patient' else current.clinician_identity
+        if role == 'patient' and plan_for(item.id):
+            identity = participant(item.id,user).room_identity
         from tele_tena.livekit import _credentials, participant_token
         url, _, _ = _credentials()
         token = participant_token(current.room_name, identity, audio_only)
         return {'url': url, 'token': token, 'role': role, 'consultation_id': current.id,
-                'audio_only': audio_only}
+                'audio_only': audio_only, 'participants': room_labels(item.id,user,current.clinician_identity)}
     except (frappe.PermissionError, frappe.ValidationError):
         frappe.db.rollback(save_point=savepoint)
         raise
@@ -125,7 +127,11 @@ def end(appointment):
         frappe.db.sql("UPDATE tt_consultation SET state='Ended',ended_by=%s,ended=UTC_TIMESTAMP(6) WHERE appointment=%s",
                       (user, item.id))
     room_name = session[0].room_name
-    identities = (session[0].patient_identity, session[0].clinician_identity)
+    from tele_tena.api.couples import plan_for, participants
+    identities = [session[0].patient_identity, session[0].clinician_identity]
+    if plan_for(item.id):
+        identities.extend(p.room_identity for p in participants(plan_for(item.id)[0].id))
+    identities = list(dict.fromkeys(identities))
     # The committed ended state denies new application tokens even if Cloud
     # revocation or room closure fails; repeated End retries both operations.
     frappe.db.commit()

@@ -1,10 +1,66 @@
 # Agreed product contract
 
+## MVP handover priority — 2026-10-08
+
+The current release boundary is `mvp-release-scope.md` and `mvp-screen-acceptance.json`. The user superseded delivery of the entire expanded platform with the agreed mental-health/counseling MVP and its complete redesign. Working two-adult couples consultations and explicitly prefunded fixed-block extensions remain MVP requirements. Full clinic management, family/group expansion, laboratory operations, subscriptions, second opinions, medical tourism and metered hourly pricing are post-handover. No-show adjudication is explicitly deferred; current pre-start cancellation limits remain. Preserve all existing source/schema/data. Older expanded-scope sections below describe retained future authorization, not the present release gate.
+
 Credential lifecycle update (2026-10-08): future booked or pending-confirmation
 appointments affected by expired or revoked scopes receive a logistics-only
 operational review flag. It does not change appointment or financial state and
 does not expose patient records to vetting reviewers. Human operational
 continuity policy remains required.
+
+Clinician profile clarification (2026-10-11): an optional owner-authored public
+introduction is distinct from private patient history and application evidence.
+It is shown only through the approved clinician profile projection; no approval,
+credential verification or service authorization follows from editing it.
+Existing records receive no inferred public text.
+
+Patient onboarding clarification (2026-10-11): optional care background is saved
+in the owner-only draft and copied to private profile history only on adult-consented
+completion. It does not imply disclosure; existing global defaults and per-booking
+preview/overrides apply. Existing ready-step drafts keep their stored meaning.
+
+## Initial clinician application structure —2026-10-12
+
+B06/B07 capture self-reported professional category, relevant experience, languages,
+qualification and credential identifiers/expiry in the private resumable onboarding
+record. These fields use the existing scope-application validators; they are not
+credential verification or a substitute for individual human scope assessment.
+Only the applicant and authorized vetting reviewers can retrieve this application
+metadata. Optional introduction is explicitly intended for the approved public
+profile; qualifications and credential identifiers never follow it into discovery.
+Existing saved applications remain valid without inferred or fabricated new fields.
+No schema, approval, payment or call policy changes follow from this composition.
+
+For the structured initial application, profession, qualification, institution
+and care languages replace a duplicate mandatory free-text credential narrative.
+Additional narrative and jurisdiction can be saved optionally; existing narrative
+applications retain their original requirement. Resume receipt plus complete
+self-reported application fields means attachments/information are present, not
+that any credential or scope is verified. Per-scope evidence and human mandatory
+gates remain separate and unchanged.
+
+## Structured service intake and clinical definition review — 12October2026
+
+Applicants may select multiple structured Draft or Active definitions. Draft intake
+is deliberately distinct from authorization: general application approval, a submitted
+scope application, and catalog presence never grant a service scope or booking rights.
+Each scope retains separate supporting evidence, clarification, decision and appeal.
+A designated Medical Lead who also has vetting-review permissions records a reasoned
+clinical-definition decision after professional, credential, adult, consent,
+jurisdiction, duration and implemented-workflow requirements are supplied. Generic
+DocType writes cannot grant clinical-definition approval. Approved definition metadata
+is preserved; changes require a new versioned draft. Immediate-care policy remains a
+separate reviewed action. None of these actions verifies an external credential.
+
+Initial private onboarding and scope applications support competencies, certifications
+and license validity start as applicant claims, in addition to existing qualification,
+issuer, expiry, experience and PDF evidence. Existing applications get nullable fields;
+no approval, credential, service name or historical snapshot is inferred. The clinical
+catalog's ten sourced drafts remain awaiting actual medical-lead requirements/decisions.
+Legacy demonstration scopes remain historical and usable under existing rules, but
+are excluded from new structured scope selection. No automatic catalog activation.
 
 ## First internal demonstration
 Adults 18+. English, Amharic and Afaan Oromo with native review before pilot.
@@ -348,3 +404,11 @@ authorized approver, a reason, and an append-only audit event. Legacy test
 services are eligible only on a site explicitly bound to review mode; migration
 does not enable immediate care. The three-minute target is measured, not
 promised.
+
+## Owner profile photos — 13October2026
+Patients, clinicians and reviewers can upload/replace/remove a personal raster
+photo. Patient/reviewer photos are owner-only and never follow name/history
+sharing into encounters or requests. Clinicians choose public-profile visibility;
+current discovery eligibility is enforced again on photo download. A photo
+provides no credential verification. See `profile-photos.md` for limits, storage,
+fictional presentation setup and revocation limitations.

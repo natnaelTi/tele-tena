@@ -1,0 +1,16 @@
+{
+  "connected_source": "0c804ed6795c0629fd630a8d9066ba794aad6e7a",
+  "terminal_and_preflight_source": "d720596e385e9f50c1ed9df256c09fd2e9b4cd13",
+  "site": "teletena-mvp-presentation.localhost",
+  "preview": "http://127.0.0.1:8017/teletena/",
+  "reference": "/home/frappe/teletena-design-reference",
+  "viewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "zoom": "Terminal patient detail paired at actual Chrome 200%; connected-call zoom not tested",
+  "media": "Fake browser devices; actual hosted development LiveKit Cloud media transport",
+  "clinical_content": "Fictional owned presentation encounter only"
+}

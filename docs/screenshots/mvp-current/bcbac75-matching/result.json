@@ -1,0 +1,14 @@
+{
+  "source": "bcbac7533e67757985fec3a4861c9b7869cf0824",
+  "site": "teletena-mvp-presentation.localhost",
+  "persisted_requests": 5,
+  "reviewer_projection": true,
+  "private_field_exclusion": true,
+  "patient_clinician_denied": true,
+  "status_filter_reload": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ]
+}

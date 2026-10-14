@@ -1,0 +1,11 @@
+{
+  "fake_media": true,
+  "hosted_cloud": true,
+  "three_person_media": true,
+  "leave_rejoin": true,
+  "three_cached_identities_rejected": true,
+  "resumed_documentation": false,
+  "recipient_api_isolation": true,
+  "one_pending_earning": true,
+  "source": "34641d87cc6b826793482e2963466fd1cd301548"
+}

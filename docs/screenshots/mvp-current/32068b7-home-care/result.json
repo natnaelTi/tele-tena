@@ -1,0 +1,13 @@
+{
+  "source": "32068b7d2168bf04c3c29949850a5fd9e71d1af1",
+  "site": "teletena-mvp-presentation.localhost",
+  "real_backend": true,
+  "selected_offering_profile_reload": true,
+  "preview_focus_return": true,
+  "calendar_disclosure_back": true,
+  "viewports": [
+    390,
+    768,
+    1440
+  ]
+}

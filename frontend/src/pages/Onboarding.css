@@ -1,0 +1,50 @@
+/* B01–B03/B06–B10 use the reference wizard; B05 has its own readiness hero. */
+.guided-panel.onboarding-guided{max-width:572px}
+.onboarding-guided>.eyebrow{font-size:12px;margin-bottom:24px}
+.onboarding-guided>.step-progress{margin:24px 0 38px}
+.guided-panel.onboarding-guided>h1{font-size:36px;line-height:1.15;letter-spacing:-1.3px;margin:0 0 16px}
+.onboarding-guided .check-field.check-card{margin:12px 0}
+.onboarding-guided .form-actions{margin-top:24px}
+.guided-panel.onboarding-ready-page{max-width:1128px}
+.onboarding-ready-hero{background:var(--ink);color:white;border-radius:24px;padding:40px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:32px;margin-top:32px}
+.onboarding-ready-hero>div,.onboarding-ready-hero>aside{min-width:0}
+.onboarding-ready-hero>div>h2{font-size:44px;line-height:1.12;letter-spacing:-1.6px;color:white;margin:0 0 16px}
+.onboarding-ready-hero>div>p{line-height:1.6;color:#d4e2e7}
+.onboarding-ready-hero>div>.button{background:white;color:var(--ink);border-color:white}
+.onboarding-ready-hero>aside{background:var(--subtle);color:var(--ink);border-radius:20px;padding:28px}
+.onboarding-ready-hero>aside>h2{font-size:24px;margin:24px 0}
+.onboarding-ready-hero dl{display:grid;grid-template-columns:minmax(100px,1fr) minmax(0,1fr);margin:0}
+.onboarding-ready-hero dt,.onboarding-ready-hero dd{margin:0;padding:16px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
+.onboarding-ready-hero dt{color:var(--muted)}.onboarding-ready-hero dd{text-align:right;font-weight:600}
+@media(max-width:650px){.guided-panel.onboarding-guided{width:calc(100% - 8px)}.guided-panel.onboarding-guided>h1{font-size:32px;line-height:1.12;letter-spacing:-1.1px;font-weight:720}.onboarding-guided .form-actions .button{flex:1;min-width:120px}.onboarding-ready-hero{grid-template-columns:1fr;padding:28px 24px;gap:24px}.onboarding-ready-hero>div>h2{font-size:36px}.onboarding-ready-hero>aside{padding:22px}}
+
+.onboarding-scope-picker .onboarding-scope-options{max-height:280px;overflow-y:auto;overscroll-behavior:contain;padding:4px 8px 4px 0;margin-top:12px}
+.onboarding-scope-picker .onboarding-scope-options .check-field{min-height:44px;align-items:center}
+.onboarding-scope-picker>.supporting{margin:12px 0 0}
+
+/* B10 uses separate professional and requested-scope summaries. */
+.onboarding-review-panel{padding:28px;border:1px solid var(--border);border-radius:16px;margin:24px 0}
+.onboarding-review-panel h2{font-size:24px;letter-spacing:-.6px;margin:0 0 20px}
+.onboarding-review-panel dl{margin:0}.onboarding-review-panel dl>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:20px;padding:12px 0;border-bottom:1px solid var(--border)}
+.onboarding-review-panel dl>div:last-child{border:0}.onboarding-review-panel dt{color:var(--muted);font-size:16px}.onboarding-review-panel dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px;font-weight:600;text-align:right}
+.onboarding-review-panel ul{padding:0;margin:0;list-style:none}.onboarding-review-panel li{display:flex;align-items:start;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}
+.onboarding-review-panel li:last-child{border:0}.onboarding-review-panel li>svg{flex:0 0 auto;box-sizing:content-box;padding:11px;border-radius:12px;background:var(--subtle);color:var(--brand)}
+.onboarding-review-panel li strong{display:block;font-size:16px;line-height:1.4}.onboarding-review-panel li p{font-size:14px;color:var(--muted);margin:6px 0 0}
+@media(max-width:600px){.onboarding-review-panel{padding:22px}.onboarding-review-panel dl>div{grid-template-columns:1fr;gap:6px}.onboarding-review-panel dd{text-align:left}}
+
+.onboarding-account-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:24px}
+.onboarding-account-choices .onboarding-review-panel{margin:0;padding:24px}
+.onboarding-account-choices h2{font-size:22px;margin:20px 0 16px;line-height:1.25}.onboarding-account-choices p{line-height:1.6;color:var(--ink)}
+.onboarding-account-choices .onboarding-review-panel>svg{box-sizing:content-box;padding:12px;background:var(--subtle);color:var(--brand);border-radius:12px}
+@media(max-width:600px){.onboarding-account-choices{grid-template-columns:1fr}}
+
+/* B09 uses standalone scope cards; the legacy enclosing fieldset border is not
+   part of the reference composition. Keep a bounded region for large catalogs. */
+.onboarding-guided .onboarding-scope-picker { border: 0; padding: 0; margin: 24px 0; }
+.onboarding-scope-picker .onboarding-scope-options .check-field.check-card { align-items: flex-start; min-height: 76px; margin-bottom: 10px; }
+
+.onboarding-guided .onboarding-language-options {border:0;padding:0;margin:0;}
+.onboarding-guided .onboarding-language-options legend {font-weight:600;margin-bottom:12px;}
+.onboarding-guided .onboarding-language-options .check-field.check-card {margin:10px 0;}
+
+.onboarding-optional-credentials>summary{min-height:44px;padding:12px 0;cursor:pointer;font-weight:600;color:var(--brand)}
