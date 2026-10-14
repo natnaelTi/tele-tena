@@ -1,0 +1,13 @@
+{
+  "result": "PASS",
+  "existing_tables_unchanged": 75,
+  "existing_rows_unchanged": 1309,
+  "existing_file_hashes_unchanged": 6,
+  "config_unchanged": true,
+  "existing_passwords_accepted": 13,
+  "patient_owners_reconciled": 6,
+  "clinician_owners_reconciled": 5,
+  "additive_empty_table": [
+    "tt_history_document"
+  ]
+}

@@ -44,7 +44,7 @@ def validated(filename,encoded):
             root=reader.trailer['/Root']
             names=root.get('/Names',{})
             if hasattr(names,'get_object'):names=names.get_object()
-            if any(key in root for key in ('/OpenAction','/AA','/AcroForm','/Collection')) or '/EmbeddedFiles' in names:raise ValueError()
+            if any(key in root for key in ('/OpenAction','/AA','/AcroForm','/Collection')) or any(key in names for key in ('/EmbeddedFiles','/JavaScript')):raise ValueError()
             if not 0<len(reader.pages)<=300:raise ValueError()
             mime='application/pdf'
         else:
