@@ -10,7 +10,7 @@ from packaging.requirements import Requirement, InvalidRequirement
 from dependency_checkpoint import canonical, installed_details
 
 parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--bench',type=Path);args=parser.parse_args()
-focus={'urllib3','cryptography','click','requests','oauthlib','websockets','boto3','botocore','frappe-bench'}
+focus={'urllib3','cryptography','click','requests','oauthlib','websockets','boto3','botocore','frappe-bench','http-message-signatures','http-sfv','pypika','gunicorn','s3transfer','jmespath'}
 installed=installed_details();rows=[];conflicts=[];source_edges=[];unresolved=[]
 
 def edge(owner,version,raw,kind):
