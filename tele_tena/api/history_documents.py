@@ -65,7 +65,7 @@ def list_documents():
     return {'documents':rows('SELECT id,filename,mime,content_size,created FROM tt_history_document WHERE patient=%s ORDER BY created DESC,id',(patient,))}
 
 
-@frappe.whitelist(methods=['POST'])
+@query('POST')
 def upload(filename,content_base64):
     patient=owner();filename,mime,content=validated(filename,content_base64)
     # Owner lock serializes quota checks and same-file retries across requests.
@@ -73,7 +73,10 @@ def upload(filename,content_base64):
     digest=hashlib.sha256(content).hexdigest()
     existing=rows('SELECT id FROM tt_history_document WHERE patient=%s AND content_sha256=%s AND filename=%s',(patient,digest,filename))
     if existing:return {'id':existing[0].id,'already_uploaded':True}
-    quota=int(frappe.conf.get('tele_tena_history_storage_mb',100))*1024*1024
+    configured=frappe.conf.get('tele_tena_history_storage_mb')
+    try:quota=int(100 if configured is None else configured)*1024*1024
+    except (ValueError,TypeError):fail('Document storage configuration is unavailable.','service_unavailable')
+    if quota<0:fail('Document storage configuration is unavailable.','service_unavailable')
     used=int(frappe.db.sql('SELECT COALESCE(SUM(content_size),0) FROM tt_history_document WHERE patient=%s',(patient,))[0][0])
     if used+len(content)>quota:fail('Your document storage is full. Remove an unneeded file before uploading.','history_storage_full')
     id=str(uuid.uuid4())
@@ -91,7 +94,7 @@ def download(id):
     return Response(bytes(document.content),mimetype=document.mime,headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Disposition':"attachment; filename*=UTF-8''"+quote(document.filename,safe=''),'Content-Security-Policy':"sandbox; default-src 'none'"})
 
 
-@frappe.whitelist(methods=['POST'])
+@query('POST')
 def remove(id):
     patient=owner();frappe.db.sql('DELETE FROM tt_history_document WHERE id=%s AND patient=%s',(id,patient))
     return {'removed':True}
