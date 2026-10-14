@@ -43,8 +43,13 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('directory',type=Path);args=parser.parse_args()
     try:
         result=verify(args.directory)
-        fd=os.open(args.directory/'verified-manifest.json',os.O_CREAT|os.O_EXCL|os.O_WRONLY|os.O_NOFOLLOW,0o600)
-        with os.fdopen(fd,'w') as stream:json.dump(result,stream,indent=2)
+        manifest=args.directory/'verified-manifest.json'
+        if manifest.exists():
+            if manifest.is_symlink() or manifest.stat().st_uid!=os.getuid() or manifest.stat().st_mode & 0o077 or json.loads(manifest.read_text())!=result:
+                raise ValueError('Backup no longer matches its protected verified manifest')
+        else:
+            fd=os.open(manifest,os.O_CREAT|os.O_EXCL|os.O_WRONLY|os.O_NOFOLLOW,0o600)
+            with os.fdopen(fd,'w') as stream:json.dump(result,stream,indent=2)
         print('PASS: database, public/private file archives and site config present/readable; private checksums recorded')
     except (ValueError,OSError,tarfile.TarError,EOFError) as e:
         raise SystemExit('FAIL: '+str(e)) from None
