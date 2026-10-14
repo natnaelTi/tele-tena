@@ -79,6 +79,7 @@ export default function SignIn() {
     }
   }
   async function request() {
+    if(channel==='phone'&&!/^\+251[79][0-9]{8}$/.test(contact.replace(/[\s().-]/g,''))){setError(w('SMS sign-in currently supports Ethiopian mobile numbers. For other countries, use email.'));return;}
     await run(async () => {
       if (!requestKey.current) requestKey.current = crypto.randomUUID();
       const result = await api<{
@@ -191,8 +192,7 @@ export default function SignIn() {
           <PhoneField
             label={w("Phone number")}
             value={contact}
-            onChange={(e) => { setContact(e.target.value); requestKey.current = ""; }}
-            hint="Ethiopia (+251). You can also enter a number starting with 09 or 07."
+            onValueChange={(value) => { setContact(value); requestKey.current = ""; }}
             required
           />
         ) : (

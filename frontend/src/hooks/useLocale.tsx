@@ -11,6 +11,32 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  // Upload/country additions are provisional pending native review.
+  "Country code": ["የአገር መደወያ ኮድ", "Koodii bilbilaa biyya"],
+  "SMS sign-in currently supports Ethiopian mobile numbers. For other countries, use email.": ["በSMS መግባት ለኢትዮጵያ ሞባይል ቁጥሮች ብቻ ይሠራል። ለሌሎች አገሮች ኢሜይል ይጠቀሙ።", "Seensi SMS lakkoofsa moobaayilaa Itoophiyaa qofa deeggara. Biyyoota biroof imeelii fayyadami."],
+  "Country suggested from your connection. You can change it.": ["አገሩ ከግንኙነትዎ ተገምቷል። መቀየር ይችላሉ።", "Biyyi walqunnamtii kee irraa tilmaamame. Jijjiiruu dandeessa."],
+  "Drop files here, or choose files": ["ፋይሎችን እዚህ ጎትተው ይጣሉ ወይም ይምረጡ", "Faayiloota asitti harkisi ykn filadhu"],
+  "Drop a file here, or choose a file": ["ፋይል እዚህ ጎትተው ይጣሉ ወይም ይምረጡ", "Faayilii asitti harkisi ykn filadhu"],
+  "Choose files": ["ፋይሎችን ይምረጡ", "Faayiloota filadhu"],
+  "Choose a file": ["ፋይል ይምረጡ", "Faayilii filadhu"],
+  "Maximum file size": ["ከፍተኛ የፋይል መጠን", "Hamma faayilii guddaa"],
+  "Choose one file for this upload.": ["ለዚህ ጭነት አንድ ፋይል ይምረጡ።", "Ol feʼuu kanaaf faayilii tokko filadhu."],
+  "A selected file is too large. Check the size limit and try again.": ["የተመረጠው ፋይል በጣም ትልቅ ነው። የመጠን ገደቡን ያረጋግጡና ይሞክሩ።", "Faayiliin filatame guddaa dha. Daangaa hammamtaa ilaaliitii irra deebiʼi yaali."],
+  "Upload failed. Your saved files are unchanged. Try again.": ["ፋይሉ አልተጫነም። የተቀመጡ ፋይሎች አልተለወጡም። እንደገና ይሞክሩ።", "Ol feʼuun hin milkoofne. Faayiloonni ol kaaʼaman hin jijjiiramne. Irra deebiʼi yaali."],
+  "Medical history documents": ["የሕክምና ታሪክ ሰነዶች", "Sanadoota seenaa fayyaa"],
+  "Add medical history files": ["የሕክምና ታሪክ ፋይሎችን ያክሉ", "Faayiloota seenaa fayyaa dabali"],
+  "PDF, JPEG or PNG. Up to 5 MB per file.": ["PDF፣ JPEG ወይም PNG። ለእያንዳንዱ ፋይል እስከ 5 MB።", "PDF, JPEG ykn PNG. Faayilii tokkoof hanga 5 MB."],
+  "These files are private to you. Uploading does not share them with a clinician; the history-sharing choice applies to your text only.": ["እነዚህ ፋይሎች ለእርስዎ ብቻ ናቸው። መጫን ለባለሙያ አያጋራቸውም፤ የታሪክ ማጋራት ምርጫ ለጽሑፍዎ ብቻ ይሠራል።", "Faayiloonni kun dhuunfaa keeti. Ol feʼuun ogeessaaf hin qoodu; filannoon seenaa qooduu barreeffama kee qofa ilaala."],
+  "No documents uploaded yet.": ["እስካሁን ሰነድ አልተጫነም።", "Ammaaf sanadi hin feʼamne."],
+  "Loading documents…": ["ሰነዶች እየተጫኑ ነው…", "Sanadoota feʼaa jira…"],
+  "Your documents are saved.": ["ሰነዶችዎ ተቀምጠዋል።", "Sanadoonni kee ol kaaʼamaniiru."],
+  "Your documents could not be loaded. Try again.": ["ሰነዶችዎ ሊጫኑ አልቻሉም። ይሞክሩ።", "Sanadoonni kee hin feʼamne. Irra deebiʼi yaali."],
+  "Document removed.": ["ሰነዱ ተወግዷል።", "Sanadichi haqameera."],
+  "Document could not be removed. Try again.": ["ሰነዱ ሊወገድ አልቻለም። ይሞክሩ።", "Sanadichi hin haqamne. Irra deebiʼi yaali."],
+  "Choose a valid PDF, JPEG or PNG up to 5 MB. PDFs must be unencrypted and non-interactive.": ["ትክክለኛ PDF፣ JPEG ወይም PNG እስከ 5 MB ይምረጡ። PDF ያልተመሰጠረና የማይገናኝ መሆን አለበት።", "PDF, JPEG ykn PNG sirrii hanga 5 MB filadhu. PDF icciitiin hin cufamneefi hojii walqunnamtii hin qabne taʼuu qaba."],
+  "Upload could not finish. Files already listed below are saved; try the remaining files again.": ["ጭነቱ አልተጠናቀቀም። ከታች ያሉት ፋይሎች ተቀምጠዋል፤ የቀሩትን ይሞክሩ።", "Ol feʼuun hin xumuramne. Faayiloonni armaan gadii ol kaaʼamaniiru; kanneen hafan irra deebiʼii yaali."],
+  "Your document storage is full. Remove an unneeded file before uploading.": ["የሰነድ ማከማቻዎ ሞልቷል። ያልፈለጉትን ፋይል ያስወግዱ።", "Kuusaan sanadoota kee guuteera. Faayilii hin barbaachifne haqi."],
+
   "Account menu": ["የመለያ ምናሌ", "Baafata herregaa"],
   "Signing out…": ["በመውጣት ላይ…", "Ba’aa…"],
   "Care & appointments": ["እንክብካቤ እና ቀጠሮዎች", "Kunuunsa fi beellamoota"],

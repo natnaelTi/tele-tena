@@ -145,3 +145,6 @@ def install():
 
     from tele_tena.patches.v1_38_profile_photos import execute as profile_photos
     profile_photos()
+
+    from tele_tena.patches.v1_39_history_documents import execute as history_documents
+    history_documents()

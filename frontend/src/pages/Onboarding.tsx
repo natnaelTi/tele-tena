@@ -1,3 +1,5 @@
+import {FileUpload} from "../components/FileUpload";
+import HistoryDocuments from "../components/HistoryDocuments";
 import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { pendingCareQuery } from "../care-intent";
@@ -239,7 +241,7 @@ export default function Onboarding() {
                 </div>
                 </details>
                 <p className="supporting">{w("Receipt does not mean your credentials are verified. Each requested scope is reviewed separately.")}</p>
-                <label className="field" data-tour="applicant-resume">{w("Resume (PDF, up to 5 MB)")}<input type="file" accept="application/pdf,.pdf" disabled={resumeBusy} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;if(file.size>5*1024*1024){setError("Choose a PDF no larger than 5 MB.");return;}setResumeBusy(true);setError("");try{const base64=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]||"");reader.onerror=()=>reject(new Error("Read failed"));reader.readAsDataURL(file);});await journeyApi.uploadResume(file.name,base64);setResumeUploaded(true);}catch{setError("The resume could not be uploaded. Choose a valid PDF and try again.");}finally{setResumeBusy(false);e.target.value="";}}}/>{resumeUploaded&&<span role="status">{w("Resume uploaded for authorized review.")} <button type="button" className="text-button" onClick={()=>void journeyApi.removeResume().then(()=>setResumeUploaded(false)).catch(()=>setError("Resume could not be removed."))}>{w("Remove")}</button></span>}</label>
+                <div className="field" data-tour="applicant-resume">{w("Resume (PDF, up to 5 MB)")}<FileUpload label={w("Upload file")} accept="application/pdf,.pdf" disabled={resumeBusy} onFiles={async files=>{const file=files[0];if(!file)return;if(file.size>5*1024*1024){setError("Choose a PDF no larger than 5 MB.");return;}setResumeBusy(true);setError("");try{const base64=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(",")[1]||"");reader.onerror=()=>reject(new Error("Read failed"));reader.readAsDataURL(file);});await journeyApi.uploadResume(file.name,base64);setResumeUploaded(true);}catch{setError("The resume could not be uploaded. Choose a valid PDF and try again.");}finally{setResumeBusy(false);}}}/>{resumeUploaded&&<span role="status">{w("Resume uploaded for authorized review.")} <button type="button" className="text-button" onClick={()=>void journeyApi.removeResume().then(()=>setResumeUploaded(false)).catch(()=>setError("Resume could not be removed."))}>{w("Remove")}</button></span>}</div>
               </>
             ) : (
               <>
@@ -333,7 +335,7 @@ export default function Onboarding() {
                 value={answers.history || ""} aria-describedby="onboarding-background-help"
                 onChange={e => update({ history: e.target.value })} />
             </div>
-            <Checkbox variant="card" label={w("I’ll decide what to share for each consultation")}
+            <HistoryDocuments/><Checkbox variant="card" label={w("I’ll decide what to share for each consultation")}
               checked={!answers.share_history} onChange={e => update({ share_history: !e.target.checked })}
               description={w(answers.share_history
                 ? "Your background is included in your default disclosure. Preview before every booking."

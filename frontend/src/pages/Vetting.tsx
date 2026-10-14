@@ -1,3 +1,4 @@
+import {FileUpload} from "../components/FileUpload";
 import { useEffect, useRef, useState } from 'react';
 import './Vetting.css';
 import { journeyApi } from '../journey-api';
@@ -81,10 +82,10 @@ function ScopeEvidencePanel({item,canUpload,refresh}:{item:any;canUpload:boolean
     {item.scope_evidence?.length?<ul className="scope-evidence-list">{item.scope_evidence.map((evidence:any)=><li key={evidence.id}><span>{w(evidence.evidence_type)} · {evidence.filename} · v{evidence.revision}</span><Button variant="quiet" onClick={()=>void openScopeEvidence(evidence,w)}>{w('Open private evidence')}</Button></li>)}</ul>:<p className="supporting">{w('No service-specific evidence uploaded yet.')}</p>}
     {canUpload&&<div className="scope-evidence-upload"><Select label={w('Evidence type')} value={evidenceType} onChange={e=>setEvidenceType(e.target.value)}>
       {['Qualification','License or registration','Scope training','Approach experience','Other supporting evidence'].map(value=><option key={value} value={value}>{w(value)}</option>)}
-    </Select><label className="field">{w('Upload PDF evidence')}<input type="file" accept="application/pdf,.pdf" disabled={action.busy} onChange={event=>{
-      const file=event.currentTarget.files?.[0];event.currentTarget.value='';if(!file)return;
+    </Select><div className="field"><FileUpload label={w('Upload PDF evidence')} accept="application/pdf,.pdf" disabled={action.busy} onFiles={files=>{
+      const file=files[0];if(!file)return;
       void action.run(async()=>{if(file.size>5*1024*1024)throw new Error('The PDF must be 5 MB or smaller.');await journeyApi.uploadScopeEvidence(item.name,evidenceType,file.name,await encodeFile(file));await refresh();});
-    }}/></label>
+    }}/></div>
     {action.error&&<InlineNotice tone="danger">{w(action.error)}</InlineNotice>}</div>}
   </section>;
 }

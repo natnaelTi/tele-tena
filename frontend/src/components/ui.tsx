@@ -81,19 +81,7 @@ export function TextField({
     </div>
   );
 }
-export function PhoneField(
-  props: Omit<Parameters<typeof TextField>[0], "type">,
-) {
-  return (
-    <TextField
-      {...props}
-      type="tel"
-      autoComplete="tel"
-      inputMode="tel"
-      placeholder="+251 9…"
-    />
-  );
-}
+export {PhoneField} from "./PhoneField";
 export function OTPInput(props: Omit<Parameters<typeof TextField>[0], "type">) {
   return (
     <TextField
