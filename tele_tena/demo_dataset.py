@@ -75,7 +75,15 @@ def setup(dry_run=True):
     if dry_run:
         return {'dry_run':True,'dataset':DATASET,'existing_dataset':marker.exists(),
                 'accounts':len(users),'services':len(SERVICES),'site':frappe.local.site,
-                'external_delivery':False,'changes':False}
+                'external_delivery':False,'changes':False,
+                'needs_private_signing_key':not bool(frappe.conf.get('encryption_key'))}
+    if not frappe.conf.get('encryption_key'):
+        # Initialize a missing fresh-site prerequisite using Frappe's own helper.
+        # Never rotate an existing key or conceal loss of encrypted credentials.
+        if frappe.db.sql('SELECT 1 FROM `__Auth` WHERE encrypted=1 LIMIT 1') or frappe.db.sql('SELECT 1 FROM tt_couple_plan LIMIT 1'):
+            raise ValueError('Restore the missing original signing key from backup before seeding')
+        from frappe.utils.password import get_encryption_key
+        get_encryption_key()  # Never print the returned secret.
     lock=Path(frappe.get_site_path('private',DATASET+'.lock'))
     fd=os.open(lock,os.O_CREAT|os.O_RDWR|os.O_NOFOLLOW,0o600)
     with os.fdopen(fd,'w') as stream:
@@ -223,9 +231,20 @@ class Builder:
         row=next(r for r in SERVICES if DATASET+'-'+r[0]==service)
         result=j.publish(service,row[3],row[4],title=row[1],description='Fictional review session with clear consent and privacy choices.',retry_key=DATASET+'-'+key+'-'+row[0])
         offering=result['offering']
+        from zoneinfo import ZoneInfo
+        local_day=self.anchor.astimezone(ZoneInfo('Africa/Addis_Ababa')).date()
+        windows={'counselor':('08:00','20:00',7),'therapist':('09:00','19:00',7),'psychiatrist':('09:00','17:00',6)}
+        begin,end,weekdays=windows[key]
+        exceptions=[{'date':(local_day+timedelta(days=10)).isoformat(),'kind':'unavailable'}]
+        if key=='counselor':
+            # Explicit one-date fictional review windows make off-hours and
+            # historical financial exercises usable without changing recurrence.
+            past=self.anchor-timedelta(minutes=int(self.state.get('historical_window_minutes',frappe.conf.get('tele_tena_demo_dispute_window_minutes',60)))+120)
+            exercise_days={point.astimezone(ZoneInfo('Africa/Addis_Ababa')).date() for point in (self.anchor,past,self.anchor+timedelta(hours=1))}
+            exceptions += [{'date':day.isoformat(),'kind':'replace','start_local':'00:00','end_local':'23:59'} for day in sorted(exercise_days)]
         s.save_schedule(offering=offering,schedule_name=row[1]+' availability',timezone_name='Africa/Addis_Ababa',
-            intervals=[{'weekday':day,'start_local':'00:00','end_local':'23:59'} for day in range(7)],
-            exceptions=[{'date':(self.anchor.date()+timedelta(days=10)).isoformat(),'kind':'unavailable'}],
+            intervals=[{'weekday':day,'start_local':begin,'end_local':end} for day in range(weekdays)],
+            exceptions=exceptions,
             minimum_notice_minutes=0,horizon_days=60,buffer_before=0,buffer_after=0,
             confirmation_mode='automatic',status='Published',consultation_format='audio' if key=='psychiatrist' else 'video')
         return {'id':offering}
@@ -418,3 +437,50 @@ def reconcile(state=None):
     unbalanced=frappe.db.sql('SELECT j.id FROM tt_journal j JOIN tt_journal_line l ON l.journal_id=j.id GROUP BY j.id HAVING SUM(l.debit_minor)<>SUM(l.credit_minor) LIMIT 1')
     if unbalanced:raise ValueError('Unbalanced journal; preserved for investigation')
     return result
+
+
+def refresh(generation, dry_run=True):
+    """Explicitly add a fresh comparison request/offers, without reseeding money.
+
+    Operator supplies a new generation label when old offers expire. Repeating
+    the same label is idempotent, including after patient acceptance/cancellation.
+    """
+    import re
+    _guard()
+    if not isinstance(generation,str) or not re.fullmatch('[a-z0-9-]{1,32}',generation):
+        raise ValueError('Use a stable generation label of1–32 lowercase letters/numbers/hyphens')
+    if type(dry_run) is not bool:raise ValueError('dry_run must be boolean')
+    marker,credentials=paths()
+    if not marker.exists():raise ValueError('Run setup before refresh')
+    state=json.loads(marker.read_text())
+    if not state.get('complete'):raise ValueError('Finish the retained setup before refresh')
+    if dry_run:return {'dry_run':True,'generation':generation,'existing':generation in state.get('live_runs',{}),'changes':False}
+    fd=os.open(marker.parent/(DATASET+'.lock'),os.O_CREAT|os.O_RDWR|os.O_NOFOLLOW,0o600)
+    original=frappe.session.user
+    with os.fdopen(fd,'w') as stream:
+        fcntl.flock(stream,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        state=json.loads(marker.read_text())
+        live=state.setdefault('live_runs',{}).setdefault(generation,{'created_at':datetime.now(timezone.utc).isoformat()})
+        seed=Builder(state,marker,json.loads(credentials.read_text()))
+        anchor=datetime.fromisoformat(live['created_at'])
+        start=(anchor+timedelta(days=2)).replace(hour=9,minute=0,second=0,microsecond=0)
+        write_private(marker,state)
+        try:
+            from tele_tena.api import journey as j,open_requests as r,scheduling
+            prefix='live-'+generation
+            request=seed.step(prefix+'-request','patient',lambda:r.publish_request(DATASET+'-counseling',
+                'I would like time to talk about everyday stress. Fictional demonstration.',
+                'scheduled','en','video',{'name':False,'history':False},DATASET+'-'+generation,
+                earliest_start=j.iso(start.replace(tzinfo=None)),latest_start=j.iso((start+timedelta(hours=4)).replace(tzinfo=None))))
+            for key in ('counselor','therapist'):
+                offering=seed.result('offering-'+key+'-counseling')['id']
+                def offer(offering=offering):
+                    available=scheduling.calendar(offering,start.date().isoformat(),1,'UTC')
+                    slots=[slot for day in available['days'] for slot in day['slots'] if start.replace(tzinfo=None)<=j.instant(slot['start'])<=(start+timedelta(hours=4)).replace(tzinfo=None)]
+                    if not slots:raise ValueError('No eligible slot; preserve existing clinician configuration')
+                    return r.submit_offer(request['id'],offering,slots[0]['start'])
+                seed.step(prefix+'-offer-'+key,key,offer)
+            live['request']=request['id'];live['complete']=True
+            write_private(marker,state)
+            return {'generation':generation,'request_created':True,'offers':2,'new_funding':False,'records_file':str(marker)}
+        finally:frappe.set_user(original)

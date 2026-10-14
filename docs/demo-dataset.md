@@ -4,7 +4,10 @@ Explicit CLI only; no installation/migration seed or public endpoint. The site
 must already be explicitly bound to review mode, with developer mode/CSRF bypass
 off. Real-money/payment/payout flags cause refusal. This command never configures
 SMS/SMTP/LiveKit, enrollment, funding switches, framework settings or real transfers.
-It adds a separate namespace `tt-demo-mvp-v2` alongside existing records. It never
+Preflight reports a missing private signing key. On a fresh review site only,
+creation initializes it through Frappe; existing keys are never rotated. Missing
+keys alongside encrypted credentials or couples plans cause a stop for backup
+restoration. No key is printed. It adds a separate namespace `tt-demo-mvp-v2` alongside existing records. It never
 adopts an existing conflicting account or service. No cleanup command is provided;
 financial and clinical audit records must be retained.
 
@@ -51,9 +54,9 @@ has a clearly fictional verified-encounter rating; no public text review is
 invented. Payout Processing/Paid/external transfer are not fabricated when no
 operator/provider settlement exists.
 
-Schedules include date exceptions. Twenty-four-hour intervals are deliberately
-**fictional review availability**, allowing an operator in any timezone to test;
-this does not claim real clinician supply. Clinicians start paused and must
+Schedules have distinct counseling/therapy/psychiatric working hours and date
+exceptions. Counselor one-date overrides permit off-hours/historical fictional
+exercises without changing weekly recurrence; they do not claim real supply. Clinicians start paused and must
 explicitly enable presence in their active browser. Recurring bookings start
 relative to the first run. Offers expire normally. No supply/three-minute result
 is guaranteed. First-run dates and accepted policy snapshots stay unchanged on
@@ -104,3 +107,21 @@ passwords into reports. Use email → Use password instead.
 
 Portable data does not verify live SMS/SMTP delivery, physical-device calls,
 real clinical competence, native translations or external financial settlement.
+
+### Explicit fresh comparison scenario
+
+To add a new waiting request and two private scheduled offers after earlier
+examples expire, choose a **new** stable label. Run preflight, then creation:
+
+```bash
+bench --site SITE execute tele_tena.demo_dataset.refresh --kwargs '{"generation":"review-20261014"}'
+bench --site SITE execute tele_tena.demo_dataset.refresh --kwargs '{"generation":"review-20261014","dry_run":False}'
+```
+
+Repeating the same label preserves the request/offers even after their outcomes
+change. A new label creates additional tagged request/offer records only, with
+normal eligibility and limits. It never adds money, reopens an old request,
+changes a schedule, moves a booking, approves a scope or renews presence. If a
+clinician has changed setup or lost eligibility, the refresh stops honestly and
+retains partial progress for inspection; do not force an offer. Use a new label
+only when deliberately preparing another review. Credentials remain unchanged.
