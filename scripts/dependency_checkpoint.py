@@ -52,6 +52,8 @@ def check_plan(before, report, mode='install', app_path=None):
     conflicts = sorted((set(proposed) & set(before)) - ({'tele-tena'} if mode == 'update' else set()))
     if conflicts:
         raise ValueError('Plan replaces protected distributions: ' + ', '.join(conflicts))
+    if mode == 'update' and set(proposed) != {'tele-tena'}:
+        raise ValueError('Update mode permits only TeleTena; new dependencies need separate reviewed compatibility evidence')
     if 'tele-tena' not in proposed:
         raise ValueError('Plan must install the intentional tele-tena package')
     if app_path is not None:

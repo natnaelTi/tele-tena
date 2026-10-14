@@ -33,6 +33,8 @@ class DependencyPlan(unittest.TestCase):
 class UpdatePlan(unittest.TestCase):
     def test_intentional_update(self):
         self.assertEqual(checkpoint.check_plan({'tele-tena':'0.1.0','frappe':'16.2.1'}, report('tele_tena'), 'update'), ['tele-tena'])
+    def test_reject_unrelated_addition_during_update(self):
+        with self.assertRaises(ValueError):checkpoint.check_plan({'tele-tena':'1'},report('tele_tena','unrelated'),'update')
     def test_modes_and_unrelated_replacements(self):
         for mode,before in [('install',{'tele-tena':'1'}),('update',{})]:
             with self.assertRaises(ValueError): checkpoint.check_plan(before,report('tele_tena'),mode)
