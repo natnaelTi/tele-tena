@@ -9,8 +9,6 @@
 .booking-review-panel .summary-list dd { text-align:right; font-weight:600; margin:0; }
 .booking-review-panel > .button { margin-top:24px; width:100%; }
 .booking-review-disclosure summary { min-height:44px; display:flex; align-items:center; cursor:pointer; font-weight:600; color:var(--brand); }
-.booking-review-disclosure summary::before { content:'+'; margin-right:10px; }
-.booking-review-disclosure[open] summary::before { content:'−'; }
 .booking-review-disclosure .disclosure-preview { margin-top:12px; }
 .booking-sharing-panel { background:white; border:1px solid var(--border); border-radius:16px; padding:28px; display:grid; gap:20px; }
 .booking-sharing-panel .field,.booking-sharing-panel p { margin:0; }

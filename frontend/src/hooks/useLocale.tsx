@@ -11,6 +11,12 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  "Account menu": ["የመለያ ምናሌ", "Baafata herregaa"],
+  "Signing out…": ["በመውጣት ላይ…", "Ba’aa…"],
+  "Care & appointments": ["እንክብካቤ እና ቀጠሮዎች", "Kunuunsa fi beellamoota"],
+  "Practice & affiliations": ["ልምምድ እና ተቋማት", "Hojii fi dhaabbilee"],
+  "Applications & approval": ["ማመልከቻዎች እና ፈቃድ", "Iyyannoowwan fi hayyama"],
+  "Services & operations": ["አገልግሎቶች እና ሥራዎች", "Tajaajiloota fi hojii"],
   // Profile photo translations are provisional, pending native review.
   "Profile picture": ["የመገለጫ ፎቶ", "Suuraa piroofaayilii"],
   "JPEG, PNG or WebP. Up to 3 MB.": ["JPEG፣ PNG ወይም WebP። እስከ 3 MB።", "JPEG, PNG ykn WebP. Hanga 3 MB."],

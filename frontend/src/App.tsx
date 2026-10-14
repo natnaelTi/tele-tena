@@ -87,6 +87,7 @@ export default function App() {
               <Route path="/clinic" element={<WorkspaceLayout kind="clinic" />}>
                 <Route index element={<ClinicMembershipPortal workspace />} />
                 <Route path="calendar" element={<ClinicCalendar />} />
+                <Route path="account" element={<ReviewerAccount />} />
               </Route>
               <Route
                 path="/patient"

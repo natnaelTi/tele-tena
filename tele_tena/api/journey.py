@@ -186,7 +186,7 @@ def session():
     user = actor()
     p = rows('SELECT * FROM tt_profile WHERE user=%s', (user,))
     from tele_tena.api.profile_photos import owner_photo
-    return {'user': user, 'photo': owner_photo(user), 'roles': frappe.get_roles(user), 'profile': p[0] if p else None,
+    return {'user': user, 'display_name': frappe.db.get_value('User', user, 'full_name'), 'photo': owner_photo(user), 'roles': frappe.get_roles(user), 'profile': p[0] if p else None,
             'clinic_workspace': _clinic_workspace_available(user),
             'clinic_schedule_workspace': _clinic_schedule_workspace_available(user),
             'csrf_token': get_csrf_token(), 'simulation': simulation_enabled()}

@@ -261,3 +261,10 @@ photos are absent or inaccessible. Account includes one compact photo editor;
 reviewers use `/admin/account`. Clinician publication is an explicit checkbox.
 No patient encounter avatar is replaced with an account photo. Existing component
 sizes, tokens, keyboard controls and mobile wrapping are retained.
+
+Final MVP navigation polish14October2026: own avatar/display name are one
+Account disclosure trigger with Account/Sign out, initials fallback, Escape,
+outside dismissal and keyboard movement. More retains the existing Radix drawer
+with role-specific Care/Practice/Payments or Applications/Operations sections.
+Native details keep their persisted form state, whole-row keyboard triggers and
+one aligned chevron. No call/notification/clinical permission design changes.
