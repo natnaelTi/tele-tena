@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import stat
 
 import frappe
 from tele_tena.review import cli, write_private
@@ -50,6 +51,8 @@ def _guard():
             'tele_tena_real_money_enabled','tele_tena_real_payments_enabled',
             'tele_tena_payments_enabled','tele_tena_real_payouts_enabled')):
         raise ValueError('Refusing financial demo seeding on a real-money or non-review site')
+    if int(frappe.conf.get('tele_tena_demo_platform_fee_bps',0))>=10000:
+        raise ValueError('The existing fee policy leaves no positive earnings for this demonstration; it was not changed')
     if frappe.conf.get('developer_mode') or frappe.conf.get('ignore_csrf'):
         raise ValueError('Developer mode/CSRF bypass are not permitted for review')
     if not frappe.db.sql("SHOW TABLES LIKE 'tt_profile_photo'"):
@@ -69,6 +72,9 @@ def setup(dry_run=True):
     marker, credentials = paths()
     users = {key:DATASET+'-'+key+'@example.invalid' for key in NAMES}
     conflicts = [key for key,user in users.items() if frappe.db.exists('User',user)]
+    for file in (marker,credentials):
+        if file.exists() and (file.is_symlink() or stat.S_IMODE(file.stat().st_mode)!=0o600 or file.stat().st_uid!=os.getuid()):
+            raise ValueError('Dataset private files must be owner-only mode600 regular files')
     if not marker.exists() and (credentials.exists() or conflicts or any(
             frappe.db.exists('Tele Tena Service',DATASET+'-'+row[0]) for row in SERVICES)):
         raise ValueError('Dataset identifier conflict: existing records will not be adopted or overwritten')
@@ -150,6 +156,10 @@ class Builder:
         if frappe.db.exists('User',user):
             # A retry may follow a committed step whose private checkpoint write
             # was interrupted. Never change that account/password/profile.
+            from frappe.utils.password import check_password
+            try:check_password(user,self.passwords[user])
+            except frappe.AuthenticationError:
+                raise ValueError('Interrupted account ownership cannot be confirmed; existing credentials were not changed') from None
             return {'user':user}
         doc=frappe.get_doc({'doctype':'User','email':user,'first_name':NAMES[key],
             'send_welcome_email':0,'user_type':'Website User'})
@@ -163,7 +173,8 @@ class Builder:
     def profile(self,key):
         from tele_tena.api import journey as j, presentation as p
         clinician=key in ('counselor','therapist','psychiatrist','applicant')
-        if not j.rows('SELECT user FROM tt_profile WHERE user=%s',(self.users[key],)):
+        new_profile=not j.rows('SELECT user FROM tt_profile WHERE user=%s',(self.users[key],))
+        if new_profile:
             j.save_profile('clinician' if clinician else 'patient',NAMES[key],True,
                 history='' if clinician else 'Fictional care background for privacy demonstration.',
                 share_name=key!='private_patient',share_history=False,
@@ -171,7 +182,7 @@ class Builder:
                 **({'introduction':'Fictional professional profile for demonstrating adult mental-health care. No real credentials or care are represented.'} if clinician else {}))
         if clinician:
             frappe.db.sql('''INSERT IGNORE INTO tt_onboarding (user,kind,step,answers,modified) VALUES (%s,'clinician',0,%s,UTC_TIMESTAMP(6))''', (self.users[key],json.dumps({'professional':QUALIFICATIONS,'care_languages':['en'],'name':NAMES[key]})))
-        if not clinician:p.save_preferences('om' if key=='oromo_patient' else 'am' if key=='private_patient' else 'en','Africa/Addis_Ababa')
+        if not clinician and new_profile:p.save_preferences('om' if key=='oromo_patient' else 'am' if key=='private_patient' else 'en','Africa/Addis_Ababa')
         return {'created':True}
 
     def service(self,row):
@@ -181,7 +192,7 @@ class Builder:
         if frappe.db.exists('Tele Tena Service',service):return {'id':service}
         c.save_draft_definition({'service_key':service,'service_label':label,'category':category,
             'description':'Adult '+label.lower()+'. Fictional demonstration definition, not a clinically approved production service.',
-            'professional_categories':QUALIFICATIONS['professional_category'],
+            'professional_categories':'Psychiatrist (fictional)' if key=='psychiatry' else QUALIFICATIONS['professional_category'],
             'credential_requirements':'Fictional qualification and license documents are assessed in this training exercise only.',
             'participant_structure':'couple' if key in ('couples','premarital') else 'individual',
             'population_restriction':'Adults only','supported_formats':'audio\nvideo',
@@ -206,22 +217,24 @@ class Builder:
 
     def scope(self,key,service,decision):
         from tele_tena.api import vetting as v
-        values={**QUALIFICATIONS,'credential_valid_from':(self.anchor.date()-timedelta(days=365)).isoformat(),
+        values={**QUALIFICATIONS,'professional_category':'Psychiatrist (fictional)' if key=='psychiatrist' else QUALIFICATIONS['professional_category'],'credential_valid_from':(self.anchor.date()-timedelta(days=365)).isoformat(),
                 'credential_expiry':(self.anchor.date()+timedelta(days=365)).isoformat()}
         existing=frappe.db.sql('SELECT name,status FROM `tabTele Tena Vetting Scope Application` WHERE clinician=%s AND service=%s',(self.users[key],service),as_dict=True)
         if existing and existing[0].status in ('Approved','Rejected','Clarification','Submitted'):
             return {'name':existing[0].name}
         result=v.save_scope_application(service,values,submit=False)
         evidence=v.upload_scope_evidence(result['name'],'License or registration','fictional-license.pdf',document('Fictional license training document. NOT VALID: '+NAMES[key]))
+        qualification=v.upload_scope_evidence(result['name'],'Qualification','fictional-qualification.pdf',document('Fictional qualification: '+NAMES[key]))
+        training=v.upload_scope_evidence(result['name'],'Scope training','fictional-scope-training.pdf',document('Fictional scope training: '+service))
         v.save_scope_application(service,values,submit=True)
-        return {'name':result['name'],'evidence':evidence['id']}
+        return {'name':result['name'],'evidence':evidence['id'],'qualification_evidence':qualification['id'],'training_evidence':training['id']}
 
     def decide(self,key,scope,decision):
         from tele_tena.api import vetting as v
         name=scope['name'];status=frappe.db.get_value('Tele Tena Vetting Scope Application',name,'status')
         if status not in ('Submitted','Resubmitted'):return {'status':status}
         evidence=scope.get('evidence') or frappe.db.get_value('Tele Tena Scope Evidence',{'scope_application':name,'evidence_type':'License or registration'},'name')
-        scores={dimension:{'score':2,'rationale':'Fictional evidence assessment exercise. Not an actual competence claim.','evidence':[evidence]} for dimension in ('scope_education','supervised_experience','approach_training','adult_population','ethics_safeguarding','assessment_interview')}
+        scores={dimension:{'score':2,'rationale':'Fictional evidence assessment exercise. Not an actual competence claim.','evidence':[scope.get('qualification_evidence',evidence) if dimension=='scope_education' else scope.get('training_evidence',evidence) if dimension in ('supervised_experience','approach_training') else evidence]} for dimension in ('scope_education','supervised_experience','approach_training','adult_population','ethics_safeguarding','assessment_interview')}
         kwargs={'findings':('Fictional exercise: '+decision+'. No external credential source checked.'),'restrictions':'Development demonstration only. No real clinical practice.'}
         if decision=='Approved':kwargs.update(identity_reviewed=True,credential_verified=True,qualification_relevant=True,experience_adequate=True,adult_scope_appropriate=True,interview_completed=True,scored_criteria=scores,credential_source='Fictional training register; not an external authority',credential_checked_on=frappe.utils.today(),credential_evidence=evidence,credential_source_reference=DATASET+'-fictional-source')
         return v.review_scope_application(name,decision,**kwargs)
@@ -341,8 +354,8 @@ class Builder:
             if scenario=='released':
                 self.step('feedback','private_patient',lambda:trust.submit_session_feedback(booked['id'],4))
         self.step('release','Administrator',lambda:(accounting.release_eligible_earnings([self.result('booking-released')['id']]) or {'processed':True}))
-        self.step('payout','counselor',lambda:accounting.request_payout(10000,DATASET+'-payout'))
-        cancelled_payout=self.step('cancelled-payout','counselor',lambda:accounting.request_payout(5000,DATASET+'-cancelled-payout'))
+        self.step('payout','counselor',lambda:accounting.request_payout(max(1,accounting.balance('clinician',self.users['counselor'],'earnings_available')//3),DATASET+'-payout'))
+        cancelled_payout=self.step('cancelled-payout','counselor',lambda:accounting.request_payout(max(1,accounting.balance('clinician',self.users['counselor'],'earnings_available')//4),DATASET+'-cancelled-payout'))
         self.step('cancel-payout','counselor',lambda:accounting.cancel_payout(cancelled_payout['id'],'Fictional cancelled payout request.'))
         # Scheduled request distribution works without requiring fresh presence.
         day=(self.anchor+timedelta(days=4)).replace(hour=9,minute=0,second=0,microsecond=0)

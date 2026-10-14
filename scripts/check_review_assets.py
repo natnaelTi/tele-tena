@@ -24,7 +24,7 @@ if args.site_private:
         if path.exists():
             values = json.loads(path.read_text())
             secrets.extend(str(values[key]).encode() for key in fields if values.get(key))
-    for filename in ('tele_tena_review_accounts.json', 'tele_tena_presentation_accounts.json'):
+    for filename in ('tele_tena_review_accounts.json', 'tele_tena_presentation_accounts.json','tt-demo-mvp-v2-accounts.json'):
         account_file = args.site_private / filename
         if account_file.exists():
             values = json.loads(account_file.read_text())

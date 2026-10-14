@@ -6,7 +6,7 @@
 .account-menu-trigger[aria-expanded=true]>svg{transform:rotate(180deg);}
 .account-menu-panel{position:absolute;top:calc(100% + 8px);right:0;z-index:85;width:240px;max-width:calc(100vw - 32px);padding:8px;background:var(--surface-card);border:1px solid var(--border-default);border-radius:16px;box-shadow:0 12px 32px #102a3320;}
 .account-menu-panel>a,.account-menu-panel>button{display:flex;align-items:center;gap:12px;min-height:48px;width:100%;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:var(--text-primary);font:inherit;text-decoration:none;cursor:pointer;}
-.account-menu-panel>a:hover,.account-menu-panel>button:hover{background:var(--surface-subtle);}
+.account-menu-panel>a[aria-current=page],.account-menu-panel>a:hover,.account-menu-panel>button:hover{background:var(--surface-subtle);}
 .account-menu button:focus-visible,.account-menu a:focus-visible{outline:3px solid var(--brand-teal);outline-offset:2px;}
 .account-menu button:disabled{cursor:wait;color:var(--text-secondary);background:var(--surface-subtle);}
 .workspace-more-group{border-bottom:1px solid var(--border-default);padding:12px 0;}

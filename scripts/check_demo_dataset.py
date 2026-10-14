@@ -23,6 +23,12 @@ def snapshot(exclude_demo=False):
     result={'users':frappe.db.sql('SELECT name,enabled,full_name FROM tabUser'+query+' ORDER BY name',(users,) if exclude_demo else ())}
     for table,column in [('tt_profile','user'),('tt_wallet','patient'),('tt_application','user'),('tt_ledger','patient'),('tt_appointment','patient')]:
         result[table]=frappe.db.sql('SELECT * FROM '+table+(' WHERE '+column+' NOT IN %s' if exclude_demo else '')+' ORDER BY 1',(users,) if exclude_demo else ())
+    for table,column in [('tt_financial_account','owner'),('tt_earning','clinician'),('tt_payout','clinician')]:
+        where=(' WHERE '+column+' NOT IN %s' + (" AND owner<>''" if table=='tt_financial_account' else '')) if exclude_demo else ''
+        result[table]=frappe.db.sql('SELECT * FROM '+table+where+' ORDER BY 1',(users,) if exclude_demo else ())
+    journal_filter=" WHERE NOT EXISTS (SELECT 1 FROM tt_journal_line jl JOIN tt_financial_account a ON a.id=jl.account_id WHERE jl.journal_id=j.id AND a.owner IN %s)" if exclude_demo else ''
+    result['journals']=frappe.db.sql('SELECT j.* FROM tt_journal j'+journal_filter+' ORDER BY j.id',(users,) if exclude_demo else ())
+    result['journal_lines']=frappe.db.sql('SELECT l.* FROM tt_journal_line l JOIN tt_journal j ON j.id=l.journal_id'+journal_filter+' ORDER BY l.id',(users,) if exclude_demo else ())
     return hashlib.sha256(json.dumps(result,default=str,sort_keys=True).encode()).hexdigest()
 
 
@@ -38,6 +44,14 @@ try:
     with patch('requests.sessions.Session.request',side_effect=AssertionError('Outbound HTTP forbidden')),patch.object(frappe,'sendmail',side_effect=AssertionError('Email forbidden')):
         second=demo.setup(False)
     assert second['already_present'] and after==snapshot(),'Repeat seed changed records'
+    # Fresh comparison generation adds only requests/offers, and preserves money.
+    money_before=frappe.db.sql('SELECT patient,available,reserved FROM tt_wallet ORDER BY patient')
+    with patch('requests.sessions.Session.request',side_effect=AssertionError('Outbound HTTP forbidden')),patch.object(frappe,'sendmail',side_effect=AssertionError('Email forbidden')):
+        demo.refresh('verification',False)
+    refreshed=snapshot()
+    demo.refresh('verification',False)
+    assert refreshed==snapshot(),'Repeat refresh changed records'
+    assert money_before==frappe.db.sql('SELECT patient,available,reserved FROM tt_wallet ORDER BY patient'),'Refresh changed funds'
     state=json.loads(demo.paths()[0].read_text());users=state['users'];steps=state['steps']
     def result(key):return steps[key]['result']
     frappe.set_user(users['patient'])

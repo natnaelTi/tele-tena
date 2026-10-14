@@ -52,7 +52,7 @@ export function MedicalLeadLayout(){
     <NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>
     {session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}
   </nav><div className="sidebar-bottom"><TranslationNote/></div></aside>
-    <div className="workspace-body"><DemoBar/><header className="workspace-header"><span>{w('Clinical standards')}</span><LanguageSelect/><AccountMenu accountPath={session.roles.includes('Tele Tena Approver')?'/admin/account':'/admin/rubrics/account'} onSignout={()=>void signout()} busy={busy}/></header>{error&&<InlineNotice tone="danger">{w('We could not sign you out. Try again.')}</InlineNotice>}<nav className="workspace-mobile-nav" aria-label={w('Clinical standards')}><NavLink to="/admin/rubrics">{w('Rubric versions')}</NavLink>{session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting">{w('Service-scope vetting')}</NavLink>}</nav><main className="workspace-main" id="main-content"><Outlet/></main></div></div>;
+    <div className="workspace-body"><DemoBar/><header className="workspace-header"><span>{w('Clinical standards')}</span><LanguageSelect/><AccountMenu accountPath={session.roles.includes('Tele Tena Approver')?'/admin/account':'/admin/rubrics/account'} onSignout={()=>void signout()} busy={busy}/></header>{error&&<InlineNotice tone="danger">{w('We could not sign you out. Try again.')}</InlineNotice>}<nav className="workspace-mobile-nav" aria-label={w('Clinical standards')}><NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>{session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}</nav><main className="workspace-main" id="main-content"><Outlet/></main></div></div>;
 }
 
 function ClinicianRequestAvailability() {
@@ -281,7 +281,7 @@ export function WorkspaceLayout({
   };
   const renderNavLink = (item: (typeof items)[number], closeMore = false) => {
     const [to, label, Icon] = item;
-    return <NavLink key={to} to={to} end data-tour={tourTargets[to]} onClick={closeMore ? () => setMoreOpen(false) : undefined}>
+    return <NavLink key={to} to={to} end={to === "/"+kind} data-tour={tourTargets[to]} onClick={closeMore ? () => setMoreOpen(false) : undefined}>
       <Icon size={20} /><span>{w(label)}</span>
     </NavLink>;
   };
