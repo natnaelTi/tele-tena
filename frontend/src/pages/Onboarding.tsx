@@ -74,7 +74,7 @@ export default function Onboarding() {
     void api<{id:string;label:string}[]>("tele_tena.api.contact_auth.application_services").then(setCatalog).catch(()=>undefined);
     void journeyApi.resumeStatus().then(value=>setResumeUploaded(value.uploaded)).catch(()=>undefined);
   }, [params]);
-  if (session?.profile) return <Navigate to={session.profile.kind === "patient" && pendingCareQuery() ? "/patient/discovery" : destination(session)} replace />;
+  if (session?.profile) return <Navigate to={session.profile.kind === "patient" && returnPath() ? returnPath() : destination(session)} replace />;
   const clinician = kind === "clinician";
   // Retain stored step 3 as the ready screen for existing saved journeys.
   // Patient-only step 4 is inserted before it without reinterpreting old drafts.
@@ -320,7 +320,7 @@ export default function Onboarding() {
                 : "This background is not included in your default disclosure. Preview before every booking.")} />
             {!answers.history && <Button variant="quiet" disabled={busy} onClick={() => void save(3)}>{w("Skip for now")}</Button>}
           </>}
-          {step === 3 && !clinician && <section className="onboarding-ready-hero"><div><h2>{w("What’s on your mind?")}</h2><p>{w("Describe what you need, browse specialists, or ask available clinicians to respond.")}</p><Button type="submit" loading={busy}>{w("Find care")}</Button></div><aside><ShieldCheck size={26}/><h2>{w("Your choices come with you.")}</h2><dl><dt>{w("Display name")}</dt><dd>{answers.name}</dd><dt>{w("Care language")}</dt><dd>{{en:"English",am:"አማርኛ",om:"Afaan Oromo"}[answers.language as "en"|"am"|"om"]||"English"}</dd><dt>{w("Sharing")}</dt><dd>{w("Preview before every booking")}</dd></dl></aside></section>}
+          {step === 3 && !clinician && <section className="onboarding-ready-hero"><div><h2>{w("Choose your next step")}</h2><p>{w("Browse clinicians and services, or post a private request.")}</p><Button type="submit" loading={busy}>{w("Find care")}</Button></div><aside><ShieldCheck size={26}/><h2>{w("Your choices come with you.")}</h2><dl><dt>{w("Display name")}</dt><dd>{answers.name}</dd><dt>{w("Care language")}</dt><dd>{{en:"English",am:"አማርኛ",om:"Afaan Oromo"}[answers.language as "en"|"am"|"om"]||"English"}</dd><dt>{w("Sharing")}</dt><dd>{w("Preview before every booking")}</dd></dl></aside></section>}
           {step === 3 && clinician && (
             <>
               <p>
