@@ -544,5 +544,5 @@ def immediate_capacity(offering):
     if not schedule or schedule.status!='Published' or not journey.service_scope_is_current(offer.clinician,offer.service):return None
     policy=frappe.db.get_value('Tele Tena Service',offer.service,['immediate_care_enabled','catalog_status','participant_structure'],as_dict=True)
     if not policy or policy.participant_structure not in (None,'','individual') or not open_requests.immediate_service_enabled(policy):return None
-    earliest=datetime.now(timezone.utc).replace(tzinfo=None)
+    earliest=open_requests.now()
     return immediate_start(schedule,offer,offer.clinician,None,earliest,earliest+timedelta(minutes=open_requests.immediate_window_minutes()))

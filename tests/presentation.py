@@ -129,6 +129,11 @@ class Presentation(unittest.TestCase):
     def setUp(self):
         fixtures.login('admin')
 
+    def tearDown(self):
+        # Match the base fixture's transaction isolation. Without this, an
+        # uncommitted request/offer from another test consumes this user's cap.
+        fixtures.Integration.tearDown(self)
+
     def test_binary_pdf_storage_preserves_bytes_for_frappe16(self):
         from tele_tena.api import vetting
         fixtures.login('admin')
@@ -807,7 +812,7 @@ class Presentation(unittest.TestCase):
             clinic_access.clinic_schedule_week(week_start, 'Not/A_Timezone')
         with self.assertRaises(frappe.ValidationError):
             clinic_access.clinic_schedule_week(
-                (local_day + timedelta(days=1)).isoformat(), 'Africa/Addis_Ababa')
+                (date.fromisoformat(week_start) + timedelta(days=1)).isoformat(), 'Africa/Addis_Ababa')
         fixtures.login('c2')
         self.assertEqual(clinic_access.clinic_schedule_access(), [])
         with self.assertRaises(frappe.PermissionError):
@@ -944,16 +949,15 @@ class Presentation(unittest.TestCase):
 
     def test_credential_provenance_migration_is_repeatable_and_preserves_history(self):
         before = journey.rows('''SELECT name,scope_application,decision,rubric_version,
-                credential_verified,findings FROM `tabTele Tena Vetting Assessment` ORDER BY name''')
+                credential_verified,findings,credential_verification_snapshot FROM `tabTele Tena Vetting Assessment` ORDER BY name''')
         v1_29_credential_verification_provenance.execute()
         v1_29_credential_verification_provenance.execute()
         self.assertTrue(frappe.db.sql(
             "SHOW COLUMNS FROM `tabTele Tena Vetting Assessment` LIKE 'credential_verification_snapshot'"))
         after = journey.rows('''SELECT name,scope_application,decision,rubric_version,
-                credential_verified,findings FROM `tabTele Tena Vetting Assessment` ORDER BY name''')
+                credential_verified,findings,credential_verification_snapshot FROM `tabTele Tena Vetting Assessment` ORDER BY name''')
         self.assertEqual([tuple(row.values()) for row in after], [tuple(row.values()) for row in before])
-        self.assertTrue(all(not row.credential_verification_snapshot for row in journey.rows(
-            'SELECT credential_verification_snapshot FROM `tabTele Tena Vetting Assessment`')))
+        # Existing verified provenance must survive,not be nulled on upgrade.
 
     def test_vetting_rubric_registry_is_immutable_and_requires_medical_lead(self):
         before = journey.rows('''SELECT version,status,definition_sha256,created_by,created_at,
@@ -2145,7 +2149,7 @@ class Presentation(unittest.TestCase):
         day = day_offset(28 + secrets.randbelow(20))
         fixtures.login('c1')
         journey.save_profile('clinician', 'Synthetic slot clinician', 1, languages=['en'])
-        journey.publish(service, 30000, 30)
+        journey.publish(service, 30000, 30,offering_id=offering)
         payload = schedule_payload(offering, day, mode='automatic')
         payload['minimum_notice_minutes'] = 0
         scheduling.save_schedule(**payload)
