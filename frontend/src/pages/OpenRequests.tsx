@@ -1,5 +1,5 @@
 import {OfferAcceptance} from '../components/OfferAcceptance';
-import {guestDraft,clearGuestDraft,rememberReturn} from '../guest-intent';
+import {guestDraft,clearGuestDraft,rememberReturn,guestTiming} from '../guest-intent';
 import {Avatar} from "../components/ProfilePhoto";
 import "./RequestWorkspace.css";
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -71,7 +71,7 @@ export function PatientOpenRequests(){
   useEffect(()=>{if(!service&&requestDraft?.service_label&&services.data){const match=services.data.find(item=>item.label===requestDraft.service_label);if(match)setService(match.id);}},[requestDraft?.service_label,service,services.data]);
   const publish=()=>void action.run(async()=>{
     if(!service||!narrative.trim())throw new Error('Add a service and a short description first.');
-    const payload={service,request_text:narrative,urgency,language,consultation_format:format,sharing,retry_key:requestKey,timezone_name:Intl.DateTimeFormat().resolvedOptions().timeZone||'Africa/Addis_Ababa',earliest_start:urgency==='scheduled'?new Date(earliest).toISOString():null,latest_start:urgency==='scheduled'?new Date(latest).toISOString():null,max_price_minor:maxPrice?etbToMinor(maxPrice):null};
+    const payload={navigation_timing:guestTiming(),service,request_text:narrative,urgency,language,consultation_format:format,sharing,retry_key:requestKey,timezone_name:Intl.DateTimeFormat().resolvedOptions().timeZone||'Africa/Addis_Ababa',earliest_start:urgency==='scheduled'?new Date(earliest).toISOString():null,latest_start:urgency==='scheduled'?new Date(latest).toISOString():null,max_price_minor:maxPrice?etbToMinor(maxPrice):null};
     let publication:any;try{publication=await journeyApi.publishRequest(payload)}catch(error){if((error as any)?.code!=='request_retry_changed')throw error;const retry=freshRequestKey();setRequestKey(retry);publication=await journeyApi.publishRequest({...payload,retry_key:retry})}
     clearGuestDraft();rememberReturn({kind:'request',ref:publication.id});
     setPublicationMessage(publication?.eligible_supply===0&&urgency==='immediate'

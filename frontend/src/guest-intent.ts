@@ -11,7 +11,13 @@ export function clearReturn(){memory=null;try{sessionStorage.removeItem(key);}ca
 export function returnPath(){const value=returnIntent();return value?.kind==='offering'?'/patient/book/'+value.ref:value?.kind==='request'?'/patient/requests'+(value.ref?'/'+value.ref:''):'';}
 export type RequestDraft={request_text:string;service?:string;service_label?:string;language?:string;format?:Format;urgency?:'immediate'|'scheduled'};
 let draft:RequestDraft|null=null;
-export function rememberGuestDraft(value:RequestDraft){draft={...value,request_text:value.request_text.slice(0,2000)};}
+export function rememberGuestDraft(value:RequestDraft){startGuestTiming();draft={...value,request_text:value.request_text.slice(0,2000)};}
 export function guestDraft(){return draft;}
 export function discardGuestDraft(){draft=null;clearReturn();}
-export function clearGuestDraft(){draft=null;}
+export function clearGuestDraft(){draft=null;guestStarted=null;authStarted=null;}
+
+// Optional client-reported navigation timing,never health text or an auth secret.
+let guestStarted:number|null=null,authStarted:number|null=null;
+export function startGuestTiming(){guestStarted??=performance.now();}
+export function startAuthTiming(){if(guestStarted!==null)authStarted??=performance.now();}
+export function guestTiming(){return guestStarted===null?undefined:{guest_ms:Math.min(3600000,Math.round(performance.now()-guestStarted)),auth_ms:authStarted===null?0:Math.min(3600000,Math.round(performance.now()-authStarted))};}

@@ -10,9 +10,9 @@ from pathlib import Path
 
 assert os.environ.get('TELE_TENA_LOCAL_OTP_TEST') == '1'
 SITE=os.environ.get('TELE_TENA_TEST_SITE')
-assert SITE in ('teletena-mvp-presentation.localhost','tele-tena-pr12-fresh.localhost')
+assert SITE in ('teletena-mvp-presentation.localhost','tele-tena-pr12-fresh.localhost','teletena-guest-first-test.localhost')
 from scripts.review_test_wsgi import application as frappe_application
-from tele_tena import sms
+from tele_tena import sms,email_delivery
 from tele_tena.review import write_private
 import frappe
 
@@ -26,6 +26,8 @@ def capture(phone, code):
 
 sms._config = lambda: {'api_key': 'local-test-no-provider', 'auth_header': 'KEY', 'auth_scheme': 'raw'}
 sms.send_otp = capture
+email_delivery.configuration=lambda: {'host':'mock.invalid','port':587,'sender':'test@example.invalid','username':'local','password':'local-test-only'}
+email_delivery.send_code=capture
 
 
 def application(environ, start_response):

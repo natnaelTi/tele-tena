@@ -1,5 +1,5 @@
 import {journeyApi} from '../journey-api';
-import {returnPath,rememberReturn} from '../guest-intent';
+import {returnPath,rememberReturn,startAuthTiming} from '../guest-intent';
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, LockKeyhole } from "lucide-react";
@@ -35,6 +35,7 @@ export default function SignIn() {
   const [options, setOptions] = useState<SignInOptions | null>(null);
   const [optionsError, setOptionsError] = useState(false);
   const requestKey = useRef("");
+  useEffect(()=>{startAuthTiming();},[]);
   useEffect(() => {
     let active = true;
     void api<SignInOptions>("tele_tena.api.contact_auth.sign_in_options")

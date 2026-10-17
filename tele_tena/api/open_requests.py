@@ -278,7 +278,7 @@ def set_request_presence(ready):
 @journey.command
 def publish_request(service, request_text, urgency, language, consultation_format,
                     sharing, retry_key, timezone_name='Africa/Addis_Ababa',
-                    earliest_start=None, latest_start=None, max_price_minor=None):
+                    earliest_start=None, latest_start=None, max_price_minor=None, navigation_timing=None):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     patient = profile('patient', lock=True)
     if urgency not in ('immediate', 'scheduled') or language not in LANGUAGES or consultation_format not in FORMATS:
@@ -357,6 +357,18 @@ def publish_request(service, request_text, urgency, language, consultation_forma
     # only the bounded first wave and expands later through the scheduler.
     candidates = _eligible(req)
     metric(req_id, 'Published', len(candidates))
+    # Bounded client-reported navigation timing is separate from authoritative
+    # publication/dispatch timestamps and never changes retry or matching policy.
+    if navigation_timing is not None:
+        try:timing=json.loads(navigation_timing) if isinstance(navigation_timing,str) else navigation_timing
+        except (ValueError,TypeError):fail('Invalid navigation timing')
+        if not isinstance(timing,dict) or set(timing)-{'guest_ms','auth_ms'}:
+            fail('Invalid navigation timing')
+        for field,event in (('guest_ms','GuestStartClient'),('auth_ms','AuthStartClient')):
+            elapsed=integer(timing.get(field,0),0,3600000)
+            metric(req_id,event,external_event_id='navigation:'+req_id+':'+field,
+                   occurred_at=current-timedelta(milliseconds=elapsed))
+
     notified, _total = _deliver(req, candidates, wave=1)
     return {'id': req_id, 'state': 'Open', 'expires_at': expiry.isoformat() + 'Z',
             'eligible_supply': len(candidates), 'notified': notified, 'wave': 1,

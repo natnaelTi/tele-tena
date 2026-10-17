@@ -85,7 +85,7 @@ class GuestFirst(unittest.TestCase):
   offer=self.offer();slot=scheduling.calendar(offer.id)['days'][0]['slots'][0]
   for extra in ({'care_language':'unsupported'},{'expected_format':'unsupported'}):
    with self.assertRaises(frappe.ValidationError):
-    journey.book(offer.id,slot['start'],'',{'name':False,'history':False},str(uuid.uuid4()),offer.price,offer.minutes,**extra)
+    journey.book(offer.id,slot['start'],'',{'name':False,'history':False},str(uuid.uuid4()),offer.price,offer.minutes,journey.preview('',{'name':False,'history':False})['disclosure'],**extra)
   self.assertFalse(frappe.db.sql('SELECT id FROM tt_appointment WHERE patient=%s AND start=%s AND clinician=%s',(users['patient'],slot['start'].replace('T',' ').replace('Z',''),offer.clinician)))
  def test_notice_claim_and_uncertain_send_cannot_duplicate(self):
   booking_notifications.save_preferences(email_enabled=True)
