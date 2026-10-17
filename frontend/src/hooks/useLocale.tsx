@@ -1,3 +1,4 @@
+import {guestFirstTranslations} from '../guest-first-translations';
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { accountTranslations } from "../account-translations";
@@ -153,6 +154,7 @@ const words: Record<string, [string, string]> = {
   ...onboardingTranslations,
   ...patientJourneyTranslations,
   ...accountTranslations,
+  ...guestFirstTranslations,
   "Shared care": ["የጋራ እንክብካቤ", "Kunuunsa waliin"],
   "Create an optional adult relationship link. It does not share clinical records or appointments.": ["አማራጭ የጎልማሶች ግንኙነት አገናኝ ይፍጠሩ። የሕክምና መዝገቦችን ወይም ቀጠሮዎችን አያጋራም።", "Walitti hidhamiinsa filannoo namoota ga'eessotaaf uumi. Galmee yaalaa ykn beellama hin qoodu."],
   "Invite an adult you trust": ["የሚያምኑትን ጎልማሳ ይጋብዙ", "Nama ga'eessa amanattu affeeri"],

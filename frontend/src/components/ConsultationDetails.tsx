@@ -14,7 +14,7 @@ export function ConversationFacts({item,clinician,status}:{item:any;clinician:bo
 }
 export function DisclosureSnapshot({disclosure}:{disclosure:any}){
   const {w}=useLocale();
-  return <Card className="encounter-disclosure"><h2>{w('Disclosure used at booking')}</h2><dl className="encounter-facts"><dt>{w('Preferred name')}</dt><dd>{disclosure.name||w('Not shared')}</dd><dt>{w('Your request')}</dt><dd className="prewrap">{disclosure.request||w('Not shared')}</dd><dt>{w('Saved history')}</dt><dd className="prewrap">{disclosure.history||w('Not shared')}</dd><dt>{w('Applies to')}</dt><dd>{w('This encounter only')}</dd></dl></Card>;
+  return <Card className="encounter-disclosure"><h2>{w('Disclosure used at booking')}</h2><dl className="encounter-facts"><dt>{w('Preferred name')}</dt><dd>{disclosure.name||disclosure.alias||w('Not shared')}</dd><dt>{w('Your request')}</dt><dd className="prewrap">{disclosure.request||w('Not shared')}</dd><dt>{w('Saved history')}</dt><dd className="prewrap">{disclosure.history||w('Not shared')}</dd>{!!disclosure.files?.length&&<><dt>{w('Selected files')}</dt><dd><ul>{disclosure.files.map((file:any)=><li key={file.id}>{file.filename}</li>)}</ul></dd></>}<dt>{w('Applies to')}</dt><dd>{w('This encounter only')}</dd></dl></Card>;
 }
 export function PreparationPanel(){
   const {w}=useLocale();

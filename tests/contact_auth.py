@@ -16,6 +16,12 @@ from tele_tena.api import contact_auth as auth
 from tele_tena.api import phone_auth
 
 
+def acknowledged(answers):
+    from tele_tena.api.policies import TERMS, PRIVACY
+    return {**answers, 'terms_accepted': True, 'privacy_acknowledged': True,
+            'terms_version': TERMS, 'privacy_version': PRIVACY}
+
+
 class ContactAuth(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -102,7 +108,7 @@ class ContactAuth(unittest.TestCase):
         with self.assertRaises(frappe.PermissionError):
             auth.onboarding()
         frappe.set_user(user)
-        auth.save_onboarding('patient', 3, {'name': 'Synthetic alias', 'adult': True, 'consent': True, 'language': 'am'}, 1)
+        auth.save_onboarding('patient', 3, acknowledged({'name': 'Synthetic alias', 'adult': True, 'consent': True, 'language': 'am'}), 1)
         self.assertIn('Tele Tena Patient', frappe.get_roles(user))
         self.assertNotIn('Tele Tena Clinician', frappe.get_roles(user))
         frappe.db.commit()
@@ -127,12 +133,12 @@ class ContactAuth(unittest.TestCase):
         with self.assertRaises(frappe.PermissionError):
             auth.onboarding()
         frappe.set_user(user)
-        auth.save_onboarding('patient', 3, answers, 1)
+        auth.save_onboarding('patient', 3, acknowledged(answers), 1)
         profile = frappe.db.sql('SELECT history,share_history FROM tt_profile WHERE user=%s', (user,), as_dict=True)[0]
         self.assertEqual(profile.history, answers['history'])
         self.assertFalse(profile.share_history)
         with self.assertRaises(frappe.ValidationError):
-            auth.save_onboarding('patient', 3, answers, 1)
+            auth.save_onboarding('patient', 3, acknowledged(answers), 1)
         self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_profile WHERE user=%s', (user,))[0][0], 1)
         frappe.db.commit()
 
@@ -196,9 +202,9 @@ class ContactAuth(unittest.TestCase):
         pdf = b'%PDF-1.7\n1 0 obj<</Type/Catalog>>endobj\n%%EOF\n'
         presentation.upload_resume('synthetic.pdf', base64.b64encode(pdf).decode())
         with self.assertRaises(frappe.ValidationError):
-            auth.save_onboarding('clinician', 3, {**answers, 'professional': {'professional_category': 'Counselor'}}, 1)
+            auth.save_onboarding('clinician', 3, acknowledged({**answers, 'professional': {'professional_category': 'Counselor'}}), 1)
         self.assertFalse(frappe.db.sql('SELECT user FROM tt_profile WHERE user=%s', (user,)))
-        auth.save_onboarding('clinician', 3, {**answers, 'statement': ''}, 1)
+        auth.save_onboarding('clinician', 3, acknowledged({**answers, 'statement': ''}), 1)
         self.assertIn('Tele Tena Applicant', frappe.get_roles(user))
         self.assertNotIn('Tele Tena Clinician', frappe.get_roles(user))
         self.assertEqual(frappe.db.sql('SELECT status FROM tt_application WHERE user=%s', (user,))[0][0], 'Pending')
@@ -220,7 +226,7 @@ class ContactAuth(unittest.TestCase):
             auth.onboarding()
         frappe.set_user(user)
         with self.assertRaises(frappe.ValidationError):
-            auth.save_onboarding('clinician', 3, answers, 1)
+            auth.save_onboarding('clinician', 3, acknowledged(answers), 1)
         self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_application WHERE user=%s', (user,))[0][0], 1)
         frappe.db.commit()
 

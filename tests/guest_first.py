@@ -81,6 +81,36 @@ class GuestFirst(unittest.TestCase):
   self.assertEqual(frappe.db.sql("SELECT COUNT(*) FROM tt_journal WHERE event_ref=%s",('booking:'+id,))[0][0],1)
   self.assertEqual(booking_notifications.preferences(),{'email_enabled':False,'sms_enabled':False})
   self.assertEqual(len(booking_notifications.notices()),1)
+ def test_booking_revalidates_selected_language_and_format(self):
+  offer=self.offer();slot=scheduling.calendar(offer.id)['days'][0]['slots'][0]
+  for extra in ({'care_language':'unsupported'},{'expected_format':'unsupported'}):
+   with self.assertRaises(frappe.ValidationError):
+    journey.book(offer.id,slot['start'],'',{'name':False,'history':False},str(uuid.uuid4()),offer.price,offer.minutes,**extra)
+  self.assertFalse(frappe.db.sql('SELECT id FROM tt_appointment WHERE patient=%s AND start=%s AND clinician=%s',(users['patient'],slot['start'].replace('T',' ').replace('Z',''),offer.clinician)))
+ def test_notice_claim_and_uncertain_send_cannot_duplicate(self):
+  booking_notifications.save_preferences(email_enabled=True)
+  frappe.db.sql("INSERT IGNORE INTO tt_contact_identity VALUES ('email',%s,%s,UTC_TIMESTAMP(6))",('guest-first-notice@example.invalid',users['patient']))
+  result,args,offer=self.book()
+  with patch.object(frappe.db,'commit'),patch('tele_tena.email_delivery.send_notice',side_effect=TimeoutError) as transport:
+   booking_notifications.dispatch();booking_notifications.dispatch()
+  self.assertEqual(transport.call_count,1)
+  rows=frappe.db.sql("SELECT id,state,attempts FROM tt_booking_notice WHERE appointment=%s AND channel='email'",(result['id'],),as_dict=True)
+  self.assertEqual([(row.state,row.attempts) for row in rows],[('Unknown',1)])
+  with self.assertRaises(frappe.PermissionError):booking_notifications.retry(rows[0].id)
+  self.assertEqual(journey.book(*args)['id'],result['id'])
+ def test_notice_configuration_failure_can_be_explicitly_retried(self):
+  from tele_tena.email_delivery import DeliveryUnavailable
+  booking_notifications.save_preferences(email_enabled=True)
+  frappe.db.sql("INSERT IGNORE INTO tt_contact_identity VALUES ('email',%s,%s,UTC_TIMESTAMP(6))",('guest-first-retry@example.invalid',users['patient']))
+  result,args,offer=self.book()
+  with patch.object(frappe.db,'commit'),patch('tele_tena.email_delivery.send_notice',side_effect=DeliveryUnavailable('email_not_configured')):
+   booking_notifications.dispatch()
+  notice=frappe.db.sql("SELECT id,state FROM tt_booking_notice WHERE appointment=%s AND channel='email'",(result['id'],),as_dict=True)[0]
+  self.assertEqual(notice.state,'Unavailable');booking_notifications.retry(notice.id)
+  with patch.object(frappe.db,'commit'),patch('tele_tena.email_delivery.send_notice') as transport:
+   booking_notifications.dispatch();booking_notifications.dispatch()
+  self.assertEqual(transport.call_count,1)
+  self.assertEqual(frappe.db.sql('SELECT state FROM tt_booking_notice WHERE id=%s',(notice.id,))[0][0],'ProviderAccepted')
  def test_policy_versions_and_no_implicit_privilege(self):
   with patch('tele_tena.review.registration_enabled',return_value=True):user=contact_auth._identity('email','guest-first-'+secrets.token_hex(6)+'@example.invalid')
   frappe.set_user(user)

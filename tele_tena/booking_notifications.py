@@ -7,6 +7,7 @@ from tele_tena.api.journey import actor,rows,query,command
 
 
 def create(appointment,state):
+    if state not in ('Booked','PendingConfirmation'):return
     event='Confirmed' if state=='Booked' else 'Pending'
     found=rows('SELECT patient,clinician FROM tt_appointment WHERE id=%s',(appointment,))
     if not found:return
@@ -88,6 +89,10 @@ def dispatch():
         when=app.start.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(app.timezone or 'Africa/Addis_Ababa')).strftime('%d %b %Y %H:%M')
         # Site-bound relative authenticated link;no permanent token or health text.
         link=frappe.utils.get_url('/teletena/'+('patient' if notice.user==app.patient else 'clinician')+'/consultations/'+app.id)
+        from urllib.parse import urlsplit,urlunsplit
+        parsed=urlsplit(link)
+        if parsed.hostname and not parsed.hostname.endswith('.localhost') and parsed.hostname not in ('localhost','127.0.0.1'):
+            link=urlunsplit(('https',parsed.netloc,parsed.path,'',''))
         message=f'TeleTena appointment {label}. {when} ({app.timezone}). Reference {app.id[:8]}. Sign in: {link}'
         try:
             if notice.channel=='email':

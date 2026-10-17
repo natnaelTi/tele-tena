@@ -703,7 +703,7 @@ def simulation_log(patient, kind, amount, reference):
 @command
 def book(offering, start, request_text, sharing, retry_key, expected_price, expected_minutes,
          expected_disclosure, booked_timezone='UTC', custom_offer_id=None,
-         booking_link_token=None, couple_plan_id=None):
+         booking_link_token=None, couple_plan_id=None,care_language=None,expected_format=None):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     p = profile('patient', True)
     selected = choices(sharing)
@@ -716,6 +716,8 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     key = text(retry_key, 80)
     payload_values = [offering, iso(start), request_text, selected, expected_price,
                       expected_minutes, expected_disclosure, booked_timezone]
+    if care_language is not None or expected_format is not None:
+        payload_values.append({'care_language':care_language,'expected_format':expected_format})
     # Keep the historic direct-booking digest stable. Link-origin retries bind
     # the opaque token into their idempotency payload without storing it.
     if booking_link_token:
@@ -800,6 +802,9 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
                 fail('Clinician immediate availability has expired', 'request_presence_stale')
     if integer(expected_price, 1, 100000000) != booking_price or integer(expected_minutes, 5, 240) != o.minutes:
         fail('Offering changed; review price and duration again', 'offering_changed')
+    if care_language is not None:
+        if care_language not in ('en','am','om') or care_language not in json.loads(one('SELECT languages FROM tt_profile WHERE user=%s',(o.clinician,)).languages or '[]'):
+            fail('The selected care language is no longer available. Review the service.','care_language_changed')
     end = start + timedelta(minutes=o.minutes)
     if start <= datetime.now(timezone.utc).replace(tzinfo=None):
         fail('Appointment must be in the future', 'future_required')
@@ -808,6 +813,8 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
                                         immediate_ready=immediate_request,
                                         immediate_window=(quoted.earliest_start, quoted.latest_start)
                                         if immediate_request else None)
+    if expected_format is not None and expected_format!=(schedule.consultation_format if schedule else 'video'):
+        fail('The consultation format changed. Review the service again.','offering_changed')
     schedule_timezone = schedule.timezone if schedule else scheduling._zone(booked_timezone).key
     before = int(schedule.buffer_before) if schedule else 0
     after = int(schedule.buffer_after) if schedule else 0
@@ -846,6 +853,7 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
               'financial': {'version': 'demo-earnings-v1', 'fee_bps': fee_bps,
                             'dispute_window_minutes': dispute_minutes,
                             'external_settlement': False}}
+    if care_language is not None:policy['care_language']=care_language
     created = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_appointment (id,patient,clinician,offering,start,end,state,price,acquisition_source,minutes,
         service_label,disclosure,choices,retry_key,payload_hash,timezone,schedule_id,confirmation_mode,
@@ -916,7 +924,7 @@ def appointments():
         if p.kind == 'patient':
             appointment.display_identity = clinician_name or 'Your clinician'
         else:
-            appointment.display_identity = appointment.disclosure.get('name') or 'Private patient'
+            appointment.display_identity = appointment.disclosure.get('name') or appointment.disclosure.get('alias') or 'Private patient'
     return result
 
 

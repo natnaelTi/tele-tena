@@ -7,6 +7,7 @@ VERSION='encounter-disclosure-v1'
 
 def selected_files(patient,ids,lock=False):
     if not isinstance(ids,list) or len(ids)>100 or any(not isinstance(id,str) or len(id)!=36 for id in ids) or len(set(ids))!=len(ids):fail('Choose your own history files','history_files_invalid')
+    if lock:frappe.db.sql('SELECT name FROM tabUser WHERE name=%s FOR UPDATE',(patient,))
     result=[]
     for id in sorted(ids):
         found=rows('SELECT id,filename,content_sha256,content_size FROM tt_history_document WHERE id=%s AND patient=%s'+(' FOR UPDATE' if lock else ''),(id,patient))
@@ -31,10 +32,10 @@ def grant_booking(appointment,patient,clinician,disclosure):
 @query()
 def grants(appointment=None):
     user=actor()
-    return rows('''SELECT g.id,g.appointment,g.document_id,g.filename,g.content_sha256,g.version,g.created,g.revoked_at,
+    return rows('''SELECT g.id,g.appointment,g.document_id,g.filename,g.content_sha256,g.version,g.created,g.revoked_at,doctor.display_name AS recipient_label,
       CASE WHEN g.patient=%s THEN 'owner' ELSE 'recipient' END access_kind
-      FROM tt_history_grant g JOIN tt_appointment a ON a.id=g.appointment
-      WHERE (g.patient=%s OR (g.recipient=%s AND a.clinician=%s))
+      FROM tt_history_grant g JOIN tt_appointment a ON a.id=g.appointment JOIN tt_profile doctor ON doctor.user=g.recipient
+      WHERE (g.patient=%s OR (g.recipient=%s AND a.clinician=%s AND g.revoked_at IS NULL AND a.state NOT IN ('Cancelled','Declined','Expired')))
       AND (%s IS NULL OR g.appointment=%s) ORDER BY g.created DESC LIMIT 100''',
       (user,user,user,user,appointment or None,appointment or None))
 

@@ -283,7 +283,9 @@ def publish_request(service, request_text, urgency, language, consultation_forma
     patient = profile('patient', lock=True)
     if urgency not in ('immediate', 'scheduled') or language not in LANGUAGES or consultation_format not in FORMATS:
         fail('Choose when you need care, a language and a session format')
-    service_row = one('SELECT name,catalog_status FROM `tabTele Tena Service` WHERE name=%s AND active=1', (service,))
+    service_row = one('SELECT name,catalog_status,participant_structure FROM `tabTele Tena Service` WHERE name=%s AND active=1', (service,))
+    if service_row.participant_structure not in ('individual',None,''):
+        fail('Use the separate consented couples booking journey for this service.','participant_workflow_unavailable')
     from tele_tena.review import enabled as review_enabled
     if service_row.catalog_status != 'Active' and not (
             service_row.catalog_status == 'Legacy test' and
@@ -834,7 +836,7 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
         booking = journey.book(item.offering, item.start.isoformat(timespec='seconds') + 'Z', req.request_text,
                                json.dumps(selected), key, int(item.price_minor),
                                int(item.duration_minutes), json.dumps(expected), req.timezone,
-                               custom_offer_id=item.id)
+                               custom_offer_id=item.id,care_language=req.language,expected_format=item.consultation_format)
     finally:
         frappe.local.tele_tena_accepting_offer = None
         frappe.local.tele_tena_offer_disclosure = None

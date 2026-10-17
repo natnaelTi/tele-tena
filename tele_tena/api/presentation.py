@@ -518,7 +518,7 @@ def appointment_detail(appointment):
             {'revision': r.revision, 'summary': r.patient_summary, 'published_at': iso(r.created)}
             for r in revisions]
     else:
-        selected['patient_identity'] = disclosure.get('name') or 'Private patient'
+        selected['patient_identity'] = disclosure.get('name') or disclosure.get('alias') or 'Private patient'
         selected['sharing_snapshot'] = disclosure
         if note:
             current = rows('''SELECT revision,private_note,patient_summary,summary_published,note_published,note_share_selected,recipient_ids,author,created
@@ -790,7 +790,7 @@ def care_directory(search='', service='', status='', from_date='', to_date='', p
         # Equal disclosed names never establish that two people are one patient.
         # The account key stays server-side and never enters the directory response.
         key = ('shared', item.patient, name) if name else ('encounter', item.id)
-        group = groups.setdefault(key, {'id': item.id, 'patient_label': name or 'Private patient',
+        group = groups.setdefault(key, {'id': item.id, 'patient_label': name or disclosure.get('alias') or 'Private patient',
                                         'encounters': [], 'last_consultation': None,
                                         'next_appointment': None, 'service_label': item.service_label,
                                         'state': item.state, 'disclosure': disclosure,
@@ -834,7 +834,7 @@ def care_patient_record(appointment):
             (clinician, item.patient, shared_name))
     else:
         matches = [{'id': item.id}]
-    return {'patient_label': shared_name or 'Private patient',
+    return {'patient_label': shared_name or disclosure.get('alias') or 'Private patient',
             'encounters': [appointment_detail(row['id']) for row in matches]}
 
 

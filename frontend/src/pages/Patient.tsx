@@ -1,4 +1,5 @@
-import {clearReturn} from '../guest-intent';
+import {discoveryFilters} from '../care-intent';
+import {clearReturn,returnIntent} from '../guest-intent';
 import {FileSharingChoice} from '../components/EncounterFiles';
 import PublicDirectory from './PublicDirectory';
 import {Avatar} from "../components/ProfilePhoto";
@@ -169,6 +170,8 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
   const offering = offeringOverride || route.offering;
   const { session } = useSession();
   const navigate = useNavigate();
+  const selectedIntent=returnIntent();
+  const [careLanguage,setCareLanguage]=useState(selectedIntent?.kind==='offering'?selectedIntent.language||discoveryFilters().language:discoveryFilters().language);
   const [selectedDate, setSelectedDate] = useState("");
   const [calendarFrom, setCalendarFrom] = useState("");
   const [displayZone, setDisplayZone] = useState("Africa/Addis_Ababa");
@@ -218,10 +221,13 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
   if (!data) return <Skeleton />;
   if (!data.offer)
     return <EmptyState title="This service is no longer available." />;
+  const requiredFormat=selectedIntent?.kind==='offering'?selectedIntent.format:undefined;
+  if(requiredFormat&&requiredFormat!==data.calendar.format)return <InlineNotice tone="danger">{w('Your selected consultation format is no longer available. Review your filters before continuing.')} <Link to="/care">{w('Find care')}</Link></InlineNotice>;
   const offer: Offer = data.offer;
+  const selectedLanguage=careLanguage||(offer.care_languages?.length===1?offer.care_languages[0]:'');
   return (
     <div className={step === 1 ? "booking-sharing-flow" : "reference-booking"} data-tour-unsaved={Boolean(start||request)||undefined}>
-      <section className="guided-content">
+      <section className="guided-content"><Select label={w("Care language")} value={selectedLanguage} onChange={event=>setCareLanguage(event.target.value)}><option value="">{w("Choose a language")}</option>{offer.care_languages?.map(value=><option key={value} value={value}>{({en:'English',am:'አማርኛ',om:'Afaan Oromo'})[value]}</option>)}</Select>
         <Link className="text-link" to="/patient/discovery">
           Back to Find care
         </Link>
@@ -325,6 +331,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
                     offering: offer.id,
                     start,
                     booked_timezone: displayZone,
+                    care_language:selectedLanguage||undefined,expected_format:data.calendar.format,
                     request_text: request,
                     sharing,
                     expected_price: offer.price,
