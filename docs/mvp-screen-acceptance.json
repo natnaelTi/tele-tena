@@ -15544,5 +15544,167 @@
       "status": "Blocked by stated external dependency",
       "action": "Physical-device calls/PWA installation, native-language review, live SMS/email receipt, medical-lead/clinical/legal approval and real-money activation remain separately gated; no Selfmade change."
     }
+  },
+  "guest_first_revision": {
+    "approved_direction": "17 October 2026; requested18October",
+    "baseline": "6c7e30ad911d6c4f143e7debed68c200cbbb1227",
+    "scope": "Mental-health MVP; no new architecture or future modules",
+    "requirements": [
+      {
+        "id": "GF01",
+        "references": [
+          "A01",
+          "C01",
+          "C02"
+        ],
+        "routes": [
+          "/",
+          "/care",
+          "/patient/discovery"
+        ],
+        "requirement": "Remove interpreted care-query entry; public allowlisted directory and reactive composable filters",
+        "functional_status": "Requested, verification pending",
+        "visual_status": "Requested, comparison pending",
+        "evidence": [],
+        "external_dependency": ""
+      },
+      {
+        "id": "GF02",
+        "references": [
+          "A04",
+          "A05",
+          "B01",
+          "B06",
+          "C05"
+        ],
+        "routes": [
+          "/sign-in",
+          "/onboarding",
+          "/patient/book/:offering"
+        ],
+        "requirement": "Intent-aware OTP/password, no role chooser, safe selected-offering return and account-role mismatch",
+        "functional_status": "Requested, verification pending",
+        "visual_status": "Requested, comparison pending",
+        "evidence": [],
+        "external_dependency": "Live SMS/email delivery requires consenting recipients"
+      },
+      {
+        "id": "GF03",
+        "references": [
+          "C02",
+          "C03",
+          "F02"
+        ],
+        "routes": [
+          "/care",
+          "/care/clinicians/:id",
+          "/clinician/*"
+        ],
+        "requirement": "One real presence/calendar/conflict availability projection; pulse/reduced motion; stale/error fallback",
+        "functional_status": "Requested, verification pending",
+        "visual_status": "Requested, comparison pending",
+        "evidence": [],
+        "external_dependency": ""
+      },
+      {
+        "id": "GF04",
+        "references": [
+          "D01",
+          "D02",
+          "D03",
+          "D04",
+          "D05",
+          "F03",
+          "F13"
+        ],
+        "routes": [
+          "/request",
+          "/patient/requests",
+          "/clinician/requests",
+          "/clinician/offers"
+        ],
+        "requirement": "Volatile guest request→auth→privacy→publish→private offers/funding/acceptance→authorized appointment",
+        "functional_status": "Requested, verification pending",
+        "visual_status": "Requested, comparison pending",
+        "evidence": [],
+        "external_dependency": "3–5 minutes is a target, not pilot evidence"
+      },
+      {
+        "id": "GF05",
+        "references": [
+          "C06",
+          "C07",
+          "H04",
+          "B03",
+          "B04"
+        ],
+        "routes": [
+          "/onboarding",
+          "/patient/book/:offering",
+          "/patient/account"
+        ],
+        "requirement": "Alias/text-history defaults only for new accounts; explicit immutable recipient/file sharing; revoke future access without erasing historical disclosure",
+        "functional_status": "Requested, verification pending",
+        "visual_status": "Requested, comparison pending",
+        "evidence": [],
+        "external_dependency": "Retention depth and production policies require governance approval"
+      },
+      {
+        "id": "GF06",
+        "references": [
+          "A06",
+          "B05",
+          "E03"
+        ],
+        "routes": [
+          "/onboarding",
+          "/policies/:kind",
+          "/patient/appointments"
+        ],
+        "requirement": "Versioned separate policy acknowledgements; truthful draft review content; booking state-aware notifications after durable commit",
+        "functional_status": "Requested, verification pending",
+        "visual_status": "Requested, comparison pending",
+        "evidence": [],
+        "external_dependency": "Approved production policy text; live provider receipt/device verification"
+      },
+      {
+        "id": "GF07",
+        "references": [
+          "E05",
+          "E07",
+          "E09",
+          "N01",
+          "N08",
+          "G01",
+          "G05",
+          "H08"
+        ],
+        "routes": [
+          "/consultation/:id/room",
+          "/patient/couples",
+          "/clinician/earnings"
+        ],
+        "requirement": "Regression gates: individual/couples consent/media/notes/finance, scheduler, privacy, PWA, migration",
+        "functional_status": "Requested, verification pending",
+        "visual_status": "Requested, comparison pending",
+        "evidence": [],
+        "external_dependency": "Physical devices and native Amharic/Afaan Oromo review"
+      },
+      {
+        "id": "GF08",
+        "references": [
+          "H08"
+        ],
+        "routes": [
+          "/patient/*",
+          "/clinician/*"
+        ],
+        "requirement": "Retain existing invitations; universal Invite proposal intentionally outside this revision pending owner decision",
+        "functional_status": "Requested, verification pending",
+        "visual_status": "Requested, comparison pending",
+        "evidence": [],
+        "external_dependency": "Owner optional review"
+      }
+    ]
   }
 }

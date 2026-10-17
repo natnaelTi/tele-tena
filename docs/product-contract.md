@@ -1,3 +1,16 @@
+## Guest-first MVP revision — approved17October2026
+
+The18October instruction supersedes the interpreted-care-query and account-type
+chooser entries below. AI care search and its natural-language bar move together
+to post-MVP. Public clinicians/services use an allowlisted eligible projection;
+selection returns through verified authentication to the chosen offering. Guest
+request text stays bounded in memory,not broadcast or stored before authenticated
+consent. Existing records/preferences remain unchanged. New-patient alias and text
+sharing are visible editable proposals;per-recipient encounter consent remains
+mandatory. Universal invitation expansion is not authorized by this revision.
+The sole screen matrix's guest_first_revision section tracks requested work and
+verification independently;historical acceptance evidence remains historical.
+
 # Agreed product contract
 
 ## MVP handover priority — 2026-10-08
