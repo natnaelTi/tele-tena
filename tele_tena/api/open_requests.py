@@ -997,7 +997,7 @@ def request_metrics():
         values = sorted(values)
         return values[min(len(values)-1, max(0, int((len(values)-1)*p + 0.999999)))]
     immediate = [req for req in requests if req.urgency == 'immediate']
-    first_offer, confirmed, both_joined, booked_to_joined = [], [], [], []
+    first_offer, confirmed, both_joined, booked_to_joined, guest_navigation, auth_navigation = [], [], [], [], [], []
     counts = {'matched': 0, 'unmatched': 0, 'expired': 0, 'cancelled': 0, 'open': 0,
               'failed_acceptance': 0, 'matched_under_3_minutes': 0,'matched_under_5_minutes':0, 'eligible_supply_total': 0, 'no_eligible_supply': 0}
     for req in immediate:
@@ -1007,6 +1007,8 @@ def request_metrics():
         counts['eligible_supply_total'] += int(supply[0].eligible_supply or 0) if supply else 0
         metrics = rows('SELECT event,occurred_at FROM tt_request_metric WHERE request_id=%s', (req.id,))
         events = {item.event: item.occurred_at for item in metrics}
+        for event,values in (('GuestStartClient',guest_navigation),('AuthStartClient',auth_navigation)):
+            if event in events:values.append(max(0,int((req.published_at-events[event]).total_seconds())))
         if 'FirstOffer' in events:
             first_offer.append(int((events['FirstOffer'] - req.published_at).total_seconds()))
         if req.state == 'Matched' and req.matched_at:
@@ -1035,6 +1037,7 @@ def request_metrics():
     counts['matched_within_3_minutes_percent'] = round(counts['matched_under_3_minutes'] * 100 / denominator, 2) if denominator else None
     counts['matched_within_5_minutes_percent']=round(counts['matched_under_5_minutes']*100/denominator,2) if denominator else None
     return {'synthetic_demo_only': True,'target_is_unvalidated':True,'target_window_seconds':[180,300], 'period_days': 90,
+            'client_reported_prepublication_seconds':{'guest':{'sample_count':len(guest_navigation),'median':median(guest_navigation) if guest_navigation else None},'auth_and_onboarding':{'sample_count':len(auth_navigation),'median':median(auth_navigation) if auth_navigation else None}},
             'seconds_from_confirmed_booking_to_both_joined':{'median':median(booked_to_joined) if booked_to_joined else None,'p90':percentile(booked_to_joined,.9)},
             'immediate_outcomes': counts,
             'seconds_to_first_offer': {'median': median(first_offer) if first_offer else None, 'p90': percentile(first_offer,.9)},

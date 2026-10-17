@@ -2053,6 +2053,8 @@ class Presentation(unittest.TestCase):
             frappe.db.sql('RELEASE SAVEPOINT ' + savepoint)
 
     def test_immediate_request_policy_is_explicit_and_site_scoped(self):
+        fixtures.login('c1')
+        journey.save_profile('clinician','Synthetic clinician',1,languages=['en'])
         offering = fixtures.Integration.offers['c1']
         self.make_schedule(offering=offering)
         fixtures.login('c1')

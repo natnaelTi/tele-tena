@@ -81,6 +81,24 @@ class GuestFirst(unittest.TestCase):
   self.assertEqual(frappe.db.sql("SELECT COUNT(*) FROM tt_journal WHERE event_ref=%s",('booking:'+id,))[0][0],1)
   self.assertEqual(booking_notifications.preferences(),{'email_enabled':False,'sms_enabled':False})
   self.assertEqual(len(booking_notifications.notices()),1)
+ def test_public_presence_capacity_and_expiry_are_distinct(self):
+  from datetime import timedelta
+  from tele_tena.api import open_requests
+  offer=self.offer();clinician=offer.clinician
+  frappe.set_user(clinician)
+  with patch.dict(frappe.conf,tele_tena_demo_immediate_care_enabled=True):
+   scheduling.save_schedule(offer.id,'Fictional readiness test','Africa/Addis_Ababa','video','automatic',0,60,0,0,
+      [{'weekday':day,'start':'00:00','end':'23:59'} for day in range(7)],[],'Published')
+   self.assertTrue(open_requests.set_request_presence(True)['ready'])
+   frappe.set_user('Guest');self.assertTrue(directory.availability(offer.id)['available_now'])
+   frappe.db.sql('UPDATE tt_clinician_request_presence SET expires_at=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND WHERE clinician=%s',(clinician,))
+   self.assertFalse(directory.availability(offer.id)['available_now'])
+   frappe.set_user(clinician);open_requests.set_request_presence(True)
+   schedules=scheduling.schedules();current=next(item for item in schedules if item.offering==offer.id)
+   # A still-fresh lease does not override loss of calendar capacity.
+   frappe.db.sql('DELETE FROM tt_schedule_rule WHERE schedule_id=%s',(current.id,))
+   frappe.set_user('Guest');status=directory.availability(offer.id)
+   self.assertFalse(status['available_now']);self.assertEqual(status['state'],'capacity_paused')
  def test_booking_revalidates_selected_language_and_format(self):
   offer=self.offer();slot=scheduling.calendar(offer.id)['days'][0]['slots'][0]
   for extra in ({'care_language':'unsupported'},{'expected_format':'unsupported'}):
