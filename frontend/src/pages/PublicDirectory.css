@@ -1,1 +1,3 @@
 .public-directory{max-width:1340px;margin:auto;padding:32px}.availability-radar{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--text-secondary,#52636a);margin:8px 0}.availability-radar i{width:10px;height:10px;background:#647774;border-radius:50%;flex-shrink:0}.availability-radar.ready{color:#176443}.availability-radar.ready i{background:#176443;box-shadow:0 0 0 5px #17644316;animation:care-pulse 3s ease-in-out infinite}@keyframes care-pulse{50%{box-shadow:0 0 0 9px #17644308}}@media(prefers-reduced-motion:reduce){.availability-radar.ready i{animation:none}}@media(max-width:600px){.public-directory{padding:20px 16px}}
+
+.public-directory .offering-grid{grid-template-columns:minmax(0,1fr)}

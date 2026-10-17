@@ -60,4 +60,4 @@
 .request-presence-shell .compact-button { min-height:44px; margin-top:2px; }
 .request-presence-shell > .notice { margin:0; }
 .clinician-facts > span { display:inline-flex; align-items:center; gap:6px; }
-.reference-clinician-card .clinician-description { margin:14px 0 0; color:var(--muted); }
+.reference-clinician-card .clinician-description { margin:14px 0 0; color:var(--muted); display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }

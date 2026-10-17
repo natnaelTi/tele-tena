@@ -84,7 +84,7 @@ class GuestFirst(unittest.TestCase):
  def test_public_presence_capacity_and_expiry_are_distinct(self):
   from datetime import timedelta
   from tele_tena.api import open_requests
-  offer=self.offer();clinician=offer.clinician
+  offer=self.offer();clinician=frappe.db.sql('SELECT clinician FROM tt_offering WHERE id=%s',(offer.id,))[0][0]
   frappe.set_user(clinician)
   with patch.dict(frappe.conf,tele_tena_demo_immediate_care_enabled=True):
    scheduling.save_schedule(offer.id,'Fictional readiness test','Africa/Addis_Ababa','video','automatic',0,60,0,0,
