@@ -1,5 +1,5 @@
 import {OfferAcceptance} from '../components/OfferAcceptance';
-import {guestDraft} from '../guest-intent';
+import {guestDraft,clearGuestDraft,rememberReturn} from '../guest-intent';
 import {Avatar} from "../components/ProfilePhoto";
 import "./RequestWorkspace.css";
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -39,6 +39,7 @@ export function PatientOpenRequests(){
   const location=useLocation();
   const requestDraft=guestDraft()||(location.state as {requestDraft?:{request_text?:string;service?:string;service_label?:string;language?:string;format?:'audio'|'video'}}|null)?.requestDraft;
   const {session}=useSession();
+
   const services=useResource(loadServices);
   const requestResource=usePolling<PatientRequest[]>(()=>journeyApi.myRequests());
 
@@ -72,6 +73,7 @@ export function PatientOpenRequests(){
     if(!service||!narrative.trim())throw new Error('Add a service and a short description first.');
     const payload={service,request_text:narrative,urgency,language,consultation_format:format,sharing,retry_key:requestKey,timezone_name:Intl.DateTimeFormat().resolvedOptions().timeZone||'Africa/Addis_Ababa',earliest_start:urgency==='scheduled'?new Date(earliest).toISOString():null,latest_start:urgency==='scheduled'?new Date(latest).toISOString():null,max_price_minor:maxPrice?etbToMinor(maxPrice):null};
     let publication:any;try{publication=await journeyApi.publishRequest(payload)}catch(error){if((error as any)?.code!=='request_retry_changed')throw error;const retry=freshRequestKey();setRequestKey(retry);publication=await journeyApi.publishRequest({...payload,retry_key:retry})}
+    clearGuestDraft();rememberReturn({kind:'request',ref:publication.id});
     setPublicationMessage(publication?.eligible_supply===0&&urgency==='immediate'
       ?`${w('No eligible clinician can start within')} ${publication.start_window_minutes||30} ${w('minutes. You can keep waiting, schedule for later, or browse clinicians. Your requirements will not change automatically.')}`
       :publication?.eligible_supply===0?w('Your request is saved, but no clinicians currently meet every selected requirement. Keep waiting or browse available clinicians.')

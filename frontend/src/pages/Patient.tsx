@@ -1,3 +1,4 @@
+import {clearReturn} from '../guest-intent';
 import {FileSharingChoice} from '../components/EncounterFiles';
 import PublicDirectory from './PublicDirectory';
 import {Avatar} from "../components/ProfilePhoto";
@@ -195,7 +196,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
   const [previewError,setPreviewError]=useState(false);
   const wallet=useResource(journeyApi.wallet);
   useEffect(()=>{
-    if(step!==1||!request.trim()) return;
+    if(step!==1) return;
     let active=true;
     setPreviewError(false);
     const timer=setTimeout(()=>{
@@ -341,7 +342,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
                     ...(bookingLinkToken ? { booking_link_token: bookingLinkToken } : {}),
                     retry_key: key,
                   });
-                  navigate("/patient/booked/"+booked.id);
+                  clearReturn();navigate("/patient/booked/"+booked.id);
                 }, "")
               }/>
         )}

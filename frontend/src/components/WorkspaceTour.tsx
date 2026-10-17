@@ -8,7 +8,7 @@ import { useLocale } from "../hooks/useLocale";
 type TourStep={title:string;text:string;path:string;target:string};
 const routes:Record<string,{id:string;steps:TourStep[]}>={
   patient:{id:"patient-home",steps:[
-    {title:"Find care",text:"Search and filter available clinician services.",path:"/patient/discovery",target:"patient-discovery"},
+    {title:"Find care",text:"Browse approved clinicians and services. Filters update results immediately.",path:"/patient/discovery",target:"patient-discovery"},
     {title:"Choose a time",text:"Pick an open slot, review what you’ll share and confirm the price.",path:"/patient/discovery",target:"patient-discovery"},
     {title:"Private requests",text:"Post what you need, compare private offers and choose before funds are reserved.",path:"/patient/requests",target:"patient-private-requests"},
     {title:"Appointments",text:"Review upcoming sessions, requests and past consultations.",path:"/patient/appointments",target:"patient-appointments"},

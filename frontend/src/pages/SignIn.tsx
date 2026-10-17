@@ -1,5 +1,5 @@
 import {journeyApi} from '../journey-api';
-import {returnPath} from '../guest-intent';
+import {returnPath,rememberReturn} from '../guest-intent';
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, LockKeyhole } from "lucide-react";
@@ -110,6 +110,9 @@ export default function SignIn() {
     });
   }
   async function proceed() {
+    const directNext=params.get('next')||'';
+    const selected=/^\/patient\/book\/([a-f0-9-]{36})$/.exec(directNext);
+    if(selected)rememberReturn({kind:'offering',ref:selected[1]});
     const current = await refresh();
     const pending=returnPath();
     if(pending&&params.get("intent")!=="clinician"){

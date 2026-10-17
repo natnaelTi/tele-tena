@@ -983,9 +983,9 @@ def request_metrics():
         values = sorted(values)
         return values[min(len(values)-1, max(0, int((len(values)-1)*p + 0.999999)))]
     immediate = [req for req in requests if req.urgency == 'immediate']
-    first_offer, confirmed, both_joined = [], [], []
+    first_offer, confirmed, both_joined, booked_to_joined = [], [], [], []
     counts = {'matched': 0, 'unmatched': 0, 'expired': 0, 'cancelled': 0, 'open': 0,
-              'failed_acceptance': 0, 'matched_under_3_minutes': 0, 'eligible_supply_total': 0, 'no_eligible_supply': 0}
+              'failed_acceptance': 0, 'matched_under_3_minutes': 0,'matched_under_5_minutes':0, 'eligible_supply_total': 0, 'no_eligible_supply': 0}
     for req in immediate:
         supply = rows("SELECT eligible_supply FROM tt_request_metric WHERE request_id=%s AND event='Published' LIMIT 1", (req.id,))
         if supply and supply[0].eligible_supply is not None and int(supply[0].eligible_supply) == 0:
@@ -999,6 +999,7 @@ def request_metrics():
             counts['matched'] += 1
             delay = int((req.matched_at - req.published_at).total_seconds())
             confirmed.append(delay)
+            if delay<=300:counts['matched_under_5_minutes']+=1
             if delay <= 180:
                 counts['matched_under_3_minutes'] += 1
         elif req.state == 'Expired':
@@ -1010,13 +1011,17 @@ def request_metrics():
         if any(item.event == 'AcceptFailed' for item in metrics):
             counts['failed_acceptance'] += 1
         if 'ParticipantJoinedPatient' in events and 'ParticipantJoinedClinician' in events:
-            both_joined.append(int((max(events['ParticipantJoinedPatient'], events['ParticipantJoinedClinician']) - req.published_at).total_seconds()))
+            joined=max(events['ParticipantJoinedPatient'],events['ParticipantJoinedClinician'])
+            both_joined.append(int((joined-req.published_at).total_seconds()))
+            if req.matched_at:booked_to_joined.append(int((joined-req.matched_at).total_seconds()))
     denominator = len(immediate)
     counts['unmatched'] = counts['expired'] + counts['cancelled'] + counts['open']
     counts['immediate_total'] = denominator
     counts['average_eligible_supply'] = counts['eligible_supply_total'] / denominator if denominator else None
     counts['matched_within_3_minutes_percent'] = round(counts['matched_under_3_minutes'] * 100 / denominator, 2) if denominator else None
-    return {'synthetic_demo_only': True, 'period_days': 90,
+    counts['matched_within_5_minutes_percent']=round(counts['matched_under_5_minutes']*100/denominator,2) if denominator else None
+    return {'synthetic_demo_only': True,'target_is_unvalidated':True,'target_window_seconds':[180,300], 'period_days': 90,
+            'seconds_from_confirmed_booking_to_both_joined':{'median':median(booked_to_joined) if booked_to_joined else None,'p90':percentile(booked_to_joined,.9)},
             'immediate_outcomes': counts,
             'seconds_to_first_offer': {'median': median(first_offer) if first_offer else None, 'p90': percentile(first_offer,.9)},
             'seconds_to_confirmed_match': {'median': median(confirmed) if confirmed else None, 'p90': percentile(confirmed,.9)},
