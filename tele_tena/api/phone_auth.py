@@ -103,6 +103,7 @@ def reserve_sms_budget(now):
         WHERE purpose IN ('contact_phone','patient_signup','clinician_application','login')
         AND dispatch_state IN ('Sending','Accepted','Rejected','Uncertain')
         AND created>%s''', (now - timedelta(hours=24),))[0][0]
+    used += int(frappe.db.sql("SELECT COALESCE(SUM(attempts),0) FROM tt_booking_notice WHERE channel='sms' AND created>%s",(now-timedelta(hours=24),))[0][0])
     # The caller inserts and commits Sending while still holding tt_otp_gate.
     return used < cap
 

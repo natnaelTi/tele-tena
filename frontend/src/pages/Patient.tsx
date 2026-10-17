@@ -1,23 +1,22 @@
+import {FileSharingChoice} from '../components/EncounterFiles';
+import PublicDirectory from './PublicDirectory';
 import {Avatar} from "../components/ProfilePhoto";
 import { PatientCareLinks } from "../components/PatientCareLinks";
 import PaymentActivity from "../components/PaymentActivity";
-import { careSearchScore } from "../care-search";
 import { AddFundsDialog } from "../components/AddFundsDialog";
 import { BookingReview } from "../components/BookingReview";
 import { appointmentDisplayGroups, appointmentsForView, type AppointmentView } from "../appointment-groups";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowRight, Search, MessageCircle, Sparkles, LockKeyhole } from "lucide-react";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { ArrowRight, Sparkles } from "lucide-react";
 import "./PatientJourney.css";
 import { WalletSummary } from "../components/WalletSummary";
 import { BookingCalendar } from "../components/BookingCalendar";
-import { pendingCareQuery, rememberCareQuery, discoveryFilters, rememberDiscoveryFilters } from "../care-intent";
 import { journeyApi } from "../journey-api";
 import type { Disclosure, Offer } from "../journey-api";
 import {
   AppointmentCard,
   HomeAppointmentPreview,
-  ClinicianCard,
   DisclosurePreview,
   PageTitle,
   date,
@@ -45,8 +44,7 @@ export function PatientHome() {
   const wallet = useResource(journeyApi.wallet);
   const requests = useResource(journeyApi.myRequests);
   const previousClinicians = useResource(journeyApi.previousClinicians);
-  const [query, setQuery] = useState("");
-  const navigate = useNavigate();
+  const query = "";
   const upcoming = appointments.data?.filter(a => a.state === "Booked" && a.call_state !== "Ended" && new Date(a.end).getTime() > now)
     .sort((a,b) => new Date(a.start).getTime() - new Date(b.start).getTime());
   return (
@@ -57,24 +55,7 @@ export function PatientHome() {
       />
       <div className="patient-dashboard-layout"><section className="patient-dashboard-primary">
       <section className="patient-home-hero"><h2>{w("A little space")}<br />{w("for yourself.")}</h2><p>{w("Find the right support for today.")}</p>
-      <section className="care-search patient-home-search">
-        <h3 className="sr-only">{w("What would you like help with?")}</h3>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            rememberCareQuery(query);
-            navigate("/patient/discovery");
-          }}
-        >
-          <TextField
-            label="Search available support"
-            placeholder="Try a service or clinician’s name"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <Button type="submit" variant="secondary" aria-label={w("Find care")}><Search size={20}/></Button>
-        </form>
-      </section></section>
+      <Link className="button" to="/patient/discovery">{w("Find care")} <ArrowRight size={18}/></Link></section>
       <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
       {!!requests.data?.some((item:any)=>item.state==='Open')&&<section className="active-request-summary"><div className="section-line"><h2>Active care requests</h2><Link to="/patient/requests">Review requests and offers <ArrowRight size={16}/></Link></div>{requests.data.filter((item:any)=>item.state==='Open').slice(0,3).map((item:any)=><Link className="active-request-row" key={item.id} to={'/patient/requests/'+encodeURIComponent(item.id)}><span>{item.urgency==='immediate'?'As soon as possible':'Schedule for later'} · {item.category}</span><strong>{item.offers.filter((offer:any)=>offer.state==='Active').length} new offers</strong></Link>)}</section>}
       <section className="patient-dashboard-panel">
@@ -134,140 +115,7 @@ export function PatientHome() {
     </>
   );
 }
-export function Discovery() {
-  const routeLocation=useLocation();
-  const navigate = useNavigate();
-  const { w } = useLocale();
-  const offers = useResource(journeyApi.discover);
-  const services = useResource(journeyApi.services);
-  const [category, setCategory] = useState(discoveryFilters().category);
-  const [sort, setSort] = useState("relevance");
-  const [languageFilter, setLanguageFilter] = useState(discoveryFilters().language);
-  const [formatFilter, setFormatFilter] = useState(discoveryFilters().format);
-  const [availabilityFilter, setAvailabilityFilter] = useState(discoveryFilters().availability);
-  const [availableOfferIds, setAvailableOfferIds] = useState<Set<string> | null>(null);
-  const [availabilityError, setAvailabilityError] = useState(false);
-  const [query, setQuery] = useState(
-    pendingCareQuery(),
-  );
-  useEffect(() => {
-    // Retire legacy care-query URLs without retaining their text in history.
-    if (new URLSearchParams(routeLocation.search).has("q")) {
-      navigate(routeLocation.pathname, { replace: true });
-    }
-  }, [routeLocation.pathname, routeLocation.search, navigate]);
-  useEffect(() => {
-    rememberCareQuery(query);
-  }, [query]);
-  useEffect(() => {
-    if (availabilityFilter !== "next14" || !offers.data) return;
-    let active = true;
-    const checkAvailability = async () => {
-      const today = new Date();
-      const fromDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
-      const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Africa/Addis_Ababa";
-      const available = new Set<string>();
-      try {
-        for (let offset=0; offset<offers.data!.length; offset+=5) {
-          const batch = offers.data!.slice(offset, offset+5);
-          const results = await Promise.all(batch.map(async offer => {
-            const calendar = await journeyApi.calendar(offer.id, fromDate, zone, 14);
-            return {id:offer.id, hasOpenSlot:calendar.days.some(day=>day.slots.length>0)};
-          }));
-          results.filter(result=>result.hasOpenSlot).forEach(result=>available.add(result.id));
-        }
-        if (active) setAvailableOfferIds(available);
-      } catch {
-        if (active) {
-          setAvailabilityError(true);
-        }
-      }
-    };
-    void checkAvailability();
-    return () => { active = false; };
-  }, [availabilityFilter, offers.data]);
-  useEffect(() => { rememberDiscoveryFilters({ category, language: languageFilter, format: formatFilter, availability: availabilityFilter }); }, [category, languageFilter, formatFilter, availabilityFilter]);
-  const availabilityBusy = availabilityFilter === "next14" && !!offers.data && !availableOfferIds && !availabilityError;
-  const relevance=(offer:Offer)=>{const definition=services.data?.find(item=>item.label===offer.service_category);return careSearchScore(query,[offer.display_name,offer.label,offer.service_category||"",offer.description||"",definition?.synonyms||"",definition?.service_label_am||"",definition?.service_label_om||""]);};
-  const shown = offers.data?.filter(
-    (offer) =>
-      (!category || offer.service_category === category) &&
-      (!languageFilter || offer.care_languages?.includes(languageFilter as "en"|"am"|"om")) &&
-      (!formatFilter || offer.consultation_format === formatFilter) &&
-      (availabilityFilter !== "next14" || !!availableOfferIds?.has(offer.id)) &&
-      relevance(offer)>0,
-  )?.sort((a,b)=>sort === "price" ? a.price-b.price || relevance(b)-relevance(a) : relevance(b)-relevance(a));
-  const requestDraft={request_text:query,service_label:category,language:languageFilter||undefined,format:formatFilter||undefined};
-  const [resultsMode,setResultsMode]=useState(()=>Boolean(pendingCareQuery().trim()||discoveryFilters().category||discoveryFilters().language||discoveryFilters().format||discoveryFilters().availability));
-  const searchInput=useRef<HTMLInputElement>(null);
-  const [refineOpen,setRefineOpen]=useState(()=>window.matchMedia("(min-width:801px)").matches);
-  useEffect(()=>{const media=window.matchMedia("(min-width:801px)");const sync=()=>setRefineOpen(media.matches);media.addEventListener("change",sync);return()=>media.removeEventListener("change",sync);},[]);
-  const filterControls=(
-      <div className="discovery-filters">
-        <Select
-          label={w("Service")}
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="">{w("All services")}</option>
-          {services.data?.map((service) => (
-            <option key={service.id}>{service.label}</option>
-          ))}
-        </Select>
-        <Select label={w("Care language")} value={languageFilter} onChange={e=>setLanguageFilter(e.target.value)}>
-          <option value="">{w("Any language")}</option><option value="en">English</option><option value="am">አማርኛ</option><option value="om">Afaan Oromo</option>
-        </Select>
-        <Select label={w("Session format")} value={formatFilter} onChange={e=>setFormatFilter(e.target.value)}>
-          <option value="">{w("Any format")}</option><option value="video">{w("Video")}</option><option value="audio">{w("Audio")}</option>
-        </Select>
-        <Select label={w("Availability")} value={availabilityFilter} onChange={e=>{setAvailabilityFilter(e.target.value);setAvailableOfferIds(null);setAvailabilityError(false);}}>
-          <option value="">{w("Any date")}</option><option value="next14">{w("Open times in the next 14 days")}</option>
-        </Select>
-      </div>  );
-  const searchControls=(<>      <form className="discovery-search" onSubmit={event => { event.preventDefault(); rememberCareQuery(query);setResultsMode(Boolean(query.trim()||category||languageFilter||formatFilter||availabilityFilter));requestAnimationFrame(()=>searchInput.current?.focus()); }}><Search size={20} /><label className="sr-only" htmlFor="discovery-care-query">Clinician or service</label><input ref={searchInput} id="discovery-care-query" placeholder={w("Search available care")} value={query} onChange={event => setQuery(event.target.value)} /><Button type="submit">{w("Search")}</Button></form>
-      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers without changing your filters.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft}}>{w("Post a request")} <ArrowRight size={16} /></Link></section></>);
-  return (
-    <section className={resultsMode?"matching-results-page":""}>
-      <PageTitle
-        eyebrow={resultsMode?undefined:w("CARE THAT FITS YOU")}
-        title={w(resultsMode?"Your matching clinicians":"What’s on your mind?")}
-        description={w(resultsMode?"Choose from approved services that fit your selections.":"You don’t need the right words. Start with what you’re feeling.")}
-      />
-      {resultsMode&&searchControls}
-      <div className={`discovery-layout ${resultsMode?"discovery-matching-layout":""}`}><section className="discovery-primary">
-      {!resultsMode&&searchControls}
-      {!resultsMode&&filterControls}
-
-      {!!offers.data && !availabilityBusy && <div className="discovery-results-heading"><p role="status" aria-live="polite">{shown?.length || 0} {w(shown?.length === 1 ? "available service" : "available services")}</p><Select label={w("Sort services")} value={sort} onChange={event=>setSort(event.target.value)}><option value="relevance">{w("Best fit")}</option><option value="price">{w("Lowest price")}</option></Select></div>}
-      {availabilityError&&<InlineNotice tone="danger">{w("Available times could not be checked. Clear this filter or try again.")}</InlineNotice>}
-      {offers.error ? (
-        <InlineNotice tone="danger">
-          Care options could not be loaded.{" "}
-          <Button onClick={() => void offers.refresh()}>Try again</Button>
-        </InlineNotice>
-      ) : !offers.data ? (
-        <Skeleton />
-      ) : availabilityError ? (
-        <InlineNotice tone="danger">{w("Available times could not be checked. Clear this filter or try again.")} <Button variant="secondary" onClick={() => { setAvailabilityFilter(""); setAvailableOfferIds(null); setAvailabilityError(false); }}>{w("Clear availability filter")}</Button></InlineNotice>
-      ) : availabilityBusy ? (
-        <p role="status" className="supporting">{w("Checking open times in the next 14 days…")}</p>
-      ) : shown?.length ? (
-        <div className="offering-grid">
-          {shown.map((offer) => (
-            <ClinicianCard key={offer.id} offer={offer} />
-          ))}
-        </div>
-        ) : (
-        <EmptyState title="No matching services yet.">
-          Try another search or return when more approved offerings are
-          available. <Link to="/patient/requests" state={{requestDraft}}>Post a private request</Link> without relaxing your preferences.
-        </EmptyState>
-      )}
-      <p className="supporting">{w("Matching helps you find a professional. It is not a diagnosis.")}</p>
-      </section><aside className="discovery-aside">{resultsMode?<Card className="discovery-refine-card"><details open={refineOpen} onToggle={event=>setRefineOpen(event.currentTarget.open)}><summary><h2>{w("Refine your care")}</h2></summary><div>{filterControls}<InlineNotice>{w("Approval, language and format determine eligible services. Open times are checked before booking.")}</InlineNotice></div></details></Card>:<><section className="discovery-request-aside"><span className="discovery-request-icon" aria-hidden="true"><MessageCircle size={24}/></span><h2>{w("Someone to talk to. A choice that’s yours.")}</h2><p>{w("Tell us what you need. Available clinicians can respond with a session time and a clear fee.")}</p><Link className="button" to="/patient/requests" state={{requestDraft}}>{w("Post a private request")}</Link><p className="supporting">{w("Your request is only shown to eligible clinicians.")}</p></section><p className="discovery-privacy supporting"><LockKeyhole size={18} aria-hidden="true"/>{w("Your name and personal details stay private until you choose to share them.")}</p></>}</aside></div>
-    </section>
-  );
-}
+export function Discovery(){return <PublicDirectory/>;}
 export function Appointments({ base = "/patient" }: { base?: string }) {
   const {w,locale} = useLocale();
   const resource = useResource(journeyApi.appointments);
@@ -340,6 +188,8 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
   const [sharing, setSharing] = useState({
     name: !!session?.profile?.share_name,
     history: !!session?.profile?.share_history,
+    files: [] as string[],
+    alias: session?.profile?.care_alias||"",
   });
   const [preview, setPreview] = useState<Disclosure | null>(null);
   const [previewError,setPreviewError]=useState(false);
@@ -402,7 +252,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
         {step === 1 && (
           <section className="booking-sharing-panel">
             <label className="field">
-              What would you like to talk about?
+              Anything you would like your clinician to know? (optional)
               <textarea
                 rows={4}
                 maxLength={2000}
@@ -432,14 +282,16 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
                 setPreview(null);
               }}
             />
+            <TextField label={w('Alias for this appointment')} value={sharing.alias} disabled={sharing.name} onChange={event=>{setSharing({...sharing,alias:event.target.value});setPreview(null);}}/>
+            <FileSharingChoice selected={sharing.files} onChange={files=>{setSharing({...sharing,files});setPreview(null);}}/>
             <p className="supporting">
               These choices apply to this booking. Your profile defaults stay
               the same.
             </p>
-            {request.trim()&&(previewError?<InlineNotice tone="danger">{w("The disclosure preview could not be loaded. Try Preview and continue again.")}</InlineNotice>:preview?<DisclosurePreview disclosure={preview}/>:<Skeleton/>)}
+            {(previewError?<InlineNotice tone="danger">{w("The disclosure preview could not be loaded. Try Preview and continue again.")}</InlineNotice>:preview?<DisclosurePreview disclosure={preview}/>:<Skeleton/>)}
             <Button
               loading={action.busy}
-              disabled={!request.trim()}
+              disabled={false}
               onClick={() =>
                 void action.run(async () => {
                   const result = await journeyApi.preview(request, sharing);

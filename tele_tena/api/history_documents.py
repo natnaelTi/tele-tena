@@ -98,5 +98,8 @@ def download(id):
 
 @query('POST')
 def remove(id):
-    patient=owner();frappe.db.sql('DELETE FROM tt_history_document WHERE id=%s AND patient=%s',(id,patient))
+    patient=owner()
+    from tele_tena.api.encounter_files import revoke
+    for grant in rows('SELECT id FROM tt_history_grant WHERE patient=%s AND document_id=%s AND revoked_at IS NULL',(patient,id)):revoke(grant.id)
+    frappe.db.sql('DELETE FROM tt_history_document WHERE id=%s AND patient=%s',(id,patient))
     return {'removed':True}

@@ -2,12 +2,12 @@ import { api } from './api'
 import { clearCareQuery } from './care-intent'
 
 type Sharing = { name: boolean; history: boolean }
-export type Profile = { kind: 'patient' | 'clinician'; display_name: string; history: string; share_name: boolean; share_history: boolean; languages?: string; introduction?: string }
+export type Profile = {care_alias?:string; kind: 'patient' | 'clinician'; display_name: string; history: string; share_name: boolean; share_history: boolean; languages?: string; introduction?: string }
 export type Session = {display_name?:string; photo?: {url:string|null;published:boolean}; user: string; roles: string[]; profile: Profile | null; csrf_token: string; simulation: boolean; clinic_workspace?: boolean; clinic_schedule_workspace?: boolean }
 export type Service = { id: string; label: string; description?:string; synonyms?:string; service_label_am?:string; service_label_om?:string }
-export type Offer = { photo_url?:string|null; participant_structure?: 'individual'|'couple'; id: string; clinician_id:string; display_name: string; label: string; description?: string; service_category?: string; price: number; minutes: number; care_languages?: ('en'|'am'|'om')[]; schedule_id?: string | null; schedule_timezone?: string | null; consultation_format?: 'video' | 'audio' }
+export type Offer = { availability?:import('./pages/PublicDirectory').Availability; photo_url?:string|null; participant_structure?: 'individual'|'couple'; id: string; clinician_id:string; display_name: string; label: string; description?: string; service_category?: string; price: number; minutes: number; care_languages?: ('en'|'am'|'om')[]; schedule_id?: string | null; schedule_timezone?: string | null; consultation_format?: 'video' | 'audio' }
 export type Application = { application_id?:string; user: string; display_name: string; statement: string; application_profile?: Record<string,string|number|null>; status: 'Pending' | 'Approved' | 'Rejected'; requested_services?: string[]; requested_service_labels?:string[]; resume_uploaded?: boolean; resume_size?: number; submission_date_available?: boolean; submitted_at?: string | null; evidence_complete?: boolean; verified_contacts?: {channel: string; contact: string; verified_at: string}[] }
-export type Disclosure = { request: string; name?: string; history?: string }
+export type Disclosure = { request: string; name?: string; alias?:string; history?: string; history_sha256?:string;disclosure_version?:string;files?:{id:string;filename:string;content_sha256:string}[] }
 export type Appointment = { id: string; start: string; end: string; state: string; price: number; minutes: number; service_label: string; disclosure: Disclosure; timezone?: string | null; consultation_format?: string; confirmation_mode?: string; expires_at?: string | null; confirmed_at?: string | null; cancelled_by?: string | null; cancelled_at?: string | null; cancel_reason?: string | null; call_state?: string; call_ended?: string | null; documentation_state?: string | null; display_identity?:string }
 export type Window = { start: string; end: string }
 export type TimeSlot = {start: string; end: string; local_time: string; timezone: string; schedule_timezone: string | null}
@@ -98,7 +98,7 @@ export const journeyApi = {
   submitOffer: (data: Record<string, unknown>) => api<any>('tele_tena.api.open_requests.submit_offer', data, true),
   withdrawOffer: (offer_id: string) => api<any>('tele_tena.api.open_requests.withdraw_offer', {offer_id}, true),
   recordOfferAcceptFailure: (request_id:string,offer_id:string,attempt_key:string,reason:string) => api<any>('tele_tena.api.open_requests.record_accept_failure',{request_id,offer_id,attempt_key,reason},true),
-  publicClinician: (clinician_id:string) => api<any>('tele_tena.api.open_requests.clinician_profile',{clinician_id}),
+  publicClinician: (clinician_id:string) => api<any>('tele_tena.api.directory.clinician',{clinician_id}),
   scopeApplicationContext: () => api<any>('tele_tena.api.vetting.application_context'),
   saveScopeApplications: (services:string[], values:Record<string,unknown>, submit=false) => api<any>('tele_tena.api.vetting.save_scope_applications',{services,values,submit:submit?1:0},true),
   reviewServiceDefinition: (service:string,decision:string,reason:string) => api<any>('tele_tena.api.service_catalog.review_definition',{service,decision,reason},true),

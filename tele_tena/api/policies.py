@@ -1,0 +1,18 @@
+"""Review-mode version display. Not approved production legal policy content."""
+import uuid
+import frappe
+from tele_tena.api.journey import fail
+TERMS='terms-review-2026-10-17';PRIVACY='privacy-review-2026-10-17'
+
+@frappe.whitelist(allow_guest=True,methods=['GET'])
+def current():
+    return {'review_only':True,'terms_version':TERMS,'privacy_version':PRIVACY,
+      'notice':'Policy content is under review. This demonstration is not real clinical care or real payments. Approved production Terms and Privacy content is not yet available.',
+      'sharing_notice':'Only the identity, text and individual files you affirmatively approve for this encounter are shared with its treating clinician. Previously viewed material cannot be recalled.'}
+
+def record(user,answers):
+    if answers.get('terms_accepted') is not True or answers.get('privacy_acknowledged') is not True:
+        fail('Review the separate Terms and Privacy acknowledgements.','policy_ack_required')
+    if answers.get('terms_version')!=TERMS or answers.get('privacy_version')!=PRIVACY:fail('Policy versions changed;review them again.','policy_changed')
+    frappe.db.sql('''INSERT IGNORE INTO tt_policy_acceptance VALUES (%s,%s,%s,%s,1,1,%s,%s,1,UTC_TIMESTAMP(6))''',
+      (str(uuid.uuid4()),user,TERMS,PRIVACY,int(answers.get('consent') is True),int(answers.get('marketing') is True)))

@@ -1,3 +1,5 @@
+import {journeyApi} from '../journey-api';
+import {returnPath} from '../guest-intent';
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, LockKeyhole } from "lucide-react";
@@ -109,6 +111,12 @@ export default function SignIn() {
   }
   async function proceed() {
     const current = await refresh();
+    const pending=returnPath();
+    if(pending&&params.get("intent")!=="clinician"){
+      if(current?.profile?.kind==='patient'){navigate(pending,{replace:true});return;}
+      if(!current?.profile&&!current?.roles.some(role=>['Tele Tena Approver','Tele Tena Medical Lead','Tele Tena Clinician'].includes(role))){navigate('/onboarding?intent=patient',{replace:true});return;}
+      setError(w('You are signed in to a professional workspace. Use a patient account to continue; no patient role has been added.'));return;
+    }
     const next = params.get("next") || "";
     const inviteToken = (routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken || "";
     const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken||"";
@@ -149,7 +157,7 @@ export default function SignIn() {
       </p>
       {session && (
         <p>
-          <a href={destination(session)}>Return to your workspace</a>
+          <Link to={destination(session)}>{w("Return to your workspace")}</Link><Button variant="quiet" onClick={()=>void run(async()=>{await journeyApi.logout();await refresh();})}>{w("Sign out and use another account")}</Button>
         </p>
       )}
       {error && <InlineNotice tone="danger">{error}</InlineNotice>}

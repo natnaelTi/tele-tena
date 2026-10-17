@@ -85,16 +85,7 @@ def immediate_service_enabled(service):
 def _has_immediate_capacity(clinician, offerings):
     """Require a complete, conflict-free session in the current request window."""
     from tele_tena.api import scheduling
-    earliest = now()
-    latest = earliest + timedelta(minutes=immediate_window_minutes())
-    for item in offerings:
-        if not item.get('schedule_id') or not immediate_service_enabled(item):
-            continue
-        schedule = scheduling._schedule_for(item.id)
-        offer = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (item.id,))
-        if scheduling.immediate_start(schedule, offer, clinician, None, earliest, latest):
-            return True
-    return False
+    return any(scheduling.immediate_capacity(item.id) for item in offerings)
 
 
 def _eligible(request, exclude_delivered=True, limit=None):
@@ -305,6 +296,8 @@ def publish_request(service, request_text, urgency, language, consultation_forma
                  'immediate_care_unavailable')
     content = text(request_text, 2000)
     selected = journey.choices(sharing)
+    if selected.get('history') or selected.get('files'):
+        fail('History is shared only after choosing a treating clinician,not with the request pool.','request_history_private')
     key = text(retry_key, 80)
     try:
         from zoneinfo import ZoneInfo
@@ -444,6 +437,10 @@ def my_request_detail(request_id):
 def clinician_profile(clinician_id):
     """Patient-facing approved clinician profile addressed only by opaque ID."""
     actor('Tele Tena Patient')
+    return _public_clinician(clinician_id)
+
+
+def _public_clinician(clinician_id):
     if not isinstance(clinician_id, str) or len(clinician_id) != 36:
         fail('Clinician profile unavailable', 'clinician_profile_unavailable')
     clinician = rows('''SELECT p.user,p.display_name,p.introduction FROM tt_profile p
@@ -541,7 +538,7 @@ def clinician_requests():
                 WHERE name=%s AND active=1''', (req._routing_service,))
             if not immediate_service_enabled(service):
                 continue
-        req.disclosure_snapshot = json.loads(req.disclosure_snapshot)
+        req.disclosure_snapshot = {key:value for key,value in json.loads(req.disclosure_snapshot).items() if key in ('request','alias','name')}
         # Offering titles are clinician-owned copy, not authorization keys.
         # Return only this clinician's currently published offerings within
         # the exact request scope/format; submission still revalidates the slot.
@@ -823,6 +820,9 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
         fail('The offer price is no longer valid.', 'request_offer_changed')
     selected = json.loads(req.sharing_choices)
     expected = json.loads(req.disclosure_snapshot)
+    if sharing is not None:
+        selected=journey.choices(sharing)
+        expected=journey.disclosure(profile('patient'),req.request_text,selected)
     if isinstance(expected_disclosure, str):
         expected_disclosure = json.loads(expected_disclosure)
     if expected_disclosure != expected:
@@ -844,6 +844,7 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
                   (request_id, offer_id))
     frappe.db.sql("UPDATE tt_open_request SET state='Matched',appointment=%s,matched_at=UTC_TIMESTAMP(6) WHERE id=%s",
                   (appt, request_id))
+    metric(request_id, 'PatientAccepted')
     metric(request_id, 'AppointmentCreated')
     route_event(request_id, item.clinician, int(req.current_wave or 1), 'OfferAccepted')
     return {'state': 'Matched', 'appointment': appt, 'simulated': True}
@@ -1114,3 +1115,12 @@ def matching_operations(state='', page=1, page_size=20):
                       'routing_events':[{'event':r.event, 'reason_code':r.reason_code,
                                          'occurrences':int(r.occurrences), 'at':r.last_at.isoformat()+'Z'} for r in reasons]})
     return {'items':items,'page':page,'page_size':page_size,'total':total,'metrics':request_metrics()}
+
+
+@query('POST')
+def preview_acceptance(request_id,offer_id,sharing):
+    patient=profile('patient')
+    req=one("SELECT request_text FROM tt_open_request WHERE id=%s AND patient=%s",(request_id,patient.user))
+    item=one("SELECT clinician FROM tt_request_offer WHERE id=%s AND request_id=%s AND state='Active'",(offer_id,request_id))
+    return {'disclosure':journey.disclosure(patient,req.request_text,journey.choices(sharing)),
+            'recipient':frappe.db.get_value('User',item.clinician,'full_name')}

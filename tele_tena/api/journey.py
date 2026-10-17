@@ -133,17 +133,28 @@ def choices(value):
             value = json.loads(value)
         except ValueError:
             fail('Invalid sharing choices')
-    if not isinstance(value, dict) or set(value) != {'name', 'history'}:
+    if not isinstance(value, dict) or not {'name','history'}<=set(value) or set(value)-{'name','history','files','alias'}:
         fail('Choose name and history disclosure explicitly')
-    return {key: boolean(value[key]) for key in ('name', 'history')}
+    selected={key: boolean(value[key]) for key in ('name', 'history')}
+    if 'files' in value:selected['files']=value['files']
+    if 'alias' in value:selected['alias']=text(value['alias'],120,False)
+    return selected
 
 
 def disclosure(p, request_text, selected):
-    result = {'request': text(request_text, 2000)}
+    result = {'request': text(request_text, 2000, False)}
     if selected['name']:
         result['name'] = p.display_name
+    elif selected.get('alias',p.get('care_alias')):
+        result['alias'] = selected.get('alias',p.get('care_alias'))
     if selected['history']:
         result['history'] = p.history
+    if 'files' in selected:
+        result['disclosure_version']='encounter-disclosure-v1'
+        if selected['history']:result['history_sha256']=hashlib.sha256(p.history.encode()).hexdigest()
+        from tele_tena.api.encounter_files import selected_files,VERSION
+        result['files']=selected_files(p.user,selected['files'])
+        result['disclosure_version']=VERSION
     return result
 
 
@@ -193,7 +204,7 @@ def session():
 
 
 @command
-def save_profile(kind, display_name, adult, history='', share_name=None, share_history=None, languages=None, introduction=None):
+def save_profile(kind, display_name, adult, history='', share_name=None, share_history=None, languages=None, introduction=None,care_alias=None):
     if kind not in ('patient', 'clinician'):
         fail('Unsupported profile type')
     user = actor()
@@ -214,6 +225,8 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
         frappe.throw('Clinician profile access required', frappe.PermissionError)
     share_name = existing[0].share_name if share_name is None and existing else (False if share_name is None else share_name)
     share_history = existing[0].share_history if share_history is None and existing else (False if share_history is None else share_history)
+    if care_alias is not None and existing and kind=='patient':
+        frappe.db.sql('UPDATE tt_profile SET care_alias=%s WHERE user=%s',(text(care_alias,120,False),user))
     name = text(display_name, 120)
     history = text(history, 4000, False) if kind == 'patient' else ''
     if languages is None:
@@ -547,6 +560,11 @@ def add_availability(start, end):
 @query()
 def discover(service=None):
     actor('Tele Tena Patient')
+    return _approved_offerings(service)
+
+
+def _approved_offerings(service=None):
+    # Internal eligibility source; public callers still require an explicit projection.
     from tele_tena.review import enabled as review_enabled
     legacy_allowed = int(review_enabled() or frappe.local.site == 'erp.localhost')
     results = rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,p.languages AS care_languages,o.clinician,o.service,
@@ -841,6 +859,10 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     frappe.db.sql('''INSERT INTO tt_appointment_event (id,appointment,event_type,actor,created)
         VALUES (%s,%s,%s,%s,%s)''', (str(uuid.uuid4()), appointment,
         'Requested' if state == 'PendingConfirmation' else 'Booked', p.user, created))
+    from tele_tena.api.encounter_files import grant_booking
+    grant_booking(appointment,p.user,o.clinician,shared)
+    from tele_tena.booking_notifications import create
+    create(appointment,state)
     frappe.db.sql('UPDATE tt_wallet SET available=available-%s,reserved=reserved+%s WHERE patient=%s', (booking_price, booking_price, p.user))
     simulation_log(p.user, 'Reservation', booking_price, 'booking:' + appointment)
     post('booking:' + appointment, 'Reservation', 'booking:' + appointment, [

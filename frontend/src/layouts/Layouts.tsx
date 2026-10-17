@@ -1,3 +1,4 @@
+import {BookingNotices} from '../components/BookingNotices';
 import {AccountMenu} from "../components/AccountMenu";
 import "./ProductShell.css";
 import { ClinicianNotifications } from "../components/ClinicianNotifications";
@@ -131,7 +132,7 @@ export function PublicLayout() {
       <header className={`public-header reference-public-header ${informationPage?"reference-information-header":""}`}>
         <Brand />
         <nav aria-label="Main navigation">
-          {!informationPage&&<Link to="/patient/discovery">{w("Find care")}</Link>}
+          {!informationPage&&<Link to="/care">{w("Find care")}</Link>}
           <Link to="/how-it-works">{w("How it works")}</Link>
           <Link to="/for-clinicians">{w("For clinicians")}</Link>
           <LanguageSelect />
@@ -144,7 +145,7 @@ export function PublicLayout() {
       <footer className="public-footer reference-public-footer">
         <Brand />
         <p>{w("Personal care, connected. Adults 18+ · Not an emergency service.")}</p>
-        <Link to="/sign-in">{w("Find care")}</Link>
+        <Link to="/care">{w("Find care")}</Link>
         <TranslationNote />
       </footer>
     </>
@@ -354,7 +355,7 @@ export function WorkspaceLayout({
                 : session?.profile?.display_name}
           </span>
           <LanguageSelect />
-          <AccountMenu accountPath={"/"+kind+"/account"} onSignout={()=>void signout()} busy={signoutBusy}/>
+          {kind==='patient'&&<BookingNotices/>}<AccountMenu accountPath={"/"+kind+"/account"} onSignout={()=>void signout()} busy={signoutBusy}/>
         </header>
 
         {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}

@@ -93,6 +93,8 @@ def respond_to_request(appointment, decision):
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         frappe.db.sql("UPDATE tt_appointment SET state='Booked',confirmed_at=%s WHERE id=%s", (now, item.id))
         _event(item.id, 'Confirmed', clinician)
+        from tele_tena.booking_notifications import create
+        create(item.id,'Booked')
         return {'state': 'Booked'}
     _wallet_release(item, 'decline')
     now = datetime.now(timezone.utc).replace(tzinfo=None)

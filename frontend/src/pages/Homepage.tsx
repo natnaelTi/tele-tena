@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, CalendarDays, LockKeyhole, MessageCircle, Search, ShieldCheck, UserRound, Users } from "lucide-react";
-import { rememberCareQuery } from "../care-intent";
+import { Link } from "react-router-dom";
+import { ArrowRight, CalendarDays, LockKeyhole, MessageCircle, ShieldCheck, UserRound, Users } from "lucide-react";
 import { useLocale } from "../hooks/useLocale";
 import "./Homepage.css";
 
@@ -12,8 +11,6 @@ const tools = {
 } as const;
 export default function Homepage() {
   const { w } = useLocale();
-  const navigate = useNavigate();
-  const [query, setQuery] = useState("");
   const [tool, setTool] = useState<keyof typeof tools>("Schedule");
   const preview = tools[tool];
   return <main className="landing-page">
@@ -28,13 +25,8 @@ export default function Homepage() {
           <span className="landing-role"><UserRound size={18} />{w("For patients")}</span>
           <h2>{w("Talk to someone")}<br />{w("who fits your needs.")}</h2>
           <p>{w("Choose your clinician, see the fee, and decide what you share. Browse directly or ask eligible clinicians for a private offer.")}</p>
-          <form className="landing-search" onSubmit={e => { e.preventDefault(); rememberCareQuery(query); navigate('/patient/discovery'); }}>
-            <label htmlFor="landing-care-query">{w("What would you like support with?")}</label>
-            <div><Search size={20} /><input id="landing-care-query" value={query} onChange={e => setQuery(e.target.value)} placeholder={w("Stress, relationships, feeling low…")} required /></div>
-            <button className="button full" type="submit">{w("Find my care")}<ArrowRight size={18} /></button>
-          </form>
-          <div className="landing-chips" aria-label={w("Ideas to get started")}>{['Work stress', 'Relationships', 'Anxiety'].map(text => <button type="button" key={text} onClick={() => setQuery(w(text))}>{w(text)}</button>)}</div>
-          <Link className="text-link" to="/patient/requests">{w("Prefer clinicians to respond? Post a private request")}<ArrowRight size={16} /></Link>
+          <Link className="button full" to="/care">{w("Find care")}<ArrowRight size={18}/></Link>
+          <Link className="text-link" to="/request">{w("Prefer clinicians to respond? Post a private request")}<ArrowRight size={16} /></Link>
           <Link className="text-link landing-signup" to="/sign-in?intent=patient&mode=register">{w("Create an account")}</Link>
           <p className="landing-note"><LockKeyhole size={16} />{w("Free to browse · Pay the agreed session fee · Adults 18+")}</p>
         </section>

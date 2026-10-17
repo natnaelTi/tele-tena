@@ -1,3 +1,4 @@
+import {AvailabilityStatus} from './AvailabilityStatus';
 import {Avatar} from "./ProfilePhoto";
 import type { AppointmentView } from "../appointment-groups";
 import { appointmentStatus } from "../appointment-status";
@@ -56,9 +57,9 @@ export function ClinicianCard({ offer }: { offer: Offer }) {
         <h3>{offer.display_name}</h3><p>{offer.label}</p>
         <span className="verified"><ShieldCheck size={16} />{w("Approved for this service")}</span>
         {offer.description && <p className="clinician-description">{offer.description}</p>}
-        <div className="clinician-facts"><span><Languages size={16} aria-hidden="true" />{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Care language not listed")}</span><span>{offer.consultation_format === 'audio' ? <Headphones size={16} aria-hidden="true" /> : <Video size={16} aria-hidden="true" />}{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')}</span></div>
+        <AvailabilityStatus value={offer.availability}/><div className="clinician-facts"><span><Languages size={16} aria-hidden="true" />{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Care language not listed")}</span><span>{offer.consultation_format === 'audio' ? <Headphones size={16} aria-hidden="true" /> : <Video size={16} aria-hidden="true" />}{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')}</span></div>
       </div></div>
-      <div className="card-actions"><div><strong>ETB {money(offer.price)}</strong><small>{offer.minutes} {w("minutes")} · {w("per session")}</small></div><div className="actions"><Button variant="quiet" onClick={event => { trigger.current = event.currentTarget; setPreview(true); }}>{w("View profile")}</Button><Link className="button" to={"/patient/book/" + offer.id}>{w("Choose a time")}</Link></div></div>
+      <div className="card-actions"><div><strong>ETB {money(offer.price)}</strong><small>{offer.minutes} {w("minutes")} · {w("per session")}</small></div><div className="actions"><Button variant="quiet" onClick={event => { trigger.current = event.currentTarget; setPreview(true); }}>{w("View profile")}</Button><Link className="button" to={"/care/select/" + offer.id}>{w("Choose a time")}</Link></div></div>
     </Card>
     {preview && <ClinicianPreview offer={offer} focusReturnTarget={trigger.current} close={() => setPreview(false)} />}
   </>;
@@ -124,9 +125,9 @@ export function DisclosurePreview({ disclosure }: { disclosure: Disclosure }) {
         <dt>Your request</dt>
         <dd>{disclosure.request}</dd>
         <dt>Preferred name</dt>
-        <dd>{disclosure.name ?? "Not shared"}</dd>
+        <dd>{disclosure.name ?? disclosure.alias ?? "Not shared"}</dd>
         <dt>Saved history</dt>
-        <dd>{disclosure.history ?? "Not shared"}</dd>
+        <dd>{disclosure.history ?? "Not shared"}</dd>{disclosure.history_sha256&&<><dt>Text snapshot</dt><dd>{disclosure.history_sha256.slice(0,12)}</dd></>}{!!disclosure.files?.length&&<><dt>Selected files for this clinician</dt><dd><ul>{disclosure.files.map(file=><li key={file.id}>{file.filename} · {file.content_sha256.slice(0,12)}</li>)}</ul></dd></>}
       </dl>
     </section>
   );

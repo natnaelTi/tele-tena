@@ -148,3 +148,6 @@ def install():
 
     from tele_tena.patches.v1_39_history_documents import execute as history_documents
     history_documents()
+
+    from tele_tena.patches.v1_40_guest_first import execute as guest_first
+    guest_first()

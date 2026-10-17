@@ -211,10 +211,10 @@ def save_onboarding(kind, step, answers, complete=0):
     rows = frappe.db.sql('SELECT completed FROM tt_onboarding WHERE user=%s FOR UPDATE', (user,))
     if not rows or rows[0][0]:
         fail('Onboarding already complete')
-    if not isinstance(answers, dict) or set(answers) - {'name', 'adult', 'consent', 'language', 'share_name', 'share_history', 'statement', 'affiliations', 'requested_services', 'history', 'professional', 'care_languages', 'introduction'}:
+    if not isinstance(answers, dict) or set(answers) - {'name', 'adult', 'consent', 'language', 'share_name', 'share_history', 'statement', 'affiliations', 'requested_services', 'history', 'professional', 'care_languages', 'introduction','care_alias','terms_accepted','privacy_acknowledged','terms_version','privacy_version','marketing'}:
         fail('Invalid onboarding answers')
-    clean = {k: text(v, 4000 if k == 'history' else 2000 if k == 'statement' else 120, False) for k, v in answers.items() if k in ('name', 'language', 'statement', 'affiliations', 'history')}
-    for key in ('adult', 'consent', 'share_name', 'share_history'):
+    clean = {k: text(v, 4000 if k == 'history' else 2000 if k == 'statement' else 120, False) for k, v in answers.items() if k in ('name', 'language', 'statement', 'affiliations', 'history','care_alias','terms_version','privacy_version')}
+    for key in ('adult', 'consent', 'share_name', 'share_history','terms_accepted','privacy_acknowledged','marketing'):
         clean[key] = boolean(answers.get(key, False))
     requested_services = answers.get('requested_services', [])
     if not isinstance(requested_services, list) or len(requested_services) > 30:
@@ -248,6 +248,8 @@ def save_onboarding(kind, step, answers, complete=0):
         clean['introduction'] = text(answers['introduction'], 2000, False)
     finish = boolean(complete)
     if finish:
+        from tele_tena.api.policies import record
+        record(user,clean)
         name = text(clean.get('name', ''), 120)
         if not clean['adult'] or not clean['consent']:
             fail('Adult eligibility and consent are required', 'adult_required')
@@ -271,6 +273,7 @@ def save_onboarding(kind, step, answers, complete=0):
              json.dumps(clean.get('care_languages', []) if kind == 'clinician' else []),
              clean.get('introduction', '') if kind == 'clinician' else ''))
         if kind == 'patient':
+            frappe.db.sql('UPDATE tt_profile SET care_alias=%s WHERE user=%s',(clean.get('care_alias') or 'Care guest',user))
             frappe.db.sql('INSERT INTO tt_wallet (patient) VALUES (%s)', (user,))
         else:
             frappe.db.sql("INSERT INTO tt_application (user,statement,status,requested_services,submitted_at) VALUES (%s,%s,'Pending',%s,UTC_TIMESTAMP(6))",

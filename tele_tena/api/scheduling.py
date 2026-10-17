@@ -529,3 +529,20 @@ def calendar(offering, from_date=None, days=35, display_timezone=None):
             'duration': offer.minutes,
             'format': schedule.consultation_format if schedule else 'video',
             'price': offer.price}
+
+
+def immediate_capacity(offering):
+    """Shared pure readiness calculation,independent of the fresh presence lease.
+
+    Used before opting in as well as by public availability. A calendar cannot
+    itself create presence. Private appointment details never leave this helper.
+    """
+    from tele_tena.api import open_requests,journey
+    offer=rows('SELECT * FROM tt_offering WHERE id=%s AND active=1',(offering,))
+    if not offer:return None
+    offer=offer[0];schedule=_schedule_for(offering)
+    if not schedule or schedule.status!='Published' or not journey.service_scope_is_current(offer.clinician,offer.service):return None
+    policy=frappe.db.get_value('Tele Tena Service',offer.service,['immediate_care_enabled','catalog_status','participant_structure'],as_dict=True)
+    if not policy or policy.participant_structure not in (None,'','individual') or not open_requests.immediate_service_enabled(policy):return None
+    earliest=datetime.now(timezone.utc).replace(tzinfo=None)
+    return immediate_start(schedule,offer,offer.clinician,None,earliest,earliest+timedelta(minutes=open_requests.immediate_window_minutes()))
