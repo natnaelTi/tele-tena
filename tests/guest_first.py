@@ -80,7 +80,8 @@ class GuestFirst(unittest.TestCase):
   result,args,offer=self.book([uploaded['id']])
   grant=encounter_files.grants(result['id'])[0]
   self.assertEqual(encounter_files.download(grant.id).get_data(),base64.b64decode(encoded))
-  frappe.set_user(offer.clinician)
+  clinician=frappe.db.sql('SELECT clinician FROM tt_appointment WHERE id=%s',(result['id'],))[0][0]
+  frappe.set_user(clinician)
   self.assertEqual(encounter_files.download(grant.id).get_data(),base64.b64decode(encoded))
   frappe.set_user(users['reviewer'])
   with self.assertRaises(frappe.PermissionError):encounter_files.download(grant.id)
