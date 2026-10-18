@@ -9,6 +9,8 @@ from tele_tena.api.journey import actor,rows,query,command
 def create(appointment,state):
     if state not in ('Booked','PendingConfirmation'):return
     event='Confirmed' if state=='Booked' else 'Pending'
+    if event=='Confirmed':
+        frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE appointment=%s AND event='Pending' AND state IN ('Available','Pending','Unavailable','Rejected')",(appointment,))
     found=rows('SELECT patient,clinician FROM tt_appointment WHERE id=%s',(appointment,))
     if not found:return
     for user in (found[0].patient,found[0].clinician):
@@ -24,7 +26,8 @@ def create(appointment,state):
 @query()
 def notices():
     user=actor()
-    return rows('SELECT id,appointment,event,channel,state,created,read_at FROM tt_booking_notice WHERE user=%s ORDER BY created DESC LIMIT 50',(user,))
+    return rows('''SELECT n.id,n.appointment,n.event,n.channel,n.state,n.created,n.read_at,a.state appointment_state
+      FROM tt_booking_notice n JOIN tt_appointment a ON a.id=n.appointment WHERE n.user=%s ORDER BY n.created DESC LIMIT 50''',(user,))
 
 
 @command

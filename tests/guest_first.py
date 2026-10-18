@@ -129,6 +129,17 @@ class GuestFirst(unittest.TestCase):
    booking_notifications.dispatch();booking_notifications.dispatch()
   self.assertEqual(transport.call_count,1)
   self.assertEqual(frappe.db.sql('SELECT state FROM tt_booking_notice WHERE id=%s',(notice.id,))[0][0],'ProviderAccepted')
+ def test_manual_request_notice_is_not_confirmation(self):
+  from tele_tena.api import presentation
+  offer=self.offer();frappe.db.sql("UPDATE tt_schedule SET confirmation_mode='manual' WHERE offering=%s",(offer.id,))
+  result,args,offer=self.book();self.assertEqual(result['state'],'PendingConfirmation')
+  notices=booking_notifications.notices();self.assertEqual(notices[0].event,'Pending')
+  self.assertFalse(presentation.appointment_detail(result['id'])['can_join'])
+  clinician=frappe.db.sql('SELECT clinician FROM tt_appointment WHERE id=%s',(result['id'],))[0][0]
+  frappe.set_user(clinician);presentation.respond_to_request(result['id'],'confirm')
+  frappe.set_user(users['patient']);notices=booking_notifications.notices()
+  self.assertEqual(sum(item.event=='Confirmed' and item.state=='Available' for item in notices),1)
+  self.assertEqual(sum(item.event=='Pending' and item.state=='Available' for item in notices),0)
  def test_policy_versions_and_no_implicit_privilege(self):
   with patch('tele_tena.review.registration_enabled',return_value=True):user=contact_auth._identity('email','guest-first-'+secrets.token_hex(6)+'@example.invalid')
   frappe.set_user(user)
