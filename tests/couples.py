@@ -282,7 +282,10 @@ class Couples(unittest.TestCase):
         self.assertEqual(len(journey.rows('SELECT id FROM tt_earning WHERE appointment=%s',(appointment,))), 1)
         base.fixtures.login('p1')
         first = presentation.appointment_detail(appointment)
-        self.assertEqual(couples.my_plans()[0]['appointment_state'], 'Completed')
+        # Other retained plans and same-second creation times must not select
+        # a different encounter when checking this finalization's projection.
+        own_plan = next(plan for plan in couples.my_plans() if plan['id'] == invitation['id'])
+        self.assertEqual(own_plan['appointment_state'], 'Completed')
         self.assertNotIn('Summary for second adult', json.dumps(first, default=str))
         self.assertNotIn('Clinician private note', json.dumps(first, default=str))
         base.fixtures.login('p2')

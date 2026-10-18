@@ -1,0 +1,35 @@
+// Paired reference / built-app captures. Credentials remain in local private files.
+const fs=require('fs'),assert=require('assert/strict'),os=require('os'),path=require('path'),{chromium}=require('playwright');
+const base=process.env.TELE_TENA_BROWSER_BASE||'http://127.0.0.1:8017/teletena',reference='http://127.0.0.1:8044/?embed=1#';
+const root=process.env.TELE_TENA_REVIEW_SITE_PATH+'/private/',out=process.env.TELE_TENA_SCREENSHOTS||'/tmp/teletena-guest-first-visual';
+const state=JSON.parse(fs.readFileSync(root+'tt-demo-mvp-v2-records.json')),passwords=JSON.parse(fs.readFileSync(root+'tt-demo-mvp-v2-accounts.json'));
+fs.mkdirSync(out,{recursive:true});let stage='launch',page;
+const captures=[];
+async function ready(p){await p.evaluate(()=>document.fonts.ready);await p.waitForTimeout(250);}
+async function pair(context,p,id,hash,label,width){
+ await p.setViewportSize({width,height:1000});await ready(p);
+ await p.screenshot({path:out+'/'+label+'-app-'+width+'.png',fullPage:true});
+ assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),label+' overflows at '+width);
+ const ref=await context.newPage();await ref.setViewportSize({width,height:1000});await ref.goto(reference+hash);await ready(ref);
+ await ref.screenshot({path:out+'/'+label+'-ref-'+width+'.png',fullPage:true});await ref.close();captures.push({id,label,width});
+}
+(async()=>{const browser=await chromium.launch();let zoomContext,zoomRoot;try{
+ const context=await browser.newContext({viewport:{width:1440,height:1000}});page=await context.newPage();page.setDefaultTimeout(18000);
+ for(const [route,id,hash,label,selector] of [['/','A01','welcome','landing','.landing-hero'],['/care','C02','care','directory','.clinician-card'],['/request','D01','d01','guest-request','textarea'],['/sign-in?mode=register&intent=patient','A04','a04','phone','input[type="tel"]']]){
+  stage=label;await page.goto(base+route);await page.locator(selector).first().waitFor();for(const width of [1440,768,390])await pair(context,page,id,hash,label,width);
+ }
+ stage='preview dialog keyboard';await page.setViewportSize({width:1440,height:1000});await page.goto(base+'/care');const trigger=page.locator('.clinician-card').first().getByRole('button',{name:'View profile',exact:true});await trigger.click();await page.getByRole('dialog').waitFor();await ready(page);await page.screenshot({path:out+'/preview-app-1440.png',fullPage:true});
+ const ref=await context.newPage();await ref.goto(reference+'care');await ref.getByRole('button',{name:'Profile',exact:true}).first().click();await ready(ref);await ref.screenshot({path:out+'/preview-ref-1440.png',fullPage:true});await ref.close();await page.keyboard.press('Escape');await page.getByRole('dialog').waitFor({state:'hidden'});assert(await trigger.evaluate(el=>el===document.activeElement));
+ stage='profile';const publicData=(await(await page.request.get(new URL('/api/method/tele_tena.api.directory.offerings',base).href)).json()).message;
+ const offer=publicData.items.find(row=>row.participant_structure==='individual');assert(offer);await page.goto(base+'/care/clinicians/'+offer.clinician_id);await page.getByRole('link',{name:'Choose a time',exact:true}).first().waitFor();await pair(context,page,'C04','c04','profile',1440);
+ stage='existing patient';await page.goto(base+'/sign-in');await page.getByRole('button',{name:'Use email instead',exact:true}).click();await page.getByRole('button',{name:'Use password instead',exact:true}).click();await page.getByLabel('Email',{exact:true}).fill(state.users.patient);await page.getByLabel('Password',{exact:true}).fill(passwords[state.users.patient]);await page.getByRole('button',{name:'Sign in',exact:true}).click();await page.getByRole('button',{name:/^Account menu:/}).waitFor();
+ for(const [route,id,hash,label,selector] of [['/patient','C01','c01','patient-home','.patient-home-hero'],['/patient/book/'+offer.id,'C06','c06','calendar','.booking-calendar'],['/patient/account','H01','h01','account','h1'],['/patient/account','H03','h03','privacy','h1'],['/patient/account','H06','h06','notifications','h1']]){
+  stage=label;await page.goto(base+route);await page.locator(selector).first().waitFor();if(label==='privacy')await page.getByRole('button',{name:'Privacy & sharing',exact:true}).click();if(label==='notifications')await page.getByRole('button',{name:'Contact & sign-in',exact:true}).click();for(const width of [1440,390])await pair(context,page,id,hash,label,width);
+ }
+ stage='language layouts and reduced motion';for(const language of ['am','om']){await page.goto(base+'/care');await page.getByLabel('Language / ቋንቋ / Afaan',{exact:true}).selectOption(language);await page.locator('.clinician-card').first().waitFor();await page.setViewportSize({width:390,height:1000});await ready(page);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:out+'/directory-'+language+'-390.png',fullPage:true});}
+ await page.emulateMedia({reducedMotion:'reduce'});assert(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches));
+ stage='actual browser zoom';zoomRoot=fs.mkdtempSync(path.join(os.tmpdir(),'tt-guest-zoom-'));const ext=path.join(zoomRoot,'extension');fs.mkdirSync(ext);fs.writeFileSync(ext+'/manifest.json',JSON.stringify({manifest_version:3,name:'Local paired zoom',version:'1.0',permissions:['tabs'],background:{service_worker:'worker.js'}}));fs.writeFileSync(ext+'/worker.js',"chrome.tabs.onUpdated.addListener((id,c,t)=>{if(c.status==='complete'&&/^http:\\/\\/127\\.0\\.0\\.1:(8017|8044)\\//.test(t.url||''))chrome.tabs.setZoom(id,2)});");
+ zoomContext=await chromium.launchPersistentContext(path.join(zoomRoot,'profile'),{channel:'chromium',viewport:null,args:['--window-size=1440,1000','--disable-extensions-except='+ext,'--load-extension='+ext]});
+ for(const [url,label] of [[base+'/care','directory-app'],[reference+'care','directory-ref'],[base+'/request','request-app'],[reference+'d01','request-ref']]){const p=await zoomContext.newPage();await p.goto(url);await p.waitForFunction(()=>devicePixelRatio===2&&innerWidth===720&&visualViewport.scale===1);await ready(p);assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await p.screenshot({path:out+'/'+label+'-200-percent.png',fullPage:true});await p.close();}
+ fs.writeFileSync(out+'/result.json',JSON.stringify({build:JSON.parse(fs.readFileSync('tele_tena/public/review/release.json')).source_commit,captures,real_backend:true,actual_zoom:2,visual_comparison_required:true},null,2));console.log('PASS paired captures at390/768/1440;real200%browser zoom;modal Escape/focus return;Amharic/Oromo rendering;reduced motion. Images still require visual inspection.');
+}catch(error){if(page)await page.screenshot({path:out+'/failure.png',fullPage:true}).catch(()=>{});console.error('FAIL '+stage+': '+error.message.split('\n')[0]);process.exitCode=1;}finally{await zoomContext?.close();await browser.close();if(zoomRoot)fs.rmSync(zoomRoot,{recursive:true,force:true});}})();
