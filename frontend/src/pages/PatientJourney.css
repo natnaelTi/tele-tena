@@ -59,7 +59,9 @@
 .booking-selection-heading h2 { font-size:24px; margin:8px 0; }
 .booking-selection-heading p { margin:0; }
 .booking-selection-heading .avatar { width:88px; height:88px; font-size:32px; }
-.booking-selection-panel > .field { max-width:300px; }
+.booking-preferences { display:flex; align-items:start; flex-wrap:wrap; gap:16px; }
+.booking-preferences > .field { width: min(100%,300px); margin:0; }
+.booking-preferences > .notice { flex-basis:100%; }
 .booking-selection-panel .booking-calendar { border:0; padding:0; margin-bottom:0; }
 @media(max-width:600px) { .booking-selection-panel { padding:20px; } .booking-selection-heading { gap:16px; } .booking-selection-heading .avatar { width:56px; height:56px; font-size:24px; } }
 

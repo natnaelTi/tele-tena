@@ -227,7 +227,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
   const languageUnavailable=!!selectedLanguage&&!offer.care_languages?.includes(selectedLanguage as 'en'|'am'|'om');
   return (
     <div className={step === 1 ? "booking-sharing-flow" : "reference-booking"} data-tour-unsaved={Boolean(start||request)||undefined}>
-      <section className="guided-content"><Select label={w("Care language")} value={selectedLanguage} onChange={event=>setCareLanguage(event.target.value)}><option value="">{w("Choose a language")}</option>{languageUnavailable&&<option value={selectedLanguage} disabled>{w("Selected language no longer offered")}</option>}{offer.care_languages?.map(value=><option key={value} value={value}>{({en:'English',am:'አማርኛ',om:'Afaan Oromo'})[value]}</option>)}</Select>{languageUnavailable&&<InlineNotice tone="danger">{w("This service no longer offers your selected language. Choose another language explicitly or return to Find care.")}</InlineNotice>}
+      <section className="guided-content">
         <Link className="text-link" to="/patient/discovery">
           Back to Find care
         </Link>
@@ -245,13 +245,14 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
         {step === 0 && (
           <>
             <section className="booking-selection-panel"><div className="booking-selection-heading"><Avatar url={offer.photo_url} name={offer.display_name}/><div><span className="verified">{w("Approved for this service")}</span><h2>{offer.display_name}</h2><p>{offer.label} · {offer.minutes} {w("minutes")} · ETB {money(offer.price)}</p></div></div>
-            <Select label="Show times in timezone" value={displayZone} onChange={e=>{setDisplayZone(e.target.value);setStart("");setSelectedDate("");}}><option value="Africa/Addis_Ababa">Addis Ababa (EAT)</option><option value="UTC">UTC</option><option value="Africa/Nairobi">Nairobi (EAT)</option></Select>
+            <div className="booking-preferences"><Select label={w("Care language")} value={selectedLanguage} onChange={event=>setCareLanguage(event.target.value)}><option value="">{w("Choose a language")}</option>{languageUnavailable&&<option value={selectedLanguage} disabled>{w("Selected language no longer offered")}</option>}{offer.care_languages?.map(value=><option key={value} value={value}>{({en:'English',am:'አማርኛ',om:'Afaan Oromo'})[value]}</option>)}</Select>{languageUnavailable&&<InlineNotice tone="danger">{w("This service no longer offers your selected language. Choose another language explicitly or return to Find care.")}</InlineNotice>}
+            <Select label="Show times in timezone" value={displayZone} onChange={e=>{setDisplayZone(e.target.value);setStart("");setSelectedDate("");}}><option value="Africa/Addis_Ababa">Addis Ababa (EAT)</option><option value="UTC">UTC</option><option value="Africa/Nairobi">Nairobi (EAT)</option></Select></div>
             <BookingCalendar days={data.calendar.days} fromDate={calendarFrom || data.calendar.days[0]?.date || new Date().toISOString().slice(0,10)} selectedDate={selectedDate} selectedStart={start} duration={offer.minutes}
               onMonth={date => { setCalendarFrom(date); setSelectedDate(""); setStart(""); }}
               onDate={date => { setSelectedDate(date); setStart(""); }} onStart={setStart} />
             </section>
             {start&&<p className="supporting">Selected: {new Date(start).toLocaleString(undefined,{dateStyle:"full",timeStyle:"short",timeZone:displayZone})} · {displayZone}</p>}
-            <Button disabled={!start||languageUnavailable} onClick={() => setStep(1)}>
+            <Button disabled={!start||!selectedLanguage||languageUnavailable} onClick={() => setStep(1)}>
               Continue
             </Button>
           </>
