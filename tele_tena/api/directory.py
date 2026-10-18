@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 import frappe
 from tele_tena.api.journey import _approved_offerings,rows,fail
 
-PUBLIC_FIELDS=('id','clinician_id','display_name','label','description','service_category',
+PUBLIC_FIELDS=('id','service_ref','clinician_id','display_name','label','description','service_category',
                'participant_structure','price','minutes','care_languages','schedule_timezone','consultation_format')
 
 
@@ -38,6 +38,7 @@ def _items():
     result=[]
     for offer in _approved_offerings():
         item={key:offer.get(key) for key in PUBLIC_FIELDS}
+        item['service_ref']=offer.service  # Public catalog reference,never an account identity.
         # Public photo is separately checked against publication/current approval.
         photo=offer.get('photo_url')
         item['photo_url']=photo.replace('tele_tena.api.profile_photos.download','tele_tena.api.directory.photo') if photo else None

@@ -58,9 +58,15 @@ export function PatientOpenRequests(){
   const [requestKey,setRequestKey]=useState(()=>{try{return sessionStorage.getItem('teletena-open-request-retry')||freshRequestKey()}catch{return crypto.randomUUID()}});
   const [showFallback,setShowFallback]=useState<Record<string,boolean>>({});
   const [publicationMessage,setPublicationMessage]=useState('');
-  const [composerStep,setComposerStep]=useState(0);
+  const [composerStep,setComposerStep]=useState(requestDraft?.request_text?1:0);
+  const guestPreviewPrepared=useRef(false);
   const [composerErrors,setComposerErrors]=useState<Record<string,string>>({});
   const [preview,setPreview]=useState<Disclosure|null>(null);
+  useEffect(()=>{
+    if(guestPreviewPrepared.current||!requestDraft?.request_text||!service||urgency!=='immediate')return;
+    guestPreviewPrepared.current=true;
+    void journeyApi.preview(narrative,sharing).then(result=>{setPreview(result.disclosure);setComposerStep(2);}).catch(()=>{setComposerStep(1);setPublicationMessage(w('Review your preferences and try the sharing preview again.'));});
+  },[service,requestDraft?.request_text,urgency]);
   const continueComposer=()=>{
     const errors:Record<string,string>={};
     if(composerStep===0&&!narrative.trim())errors.narrative=w('Describe the support you’re looking for.');
@@ -103,10 +109,10 @@ export function PatientOpenRequests(){
       <p className="supporting">{w("Step")} {composerStep+1} / 3</p><ol className="request-step-progress" aria-label={w("Request steps")}>{[w("Describe"),w("Preferences"),w("Privacy")].map((label,index)=><li key={label} aria-current={composerStep===index?"step":undefined} className={index<=composerStep?"complete":""}>{label}</li>)}</ol>
       {composerStep===0&&<>
       <h2>{w('What would you like help with?')}</h2>
-      <label className="field">Describe what you are looking for<textarea rows={4} maxLength={2000} value={narrative} onChange={e=>setNarrative(e.target.value)} placeholder="A few words about the support you’re seeking" /></label>
+      <div className="field"><label htmlFor="request-narrative">{w("Describe what you are looking for")}</label><textarea id="request-narrative" rows={4} maxLength={2000} value={narrative} onChange={e=>setNarrative(e.target.value)} placeholder={w("A few words about the support you’re seeking")} /></div>
       {composerErrors.narrative&&<InlineNotice tone="danger">{composerErrors.narrative}</InlineNotice>}</>}
       {composerStep===1&&<>
-      <Select label={w('Suggested service category')} value={service} onChange={e=>setService(e.target.value)}><option value="">Choose a service</option>{services.data?.map((x:Service)=><option key={x.id} value={x.id}>{x.label}</option>)}</Select>
+      <Select label={w('Service category')} value={service} onChange={e=>setService(e.target.value)}><option value="">Choose a service</option>{services.data?.map((x:Service)=><option key={x.id} value={x.id}>{x.label}</option>)}</Select>
       <div className="open-request-grid">
         <Select label={w('When would you like care?')} value={urgency} onChange={e=>setUrgency(e.target.value as typeof urgency)}><option value="immediate">{w('As soon as possible')}</option><option value="scheduled">{w('Schedule for later')}</option></Select>
         <Select label="Language" value={language} onChange={e=>setLanguage(e.target.value)}><option value="en">English</option><option value="am">Amharic</option><option value="om">Afaan Oromo</option></Select>

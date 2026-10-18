@@ -225,9 +225,10 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
   if(requiredFormat&&requiredFormat!==data.calendar.format)return <InlineNotice tone="danger">{w('Your selected consultation format is no longer available. Review your filters before continuing.')} <Link to="/care">{w('Find care')}</Link></InlineNotice>;
   const offer: Offer = data.offer;
   const selectedLanguage=careLanguage||(offer.care_languages?.length===1?offer.care_languages[0]:'');
+  const languageUnavailable=!!selectedLanguage&&!offer.care_languages?.includes(selectedLanguage as 'en'|'am'|'om');
   return (
     <div className={step === 1 ? "booking-sharing-flow" : "reference-booking"} data-tour-unsaved={Boolean(start||request)||undefined}>
-      <section className="guided-content"><Select label={w("Care language")} value={selectedLanguage} onChange={event=>setCareLanguage(event.target.value)}><option value="">{w("Choose a language")}</option>{offer.care_languages?.map(value=><option key={value} value={value}>{({en:'English',am:'አማርኛ',om:'Afaan Oromo'})[value]}</option>)}</Select>
+      <section className="guided-content"><Select label={w("Care language")} value={selectedLanguage} onChange={event=>setCareLanguage(event.target.value)}><option value="">{w("Choose a language")}</option>{languageUnavailable&&<option value={selectedLanguage} disabled>{w("Selected language no longer offered")}</option>}{offer.care_languages?.map(value=><option key={value} value={value}>{({en:'English',am:'አማርኛ',om:'Afaan Oromo'})[value]}</option>)}</Select>{languageUnavailable&&<InlineNotice tone="danger">{w("This service no longer offers your selected language. Choose another language explicitly or return to Find care.")}</InlineNotice>}
         <Link className="text-link" to="/patient/discovery">
           Back to Find care
         </Link>
@@ -251,7 +252,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
               onDate={date => { setSelectedDate(date); setStart(""); }} onStart={setStart} />
             </section>
             {start&&<p className="supporting">Selected: {new Date(start).toLocaleString(undefined,{dateStyle:"full",timeStyle:"short",timeZone:displayZone})} · {displayZone}</p>}
-            <Button disabled={!start} onClick={() => setStep(1)}>
+            <Button disabled={!start||languageUnavailable} onClick={() => setStep(1)}>
               Continue
             </Button>
           </>
