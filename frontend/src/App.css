@@ -1815,7 +1815,7 @@ button { color: inherit; background: transparent; }
   .public-header > nav {
     order: 2;
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 4px;
   }
   .public-header > nav > a:first-of-type {
