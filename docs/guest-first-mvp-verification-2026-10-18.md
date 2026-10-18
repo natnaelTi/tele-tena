@@ -5,6 +5,28 @@ historical evidence, not the runtime identity for this preview. The sole accepta
 matrix remains [mvp-screen-acceptance.json](mvp-screen-acceptance.json), under
 `guest_first_revision`. Owner acceptance is pending. Nothing was merged or deployed.
 
+## Role-aware navigation follow-up —18October
+
+This follow-up supersedes the earlier guest-card booking labels in the images
+below. At runtime checkpoint55432b9, guest/non-patient cards contain only View
+profile; the pane and full profile say Sign in to Book and preserve the selected
+offering through auth. Authenticated patients retain Choose a time. The root route
+waits for the server-verified cookie session and redirects to the existing role
+destination; intent never grants another role. Public-page menus now use patient,
+clinician/applicant or reviewer links plus the existing Account/Sign out menu.
+Horizontal navigation is right aligned; direct-child CSS avoids corrupting the
+nested account dropdown. Mobile navigation remains responsive.
+
+`browser-role-navigation.cjs` passed against the real8017 backend:guest cards,
+profile/pane actions,selected offering through password sign-in,three-role root
+redirect/reload,curated390/768/1440 navigation,Escape/account menu,and authenticated
+session invalidation on sign-out. `nav-zoom.log` passed actual browser200% for
+guest/patient/clinician/reviewer. Rendered screenshots inspected at
+[screenshots/role-navigation](screenshots/role-navigation/). Existing guest journey
+browser also passed after its expected controls were updated. Locked production
+build and lint pass;no API/schema/dependency/financial change or migration required.
+Owner review remains pending;PR47 remains draft.
+
 ## Candidate and preview
 
 - Branch `feat/guest-first-mvp`, dependent on PR46's

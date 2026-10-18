@@ -1,3 +1,11 @@
+## Guest role navigation clarification —18October2026
+
+Guest/non-patient directory cards open the clinician preview only. Booking actions
+inside the preview/full profile read Sign in to Book until a patient is signed in.
+The selected offering survives authentication. Verified existing sessions visiting
+home return to their existing role destination;navigation intent grants no roles.
+Horizontal menus align right and use the current role’s supported workspace links.
+
 ## Guest-first MVP revision — approved17October2026
 
 The18October instruction supersedes the interpreted-care-query and account-type

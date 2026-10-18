@@ -16074,6 +16074,30 @@
       "A07": "Separate account chooser removed by approved intent-aware flow.",
       "C02 interpreted query": "AI search bar deferred together with AI;structured directory replaces it.",
       "C03 inferred matching": "No AI inference or diagnosis promise in the structured directory."
+    },
+    "role_navigation_followup": {
+      "runtime_checkpoint": "55432b9639c01d57c3a5e8e5089dc53a6d721fbc",
+      "routes": [
+        "/",
+        "/care",
+        "/care/clinicians/:id"
+      ],
+      "reference": [
+        "A01",
+        "C02 popup",
+        "C04"
+      ],
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex;awaiting owner acceptance",
+      "behavior": "Guest/non-patient cards profile-only;pane/profile Sign in to Book;patient Choose a time;cookie session root redirects;role menus and right alignment;no role grants.",
+      "evidence": [
+        "scripts/browser-role-navigation.cjs",
+        "/home/frappe/teletena-guest-first/nav-browser-final.log",
+        "/home/frappe/teletena-guest-first/nav-zoom.log",
+        "/home/frappe/teletena-guest-first/nav-existing.log",
+        "docs/screenshots/role-navigation/"
+      ],
+      "verification": "390/768/1440;actual200%zoom;real session/selected offering/sign-out;build and lint. No backend/schema change."
     }
   }
 }
