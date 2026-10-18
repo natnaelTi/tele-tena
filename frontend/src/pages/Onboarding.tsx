@@ -41,6 +41,7 @@ export default function Onboarding() {
   const [params] = useSearchParams();
   const [step, setStep] = useState(0);
   const [kind, setKind] = useState("patient");
+  const [resumeKind,setResumeKind]=useState("");
   const [answers, setAnswers] = useState<Answers>({});
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -50,12 +51,14 @@ export default function Onboarding() {
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [resumeBusy, setResumeBusy] = useState(false);
   const [scopeSearch, setScopeSearch] = useState("");
-  const [, setAccess] = useState<{patient_registration:boolean;clinician_registration:boolean}|null>(null);
+  const [access, setAccess] = useState<{patient_registration:boolean;clinician_registration:boolean}|null>(null);
   useEffect(() => {
     api<{ kind: string; step: number; answers: Answers }>(
       "tele_tena.api.contact_auth.onboarding",
     )
       .then((draft) => {
+        const requested=params.get('intent');
+        setResumeKind(Object.keys(draft.answers).length&&requested&&requested!==draft.kind?draft.kind:'');
         setKind(
           params.get("intent") === "clinician" ? "clinician" : draft.kind,
         );
@@ -74,8 +77,12 @@ export default function Onboarding() {
     void api<{id:string;label:string}[]>("tele_tena.api.contact_auth.application_services").then(setCatalog).catch(()=>undefined);
     void journeyApi.resumeStatus().then(value=>setResumeUploaded(value.uploaded)).catch(()=>undefined);
   }, [params]);
-  if (session?.profile) return <Navigate to={session.profile.kind === "patient" && returnPath() ? returnPath() : destination(session)} replace />;
+  const inviteState=routeLocation.state as {coupleInvitationToken?:string;relationshipInvitationToken?:string}|null;
+  const invitationPath=/^[A-Za-z0-9_-]{40,64}$/.test(inviteState?.coupleInvitationToken||'')?'/couple-invitation':/^[A-Za-z0-9_-]{40,64}$/.test(inviteState?.relationshipInvitationToken||'')?'/relationship-invitation':'';
+  if(session?.profile)return <Navigate to={session.profile.kind==='patient'?(invitationPath||returnPath()||destination(session)):destination(session)} state={routeLocation.state} replace/>;
   const clinician = kind === "clinician";
+  if(ready&&resumeKind)return <section className="guided-panel"><h1>{w('Your saved registration is a different journey')}</h1><InlineNotice>{w('Your existing draft is retained. Resume it, or sign in with the account you want to use. No roles or profile details have changed.')}</InlineNotice><Link className="button" to={'/onboarding?intent='+resumeKind}>{w('Resume saved registration')}</Link><Link className="text-link" to="/sign-in">{w('Use another account')}</Link></section>;
+  if(ready&&access&&!(clinician?access.clinician_registration:access.patient_registration))return <section className="guided-panel"><h1>{w('Registration is unavailable on this site.')}</h1><InlineNotice>{w('Your saved progress is retained and has not been submitted. Existing invited accounts can still sign in.')}</InlineNotice><Link to="/sign-in">{w('Return to sign in')}</Link></section>;
   // Retain stored step 3 as the ready screen for existing saved journeys.
   // Patient-only step 4 is inserted before it without reinterpreting old drafts.
   const steps = clinician ? [0, 1, 2, 5, 3] : [0, 1, 2, 4, 3];
@@ -118,10 +125,10 @@ export default function Onboarding() {
       setSaved(true);
       if (complete) {
         const current = await refresh();
-        if(current?.profile?.kind==='patient'&&returnPath()){navigate(returnPath(),{replace:true});return;}
         const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken;
         if(coupleToken&&kind==="patient"){navigate("/couple-invitation",{replace:true,state:{coupleInvitationToken:coupleToken}});return;}
         const invitationToken=(routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken;
+        if(current?.profile?.kind==='patient'&&!invitationToken&&returnPath()){navigate(returnPath(),{replace:true});return;}
         navigate(invitationToken && current?.profile?.kind==='patient' ? '/relationship-invitation' : current?.profile?.kind === 'patient' && pendingCareQuery() ? '/patient/discovery' : destination(current),
           { replace:true, state: invitationToken ? {relationshipInvitationToken:invitationToken} : undefined });
       }
@@ -156,7 +163,7 @@ export default function Onboarding() {
       </div>
       <h1>{w(titles[step])}</h1>
       {error && <InlineNotice tone="danger">{w(error)}</InlineNotice>}
-      {!ready ? (
+      {!ready||!access ? (
         <Skeleton />
       ) : (
         <form

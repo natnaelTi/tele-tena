@@ -114,9 +114,12 @@ export default function SignIn() {
     const directNext=params.get('next')||'';
     const selected=/^\/patient\/book\/([a-f0-9-]{36})$/.exec(directNext);
     if(selected)rememberReturn({kind:'offering',ref:selected[1]});
+    const linked=/^\/patient\/book-link\/([a-f0-9]{64})$/.exec(directNext);if(linked)rememberReturn({kind:'booking-link',ref:linked[1]});
+    const state=routeLocation.state as {coupleInvitationToken?:string;relationshipInvitationToken?:string}|null;
+    const explicitInvitation=(directNext==='/couple-invitation'&&/^[A-Za-z0-9_-]{40,64}$/.test(state?.coupleInvitationToken||''))||(directNext==='/relationship-invitation'&&/^[A-Za-z0-9_-]{40,64}$/.test(state?.relationshipInvitationToken||''));
     const current = await refresh();
     const pending=returnPath();
-    if(pending&&params.get("intent")!=="clinician"){
+    if(pending&&!explicitInvitation&&params.get("intent")!=="clinician"){
       if(current?.profile?.kind==='patient'){navigate(pending,{replace:true});return;}
       if(!current?.profile&&!current?.roles.some(role=>['Tele Tena Approver','Tele Tena Medical Lead','Tele Tena Clinician'].includes(role))){navigate('/onboarding?intent=patient',{replace:true});return;}
       setError(w('You are signed in to a professional workspace. Use a patient account to continue; no patient role has been added.'));return;
@@ -308,8 +311,8 @@ export default function SignIn() {
       )}
       {!challenge && <div className="auth-registration">
         <p>{w("New to TeleTena?")}</p>
-        <Link to="/sign-in?intent=patient&mode=register">{w("Create an account")}</Link>
-        <Link to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}</Link>
+        {options?.patient_registration?<Link to="/sign-in?intent=patient&mode=register">{w("Create an account")}</Link>:<span aria-disabled="true">{w("Patient registration is unavailable on this site.")}</span>}
+        {options?.clinician_registration?<Link to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}</Link>:<span aria-disabled="true">{w("Clinician applications are unavailable on this site.")}</span>}
       </div>}
       <p className="auth-privacy">
         <LockKeyhole size={16} />
