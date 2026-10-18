@@ -183,3 +183,7 @@
 .patient-care-link strong{color:var(--primary);text-decoration:underline;text-underline-offset:3px}
 .patient-care-link small{font-size:14px;color:var(--muted);overflow-wrap:anywhere}
 .care-record-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--subtle);flex-shrink:0;color:var(--primary)}
+
+/* C04 uses the same document gutters when reached before authentication. */
+.public-header + .public-clinician-page { max-width:1208px; margin:auto; padding:40px; }
+@media(max-width:600px) { .public-header + .public-clinician-page { padding:24px 20px; } }
