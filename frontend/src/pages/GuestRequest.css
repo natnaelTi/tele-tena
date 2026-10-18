@@ -1,0 +1,7 @@
+/* D01/D02 condensed for the approved guest draft, without a broadcast step. */
+.guest-request { width:calc(100% - 40px); max-width:760px; padding:24px 0 48px; }
+.guest-request > .notice { margin-bottom:20px; }
+.guest-request textarea { min-height:128px; }
+.guest-request-preferences { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 20px; }
+.guest-request form { margin:24px 0; }
+@media(max-width:600px) { .guest-request-preferences { grid-template-columns:1fr; } }

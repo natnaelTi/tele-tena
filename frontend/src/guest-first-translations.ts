@@ -124,4 +124,5 @@ export const guestFirstTranslations:Record<string,[string,string]>={
  "Selected language no longer offered":["የመረጡት ቋንቋ አሁን አይገኝም", "Afaan filatame kana booda hin kennamu"],
  "This service no longer offers your selected language. Choose another language explicitly or return to Find care.":["ይህ አገልግሎት የመረጡትን ቋንቋ አሁን አይሰጥም። ሌላ ቋንቋ ይምረጡ ወይም ወደ እንክብካቤ ፍለጋ ይመለሱ።", "Tajaajilli kun afaan filatte hin kennu. Afaan biraa ofii keetiin filadhu yookaan gara barbaacha tajaajilaatti deebiʼi."],
  "Appointment updates could not be refreshed. Accepted offers remain available.":["የቀጠሮ መረጃ አልታደሰም። የተቀበሉ ቅናሾች አሁንም ይገኛሉ።", "Odeeffannoon beellamaa hin haaromfamne. Yaadonni fudhataman ammallee ni jiru."],
+ 'No history files have been shared yet.':['እስካሁን የታሪክ ፋይል አልተጋራም።','Faayiliin seenaa hanga ammaatti hin qoodamne.'],
 };
