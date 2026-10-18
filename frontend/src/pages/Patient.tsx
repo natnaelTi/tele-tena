@@ -46,7 +46,6 @@ export function PatientHome() {
   const wallet = useResource(journeyApi.wallet);
   const requests = useResource(journeyApi.myRequests);
   const previousClinicians = useResource(journeyApi.previousClinicians);
-  const query = "";
   const upcoming = appointments.data?.filter(a => a.state === "Booked" && a.call_state !== "Ended" && new Date(a.end).getTime() > now)
     .sort((a,b) => new Date(a.start).getTime() - new Date(b.start).getTime());
   return (
@@ -58,7 +57,7 @@ export function PatientHome() {
       <div className="patient-dashboard-layout"><section className="patient-dashboard-primary">
       <section className="patient-home-hero"><h2>{w("A little space")}<br />{w("for yourself.")}</h2><p>{w("Find the right support for today.")}</p>
       <Link className="button" to="/patient/discovery">{w("Find care")} <ArrowRight size={18}/></Link></section>
-      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers.")}</p></div><Link className="text-link" to="/patient/requests" state={{requestDraft:{request_text:query}}}>{w("Post a request")}</Link></section>
+      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers.")}</p></div><Link className="text-link" to="/patient/requests">{w("Post a request")}</Link></section>
       {!!requests.data?.some((item:any)=>item.state==='Open')&&<section className="active-request-summary"><div className="section-line"><h2>Active care requests</h2><Link to="/patient/requests">Review requests and offers <ArrowRight size={16}/></Link></div>{requests.data.filter((item:any)=>item.state==='Open').slice(0,3).map((item:any)=><Link className="active-request-row" key={item.id} to={'/patient/requests/'+encodeURIComponent(item.id)}><span>{item.urgency==='immediate'?'As soon as possible':'Schedule for later'} · {item.category}</span><strong>{item.offers.filter((offer:any)=>offer.state==='Active').length} new offers</strong></Link>)}</section>}
       <section className="patient-dashboard-panel">
       <div className="section-line">

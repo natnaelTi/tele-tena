@@ -320,7 +320,7 @@ export default function Onboarding() {
                 : "This background is not included in your default disclosure. Preview before every booking.")} />
             {!answers.history && <Button variant="quiet" disabled={busy} onClick={() => void save(3)}>{w("Skip for now")}</Button>}
           </>}
-          {step === 3 && !clinician && <section className="onboarding-ready-hero"><div><h2>{w("Choose your next step")}</h2><p>{w("Browse clinicians and services, or post a private request.")}</p><Button type="submit" loading={busy}>{w("Find care")}</Button></div><aside><ShieldCheck size={26}/><h2>{w("Your choices come with you.")}</h2><dl><dt>{w("Display name")}</dt><dd>{answers.name}</dd><dt>{w("Care language")}</dt><dd>{{en:"English",am:"አማርኛ",om:"Afaan Oromo"}[answers.language as "en"|"am"|"om"]||"English"}</dd><dt>{w("Sharing")}</dt><dd>{w("Preview before every booking")}</dd></dl></aside></section>}
+          {step === 3 && !clinician && <section className="onboarding-ready-hero"><div><h2>{w("Choose your next step")}</h2><p>{w("Browse clinicians and services, or post a private request.")}</p></div><aside><ShieldCheck size={26}/><h2>{w("Your choices come with you.")}</h2><dl><dt>{w("Display name")}</dt><dd>{answers.name}</dd><dt>{w("Care language")}</dt><dd>{{en:"English",am:"አማርኛ",om:"Afaan Oromo"}[answers.language as "en"|"am"|"om"]||"English"}</dd><dt>{w("Sharing")}</dt><dd>{w("Preview before every booking")}</dd></dl></aside></section>}
           {step === 3 && clinician && (
             <>
               <p>
@@ -358,13 +358,13 @@ export default function Onboarding() {
                 {w("Back")}
               </Button>
             )}
-            {(clinician||step!==3)&&<Button type="submit" loading={busy}>
+            <Button type="submit" loading={busy}>
               {step === 3
                 ? clinician
                   ? w("Submit for review")
                   : w("Find care")
                 : w(step === 5 ? "Review application" : step === 4 ? "Save and continue" : "Continue")}
-            </Button>}
+            </Button>
           </div>
           <Button
             variant="quiet"

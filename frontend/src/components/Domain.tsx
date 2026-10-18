@@ -110,27 +110,19 @@ export function AppointmentCard({
     <div className="appointment-status-actions"><StatusBadge tone={presentation.tone}>{w(presentation.label)}</StatusBadge>{presentation.detail && <p className="supporting">{w(presentation.detail)}</p>}<Link className="button secondary" to={`${base}/consultations/${appointment.id}`} state={view?{appointmentView:view}:undefined}>{w("View consultation")}<ArrowRight size={18}/></Link></div>
   </Card>;
 }
-export function DisclosurePreview({ disclosure }: { disclosure: Disclosure }) {
-  return (
-    <section className="disclosure-preview">
-      <h3>
-        <ShieldCheck size={20} />
-        What you’ll share
-      </h3>
-      <p>
-        Your clinician will receive only the information shown below for this
-        booking.
-      </p>
-      <dl className="summary-list">
-        <dt>Your request</dt>
-        <dd>{disclosure.request}</dd>
-        <dt>Preferred name</dt>
-        <dd>{disclosure.name ?? disclosure.alias ?? "Not shared"}</dd>
-        <dt>Saved history</dt>
-        <dd>{disclosure.history ?? "Not shared"}</dd>{disclosure.history_sha256&&<><dt>Text snapshot</dt><dd>{disclosure.history_sha256.slice(0,12)}</dd></>}{!!disclosure.files?.length&&<><dt>Selected files for this clinician</dt><dd><ul>{disclosure.files.map(file=><li key={file.id}>{file.filename} · {file.content_sha256.slice(0,12)}</li>)}</ul></dd></>}
-      </dl>
-    </section>
-  );
+export function DisclosurePreview({ disclosure,context='booking' }: { disclosure: Disclosure;context?:'booking'|'request'|'received' }) {
+  const {w}=useLocale();
+  return <section className="disclosure-preview">
+    <h3><ShieldCheck size={20}/>{w(context==='received'?'Patient-authorized disclosure':'What you’ll share')}</h3>
+    <p>{w(context==='request'?'After you publish, eligible clinicians receive this request and selected identity. Saved history and files remain private.':context==='received'?'The patient authorized this disclosure for this request.':'Your clinician will receive only the information shown below for this booking.')}</p>
+    <dl className="summary-list">
+      <dt>{w('Your request')}</dt><dd>{disclosure.request}</dd>
+      <dt>{w(disclosure.name?'Preferred name':'Alias')}</dt><dd>{disclosure.name??disclosure.alias??w('Not shared')}</dd>
+      <dt>{w('Saved history')}</dt><dd>{disclosure.history??w('Not shared')}</dd>
+      {disclosure.history_sha256&&<><dt>{w('Text snapshot')}</dt><dd>{disclosure.history_sha256.slice(0,12)}</dd></>}
+      {!!disclosure.files?.length&&<><dt>{w('Selected files for this clinician')}</dt><dd><ul>{disclosure.files.map(file=><li key={file.id}>{file.filename} · {file.content_sha256.slice(0,12)}</li>)}</ul></dd></>}
+    </dl>
+  </section>;
 }
 
 export function BookingSummary({

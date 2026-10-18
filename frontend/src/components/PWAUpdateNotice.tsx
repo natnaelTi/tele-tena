@@ -51,7 +51,7 @@ export default function PWAUpdateNotice() {
     };
   }, []);
 
-  const protectedWorkflow = pathname === "/sign-in" || pathname === "/onboarding" ||
+  const protectedWorkflow = pathname === "/sign-in" || pathname === "/onboarding" || pathname === "/request" || pathname === "/patient/requests" ||
     pathname.startsWith("/consultation/") || pathname.includes("/consultations/");
   if (!waitingWorker || dismissed || protectedWorkflow) return null;
 
