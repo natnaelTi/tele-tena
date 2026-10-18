@@ -67,7 +67,7 @@ OTPs, provider secrets, private site configs or database backups are committed.
 | Existing800 upgrade |Two native migrations pass; `clean-preservation.log`:73 original operational/auth/permission tables,1,292 original rows unchanged on original columns, including passwords, balances and disclosure/consent. New columns/tables additive only |
 | Retained presentation preservation |`private-preservation-final.log`:24 original private manifests/provider/key files byte-identical, configuration values identical. Complete before backup includes database, public/private files and private state; no reseed |
 | Reconciliation |`reconcile-final-preview.log`:11 patients/8 clinicians; clean upgrade6/5; tested copy16/6, `reconcile-final-journeys.log`. Every owner reconciles and all journals balance; no repairs/deletions |
-| Packaging / lint / privacy |Locked Node24 build passes; lint passes with69 existing warnings (not errors); compileall passes;9 review-package tests,8 dependency-checkpoint tests,2 backup/lock tests pass; service-worker static/privacy tests pass. Large-bundle warning retained |
+| Packaging / lint / privacy |Locked Node24 build passes; lint passes with68 existing warnings (not errors); compileall passes;9 review-package tests,8 dependency-checkpoint tests,2 backup/lock tests pass; service-worker static/privacy tests pass. Large-bundle warning retained |
 | Staged package graph |`pip-final.log`: no broken requirements. No dependency declarations/lockfiles changed from PR46; completed shared repair not repeated |
 
 Browser scripts are committed under `scripts/browser-guest-*.cjs`. Use installed
