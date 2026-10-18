@@ -1,5 +1,5 @@
 import {guestFirstTranslations} from '../guest-first-translations';
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { accountTranslations } from "../account-translations";
 import { patientJourneyTranslations } from "../patient-journey-translations";
@@ -914,16 +914,19 @@ const Context = createContext<{
   w: (english: string) => string;
 } | null>(null);
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>("en");
+  const [locale, updateLocale] = useState<Locale>("en");
+  const choiceVersion=useRef(0);
+  const setLocale=useCallback((value:Locale)=>{choiceVersion.current++;updateLocale(value);},[]);
   const {session,loading}=useSession();
   const loadedUser=useRef<string|null>(null);
   useEffect(()=>{
     if(loading)return;
-    if(!session){loadedUser.current=null;setLocale("en");return;}
+    if(!session){if(loadedUser.current!==null)updateLocale("en");loadedUser.current=null;return;}
     if(loadedUser.current===session.user)return;
     loadedUser.current=session.user;
+    const version=choiceVersion.current;
     let active=true;
-    void journeyApi.preferences().then(preference=>{if(active&&["en","am","om"].includes(preference.locale))setLocale(preference.locale as Locale);}).catch(()=>undefined);
+    void journeyApi.preferences().then(preference=>{if(active&&version===choiceVersion.current&&["en","am","om"].includes(preference.locale))updateLocale(preference.locale as Locale);}).catch(()=>undefined);
     return()=>{active=false;};
   },[session?.user,loading]);
   useEffect(() => {
