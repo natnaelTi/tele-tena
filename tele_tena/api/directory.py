@@ -19,11 +19,10 @@ def availability(offering):
     presence=rows('SELECT ready,expires_at FROM tt_clinician_request_presence WHERE clinician=%s',(offer.clinician,))
     live=bool(presence and presence[0].ready and presence[0].expires_at>instant)
     start=scheduling.immediate_capacity(offering) if live else None
-    immediate=bool(start)
     # A summary of genuinely generated slots,not a booked/busy time feed.
     day=datetime.now(ZoneInfo(schedule.timezone)).date();next_time=None
     horizon=min(int(schedule.horizon_days),366)
-    booked=rows("SELECT start,end,buffer_before,buffer_after FROM tt_appointment WHERE clinician=%s AND state IN ('Booked','PendingConfirmation') AND end>%s AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6))",(offer.clinician,instant))
+    booked=rows("SELECT start,end,buffer_before,buffer_after FROM tt_appointment WHERE clinician=%s AND state IN ('Booked','PendingConfirmation') AND end>%s AND (expires_at IS NULL OR expires_at>UTC_TIMESTAMP(6))",(offer.clinician,instant-timedelta(days=1)))
     for offset in range(horizon+1):
         slots=scheduling._slots_for_day(schedule,offer,day+timedelta(days=offset),booked)
         if slots:next_time=slots[0][0];break
@@ -34,7 +33,6 @@ def availability(offering):
 
 
 def _items():
-    from tele_tena.api.profile_photos import public_photo
     result=[]
     for offer in _approved_offerings():
         item={key:offer.get(key) for key in PUBLIC_FIELDS}

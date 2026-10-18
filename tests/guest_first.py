@@ -129,6 +129,29 @@ class GuestFirst(unittest.TestCase):
    booking_notifications.dispatch();booking_notifications.dispatch()
   self.assertEqual(transport.call_count,1)
   self.assertEqual(frappe.db.sql('SELECT state FROM tt_booking_notice WHERE id=%s',(notice.id,))[0][0],'ProviderAccepted')
+ def test_public_summary_keeps_a_recent_appointment_buffer(self):
+  from datetime import timedelta
+  offer=self.offer();clinician=frappe.db.sql('SELECT clinician FROM tt_offering WHERE id=%s',(offer.id,))[0][0]
+  frappe.set_user(clinician)
+  scheduling.save_schedule(offer.id,'Fictional buffer test','Africa/Addis_Ababa','video','automatic',0,60,0,60,
+      [{'weekday':day,'start':'00:00','end':'23:59'} for day in range(7)],[],'Published')
+  frappe.set_user(users['patient']);slot=scheduling.calendar(offer.id)['days'][0]['slots'][0]
+  if journey.wallet()['available']<offer.price:journey.simulated_deposit(offer.price,str(uuid.uuid4()))
+  sharing={'name':False,'history':False};preview=journey.preview('',sharing)['disclosure']
+  result=journey.book(offer.id,slot['start'],'',sharing,str(uuid.uuid4()),offer.price,offer.minutes,preview)
+  app=frappe.db.sql('SELECT end,buffer_after FROM tt_appointment WHERE id=%s',(result['id'],),as_dict=True)[0]
+  future=app.end+timedelta(minutes=5)
+  class Clock(datetime):
+   @classmethod
+   def now(cls,tz=None):
+    aware=future.replace(tzinfo=timezone.utc)
+    return aware.astimezone(tz) if tz else future
+  frappe.set_user('Guest')
+  with patch.object(directory,'datetime',Clock),patch.object(scheduling,'datetime',Clock):
+   status=directory.availability(offer.id)
+  self.assertTrue(status['next_available_at'])
+  next_start=datetime.fromisoformat(status['next_available_at']).replace(tzinfo=None)
+  self.assertGreaterEqual(next_start,app.end+timedelta(minutes=app.buffer_after))
  def test_manual_request_notice_is_not_confirmation(self):
   from tele_tena.api import presentation
   offer=self.offer();frappe.db.sql("UPDATE tt_schedule SET confirmation_mode='manual' WHERE offering=%s",(offer.id,))

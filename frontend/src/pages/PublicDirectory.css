@@ -1,3 +1,9 @@
 .public-directory{max-width:1340px;margin:auto;padding:32px}.availability-radar{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--text-secondary,#52636a);margin:8px 0}.availability-radar i{width:10px;height:10px;background:#647774;border-radius:50%;flex-shrink:0}.availability-radar.ready{color:#176443}.availability-radar.ready i{background:#176443;box-shadow:0 0 0 5px #17644316;animation:care-pulse 3s ease-in-out infinite}@keyframes care-pulse{50%{box-shadow:0 0 0 9px #17644308}}@media(prefers-reduced-motion:reduce){.availability-radar.ready i{animation:none}}@media(max-width:600px){.public-directory{padding:20px 16px}}
 
 .public-directory .offering-grid{grid-template-columns:minmax(0,1fr)}
+
+.public-directory .discovery-refine-card summary{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;min-height:44px}
+.public-directory .discovery-refine-card summary::-webkit-details-marker{display:none}
+.public-directory .discovery-refine-card summary h2{margin:0;font-size:22px}
+.public-directory .discovery-refine-card details[open]>summary svg{transform:rotate(180deg)}
+@media(max-width:800px){.public-directory .discovery-layout>aside{grid-row:1}.public-directory .discovery-refine-card{padding:16px 20px}.public-directory .discovery-refine-card .discovery-filters{display:block}.public-directory .request-entry{flex-wrap:wrap;gap:12px}}
