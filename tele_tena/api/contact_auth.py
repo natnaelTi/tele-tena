@@ -273,6 +273,7 @@ def save_onboarding(kind, step, answers, complete=0):
              json.dumps(clean.get('care_languages', []) if kind == 'clinician' else []),
              clean.get('introduction', '') if kind == 'clinician' else ''))
         if kind == 'patient':
+            frappe.db.sql('INSERT IGNORE INTO tt_preferences (user,locale,modified) VALUES (%s,%s,UTC_TIMESTAMP(6))',(user,clean.get('language','en')))
             frappe.db.sql('UPDATE tt_profile SET care_alias=%s WHERE user=%s',(clean.get('care_alias') or 'Care guest',user))
             frappe.db.sql('INSERT INTO tt_wallet (patient) VALUES (%s)', (user,))
         else:

@@ -35,7 +35,7 @@ type Answers = {
 };
 export default function Onboarding() {
   const { session, refresh } = useSession();
-  const { w } = useLocale();
+  const { w,setLocale } = useLocale();
   const navigate = useNavigate();
   const routeLocation = useLocation();
   const [params] = useSearchParams();
@@ -124,6 +124,7 @@ export default function Onboarding() {
       setStep(next);
       setSaved(true);
       if (complete) {
+        if(kind==='patient')setLocale((answers.language||'en') as 'en'|'am'|'om');
         const current = await refresh();
         const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken;
         if(coupleToken&&kind==="patient"){navigate("/couple-invitation",{replace:true,state:{coupleInvitationToken:coupleToken}});return;}

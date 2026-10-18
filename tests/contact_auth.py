@@ -109,6 +109,8 @@ class ContactAuth(unittest.TestCase):
             auth.onboarding()
         frappe.set_user(user)
         auth.save_onboarding('patient', 3, acknowledged({'name': 'Synthetic alias', 'adult': True, 'consent': True, 'language': 'am'}), 1)
+        from tele_tena.api.presentation import preferences
+        self.assertEqual(preferences()['locale'],'am')
         self.assertIn('Tele Tena Patient', frappe.get_roles(user))
         self.assertNotIn('Tele Tena Clinician', frappe.get_roles(user))
         frappe.db.commit()

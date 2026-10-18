@@ -35,7 +35,7 @@ function usePolling<T>(loader:()=>Promise<T>, delay=5000) {
 }
 
 export function PatientOpenRequests(){
-  const {w}=useLocale();
+  const {w,locale}=useLocale();
   const navigate=useNavigate();
   const location=useLocation();
   const requestDraft=guestDraft()||(location.state as {requestDraft?:{request_text?:string;service?:string;service_label?:string;language?:string;format?:'audio'|'video'}}|null)?.requestDraft;
@@ -48,7 +48,7 @@ export function PatientOpenRequests(){
   const [service,setService]=useState(()=>requestDraft?.service||'');
   const [narrative,setNarrative]=useState(()=>requestDraft?.request_text||'');
   const [urgency,setUrgency]=useState<'immediate'|'scheduled'>(guestDraft()?.urgency||'immediate');
-  const [language,setLanguage]=useState(()=>requestDraft?.language||'en');
+  const [language,setLanguage]=useState(()=>requestDraft?.language||locale);
   const [format,setFormat]=useState<'video'|'audio'>(requestDraft?.format||'video');
   const [sharing,setSharing]=useState({name:!!session?.profile?.share_name,history:false});
   const [earliest,setEarliest]=useState('');
