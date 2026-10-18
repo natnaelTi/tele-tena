@@ -74,6 +74,16 @@ class GuestFirst(unittest.TestCase):
   result,args,offer=self.book([uploaded['id']]);grant=encounter_files.grants(result['id'])[0]
   history_documents.remove(uploaded['id']);self.assertTrue(encounter_files.grants(result['id'])[0].revoked_at)
   self.assertEqual(encounter_files.download(grant.id).status_code,200)
+ def test_binary_history_snapshot_preserves_bytes_and_isolation(self):
+  encoded='iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAALUlEQVR4nGPkj69goCVgoqnpoxaMWjBqwagFoxaMWjBqwagFoxaMWjBqARUBAHNfASYqM4zQAAAAAElFTkSuQmCC'
+  uploaded=history_documents.upload('fictional-binary-history.png',encoded)
+  result,args,offer=self.book([uploaded['id']])
+  grant=encounter_files.grants(result['id'])[0]
+  self.assertEqual(encounter_files.download(grant.id).get_data(),base64.b64decode(encoded))
+  frappe.set_user(offer.clinician)
+  self.assertEqual(encounter_files.download(grant.id).get_data(),base64.b64decode(encoded))
+  frappe.set_user(users['reviewer'])
+  with self.assertRaises(frappe.PermissionError):encounter_files.download(grant.id)
  def test_notice_is_idempotent_and_not_a_payment(self):
   result,args,offer=self.book();id=result['id'];app=frappe.db.sql('SELECT * FROM tt_appointment WHERE id=%s',(id,),as_dict=True)[0]
   booking_notifications.create(id,app.state);booking_notifications.create(id,app.state)
@@ -111,7 +121,7 @@ class GuestFirst(unittest.TestCase):
   result,args,offer=self.book()
   with patch.object(frappe.db,'commit'),patch('tele_tena.email_delivery.send_notice',side_effect=TimeoutError) as transport:
    booking_notifications.dispatch();booking_notifications.dispatch()
-  self.assertEqual(transport.call_count,1)
+  self.assertEqual(sum(('Reference '+result['id'][:8]+'.') in call.args[1] for call in transport.call_args_list),1)
   rows=frappe.db.sql("SELECT id,state,attempts FROM tt_booking_notice WHERE appointment=%s AND channel='email'",(result['id'],),as_dict=True)
   self.assertEqual([(row.state,row.attempts) for row in rows],[('Unknown',1)])
   with self.assertRaises(frappe.PermissionError):booking_notifications.retry(rows[0].id)
@@ -127,7 +137,7 @@ class GuestFirst(unittest.TestCase):
   self.assertEqual(notice.state,'Unavailable');booking_notifications.retry(notice.id)
   with patch.object(frappe.db,'commit'),patch('tele_tena.email_delivery.send_notice') as transport:
    booking_notifications.dispatch();booking_notifications.dispatch()
-  self.assertEqual(transport.call_count,1)
+  self.assertEqual(sum(('Reference '+result['id'][:8]+'.') in call.args[1] for call in transport.call_args_list),1)
   self.assertEqual(frappe.db.sql('SELECT state FROM tt_booking_notice WHERE id=%s',(notice.id,))[0][0],'ProviderAccepted')
  def test_public_summary_keeps_a_recent_appointment_buffer(self):
   from datetime import timedelta

@@ -22,10 +22,13 @@ def grant_booking(appointment,patient,clinician,disclosure):
         file=rows('SELECT * FROM tt_history_document WHERE id=%s AND patient=%s FOR UPDATE',(item['id'],patient))[0]
         if file.content_sha256!=item['content_sha256']:fail('History changed;review sharing again','history_files_changed')
         id=str(uuid.uuid4())
+        # Keep binary bytes inside SQL: Frappe16 decodes bound query text as
+        # UTF-8 for query inspection, which rejects valid PNG/JPEG bytes.
         frappe.db.sql('''INSERT INTO tt_history_grant
           (id,document_id,appointment,patient,recipient,version,filename,mime,content,content_sha256,created)
-          VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))''',
-          (id,file.id,appointment,patient,clinician,VERSION,file.filename,file.mime,file.content,file.content_sha256))
+          SELECT %s,id,%s,%s,%s,%s,filename,mime,content,content_sha256,UTC_TIMESTAMP(6)
+          FROM tt_history_document WHERE id=%s AND patient=%s''',
+          (id,appointment,patient,clinician,VERSION,file.id,patient))
         frappe.db.sql("INSERT INTO tt_history_grant_event VALUES (%s,%s,%s,'Granted',UTC_TIMESTAMP(6))",(str(uuid.uuid4()),id,patient))
 
 
