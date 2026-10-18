@@ -1,0 +1,123 @@
+{
+  "build": "cd995539be4d4fd583358082f3bb324a8e4b6d94",
+  "captures": [
+    {
+      "id": "A01",
+      "label": "landing",
+      "width": 1440
+    },
+    {
+      "id": "A01",
+      "label": "landing",
+      "width": 768
+    },
+    {
+      "id": "A01",
+      "label": "landing",
+      "width": 390
+    },
+    {
+      "id": "C02",
+      "label": "directory",
+      "width": 1440
+    },
+    {
+      "id": "C02",
+      "label": "directory",
+      "width": 768
+    },
+    {
+      "id": "C02",
+      "label": "directory",
+      "width": 390
+    },
+    {
+      "id": "D01",
+      "label": "guest-request",
+      "width": 1440
+    },
+    {
+      "id": "D01",
+      "label": "guest-request",
+      "width": 768
+    },
+    {
+      "id": "D01",
+      "label": "guest-request",
+      "width": 390
+    },
+    {
+      "id": "A04",
+      "label": "phone",
+      "width": 1440
+    },
+    {
+      "id": "A04",
+      "label": "phone",
+      "width": 768
+    },
+    {
+      "id": "A04",
+      "label": "phone",
+      "width": 390
+    },
+    {
+      "id": "C04",
+      "label": "profile",
+      "width": 1440
+    },
+    {
+      "id": "C01",
+      "label": "patient-home",
+      "width": 1440
+    },
+    {
+      "id": "C01",
+      "label": "patient-home",
+      "width": 390
+    },
+    {
+      "id": "C06",
+      "label": "calendar",
+      "width": 1440
+    },
+    {
+      "id": "C06",
+      "label": "calendar",
+      "width": 390
+    },
+    {
+      "id": "H01",
+      "label": "account",
+      "width": 1440
+    },
+    {
+      "id": "H01",
+      "label": "account",
+      "width": 390
+    },
+    {
+      "id": "H03",
+      "label": "privacy",
+      "width": 1440
+    },
+    {
+      "id": "H03",
+      "label": "privacy",
+      "width": 390
+    },
+    {
+      "id": "H06",
+      "label": "notifications",
+      "width": 1440
+    },
+    {
+      "id": "H06",
+      "label": "notifications",
+      "width": 390
+    }
+  ],
+  "real_backend": true,
+  "actual_zoom": 2,
+  "visual_comparison_required": true
+}

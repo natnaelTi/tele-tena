@@ -1,3 +1,7 @@
+## Guest-first revision —17October2026
+
+AI care search and its natural-language bar are jointly deferred post-MVP. Structured guest clinicians/services,live filters,safe auth return and private request drafting are the current care entry. Existing invitation types remain;universal Invite needs optional owner review and is not authorized. Other MVP rules and post-handover modules remain unchanged. See the current guest-first verification report and existing matrix.
+
 # Product roadmap and capability boundaries
 
 ## MVP-first release boundary — 2026-10-08

@@ -1,3 +1,5 @@
+> Historical journey evidence retained. For the current guest-first runtime and revised entry/consent journeys,see [18October verification](guest-first-mvp-verification-2026-10-18.md). Named older hosted/financial checks remain evidence only for their stated sources.
+
 # Active final MVP polish verification —14October2026
 
 Current runtime and packaged frontend: **105cd15af1d1432e37b95de583f151d3056f6950**.

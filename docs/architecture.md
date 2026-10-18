@@ -1,3 +1,7 @@
+## Guest-first additive boundary —18October2026
+
+Public directory APIs expose explicit approved-professional/offering projections only;booking,private requests,records and file grants remain authenticated. v1.40 adds nullable care_alias and empty policy/grant/notice tables,without historical preference backfills or financial schema changes. Binary document snapshots copy inside the existing transaction;neutral notification jobs claim durable per-recipient events before provider I/O. Unknown delivery outcomes are not auto-retried. Guest health drafts stay in memory;safe opaque navigation intent alone may use sessionStorage. No new Python/Node dependencies,framework or real payment rails. See guest-first-mvp-verification-2026-10-18.md.
+
 # Architecture decision 001 — Frappe-backed PWA
 
 Status: accepted direction; foundation installation verified on Frappe 15.121.2

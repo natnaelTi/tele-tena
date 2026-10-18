@@ -1,3 +1,7 @@
+## Guest-first review —18October2026
+
+Guest public directory,reactive eligibility/availability filters,intent-aware auth,volatile request drafts,explicit encounter history/file sharing and state-aware neutral notices are implemented and locally tested. The existing guest_first_revision matrix and guest-first-mvp-verification-2026-10-18.md contain exact evidence. Owner review,live delivery,physical devices,native translations and production policy/retention approval remain separate. No reseed,merge,Selfmade/shared-repair change or real-money activation.
+
 # TeleTena delivery tracker
 
 ## Active final bounded checkpoint —14October2026
