@@ -6,14 +6,22 @@ import frappe
 from tele_tena.api.journey import actor,rows,query,command
 
 
-def create(appointment,state):
+def create(appointment,state,plan_id=None):
     if state not in ('Booked','PendingConfirmation'):return
     event='Confirmed' if state=='Booked' else 'Pending'
     if event=='Confirmed':
         frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE appointment=%s AND event='Pending' AND state IN ('Available','Pending','Unavailable','Rejected')",(appointment,))
-    found=rows('SELECT patient,clinician FROM tt_appointment WHERE id=%s',(appointment,))
+    found=rows('SELECT patient,clinician,offering FROM tt_appointment WHERE id=%s',(appointment,))
     if not found:return
-    for user in (found[0].patient,found[0].clinician):
+    app=found[0];recipients={app.patient,app.clinician}
+    # Both separately consented adults receive neutral booking logistics,never
+    # one another's intake,identity or clinical summary. The booking command
+    # supplies the validated plan before its appointment link is committed.
+    people=rows("""SELECT p.user FROM tt_couple_participant p JOIN tt_couple_plan cp ON cp.id=p.plan
+      WHERE (cp.appointment=%s OR cp.id=%s) AND cp.payer=%s AND cp.offering=%s
+      AND p.state='Consented'""",(appointment,plan_id,app.patient,app.offering))
+    recipients.update(p.user for p in people)
+    for user in sorted(recipients):
         prefs=rows('SELECT * FROM tt_notice_preference WHERE user=%s',(user,))
         channels=['in_app']+[channel for channel in ('email','sms') if prefs and prefs[0][channel+'_enabled']]
         for channel in channels:
@@ -76,6 +84,13 @@ def dispatch():
         app=rows('SELECT * FROM tt_appointment WHERE id=%s',(notice.appointment,))
         if not app or (notice.event=='Confirmed' and app[0].state!='Booked') or (notice.event=='Pending' and app[0].state!='PendingConfirmation'):
             frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
+        if not frappe.db.get_value('User',notice.user,'enabled'):
+            frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
+        if notice.user not in (app[0].patient,app[0].clinician):
+            consent=rows("""SELECT 1 FROM tt_couple_participant p JOIN tt_couple_plan cp ON cp.id=p.plan
+              WHERE cp.appointment=%s AND p.user=%s AND p.state='Consented'""",(notice.appointment,notice.user))
+            if not consent:
+                frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
         prefs=rows('SELECT * FROM tt_notice_preference WHERE user=%s',(notice.user,))
         identities=rows('SELECT contact FROM tt_contact_identity WHERE user=%s AND channel=%s AND verified_at IS NOT NULL LIMIT 1',(notice.user,'phone' if notice.channel=='sms' else 'email'))
         if not prefs or not prefs[0][notice.channel+'_enabled'] or not identities:
@@ -91,7 +106,7 @@ def dispatch():
         label='confirmed' if notice.event=='Confirmed' else 'awaiting clinician approval'
         when=app.start.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(app.timezone or 'Africa/Addis_Ababa')).strftime('%d %b %Y %H:%M')
         # Site-bound relative authenticated link;no permanent token or health text.
-        link=frappe.utils.get_url('/teletena/'+('patient' if notice.user==app.patient else 'clinician')+'/consultations/'+app.id)
+        link=frappe.utils.get_url('/teletena/'+('clinician' if notice.user==app.clinician else 'patient')+'/consultations/'+app.id)
         from urllib.parse import urlsplit,urlunsplit
         parsed=urlsplit(link)
         if parsed.hostname and not parsed.hostname.endswith('.localhost') and parsed.hostname not in ('localhost','127.0.0.1'):

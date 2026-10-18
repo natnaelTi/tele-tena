@@ -76,6 +76,23 @@ class Couples(unittest.TestCase):
         frappe.db.commit()
         return invitation, booked['id'], one, two
 
+    def test_booking_notices_are_individual_and_neutral(self):
+        from tele_tena import booking_notifications
+        invitation,appointment,one,two=self.consented_plan()
+        booking_notifications.create(appointment,'Booked')
+        notices=journey.rows('SELECT user,event,channel,state FROM tt_booking_notice WHERE appointment=%s',(appointment,))
+        self.assertEqual({item.user for item in notices},{base.fixtures.USERS[key] for key in ('p1','p2','c1')})
+        self.assertEqual(len(notices),3)
+        for key in ('p1','p2','c1'):
+            base.fixtures.login(key)
+            own=[item for item in booking_notifications.notices() if item.appointment==appointment]
+            self.assertEqual(len(own),1)
+            self.assertNotIn(one['request'],json.dumps(own,default=str))
+            self.assertNotIn(two['request'],json.dumps(own,default=str))
+            self.assertNotIn('patient',own[0]);self.assertNotIn('clinician',own[0])
+        base.fixtures.login('admin')
+        self.assertFalse(any(item.appointment==appointment for item in booking_notifications.notices()))
+
     def test_concurrent_couple_confirmation_reserves_once(self):
         invitation, _, _, _ = self.consented_plan(book=False)
         barrier = threading.Barrier(2)

@@ -870,7 +870,7 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     from tele_tena.api.encounter_files import grant_booking
     grant_booking(appointment,p.user,o.clinician,shared)
     from tele_tena.booking_notifications import create
-    create(appointment,state)
+    create(appointment,state,plan_id=couple_plan_id)
     frappe.db.sql('UPDATE tt_wallet SET available=available-%s,reserved=reserved+%s WHERE patient=%s', (booking_price, booking_price, p.user))
     simulation_log(p.user, 'Reservation', booking_price, 'booking:' + appointment)
     post('booking:' + appointment, 'Reservation', 'booking:' + appointment, [
