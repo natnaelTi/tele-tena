@@ -14,7 +14,7 @@ state=json.loads(Path(frappe.get_site_path('private','tt-demo-mvp-v2-records.jso
 
 class GuestFirst(unittest.TestCase):
  def setUp(self):
-  frappe.db.savepoint('guest_first');frappe.set_user(users['patient']);self.guard=patch('frappe.sendmail',side_effect=AssertionError('Unexpected external mail'));self.guard.start()
+  frappe.db.savepoint('guest_first');frappe.set_user(users['patient']);self.guard=patch('frappe.sendmail',side_effect=AssertionError('Unexpected external mail'));self.guard.start();booking_notifications.save_preferences(email_enabled=False,sms_enabled=False)
  def tearDown(self):
   frappe.db.rollback(save_point='guest_first');self.guard.stop();frappe.set_user('Administrator')
  def offer(self):
@@ -80,7 +80,7 @@ class GuestFirst(unittest.TestCase):
   self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_booking_notice WHERE appointment=%s',(id,))[0][0],2)
   self.assertEqual(frappe.db.sql("SELECT COUNT(*) FROM tt_journal WHERE event_ref=%s",('booking:'+id,))[0][0],1)
   self.assertEqual(booking_notifications.preferences(),{'email_enabled':False,'sms_enabled':False})
-  self.assertEqual(len(booking_notifications.notices()),1)
+  self.assertEqual(len([item for item in booking_notifications.notices() if item.appointment==id]),1)
  def test_public_presence_capacity_and_expiry_are_distinct(self):
   from datetime import timedelta
   from tele_tena.api import open_requests
@@ -156,16 +156,17 @@ class GuestFirst(unittest.TestCase):
   from tele_tena.api import presentation
   offer=self.offer();frappe.db.sql("UPDATE tt_schedule SET confirmation_mode='manual' WHERE offering=%s",(offer.id,))
   result,args,offer=self.book();self.assertEqual(result['state'],'PendingConfirmation')
-  notices=booking_notifications.notices();self.assertEqual(notices[0].event,'Pending')
+  notices=[item for item in booking_notifications.notices() if item.appointment==result['id']];self.assertEqual(notices[0].event,'Pending')
   self.assertFalse(presentation.appointment_detail(result['id'])['can_join'])
   clinician=frappe.db.sql('SELECT clinician FROM tt_appointment WHERE id=%s',(result['id'],))[0][0]
   frappe.set_user(clinician);presentation.respond_to_request(result['id'],'confirm')
-  frappe.set_user(users['patient']);notices=booking_notifications.notices()
+  frappe.set_user(users['patient']);notices=[item for item in booking_notifications.notices() if item.appointment==result['id']]
   self.assertEqual(sum(item.event=='Confirmed' and item.state=='Available' for item in notices),1)
   self.assertEqual(sum(item.event=='Pending' and item.state=='Available' for item in notices),0)
  def test_policy_versions_and_no_implicit_privilege(self):
   with patch('tele_tena.review.registration_enabled',return_value=True):user=contact_auth._identity('email','guest-first-'+secrets.token_hex(6)+'@example.invalid')
   frappe.set_user(user)
+  self.assertEqual(booking_notifications.preferences(),{'email_enabled':False,'sms_enabled':False})
   answers={'name':'Fictional patient','adult':True,'consent':True,'care_alias':'River','share_name':False,'share_history':True}
   with patch('tele_tena.review.registration_enabled',return_value=True):
    with self.assertRaises(frappe.ValidationError):contact_auth.save_onboarding('patient',3,answers,1)
