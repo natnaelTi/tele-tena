@@ -39,5 +39,14 @@ lock = hashlib.sha256((FRONTEND / 'package-lock.json').read_bytes()).hexdigest()
               for p in sorted(dist.rglob('*')) if p.is_file() and p.name != 'release.json'}}, indent=2) + '\n')
 target = APP / 'tele_tena/public/review'
 # Retain old hashed assets for open clients; never auto-reload an active call.
+# An operator may use umask077 for private backups/configuration. Public assets
+# still need nginx-readable modes. Refuse symlinks before copying or chmodding;
+# nothing outside this app-owned public tree is touched.
+assert not target.is_symlink(), 'Public build target must not be a symbolic link'
+for tree in (dist,target):
+    assert not any(path.is_symlink() for path in tree.rglob('*')), 'Public build trees must not contain symbolic links'
 shutil.copytree(dist, target, dirs_exist_ok=True)
+target.chmod(0o755)
+for path in target.rglob('*'):
+    path.chmod(0o755 if path.is_dir() else 0o644)
 print('Built Frappe assets for source commit ' + source)

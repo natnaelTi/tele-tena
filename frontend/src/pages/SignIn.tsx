@@ -121,6 +121,9 @@ export default function SignIn() {
       if(!current?.profile&&!current?.roles.some(role=>['Tele Tena Approver','Tele Tena Medical Lead','Tele Tena Clinician'].includes(role))){navigate('/onboarding?intent=patient',{replace:true});return;}
       setError(w('You are signed in to a professional workspace. Use a patient account to continue; no patient role has been added.'));return;
     }
+    if(params.get('intent')==='clinician'&&current?.profile?.kind==='patient'){
+      setError(w('This account has a patient profile. Use your professional account to apply; your existing profile and permissions are unchanged.'));return;
+    }
     const next = params.get("next") || "";
     const inviteToken = (routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken || "";
     const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken||"";
