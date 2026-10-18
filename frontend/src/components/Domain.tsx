@@ -1,3 +1,4 @@
+import {useSession} from '../hooks/useSession';
 import {AvailabilityStatus} from './AvailabilityStatus';
 import {Avatar} from "./ProfilePhoto";
 import type { AppointmentView } from "../appointment-groups";
@@ -48,6 +49,8 @@ export function PageTitle({
   );
 }
 export function ClinicianCard({ offer }: { offer: Offer }) {
+  const {session}=useSession();
+  const canBook=session?.profile?.kind==='patient'&&session.roles.includes('Tele Tena Patient');
   const { w } = useLocale();
   const [preview, setPreview] = useState(false);
   const trigger = useRef<HTMLButtonElement | null>(null);
@@ -59,7 +62,7 @@ export function ClinicianCard({ offer }: { offer: Offer }) {
         {offer.description && <p className="clinician-description">{offer.description}</p>}
         <AvailabilityStatus value={offer.availability}/><div className="clinician-facts"><span><Languages size={16} aria-hidden="true" />{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Care language not listed")}</span><span>{offer.consultation_format === 'audio' ? <Headphones size={16} aria-hidden="true" /> : <Video size={16} aria-hidden="true" />}{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')}</span></div>
       </div></div>
-      <div className="card-actions"><div><strong>ETB {money(offer.price)}</strong><small>{offer.minutes} {w("minutes")} · {w("per session")}</small></div><div className="actions"><Button variant="quiet" onClick={event => { trigger.current = event.currentTarget; setPreview(true); }}>{w("View profile")}</Button><Link className="button" to={"/care/select/" + offer.id}>{w("Choose a time")}</Link></div></div>
+      <div className="card-actions"><div><strong>ETB {money(offer.price)}</strong><small>{offer.minutes} {w("minutes")} · {w("per session")}</small></div><div className="actions"><Button variant="quiet" onClick={event => { trigger.current = event.currentTarget; setPreview(true); }}>{w("View profile")}</Button>{canBook&&<Link className="button" to={"/care/select/" + offer.id}>{w("Choose a time")}</Link>}</div></div>
     </Card>
     {preview && <ClinicianPreview offer={offer} focusReturnTarget={trigger.current} close={() => setPreview(false)} />}
   </>;

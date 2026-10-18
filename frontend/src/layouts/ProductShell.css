@@ -1,11 +1,11 @@
 /* Reference patient/clinician top-bar shell; administrator keeps its own queue shell. */
 .reference-workspace { background:white; min-height:100svh; }
 .product-header { min-height:80px; padding:16px 40px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:40px; }
-.product-desktop-nav { display:flex; align-items:center; gap:24px; }
+.product-desktop-nav { margin-left:auto; display:flex; align-items:center; gap:24px; }
 .product-desktop-nav a { display:inline-flex; align-items:center; gap:8px; min-height:44px; text-decoration:none; color:var(--muted); font-size:14px; font-weight:600; }
 .product-desktop-nav a.active { color:var(--ink); }
 .product-desktop-nav a svg { display:none; }
-.product-user { margin-left:auto; display:flex; align-items:center; gap:16px; font-size:14px; }
+.product-user { margin-left:0; display:flex; align-items:center; gap:16px; font-size:14px; }
 .product-user > span { max-width:200px; overflow-wrap:anywhere; }
 .reference-workspace-main { max-width:1200px; padding:48px 36px 90px; margin:0 auto; }
 .reference-workspace-main.workspace-wide { max-width:1340px; padding-inline:48px; }
@@ -61,3 +61,5 @@
 .request-presence-shell > .notice { margin:0; }
 .clinician-facts > span { display:inline-flex; align-items:center; gap:6px; }
 .reference-clinician-card .clinician-description { margin:14px 0 0; color:var(--muted); display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
+
+@media(max-width:800px) { .product-header .product-user { margin-left:auto; } }

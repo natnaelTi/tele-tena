@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { ArrowRight, CalendarDays, LockKeyhole, MessageCircle, ShieldCheck, UserRound, Users } from "lucide-react";
+import {useSession,destination} from '../hooks/useSession';
+import {Skeleton,InlineNotice,Button} from '../components/ui';
 import { useLocale } from "../hooks/useLocale";
 import "./Homepage.css";
 
@@ -13,6 +15,10 @@ export default function Homepage() {
   const { w } = useLocale();
   const [tool, setTool] = useState<keyof typeof tools>("Schedule");
   const preview = tools[tool];
+  const {session,loading,error,refresh}=useSession();
+  if(loading)return <Skeleton/>;
+  if(error)return <InlineNotice tone="danger">{w("Your session could not be checked. Try again.")} <Button onClick={()=>void refresh().catch(()=>undefined)}>{w("Try again")}</Button></InlineNotice>;
+  if(session)return <Navigate to={destination(session)} replace/>;
   return <main className="landing-page">
     <section className="landing-hero">
       <header className="landing-intro">

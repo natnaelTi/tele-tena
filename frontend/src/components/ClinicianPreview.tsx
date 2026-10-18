@@ -1,3 +1,4 @@
+import {useSession} from '../hooks/useSession';
 import {AvailabilityStatus} from './AvailabilityStatus';
 import {Avatar} from "./ProfilePhoto";
 import { useCallback,useEffect } from "react";
@@ -12,6 +13,8 @@ import { money } from "./Domain";
 /** Patient-facing, approved backend facts only. No credentials inferred from a title. */
 export function ClinicianPreview({ offer, close, focusReturnTarget }: { offer: Offer; close: () => void; focusReturnTarget?: HTMLElement | null }) {
   const { w, t } = useLocale();
+  const {session}=useSession();
+  const canBook=session?.profile?.kind==='patient'&&session.roles.includes('Tele Tena Patient');
   const load = useCallback(() => journeyApi.publicClinician(offer.clinician_id), [offer.clinician_id]);
   const resource = useResource(load);
   useEffect(()=>{const timer=setInterval(()=>void resource.refresh(),30000);return()=>clearInterval(timer);},[resource.refresh]);
@@ -23,7 +26,7 @@ export function ClinicianPreview({ offer, close, focusReturnTarget }: { offer: O
       <AvailabilityStatus value={resource.data?.services?.find((item:any)=>item.offering===offer.id)?.availability}/>{offer.description && <p>{offer.description}</p>}
       <dl className="profile-preview-facts"><div><dt>{w("Approved service")}</dt><dd>{offer.label}</dd></div><div><dt>{w("Care language")}</dt><dd>{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Not listed")}</dd></div><div><dt>{w("Consultation")}</dt><dd>{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')} · {offer.minutes} {w("minutes")}</dd></div><div><dt>{w("Published fee")}</dt><dd>ETB {money(offer.price)}</dd></div><div><dt>{t("sessionExperienceMetric")}</dt><dd>{experience?.average == null ? t(experience?.status === "new" ? "sessionExperienceNew" : "sessionExperienceMore") : `${experience.average} / 5`} · {experience?.sample_count ?? 0} {t("evidenceCount")}</dd></div></dl>
       <p className="supporting">{w("Credential review and patient feedback are separate signals. Neither guarantees a clinical outcome.")}</p>
-      <div className="actions"><Link className="button secondary" to={'/care/clinicians/' + offer.clinician_id} state={{selectedOffering:offer.id}}>{w("View full profile")}</Link>{currentOffering && <Link className="button" to={'/care/select/' + offer.id}>{w("Choose a time")}</Link>}</div>
+      <div className="actions"><Link className="button secondary" to={'/care/clinicians/' + offer.clinician_id} state={{selectedOffering:offer.id}}>{w("View full profile")}</Link>{currentOffering && <Link className="button" to={'/care/select/' + offer.id}>{w(canBook?"Choose a time":"Sign in to Book")}</Link>}</div>
       {!currentOffering && <InlineNotice>{w("This offering is no longer available. Close this preview and choose another service.")}</InlineNotice>}
     </>}
   </Dialog>;

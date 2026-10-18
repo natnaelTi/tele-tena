@@ -129,4 +129,6 @@ export const guestFirstTranslations:Record<string,[string,string]>={
  'minutes since publication':['ከታተመ ደቂቃዎች','daqiiqaa erga maxxanfamee'],
  'Post a private request':['የግል ጥያቄ ያቅርቡ','Gaaffii dhuunfaa dhiyeessi'],
  'services':['አገልግሎቶች','tajaajiloota'],
+ 'Sign in to Book':['ቀጠሮ ለመያዝ ይግቡ','Beellama qabachuuf seeni'],
+ 'Your session could not be checked. Try again.':['መለያዎን ማረጋገጥ አልተቻለም። እንደገና ይሞክሩ።','Seensa kee mirkaneessuun hin dandaʼamne. Irra deebiʼii yaali.'],
 };

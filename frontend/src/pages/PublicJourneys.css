@@ -22,4 +22,4 @@
 @media(max-width:1000px){.public-journey-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.public-journey-hero h1{font-size:38px}}
 @media(max-width:650px){.public-journey{padding:28px 20px 70px}.public-journey-hero{grid-template-columns:1fr;padding:28px 24px;gap:24px}.public-journey-hero h1{font-size:36px}.public-journey-preview{padding:22px}.public-journey-grid{grid-template-columns:1fr}.public-journey-grid>.card{padding:22px}}
 
-.reference-information-header nav{margin-left:auto}
+.reference-information-header > nav{margin-left:auto}

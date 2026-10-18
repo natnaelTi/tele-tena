@@ -41,12 +41,12 @@
   gap: 24px;
   padding-block: 24px;
 }
-.public-header nav {
+.public-header > nav {
   display: flex;
   align-items: center;
   gap: 28px;
 }
-.public-header nav > a:not(.button) {
+.public-header > nav > a:not(.button) {
   text-decoration: none;
   color: var(--ink);
   font-size: 14px;
@@ -1271,7 +1271,7 @@ button { color: inherit; background: transparent; }
   }
 }
 @media (max-width: 1100px) {
-  .public-header nav {
+  .public-header > nav {
     gap: 16px;
   }
   .workspace {
@@ -1311,7 +1311,7 @@ button { color: inherit; background: transparent; }
   .public-header {
     padding-block: 20px;
   }
-  .public-header nav {
+  .public-header > nav {
     gap: 8px;
   }
   .hero {
@@ -1812,17 +1812,17 @@ button { color: inherit; background: transparent; }
     flex-wrap: wrap;
     row-gap: 16px;
   }
-  .public-header nav {
+  .public-header > nav {
     order: 2;
     width: 100%;
     justify-content: space-between;
     gap: 4px;
   }
-  .public-header nav > a:first-of-type {
+  .public-header > nav > a:first-of-type {
     display: inline-flex;
     font-size: 12px;
   }
-  .public-header nav > a:nth-of-type(2) {
+  .public-header > nav > a:nth-of-type(2) {
     font-size: 12px;
   }
 }

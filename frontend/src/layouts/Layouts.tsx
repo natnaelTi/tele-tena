@@ -21,7 +21,7 @@ import {
 import { Brand } from "../components/Brand";
 import { Button, Dialog, InlineNotice, Skeleton } from "../components/ui";
 import { LanguageSelect, useLocale } from "../hooks/useLocale";
-import { useSession } from "../hooks/useSession";
+import { useSession, destination } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
 import { useResource } from "../hooks/useResource";
 import { ApiError } from "../api";
@@ -124,6 +124,13 @@ function ClinicianRequestAvailability() {
 }
 export function PublicLayout() {
   const { w } = useLocale();
+  const {session,refresh}=useSession(),navigate=useNavigate();
+  const [signingOut,setSigningOut]=useState(false),[signoutError,setSignoutError]=useState(false);
+  const home=destination(session);
+  const isReviewer=!!session?.roles.some(role=>['Tele Tena Approver','Tele Tena Medical Lead'].includes(role));
+  const links=!session?[]:isReviewer?[[home,'Applications & approval'],...(session.roles.includes('Tele Tena Approver')?[['/admin/services','Services']]:[])]:session.profile?.kind==='patient'?[[home,'Home'],['/care','Find care'],['/patient/appointments','Appointments'],['/patient/requests','My requests']]:session.profile?.kind==='clinician'?[[home,'Home'],...(session.roles.includes('Tele Tena Clinician')?[['/clinician/appointments','Appointments'],['/clinician/requests','Requests']]:[['/clinician/vetting','Professional review']])]:[[home,'Continue']];
+  const accountPath=isReviewer?(session?.roles.includes('Tele Tena Approver')?'/admin/account':'/admin/rubrics/account'):session?.profile?'/'+session.profile.kind+'/account':home;
+  const signout=async()=>{setSigningOut(true);setSignoutError(false);try{await journeyApi.logout();await refresh();navigate('/sign-in');}catch{setSignoutError(true);}finally{setSigningOut(false);}};
   const location=useLocation();
   const informationPage=["/how-it-works","/for-clinicians"].includes(location.pathname);
   return (
@@ -131,16 +138,17 @@ export function PublicLayout() {
       <DemoBar />
       <header className={`public-header reference-public-header ${informationPage?"reference-information-header":""}`}>
         <Brand />
-        <nav aria-label="Main navigation">
-          {!informationPage&&<Link to="/care">{w("Find care")}</Link>}
-          <Link to="/how-it-works">{w("How it works")}</Link>
-          <Link to="/for-clinicians">{w("For clinicians")}</Link>
+        <nav aria-label={w(session?"Workspace":"Main navigation")}>
+          {session?links.map(([to,label])=><Link key={to} className={to===home?"button secondary":""} to={to}>{w(label)}</Link>):<>
+            {!informationPage&&<Link to="/care">{w("Find care")}</Link>}
+            <Link to="/how-it-works">{w("How it works")}</Link>
+            <Link to="/for-clinicians">{w("For clinicians")}</Link>
+          </>}
           <LanguageSelect />
-          <Link className="button secondary" to="/sign-in">
-            {w("Sign in")}
-          </Link>
+          {session?<AccountMenu accountPath={accountPath} onSignout={()=>void signout()} busy={signingOut}/>:<Link className="button secondary" to="/sign-in">{w("Sign in")}</Link>}
         </nav>
       </header>
+      {signoutError&&<InlineNotice tone="danger">{w("We could not sign you out. Try again.")}</InlineNotice>}
       <Outlet />
       <footer className="public-footer reference-public-footer">
         <Brand />
