@@ -128,4 +128,6 @@ export const guestFirstTranslations:Record<string,[string,string]>={
  'Review available offers':['የደረሱ ቅናሾችን ይመልከቱ','Yaadota dhiyaatan ilaali'],
  'minutes since publication':['ከታተመ ደቂቃዎች','daqiiqaa erga maxxanfamee'],
  'An encounter alias is created when you book.':['ቀጠሮ ሲይዙ ለዚያ ቀጠሮ ቅጽል ስም ይፈጠራል።','Yeroo beellama qabattu maqaan bakka buʼaa beellamaaf ni uumama.'],
+ 'Post a private request':['የግል ጥያቄ ያቅርቡ','Gaaffii dhuunfaa dhiyeessi'],
+ 'services':['አገልግሎቶች','tajaajiloota'],
 };
