@@ -40,7 +40,8 @@ function ConnectedPresence({children}:{children:ReactNode}) {
     renew();
     const timer=window.setInterval(renew,30000);
     window.addEventListener('online',renew);
-    return()=>{active=false;window.clearInterval(timer);window.removeEventListener('online',renew);};
+    window.addEventListener('teletena:availability-saved',renew);
+    return()=>{active=false;window.clearInterval(timer);window.removeEventListener('online',renew);window.removeEventListener('teletena:availability-saved',renew);};
   },[refresh,recordFailure]);
   const toggle = async (pause=false) => {
     setBusy(true);
@@ -61,14 +62,14 @@ export function RequestAvailabilityCard(){
  if(!context)return null;
  const {data,busy,failureMessage,toggle,error,refresh}=context;
  const state=error?'error':data?.occupancy|| (data?.ready?'available':data?.reasons?.some((r:string)=>r!=='no_immediate_capacity')?'setup':'paused');
- const title=state==='available'?'Available for requests':state==='in_consultation'?'In consultation':state==='occupied'?'Occupied':state==='setup'?'Complete your request setup':state==='error'?'Availability unavailable':'Requests paused';
+ const title=state==='available'?'Available for requests':state==='in_consultation'?'In consultation':state==='occupied'?'Occupied':state==='setup'?'Complete your request setup':state==='error'?'Availability unavailable':data?.reasons?.includes('no_immediate_capacity')?'Requests paused — No immediate opening':'Requests paused';
  const guidance:Record<string,{label:string;to:string}>={
  approval_required:{label:'Approval required',to:'/clinician/vetting'},language_required:{label:'Add a care language',to:'/clinician/account'},offering_required:{label:'Publish an offering',to:'/clinician/services'},scope_approval_required:{label:'Get approval for a service scope',to:'/clinician/vetting'},published_schedule_required:{label:'Publish availability',to:'/clinician/availability'},immediate_policy_required:{label:'Ask a reviewer about immediate-care policy',to:'/clinician/services'},no_immediate_capacity:{label:'Review availability',to:'/clinician/availability'}};
  return <section className={'request-availability-card state-'+state} aria-label={w('Request availability')}>
  <div className="presence-card-heading"><Radio size={28} aria-hidden="true"/><div><span>{w('Immediate requests')}</span><h2 aria-live="polite">{w(title)}</h2></div><span className="presence-status-dot" aria-hidden="true"/></div>
  {!data&&!error?<p>{w('Checking availability…')}</p>:<p>{w(data?.ready?'You can receive eligible requests while this workspace is connected.':data?.occupancy?'Your booked time is protected. Requests resume when a full session fits.':data?.control_mode==='paused'?'You paused requests. Start again when you are ready.':data?.automatic&&!data?.within_hours?'Automatic availability resumes during your published hours while this workspace is connected.':data?.reasons?.includes('no_immediate_capacity')?'No full session can start within the immediate-care window.':'Complete the steps below or start when you are ready.')}</p>}
  {state==='setup'&&<ul>{data?.reasons?.map((reason:string)=>guidance[reason]&&<li key={reason}><Link to={guidance[reason].to}>{w(guidance[reason].label)}</Link></li>)}</ul>}
- <div className="actions">{error?<Button variant="secondary" onClick={()=>void refresh()}>{w('Retry')}</Button>:<Button loading={busy} disabled={!data||(!data.configured&&!data.ready&&!data.automatic)} onClick={()=>void toggle()}>{w(data?.ready?'Pause':data?.automatic?'Resume automatic availability':'Go available')}</Button>}
+ <div className="actions">{error?<Button variant="secondary" onClick={()=>void refresh()}>{w('Retry')}</Button>:<Button loading={busy} disabled={!data||(!data.configured&&!data.ready&&!data.automatic)||(data.automatic&&data.control_mode!=='paused'&&!data.ready)} onClick={()=>void toggle()}>{w(data?.ready?'Pause':data?.automatic?(data.control_mode==='paused'?'Resume automatic availability':'Automatic availability enabled'):'Go available')}</Button>}
  {data?.automatic&&data.control_mode!=='paused'&&!data.ready&&<Button variant="secondary" loading={busy} onClick={()=>void toggle(true)}>{w('Pause requests')}</Button>}
  <Link className="text-link" to="/clinician/availability"><CalendarClock size={18}/>{w('Manage availability')}</Link></div>
  {data?.automatic&&<small>{w('Automatic during published hours · Manual pause always takes priority.')}</small>}

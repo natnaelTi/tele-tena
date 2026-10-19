@@ -1,5 +1,7 @@
 /** Provisional UI translations;native and clinical review remain release gates. */
 export const guestFirstTranslations:Record<string,[string,string]>={
+"Automatic availability enabled":["ራስ ሰር ዝግጁነት ነቅቷል","Qophaa’inni ofumaan banameera"],
+"Requests paused — No immediate opening":["ጥያቄዎች ቆመዋል — አሁን ክፍት ጊዜ የለም","Gaaffileen dhaabataniiru — Yeroon hatattamaa hin jiru"],
 "Automatic immediate requests":["ለአስቸኳይ ጥያቄዎች በራስ ሰር ዝግጁ ይሁኑ", "Gaaffii hatattamaaf ofumaan qophaa’i"],
 "Immediate requests":["አስቸኳይ ጥያቄዎች", "Gaaffilee hatattamaa"],
 "In consultation":["በምክክር ላይ", "Marii keessa"],

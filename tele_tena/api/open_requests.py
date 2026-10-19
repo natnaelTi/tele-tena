@@ -293,8 +293,7 @@ def _automatic_hours(clinician):
         intervals, breaks = _ranges_for_day(schedule, local.date())
         wall = local.time().replace(tzinfo=None)
         if any(start <= wall < end for start,end in intervals) and not any(start <= wall < end for start,end in breaks):
-            if _has_immediate_capacity(clinician, [frappe._dict(id=schedule.offering)]):
-                return True
+            return True
     return False
 
 

@@ -40,6 +40,14 @@ class SchedulePresence(GuestFirst):
    result=requests.heartbeat_request_presence();self.assertFalse(result['ready']);self.assertIn('no_immediate_capacity',result['reasons'])
   with patch.object(requests,'_has_immediate_capacity',return_value=True),patch.object(requests,'dispatch_open_requests'):
    self.assertTrue(requests.heartbeat_request_presence()['ready'])
+ def test_real_capacity_and_opt_out(self):
+  expected=requests._has_immediate_capacity(self.clinician,[frappe._dict(id=self.item.id)])
+  with patch.object(requests,'dispatch_open_requests'):
+   result=requests.heartbeat_request_presence()
+   self.assertEqual(result['ready'],expected)
+   self.assertTrue(result['within_hours'])
+   scheduling.save_schedule(**{**self.args,'auto_requests':False})
+   self.assertFalse(requests.heartbeat_request_presence()['ready'])
  def test_unauthorized_setting_and_presence(self):
   frappe.set_user(users['patient'])
   with self.assertRaises(frappe.PermissionError):scheduling.save_schedule(**self.args)

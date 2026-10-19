@@ -2,7 +2,7 @@
 export function appointmentStatus(item: { state?: string; status?: string; call_state?: string | null; documentation_state?: string | null; end: string }, clinician: boolean, now = Date.now()) {
   const state = item.state || item.status;
   if (state === 'Completed') return { label: 'Completed', detail: '', tone: 'success' as const };
-  if (state === 'Cancelled') return { label: 'Cancelled', detail: '', tone: 'neutral' as const };
+  if (state === 'Cancelled') return { label: 'Cancelled', detail: '', tone: 'danger' as const };
   if (state === 'Expired') return { label: 'Expired', detail: '', tone: 'neutral' as const };
   if (state === 'NoShow') return { label: 'No-show recorded', detail: '', tone: 'warning' as const };
   if (state === 'PendingConfirmation') return { label: 'Needs confirmation', detail: '', tone: 'warning' as const };
