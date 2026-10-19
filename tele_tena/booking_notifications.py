@@ -129,6 +129,8 @@ def dispatch():
         message=f'TeleTena appointment {label}. {when} ({app.timezone}). Reference {app.id[:8]}. Sign in: {link}'
         if notice.user==app.patient and notice.event in ('Confirmed','Pending') and rows('SELECT id FROM tt_journal WHERE event_ref=%s',('booking:'+app.id,)):
             minor=int(app.price);message+=f' Demonstration balance: ETB {minor//100}.{minor%100:02d} reserved. No external payment collected.'
+        if notice.user==app.patient and notice.event in ('Cancelled','Declined','Expired') and rows('SELECT id FROM tt_journal WHERE event_ref=%s',('release:'+app.id,)):
+            message+=' Demonstration balance reservation released. No external refund was processed.'
         if notice.event in ('Pending','ConfirmationReminder') and app.expires_at:
             deadline=app.expires_at.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(app.timezone or 'Africa/Addis_Ababa')).strftime('%d %b %Y %H:%M')
             message+=f' Response deadline: {deadline} ({app.timezone}).'
