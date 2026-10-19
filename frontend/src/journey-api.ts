@@ -13,7 +13,7 @@ export type Window = { start: string; end: string }
 export type TimeSlot = {start: string; end: string; local_time: string; timezone: string; schedule_timezone: string | null}
 export type ScheduleInterval = {weekday: number; start_local: string; end_local: string}
 export type ScheduleException = {date: string; kind: 'unavailable' | 'replace' | 'break'; start_local?: string | null; end_local?: string | null}
-export type Schedule = {id: string; offering: string; schedule_name: string; timezone: string; consultation_format: 'audio'|'video'; confirmation_mode: 'automatic'|'manual'; minimum_notice_minutes: number; horizon_days: number; buffer_before: number; buffer_after: number; status: 'Draft'|'Published'|'Paused'; service_label: string; minutes: number; intervals: ScheduleInterval[]; exceptions: ScheduleException[]}
+export type Schedule = {id: string; offering: string; schedule_name: string; timezone: string; consultation_format: 'audio'|'video'; confirmation_mode: 'automatic'|'manual'; minimum_notice_minutes: number; horizon_days: number; buffer_before: number; buffer_after: number; auto_requests?: number; status: 'Draft'|'Published'|'Paused'; service_label: string; minutes: number; intervals: ScheduleInterval[]; exceptions: ScheduleException[]}
 export type PreviousClinician = {photo_url?:string|null;clinician_id:string;display_name:string;last_consultation:string;completed_sessions:number}
 
 /** Domain-facing API. Frappe method names and HTTP/CSRF details stay out of views. */
@@ -89,6 +89,7 @@ export const journeyApi = {
   findMoreOptions: (request_id: string) => api<any>('tele_tena.api.open_requests.find_more_options', {request_id}, true),
   cancelRequest: (request_id: string) => api<any>('tele_tena.api.open_requests.close_request', {request_id}, true),
   respondOffer: (request_id: string, offer_id: string, decision: 'accept'|'decline', sharing?:Sharing, expected_disclosure?:Disclosure) => api<any>('tele_tena.api.open_requests.respond_offer', {request_id,offer_id,decision,sharing,expected_disclosure}, true),
+  heartbeatRequestPresence: (resume_automatic=false) => api<any>('tele_tena.api.open_requests.heartbeat_request_presence',{resume_automatic},true),
   requestPresence: () => api<any>('tele_tena.api.open_requests.request_presence'),
   setRequestPresence: (ready: boolean) => api<any>('tele_tena.api.open_requests.set_request_presence', {ready}, true),
   clinicianRequests: () => api<any[]>('tele_tena.api.open_requests.clinician_requests'),

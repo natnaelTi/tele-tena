@@ -899,3 +899,8 @@ retain the history textarea and can save multiple private PDF/JPEG/PNG files
 during eligible onboarding and in Personal profile. These files are not
 automatically shared with clinicians. Evidence: history-country-verification.md.
 Native-language approval and live delivery remain external, not claimed.
+
+- 19 October follow-up: opt-in connected schedule presence, persistent manual pause,
+  Today readiness/occupancy card, historical-open appointment display correction and
+  native dropdown/section styling implemented; verification recorded in the current
+  guest-first report and existing screen matrix. No remote deployment or owner acceptance.
