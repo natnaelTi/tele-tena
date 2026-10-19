@@ -15443,8 +15443,8 @@
     },
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
-  "current_verification_report": "docs/final-mvp-polish-verification.md",
-  "current_packaged_source": "105cd15af1d1432e37b95de583f151d3056f6950",
+  "current_verification_report": "docs/automatic-request-availability-verification-2026-10-19.md",
+  "current_packaged_source": "624b013b3aa41017107e0fd6cd551805834deea3",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -16098,6 +16098,28 @@
         "docs/screenshots/role-navigation/"
       ],
       "verification": "390/768/1440;actual200%zoom;real session/selected offering/sign-out;build and lint. No backend/schema change."
+    },
+    "schedule_presence_followup": {
+      "runtime_source": "624b013b3aa41017107e0fd6cd551805834deea3",
+      "references": [
+        "F01#f01",
+        "F05#availability"
+      ],
+      "routes": [
+        "/clinician",
+        "/clinician/availability",
+        "/clinician/appointments"
+      ],
+      "behavior": "Opt-in connected automatic hours with explicit manual start/pause; Today readiness/occupancy card; truthful past opened calls; native dropdown themes.",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex; awaiting owner acceptance",
+      "evidence_report": "docs/automatic-request-availability-verification-2026-10-19.md",
+      "screenshots": "docs/screenshots/schedule-presence",
+      "external_dependencies": [
+        "Native translation approval",
+        "Physical-device and live provider checks unchanged; not repeated"
+      ],
+      "migration": "Additive v1.41; disabled by default; no appointment/financial backfill."
     }
   }
 }

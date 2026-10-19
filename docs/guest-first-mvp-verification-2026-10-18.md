@@ -236,3 +236,5 @@ Selfmade's actual current commit was **not re-observed** in this local revision.
 After owner acceptance, inspect it and prepare an incremental, backed-up, site-only
 update preserving the repaired shared environment, Amazon patch, credentials,
 demo data and `/teletena` Nginx exception. No remote update commands were executed.
+
+Latest19 October schedule-presence/dropdown/status follow-up: see [current verification](automatic-request-availability-verification-2026-10-19.md). Earlier runtime identities remain historical evidence.

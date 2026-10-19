@@ -278,3 +278,12 @@ File/public routes. Authenticated opaque download endpoints enforce owner access
 or explicit clinician publication plus current discovery eligibility. Raster
 re-encoding removes EXIF; no patient photo enters clinical/disclosure/call models.
 Existing sites awaiting migration retain session/discovery without photos.
+
+### Connected schedule presence v1.41
+`tt_schedule.auto_requests` is off by default. `tt_clinician_request_presence.control_mode`
+records legacy manual, explicit started, paused or automatic behavior. Authenticated POST
+heartbeats serialize on approved application/profile locks with manual commands, renew
+short leases and recompute current eligibility/capacity. Schedule hours use the booking
+engine's timezone/rule/exception projection. No background process advertises a clinician
+without an active reachable workspace. Dashboard visibility is separate from the shell's
+headless heartbeat; notifications and appointment authorization are unchanged.
