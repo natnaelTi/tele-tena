@@ -72,6 +72,20 @@ class Notifications(GuestFirst):
   self.assertEqual(states,{'email':'ProviderAccepted','sms':'Unknown'})
   uncertain=frappe.db.sql("SELECT id FROM tt_booking_notice WHERE appointment=%s AND user=%s AND channel='sms'",(app.id,app.patient))[0][0]
   with self.assertRaises(frappe.PermissionError):booking_notifications.retry(uncertain)
+ def test_successful_sms_receipt_and_site_cap(self):
+  frappe.db.sql("DELETE FROM tt_booking_notice WHERE channel<>'in_app'")
+  booking_notifications.save_preferences(True,True)
+  for channel,contact in [('email','fictional-success-receipt@example.invalid'),('phone','+251900000124')]:
+   frappe.db.sql('INSERT INTO tt_contact_identity (channel,contact,user,verified_at) VALUES (%s,%s,%s,UTC_TIMESTAMP(6))',(channel,contact,users['patient']))
+  result,_,_=self.book();id=result['id']
+  with patch.object(frappe.db,'commit'),patch('tele_tena.review.phone_enabled',return_value=True),patch('tele_tena.api.phone_auth.reserve_sms_budget',return_value=False),patch('tele_tena.email_delivery.send_notice'),patch('tele_tena.sms.send_notice') as sms:
+   booking_notifications.dispatch();self.assertEqual(sms.call_count,0)
+  row=frappe.db.sql("SELECT id,state,attempts FROM tt_booking_notice WHERE appointment=%s AND user=%s AND channel='sms'",(id,users['patient']),as_dict=True)[0]
+  self.assertEqual((row.state,row.attempts),('Unavailable',0));booking_notifications.retry(row.id)
+  with patch.object(frappe.db,'commit'),patch('tele_tena.review.phone_enabled',return_value=True),patch('tele_tena.api.phone_auth.reserve_sms_budget',return_value=True) as budget,patch('tele_tena.sms.send_notice') as sms:
+   booking_notifications.dispatch();booking_notifications.dispatch();self.assertEqual(sms.call_count,1);budget.assert_called_once()
+   self.assertIn('reserved',sms.call_args.args[1]);self.assertLessEqual(len(sms.call_args.args[1]),600)
+  self.assertEqual(frappe.db.sql('SELECT state FROM tt_booking_notice WHERE id=%s',(row.id,))[0][0],'ProviderAccepted')
  def test_optout_is_preserved(self):
   app=self.manual();booking_notifications.queue_external(app.id,'ConfirmationReminder',[app.patient],('email',))
   self.assertEqual(frappe.db.sql("SELECT state FROM tt_booking_notice WHERE appointment=%s AND user=%s AND event='ConfirmationReminder'",(app.id,app.patient))[0][0],'Suppressed')
