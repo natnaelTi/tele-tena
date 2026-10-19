@@ -1,5 +1,6 @@
 /** Provisional UI translations;native and clinical review remain release gates. */
 export const guestFirstTranslations:Record<string,[string,string]>={
+"Choose your sharing defaults. You can change these for each booking.":["ነባሪ የማጋራት ምርጫዎን ይምረጡ። ለእያንዳንዱ ቀጠሮ መቀየር ይችላሉ።","Filannoo qoodinsaa keessan filadhaa. Beellama hundaaf jijjiiruu dandeessu."],
 "Your preferred name and request text will be shared. Saved history and files stay private until you select a treating clinician.":["የመረጡት ስም እና የጥያቄ ጽሑፍ ይጋራሉ። ባለሙያ እስኪመርጡ ድረስ ታሪክና ፋይሎች የግል ናቸው።","Maqaan filattan fi barruun gaaffii keessanii ni qoodamu. Seenaa fi faayiloonni hanga ogeessa filattanitti dhuunfaa ta’u."],
 "Your preferred name is shared.":["የመረጡት ስም ይጋራል።","Maqaan filattan ni qoodama."],
 "Your name stays private.":["ስምዎ የግል ሆኖ ይቆያል።","Maqaan keessan dhuunfaa ta’a."],

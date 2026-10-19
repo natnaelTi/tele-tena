@@ -286,7 +286,7 @@ export default function Onboarding() {
                   <option value="om">Afaan Oromo</option>
                 </Select>
                 <p>
-                  {w("Start with private defaults. You can change these for each booking.")}
+                  {w("Choose your sharing defaults. You can change these for each booking.")}
                 </p>
                 <Checkbox
                   variant="card"
