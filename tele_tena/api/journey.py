@@ -841,7 +841,7 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     if mode == 'manual':
         hours = int(frappe.conf.get('tele_tena_pending_expiry_hours', 24))
         hours = max(1, min(168, hours))
-        expires = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=hours)
+        expires = min(start, datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=hours))
         state = 'PendingConfirmation'
     fee_bps = int(frappe.conf.get('tele_tena_demo_platform_fee_bps', 0))
     dispute_minutes = int(frappe.conf.get('tele_tena_demo_dispute_window_minutes', 60))
@@ -853,6 +853,9 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
               'financial': {'version': 'demo-earnings-v1', 'fee_bps': fee_bps,
                             'dispute_window_minutes': dispute_minutes,
                             'external_settlement': False}}
+    policy['notifications']={'version':'booking-notices-v2','confirmation_reminder_seconds':180,
+                             'confirmation_deadline':iso(expires) if expires else None,
+                             'expiry_effect':'full_reservation_release'}
     if care_language is not None:policy['care_language']=care_language
     created = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_appointment (id,patient,clinician,offering,start,end,state,price,acquisition_source,minutes,

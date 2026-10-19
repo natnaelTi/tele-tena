@@ -87,8 +87,11 @@ class GuestFirst(unittest.TestCase):
   with self.assertRaises(frappe.PermissionError):encounter_files.download(grant.id)
  def test_notice_is_idempotent_and_not_a_payment(self):
   result,args,offer=self.book();id=result['id'];app=frappe.db.sql('SELECT * FROM tt_appointment WHERE id=%s',(id,),as_dict=True)[0]
+  original=frappe.db.sql('SELECT COUNT(*) FROM tt_booking_notice WHERE appointment=%s',(id,))[0][0]
   booking_notifications.create(id,app.state);booking_notifications.create(id,app.state)
-  self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_booking_notice WHERE appointment=%s',(id,))[0][0],2)
+  self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_booking_notice WHERE appointment=%s',(id,))[0][0],original)
+  self.assertEqual(frappe.db.sql("SELECT COUNT(*) FROM tt_booking_notice WHERE appointment=%s AND channel='in_app'",(id,))[0][0],2)
+  self.assertFalse(frappe.db.sql("SELECT id FROM tt_booking_notice WHERE appointment=%s AND user=%s AND channel<>'in_app'",(id,app.patient)))
   self.assertEqual(frappe.db.sql("SELECT COUNT(*) FROM tt_journal WHERE event_ref=%s",('booking:'+id,))[0][0],1)
   self.assertEqual(booking_notifications.preferences(),{'email_enabled':False,'sms_enabled':False})
   self.assertEqual(len([item for item in booking_notifications.notices() if item.appointment==id]),1)

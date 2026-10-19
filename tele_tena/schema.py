@@ -154,3 +154,6 @@ def install():
 
     from tele_tena.patches.v1_41_schedule_presence import execute as schedule_presence
     schedule_presence()
+
+    from tele_tena.patches.v1_42_patient_notifications import execute as patient_notifications
+    patient_notifications()

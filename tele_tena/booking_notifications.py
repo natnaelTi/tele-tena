@@ -21,9 +21,14 @@ def create(appointment,state,plan_id=None):
       WHERE (cp.appointment=%s OR cp.id=%s) AND cp.payer=%s AND cp.offering=%s
       AND p.state='Consented'""",(appointment,plan_id,app.patient,app.offering))
     recipients.update(p.user for p in people)
+    if event=='Pending':
+        policy=rows('SELECT policy_snapshot,created FROM tt_appointment WHERE id=%s',(appointment,))[0]
+        import json
+        if json.loads(policy.policy_snapshot or '{}').get('notifications',{}).get('version')=='booking-notices-v2':
+            frappe.db.sql('INSERT IGNORE INTO tt_confirmation_observation (appointment,clinician,requested_at) VALUES (%s,%s,%s)',(appointment,app.clinician,policy.created))
     for user in sorted(recipients):
         prefs=rows('SELECT * FROM tt_notice_preference WHERE user=%s',(user,))
-        channels=['in_app']+[channel for channel in ('email','sms') if prefs and prefs[0][channel+'_enabled']]
+        channels=['in_app']+[channel for channel in ('email','sms') if not prefs or prefs[0][channel+'_enabled']]
         for channel in channels:
             frappe.db.sql('''INSERT IGNORE INTO tt_booking_notice
               (id,appointment,user,event,channel,state,created,modified)
@@ -46,15 +51,20 @@ def mark_read(id):
 @query()
 def preferences():
     user=actor();found=rows('SELECT email_enabled,sms_enabled FROM tt_notice_preference WHERE user=%s',(user,))
-    return dict(found[0]) if found else {'email_enabled':False,'sms_enabled':False}
+    return dict(found[0]) if found else {'email_enabled':True,'sms_enabled':True}
 
 
 @command
 def save_preferences(email_enabled=False,sms_enabled=False):
     from tele_tena.api.journey import boolean
     user=actor();email=boolean(email_enabled);sms=boolean(sms_enabled)
+    frappe.db.sql('SELECT name FROM tabUser WHERE name=%s FOR UPDATE',(user,))
+    before=preferences()
     frappe.db.sql('''INSERT INTO tt_notice_preference VALUES (%s,%s,%s)
       ON DUPLICATE KEY UPDATE email_enabled=VALUES(email_enabled),sms_enabled=VALUES(sms_enabled)''',(user,email,sms))
+    if before!={'email_enabled':email,'sms_enabled':sms}:
+        from tele_tena.notifications import emit
+        emit(user,'notice-preferences:'+str(uuid.uuid4()),'AccountUpdated')
     return preferences()
 
 
@@ -70,6 +80,9 @@ def retry(id):
     return {'state':'Pending'}
 
 
+EVENT_STATES={'Confirmed':('Booked',),'Pending':('PendingConfirmation',),'ConfirmationReminder':('PendingConfirmation',),
+              'AppointmentReminder':('Booked',),'Cancelled':('Cancelled',),'Declined':('Cancelled',),'Expired':('Expired',)}
+
 def dispatch():
     # A crashed/uncertain send is not retried automatically:SMTP/SMS lack a verified
     # provider idempotency key. Pending rows are claimed durably before external I/O.
@@ -82,7 +95,7 @@ def dispatch():
         if not notice:frappe.db.commit();continue
         notice=notice[0]
         app=rows('SELECT * FROM tt_appointment WHERE id=%s',(notice.appointment,))
-        if not app or (notice.event=='Confirmed' and app[0].state!='Booked') or (notice.event=='Pending' and app[0].state!='PendingConfirmation'):
+        if not app or app[0].state not in EVENT_STATES.get(notice.event,()):
             frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
         if not frappe.db.get_value('User',notice.user,'enabled'):
             frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
@@ -93,7 +106,7 @@ def dispatch():
                 frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
         prefs=rows('SELECT * FROM tt_notice_preference WHERE user=%s',(notice.user,))
         identities=rows('SELECT contact FROM tt_contact_identity WHERE user=%s AND channel=%s AND verified_at IS NOT NULL LIMIT 1',(notice.user,'phone' if notice.channel=='sms' else 'email'))
-        if not prefs or not prefs[0][notice.channel+'_enabled'] or not identities:
+        if (prefs and not prefs[0][notice.channel+'_enabled']) or not identities:
             frappe.db.sql("UPDATE tt_booking_notice SET state='Unavailable',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
         if notice.channel=='sms':
             from tele_tena.review import phone_enabled
@@ -103,7 +116,9 @@ def dispatch():
                 frappe.db.sql("UPDATE tt_booking_notice SET state='Unavailable',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
         frappe.db.sql("UPDATE tt_booking_notice SET state='Sending',attempts=attempts+1,modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit()
         app=app[0];state='Unknown'
-        label='confirmed' if notice.event=='Confirmed' else 'awaiting clinician approval'
+        label={'Confirmed':'confirmed','Pending':'awaiting your confirmation' if notice.user==app.clinician else 'awaiting clinician confirmation',
+               'ConfirmationReminder':'still awaiting your confirmation; please confirm or decline before the deadline',
+               'AppointmentReminder':'coming up soon','Cancelled':'cancelled','Declined':'declined','Expired':'expired without confirmation'}.get(notice.event,'updated')
         when=app.start.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(app.timezone or 'Africa/Addis_Ababa')).strftime('%d %b %Y %H:%M')
         # Site-bound relative authenticated link;no permanent token or health text.
         link=frappe.utils.get_url('/teletena/'+('clinician' if notice.user==app.clinician else 'patient')+'/consultations/'+app.id)
@@ -112,6 +127,11 @@ def dispatch():
         if parsed.hostname and not parsed.hostname.endswith('.localhost') and parsed.hostname not in ('localhost','127.0.0.1'):
             link=urlunsplit(('https',parsed.netloc,parsed.path,'',''))
         message=f'TeleTena appointment {label}. {when} ({app.timezone}). Reference {app.id[:8]}. Sign in: {link}'
+        if notice.user==app.patient and notice.event in ('Confirmed','Pending') and rows('SELECT id FROM tt_journal WHERE event_ref=%s',('booking:'+app.id,)):
+            minor=int(app.price);message+=f' Demonstration balance: ETB {minor//100}.{minor%100:02d} reserved. No external payment collected.'
+        if notice.event in ('Pending','ConfirmationReminder') and app.expires_at:
+            deadline=app.expires_at.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(app.timezone or 'Africa/Addis_Ababa')).strftime('%d %b %Y %H:%M')
+            message+=f' Response deadline: {deadline} ({app.timezone}).'
         try:
             if notice.channel=='email':
                 from tele_tena.email_delivery import send_notice
@@ -127,3 +147,47 @@ def dispatch():
             from tele_tena.email_delivery import DeliveryUnavailable
             state='Rejected' if isinstance(error,SMSRejected) and error.args==('provider_rejected',) else 'Unavailable' if (isinstance(error,SMSRejected) and error.args==('not_configured',)) or (isinstance(error,DeliveryUnavailable) and error.args==('email_not_configured',)) else 'Unknown'
         frappe.db.sql('UPDATE tt_booking_notice SET state=%s,modified=UTC_TIMESTAMP(6) WHERE id=%s',(state,item.id));frappe.db.commit()
+
+
+def queue_external(appointment,event,recipients,channels=('email','sms')):
+    if event not in EVENT_STATES:raise ValueError('Unsupported delivery event')
+    for user in recipients:
+        prefs=rows('SELECT * FROM tt_notice_preference WHERE user=%s',(user,))
+        for channel in channels:
+            state='Suppressed' if prefs and not prefs[0][channel+'_enabled'] else 'Pending'
+            frappe.db.sql("""INSERT IGNORE INTO tt_booking_notice
+              (id,appointment,user,event,channel,state,created,modified)
+              VALUES (%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))""",
+              (str(uuid.uuid4()),appointment,user,event,channel,state))
+
+
+def process_reminders():
+    """Minute scheduler job. Durable keys and gate serialize with clinician response."""
+    from tele_tena.notifications import emit,participants
+    from tele_tena.api.journey import one
+    candidates=rows("""SELECT a.id FROM tt_appointment a JOIN tt_confirmation_observation o ON o.appointment=a.id
+        WHERE a.state='PendingConfirmation' AND a.expires_at>UTC_TIMESTAMP(6)
+        AND o.reminded_at IS NULL AND o.requested_at<=UTC_TIMESTAMP(6)-INTERVAL 3 MINUTE LIMIT 100""")
+    for candidate in candidates:
+        one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+        app=rows("SELECT * FROM tt_appointment WHERE id=%s AND state='PendingConfirmation' AND expires_at>UTC_TIMESTAMP(6) FOR UPDATE",(candidate.id,))
+        observation=rows('SELECT * FROM tt_confirmation_observation WHERE appointment=%s AND reminded_at IS NULL FOR UPDATE',(candidate.id,))
+        if not app or not observation:continue
+        queue_external(candidate.id,'ConfirmationReminder',[app[0].clinician],('email',))
+        emit(app[0].clinician,'confirmation-reminder:'+candidate.id,'ConfirmationReminder',candidate.id)
+        frappe.db.sql('UPDATE tt_confirmation_observation SET reminded_at=UTC_TIMESTAMP(6) WHERE appointment=%s',(candidate.id,))
+    # Only bookings explicitly accepting the new policy get automatic reminders.
+    upcoming=rows("SELECT * FROM tt_appointment WHERE state='Booked' AND start>UTC_TIMESTAMP(6) AND start<=UTC_TIMESTAMP(6)+INTERVAL 1 HOUR LIMIT 100")
+    import json
+    for app in upcoming:
+        if json.loads(app.policy_snapshot or '{}').get('notifications',{}).get('version')!='booking-notices-v2':continue
+        for user in participants(app.id):emit(user,'appointment-reminder:'+app.id,'AppointmentReminder',app.id)
+        queue_external(app.id,'AppointmentReminder',participants(app.id))
+
+    # Reconcile neutral ended-call inbox events independently of the token/room
+    # closure transaction; notification storage can never undo authoritative End.
+    ended=rows("""SELECT a.* FROM tt_appointment a JOIN tt_consultation c ON c.appointment=a.id
+        WHERE c.state='Ended' AND c.ended>=UTC_TIMESTAMP(6)-INTERVAL 7 DAY LIMIT 100""")
+    for app in ended:
+        if json.loads(app.policy_snapshot or '{}').get('notifications',{}).get('version')!='booking-notices-v2':continue
+        for user in participants(app.id):emit(user,'CallEnded:'+app.id,'CallEnded',app.id)
