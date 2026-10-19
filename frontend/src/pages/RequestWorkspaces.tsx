@@ -377,6 +377,10 @@ export function PatientRequestsWorkspace() {
         !!narrative.trim() ||
         !liveRequests.length));
   const activeId = selected || liveRequests[0]?.id;
+  useEffect(() => {
+    if (!selected && !composing && activeId)
+      setSearch({ request: activeId }, { replace: true });
+  }, [selected, composing, activeId, setSearch]);
   const shown = listView === "Active" ? liveRequests : historyRequests;
   const choose = (id: string) => {
     setPublicationMessage("");
@@ -438,7 +442,7 @@ export function PatientRequestsWorkspace() {
           ) : shown.length ? (
             <ul className="request-compact-list">
               {shown.map((req) => (
-                <li key={req.id}>
+                <li key={req.id} data-request-id={req.id}>
                   <button
                     type="button"
                     className="request-list-item"
@@ -718,6 +722,7 @@ export function PatientRequestsWorkspace() {
               initialOffer={search.get("offer") || offerId}
               onRefresh={requestResource.refresh}
               onLater={prepareForLater}
+              onReview={(id) => setSearch({ request: activeId, offer: id })}
               onCloseOffer={() =>
                 setSearch({ request: activeId }, { replace: true })
               }
@@ -737,12 +742,14 @@ function PatientRequestThread({
   onRefresh,
   onLater,
   onCloseOffer,
+  onReview,
 }: {
   requestId: string;
   initialOffer?: string;
   onRefresh: () => Promise<unknown>;
   onLater: (r: PatientRequest) => void;
   onCloseOffer: () => void;
+  onReview: (id: string) => void;
 }) {
   const { w } = useLocale(),
     resource = usePolling<PatientRequest>(() =>
@@ -964,7 +971,10 @@ function PatientRequestThread({
                       <div className="actions">
                         <Button
                           disabled={!!resource.error || action.busy}
-                          onClick={() => setReview(offer.id)}
+                          onClick={() => {
+                            setReview(offer.id);
+                            onReview(offer.id);
+                          }}
                         >
                           {w("Review and accept")}
                         </Button>
@@ -1264,6 +1274,19 @@ export function ClinicianRequestsWorkspace() {
     current =
       requests.find((r) => r.id === selected) ||
       (!selected && !ownOffer ? requests[0] : undefined);
+  useEffect(() => {
+    if (view === "Requests" && !selected && !ownOffer && requests[0])
+      setSearch({ request: requests[0].id }, { replace: true });
+  }, [view, selected, ownOffer, requests, setSearch]);
+  useEffect(() => {
+    const next =
+      search.get("view") === "history"
+        ? "History"
+        : search.get("offer") || search.get("view") === "offers"
+          ? "Your offers"
+          : "Requests";
+    setView(next);
+  }, [search]);
   const chooseView = (next: string) => {
     setView(next);
     setPage(0);
@@ -1317,7 +1340,7 @@ export function ClinicianRequestsWorkspace() {
             ) : requests.length ? (
               <ul className="request-compact-list">
                 {requests.map((req) => (
-                  <li key={req.id}>
+                  <li key={req.id} data-request-id={req.id}>
                     <button
                       type="button"
                       className="request-list-item"
@@ -1363,7 +1386,7 @@ export function ClinicianRequestsWorkspace() {
               ) : offers.data.items.length ? (
                 <ul className="request-compact-list">
                   {offers.data.items.map((item) => (
-                    <li key={item.id}>
+                    <li key={item.id} data-offer-id={item.id}>
                       <button
                         type="button"
                         className="request-list-item"
