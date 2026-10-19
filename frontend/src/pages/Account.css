@@ -109,3 +109,6 @@
 .reference-workspace .account-workspace>.account-tabs button{display:flex;align-items:center;gap:10px}
 .reference-workspace .account-workspace>.account-tabs button>svg{flex:0 0 auto}
 @media(max-width:800px){.reference-workspace .account-workspace>.account-tabs button{justify-content:center}}
+
+.account-mobile-sections{display:none}
+@media(max-width:800px){.account-mobile-sections{display:block;margin-top:20px}.reference-workspace .account-workspace>.account-tabs{display:none}.reference-workspace .account-workspace{margin-top:12px}}
