@@ -1,5 +1,5 @@
 import {RequestPresenceProvider} from '../components/RequestPresence';
-import {BookingNotices} from '../components/BookingNotices';
+import {UserNotifications} from '../components/UserNotifications';
 import {AccountMenu} from "../components/AccountMenu";
 import "./ProductShell.css";
 import { ClinicianNotifications } from "../components/ClinicianNotifications";
@@ -77,6 +77,7 @@ export function PublicLayout() {
             <Link to="/how-it-works">{w("How it works")}</Link>
             <Link to="/for-clinicians">{w("For clinicians")}</Link>
           </>}
+          {session?.profile?.kind==='patient'&&<UserNotifications/>}
           <LanguageSelect />
           {session?<AccountMenu accountPath={accountPath} onSignout={()=>void signout()} busy={signingOut}/>:<Link className="button secondary" to="/sign-in">{w("Sign in")}</Link>}
         </nav>
@@ -252,7 +253,7 @@ export function WorkspaceLayout({
     return <Navigate to="/onboarding" replace />;
   if (kind === "patient" || kind === "clinician") return <div className="reference-workspace">
     <DemoBar />
-    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button>}</nav><div className="product-user">{kind==='patient'&&<BookingNotices/>}{kind==="clinician"&&session?.roles.includes("Tele Tena Clinician")&&<ClinicianNotifications/>}<LanguageSelect /><AccountMenu accountPath={'/'+kind+'/account'} onSignout={()=>void signout()} busy={signoutBusy}/></div></header>
+    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button>}</nav><div className="product-user">{kind==='patient'&&<UserNotifications/>}{kind==="clinician"&&session?.roles.includes("Tele Tena Clinician")&&<ClinicianNotifications/>}<LanguageSelect /><AccountMenu accountPath={'/'+kind+'/account'} onSignout={()=>void signout()} busy={signoutBusy}/></div></header>
     {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
     <RequestPresenceProvider enabled={kind === "clinician" && !!session?.roles.includes("Tele Tena Clinician")}><main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') ? 'workspace-wide' : ''}`} id="main-content"><Outlet /></main></RequestPresenceProvider>
     <nav className="product-mobile-nav" aria-label={w("Mobile workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} /><span>{w("More")}</span></Button>}</nav>
