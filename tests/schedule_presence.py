@@ -54,6 +54,13 @@ class SchedulePresence(GuestFirst):
    self.assertEqual(requests.request_presence()['occupancy'],'in_consultation')
   with patch.object(requests,'now',return_value=appointment.end+timedelta(days=1)):
    self.assertIsNone(requests.request_presence()['occupancy'])
+ def test_manual_start_remains_available_outside_automatic_hours(self):
+  with patch.object(requests,'_automatic_hours',return_value=False),patch.object(requests,'_has_immediate_capacity',return_value=True),patch.object(requests,'dispatch_open_requests'):
+   self.assertFalse(requests.heartbeat_request_presence()['ready'])
+   self.assertTrue(requests.set_request_presence(True)['ready'])
+   self.assertTrue(requests.heartbeat_request_presence()['ready'])
+   requests.set_request_presence(False)
+   self.assertFalse(requests.heartbeat_request_presence()['ready'])
  def test_real_capacity_and_opt_out(self):
   expected=requests._has_immediate_capacity(self.clinician,[frappe._dict(id=self.item.id)])
   with patch.object(requests,'dispatch_open_requests'):

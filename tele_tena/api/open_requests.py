@@ -271,7 +271,7 @@ def _set_request_presence(ready, manual=True):
         (clinician, 1 if ready else 0, expires))
     if manual:
         frappe.db.sql('UPDATE tt_clinician_request_presence SET control_mode=%s WHERE clinician=%s',
-                      ('manual' if ready else 'paused', clinician))
+                      ('started' if ready else 'paused', clinician))
     if ready:
         dispatch_open_requests()
     return {'ready': ready, 'expires_at': expires.isoformat() + 'Z', 'ttl_seconds': ttl}
@@ -308,10 +308,10 @@ def heartbeat_request_presence(resume_automatic=False):
         mode = 'auto'
     automatic = bool(rows("SELECT id FROM tt_schedule WHERE clinician=%s AND status='Published' AND auto_requests=1", (clinician,)))
     status = request_presence()
-    wants_ready = mode != 'paused' and ((automatic and _automatic_hours(clinician)) or
-                    (not automatic and mode == 'manual' and bool(settings and settings[0].ready and settings[0].expires_at > now())))
+    manual_live = mode in ('manual', 'started') and bool(settings and settings[0].ready and settings[0].expires_at > now())
+    wants_ready = mode != 'paused' and (manual_live or (automatic and _automatic_hours(clinician)))
     _set_request_presence(wants_ready and status['configured'], manual=False)
-    if automatic and mode != 'paused':
+    if automatic and mode not in ('paused', 'started'):
         frappe.db.sql("UPDATE tt_clinician_request_presence SET control_mode='auto' WHERE clinician=%s", (clinician,))
     return request_presence()
 

@@ -43,10 +43,11 @@ function ConnectedPresence({children}:{children:ReactNode}) {
     window.addEventListener('teletena:availability-saved',renew);
     return()=>{active=false;window.clearInterval(timer);window.removeEventListener('online',renew);window.removeEventListener('teletena:availability-saved',renew);};
   },[refresh,recordFailure]);
-  const toggle = async (pause=false) => {
+  const toggle = async (pause=false, manual=false) => {
     setBusy(true);
     try {
       if(pause) await journeyApi.setRequestPresence(false);
+      else if(manual) await journeyApi.setRequestPresence(true);
       else if(!presence.data?.ready && presence.data?.automatic) await journeyApi.heartbeatRequestPresence(true);
       else await journeyApi.setRequestPresence(!presence.data?.ready);
       setFailure(null);
@@ -70,6 +71,7 @@ export function RequestAvailabilityCard(){
  {!data&&!error?<p>{w('Checking availability…')}</p>:<p>{w(data?.ready?'You can receive eligible requests while this workspace is connected.':data?.occupancy?'Your booked time is protected. Requests resume when a full session fits.':data?.control_mode==='paused'?'You paused requests. Start again when you are ready.':data?.automatic&&!data?.within_hours?'Automatic availability resumes during your published hours while this workspace is connected.':data?.reasons?.includes('no_immediate_capacity')?'No full session can start within the immediate-care window.':'Complete the steps below or start when you are ready.')}</p>}
  {state==='setup'&&<ul>{data?.reasons?.map((reason:string)=>guidance[reason]&&<li key={reason}><Link to={guidance[reason].to}>{w(guidance[reason].label)}</Link></li>)}</ul>}
  <div className="actions">{error?<Button variant="secondary" onClick={()=>void refresh()}>{w('Retry')}</Button>:<Button loading={busy} disabled={!data||(!data.configured&&!data.ready&&!data.automatic)||(data.automatic&&data.control_mode!=='paused'&&!data.ready)} onClick={()=>void toggle()}>{w(data?.ready?'Pause':data?.automatic?(data.control_mode==='paused'?'Resume automatic availability':'Automatic availability enabled'):'Go available')}</Button>}
+ {data?.automatic&&!data.ready&&data.configured&&<Button variant="secondary" loading={busy} onClick={()=>void toggle(false,true)}>{w('Go available now')}</Button>}
  {data?.automatic&&data.control_mode!=='paused'&&!data.ready&&<Button variant="secondary" loading={busy} onClick={()=>void toggle(true)}>{w('Pause requests')}</Button>}
  <Link className="text-link" to="/clinician/availability"><CalendarClock size={18}/>{w('Manage availability')}</Link></div>
  {data?.automatic&&<small>{w('Automatic during published hours · Manual pause always takes priority.')}</small>}
