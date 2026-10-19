@@ -759,7 +759,8 @@ function PatientRequestThread({
   const [review, setReview] = useState(initialOffer || ""),
     [profile, setProfile] = useState<Offer | null>(null),
     [cancel, setCancel] = useState(false),
-    [accepted, setAccepted] = useState("");
+    [accepted, setAccepted] = useState(""),
+    [optionsMessage, setOptionsMessage] = useState("");
   useEffect(() => setReview(initialOffer || ""), [initialOffer]);
   const request = resource.data;
   const refresh = async () => {
@@ -1047,10 +1048,13 @@ function PatientRequestThread({
                 void action.run(async () => {
                   const result = await journeyApi.findMoreOptions(request.id);
                   await refresh();
-                  if (!result?.notified)
-                    throw new Error(
-                      "No additional clinicians currently meet your requirements. Your request remains open; you can keep waiting or browse clinicians.",
-                    );
+                  setOptionsMessage(
+                    !result?.notified
+                      ? w(
+                          "No additional clinicians currently meet your requirements. Your request remains open; you can keep waiting or browse clinicians.",
+                        )
+                      : "",
+                  );
                 })
               }
             >
@@ -1540,6 +1544,8 @@ function ClinicianResponsePanel({
       price: "",
     },
     offering = eligible.find((o) => o.id === values.service);
+  const [priceError, setPriceError] = useState("");
+  const priceSection = useRef<HTMLDetailsElement>(null);
   return (
     <section
       className="request-thread"
@@ -1649,6 +1655,24 @@ function ClinicianResponsePanel({
                 <form
                   onSubmit={(event) => {
                     event.preventDefault();
+                    let amount: number | null = null;
+                    try {
+                      amount = values.price ? etbToMinor(values.price) : null;
+                      setPriceError("");
+                    } catch {
+                      setPriceError(
+                        w(
+                          "Enter a positive price with at most two decimal places.",
+                        ),
+                      );
+                      if (priceSection.current) {
+                        priceSection.current.open = true;
+                        requestAnimationFrame(() =>
+                          priceSection.current?.querySelector("input")?.focus(),
+                        );
+                      }
+                      return;
+                    }
                     void action.run(async () => {
                       if (!offering || !values.start)
                         throw new Error(
@@ -1661,9 +1685,7 @@ function ClinicianResponsePanel({
                         request_id: request.id,
                         offering: values.service,
                         start: start.toISOString(),
-                        price_minor: values.price
-                          ? etbToMinor(values.price)
-                          : null,
+                        price_minor: amount,
                       });
                       await onSubmitted(response.id);
                     });
@@ -1719,17 +1741,19 @@ function ClinicianResponsePanel({
                       {w("Use suggested time")}
                     </Button>
                   )}
-                  <details className="request-context">
+                  <details className="request-context" ref={priceSection}>
                     <summary>{w("Custom quote (optional)")}</summary>
                     <TextField
                       label={w("Total price (ETB)")}
                       inputMode="decimal"
                       value={values.price}
+                      error={priceError || undefined}
                       placeholder={offering ? money(offering.price) : ""}
                       disabled={action.busy}
-                      onChange={(e) =>
-                        setDraft({ ...values, price: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setPriceError("");
+                        setDraft({ ...values, price: e.target.value });
+                      }}
                     />
                     <p className="supporting">
                       {w(
