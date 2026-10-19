@@ -1,5 +1,8 @@
 /** Provisional UI translations;native and clinical review remain release gates. */
 export const guestFirstTranslations:Record<string,[string,string]>={
+"clinician":["ባለሙያ","ogeessa"],
+"service":["አገልግሎት","tajaajila"],
+"offering":["የቀረበ አገልግሎት","tajaajila dhiyaate"],
 "Browse by service":["በአገልግሎት ይፈልጉ","Tajaajilaan ilaalaa"],
 "offerings":["የቀረቡ አገልግሎቶች","tajaajiloota dhiyaatan"],
 "clinicians":["ባለሙያዎች","ogeessota"],
