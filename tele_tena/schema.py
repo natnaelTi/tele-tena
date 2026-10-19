@@ -151,3 +151,6 @@ def install():
 
     from tele_tena.patches.v1_40_guest_first import execute as guest_first
     guest_first()
+
+    from tele_tena.patches.v1_41_schedule_presence import execute as schedule_presence
+    schedule_presence()

@@ -47,3 +47,5 @@ tele_tena.patches.v1_38_profile_photos
 tele_tena.patches.v1_39_history_documents
 
 tele_tena.patches.v1_40_guest_first
+
+tele_tena.patches.v1_41_schedule_presence

@@ -433,3 +433,20 @@ sharing into encounters or requests. Clinicians choose public-profile visibility
 current discovery eligibility is enforced again on photo download. A photo
 provides no credential verification. See `profile-photos.md` for limits, storage,
 fictional presentation setup and revocation limitations.
+
+### Connected automatic request availability (19 October revision)
+Schedules may opt into immediate-request presence during their Published local intervals,
+including replacements and excluding breaks/unavailable dates. Default is off. This is
+not unattended on-call coverage: an authenticated reachable clinician workspace renews
+a bounded presence lease. Closing/disconnecting the workspace expires availability.
+Manual pause persists across navigation, reconnects and expiry until explicitly resumed.
+Approval, scope, language, immediate-care policy and full-session/buffer/conflict checks
+still apply; automatic preference never reserves a slot. Today owns the controls; the
+workspace owns the headless heartbeat. Current booked/buffer time is shown as Occupied,
+or In consultation for an opened call within that occupied interval.
+
+An Open consultation row is evidence a call was opened, not evidence of indefinite
+participation. After its booked/extended end, lists show Outcome not recorded and Past
+until an explicit authorized outcome is recorded. No call, appointment or ledger is
+mutated by this presentation rule. Call activity says Call opened, never claims measured
+connected time. Existing End/revocation and documentation controls are unchanged.

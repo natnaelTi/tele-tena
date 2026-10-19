@@ -227,8 +227,7 @@ def _deliver(request, candidates=None, wave=None):
     return added, delivered + added
 
 
-@journey.command
-def set_request_presence(ready):
+def _set_request_presence(ready, manual=True):
     clinician = actor('Tele Tena Clinician')
     if not journey.boolean(ready):
         ready = False
@@ -270,9 +269,52 @@ def set_request_presence(ready):
         VALUES (%s,%s,UTC_TIMESTAMP(6),%s) ON DUPLICATE KEY UPDATE ready=VALUES(ready),
         heartbeat_at=VALUES(heartbeat_at),expires_at=VALUES(expires_at)''',
         (clinician, 1 if ready else 0, expires))
+    if manual:
+        frappe.db.sql('UPDATE tt_clinician_request_presence SET control_mode=%s WHERE clinician=%s',
+                      ('manual' if ready else 'paused', clinician))
     if ready:
         dispatch_open_requests()
     return {'ready': ready, 'expires_at': expires.isoformat() + 'Z', 'ttl_seconds': ttl}
+
+
+@journey.command
+def set_request_presence(ready):
+    return _set_request_presence(ready)
+
+
+def _automatic_hours(clinician):
+    """Use the same local rules/exceptions as booking, never the generated slot grid."""
+    from zoneinfo import ZoneInfo
+    from tele_tena.api.scheduling import _ranges_for_day
+    for schedule in rows("SELECT s.*,o.service FROM tt_schedule s JOIN tt_offering o ON o.id=s.offering AND o.active=1 JOIN `tabTele Tena Service` svc ON svc.name=o.service AND svc.active=1 AND svc.immediate_care_enabled=1 WHERE s.clinician=%s AND s.status='Published' AND s.auto_requests=1", (clinician,)):
+        if not journey.service_scope_is_current(clinician, schedule.service):
+            continue
+        local = now().replace(tzinfo=timezone.utc).astimezone(ZoneInfo(schedule.timezone))
+        intervals, breaks = _ranges_for_day(schedule, local.date())
+        wall = local.time().replace(tzinfo=None)
+        if any(start <= wall < end for start,end in intervals) and not any(start <= wall < end for start,end in breaks):
+            if _has_immediate_capacity(clinician, [frappe._dict(id=schedule.offering)]):
+                return True
+    return False
+
+
+@journey.command
+def heartbeat_request_presence(resume_automatic=False):
+    clinician = actor('Tele Tena Clinician')
+    approved(clinician, lock=True)
+    profile('clinician', lock=True)  # Serializes heartbeat with manual pause/start.
+    settings = rows('SELECT * FROM tt_clinician_request_presence WHERE clinician=%s FOR UPDATE', (clinician,))
+    mode = settings[0].control_mode if settings else 'manual'
+    if journey.boolean(resume_automatic):
+        mode = 'auto'
+    automatic = bool(rows("SELECT id FROM tt_schedule WHERE clinician=%s AND status='Published' AND auto_requests=1", (clinician,)))
+    status = request_presence()
+    wants_ready = mode != 'paused' and ((automatic and _automatic_hours(clinician)) or
+                    (not automatic and mode == 'manual' and bool(settings and settings[0].ready and settings[0].expires_at > now())))
+    _set_request_presence(wants_ready and status['configured'], manual=False)
+    if automatic and mode != 'paused':
+        frappe.db.sql("UPDATE tt_clinician_request_presence SET control_mode='auto' WHERE clinician=%s", (clinician,))
+    return request_presence()
 
 
 @journey.command
@@ -674,7 +716,7 @@ def acknowledge_inbox_fetch(request_ids):
 def request_presence():
     clinician = actor('Tele Tena Clinician')
     profile('clinician')
-    row = rows('SELECT ready,expires_at FROM tt_clinician_request_presence WHERE clinician=%s', (clinician,))
+    row = rows('SELECT ready,expires_at,control_mode FROM tt_clinician_request_presence WHERE clinician=%s', (clinician,))
     reasons = []
     app = rows("SELECT status FROM tt_application WHERE user=%s", (clinician,))
     if not app or app[0].status != 'Approved':
@@ -703,7 +745,15 @@ def request_presence():
     # A previously valid lease is not enough after schedule, scope, or policy
     # changes. Do not display Available while current hard eligibility fails.
     effective_ready = live and not reasons
-    return {'ready': effective_ready, 'configured': not reasons, 'reasons': reasons,
+    occupied = rows('''SELECT c.state call_state FROM tt_appointment a LEFT JOIN tt_consultation c ON c.appointment=a.id
+        WHERE a.clinician=%s AND a.state IN ('Booked','PendingConfirmation')
+        AND DATE_SUB(a.start,INTERVAL a.buffer_before MINUTE)<=UTC_TIMESTAMP(6)
+        AND DATE_ADD(a.end,INTERVAL a.buffer_after MINUTE)>UTC_TIMESTAMP(6)''', (clinician,))
+    automatic = bool(rows("SELECT id FROM tt_schedule WHERE clinician=%s AND status='Published' AND auto_requests=1", (clinician,)))
+    return {'automatic': automatic, 'within_hours': _automatic_hours(clinician) if automatic else False,
+            'control_mode': row[0].control_mode if row else 'manual',
+            'occupancy': ('in_consultation' if any(item.call_state == 'Open' for item in occupied) else 'occupied') if occupied else None,
+            'ready': effective_ready, 'configured': not reasons, 'reasons': reasons,
             'immediate_window_minutes': immediate_window_minutes(),
             'expires_at': row[0].expires_at.isoformat() + 'Z' if row else None}
 

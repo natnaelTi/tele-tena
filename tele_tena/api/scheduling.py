@@ -170,7 +170,7 @@ def _validate_exceptions(value):
 @frappe.whitelist(methods=['POST'])
 def save_schedule(offering, schedule_name, timezone_name, consultation_format,
                   confirmation_mode, minimum_notice_minutes, horizon_days,
-                  buffer_before, buffer_after, intervals, exceptions, status='Draft'):
+                  buffer_before, buffer_after, intervals, exceptions, status='Draft', auto_requests=False):
     clinician = actor('Tele Tena Clinician')
     savepoint = 'tt_schedule_' + uuid.uuid4().hex
     frappe.db.savepoint(savepoint)
@@ -212,6 +212,8 @@ def save_schedule(offering, schedule_name, timezone_name, consultation_format,
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
                 (schedule_id, clinician, offering, name, zone.key, consultation_format, confirmation_mode,
                  notice, horizon, before, after, status, now, now))
+        frappe.db.sql('UPDATE tt_schedule SET auto_requests=%s WHERE id=%s',
+                      (1 if str(auto_requests).lower() in ('1', 'true') else 0, schedule_id))
         for interval in weekly:
             frappe.db.sql('''INSERT INTO tt_schedule_rule (id,schedule_id,weekday,start_local,end_local)
                 VALUES (%s,%s,%s,%s,%s)''',
