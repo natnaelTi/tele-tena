@@ -177,7 +177,7 @@ def process_reminders():
         emit(app[0].clinician,'confirmation-reminder:'+candidate.id,'ConfirmationReminder',candidate.id)
         frappe.db.sql('UPDATE tt_confirmation_observation SET reminded_at=UTC_TIMESTAMP(6) WHERE appointment=%s',(candidate.id,))
     # Only bookings explicitly accepting the new policy get automatic reminders.
-    upcoming=rows("SELECT a.* FROM tt_appointment a WHERE a.state='Booked' AND a.start>UTC_TIMESTAMP(6) AND a.start<=UTC_TIMESTAMP(6)+INTERVAL 1 HOUR AND NOT EXISTS (SELECT 1 FROM tt_user_notification n WHERE n.appointment=a.id AND n.kind='AppointmentReminder') ORDER BY a.start,a.id LIMIT 100")
+    upcoming=rows("SELECT a.* FROM tt_appointment a WHERE a.state='Booked' AND a.start>UTC_TIMESTAMP(6) AND a.start<=UTC_TIMESTAMP(6)+INTERVAL 1 HOUR AND JSON_UNQUOTE(JSON_EXTRACT(IF(JSON_VALID(a.policy_snapshot),a.policy_snapshot,'{}'),'$.notifications.version'))='booking-notices-v2' AND NOT EXISTS (SELECT 1 FROM tt_user_notification n WHERE n.appointment=a.id AND n.kind='AppointmentReminder') ORDER BY a.start,a.id LIMIT 100")
     import json
     for app in upcoming:
         one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
@@ -192,6 +192,7 @@ def process_reminders():
     # closure transaction; notification storage can never undo authoritative End.
     ended=rows("""SELECT a.* FROM tt_appointment a JOIN tt_consultation c ON c.appointment=a.id
         WHERE c.state='Ended' AND c.ended>=UTC_TIMESTAMP(6)-INTERVAL 7 DAY
+        AND JSON_UNQUOTE(JSON_EXTRACT(IF(JSON_VALID(a.policy_snapshot),a.policy_snapshot,'{}'),'$.notifications.version'))='booking-notices-v2'
         AND NOT EXISTS (SELECT 1 FROM tt_user_notification n WHERE n.appointment=a.id AND n.kind='CallEnded')
         ORDER BY c.ended,a.id LIMIT 100""")
     for app in ended:
