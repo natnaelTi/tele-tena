@@ -1069,6 +1069,7 @@ function PatientRequestThread({
       {action.error && (
         <InlineNotice tone="danger">{action.error}</InlineNotice>
       )}
+      {optionsMessage&&<InlineNotice>{optionsMessage}</InlineNotice>}
       {selected && isLive && valid(selected) && (
         <OfferAcceptance
           request={request}
