@@ -22,15 +22,15 @@ class Notifications(GuestFirst):
   booking_notifications.process_reminders();booking_notifications.process_reminders()
   reminders=frappe.db.sql("SELECT user,channel FROM tt_booking_notice WHERE appointment=%s AND event='ConfirmationReminder'",(app.id,),as_dict=True)
   self.assertEqual([(r.user,r.channel) for r in reminders],[(app.clinician,'email')])
-  frappe.set_user(app.clinician);self.assertEqual(len([n for n in notifications.feed() if n['kind']=='ConfirmationReminder']),1)
+  frappe.set_user(app.clinician);self.assertEqual(len([n for n in notifications.feed() if n['kind']=='ConfirmationReminder' and n['appointment']==app.id]),1)
  def test_response_stops_reminder_and_is_idempotent(self):
-  app=self.manual();frappe.set_user(app.clinician);notifications.confirmation_presented(app.id)
+  app=self.manual();before=notifications.confirmation_metric(app.clinician)['sample_count'];frappe.set_user(app.clinician);notifications.confirmation_presented(app.id)
   presentation.respond_to_request(app.id,'confirm');presentation.respond_to_request(app.id,'confirm')
   frappe.db.sql('UPDATE tt_confirmation_observation SET requested_at=UTC_TIMESTAMP(6)-INTERVAL 181 SECOND WHERE appointment=%s',(app.id,))
   booking_notifications.process_reminders()
   self.assertFalse(frappe.db.sql("SELECT id FROM tt_booking_notice WHERE appointment=%s AND event='ConfirmationReminder'",(app.id,)))
   observation=frappe.db.sql('SELECT response FROM tt_confirmation_observation WHERE appointment=%s',(app.id,))[0][0]
-  self.assertEqual(observation,'Confirmed');self.assertEqual(notifications.confirmation_metric(app.clinician)['sample_count'],1)
+  self.assertEqual(observation,'Confirmed');self.assertEqual(notifications.confirmation_metric(app.clinician)['sample_count'],before+1)
   self.assertEqual(frappe.db.sql("SELECT COUNT(*) FROM tt_journal WHERE event_ref=%s",('booking:'+app.id,))[0][0],1)
  def test_expiry_releases_once_and_records_observed_nonresponse(self):
   app=self.manual();frappe.set_user(app.clinician);notifications.confirmation_presented(app.id)
@@ -42,9 +42,9 @@ class Notifications(GuestFirst):
   self.assertEqual(notifications.confirmation_metric(app.clinician)['expired_count'],1)
   frappe.set_user(app.patient);self.assertEqual(len([n for n in notifications.feed() if n['kind']=='Expired' and n['appointment']==app.id]),1)
  def test_unseen_expiry_is_not_a_clinician_penalty(self):
-  app=self.manual();frappe.db.sql('UPDATE tt_appointment SET expires_at=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND WHERE id=%s',(app.id,))
+  app=self.manual();before=notifications.confirmation_metric(app.clinician)['sample_count'];frappe.db.sql('UPDATE tt_appointment SET expires_at=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND WHERE id=%s',(app.id,))
   with patch.object(frappe.db,'commit'):presentation.expire_pending_appointments()
-  self.assertEqual(notifications.confirmation_metric(app.clinician)['sample_count'],0)
+  self.assertEqual(notifications.confirmation_metric(app.clinician)['sample_count'],before)
  def test_owner_read_privacy_and_system_deduplication(self):
   app=self.manual();notifications.emit(app.patient,'private-system-test','SystemUpdate');notifications.emit(app.patient,'private-system-test','SystemUpdate')
   feed=notifications.feed();notice=next(n for n in feed if n['kind']=='SystemUpdate');self.assertEqual(len([n for n in feed if n['kind']=='SystemUpdate']),1)
@@ -86,6 +86,16 @@ class Notifications(GuestFirst):
    booking_notifications.dispatch();booking_notifications.dispatch();self.assertEqual(sms.call_count,1);budget.assert_called_once()
    self.assertIn('reserved',sms.call_args.args[1]);self.assertLessEqual(len(sms.call_args.args[1]),600)
   self.assertEqual(frappe.db.sql('SELECT state FROM tt_booking_notice WHERE id=%s',(row.id,))[0][0],'ProviderAccepted')
+ def test_confirmation_metric_requires_observed_sample(self):
+  before=None;clinician=None
+  for _ in range(5):
+   frappe.set_user(users['patient']);app=self.manual();clinician=app.clinician
+   if before is None:before=notifications.confirmation_metric(clinician)
+   frappe.set_user(clinician);notifications.confirmation_presented(app.id);presentation.respond_to_request(app.id,'confirm')
+  result=notifications.confirmation_metric(clinician)
+  self.assertEqual(result['sample_count'],before['sample_count']+5)
+  self.assertEqual(result['timely_count'],before['timely_count']+5)
+  self.assertEqual(result['status'],'available');self.assertIsNotNone(result['rate_percent'])
  def test_optout_is_preserved(self):
   app=self.manual();booking_notifications.queue_external(app.id,'ConfirmationReminder',[app.patient],('email',))
   self.assertEqual(frappe.db.sql("SELECT state FROM tt_booking_notice WHERE appointment=%s AND user=%s AND event='ConfirmationReminder'",(app.id,app.patient))[0][0],'Suppressed')
