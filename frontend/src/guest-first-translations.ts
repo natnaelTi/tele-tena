@@ -1,5 +1,8 @@
 /** Provisional UI translations;native and clinical review remain release gates. */
 export const guestFirstTranslations:Record<string,[string,string]>={
+"Sharing choices":["የማጋራት ምርጫዎች","Filannoowwan qoodinsaa"],
+"Choose history files (optional)":["የታሪክ ፋይሎችን ይምረጡ (አማራጭ)","Faayiloota seenaa filadhaa (dirqama miti)"],
+"Sharing preview":["የማጋራት ቅድመ እይታ","Durargii qoodinsaa"],
 "Your private requests":["የግል የእንክብካቤ ጥያቄዎችዎ", "Gaaffilee kunuunsa dhuunfaa keessanii"],
 "Post a request, compare offers and choose your clinician here.":["ጥያቄ ያቅርቡ፣ አቅርቦቶችን ያወዳድሩ እና ባለሙያዎን እዚህ ይምረጡ።", "Gaaffii maxxansaa, yaada dhiyaate madaalaa, ogeessa keessan as filadhaa."],
 "New request":["አዲስ ጥያቄ", "Gaaffii haaraa"],

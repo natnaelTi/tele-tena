@@ -1572,15 +1572,8 @@ function ClinicianResponsePanel({
       <div className="request-response-layout">
         <section className="request-authorized-context">
           <h3>{w("Patient request")}</h3>
-          <DisclosurePreview
-            disclosure={request.disclosure_snapshot}
-            context="received"
-          />
-          <p className="supporting">
-            {w(
-              "The patient chose what to share for this request. Do not use it outside this response.",
-            )}
-          </p>
+          <p className="prewrap request-authorized-narrative">{request.request_text}</p>
+          <details className="request-context"><summary>{w('Patient-authorized disclosure')}</summary><DisclosurePreview disclosure={request.disclosure_snapshot} context="received"/><p className="supporting">{w('The patient chose what to share for this request. Do not use it outside this response.')}</p></details>
           <dl className="request-inline-facts">
             <div>
               <dt>{w("Language")}</dt>
