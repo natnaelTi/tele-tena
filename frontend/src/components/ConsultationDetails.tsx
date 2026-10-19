@@ -22,7 +22,7 @@ export function PreparationPanel(){
 }
 export function RecordedCallTiming({item}:{item:any}){
   const {w}=useLocale();
-  return <details className="recorded-call-timing"><summary>{w('Call activity')}</summary><dl className="encounter-facts"><dt>{w('Call state')}</dt><dd>{w(({Ended:'Call ended',Open:'In progress',NotStarted:'Not started'} as Record<string,string>)[item.call_state]||'Unavailable')}</dd><dt>{w('Call ended')}</dt><dd>{item.call_ended_at?date(item.call_ended_at,item.timezone):w('Unavailable')}</dd><dt>{w('Connected time')}</dt><dd>{w('Unavailable')}</dd></dl><p className="supporting">{w('Booked duration is not measured connected time.')}</p></details>;
+  return <details className="recorded-call-timing"><summary>{w('Call activity')}</summary><dl className="encounter-facts"><dt>{w('Call state')}</dt><dd>{w(({Ended:'Call ended',Open:'Call opened',NotStarted:'Not started'} as Record<string,string>)[item.call_state]||'Unavailable')}</dd><dt>{w('Call ended')}</dt><dd>{item.call_ended_at?date(item.call_ended_at,item.timezone):w('Unavailable')}</dd><dt>{w('Connected time')}</dt><dd>{w('Unavailable')}</dd></dl><p className="supporting">{w('Booked duration is not measured connected time.')}</p></details>;
 }
 
 /** N08: labels explain access without receiving either adult's private notes. */

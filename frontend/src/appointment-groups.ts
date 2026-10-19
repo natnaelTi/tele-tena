@@ -7,7 +7,7 @@ export function appointmentGroups(appointments: Appointment[], clinician: boolea
     if (['Completed', 'Cancelled', 'Expired', 'NoShow'].includes(item.state)) group = 'Past';
     else if (item.state === 'PendingConfirmation') group = 'Needs action';
     else if (item.call_state === 'Ended') group = clinician && item.documentation_state !== 'Finalized' ? 'Needs action' : 'Past';
-    else if (item.call_state === 'Open') group = 'In progress';
+    else if (item.call_state === 'Open' && Date.parse(item.end) >= now) group = 'In progress';
     else if (item.state === 'Booked' && new Date(item.end).getTime() >= now) group = 'Upcoming';
     else group = 'Past';
     groups[group].push(item);
@@ -27,7 +27,7 @@ export function appointmentsForView(appointments: Appointment[], view: Appointme
     if (view === 'attention') return item.state === 'PendingConfirmation' ||
       (clinician && item.state === 'Booked' && item.call_state === 'Ended' && item.documentation_state !== 'Finalized');
     return item.state === 'Booked' && item.call_state !== 'Ended' &&
-      (item.call_state === 'Open' || Date.parse(item.end) >= now);
+      Date.parse(item.end) >= now;
   });
 }
 

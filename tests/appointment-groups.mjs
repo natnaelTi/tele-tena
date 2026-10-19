@@ -23,3 +23,7 @@ assert.equal(months['September 2026'][0].id,'bad-zone');
 assert.equal(months.Past[0].id,'missing-date');
 assert.deepEqual(history.map(x=>x.state),['Completed','Completed','Completed','Completed']);
 console.log('PASS: historical month/year groups use booking timezone, retain incomplete legacy rows and preserve lifecycle.');
+
+const stale=make('stale-open',{call_state:'Open',end:'2026-10-08T12:00:00Z'});
+assert.equal(Object.fromEntries(appointmentGroups([stale],true,now)).Past[0].id,'stale-open');
+assert.equal(appointmentsForView([stale],'upcoming',true,now).length,0);
