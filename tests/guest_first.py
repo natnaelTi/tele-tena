@@ -126,7 +126,7 @@ class GuestFirst(unittest.TestCase):
   with patch.object(frappe.db,'commit'),patch('tele_tena.email_delivery.send_notice',side_effect=TimeoutError) as transport:
    booking_notifications.dispatch();booking_notifications.dispatch()
   self.assertEqual(sum(('Reference '+result['id'][:8]+'.') in call.args[1] for call in transport.call_args_list),1)
-  rows=frappe.db.sql("SELECT id,state,attempts FROM tt_booking_notice WHERE appointment=%s AND channel='email'",(result['id'],),as_dict=True)
+  rows=frappe.db.sql("SELECT id,state,attempts FROM tt_booking_notice WHERE appointment=%s AND user=%s AND channel='email'",(result['id'],users['patient']),as_dict=True)
   self.assertEqual([(row.state,row.attempts) for row in rows],[('Unknown',1)])
   with self.assertRaises(frappe.PermissionError):booking_notifications.retry(rows[0].id)
   self.assertEqual(journey.book(*args)['id'],result['id'])
@@ -137,7 +137,7 @@ class GuestFirst(unittest.TestCase):
   result,args,offer=self.book()
   with patch.object(frappe.db,'commit'),patch('tele_tena.email_delivery.send_notice',side_effect=DeliveryUnavailable('email_not_configured')):
    booking_notifications.dispatch()
-  notice=frappe.db.sql("SELECT id,state FROM tt_booking_notice WHERE appointment=%s AND channel='email'",(result['id'],),as_dict=True)[0]
+  notice=frappe.db.sql("SELECT id,state FROM tt_booking_notice WHERE appointment=%s AND user=%s AND channel='email'",(result['id'],users['patient']),as_dict=True)[0]
   self.assertEqual(notice.state,'Unavailable');booking_notifications.retry(notice.id)
   with patch.object(frappe.db,'commit'),patch('tele_tena.email_delivery.send_notice') as transport:
    booking_notifications.dispatch();booking_notifications.dispatch()
@@ -180,7 +180,8 @@ class GuestFirst(unittest.TestCase):
  def test_policy_versions_and_no_implicit_privilege(self):
   with patch('tele_tena.review.registration_enabled',return_value=True):user=contact_auth._identity('email','guest-first-'+secrets.token_hex(6)+'@example.invalid')
   frappe.set_user(user)
-  self.assertEqual(booking_notifications.preferences(),{'email_enabled':False,'sms_enabled':False})
+  self.assertEqual(booking_notifications.preferences(),{'email_enabled':True,'sms_enabled':True})
+  self.assertFalse(frappe.db.sql('SELECT user FROM tt_notice_preference WHERE user=%s',(user,)))
   answers={'name':'Fictional patient','adult':True,'consent':True,'care_alias':'River','share_name':False,'share_history':True}
   with patch('tele_tena.review.registration_enabled',return_value=True):
    with self.assertRaises(frappe.ValidationError):contact_auth.save_onboarding('patient',3,answers,1)
