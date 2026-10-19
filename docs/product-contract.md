@@ -450,3 +450,10 @@ participation. After its booked/extended end, lists show Outcome not recorded an
 until an explicit authorized outcome is recorded. No call, appointment or ledger is
 mutated by this presentation rule. Call activity says Call opened, never claims measured
 connected time. Existing End/revocation and documentation controls are unchanged.
+
+### Service-grouped public directory (19 October)
+Clinicians & services presents the existing approved cards under public service-name
+headings with service shortcuts. Filters remain server-enforced; each offering keeps
+its own scope, clinician, price, format and booking reference. Display grouping does
+not merge catalog definitions or grant additional authorization. Guest cards retain
+View profile, with Sign in to Book inside the profile; patients keep direct scheduling.

@@ -1,6 +1,8 @@
 # Connected schedule availability follow-up — 19 October 2026
 
-Current runtime/package: `624b013b3aa41017107e0fd6cd551805834deea3` on
+Latest packaged frontend: `f5e52b350fd53857f1d94c6864fe0e20d1d5c6b8`; service-grouping follow-up below. Backend behavior remains identical to the earlier verified checkpoint.
+
+Schedule-presence verification checkpoint: `624b013b3aa41017107e0fd6cd551805834deea3` on
 `feat/guest-first-mvp`, draft PR #47, dependent on PR #46. Subsequent evidence/test-only
 commits do not require a runtime rebuild. No dependency changes, reseed, merge or remote deployment.
 
@@ -107,3 +109,36 @@ protected. In Appointments, inspect14 October history: it remains incomplete, no
 Use existing private account manifests described in `docs/local-preview.md`. Restart only
 this preview with the documented `scripts/local_review.py` commands. No Selfmade commands
 were executed; the previous remote release remains unchanged.
+
+## Clinicians & services grouped navigation — latest follow-up
+
+Owner-requested C02 extension: retain the approved cards and present them under
+public service-name headings, with keyboard-accessible Browse by service links.
+A clinician appears in each relevant service section; all distinct offerings,
+formats, durations, prices and original booking references remain intact. The
+existing directory projection already supplies these service labels. Identically
+named legacy/current public services share a display section only; no catalog,
+authorization, historical snapshot or database record is merged or changed.
+
+Real-backend browser verification (`scripts/browser-directory-service-groups.cjs`):
+7 visible service groups retain all13 currently eligible offerings; per-group counts
+and card membership match the public API, including multiple clinicians for one
+service. Dynamic service filtering/reset, keyboard service jumps, guest preview /
+Sign in to Book and authenticated patient selected-offering scheduling handoff pass.
+No booking/reservation or fixture mutation is required by this navigation test.
+
+Production build/TypeScript and lint pass. Rendered guest/patient screenshots at
+1440/768/390 and an actual200% Chromium zoom capture are in
+`docs/screenshots/directory-service-groups/`. Whole-list and scrolled mobile-group
+captures expose all groups and the existing card composition. Images were opened
+for visual inspection: grouped headings/counts align with the unchanged cards,
+shortcuts wrap accessibly, filters remain on the right at desktop and above results
+on mobile. The original C02 flat-card reference remains the component reference;
+grouping is this explicitly approved new direction, not a claimed pre-existing
+prototype state. Owner acceptance remains pending. New localized grouping labels
+are provisional Amharic/Afaan Oromo; native review is not claimed.
+
+Source/build `f5e52b350fd53857f1d94c6864fe0e20d1d5c6b8`; subsequent test/evidence-only commits do not change
+the runtime. No backend, schema, dependency, permission or provider changes. Prior
+backend/call/financial evidence is reused rather than rerunning unchanged suites.
+No remote changes, re-seeding or merge.

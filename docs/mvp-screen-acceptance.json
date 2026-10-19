@@ -15444,7 +15444,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/automatic-request-availability-verification-2026-10-19.md",
-  "current_packaged_source": "624b013b3aa41017107e0fd6cd551805834deea3",
+  "current_packaged_source": "f5e52b350fd53857f1d94c6864fe0e20d1d5c6b8",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -16120,6 +16120,20 @@
         "Physical-device and live provider checks unchanged; not repeated"
       ],
       "migration": "Additive v1.41; disabled by default; no appointment/financial backfill."
+    },
+    "directory_service_groups": {
+      "route": "/care",
+      "actors": [
+        "guest",
+        "patient"
+      ],
+      "reference": "C02 cards preserved; service headings and shortcut navigation explicitly requested by owner",
+      "runtime_source": "f5e52b350fd53857f1d94c6864fe0e20d1d5c6b8",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex; awaiting owner acceptance",
+      "evidence": "docs/screenshots/directory-service-groups; scripts/browser-directory-service-groups.cjs",
+      "behavior": "Group by the existing public service label, retain all distinct offerings and original selection references. Multiple clinicians/offerings for one displayed service share one section. Dynamic filters apply before grouping.",
+      "changes": "Frontend only; no API, eligibility, schema, data, financial or provider changes."
     }
   }
 }

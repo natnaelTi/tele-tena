@@ -904,3 +904,8 @@ Native-language approval and live delivery remain external, not claimed.
   Today readiness/occupancy card, historical-open appointment display correction and
   native dropdown/section styling implemented; verification recorded in the current
   guest-first report and existing screen matrix. No remote deployment or owner acceptance.
+
+- 19 October directory follow-up: approved cards grouped by public service with
+  shortcut links and clinician counts; real-backend guest/patient filters, previews
+  and scheduling handoff verified. Screenshots/current packaged identity recorded
+  in the existing acceptance matrix and current19 October verification report.
