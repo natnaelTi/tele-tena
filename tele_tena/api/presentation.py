@@ -18,11 +18,12 @@ MAX_RESUME_BYTES = 5 * 1024 * 1024
 
 
 def _event(appointment, event_type, event_actor=None, reason=None):
+    event_id=str(uuid.uuid4())
     frappe.db.sql('''INSERT INTO tt_appointment_event
         (id,appointment,event_type,actor,reason,created) VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))''',
-        (str(uuid.uuid4()), appointment, event_type, event_actor or actor(), reason))
+        (event_id, appointment, event_type, event_actor or actor(), reason))
     from tele_tena.notifications import lifecycle
-    lifecycle(appointment,event_type)
+    lifecycle(appointment,event_type,event_id)
 
 
 def _authorized(appointment, lock=False):
@@ -742,11 +743,8 @@ def finalize_consultation(appointment, publish_summary=0, publish_note=0):
         frappe.db.sql("UPDATE tt_appointment SET state='Completed' WHERE id=%s", (item.id,))
         _event(item.id, 'Completed', clinician)
     _event(item.id, 'DocumentationFinalized', clinician)
-    from tele_tena.notifications import emit
-    for recipient in recipients if (publish or share_note) else []:
-        emit(recipient,f'summary:{item.id}:{finalized_revision}','SummaryReady',item.id)
-    for entry in followup:
-        emit(entry.recipient,f'followup:{item.id}:{finalized_revision}:{entry.recipient}','FollowUpReady',item.id)
+    from tele_tena.notifications import published_content
+    published_content(item.id,finalized_revision,recipients,publish or share_note,followup)
     return {'status': 'Finalized', 'revision': finalized_revision,
             'patient_summary_published': publish, 'consultation_note_published': share_note}
 

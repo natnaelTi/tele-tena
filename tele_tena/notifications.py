@@ -17,6 +17,11 @@ KINDS={
  'SummaryReady':('Shared Consultation Update Available','consultations'),
  'FollowUpReady':('Follow-Up Instructions Available','followups'),
  'TimeChanged':('Appointment Time Updated','appointments'),
+ 'TimeChangeRequested':('Appointment Time Change Requested','appointments'),
+ 'TimeChangeDeclined':('Appointment Time Change Declined','appointments'),
+ 'TimeChangeExpired':('Appointment Time Change Request Expired','appointments'),
+ 'TimeChangeWithdrawn':('Appointment Time Change Withdrawn','appointments'),
+ 'TimeChangeUnavailable':('Proposed Appointment Time Unavailable','appointments'),
  'AccountUpdated':('Account Settings Updated','account'),
  'SystemUpdate':('TeleTena System Update','system'),
 }
@@ -42,14 +47,17 @@ def participants(appointment):
     return people
 
 
-def lifecycle(appointment,event):
+def lifecycle(appointment,event,event_key=None):
     kind={'Cancelled':'Cancelled','Declined':'Declined','Expired':'Expired','CallEnded':'CallEnded',
-          'Completed':'Completed','Rescheduled':'TimeChanged'}.get(event)
+          'Completed':'Completed','RescheduleAccepted':'TimeChanged',
+          'RescheduleProposed':'TimeChangeRequested','RescheduleDeclined':'TimeChangeDeclined',
+          'RescheduleExpired':'TimeChangeExpired','RescheduleWithdrawn':'TimeChangeWithdrawn',
+          'RescheduleUnavailable':'TimeChangeUnavailable','RescheduleSlotUnavailable':'TimeChangeUnavailable'}.get(event)
     if event in ('Cancelled','Declined','Expired'):
         from tele_tena.booking_notifications import queue_external
         queue_external(appointment,event,participants(appointment))
     if kind:
-        for user in participants(appointment):emit(user,kind+':'+appointment,kind,appointment)
+        for user in participants(appointment):emit(user,kind+':'+(event_key or appointment),kind,appointment)
     if event in ('Confirmed','Declined','Expired'):
         frappe.db.sql('''UPDATE tt_confirmation_observation SET response=%s,
           first_presented_at=IF(%s='Expired',first_presented_at,COALESCE(first_presented_at,UTC_TIMESTAMP(6))),
@@ -113,3 +121,19 @@ def confirmation_metric(clinician):
             'expired_count':sum(r.response=='Expired' for r in sample),
             'rate_percent':int(timely*10000//count)/100 if count>=5 else None,
             'status':'available' if count>=5 else 'more_data_needed' if count else 'new'}
+
+
+def published_content(appointment,revision,recipient_ids,shared,followups):
+    """Participant row IDs are not account IDs. Resolve only this consented encounter."""
+    app=rows('SELECT patient FROM tt_appointment WHERE id=%s',(appointment,))[0]
+    couple=rows('SELECT id FROM tt_couple_plan WHERE appointment=%s',(appointment,))
+    recipients=[]
+    if shared:
+        if not couple:recipients=[app.patient]
+        elif recipient_ids:
+            recipients=[p.user for p in rows("SELECT user FROM tt_couple_participant WHERE plan=%s AND state='Consented' AND id IN %s",(couple[0].id,tuple(recipient_ids)))]
+    for user in recipients:emit(user,f'summary:{appointment}:{revision}','SummaryReady',appointment)
+    for followup in followups:
+        if not couple:continue
+        targets=rows("SELECT user FROM tt_couple_participant WHERE plan=%s AND id=%s AND state='Consented'",(couple[0].id,followup.recipient))
+        for target in targets:emit(target.user,f'followup:{appointment}:{revision}:{followup.recipient}','FollowUpReady',appointment)

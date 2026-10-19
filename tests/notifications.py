@@ -9,7 +9,7 @@ class Notifications(GuestFirst):
  def manual(self):
   offer=self.offer();clinician=frappe.db.sql('SELECT clinician FROM tt_offering WHERE id=%s',(offer.id,))[0][0]
   frappe.set_user(clinician);schedule=next(s for s in scheduling.schedules() if s.offering==offer.id)
-  scheduling.save_schedule(offer.id,schedule.schedule_name,schedule.timezone,schedule.consultation_format,'manual',schedule.minimum_notice_minutes,schedule.horizon_days,schedule.buffer_before,schedule.buffer_after,schedule.intervals,schedule.exceptions,'Published')
+  scheduling.save_schedule(offer.id,schedule.schedule_name,schedule.timezone,schedule.consultation_format,'manual',schedule.minimum_notice_minutes,schedule.horizon_days,schedule.buffer_before,schedule.buffer_after,schedule.intervals,[{**e,'date':str(e['date'])} for e in schedule.exceptions],'Published')
   frappe.set_user(users['patient']);result,_,_=self.book()
   app=frappe.db.sql('SELECT * FROM tt_appointment WHERE id=%s',(result['id'],),as_dict=True)[0]
   self.assertEqual(app.state,'PendingConfirmation');return app
