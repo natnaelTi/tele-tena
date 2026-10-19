@@ -746,8 +746,9 @@ def request_presence():
     effective_ready = live and not reasons
     occupied = rows('''SELECT c.state call_state FROM tt_appointment a LEFT JOIN tt_consultation c ON c.appointment=a.id
         WHERE a.clinician=%s AND a.state IN ('Booked','PendingConfirmation')
-        AND DATE_SUB(a.start,INTERVAL a.buffer_before MINUTE)<=UTC_TIMESTAMP(6)
-        AND DATE_ADD(a.end,INTERVAL a.buffer_after MINUTE)>UTC_TIMESTAMP(6)''', (clinician,))
+        AND (a.expires_at IS NULL OR a.expires_at>%s)
+        AND DATE_SUB(a.start,INTERVAL a.buffer_before MINUTE)<=%s
+        AND DATE_ADD(a.end,INTERVAL a.buffer_after MINUTE)>%s''', (clinician, now(), now(), now()))
     automatic = bool(rows("SELECT id FROM tt_schedule WHERE clinician=%s AND status='Published' AND auto_requests=1", (clinician,)))
     return {'automatic': automatic, 'within_hours': _automatic_hours(clinician) if automatic else False,
             'control_mode': row[0].control_mode if row else 'manual',

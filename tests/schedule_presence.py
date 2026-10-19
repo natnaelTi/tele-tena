@@ -40,6 +40,20 @@ class SchedulePresence(GuestFirst):
    result=requests.heartbeat_request_presence();self.assertFalse(result['ready']);self.assertIn('no_immediate_capacity',result['reasons'])
   with patch.object(requests,'_has_immediate_capacity',return_value=True),patch.object(requests,'dispatch_open_requests'):
    self.assertTrue(requests.heartbeat_request_presence()['ready'])
+ def test_booked_occupancy_and_opened_consultation(self):
+  from tele_tena.api import consultations
+  frappe.set_user(users['patient']);result,_,_=self.book()
+  appointment=frappe.db.sql('SELECT * FROM tt_appointment WHERE id=%s',(result['id'],),as_dict=True)[0]
+  frappe.set_user(appointment.clinician)
+  with patch.object(requests,'now',return_value=appointment.start+timedelta(minutes=1)):
+   self.assertEqual(requests.request_presence()['occupancy'],'occupied')
+   # Controlled future join window/token transport; authorization and persisted
+   # join command are real. This is not hosted-media evidence.
+   with patch.object(consultations,'_window',return_value=True),patch('tele_tena.livekit._credentials',return_value=('wss://local.invalid','test','test')),patch('tele_tena.livekit.participant_token',return_value='local-test-token'):
+    consultations.join(appointment.id)
+   self.assertEqual(requests.request_presence()['occupancy'],'in_consultation')
+  with patch.object(requests,'now',return_value=appointment.end+timedelta(days=1)):
+   self.assertIsNone(requests.request_presence()['occupancy'])
  def test_real_capacity_and_opt_out(self):
   expected=requests._has_immediate_capacity(self.clinician,[frappe._dict(id=self.item.id)])
   with patch.object(requests,'dispatch_open_requests'):
