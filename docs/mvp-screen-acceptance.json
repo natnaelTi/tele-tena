@@ -15444,7 +15444,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/automatic-request-availability-verification-2026-10-19.md",
-  "current_packaged_source": "f45cf77e919da6b4f9759fe69787d99e1c4b704a",
+  "current_packaged_source": "ba60959e7eb2f921c130a2ea4c426d2db8c6552b",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -16182,6 +16182,51 @@
       "external_dependencies": [
         "Owner visual acceptance",
         "Native translation review"
+      ]
+    },
+    "open_request_consolidation": {
+      "runtime_source": "ba60959e7eb2f921c130a2ea4c426d2db8c6552b",
+      "routes": [
+        "/patient/requests?request=:id&offer=:offer",
+        "/clinician/requests?request=:id",
+        "/clinician/requests?offer=:id&view=offers",
+        "/clinician/requests?view=history"
+      ],
+      "legacy_routes": "Patient requests/:requestId, requests/:requestId/offers/:offerId and clinician offers[/offerId] resolve to the selected record in the consolidated workspace. Opaque IDs only; no health text in URLs.",
+      "references": [
+        "D01",
+        "D03",
+        "D05",
+        "D09",
+        "F02",
+        "F03",
+        "F04",
+        "F13",
+        "F14",
+        "F15"
+      ],
+      "owner_override": "19 October request: one page per role until offer acceptance, compact cards/editors, dialogs and local micro-flows. This supersedes the prototype multi-route navigation, not its visual language or backend rules.",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex for the named paired comparisons and responsive states; awaiting owner acceptance",
+      "backend": "Existing publish_request,preview,clinician_requests,submit_offer,my_request_detail,clinician_offers,preview_acceptance,respond_offer,cancel_request,withdraw_offer and authoritative wallet/appointment APIs. No new model, migration, dependency, approval, dispatch or financial implementation.",
+      "permissions": "Owner-only patient requests; eligible recipient-only clinician inbox; own quotes/history; approved public clinician projection; selected treating-clinician history/file grants only after accepted encounter consent. Server revalidates eligibility,slot,price,disclosure and funds.",
+      "states_verified": [
+        "Guided draft/preferences/privacy and validation",
+        "Publication and real waiting",
+        "Private profile pane and offer review",
+        "Insufficient funds,top-up dialog,cancel/retry and acceptance",
+        "One winning appointment/reservation,repeated acceptance",
+        "Clinician waiting/accepted history and reload",
+        "Withdrawal closes stale review;explicit request cancellation",
+        "No eligible required-language supply;scheduled draft fallback",
+        "Current appointment cancellation distinct from matched request",
+        "390/768/1440,actual200% and reduced-motion;provisional locale layouts"
+      ],
+      "evidence_report": "docs/request-workspace-verification-2026-10-19.md",
+      "screenshots": "docs/screenshots/request-workspace",
+      "remaining": [
+        "Owner visual acceptance",
+        "Native translation review;live delivery/physical-device gates remain external and unchanged"
       ]
     }
   }
