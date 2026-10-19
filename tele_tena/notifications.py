@@ -72,7 +72,7 @@ def confirmation_presented(appointment):
     app,user,role=_authorized(appointment)
     if role!='clinician':frappe.throw('Confirmation prompt unavailable',frappe.PermissionError)
     if app.state=='PendingConfirmation':
-        frappe.db.sql('UPDATE tt_confirmation_observation SET first_presented_at=COALESCE(first_presented_at,UTC_TIMESTAMP(6)) WHERE appointment=%s AND clinician=%s',(appointment,user))
+        frappe.db.sql('UPDATE tt_confirmation_observation SET first_presented_at=COALESCE(first_presented_at,UTC_TIMESTAMP(6)) WHERE appointment=%s AND clinician=%s AND response IS NULL',(appointment,user))
     return {'recorded':True}
 
 
