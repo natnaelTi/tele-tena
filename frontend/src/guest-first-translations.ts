@@ -1,5 +1,8 @@
 /** Provisional UI translations;native and clinical review remain release gates. */
 export const guestFirstTranslations:Record<string,[string,string]>={
+"Browse by service":["በአገልግሎት ይፈልጉ","Tajaajilaan ilaalaa"],
+"offerings":["የቀረቡ አገልግሎቶች","tajaajiloota dhiyaatan"],
+"clinicians":["ባለሙያዎች","ogeessota"],
 "Go available now":["አሁን ዝግጁ ይሁኑ","Amma qophaa’aa"],
 "Automatic availability enabled":["ራስ ሰር ዝግጁነት ነቅቷል","Qophaa’inni ofumaan banameera"],
 "Requests paused — No immediate opening":["ጥያቄዎች ቆመዋል — አሁን ክፍት ጊዜ የለም","Gaaffileen dhaabataniiru — Yeroon hatattamaa hin jiru"],
