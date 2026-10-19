@@ -287,3 +287,9 @@ short leases and recompute current eligibility/capacity. Schedule hours use the 
 engine's timezone/rule/exception projection. No background process advertises a clinician
 without an active reachable workspace. Dashboard visibility is separate from the shell's
 headless heartbeat; notifications and appointment authorization are unchanged.
+
+## v1.42 Neutral Notification Inbox
+
+Empty additive `tt_user_notification` and `tt_confirmation_observation` tables preserve durable owner/read state and actual booking-prompt observations. They are not publicly exposed DocTypes. Custom endpoints authorize the owner and current encounter membership; recipient-specific publication resolves participant row IDs only within the consented encounter. Stable lifecycle/event keys and existing booking-outbox unique keys make retries idempotent.
+
+Minute cron queues reminders through the existing provider outbox; booking gate and row locks serialize reminders against decisions. Durable Sending claims precede network I/O; uncertain outcomes are not automatically retried. SQL batching excludes legacy policy rows before limiting so they cannot starve current reminders. Existing LiveKit End/revocation implementation is unchanged; ended-call notices reconcile without mutating room security transactions.

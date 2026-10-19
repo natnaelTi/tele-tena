@@ -15444,7 +15444,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/automatic-request-availability-verification-2026-10-19.md",
-  "current_packaged_source": "f5e52b350fd53857f1d94c6864fe0e20d1d5c6b8",
+  "current_packaged_source": "31a77c14c12a74c9b4e4632dad8cac988601836c",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -16128,12 +16128,38 @@
         "patient"
       ],
       "reference": "C02 cards preserved; service headings and shortcut navigation explicitly requested by owner",
-      "runtime_source": "f5e52b350fd53857f1d94c6864fe0e20d1d5c6b8",
+      "runtime_source": "31a77c14c12a74c9b4e4632dad8cac988601836c",
       "functional_status": "Functionally verified",
       "visual_status": "Visually verified by Codex; awaiting owner acceptance",
       "evidence": "docs/screenshots/directory-service-groups; scripts/browser-directory-service-groups.cjs",
-      "behavior": "Group by the existing public service label, retain all distinct offerings and original selection references. Multiple clinicians/offerings for one displayed service share one section. Dynamic filters apply before grouping.",
+      "behavior": "Group cards by the existing public service label; preserve every eligible offering and selected offering reference. Owner-requested Browse by service shortcut removed; service headings and dynamic filters retained.",
       "changes": "Frontend only; no API, eligibility, schema, data, financial or provider changes."
+    },
+    "patient_notification_followup": {
+      "runtime_source": "31a77c14c12a74c9b4e4632dad8cac988601836c",
+      "routes": [
+        "/patient",
+        "/patient/appointments",
+        "/care",
+        "/clinician",
+        "/clinician/consultations/:id"
+      ],
+      "references": [
+        "C02 directory cards retained",
+        "H04 notification preferences",
+        "Existing shared bell, dialog and accepted-offer components; new neutral inbox states requested by owner"
+      ],
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex for named screenshots; awaiting owner acceptance",
+      "behavior": "Patient bell replaces navbar Appointment Updates; owner-only durable read state and neutral lifecycle events. Appointment delivery history stays on Appointments. New manual bookings get one follow-up email after 180 seconds, then existing snapshotted expiry/release. Separate presented-prompt responsiveness metric. Title Case headings/subtitles.",
+      "evidence_report": "docs/patient-notifications-verification-2026-10-19.md",
+      "screenshots": "docs/screenshots/patient-notifications",
+      "external_dependencies": [
+        "Live consenting SMS/email delivery not performed",
+        "Native Amharic/Afaan Oromo review pending",
+        "Owner visual acceptance pending"
+      ],
+      "migration": "Additive v1.42 empty private inbox/observation tables; no historical financial, policy or preference backfill."
     }
   }
 }

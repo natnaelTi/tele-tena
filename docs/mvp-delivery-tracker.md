@@ -909,3 +909,5 @@ Native-language approval and live delivery remain external, not claimed.
   shortcut links and clinician counts; real-backend guest/patient filters, previews
   and scheduling handoff verified. Screenshots/current packaged identity recorded
   in the existing acceptance matrix and current19 October verification report.
+
+- 19 October notification follow-up: patient universal bell/read persistence; Appointments-only delivery history; SMS/email reservation and booking messages; one three-minute manual-confirmation email reminder; recorded expiry/release; separate presented-prompt responsiveness metric; Title Case headings; directory shortcuts removed. See patient-notifications-verification-2026-10-19.md and the existing screen matrix. Real-backend tests and isolated automatic scheduler/private-transport processing verified; live delivery and owner acceptance remain external. No historical financial/policy backfill, reseed or remote deployment.

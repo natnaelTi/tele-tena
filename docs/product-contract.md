@@ -457,3 +457,11 @@ headings with service shortcuts. Filters remain server-enforced; each offering k
 its own scope, clinician, price, format and booking reference. Display grouping does
 not merge catalog definitions or grant additional authorization. Guest cards retain
 View profile, with Sign in to Book inside the profile; patients keep direct scheduling.
+
+## Booking Notifications — 19 October Follow-up
+
+Patients use one neutral notification bell for appointment, follow-up, account and system events; appointment delivery history remains on Appointments. Authorization is rechecked on fetch/read/link access, including individual couples consent. Private note content never enters notifications.
+
+New booking policy version `booking-notices-v2` records a 180-second clinician reminder threshold and an explicit confirmation deadline (configured hours, capped at start). One follow-up email is queued after that threshold; minute scheduling and provider availability determine actual sending. Existing bookings retain their accepted policy. Expiry releases the demonstration reservation once under the existing cancellation rules; no new penalty or external refund is implied.
+
+Email/SMS operational booking preferences default on only when no saved choice exists; explicit opt-outs remain honored, with verified contacts, site/provider gates and send caps. Reservation receipts identify demonstration funds. ProviderAccepted is not delivery. The 90-day, minimum-five presented-booking-prompt response metric is separate from clinical competency and patient experience; responsible declines count, unseen expiries do not.
