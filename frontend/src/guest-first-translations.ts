@@ -1,5 +1,21 @@
 /** Provisional UI translations;native and clinical review remain release gates. */
 export const guestFirstTranslations:Record<string,[string,string]>={
+"Adjust your photo":["ፎቶዎን ያስተካክሉ", "Suuraa keessan sirreessaa"],
+"Drag to position your photo, or use the sliders. Nothing uploads until you save.":["ፎቶዎን በመጎተት ወይም በተንሸራታቾቹ ያስተካክሉ። እስኪያስቀምጡ ድረስ አይሰቀልም።", "Suuraa harkisuun ykn to’annoo fayyadamuun sirreessaa. Hanga olkeessitanitti hin fe’amu."],
+"Profile photo crop preview":["የተቆረጠ የመገለጫ ፎቶ ቅድመ እይታ", "Durargii murtii suuraa dhuunfaa"],
+"Zoom":["የፎቶ መጠን", "Hammamtaa suuraa"],
+"Horizontal position":["አግድም አቀማመጥ", "Iddoo dalgee"],
+"Vertical position":["ቋሚ አቀማመጥ", "Iddoo dhaabbataa"],
+"Save photo":["ፎቶ ያስቀምጡ", "Suuraa olkaa’aa"],
+"Reset crop":["መቁረጥን ዳግም ያስጀምሩ", "Murtii deebisaa"],
+"Your details, preferences and privacy, all in one place.":["ዝርዝሮችዎ፣ ምርጫዎችዎ እና ግላዊነትዎ በአንድ ቦታ።", "Odeeffannoo, filannoo fi iccitii keessan bakka tokkotti."],
+"Account overview":["የመለያ አጠቃላይ እይታ", "Cuunfaa herregaa"],
+"Edit personal details":["የግል ዝርዝሮችን ያርትዑ", "Odeeffannoo dhuunfaa gulaalaa"],
+"Medical history":["የጤና ታሪክ", "Seenaa fayyaa"],
+"Help & installation":["እገዛ እና ጭነት", "Gargaarsa fi fe’iinsa"],
+"Use the Help & tours button for guides and walkthroughs.":["ለመመሪያዎች የእገዛ እና ጉብኝት አዝራሩን ይጠቀሙ።", "Qajeelfamaaf qabduu Gargaarsa fi daawwannaa fayyadamaa."],
+"Choose a valid, non-animated JPEG, PNG or WebP image up to 3 MB and 4096 pixels.":["የማይንቀሳቀስ JPEG፣ PNG ወይም WebP እስከ 3 MB እና 4096 ፒክስል ይምረጡ።", "Suuraa hin sochoone JPEG, PNG ykn WebP hanga 3 MB fi piikselii 4096 filadhaa."],
+
 "Appointment Time Change Requested":["የቀጠሮ ጊዜ ለውጥ ተጠይቋል", "Jijjiiramni yeroo beellamaa gaafatameera"],
 "Appointment Time Change Declined":["የቀጠሮ ጊዜ ለውጥ አልተቀበለም", "Jijjiiramni yeroo beellamaa didameera"],
 "Appointment Time Change Request Expired":["የቀጠሮ ጊዜ ለውጥ ጥያቄ ጊዜ አልፎበታል", "Yeroon gaaffii jijjiirama beellamaa darbeera"],

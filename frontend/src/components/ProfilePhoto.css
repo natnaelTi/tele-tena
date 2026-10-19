@@ -4,3 +4,11 @@
 .profile-photo-controls>.avatar {width:88px;height:88px;border-radius:50%;font-size:32px;}
 .profile-photo-controls input {max-width:100%;}
 .workspace-header>.profile-avatar,.product-user>.profile-avatar {width:36px;height:36px;border-radius:50%;font-size:16px;}
+.photo-crop-dialog{max-width:480px!important}
+.photo-crop-preview{position:relative;max-width:260px;aspect-ratio:1;margin:12px auto 20px;overflow:hidden;border-radius:16px;background:var(--subtle)}
+.photo-crop-preview canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.photo-crop-preview canvas:active{cursor:grabbing}
+.photo-crop-preview>span{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 70px #102f3a66;pointer-events:none;border:2px solid #fff}
+.photo-crop-sliders{display:grid;gap:12px}.photo-crop-sliders label{display:grid;grid-template-columns:145px minmax(0,1fr);gap:12px;align-items:center;font-size:14px;color:var(--ink)}
+.photo-crop-sliders input{width:100%;min-height:32px;accent-color:var(--brand-primary);padding:0}
+@media(max-width:450px){.photo-crop-preview{max-width:210px}.photo-crop-sliders label{grid-template-columns:minmax(0,1fr);gap:2px}}
