@@ -180,6 +180,10 @@ def process_reminders():
     upcoming=rows("SELECT * FROM tt_appointment WHERE state='Booked' AND start>UTC_TIMESTAMP(6) AND start<=UTC_TIMESTAMP(6)+INTERVAL 1 HOUR LIMIT 100")
     import json
     for app in upcoming:
+        one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+        current=rows("SELECT * FROM tt_appointment WHERE id=%s AND state='Booked' AND start>UTC_TIMESTAMP(6) FOR UPDATE",(app.id,))
+        if not current:continue
+        app=current[0]
         if json.loads(app.policy_snapshot or '{}').get('notifications',{}).get('version')!='booking-notices-v2':continue
         for user in participants(app.id):emit(user,'appointment-reminder:'+app.id,'AppointmentReminder',app.id)
         queue_external(app.id,'AppointmentReminder',participants(app.id))
