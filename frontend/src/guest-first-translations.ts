@@ -1,5 +1,11 @@
 /** Provisional UI translations;native and clinical review remain release gates. */
 export const guestFirstTranslations:Record<string,[string,string]>={
+"Your preferred name and request text will be shared. Saved history and files stay private until you select a treating clinician.":["የመረጡት ስም እና የጥያቄ ጽሑፍ ይጋራሉ። ባለሙያ እስኪመርጡ ድረስ ታሪክና ፋይሎች የግል ናቸው።","Maqaan filattan fi barruun gaaffii keessanii ni qoodamu. Seenaa fi faayiloonni hanga ogeessa filattanitti dhuunfaa ta’u."],
+"Your preferred name is shared.":["የመረጡት ስም ይጋራል።","Maqaan filattan ni qoodama."],
+"Your name stays private.":["ስምዎ የግል ሆኖ ይቆያል።","Maqaan keessan dhuunfaa ta’a."],
+"Your saved text history is shared with this treating clinician when you accept.":["ሲቀበሉ የተቀመጠው የጽሑፍ ታሪክዎ ለዚህ ባለሙያ ይጋራል።","Yeroo fudhattan seenaan barruu olkaa’ame ogeessa kanaaf ni qoodama."],
+"Your saved text history stays private.":["የተቀመጠው የጽሑፍ ታሪክዎ የግል ሆኖ ይቆያል።","Seenaan barruu olkaa’ame dhuunfaa ta’a."],
+
 "Request matched":["ጥያቄው ተዛምዷል","Gaaffiin wal simateera"],
 "Offer accepted":["አቅርቦቱ ተቀብሏል","Yaadni fudhatameera"],
 "Your offer was accepted. Appointment details show its current status and next steps.":["አቅርቦቱ ተቀብሏል። የቀጠሮ ዝርዝሮች አሁን ያለውን ሁኔታ እና ቀጣይ እርምጃዎች ያሳያሉ።","Yaadni fudhatameera. Bal’inni beellamaa haala yeroo ammaa fi tarkaanfii itti aanu agarsiisa."],

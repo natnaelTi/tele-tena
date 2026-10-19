@@ -1,3 +1,4 @@
+import {RequestAvailabilityCard} from '../components/RequestPresence';
 import {appointmentStatus} from '../appointment-status';
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -210,6 +211,8 @@ export function PatientRequestsWorkspace() {
   const [composerStep, setComposerStep] = useState(
     requestDraft?.request_text ? 1 : 0,
   );
+  const skipSharingReview = !!session?.profile?.share_name && !!session?.profile?.share_history;
+  const showSharingStep = !skipSharingReview || composerStep === 2;
   const guestPreviewPrepared = useRef(false);
   const [composerErrors, setComposerErrors] = useState<Record<string, string>>(
     {},
@@ -228,7 +231,7 @@ export function PatientRequestsWorkspace() {
       .preview(narrative, sharing)
       .then((result) => {
         setPreview(result.disclosure);
-        setComposerStep(2);
+        setComposerStep(skipSharingReview ? 1 : 2);
       })
       .catch(() => {
         setComposerStep(1);
@@ -264,6 +267,7 @@ export function PatientRequestsWorkspace() {
     }
     setComposerErrors(errors);
     if (Object.keys(errors).length) return;
+    if (composerStep === 1 && skipSharingReview) { publish(); return; }
     if (composerStep === 1)
       void action.run(async () => {
         const result = await journeyApi.preview(narrative, sharing);
@@ -516,13 +520,13 @@ export function PatientRequestsWorkspace() {
                 data-tour-unsaved={!!narrative.trim()}
               >
                 <p className="supporting">
-                  {w("Step")} {composerStep + 1} / 3
+                  {w("Step")} {composerStep + 1} / {showSharingStep ? 3 : 2}
                 </p>
                 <ol
                   className="request-step-progress"
                   aria-label={w("Request steps")}
                 >
-                  {[w("Describe"), w("Preferences"), w("Privacy")].map(
+                  {(showSharingStep ? [w("Describe"), w("Preferences"), w("Privacy")] : [w("Describe"), w("Preferences")]).map(
                     (label, index) => (
                       <li
                         key={label}
@@ -687,6 +691,7 @@ export function PatientRequestsWorkspace() {
                     )}
                   </>
                 )}
+                {composerStep === 1 && skipSharingReview && <p className="supporting">{w('Your preferred name and request text will be shared. Saved history and files stay private until you select a treating clinician.')} <Button variant="quiet" onClick={() => {setComposerStep(2);updateSharing(sharing);}}>{w('Sharing choices')}</Button></p>}
                 <div className="actions">
                   {composerStep > 0 && (
                     <Button
@@ -699,7 +704,7 @@ export function PatientRequestsWorkspace() {
                   )}
                   {composerStep < 2 ? (
                     <Button loading={action.busy} onClick={continueComposer}>
-                      {w(composerStep === 0 ? "Continue" : "Review privacy")}
+                      {w(composerStep === 0 ? "Continue" : skipSharingReview ? "Publish request" : "Review privacy")}
                     </Button>
                   ) : (
                     <Button
@@ -1299,6 +1304,7 @@ export function ClinicianRequestsWorkspace() {
           "Review eligible requests, send a private offer and follow its outcome here.",
         )}
       />
+      <RequestAvailabilityCard/>
       <div className="request-workspace-layout">
         <aside
           className="request-workspace-index"

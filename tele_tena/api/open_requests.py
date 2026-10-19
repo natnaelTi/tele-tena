@@ -308,7 +308,9 @@ def heartbeat_request_presence(resume_automatic=False):
         mode = 'auto'
     automatic = bool(rows("SELECT id FROM tt_schedule WHERE clinician=%s AND status='Published' AND auto_requests=1", (clinician,)))
     status = request_presence()
-    manual_live = mode in ('manual', 'started') and bool(settings and settings[0].ready and settings[0].expires_at > now())
+    # Desired availability survives an expired lease or temporary capacity loss.
+    # Only this authenticated heartbeat renews effective, short-lived presence.
+    manual_live = mode == 'started' or (mode == 'manual' and bool(settings and settings[0].ready and settings[0].expires_at > now()))
     wants_ready = mode != 'paused' and (manual_live or (automatic and _automatic_hours(clinician)))
     _set_request_presence(wants_ready and status['configured'], manual=False)
     if automatic and mode not in ('paused', 'started'):

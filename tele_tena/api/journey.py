@@ -223,8 +223,8 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
         # it is separate from approval; applicants cannot create a profile here
         # or use this command to gain any clinical/service authorization.
         frappe.throw('Clinician profile access required', frappe.PermissionError)
-    share_name = existing[0].share_name if share_name is None and existing else (False if share_name is None else share_name)
-    share_history = existing[0].share_history if share_history is None and existing else (False if share_history is None else share_history)
+    share_name = existing[0].share_name if share_name is None and existing else (kind == 'patient' if share_name is None else share_name)
+    share_history = existing[0].share_history if share_history is None and existing else (kind == 'patient' if share_history is None else share_history)
     if care_alias is not None and existing and kind=='patient':
         frappe.db.sql('UPDATE tt_profile SET care_alias=%s WHERE user=%s',(text(care_alias,120,False),user))
     name = text(display_name, 120)

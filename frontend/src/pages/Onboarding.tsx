@@ -63,7 +63,7 @@ export default function Onboarding() {
           params.get("intent") === "clinician" ? "clinician" : draft.kind,
         );
         setStep(draft.step);
-        setAnswers(Object.keys(draft.answers).length?draft.answers:{share_name:false,share_history:true});
+        setAnswers({share_name:true,share_history:true,...draft.answers});
         setReady(true);
         void api<{terms_version:string;privacy_version:string}>('tele_tena.api.policies.current').then(policy=>setAnswers(previous=>({...previous,terms_version:policy.terms_version,privacy_version:policy.privacy_version})));
       })

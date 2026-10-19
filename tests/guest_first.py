@@ -191,6 +191,34 @@ class GuestFirst(unittest.TestCase):
   self.assertEqual(journey.profile('patient').care_alias,'River')
   self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_policy_acceptance WHERE user=%s',(user,))[0][0],1)
   self.assertTrue(journey.profile('patient').share_history)
+ def test_new_patient_defaults_and_existing_opt_out_preserved(self):
+  with patch('tele_tena.review.registration_enabled',return_value=True):
+   user=contact_auth._identity('email','sharing-default-'+secrets.token_hex(6)+'@example.invalid')
+   frappe.set_user(user)
+   answers={'name':'Fictional defaults patient','adult':True,'consent':True,
+     'terms_accepted':True,'privacy_acknowledged':True,'terms_version':policies.TERMS,'privacy_version':policies.PRIVACY}
+   contact_auth.save_onboarding('patient',3,answers,1)
+  saved=journey.profile('patient');self.assertTrue(saved.share_name);self.assertTrue(saved.share_history)
+  journey.save_profile('patient','Fictional defaults patient',True,share_name=False,share_history=False)
+  journey.save_profile('patient','Fictional edited name',True)
+  saved=journey.profile('patient');self.assertFalse(saved.share_name);self.assertFalse(saved.share_history)
+ def test_manual_request_intent_survives_capacity_and_lease_loss_but_pause_wins(self):
+  from tele_tena.api import open_requests
+  offer=self.offer();clinician=frappe.db.sql('SELECT clinician FROM tt_offering WHERE id=%s',(offer.id,))[0][0]
+  frappe.set_user(clinician)
+  with patch.dict(frappe.conf,tele_tena_demo_immediate_care_enabled=True):
+   scheduling.save_schedule(offer.id,'Fictional presence continuity','Africa/Addis_Ababa','video','automatic',0,60,0,0,
+     [{'weekday':day,'start':'00:00','end':'23:59'} for day in range(7)],[],'Published')
+   self.assertTrue(open_requests.set_request_presence(True)['ready'])
+   frappe.db.sql('UPDATE tt_clinician_request_presence SET expires_at=UTC_TIMESTAMP(6)-INTERVAL 1 SECOND WHERE clinician=%s',(clinician,))
+   self.assertFalse(open_requests.request_presence()['ready'])
+   self.assertTrue(open_requests.heartbeat_request_presence()['ready'])
+   with patch.object(open_requests,'_has_immediate_capacity',return_value=False):
+    self.assertFalse(open_requests.heartbeat_request_presence()['ready'])
+   self.assertTrue(open_requests.heartbeat_request_presence()['ready'])
+   open_requests.set_request_presence(False)
+   self.assertFalse(open_requests.heartbeat_request_presence()['ready'])
+   self.assertEqual(open_requests.request_presence()['control_mode'],'paused')
  def test_invalid_files_and_cross_owner_selection_denied(self):
   with self.assertRaises(frappe.ValidationError):journey.preview('',{'name':False,'history':False,'files':[str(uuid.uuid4())]})
   with self.assertRaises(frappe.ValidationError):history_documents.upload('bad.exe',base64.b64encode(b'bad').decode())

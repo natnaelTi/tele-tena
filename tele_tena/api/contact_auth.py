@@ -215,7 +215,7 @@ def save_onboarding(kind, step, answers, complete=0):
         fail('Invalid onboarding answers')
     clean = {k: text(v, 4000 if k == 'history' else 2000 if k == 'statement' else 120, False) for k, v in answers.items() if k in ('name', 'language', 'statement', 'affiliations', 'history','care_alias','terms_version','privacy_version')}
     for key in ('adult', 'consent', 'share_name', 'share_history','terms_accepted','privacy_acknowledged','marketing'):
-        clean[key] = boolean(answers.get(key, False))
+        clean[key] = boolean(answers.get(key, kind == 'patient' and key in ('share_name', 'share_history')))
     requested_services = answers.get('requested_services', [])
     if not isinstance(requested_services, list) or len(requested_services) > 30:
         fail('Invalid requested service scopes')

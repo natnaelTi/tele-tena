@@ -1,3 +1,19 @@
+## Sharing and immediate-request continuity —19October2026
+
+New patient accounts default preferred-name and saved text-history sharing on,
+with editable controls. Existing choices are unchanged. When both are on, open
+requests publish from Preferences without a separate privacy step; the inline
+notice and optional sharing editor remain. Requests disclose name/request text
+only, never full history to the recipient pool. Offer acceptance uses a compact
+price/funding confirmation with collapsed sharing controls and server-generated
+encounter disclosure; disabled preferences open the editor. Individual history
+files retain explicit selection and encounter-scoped grants. Acceptance is the
+affirmative authorization; no disclosure snapshot or financial check is removed.
+Manual request start persists as intent across capacity pauses and expired leases;
+effective readiness still requires a fresh authenticated heartbeat, approved
+published service and feasible session. Manual pause always wins. The shared
+availability card appears on Today and Requests.
+
 ## Guest role navigation clarification —18October2026
 
 Guest/non-patient directory cards open the clinician preview only. Booking actions
