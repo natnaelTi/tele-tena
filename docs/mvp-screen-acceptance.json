@@ -15444,7 +15444,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/automatic-request-availability-verification-2026-10-19.md",
-  "current_packaged_source": "31a77c14c12a74c9b4e4632dad8cac988601836c",
+  "current_packaged_source": "f45cf77e919da6b4f9759fe69787d99e1c4b704a",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -16160,6 +16160,29 @@
         "Owner visual acceptance pending"
       ],
       "migration": "Additive v1.42 empty private inbox/observation tables; no historical financial, policy or preference backfill."
+    },
+    "account_consolidation": {
+      "runtime_source": "f45cf77e919da6b4f9759fe69787d99e1c4b704a",
+      "routes": [
+        "/patient/account",
+        "/clinician/account"
+      ],
+      "references": [
+        "H01#h01",
+        "H03#h03",
+        "H04#h04"
+      ],
+      "owner_override": "19 October: compact consolidated account micro-flows and pre-upload photo crop supersede the old bulky account composition. Preserve TeleTena tokens and actual workflows.",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex for the named paired references, roles, responsive/crop states; awaiting owner acceptance",
+      "behavior": "All account groups remain discoverable through a persistent desktop index and compact native mobile section selector. Local editors retain entered values across sections. Photo sizing/positioning, drag, reset, cancel, failed save and retry precede authorized upload. Clinical/practice workflows retain their dedicated authorized links.",
+      "evidence_report": "docs/account-settings-verification-2026-10-19.md",
+      "screenshots": "docs/screenshots/account-consolidation",
+      "changes": "Frontend only; no dependency, schema, financial, permission, access-switch or credential changes.",
+      "external_dependencies": [
+        "Owner visual acceptance",
+        "Native translation review"
+      ]
     }
   }
 }

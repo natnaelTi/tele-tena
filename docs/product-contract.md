@@ -465,3 +465,9 @@ Patients use one neutral notification bell for appointment, follow-up, account a
 New booking policy version `booking-notices-v2` records a 180-second clinician reminder threshold and an explicit confirmation deadline (configured hours, capped at start). One follow-up email is queued after that threshold; minute scheduling and provider availability determine actual sending. Existing bookings retain their accepted policy. Expiry releases the demonstration reservation once under the existing cancellation rules; no new penalty or external refund is implied.
 
 Email/SMS operational booking preferences default on only when no saved choice exists; explicit opt-outs remain honored, with verified contacts, site/provider gates and send caps. Reservation receipts identify demonstration funds. ProviderAccepted is not delivery. The 90-day, minimum-five presented-booking-prompt response metric is separate from clinical competency and patient experience; responsible declines count, unseen expiries do not.
+
+## Compact Account Settings — 19 October
+
+Patient and clinician Account pages expose all account groups through one index and local editors. Profile/history/privacy, notifications, contact methods, language/timezone and help remain discoverable without returning to a separate overview. Practice and shared-care workflows retain explicit authorized entry links. Text entered in an editor survives local section changes; only explicit saves persist it. Unsupported contact changes remain accurately unavailable.
+
+Profile photo selection/drop opens an in-memory crop/zoom/position preview with keyboard alternatives. Cancellation uploads nothing. Saving uses the existing owner-authorized, size/type-validated, normalized private photo API and existing public-visibility choice; no additional sharing permission is implied. No image data is stored in browser persistence or external services.

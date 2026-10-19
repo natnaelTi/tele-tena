@@ -1,6 +1,6 @@
 # Connected schedule availability follow-up — 19 October 2026
 
-Current packaged frontend/backend: `31a77c14c12a74c9b4e4632dad8cac988601836c`. The notification follow-up is documented in [patient-notifications-verification-2026-10-19.md](patient-notifications-verification-2026-10-19.md). Earlier identities and unchanged-behavior statements below describe their dated checkpoints, not this candidate.
+Notification backend checkpoint: `31a77c14c12a74c9b4e4632dad8cac988601836c`. Current frontend follow-up: `f45cf77e919da6b4f9759fe69787d99e1c4b704a`; see [Account verification](account-settings-verification-2026-10-19.md). The Account changes contain no backend changes. The notification follow-up is documented in [patient-notifications-verification-2026-10-19.md](patient-notifications-verification-2026-10-19.md). Earlier identities and unchanged-behavior statements below describe their dated checkpoints, not this candidate.
 
 Schedule-presence verification checkpoint: `624b013b3aa41017107e0fd6cd551805834deea3` on
 `feat/guest-first-mvp`, draft PR #47, dependent on PR #46. Subsequent evidence/test-only
