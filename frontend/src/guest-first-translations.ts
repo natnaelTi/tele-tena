@@ -1,5 +1,9 @@
 /** Provisional UI translations;native and clinical review remain release gates. */
 export const guestFirstTranslations:Record<string,[string,string]>={
+"Request matched":["ጥያቄው ተዛምዷል","Gaaffiin wal simateera"],
+"Offer accepted":["አቅርቦቱ ተቀብሏል","Yaadni fudhatameera"],
+"Your offer was accepted. Appointment details show its current status and next steps.":["አቅርቦቱ ተቀብሏል። የቀጠሮ ዝርዝሮች አሁን ያለውን ሁኔታ እና ቀጣይ እርምጃዎች ያሳያሉ።","Yaadni fudhatameera. Bal’inni beellamaa haala yeroo ammaa fi tarkaanfii itti aanu agarsiisa."],
+"Appointment status could not be refreshed.":["የቀጠሮ ሁኔታን ማደስ አልተቻለም።","Haala beellamaa haaromsuun hin danda’amne."],
 "Sharing choices":["የማጋራት ምርጫዎች","Filannoowwan qoodinsaa"],
 "Choose history files (optional)":["የታሪክ ፋይሎችን ይምረጡ (አማራጭ)","Faayiloota seenaa filadhaa (dirqama miti)"],
 "Sharing preview":["የማጋራት ቅድመ እይታ","Durargii qoodinsaa"],

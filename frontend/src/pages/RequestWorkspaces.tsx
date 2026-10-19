@@ -1,3 +1,4 @@
+import {appointmentStatus} from '../appointment-status';
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -887,20 +888,7 @@ function PatientRequestThread({
         </dl>
       </details>
       {appointment ? (
-        <section className="request-success-card">
-          <h3>{w("Appointment confirmed")}</h3>
-          <p>
-            {w(
-              "Your selected offer and balance reservation are saved. Open the appointment for its join window and next steps.",
-            )}
-          </p>
-          <Link
-            className="button primary"
-            to={"/patient/consultations/" + appointment}
-          >
-            {w("View appointment")}
-          </Link>
-        </section>
+        <MatchedAppointmentCard appointmentId={appointment} clinician={false}/>
       ) : (
         <>
           <div className="section-line">
@@ -1852,20 +1840,7 @@ function ClinicianQuotePanel({
         </div>
       </dl>
       {item.state === "Accepted" && item.appointment && (
-        <section className="request-success-card">
-          <h3>{w("Appointment confirmed")}</h3>
-          <p>
-            {w(
-              "The patient accepted your offer. Open the appointment for its join window and next steps.",
-            )}
-          </p>
-          <Link
-            className="button primary"
-            to={"/clinician/consultations/" + item.appointment}
-          >
-            {w("Open consultation details")}
-          </Link>
-        </section>
+        <MatchedAppointmentCard appointmentId={item.appointment} clinician/>
       )}
       {item.state === "Active" && (
         <Button variant="secondary" onClick={() => setWithdraw(true)}>
@@ -1911,3 +1886,5 @@ function ClinicianQuotePanel({
     </section>
   );
 }
+
+function MatchedAppointmentCard({appointmentId,clinician}:{appointmentId:string;clinician:boolean}){const {w}=useLocale(),resource=usePolling(()=>journeyApi.appointmentDetail(appointmentId),15000);const status=resource.data?appointmentStatus(resource.data,clinician):null;return <section className="request-success-card"><h3>{w(status?.label==='Confirmed'?'Appointment confirmed':status?.label||'Offer accepted')}</h3><p>{w('Your offer was accepted. Appointment details show its current status and next steps.')}{status?.detail?' '+w(status.detail):''}</p>{resource.error&&<InlineNotice>{w('Appointment status could not be refreshed.')} <Button variant="quiet" onClick={()=>void resource.refresh()}>{w('Retry')}</Button></InlineNotice>}<Link className="button primary" to={(clinician?'/clinician':'/patient')+'/consultations/'+appointmentId}>{w(clinician?'Open consultation details':'View appointment')}</Link></section>;}

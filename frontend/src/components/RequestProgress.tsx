@@ -8,7 +8,7 @@ export function RequestProgress({state,hasOffer=false,wave=1,clinician=false,imm
   const {w}=useLocale();
   const closed=!['Open','Active'].includes(state);
   const confirmed=state==='Matched'||state==='Accepted';
-  const words=confirmed?['Appointment confirmed']:closed?[state==='Superseded'?'Offer closed':state]:clinician?
+  const words=confirmed?[clinician?'Offer accepted':'Request matched']:closed?[state==='Superseded'?'Offer closed':state]:clinician?
     ['Your offer is with the patient','Waiting for their decision','Your proposed time will be rechecked']:
     hasOffer?['An offer is ready to review','Compare the time and fee','The next step is yours']:
     immediate&&eligibleSupply===0?['No eligible clinician at publication','Your requirements stay in place','You can keep waiting or choose later']:
