@@ -1,5 +1,14 @@
 /** Provisional UI translations;native and clinical review remain release gates. */
 export const guestFirstTranslations:Record<string,[string,string]>={
+"Appointment Time Change Requested":["የቀጠሮ ጊዜ ለውጥ ተጠይቋል", "Jijjiiramni yeroo beellamaa gaafatameera"],
+"Appointment Time Change Declined":["የቀጠሮ ጊዜ ለውጥ አልተቀበለም", "Jijjiiramni yeroo beellamaa didameera"],
+"Appointment Time Change Request Expired":["የቀጠሮ ጊዜ ለውጥ ጥያቄ ጊዜ አልፎበታል", "Yeroon gaaffii jijjiirama beellamaa darbeera"],
+"Appointment Time Change Withdrawn":["የቀጠሮ ጊዜ ለውጥ ጥያቄ ተመልሷል", "Gaaffiin jijjiirama yeroo beellamaa deebi’eera"],
+"Proposed Appointment Time Unavailable":["የተጠየቀው የቀጠሮ ጊዜ አይገኝም", "Yeroon beellamaa dhiyaate hin jiru"],
+"Booking updates use verified contacts and your delivery preferences. Provider availability still applies.":["የቀጠሮ ዝማኔዎች የተረጋገጡ አድራሻዎችን እና የመላኪያ ምርጫዎችዎን ይጠቀማሉ። የአቅራቢው ተገኝነት ያስፈልጋል።", "Odeeffannoon beellamaa teessoo mirkanaa’e fi filannoo ergaa keessanii fayyadama. Tajaajilli ergaa jiraachuu qaba."],
+"Confirm or decline this booking. A follow-up email is queued after three minutes without a response.":["ይህን ቀጠሮ ያረጋግጡ ወይም አይቀበሉ። ምላሽ ከሌለ ከሦስት ደቂቃ በኋላ ክትትል ኢሜይል ይዘጋጃል።", "Beellama kana mirkaneessaa ykn didaa. Deebiin yoo dhabame daqiiqaa sadii booda imeeliin yaadachiisaa qophaa’a."],
+"Waiting for the clinician to confirm your booking. Your funds remain reserved.":["ባለሙያው ቀጠሮዎን እስኪያረጋግጥ ድረስ በመጠባበቅ ላይ። ገንዘብዎ ተይዞ ይቆያል።", "Ogeessi beellama keessan akka mirkaneessu eegaa. Maallaqni keessan qabamee tura."],
+
 "Appointments, follow-ups and updates for your account.":["ቀጠሮዎች፣ ክትትሎች እና የመለያዎ ዝማኔዎች።", "Beellamoota, hordoffii fi odeeffannoo herrega keessanii."],
 "Notification filter":["የማሳወቂያ ማጣሪያ", "Gingilchaa beeksisaa"],
 "Unread":["ያልተነበቡ", "Kan hin dubbifamne"],

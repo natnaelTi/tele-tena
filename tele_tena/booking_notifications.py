@@ -167,7 +167,7 @@ def process_reminders():
     from tele_tena.api.journey import one
     candidates=rows("""SELECT a.id FROM tt_appointment a JOIN tt_confirmation_observation o ON o.appointment=a.id
         WHERE a.state='PendingConfirmation' AND a.expires_at>UTC_TIMESTAMP(6)
-        AND o.reminded_at IS NULL AND o.requested_at<=UTC_TIMESTAMP(6)-INTERVAL 3 MINUTE LIMIT 100""")
+        AND o.reminded_at IS NULL AND o.requested_at<=UTC_TIMESTAMP(6)-INTERVAL 3 MINUTE ORDER BY o.requested_at,a.id LIMIT 100""")
     for candidate in candidates:
         one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
         app=rows("SELECT * FROM tt_appointment WHERE id=%s AND state='PendingConfirmation' AND expires_at>UTC_TIMESTAMP(6) FOR UPDATE",(candidate.id,))
@@ -177,7 +177,7 @@ def process_reminders():
         emit(app[0].clinician,'confirmation-reminder:'+candidate.id,'ConfirmationReminder',candidate.id)
         frappe.db.sql('UPDATE tt_confirmation_observation SET reminded_at=UTC_TIMESTAMP(6) WHERE appointment=%s',(candidate.id,))
     # Only bookings explicitly accepting the new policy get automatic reminders.
-    upcoming=rows("SELECT * FROM tt_appointment WHERE state='Booked' AND start>UTC_TIMESTAMP(6) AND start<=UTC_TIMESTAMP(6)+INTERVAL 1 HOUR LIMIT 100")
+    upcoming=rows("SELECT a.* FROM tt_appointment a WHERE a.state='Booked' AND a.start>UTC_TIMESTAMP(6) AND a.start<=UTC_TIMESTAMP(6)+INTERVAL 1 HOUR AND NOT EXISTS (SELECT 1 FROM tt_user_notification n WHERE n.appointment=a.id AND n.kind='AppointmentReminder') ORDER BY a.start,a.id LIMIT 100")
     import json
     for app in upcoming:
         one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
@@ -191,7 +191,9 @@ def process_reminders():
     # Reconcile neutral ended-call inbox events independently of the token/room
     # closure transaction; notification storage can never undo authoritative End.
     ended=rows("""SELECT a.* FROM tt_appointment a JOIN tt_consultation c ON c.appointment=a.id
-        WHERE c.state='Ended' AND c.ended>=UTC_TIMESTAMP(6)-INTERVAL 7 DAY LIMIT 100""")
+        WHERE c.state='Ended' AND c.ended>=UTC_TIMESTAMP(6)-INTERVAL 7 DAY
+        AND NOT EXISTS (SELECT 1 FROM tt_user_notification n WHERE n.appointment=a.id AND n.kind='CallEnded')
+        ORDER BY c.ended,a.id LIMIT 100""")
     for app in ended:
         if json.loads(app.policy_snapshot or '{}').get('notifications',{}).get('version')!='booking-notices-v2':continue
         for user in participants(app.id):emit(user,'CallEnded:'+app.id,'CallEnded',app.id)
