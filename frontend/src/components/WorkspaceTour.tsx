@@ -19,7 +19,7 @@ const routes:Record<string,{id:string;steps:TourStep[]}>={
     {title:"Your practice",text:"Check upcoming sessions and actions for today.",path:"/clinician",target:"clinician-today"},
     {title:"Profile and resume",text:"Complete your professional profile and upload evidence for review. Approval is manual.",path:"/clinician/account",target:"clinician-account"},
     {title:"Services and schedule",text:"Publish approved services, then set a timezone-based weekly schedule.",path:"/clinician/availability",target:"clinician-availability"},
-    {title:"Private offers",text:"Review your own quotes and outcomes. Accepted offers link to their consultation.",path:"/clinician/offers",target:"clinician-offers"},
+    {title:"Private offers",text:"Review your own quotes and outcomes. Accepted offers link to their consultation.",path:"/clinician/requests",target:"clinician-offers"},
     {title:"Appointments and calls",text:"Open an appointment to see its state and join the authorized room.",path:"/clinician/appointments",target:"clinician-appointments"},
     {title:"Consultation notes",text:"After ending a call, save a private note and choose whether to publish a summary.",path:"/clinician/appointments",target:"clinician-appointments"},
     {title:"Care records",text:"Open only the encounters you treated. Clinic affiliation does not grant access.",path:"/clinician/care",target:"clinician-care"},
