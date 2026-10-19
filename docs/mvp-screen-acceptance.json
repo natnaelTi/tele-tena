@@ -15444,7 +15444,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/automatic-request-availability-verification-2026-10-19.md",
-  "current_packaged_source": "ba60959e7eb2f921c130a2ea4c426d2db8c6552b",
+  "current_packaged_source": "cc5886f3a5378bb7964aff1fe9042d495c183ef6",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -16228,6 +16228,35 @@
         "Owner visual acceptance",
         "Native translation review;live delivery/physical-device gates remain external and unchanged"
       ]
+    },
+    "sharing_presence_followup": {
+      "runtime_source": "cc5886f3a5378bb7964aff1fe9042d495c183ef6",
+      "routes": [
+        "/onboarding",
+        "/patient/requests",
+        "/clinician/requests",
+        "/clinician"
+      ],
+      "references": [
+        "D03",
+        "D05",
+        "D09",
+        "F02",
+        "F03",
+        "F04",
+        "F14",
+        "F15"
+      ],
+      "owner_override": "19October: default new patient name/text sharing on; skip separate review when both enabled; shared request availability card and durable started intent. Existing choices unchanged.",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex for named compact confirmation/card screenshots; awaiting owner acceptance",
+      "evidence": "docs/request-sharing-presence-verification-2026-10-19.md",
+      "remaining": [
+        "Owner visual acceptance",
+        "Native-language review",
+        "Live provider/physical-device checks remain external"
+      ],
+      "privacy": "No full history broadcast; files remain individually selected; atomic encounter consent snapshot and server file grants unchanged."
     }
   }
 }
