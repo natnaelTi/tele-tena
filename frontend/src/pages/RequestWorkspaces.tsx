@@ -388,7 +388,7 @@ export function PatientRequestsWorkspace() {
     setSearch({ request: id });
   };
   return (
-    <section className="request-workspace" data-tour="patient-private-requests">
+    <section className="request-workspace" data-tour="patient-private-requests" data-tour-unsaved={!!narrative.trim()}>
       <PageTitle
         title={w("Your private requests")}
         description={w(
@@ -1292,7 +1292,7 @@ export function ClinicianRequestsWorkspace() {
     );
   };
   return (
-    <section className="request-workspace" data-tour="clinician-offers">
+    <section className="request-workspace" data-tour="clinician-offers" data-tour-unsaved={Object.keys(drafts).length>0}>
       <PageTitle
         title={w("Requests & offers")}
         description={w(
@@ -1463,6 +1463,7 @@ export function ClinicianRequestsWorkspace() {
                 setDrafts((previous) => ({ ...previous, [current.id]: draft }))
               }
               onSubmitted={async (id) => {
+                setDrafts(previous=>{const next={...previous};delete next[current.id];return next;});
                 setView("Your offers");
                 setSearch({ offer: id, view: "offers" });
                 await Promise.all([inbox.refresh(), offers.refresh()]);
