@@ -1,5 +1,6 @@
 /** Provisional UI translations;native and clinical review remain release gates. */
 export const guestFirstTranslations:Record<string,[string,string]>={
+"Drop here, or":["እዚህ ይጣሉ፣ ወይም","As kaa’aa, ykn"],
 "Account section":["የመለያ ክፍል","Kutaa herregaa"],
 "Adjust your photo":["ፎቶዎን ያስተካክሉ", "Suuraa keessan sirreessaa"],
 "Drag to position your photo, or use the sliders. Nothing uploads until you save.":["ፎቶዎን በመጎተት ወይም በተንሸራታቾቹ ያስተካክሉ። እስኪያስቀምጡ ድረስ አይሰቀልም።", "Suuraa harkisuun ykn to’annoo fayyadamuun sirreessaa. Hanga olkeessitanitti hin fe’amu."],

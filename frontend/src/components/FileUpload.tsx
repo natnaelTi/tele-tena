@@ -19,7 +19,7 @@ export function FileUpload({label,accept,multiple=false,disabled=false,maxBytes,
  return <div className={'upload-field'+(compact?' is-compact':'')+(dragging?' is-dragging':'')+(disabled||busy?' is-disabled':'')} onDragEnter={event=>{event.preventDefault();depth.current++;if(!disabled&&!busy)setDragging(true);}} onDragOver={event=>{event.preventDefault();event.dataTransfer.dropEffect=disabled||busy?'none':'copy';}} onDragLeave={event=>{event.preventDefault();depth.current=Math.max(0,depth.current-1);if(!depth.current)setDragging(false);}} onDrop={event=>{event.preventDefault();depth.current=0;setDragging(false);void receive(Array.from(event.dataTransfer.files));}}>
   <label id={id+'-label'} htmlFor={id}>{label}</label>
   <div className="upload-dropzone" aria-busy={busy}>
-   <UploadCloud size={28} aria-hidden="true"/><p>{w(multiple?'Drop files here, or choose files':'Drop a file here, or choose a file')}</p>
+   <UploadCloud size={28} aria-hidden="true"/><p>{w(compact?'Drop here, or':multiple?'Drop files here, or choose files':'Drop a file here, or choose a file')}</p>
    <input ref={input} id={id} className="upload-native" tabIndex={-1} type="file" accept={accept} multiple={multiple} disabled={disabled||busy} aria-describedby={id+'-help'} onChange={event=>void receive(Array.from(event.currentTarget.files||[]))}/>
    <Button type="button" variant="secondary" disabled={disabled||busy} loading={busy} onClick={()=>input.current?.click()}>{w(multiple?'Choose files':'Choose a file')}</Button>
    <p className="supporting" id={id+'-help'}>{maxBytes?w('Maximum file size')+': '+Math.round(maxBytes/1024/1024)+' MB':w('Files are checked before saving.')}</p>

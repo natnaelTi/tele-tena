@@ -2,6 +2,6 @@
 .upload-field.is-compact{margin:0}
 .upload-field.is-compact .upload-dropzone{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:8px;padding:12px;border-radius:12px;min-height:0;text-align:start}
 .upload-field.is-compact .upload-dropzone>svg{width:20px;height:20px;flex:0 0 auto}
-.upload-field.is-compact .upload-dropzone>p:not(.supporting){display:none}
-.upload-field.is-compact .upload-dropzone>.supporting{margin:0;font-size:12px;flex:1 1 100%}
+.upload-field.is-compact .upload-dropzone>p:not(.supporting){font-size:13px;flex:1;min-width:70px}
+.upload-field.is-compact .upload-dropzone>.supporting{display:none}
 .upload-field.is-compact .upload-dropzone>.button{width:auto;min-height:40px;padding:8px 12px;font-size:13px}
