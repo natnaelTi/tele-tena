@@ -1,3 +1,4 @@
+import {RequestAvailabilityCard} from '../components/RequestPresence';
 import { CalendarDays, Layers, ShieldCheck } from "lucide-react";
 import { appointmentStatus } from "../appointment-status";
 import { appointmentGroups } from "../appointment-groups";
@@ -64,6 +65,7 @@ export function ClinicianToday() {
   </>;
   return <>
     <PageTitle title={w("Your day at a glance")} description={`${new Date(now).toLocaleDateString(undefined,{dateStyle:"full"})} · ${timezone}`} action={<Link className="button secondary" to="/clinician/availability">{w("Manage availability")}</Link>}/>
+    <RequestAvailabilityCard/>
     <div className="practice-metrics">
       <section><span>{w("Today’s sessions")}</span><strong>{appointments.error?w("Unavailable"):today?.length??"—"}</strong><p>{w("Appointments on your calendar")}</p></section>
       <section><span>{w("Open requests")}</span><strong>{inbox.error?w("Unavailable"):inbox.data?.length??"—"}</strong><Link to="/clinician/requests">{w("View eligible requests")}</Link></section>
@@ -86,6 +88,7 @@ export function Availability() {
   const [zone, setZone] = useState("Africa/Addis_Ababa");
   const [format, setFormat] = useState<"video"|"audio">("video");
   const [confirmation, setConfirmation] = useState<"automatic"|"manual">("automatic");
+  const [autoRequests,setAutoRequests]=useState(false);
   const [notice, setNotice] = useState("60");
   const [horizon, setHorizon] = useState("60");
   const [before, setBefore] = useState("0");
@@ -116,9 +119,9 @@ export function Availability() {
   useEffect(()=>{const query=window.matchMedia("(max-width: 800px)");const update=()=>setTimeEditorOpen(query.matches);query.addEventListener("change",update);return()=>query.removeEventListener("change",update);},[]);
   useEffect(() => {
     const s = current.data?.find(item=>item.offering===offering) || (!offering?current.data?.[0]:undefined);
-    if (s) { setName(s.schedule_name); if(s.offering!==offering)setOffering(s.offering); setZone(s.timezone); setFormat(s.consultation_format); setConfirmation(s.confirmation_mode); setNotice(String(s.minimum_notice_minutes)); setHorizon(String(s.horizon_days)); setBefore(String(s.buffer_before)); setAfter(String(s.buffer_after)); setStatus(s.status); setIntervals(s.intervals); setExceptions(s.exceptions); }
+    if (s) { setAutoRequests(!!s.auto_requests);setName(s.schedule_name); if(s.offering!==offering)setOffering(s.offering); setZone(s.timezone); setFormat(s.consultation_format); setConfirmation(s.confirmation_mode); setNotice(String(s.minimum_notice_minutes)); setHorizon(String(s.horizon_days)); setBefore(String(s.buffer_before)); setAfter(String(s.buffer_after)); setStatus(s.status); setIntervals(s.intervals); setExceptions(s.exceptions); }
     else if (!offering && offerings.data?.offerings[0]) setOffering(offerings.data.offerings[0].id);
-    else if(offering){setName("Weekly schedule");setStatus("Draft");setIntervals([]);setExceptions([]);}
+    else if(offering){setAutoRequests(false);setName("Weekly schedule");setStatus("Draft");setIntervals([]);setExceptions([]);}
   }, [current.data, offerings.data, offering]);
   const dateLocale=locale==="am"?"am-ET":locale==="om"?"om-ET":"en-ET";
   const dayNames = Array.from({length:7},(_,weekday)=>new Intl.DateTimeFormat(dateLocale,{weekday:"long",timeZone:"UTC"}).format(new Date(Date.UTC(2024,0,1+weekday,12))));
@@ -149,7 +152,7 @@ export function Availability() {
     if(!name.trim()){setNameError("Enter a name for this schedule.");return;}
     if(status==="Published"&&!intervals.length&&!exceptions.some(x=>x.kind==="replace")){setAvailabilityError("Add at least one available time before publishing.");return;}
     if(!validTimes)return;
-    void action.run(async()=>{await journeyApi.saveSchedule({offering,schedule_name:name,timezone_name:zone,consultation_format:format,confirmation_mode:confirmation,minimum_notice_minutes:Number(notice),horizon_days:Number(horizon),buffer_before:Number(before),buffer_after:Number(after),status,intervals,exceptions});setDirty(false);await current.refresh();},status==="Published"?"Schedule published.":status==="Draft"?"Draft saved. Publish it to enable bookings.":"Schedule paused.");
+    void action.run(async()=>{await journeyApi.saveSchedule({auto_requests:autoRequests,offering,schedule_name:name,timezone_name:zone,consultation_format:format,confirmation_mode:confirmation,minimum_notice_minutes:Number(notice),horizon_days:Number(horizon),buffer_before:Number(before),buffer_after:Number(after),status,intervals,exceptions});setDirty(false);await current.refresh();window.dispatchEvent(new Event('teletena:availability-saved'));},status==="Published"?"Schedule published.":status==="Draft"?"Draft saved. Publish it to enable bookings.":"Schedule paused.");
   }
   async function createBookingLink() {
     setBookingLinkStatus("");
@@ -179,7 +182,7 @@ export function Availability() {
     calendarScrollRef.current?.scrollTo({top:startHour*40,behavior:"instant"});
   },[current.data,offering,weekShift]);
   const visibleException = (date:string) => exceptions.map((item,index)=>({...item,index})).filter(item=>item.date===date);
-  const visibleBookings = (date:string) => (appointments.data||[]).filter(item=>["Booked","PendingConfirmation"].includes(item.state)).flatMap(item=>{try{const parts=new Intl.DateTimeFormat("en-CA",{timeZone:zone,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date(item.start));const values=Object.fromEntries(parts.map(x=>[x.type,x.value]));const localDate=`${values.year}-${values.month}-${values.day}`;if(localDate!==date)return[];const startMinute=Number(values.hour)*60+Number(values.minute);const endMinute=startMinute+Number(item.minutes);return endMinute<=0||startMinute>=1440?[]:[{...item,startMinute:Math.max(0,startMinute),endMinute:Math.min(1440,endMinute)}];}catch{return[];}});
+  const visibleBookings = (date:string) => (appointments.data||[]).filter(item=>["Booked","PendingConfirmation","Completed","Cancelled","Expired","NoShow"].includes(item.state)).flatMap(item=>{try{const parts=new Intl.DateTimeFormat("en-CA",{timeZone:zone,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date(item.start));const values=Object.fromEntries(parts.map(x=>[x.type,x.value]));const localDate=`${values.year}-${values.month}-${values.day}`;if(localDate!==date)return[];const startMinute=Number(values.hour)*60+Number(values.minute);const endMinute=startMinute+Number(item.minutes);return endMinute<=0||startMinute>=1440?[]:[{...item,startMinute:Math.max(0,startMinute),endMinute:Math.min(1440,endMinute)}];}catch{return[];}});
   return (
     <>
       <PageTitle
@@ -195,6 +198,7 @@ export function Availability() {
           <TextField label="Timezone" value={zone} onChange={e=>setZone(e.target.value)} required placeholder="Africa/Addis_Ababa" />
           <Select label="Patient visibility" value={status} onChange={e=>setStatus(e.target.value as "Draft"|"Published"|"Paused")}><option>Draft</option><option>Published</option><option>Paused</option></Select>
           <p className="supporting">{w(status==="Published"?"Save to publish these hours for patient booking.":"Draft and paused schedules are not available for booking or requests. Choose Published and save when ready.")}</p>
+          <label className="schedule-auto-requests"><input type="checkbox" checked={autoRequests} onChange={e=>setAutoRequests(e.target.checked)}/><span><strong>{w("Automatic immediate requests")}</strong><small>{w("Become available during these published hours while your workspace is connected. You can pause from Today at any time.")}</small></span></label>
           <details className="schedule-advanced"><summary>Format, confirmation and booking rules</summary>
             <Select label="Consultation format" value={format} onChange={e=>setFormat(e.target.value as "video"|"audio")}><option value="video">Video</option><option value="audio">Audio</option></Select>
             <Select label="Booking confirmation" value={confirmation} onChange={e=>setConfirmation(e.target.value as "automatic"|"manual")}><option value="automatic">Confirm automatically</option><option value="manual">Review each request</option></Select>
@@ -221,7 +225,7 @@ export function Availability() {
                 {Array.from({length:24},(_,hour)=><button type="button" key={hour} className="calendar-add-slot" style={{top:hour*40}} aria-label={`${calendarEditMode==="weekly"?"Add weekly availability":"Set date-specific availability"} ${dayNames[weekday]} ${key} at ${String(hour).padStart(2,"0")}:00`} title={`Add at ${String(hour).padStart(2,"0")}:00`} onClick={()=>{const start=`${String(hour).padStart(2,"0")}:00`;if(calendarEditMode==="weekly")addInterval(weekday,start);else{const endMinutes=Math.min(23*60+59,hour*60+60);setExceptionDate(key);setExceptionKind("replace");setExceptionStart(start);setExceptionEnd(`${String(Math.floor(endMinutes/60)).padStart(2,"0")}:${String(endMinutes%60).padStart(2,"0")}`);setDirty(true);}}}><span aria-hidden="true">+</span></button>)}
                 {rules.map(item=>{const top=minutePosition(item.start_local)/60*40;const height=(minutePosition(item.end_local)-minutePosition(item.start_local))/60*40;return <button type="button" key={`rule-${item.index}`} className="calendar-block availability-block" style={{top,height:Math.max(24,height)}} aria-pressed={selectedInterval===item.index} aria-label={`Edit ${dayNames[weekday]} availability ${item.start_local} to ${item.end_local}`} onClick={()=>inspectInterval(item.index,weekday)}>{item.start_local}–{item.end_local}</button>;})}
                 {visibleException(key).map(item=>{const start=minutePosition(item.start_local||"00:00"),end=minutePosition(item.end_local||"24:00");const top=item.kind==="unavailable"?0:Math.max(0,start/60*40);const height=item.kind==="unavailable"?960:Math.max(24,(Math.min(1440,end)-Math.max(0,start))/60*40);return <button type="button" key={`exception-${item.index}`} className={`calendar-block calendar-exception ${item.kind}`} style={{top,height}} aria-label={`Edit ${item.kind} exception on ${key}`} onClick={()=>{setExceptionDate(key);setExceptionKind(item.kind);setExceptionStart(item.start_local||"09:00");setExceptionEnd(item.end_local||"17:00");setEditingException(item.index);}}>{item.kind==="unavailable"?"Unavailable":item.kind}</button>;})}
-                {visibleBookings(key).map(item=>{const blockHeight=Math.max(26,(item.endMinute-item.startMinute)/60*40);const appointmentTime=new Date(item.start).toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit",timeZone:zone});return <div key={`booking-${item.id}`} className="calendar-block calendar-booking" style={{top:item.startMinute/60*40,height:blockHeight}} aria-label={`${item.display_identity||"Appointment"}, ${item.service_label}, ${appointmentTime}`} title={`${item.service_label} · ${appointmentTime}`}><strong>{item.display_identity||"Appointment"}</strong>{blockHeight>=36&&<span>{item.service_label} · {appointmentTime}</span>}</div>;})}
+                {visibleBookings(key).map(item=>{const blockHeight=Math.max(26,(item.endMinute-item.startMinute)/60*40);const appointmentTime=new Date(item.start).toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit",timeZone:zone});return <div key={`booking-${item.id}`} className={`calendar-block calendar-booking booking-${appointmentStatus(item,true).label.toLowerCase().replaceAll(" ","-")}`} style={{top:item.startMinute/60*40,height:blockHeight}} aria-label={`${w(appointmentStatus(item,true).label)}, ${item.display_identity||"Appointment"}, ${item.service_label}, ${appointmentTime}`} title={`${w(appointmentStatus(item,true).label)} · ${item.service_label} · ${appointmentTime}`}><strong>{w(appointmentStatus(item,true).label)} · {item.display_identity||"Appointment"}</strong>{blockHeight>=36&&<span>{item.service_label} · {appointmentTime}</span>}</div>;})}
               </div>;})}
             </div>
           </div>

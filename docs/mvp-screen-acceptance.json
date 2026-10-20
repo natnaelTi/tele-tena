@@ -15443,8 +15443,8 @@
     },
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
-  "current_verification_report": "docs/final-mvp-polish-verification.md",
-  "current_packaged_source": "105cd15af1d1432e37b95de583f151d3056f6950",
+  "current_verification_report": "docs/automatic-request-availability-verification-2026-10-19.md",
+  "current_packaged_source": "d8f11c8c8b16148c8b68e42320e847a13106c299",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15543,6 +15543,742 @@
     "external_validation": {
       "status": "Blocked by stated external dependency",
       "action": "Physical-device calls/PWA installation, native-language review, live SMS/email receipt, medical-lead/clinical/legal approval and real-money activation remain separately gated; no Selfmade change."
+    }
+  },
+  "guest_first_revision": {
+    "approved_direction": "17 October 2026; requested18October",
+    "baseline": "6c7e30ad911d6c4f143e7debed68c200cbbb1227",
+    "scope": "Mental-health MVP; no new architecture or future modules",
+    "requirements": [
+      {
+        "id": "GF01",
+        "references": [
+          "A01",
+          "C01",
+          "C02"
+        ],
+        "routes": [
+          "/",
+          "/care",
+          "/patient/discovery"
+        ],
+        "requirement": "Remove interpreted care-query entry; public allowlisted directory and reactive composable filters",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex for named comparisons; awaiting owner acceptance",
+        "evidence": [
+          {
+            "private_log_root": "/home/frappe/teletena-guest-first/",
+            "logs": "backend-final15.log;browser-directory-states2.log;visual-final.log"
+          },
+          {
+            "report": "docs/guest-first-mvp-verification-2026-10-18.md",
+            "screenshot_root": "docs/screenshots/guest-first/",
+            "paired_labels": [
+              "landing",
+              "directory",
+              "patient-home"
+            ]
+          }
+        ],
+        "external_dependency": "",
+        "roles": [
+          "guest",
+          "patient"
+        ],
+        "api_commands_queries": "directory.offerings;directory.clinician;directory.photo",
+        "server_permissions": "Only explicit public fields;active approved scopes/published offerings;no patient/contact/evidence/balance fields.",
+        "states": "guest allowlist;live composable filters;selected service;empty/error/reset;stale response ignored",
+        "remaining_action": "Owner review; external gates as stated. No known unresolved defect in the tested changed paths.",
+        "responsive_accessibility": "Named390/768/1440 captures;actual200% browser zoom;native controls;keyboard modal Escape/focus;reduced motion. Unchanged routes retain existing evidence.",
+        "localization": "English;provisional Amharic/Afaan Oromo rendered with actual translated headings. Native review pending;catalog content remains as approved/stored."
+      },
+      {
+        "id": "GF02",
+        "references": [
+          "A04",
+          "A05",
+          "A06",
+          "B01",
+          "B02",
+          "B03",
+          "B04",
+          "B05",
+          "B06",
+          "B07",
+          "C06"
+        ],
+        "routes": [
+          "/sign-in",
+          "/onboarding",
+          "/patient/book/:offering"
+        ],
+        "requirement": "Intent-aware OTP/password, no role chooser, safe selected-offering return and account-role mismatch",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex for named comparisons; awaiting owner acceptance",
+        "evidence": [
+          {
+            "private_log_root": "/home/frappe/teletena-guest-first/",
+            "logs": "contact657.log;browser-registration-files-fixed2.log;browser-access657.log;browser-disabled2.log;browser-code-state.log"
+          },
+          {
+            "report": "docs/guest-first-mvp-verification-2026-10-18.md",
+            "screenshot_root": "docs/screenshots/guest-first/",
+            "paired_labels": [
+              "phone",
+              "code-error",
+              "calendar"
+            ]
+          }
+        ],
+        "external_dependency": "Live SMS/email delivery requires consenting recipients",
+        "roles": [
+          "guest",
+          "new patient",
+          "new clinician",
+          "existing account"
+        ],
+        "api_commands_queries": "contact_auth.request_code/verify_code/save_onboarding/complete_onboarding;journey.session",
+        "server_permissions": "Navigation intent never grants roles;OTP HMAC/single-use/rates/site caps;separate policy acknowledgements;safe offering/practice-link returns.",
+        "states": "wrong/expired code;resend;interrupted draft;role mismatch;new/returning account;selected-calendar reload",
+        "remaining_action": "Owner review; external gates as stated. No known unresolved defect in the tested changed paths.",
+        "responsive_accessibility": "Named390/768/1440 captures;actual200% browser zoom;native controls;keyboard modal Escape/focus;reduced motion. Unchanged routes retain existing evidence.",
+        "localization": "English;provisional Amharic/Afaan Oromo rendered with actual translated headings. Native review pending;catalog content remains as approved/stored."
+      },
+      {
+        "id": "GF03",
+        "references": [
+          "C02",
+          "C04",
+          "F02"
+        ],
+        "routes": [
+          "/care",
+          "/care/clinicians/:id",
+          "/clinician/*"
+        ],
+        "requirement": "One real presence/calendar/conflict availability projection; pulse/reduced motion; stale/error fallback",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex for named comparisons; awaiting owner acceptance",
+        "evidence": [
+          {
+            "private_log_root": "/home/frappe/teletena-guest-first/",
+            "logs": "backend-final15.log;browser-directory-states2.log"
+          },
+          {
+            "report": "docs/guest-first-mvp-verification-2026-10-18.md",
+            "screenshot_root": "docs/screenshots/guest-first/",
+            "paired_labels": [
+              "directory",
+              "preview",
+              "profile"
+            ]
+          }
+        ],
+        "external_dependency": "",
+        "roles": [
+          "guest",
+          "patient",
+          "clinician"
+        ],
+        "api_commands_queries": "directory.availability;scheduling.immediate_capacity;open_requests.request_presence",
+        "server_permissions": "Fresh actual presence plus full-duration/buffer feasibility and scope required;calendar is not presence.",
+        "states": "now;appointment-only;unpublished;expired presence;capacity paused;30s refresh/stale/error",
+        "remaining_action": "Owner review; external gates as stated. No known unresolved defect in the tested changed paths.",
+        "responsive_accessibility": "Named390/768/1440 captures;actual200% browser zoom;native controls;keyboard modal Escape/focus;reduced motion. Unchanged routes retain existing evidence.",
+        "localization": "English;provisional Amharic/Afaan Oromo rendered with actual translated headings. Native review pending;catalog content remains as approved/stored."
+      },
+      {
+        "id": "GF04",
+        "references": [
+          "D01",
+          "D02",
+          "D03",
+          "D04",
+          "D09",
+          "D05",
+          "F02",
+          "F03",
+          "F14",
+          "F15"
+        ],
+        "routes": [
+          "/request",
+          "/patient/requests",
+          "/clinician/requests",
+          "/clinician/offers"
+        ],
+        "requirement": "Volatile guest request→auth→privacy→publish→private offers/funding/acceptance→authorized appointment",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex for named comparisons; awaiting owner acceptance",
+        "evidence": [
+          {
+            "private_log_root": "/home/frappe/teletena-guest-first/",
+            "logs": "browser-offer-latest.log;presentation657.log;job-results.json"
+          },
+          {
+            "report": "docs/guest-first-mvp-verification-2026-10-18.md",
+            "screenshot_root": "docs/screenshots/guest-first/",
+            "paired_labels": [
+              "guest-request"
+            ]
+          }
+        ],
+        "external_dependency": "3–5 minutes is a target, not pilot evidence",
+        "roles": [
+          "guest",
+          "patient",
+          "clinician"
+        ],
+        "api_commands_queries": "open_requests.publish_request/clinician_requests/submit_offer/respond_offer;presentation.appointment_detail",
+        "server_permissions": "Only authorized clinician recipients;competing offers private;acceptance revalidates eligibility/time/price/funds with one reservation.",
+        "states": "memory draft/auth return;privacy;publish/wait;offer;shortfall/retry;accepted preflight;expiry/cancel/no-supply/target fallback",
+        "remaining_action": "Owner review; external gates as stated. No known unresolved defect in the tested changed paths.",
+        "responsive_accessibility": "Named390/768/1440 captures;actual200% browser zoom;native controls;keyboard modal Escape/focus;reduced motion. Unchanged routes retain existing evidence.",
+        "localization": "English;provisional Amharic/Afaan Oromo rendered with actual translated headings. Native review pending;catalog content remains as approved/stored."
+      },
+      {
+        "id": "GF05",
+        "references": [
+          "B03",
+          "B04",
+          "C07",
+          "H03"
+        ],
+        "routes": [
+          "/onboarding",
+          "/patient/book/:offering",
+          "/patient/account"
+        ],
+        "requirement": "Alias/text-history defaults only for new accounts; explicit immutable recipient/file sharing; revoke future access without erasing historical disclosure",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex for named comparisons; awaiting owner acceptance",
+        "evidence": [
+          {
+            "private_log_root": "/home/frappe/teletena-guest-first/",
+            "logs": "backend-final15.log;history657.log;browser-registration-files-fixed2.log;private-preservation-final.log"
+          },
+          {
+            "report": "docs/guest-first-mvp-verification-2026-10-18.md",
+            "screenshot_root": "docs/screenshots/guest-first/",
+            "paired_labels": [
+              "privacy"
+            ]
+          }
+        ],
+        "external_dependency": "Retention depth and production policies require governance approval",
+        "roles": [
+          "patient",
+          "treating clinician"
+        ],
+        "api_commands_queries": "history_documents.upload/list_documents/download/remove;journey.preview/book;encounter_files.grants/download/revoke",
+        "server_permissions": "Owner-only before explicit recipient consent;immutable text/file versions;no reviewer/clinic/partner access;revocation keeps auditable historic snapshots.",
+        "states": "new proposals vs old settings;selected files;binary PNG;source removal;revoke/retry;cross-role denial",
+        "remaining_action": "Owner review; external gates as stated. No known unresolved defect in the tested changed paths.",
+        "responsive_accessibility": "Named390/768/1440 captures;actual200% browser zoom;native controls;keyboard modal Escape/focus;reduced motion. Unchanged routes retain existing evidence.",
+        "localization": "English;provisional Amharic/Afaan Oromo rendered with actual translated headings. Native review pending;catalog content remains as approved/stored."
+      },
+      {
+        "id": "GF06",
+        "references": [
+          "B05",
+          "H06",
+          "E03"
+        ],
+        "routes": [
+          "/onboarding",
+          "/policies/:kind",
+          "/patient/appointments"
+        ],
+        "requirement": "Versioned separate policy acknowledgements; truthful draft review content; booking state-aware notifications after durable commit",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex for named comparisons; awaiting owner acceptance",
+        "evidence": [
+          {
+            "private_log_root": "/home/frappe/teletena-guest-first/",
+            "logs": "backend-final15.log;couples-final.log;job-results.json;browser-offer-latest.log"
+          },
+          {
+            "report": "docs/guest-first-mvp-verification-2026-10-18.md",
+            "screenshot_root": "docs/screenshots/guest-first/",
+            "paired_labels": [
+              "notifications"
+            ]
+          }
+        ],
+        "external_dependency": "Approved production policy text; live provider receipt/device verification",
+        "roles": [
+          "new patient",
+          "new clinician",
+          "appointment participants"
+        ],
+        "api_commands_queries": "policies.current/record;booking_notifications.create/dispatch/notices/preferences/retry",
+        "server_permissions": "Review-only policies with distinct choices;durable notices only after state transition;verified contact/site settings/shared budget;unknown delivery not retried automatically.",
+        "states": "pending vs confirmed;queued/provider-accepted/unknown/rejected/unavailable;retry;per-adult neutral notice;read persistence",
+        "remaining_action": "Owner review; external gates as stated. No known unresolved defect in the tested changed paths.",
+        "responsive_accessibility": "Named390/768/1440 captures;actual200% browser zoom;native controls;keyboard modal Escape/focus;reduced motion. Unchanged routes retain existing evidence.",
+        "localization": "English;provisional Amharic/Afaan Oromo rendered with actual translated headings. Native review pending;catalog content remains as approved/stored."
+      },
+      {
+        "id": "GF07",
+        "references": [
+          "E05",
+          "E07",
+          "E09",
+          "N01",
+          "N08",
+          "G01",
+          "G05",
+          "H08"
+        ],
+        "routes": [
+          "/consultation/:id/room",
+          "/patient/couples",
+          "/clinician/earnings"
+        ],
+        "requirement": "Regression gates: individual/couples consent/media/notes/finance, scheduler, privacy, PWA, migration",
+        "functional_status": "Functionally verified",
+        "visual_status": "Intentionally unchanged; retained evidence, awaiting owner acceptance",
+        "evidence": [
+          {
+            "private_log_root": "/home/frappe/teletena-guest-first/",
+            "logs": "presentation657.log;couples-final.log;fresh3.log;clean-preservation.log;reconcile-final-preview.log;reconcile-final-journeys.log;browser-pwa-latest.log;existing hosted evidence cited in current report"
+          },
+          {
+            "report": "docs/guest-first-mvp-verification-2026-10-18.md",
+            "screenshot_root": "docs/screenshots/guest-first/",
+            "paired_labels": []
+          }
+        ],
+        "external_dependency": "Physical devices and native Amharic/Afaan Oromo review",
+        "roles": [
+          "patient",
+          "clinician",
+          "reviewer",
+          "second adult"
+        ],
+        "api_commands_queries": "Existing consultations/couples/presentation/accounting/tours APIs preserved",
+        "server_permissions": "Unchanged room/End security and ledger;couples recipient/consent isolation;no clinical API caching.",
+        "states": "fresh/repeat upgrade;owner reconciliation;scheduler execution;leave/End/notes;existing invites/tours",
+        "remaining_action": "Owner review; external gates as stated. No known unresolved defect in the tested changed paths.",
+        "responsive_accessibility": "Named390/768/1440 captures;actual200% browser zoom;native controls;keyboard modal Escape/focus;reduced motion. Unchanged routes retain existing evidence.",
+        "localization": "English;provisional Amharic/Afaan Oromo rendered with actual translated headings. Native review pending;catalog content remains as approved/stored."
+      },
+      {
+        "id": "GF08",
+        "references": [
+          "H08",
+          "N01",
+          "N02",
+          "N03"
+        ],
+        "routes": [
+          "/patient/*",
+          "/clinician/*"
+        ],
+        "requirement": "Retain existing invitations; universal Invite proposal intentionally outside this revision pending owner decision",
+        "functional_status": "Existing behavior preserved; optional expansion intentionally deferred",
+        "visual_status": "Intentionally unchanged; retained evidence, awaiting owner acceptance",
+        "evidence": [
+          {
+            "private_log_root": "/home/frappe/teletena-guest-first/",
+            "logs": "couples-final.log;source review 06daac5"
+          },
+          {
+            "report": "docs/guest-first-mvp-verification-2026-10-18.md",
+            "screenshot_root": "docs/screenshots/guest-first/",
+            "paired_labels": []
+          }
+        ],
+        "external_dependency": "Owner optional review",
+        "roles": [
+          "patient",
+          "clinician"
+        ],
+        "api_commands_queries": "Existing practice-link and adult invitation APIs",
+        "server_permissions": "No universal privileged invitations or blanket record access;existing explicit invitation state outranks stale navigation return.",
+        "states": "existing invitation return;optional universal entry deliberately deferred",
+        "remaining_action": "Owner review; external gates as stated. No known unresolved defect in the tested changed paths.",
+        "responsive_accessibility": "Named390/768/1440 captures;actual200% browser zoom;native controls;keyboard modal Escape/focus;reduced motion. Unchanged routes retain existing evidence.",
+        "localization": "English;provisional Amharic/Afaan Oromo rendered with actual translated headings. Native review pending;catalog content remains as approved/stored."
+      }
+    ],
+    "last_verified_runtime": "d8f11c8c8b16148c8b68e42320e847a13106c299",
+    "verification_report": "docs/guest-first-release-readiness.md",
+    "owner_acceptance": "Awaiting owner acceptance",
+    "historical_evidence": "Earlier entries remain historical; this section supersedes AI query and account-chooser requirements only.",
+    "route_state_acceptance": [
+      {
+        "route": "/",
+        "actor": "guest",
+        "reference": "A01",
+        "state": "patient/clinician entry;no query bar",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex;awaiting owner acceptance",
+        "evidence": "landing paired390/768/1440"
+      },
+      {
+        "route": "/care",
+        "actor": "guest/patient",
+        "reference": "C02",
+        "state": "list/filter/empty/connection failure/stale response",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex;awaiting owner acceptance",
+        "evidence": "directory pairs;browser-directory-states.log"
+      },
+      {
+        "route": "/care",
+        "actor": "guest/patient",
+        "reference": "C02 popup",
+        "state": "open/close/Escape/focus return",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex;awaiting owner acceptance",
+        "evidence": "preview pair;visual-final.log"
+      },
+      {
+        "route": "/care/clinicians/:id",
+        "actor": "guest/patient",
+        "reference": "C04",
+        "state": "published offerings/selection/trust",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex;awaiting owner acceptance",
+        "evidence": "profile pair"
+      },
+      {
+        "route": "/sign-in",
+        "actor": "guest",
+        "reference": "A04/A05/A06",
+        "state": "phone/email/password;wrong code/cooldown/disabled registration",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex for named captures;awaiting owner acceptance",
+        "evidence": "phone/code pairs;browser-access657.log;browser-disabled2.log"
+      },
+      {
+        "route": "/onboarding",
+        "actor": "new patient",
+        "reference": "B01–B05",
+        "state": "guided/reload/history upload/separate policy acknowledgements",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex for captured states;awaiting owner acceptance",
+        "evidence": "registration screenshots;browser-registration-files-fixed2.log"
+      },
+      {
+        "route": "/onboarding",
+        "actor": "new clinician",
+        "reference": "B06/B07",
+        "state": "intent/private evidence/application draft/pending",
+        "functional_status": "Functionally verified",
+        "visual_status": "Unchanged composition;prior completion evidence retained",
+        "evidence": "browser-clinician-completion3.log;new-clinician-resume.png"
+      },
+      {
+        "route": "/patient",
+        "actor": "patient",
+        "reference": "C01",
+        "state": "dashboard/direct discovery/private-request entry",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex;awaiting owner acceptance",
+        "evidence": "patient-home pair"
+      },
+      {
+        "route": "/patient/book/:offering",
+        "actor": "patient",
+        "reference": "C06/C07/C08/C09",
+        "state": "calendar/sharing/funds/confirmed-or-pending/reload",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex for named comparisons;awaiting owner acceptance",
+        "evidence": "calendar pair;registration booking;binary grant browser"
+      },
+      {
+        "route": "/request",
+        "actor": "guest",
+        "reference": "D01/D02 combined",
+        "state": "unpublished in-memory draft/discard/auth return",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex;awaiting owner acceptance",
+        "evidence": "guest-request pairs;actual zoom"
+      },
+      {
+        "route": "/patient/requests/:id",
+        "actor": "patient",
+        "reference": "D03/D09/D05",
+        "state": "published progress/private offers/funding/acceptance",
+        "functional_status": "Functionally verified",
+        "visual_status": "Existing compositions preserved;named operational screenshots inspected",
+        "evidence": "browser-offer-latest.log;offer-shortfall/accepted-preflight"
+      },
+      {
+        "route": "/clinician/requests",
+        "actor": "clinician",
+        "reference": "F02/F03",
+        "state": "eligible inbox/private quote/presence",
+        "functional_status": "Functionally verified",
+        "visual_status": "Unchanged composition;real two-role browser verified",
+        "evidence": "browser-offer-latest.log"
+      },
+      {
+        "route": "/clinician/offers",
+        "actor": "clinician",
+        "reference": "F14/F15",
+        "state": "own history/accepted appointment link",
+        "functional_status": "Functionally verified",
+        "visual_status": "Unchanged;prior evidence retained",
+        "evidence": "presentation657.log;existing matrix"
+      },
+      {
+        "route": "/patient/account",
+        "actor": "patient",
+        "reference": "H01/H03/H06",
+        "state": "overview/alias/defaults/file grants/notification preferences",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex;documented operational placement;awaiting owner acceptance",
+        "evidence": "account/privacy/notifications pairs"
+      },
+      {
+        "route": "/consultation/:id/room",
+        "actor": "authorized participants",
+        "reference": "E05/E07/E09/N06",
+        "state": "preflight;individual/couples Leave/End",
+        "functional_status": "Functionally verified",
+        "visual_status": "Intentionally unchanged;retained hosted/visual evidence",
+        "evidence": "couples-final.log;existing hosted report;accepted-preflight"
+      },
+      {
+        "route": "/patient/consultations/:id",
+        "actor": "patient",
+        "reference": "E02/E13/N07",
+        "state": "status/authorized summary/grants",
+        "functional_status": "Functionally verified",
+        "visual_status": "Unchanged document layout;new grant permission checks pass",
+        "evidence": "backend-final15.log;couples-final.log"
+      },
+      {
+        "route": "/clinician/consultations/:id",
+        "actor": "clinician",
+        "reference": "E11/E13/N07",
+        "state": "notes/summary/recipients/finalization",
+        "functional_status": "Functionally verified",
+        "visual_status": "Unchanged composition;retained evidence",
+        "evidence": "presentation657.log;couples-final.log"
+      },
+      {
+        "route": "/policies",
+        "actor": "guest/new account",
+        "reference": "B05 extension",
+        "state": "review-only version display and separate acceptance",
+        "functional_status": "Functionally verified",
+        "visual_status": "Minimal extension documented;awaiting owner acceptance",
+        "evidence": "onboarding-policies.png;contact657.log"
+      }
+    ],
+    "superseded_reference_states": {
+      "A07": "Separate account chooser removed by approved intent-aware flow.",
+      "C02 interpreted query": "AI search bar deferred together with AI;structured directory replaces it.",
+      "C03 inferred matching": "No AI inference or diagnosis promise in the structured directory."
+    },
+    "role_navigation_followup": {
+      "runtime_checkpoint": "55432b9639c01d57c3a5e8e5089dc53a6d721fbc",
+      "routes": [
+        "/",
+        "/care",
+        "/care/clinicians/:id"
+      ],
+      "reference": [
+        "A01",
+        "C02 popup",
+        "C04"
+      ],
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex;awaiting owner acceptance",
+      "behavior": "Guest/non-patient cards profile-only;pane/profile Sign in to Book;patient Choose a time;cookie session root redirects;role menus and right alignment;no role grants.",
+      "evidence": [
+        "scripts/browser-role-navigation.cjs",
+        "/home/frappe/teletena-guest-first/nav-browser-final.log",
+        "/home/frappe/teletena-guest-first/nav-zoom.log",
+        "/home/frappe/teletena-guest-first/nav-existing.log",
+        "docs/screenshots/role-navigation/"
+      ],
+      "verification": "390/768/1440;actual200%zoom;real session/selected offering/sign-out;build and lint. No backend/schema change."
+    },
+    "schedule_presence_followup": {
+      "runtime_source": "624b013b3aa41017107e0fd6cd551805834deea3",
+      "references": [
+        "F01#f01",
+        "F05#availability"
+      ],
+      "routes": [
+        "/clinician",
+        "/clinician/availability",
+        "/clinician/appointments"
+      ],
+      "behavior": "Opt-in connected automatic hours with explicit manual start/pause; Today readiness/occupancy card; truthful past opened calls; native dropdown themes.",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex; awaiting owner acceptance",
+      "evidence_report": "docs/automatic-request-availability-verification-2026-10-19.md",
+      "screenshots": "docs/screenshots/schedule-presence",
+      "external_dependencies": [
+        "Native translation approval",
+        "Physical-device and live provider checks unchanged; not repeated"
+      ],
+      "migration": "Additive v1.41; disabled by default; no appointment/financial backfill."
+    },
+    "directory_service_groups": {
+      "route": "/care",
+      "actors": [
+        "guest",
+        "patient"
+      ],
+      "reference": "C02 cards preserved; service headings and shortcut navigation explicitly requested by owner",
+      "runtime_source": "31a77c14c12a74c9b4e4632dad8cac988601836c",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex; awaiting owner acceptance",
+      "evidence": "docs/screenshots/directory-service-groups; scripts/browser-directory-service-groups.cjs",
+      "behavior": "Group cards by the existing public service label; preserve every eligible offering and selected offering reference. Owner-requested Browse by service shortcut removed; service headings and dynamic filters retained.",
+      "changes": "Frontend only; no API, eligibility, schema, data, financial or provider changes."
+    },
+    "patient_notification_followup": {
+      "runtime_source": "31a77c14c12a74c9b4e4632dad8cac988601836c",
+      "routes": [
+        "/patient",
+        "/patient/appointments",
+        "/care",
+        "/clinician",
+        "/clinician/consultations/:id"
+      ],
+      "references": [
+        "C02 directory cards retained",
+        "H04 notification preferences",
+        "Existing shared bell, dialog and accepted-offer components; new neutral inbox states requested by owner"
+      ],
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex for named screenshots; awaiting owner acceptance",
+      "behavior": "Patient bell replaces navbar Appointment Updates; owner-only durable read state and neutral lifecycle events. Appointment delivery history stays on Appointments. New manual bookings get one follow-up email after 180 seconds, then existing snapshotted expiry/release. Separate presented-prompt responsiveness metric. Title Case headings/subtitles.",
+      "evidence_report": "docs/patient-notifications-verification-2026-10-19.md",
+      "screenshots": "docs/screenshots/patient-notifications",
+      "external_dependencies": [
+        "Live consenting SMS/email delivery not performed",
+        "Native Amharic/Afaan Oromo review pending",
+        "Owner visual acceptance pending"
+      ],
+      "migration": "Additive v1.42 empty private inbox/observation tables; no historical financial, policy or preference backfill."
+    },
+    "account_consolidation": {
+      "runtime_source": "f45cf77e919da6b4f9759fe69787d99e1c4b704a",
+      "routes": [
+        "/patient/account",
+        "/clinician/account"
+      ],
+      "references": [
+        "H01#h01",
+        "H03#h03",
+        "H04#h04"
+      ],
+      "owner_override": "19 October: compact consolidated account micro-flows and pre-upload photo crop supersede the old bulky account composition. Preserve TeleTena tokens and actual workflows.",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex for the named paired references, roles, responsive/crop states; awaiting owner acceptance",
+      "behavior": "All account groups remain discoverable through a persistent desktop index and compact native mobile section selector. Local editors retain entered values across sections. Photo sizing/positioning, drag, reset, cancel, failed save and retry precede authorized upload. Clinical/practice workflows retain their dedicated authorized links.",
+      "evidence_report": "docs/account-settings-verification-2026-10-19.md",
+      "screenshots": "docs/screenshots/account-consolidation",
+      "changes": "Frontend only; no dependency, schema, financial, permission, access-switch or credential changes.",
+      "external_dependencies": [
+        "Owner visual acceptance",
+        "Native translation review"
+      ]
+    },
+    "open_request_consolidation": {
+      "runtime_source": "ba60959e7eb2f921c130a2ea4c426d2db8c6552b",
+      "routes": [
+        "/patient/requests?request=:id&offer=:offer",
+        "/clinician/requests?request=:id",
+        "/clinician/requests?offer=:id&view=offers",
+        "/clinician/requests?view=history"
+      ],
+      "legacy_routes": "Patient requests/:requestId, requests/:requestId/offers/:offerId and clinician offers[/offerId] resolve to the selected record in the consolidated workspace. Opaque IDs only; no health text in URLs.",
+      "references": [
+        "D01",
+        "D03",
+        "D05",
+        "D09",
+        "F02",
+        "F03",
+        "F04",
+        "F13",
+        "F14",
+        "F15"
+      ],
+      "owner_override": "19 October request: one page per role until offer acceptance, compact cards/editors, dialogs and local micro-flows. This supersedes the prototype multi-route navigation, not its visual language or backend rules.",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex for the named paired comparisons and responsive states; awaiting owner acceptance",
+      "backend": "Existing publish_request,preview,clinician_requests,submit_offer,my_request_detail,clinician_offers,preview_acceptance,respond_offer,cancel_request,withdraw_offer and authoritative wallet/appointment APIs. No new model, migration, dependency, approval, dispatch or financial implementation.",
+      "permissions": "Owner-only patient requests; eligible recipient-only clinician inbox; own quotes/history; approved public clinician projection; selected treating-clinician history/file grants only after accepted encounter consent. Server revalidates eligibility,slot,price,disclosure and funds.",
+      "states_verified": [
+        "Guided draft/preferences/privacy and validation",
+        "Publication and real waiting",
+        "Private profile pane and offer review",
+        "Insufficient funds,top-up dialog,cancel/retry and acceptance",
+        "One winning appointment/reservation,repeated acceptance",
+        "Clinician waiting/accepted history and reload",
+        "Withdrawal closes stale review;explicit request cancellation",
+        "No eligible required-language supply;scheduled draft fallback",
+        "Current appointment cancellation distinct from matched request",
+        "390/768/1440,actual200% and reduced-motion;provisional locale layouts"
+      ],
+      "evidence_report": "docs/request-workspace-verification-2026-10-19.md",
+      "screenshots": "docs/screenshots/request-workspace",
+      "remaining": [
+        "Owner visual acceptance",
+        "Native translation review;live delivery/physical-device gates remain external and unchanged"
+      ]
+    },
+    "sharing_presence_followup": {
+      "runtime_source": "cc5886f3a5378bb7964aff1fe9042d495c183ef6",
+      "routes": [
+        "/onboarding",
+        "/patient/requests",
+        "/clinician/requests",
+        "/clinician"
+      ],
+      "references": [
+        "D03",
+        "D05",
+        "D09",
+        "F02",
+        "F03",
+        "F04",
+        "F14",
+        "F15"
+      ],
+      "owner_override": "19October: default new patient name/text sharing on; skip separate review when both enabled; shared request availability card and durable started intent. Existing choices unchanged.",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex for named compact confirmation/card screenshots; awaiting owner acceptance",
+      "evidence": "docs/request-sharing-presence-verification-2026-10-19.md",
+      "remaining": [
+        "Owner visual acceptance",
+        "Native-language review",
+        "Live provider/physical-device checks remain external"
+      ],
+      "privacy": "No full history broadcast; files remain individually selected; atomic encounter consent snapshot and server file grants unchanged."
+    },
+    "release_readiness_2026_10_20": {
+      "installation_source": "d8f11c8c8b16148c8b68e42320e847a13106c299",
+      "schema": "v1_42_patient_notifications",
+      "status": "Incremental package prepared for operator deployment; target preflight and owner acceptance separate",
+      "evidence": "docs/guest-first-release-readiness.md",
+      "update_guide": "docs/selfmade-guest-first-mvp-update.md",
+      "fresh_combined_install": "Locally verified: fresh v1.42 Frappe16/ERPNext16, two repeat migrations",
+      "populated_upgrade": "Locally verified: Fresh clone of original800a591:61original tables/1225rows/six files unchanged through v1.39–v1.42 and repeat migration; historical hold1 preserved; owner reconciliation6patient/5clinician",
+      "retained_preview": "Locally verified: 11patient/8clinician owner reconciliation;24private files unchanged;guest/auth offering return;actual SW recovery",
+      "registration": "Real backend browser test transport verified; isolated disabled-mode verified; live delivery external",
+      "backend_checks": "27guest/presence/file/notice +8contact-auth +21individual/couples/finance tests; 8dependency guard +1backup test",
+      "processing": "Current isolated native scheduler/worker reminder/dispatch/expiry verified; current release job execution; previous timed release/worker restart evidence inherited",
+      "qa_warning": "Initially overlapping disposable suites deadlocked during teardown; sequential rerun passes. One temporary tt-test owner remains inconsistent and preserved. Full disposable-site owner reconciliation is NOT passed; no original/presentation/migration-source discrepancy.",
+      "visual": "Existing reference comparisons inherited unchanged; no new redesign or owner approval",
+      "external_manual": [
+        "Current Selfmade baseline and loaded services",
+        "Shared-Bench maintenance window and verified remote backup",
+        "HTTPS/PWA/operator smoke tests after installation",
+        "Live delivery/physical devices/native-language review",
+        "Owner visual acceptance and approved production policies"
+      ]
     }
   }
 }

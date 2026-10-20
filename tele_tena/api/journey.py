@@ -133,17 +133,28 @@ def choices(value):
             value = json.loads(value)
         except ValueError:
             fail('Invalid sharing choices')
-    if not isinstance(value, dict) or set(value) != {'name', 'history'}:
+    if not isinstance(value, dict) or not {'name','history'}<=set(value) or set(value)-{'name','history','files','alias'}:
         fail('Choose name and history disclosure explicitly')
-    return {key: boolean(value[key]) for key in ('name', 'history')}
+    selected={key: boolean(value[key]) for key in ('name', 'history')}
+    if 'files' in value:selected['files']=value['files']
+    if 'alias' in value:selected['alias']=text(value['alias'],120,False)
+    return selected
 
 
 def disclosure(p, request_text, selected):
-    result = {'request': text(request_text, 2000)}
+    result = {'request': text(request_text, 2000, False)}
     if selected['name']:
         result['name'] = p.display_name
+    elif selected.get('alias',p.get('care_alias')):
+        result['alias'] = selected.get('alias',p.get('care_alias'))
     if selected['history']:
         result['history'] = p.history
+    if 'files' in selected:
+        result['disclosure_version']='encounter-disclosure-v1'
+        if selected['history']:result['history_sha256']=hashlib.sha256(p.history.encode()).hexdigest()
+        from tele_tena.api.encounter_files import selected_files,VERSION
+        result['files']=selected_files(p.user,selected['files'])
+        result['disclosure_version']=VERSION
     return result
 
 
@@ -193,7 +204,7 @@ def session():
 
 
 @command
-def save_profile(kind, display_name, adult, history='', share_name=None, share_history=None, languages=None, introduction=None):
+def save_profile(kind, display_name, adult, history='', share_name=None, share_history=None, languages=None, introduction=None,care_alias=None):
     if kind not in ('patient', 'clinician'):
         fail('Unsupported profile type')
     user = actor()
@@ -212,8 +223,10 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
         # it is separate from approval; applicants cannot create a profile here
         # or use this command to gain any clinical/service authorization.
         frappe.throw('Clinician profile access required', frappe.PermissionError)
-    share_name = existing[0].share_name if share_name is None and existing else (False if share_name is None else share_name)
-    share_history = existing[0].share_history if share_history is None and existing else (False if share_history is None else share_history)
+    share_name = existing[0].share_name if share_name is None and existing else (kind == 'patient' if share_name is None else share_name)
+    share_history = existing[0].share_history if share_history is None and existing else (kind == 'patient' if share_history is None else share_history)
+    if care_alias is not None and existing and kind=='patient':
+        frappe.db.sql('UPDATE tt_profile SET care_alias=%s WHERE user=%s',(text(care_alias,120,False),user))
     name = text(display_name, 120)
     history = text(history, 4000, False) if kind == 'patient' else ''
     if languages is None:
@@ -547,6 +560,11 @@ def add_availability(start, end):
 @query()
 def discover(service=None):
     actor('Tele Tena Patient')
+    return _approved_offerings(service)
+
+
+def _approved_offerings(service=None):
+    # Internal eligibility source; public callers still require an explicit projection.
     from tele_tena.review import enabled as review_enabled
     legacy_allowed = int(review_enabled() or frappe.local.site == 'erp.localhost')
     results = rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,p.languages AS care_languages,o.clinician,o.service,
@@ -685,7 +703,7 @@ def simulation_log(patient, kind, amount, reference):
 @command
 def book(offering, start, request_text, sharing, retry_key, expected_price, expected_minutes,
          expected_disclosure, booked_timezone='UTC', custom_offer_id=None,
-         booking_link_token=None, couple_plan_id=None):
+         booking_link_token=None, couple_plan_id=None,care_language=None,expected_format=None):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     p = profile('patient', True)
     selected = choices(sharing)
@@ -698,6 +716,8 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     key = text(retry_key, 80)
     payload_values = [offering, iso(start), request_text, selected, expected_price,
                       expected_minutes, expected_disclosure, booked_timezone]
+    if care_language is not None or expected_format is not None:
+        payload_values.append({'care_language':care_language,'expected_format':expected_format})
     # Keep the historic direct-booking digest stable. Link-origin retries bind
     # the opaque token into their idempotency payload without storing it.
     if booking_link_token:
@@ -782,6 +802,9 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
                 fail('Clinician immediate availability has expired', 'request_presence_stale')
     if integer(expected_price, 1, 100000000) != booking_price or integer(expected_minutes, 5, 240) != o.minutes:
         fail('Offering changed; review price and duration again', 'offering_changed')
+    if care_language is not None:
+        if care_language not in ('en','am','om') or care_language not in json.loads(one('SELECT languages FROM tt_profile WHERE user=%s',(o.clinician,)).languages or '[]'):
+            fail('The selected care language is no longer available. Review the service.','care_language_changed')
     end = start + timedelta(minutes=o.minutes)
     if start <= datetime.now(timezone.utc).replace(tzinfo=None):
         fail('Appointment must be in the future', 'future_required')
@@ -790,6 +813,8 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
                                         immediate_ready=immediate_request,
                                         immediate_window=(quoted.earliest_start, quoted.latest_start)
                                         if immediate_request else None)
+    if expected_format is not None and expected_format!=(schedule.consultation_format if schedule else 'video'):
+        fail('The consultation format changed. Review the service again.','offering_changed')
     schedule_timezone = schedule.timezone if schedule else scheduling._zone(booked_timezone).key
     before = int(schedule.buffer_before) if schedule else 0
     after = int(schedule.buffer_after) if schedule else 0
@@ -816,7 +841,7 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     if mode == 'manual':
         hours = int(frappe.conf.get('tele_tena_pending_expiry_hours', 24))
         hours = max(1, min(168, hours))
-        expires = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=hours)
+        expires = min(start, datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=hours))
         state = 'PendingConfirmation'
     fee_bps = int(frappe.conf.get('tele_tena_demo_platform_fee_bps', 0))
     dispute_minutes = int(frappe.conf.get('tele_tena_demo_dispute_window_minutes', 60))
@@ -828,6 +853,10 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
               'financial': {'version': 'demo-earnings-v1', 'fee_bps': fee_bps,
                             'dispute_window_minutes': dispute_minutes,
                             'external_settlement': False}}
+    policy['notifications']={'version':'booking-notices-v2','confirmation_reminder_seconds':180,
+                             'confirmation_deadline':iso(expires) if expires else None,
+                             'expiry_effect':'full_reservation_release'}
+    if care_language is not None:policy['care_language']=care_language
     created = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_appointment (id,patient,clinician,offering,start,end,state,price,acquisition_source,minutes,
         service_label,disclosure,choices,retry_key,payload_hash,timezone,schedule_id,confirmation_mode,
@@ -841,6 +870,10 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     frappe.db.sql('''INSERT INTO tt_appointment_event (id,appointment,event_type,actor,created)
         VALUES (%s,%s,%s,%s,%s)''', (str(uuid.uuid4()), appointment,
         'Requested' if state == 'PendingConfirmation' else 'Booked', p.user, created))
+    from tele_tena.api.encounter_files import grant_booking
+    grant_booking(appointment,p.user,o.clinician,shared)
+    from tele_tena.booking_notifications import create
+    create(appointment,state,plan_id=couple_plan_id)
     frappe.db.sql('UPDATE tt_wallet SET available=available-%s,reserved=reserved+%s WHERE patient=%s', (booking_price, booking_price, p.user))
     simulation_log(p.user, 'Reservation', booking_price, 'booking:' + appointment)
     post('booking:' + appointment, 'Reservation', 'booking:' + appointment, [
@@ -894,7 +927,7 @@ def appointments():
         if p.kind == 'patient':
             appointment.display_identity = clinician_name or 'Your clinician'
         else:
-            appointment.display_identity = appointment.disclosure.get('name') or 'Private patient'
+            appointment.display_identity = appointment.disclosure.get('name') or appointment.disclosure.get('alias') or 'Private patient'
     return result
 
 

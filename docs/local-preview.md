@@ -42,5 +42,8 @@ Linux HTTP check alone is not evidence for it.
 
 Credentials stay in the mode-600 private site file
 `/home/frappe/frappe/frappe-bench/sites/teletena-mvp-presentation.localhost/private/tele_tena_presentation_accounts.json`.
-The normal preview uses invited review: Use email instead → Use password
-instead. Enabled-registration tests use a separate site and controlled transport.
+Use email instead → Use password instead for the existing private review accounts.
+Observed18October:the retained presentation site reports phone/email code and both
+registration switches enabled;this revision did not change them or test their live
+delivery. Controlled registration tests use a separate site and loopback transport;
+its test adapter is never the8017 review entrypoint.

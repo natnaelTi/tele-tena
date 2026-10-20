@@ -18,9 +18,12 @@ MAX_RESUME_BYTES = 5 * 1024 * 1024
 
 
 def _event(appointment, event_type, event_actor=None, reason=None):
+    event_id=str(uuid.uuid4())
     frappe.db.sql('''INSERT INTO tt_appointment_event
         (id,appointment,event_type,actor,reason,created) VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))''',
-        (str(uuid.uuid4()), appointment, event_type, event_actor or actor(), reason))
+        (event_id, appointment, event_type, event_actor or actor(), reason))
+    from tele_tena.notifications import lifecycle
+    lifecycle(appointment,event_type,event_id)
 
 
 def _authorized(appointment, lock=False):
@@ -93,6 +96,8 @@ def respond_to_request(appointment, decision):
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         frappe.db.sql("UPDATE tt_appointment SET state='Booked',confirmed_at=%s WHERE id=%s", (now, item.id))
         _event(item.id, 'Confirmed', clinician)
+        from tele_tena.booking_notifications import create
+        create(item.id,'Booked')
         return {'state': 'Booked'}
     _wallet_release(item, 'decline')
     now = datetime.now(timezone.utc).replace(tzinfo=None)
@@ -516,7 +521,7 @@ def appointment_detail(appointment):
             {'revision': r.revision, 'summary': r.patient_summary, 'published_at': iso(r.created)}
             for r in revisions]
     else:
-        selected['patient_identity'] = disclosure.get('name') or 'Private patient'
+        selected['patient_identity'] = disclosure.get('name') or disclosure.get('alias') or 'Private patient'
         selected['sharing_snapshot'] = disclosure
         if note:
             current = rows('''SELECT revision,private_note,patient_summary,summary_published,note_published,note_share_selected,recipient_ids,author,created
@@ -738,6 +743,8 @@ def finalize_consultation(appointment, publish_summary=0, publish_note=0):
         frappe.db.sql("UPDATE tt_appointment SET state='Completed' WHERE id=%s", (item.id,))
         _event(item.id, 'Completed', clinician)
     _event(item.id, 'DocumentationFinalized', clinician)
+    from tele_tena.notifications import published_content
+    published_content(item.id,finalized_revision,recipients,publish or share_note,followup)
     return {'status': 'Finalized', 'revision': finalized_revision,
             'patient_summary_published': publish, 'consultation_note_published': share_note}
 
@@ -788,7 +795,7 @@ def care_directory(search='', service='', status='', from_date='', to_date='', p
         # Equal disclosed names never establish that two people are one patient.
         # The account key stays server-side and never enters the directory response.
         key = ('shared', item.patient, name) if name else ('encounter', item.id)
-        group = groups.setdefault(key, {'id': item.id, 'patient_label': name or 'Private patient',
+        group = groups.setdefault(key, {'id': item.id, 'patient_label': name or disclosure.get('alias') or 'Private patient',
                                         'encounters': [], 'last_consultation': None,
                                         'next_appointment': None, 'service_label': item.service_label,
                                         'state': item.state, 'disclosure': disclosure,
@@ -832,7 +839,7 @@ def care_patient_record(appointment):
             (clinician, item.patient, shared_name))
     else:
         matches = [{'id': item.id}]
-    return {'patient_label': shared_name or 'Private patient',
+    return {'patient_label': shared_name or disclosure.get('alias') or 'Private patient',
             'encounters': [appointment_detail(row['id']) for row in matches]}
 
 

@@ -69,12 +69,20 @@ def send_otp(phone, code):
     credential = ('Bearer ' if config['auth_scheme'] == 'bearer' else '') + config['api_key']
     if not re.fullmatch(r'\+251[79][0-9]{8}', phone) or not re.fullmatch(r'[0-9]{6}', code):
         raise SMSRejected('invalid_request')
+    return _send_message(phone,f'Tele-tena verification code: {code}. Expires in 5 minutes. Do not share this code.',config)
+
+def send_notice(phone,message):
+    if not re.fullmatch(r'\+251[79][0-9]{8}',phone) or not isinstance(message,str) or len(message)>600:raise SMSRejected('invalid_request')
+    return _send_message(phone,message,_config())
+
+def _send_message(phone,message,config):
+    credential=('Bearer ' if config['auth_scheme']=='bearer' else '')+config['api_key']
     try:
         response = requests.post(
             SEND_URL,
             headers={config['auth_header']: credential, 'Content-Type': 'application/json', 'Accept': 'application/json'},
             json={'msisdn': phone[1:],
-                  'text': f'Tele-tena verification code: {code}. Expires in 5 minutes. Do not share this code.'},
+                  'text': message},
             timeout=(3, 8),
         )
     except requests.RequestException:

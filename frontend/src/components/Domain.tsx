@@ -1,3 +1,5 @@
+import {useSession} from '../hooks/useSession';
+import {AvailabilityStatus} from './AvailabilityStatus';
 import {Avatar} from "./ProfilePhoto";
 import type { AppointmentView } from "../appointment-groups";
 import { appointmentStatus } from "../appointment-status";
@@ -47,6 +49,8 @@ export function PageTitle({
   );
 }
 export function ClinicianCard({ offer }: { offer: Offer }) {
+  const {session}=useSession();
+  const canBook=session?.profile?.kind==='patient'&&session.roles.includes('Tele Tena Patient');
   const { w } = useLocale();
   const [preview, setPreview] = useState(false);
   const trigger = useRef<HTMLButtonElement | null>(null);
@@ -56,9 +60,9 @@ export function ClinicianCard({ offer }: { offer: Offer }) {
         <h3>{offer.display_name}</h3><p>{offer.label}</p>
         <span className="verified"><ShieldCheck size={16} />{w("Approved for this service")}</span>
         {offer.description && <p className="clinician-description">{offer.description}</p>}
-        <div className="clinician-facts"><span><Languages size={16} aria-hidden="true" />{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Care language not listed")}</span><span>{offer.consultation_format === 'audio' ? <Headphones size={16} aria-hidden="true" /> : <Video size={16} aria-hidden="true" />}{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')}</span></div>
+        <AvailabilityStatus value={offer.availability}/><div className="clinician-facts"><span><Languages size={16} aria-hidden="true" />{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Care language not listed")}</span><span>{offer.consultation_format === 'audio' ? <Headphones size={16} aria-hidden="true" /> : <Video size={16} aria-hidden="true" />}{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')}</span></div>
       </div></div>
-      <div className="card-actions"><div><strong>ETB {money(offer.price)}</strong><small>{offer.minutes} {w("minutes")} · {w("per session")}</small></div><div className="actions"><Button variant="quiet" onClick={event => { trigger.current = event.currentTarget; setPreview(true); }}>{w("View profile")}</Button><Link className="button" to={"/patient/book/" + offer.id}>{w("Choose a time")}</Link></div></div>
+      <div className="card-actions"><div><strong>ETB {money(offer.price)}</strong><small>{offer.minutes} {w("minutes")} · {w("per session")}</small></div><div className="actions"><Button variant="quiet" onClick={event => { trigger.current = event.currentTarget; setPreview(true); }}>{w("View profile")}</Button>{canBook&&<Link className="button" to={"/care/select/" + offer.id}>{w("Choose a time")}</Link>}</div></div>
     </Card>
     {preview && <ClinicianPreview offer={offer} focusReturnTarget={trigger.current} close={() => setPreview(false)} />}
   </>;
@@ -109,27 +113,19 @@ export function AppointmentCard({
     <div className="appointment-status-actions"><StatusBadge tone={presentation.tone}>{w(presentation.label)}</StatusBadge>{presentation.detail && <p className="supporting">{w(presentation.detail)}</p>}<Link className="button secondary" to={`${base}/consultations/${appointment.id}`} state={view?{appointmentView:view}:undefined}>{w("View consultation")}<ArrowRight size={18}/></Link></div>
   </Card>;
 }
-export function DisclosurePreview({ disclosure }: { disclosure: Disclosure }) {
-  return (
-    <section className="disclosure-preview">
-      <h3>
-        <ShieldCheck size={20} />
-        What you’ll share
-      </h3>
-      <p>
-        Your clinician will receive only the information shown below for this
-        booking.
-      </p>
-      <dl className="summary-list">
-        <dt>Your request</dt>
-        <dd>{disclosure.request}</dd>
-        <dt>Preferred name</dt>
-        <dd>{disclosure.name ?? "Not shared"}</dd>
-        <dt>Saved history</dt>
-        <dd>{disclosure.history ?? "Not shared"}</dd>
-      </dl>
-    </section>
-  );
+export function DisclosurePreview({ disclosure,context='booking' }: { disclosure: Disclosure;context?:'booking'|'request'|'received' }) {
+  const {w}=useLocale();
+  return <section className="disclosure-preview">
+    <h3><ShieldCheck size={20}/>{w(context==='received'?'Patient-authorized disclosure':'What you’ll share')}</h3>
+    <p>{w(context==='request'?'After you publish, eligible clinicians receive this request and selected identity. Saved history and files remain private.':context==='received'?'The patient authorized this disclosure for this request.':'Your clinician will receive only the information shown below for this booking.')}</p>
+    <dl className="summary-list">
+      <dt>{w('Your request')}</dt><dd>{disclosure.request}</dd>
+      <dt>{w(disclosure.name?'Preferred name':'Alias')}</dt><dd>{disclosure.name??disclosure.alias??w('Not shared')}</dd>
+      <dt>{w('Saved history')}</dt><dd>{disclosure.history??w('Not shared')}</dd>
+      {disclosure.history_sha256&&<><dt>{w('Text snapshot')}</dt><dd>{disclosure.history_sha256.slice(0,12)}</dd></>}
+      {!!disclosure.files?.length&&<><dt>{w('Selected files for this clinician')}</dt><dd><ul>{disclosure.files.map(file=><li key={file.id}>{file.filename} · {file.content_sha256.slice(0,12)}</li>)}</ul></dd></>}
+    </dl>
+  </section>;
 }
 
 export function BookingSummary({

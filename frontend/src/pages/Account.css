@@ -81,3 +81,34 @@
   .account-sections .settings-summary { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .account-sections .settings-summary dd { margin-bottom: 12px; }
 }
+
+/* Consolidated settings: one stable page, a compact photo row, and local editors. */
+.reference-workspace .account-workspace{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;align-items:start;margin-top:24px}
+.reference-workspace .account-workspace>.account-tabs{display:grid;gap:4px;margin:0;padding:8px;position:sticky;top:96px;border:1px solid var(--border);border-radius:16px;background:var(--white);overflow:visible}
+.reference-workspace .account-workspace>.account-tabs button{white-space:normal;text-align:start;border:0;border-radius:10px;padding:12px 14px;line-height:1.4;min-height:46px}
+.reference-workspace .account-workspace>.account-tabs button:not(.selected):hover{background:var(--subtle)}
+.reference-workspace .account-workspace .account-overview,.reference-workspace .account-workspace .account-settings-columns{grid-template-columns:minmax(0,1fr);gap:16px}
+.reference-workspace .account-workspace .account-overview>aside{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:16px}
+.reference-workspace .account-workspace .settings-section{padding:22px;margin-bottom:16px}
+.reference-workspace .account-workspace .account-sections{min-width:0}
+.reference-workspace .account-workspace .settings-section h2{font-size:20px;margin-bottom:14px}
+.reference-workspace .account-workspace .profile-photo-editor{display:grid;grid-template-columns:minmax(160px,.8fr) minmax(0,1.8fr);gap:8px 20px;align-items:center;max-width:none}
+.account-workspace .profile-photo-editor>div:first-child p{margin:0;font-size:13px}
+.account-workspace .profile-photo-editor h2{margin:0 0 4px!important;font-size:17px!important}
+.account-workspace .profile-photo-editor .profile-photo-controls{gap:14px;flex-wrap:nowrap}
+.account-workspace .profile-photo-editor .profile-photo-controls>.avatar{width:56px;height:56px;font-size:22px}
+.account-workspace .profile-photo-editor .profile-photo-controls>div{flex:1;min-width:0}
+.account-workspace .profile-photo-editor .field{margin:0!important}
+.account-workspace .profile-photo-editor>.check-field,.account-workspace .profile-photo-editor>p{grid-column:1/-1;margin:4px 0;font-size:13px}
+.account-workspace .profile-photo-editor .upload-field>label{display:none}
+.account-workspace .settings-link-row>span strong{text-decoration:none}
+.account-workspace .settings-help>summary{padding:12px 0}
+@media(min-width:1250px){.reference-workspace .account-workspace .account-overview{grid-template-columns:minmax(0,1.2fr) minmax(250px,1fr)}}
+@media(max-width:800px){.reference-workspace .account-workspace{grid-template-columns:minmax(0,1fr);gap:16px}.reference-workspace .account-workspace>.account-tabs{position:static;display:flex;flex-wrap:wrap;gap:4px}.reference-workspace .account-workspace>.account-tabs button{flex:1 1 auto;white-space:normal;text-align:center;font-size:13px}}
+@media(max-width:500px){.reference-workspace .account-workspace .profile-photo-editor{grid-template-columns:minmax(0,1fr)}.reference-workspace .account-workspace .settings-section{padding:16px}.reference-workspace .account-workspace>.account-tabs button{padding:9px;min-height:44px}.account-workspace .profile-photo-editor .profile-photo-controls{align-items:flex-start}}
+.reference-workspace .account-workspace>.account-tabs button{display:flex;align-items:center;gap:10px}
+.reference-workspace .account-workspace>.account-tabs button>svg{flex:0 0 auto}
+@media(max-width:800px){.reference-workspace .account-workspace>.account-tabs button{justify-content:center}}
+
+.account-mobile-sections{display:none}
+@media(max-width:800px){.account-mobile-sections{display:block;margin-top:20px}.reference-workspace .account-workspace>.account-tabs{display:none}.reference-workspace .account-workspace{margin-top:12px}}

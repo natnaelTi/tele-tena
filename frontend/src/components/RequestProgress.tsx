@@ -8,7 +8,7 @@ export function RequestProgress({state,hasOffer=false,wave=1,clinician=false,imm
   const {w}=useLocale();
   const closed=!['Open','Active'].includes(state);
   const confirmed=state==='Matched'||state==='Accepted';
-  const words=confirmed?['Appointment confirmed']:closed?[state==='Superseded'?'Offer closed':state]:clinician?
+  const words=confirmed?[clinician?'Offer accepted':'Request matched']:closed?[state==='Superseded'?'Offer closed':state]:clinician?
     ['Your offer is with the patient','Waiting for their decision','Your proposed time will be rechecked']:
     hasOffer?['An offer is ready to review','Compare the time and fee','The next step is yours']:
     immediate&&eligibleSupply===0?['No eligible clinician at publication','Your requirements stay in place','You can keep waiting or choose later']:
@@ -18,7 +18,7 @@ export function RequestProgress({state,hasOffer=false,wave=1,clinician=false,imm
     'This outcome is retained in your history.':clinician?'No appointment is confirmed until the patient accepts. Your quote is private.':
     immediate&&eligibleSupply===0?'Matching continues without changing your requirements.':
     hasOffer?'Review the clinician’s proposal. A booking is confirmed only after you accept.':
-    immediate?'We aim to connect you within three minutes. Availability and your choice may take longer.':
+    immediate?'We aim to find suitable offers within 3–5 minutes, depending on clinician availability.':
     'Eligible clinicians can propose a time within your requested window.';
   const Icon=confirmed?Check:closed?CircleX:clinician?MessageSquare:Search;
   return <section className={`request-progress ${closed?'settled':''}`} aria-label="Request progress">

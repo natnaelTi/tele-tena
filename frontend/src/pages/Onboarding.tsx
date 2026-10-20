@@ -1,7 +1,8 @@
+import {returnPath} from '../guest-intent';
 import {FileUpload} from "../components/FileUpload";
 import HistoryDocuments from "../components/HistoryDocuments";
 import { useEffect, useState } from "react";
-import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Link,Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { pendingCareQuery } from "../care-intent";
 import { api, ApiError } from "../api";
 import {
@@ -15,13 +16,13 @@ import {
 import { destination, useSession } from "../hooks/useSession";
 import { useLocale } from "../hooks/useLocale";
 import { journeyApi } from "../journey-api";
-import { FileText, ShieldCheck, UserRound, Users } from "lucide-react";
+import { FileText, ShieldCheck } from "lucide-react";
 import "./Onboarding.css";
 type Answers = {
   professional?: {competencies?:string; certifications?:string; credential_valid_from?:string; professional_category?:string; qualification?:string; issuing_institution?:string; registration_number?:string; issuing_authority?:string; jurisdiction?:string; credential_expiry?:string; experience_years?:number};
   care_languages?: string[];
   introduction?: string;
-  name?: string;
+  name?: string;care_alias?:string;terms_accepted?:boolean;privacy_acknowledged?:boolean;terms_version?:string;privacy_version?:string;marketing?:boolean;
   history?: string;
   adult?: boolean;
   consent?: boolean;
@@ -34,12 +35,13 @@ type Answers = {
 };
 export default function Onboarding() {
   const { session, refresh } = useSession();
-  const { w } = useLocale();
+  const { w,setLocale } = useLocale();
   const navigate = useNavigate();
   const routeLocation = useLocation();
   const [params] = useSearchParams();
   const [step, setStep] = useState(0);
   const [kind, setKind] = useState("patient");
+  const [resumeKind,setResumeKind]=useState("");
   const [answers, setAnswers] = useState<Answers>({});
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -49,20 +51,21 @@ export default function Onboarding() {
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [resumeBusy, setResumeBusy] = useState(false);
   const [scopeSearch, setScopeSearch] = useState("");
-  const [chooseRole, setChooseRole] = useState(false);
   const [access, setAccess] = useState<{patient_registration:boolean;clinician_registration:boolean}|null>(null);
   useEffect(() => {
     api<{ kind: string; step: number; answers: Answers }>(
       "tele_tena.api.contact_auth.onboarding",
     )
       .then((draft) => {
+        const requested=params.get('intent');
+        setResumeKind(Object.keys(draft.answers).length&&requested&&requested!==draft.kind?draft.kind:'');
         setKind(
           params.get("intent") === "clinician" ? "clinician" : draft.kind,
         );
-        setChooseRole(!["patient", "clinician"].includes(params.get("intent") || "") && draft.step === 0 && Object.keys(draft.answers).length === 0);
         setStep(draft.step);
-        setAnswers(draft.answers);
+        setAnswers({share_name:true,share_history:true,...draft.answers});
         setReady(true);
+        void api<{terms_version:string;privacy_version:string}>('tele_tena.api.policies.current').then(policy=>setAnswers(previous=>({...previous,terms_version:policy.terms_version,privacy_version:policy.privacy_version})));
       })
       .catch(() =>
         setError(
@@ -74,8 +77,12 @@ export default function Onboarding() {
     void api<{id:string;label:string}[]>("tele_tena.api.contact_auth.application_services").then(setCatalog).catch(()=>undefined);
     void journeyApi.resumeStatus().then(value=>setResumeUploaded(value.uploaded)).catch(()=>undefined);
   }, [params]);
-  if (session?.profile) return <Navigate to={session.profile.kind === "patient" && pendingCareQuery() ? "/patient/discovery" : destination(session)} replace />;
+  const inviteState=routeLocation.state as {coupleInvitationToken?:string;relationshipInvitationToken?:string}|null;
+  const invitationPath=/^[A-Za-z0-9_-]{40,64}$/.test(inviteState?.coupleInvitationToken||'')?'/couple-invitation':/^[A-Za-z0-9_-]{40,64}$/.test(inviteState?.relationshipInvitationToken||'')?'/relationship-invitation':'';
+  if(session?.profile)return <Navigate to={session.profile.kind==='patient'?(invitationPath||returnPath()||destination(session)):destination(session)} state={routeLocation.state} replace/>;
   const clinician = kind === "clinician";
+  if(ready&&resumeKind)return <section className="guided-panel"><h1>{w('Your saved registration is a different journey')}</h1><InlineNotice>{w('Your existing draft is retained. Resume it, or sign in with the account you want to use. No roles or profile details have changed.')}</InlineNotice><Link className="button" to={'/onboarding?intent='+resumeKind}>{w('Resume saved registration')}</Link><Link className="text-link" to="/sign-in">{w('Use another account')}</Link></section>;
+  if(ready&&access&&!(clinician?access.clinician_registration:access.patient_registration))return <section className="guided-panel"><h1>{w('Registration is unavailable on this site.')}</h1><InlineNotice>{w('Your saved progress is retained and has not been submitted. Existing invited accounts can still sign in.')}</InlineNotice><Link to="/sign-in">{w('Return to sign in')}</Link></section>;
   // Retain stored step 3 as the ready screen for existing saved journeys.
   // Patient-only step 4 is inserted before it without reinterpreting old drafts.
   const steps = clinician ? [0, 1, 2, 5, 3] : [0, 1, 2, 4, 3];
@@ -101,6 +108,7 @@ export default function Onboarding() {
     setSaved(false);
   };
   async function save(next: number, complete = false) {
+    if(complete&&(!answers.terms_accepted||!answers.privacy_acknowledged)){setError(w('Review and accept Terms and acknowledge Privacy separately.'));return;}
     if (complete && clinician && (!resumeUploaded || !(answers.requested_services||[]).length)) {
       setError("Upload a resume and select at least one service to request before submitting.");
       return;
@@ -116,10 +124,12 @@ export default function Onboarding() {
       setStep(next);
       setSaved(true);
       if (complete) {
+        if(kind==='patient')setLocale((answers.language||'en') as 'en'|'am'|'om');
         const current = await refresh();
         const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken;
         if(coupleToken&&kind==="patient"){navigate("/couple-invitation",{replace:true,state:{coupleInvitationToken:coupleToken}});return;}
         const invitationToken=(routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken;
+        if(current?.profile?.kind==='patient'&&!invitationToken&&returnPath()){navigate(returnPath(),{replace:true});return;}
         navigate(invitationToken && current?.profile?.kind==='patient' ? '/relationship-invitation' : current?.profile?.kind === 'patient' && pendingCareQuery() ? '/patient/discovery' : destination(current),
           { replace:true, state: invitationToken ? {relationshipInvitationToken:invitationToken} : undefined });
       }
@@ -140,30 +150,6 @@ export default function Onboarding() {
       setBusy(false);
     }
   }
-  async function choose(kind: "patient" | "clinician") {
-    setBusy(true); setError("");
-    try {
-      await api("tele_tena.api.contact_auth.save_onboarding", {kind,step:0,answers:{}}, true);
-      setKind(kind); setChooseRole(false); setSaved(true);
-    } catch {
-      setError("We couldn’t save this step. Your entries are still here; check your connection and try again.");
-    } finally { setBusy(false); }
-  }
-  if (chooseRole) return <section className="guided-panel onboarding-guided">
-    <p className="eyebrow">{w("Contact verified")}</p><div className="step-progress" aria-hidden="true"><span data-complete="true" /></div>
-    <h1>{w("Choose your account")}</h1><p>{w("How will you use TeleTena?")}</p>
-    {error && <InlineNotice tone="danger">{w(error)}</InlineNotice>}
-    {!access ? <Skeleton /> : <div className="onboarding-account-choices">
-      <section className="onboarding-review-panel"><UserRound size={20} aria-hidden="true"/><h2>{w("I’m looking for care")}</h2><p>{w("Find clinicians, book a session, and keep your care connected.")}</p>
-        <Button loading={busy} disabled={!access.patient_registration} onClick={() => void choose("patient")}>{w("Continue as a patient")}</Button>
-        {!access.patient_registration && <p>{w("New registration is unavailable on this site. Existing invited users can still sign in.")}</p>}
-      </section>
-      <section className="onboarding-review-panel"><Users size={20} aria-hidden="true"/><h2>{w("I provide care")}</h2><p>{w("Apply, verify your expertise, and set up your practice.")}</p>
-        <Button loading={busy} disabled={!access.clinician_registration} onClick={() => void choose("clinician")}>{w("Apply as a clinician")}</Button>
-        {!access.clinician_registration && <p>{w("New registration is unavailable on this site. Existing invited users can still sign in.")}</p>}
-      </section>
-    </div>}
-  </section>;
   return (
     <>
     <section className={`guided-panel onboarding-guided ${!clinician&&step===3?"onboarding-ready-page":""}`}>
@@ -178,7 +164,7 @@ export default function Onboarding() {
       </div>
       <h1>{w(titles[step])}</h1>
       {error && <InlineNotice tone="danger">{w(error)}</InlineNotice>}
-      {!ready ? (
+      {!ready||!access ? (
         <Skeleton />
       ) : (
         <form
@@ -300,7 +286,7 @@ export default function Onboarding() {
                   <option value="om">Afaan Oromo</option>
                 </Select>
                 <p>
-                  {w("Start with private defaults. You can change these for each booking.")}
+                  {w("Choose your sharing defaults. You can change these for each booking.")}
                 </p>
                 <Checkbox
                   variant="card"
@@ -342,7 +328,7 @@ export default function Onboarding() {
                 : "This background is not included in your default disclosure. Preview before every booking.")} />
             {!answers.history && <Button variant="quiet" disabled={busy} onClick={() => void save(3)}>{w("Skip for now")}</Button>}
           </>}
-          {step === 3 && !clinician && <section className="onboarding-ready-hero"><div><h2>{w("What’s on your mind?")}</h2><p>{w("Describe what you need, browse specialists, or ask available clinicians to respond.")}</p><Button type="submit" loading={busy}>{w("Find care")}</Button></div><aside><ShieldCheck size={26}/><h2>{w("Your choices come with you.")}</h2><dl><dt>{w("Display name")}</dt><dd>{answers.name}</dd><dt>{w("Care language")}</dt><dd>{{en:"English",am:"አማርኛ",om:"Afaan Oromo"}[answers.language as "en"|"am"|"om"]||"English"}</dd><dt>{w("Sharing")}</dt><dd>{w("Preview before every booking")}</dd></dl></aside></section>}
+          {step === 3 && !clinician && <section className="onboarding-ready-hero"><div><h2>{w("Choose your next step")}</h2><p>{w("Browse clinicians and services, or post a private request.")}</p></div><aside><ShieldCheck size={26}/><h2>{w("Your choices come with you.")}</h2><dl><dt>{w("Display name")}</dt><dd>{answers.name}</dd><dt>{w("Care language")}</dt><dd>{{en:"English",am:"አማርኛ",om:"Afaan Oromo"}[answers.language as "en"|"am"|"om"]||"English"}</dd><dt>{w("Sharing")}</dt><dd>{w("Preview before every booking")}</dd></dl></aside></section>}
           {step === 3 && clinician && (
             <>
               <p>
@@ -368,6 +354,8 @@ export default function Onboarding() {
               </section>
             </>
           )}
+          {!clinician&&step===0&&<TextField label={w('Your clinician-facing alias')} value={answers.care_alias||''} placeholder={w('Choose an alias')} onChange={event=>update({care_alias:event.target.value})}/>}
+          {step===3&&<section className="onboarding-review-panel"><h2>{w('Terms,privacy and consent')}</h2><p>{w('Review-only policy content;approved production policies are still pending.')}</p><Link to="/policies" target="_blank">{w('Read Terms and Privacy review versions')}</Link><Checkbox label={w('I accept the displayed review Terms version')} checked={!!answers.terms_accepted} onChange={event=>update({terms_accepted:event.target.checked})}/><Checkbox label={w('I acknowledge the displayed Privacy version')} checked={!!answers.privacy_acknowledged} onChange={event=>update({privacy_acknowledged:event.target.checked})}/><p>{w('Your earlier care consent is separate. Each encounter has its own sharing preview;global preferences do not share records with unknown recipients.')}</p><Checkbox label={w('Optional marketing updates')} checked={!!answers.marketing} onChange={event=>update({marketing:event.target.checked})}/></section>}
           <div className="form-actions" data-tour={step===3&&clinician?"applicant-submit":undefined}>
             {step > 0 && (
               <Button
@@ -378,13 +366,13 @@ export default function Onboarding() {
                 {w("Back")}
               </Button>
             )}
-            {(clinician||step!==3)&&<Button type="submit" loading={busy}>
+            <Button type="submit" loading={busy}>
               {step === 3
                 ? clinician
                   ? w("Submit for review")
                   : w("Find care")
                 : w(step === 5 ? "Review application" : step === 4 ? "Save and continue" : "Continue")}
-            </Button>}
+            </Button>
           </div>
           <Button
             variant="quiet"

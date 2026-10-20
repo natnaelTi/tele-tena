@@ -1,3 +1,12 @@
+## Guest-first direction —17October2026
+
+Public directory,structured reactive filters,intent-aware authentication,volatile
+guest request drafting and explicit encounter sharing replace the mandatory care
+query/account chooser. AI care search is deferred with its query bar. Existing
+requests/history are retained. See the guest_first_revision entries of the sole
+mvp-screen-acceptance.json for this revision's routes,states and acceptance gates.
+All other agreed MVP capabilities and prior evidence remain preserved below.
+
 # TeleTena MVP release and handover scope
 
 Authoritative release boundary: user priority change on 2026-10-08, plus the

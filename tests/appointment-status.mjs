@@ -9,3 +9,6 @@ assert.equal(appointmentStatus({...past,call_state:'Ended'},true,now).detail,'No
 assert.equal(appointmentStatus({...past,state:'Cancelled',call_state:'Open'},false,now).label,'Cancelled');
 assert.equal(appointmentStatus({...past,state:'Completed',call_state:'Ended'},false,now).detail,'');
 console.log('PASS: one dominant label, terminal outcome precedence, truthful elapsed status, role-specific documentation explanation.');
+
+assert.equal(appointmentStatus({...past,call_state:'Open'},true,now).label,'Outcome not recorded');
+assert.equal(appointmentStatus({...past,end:'2026-10-09T13:00:00Z',call_state:'Open'},true,now).label,'In progress');

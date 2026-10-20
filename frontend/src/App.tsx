@@ -1,3 +1,6 @@
+import Policies from './pages/Policies';
+import PublicDirectory,{OfferingEntry} from './pages/PublicDirectory';
+import GuestRequest from './pages/GuestRequest';
 import HelpTools from './components/HelpTools';
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LocaleProvider } from "./hooks/useLocale";
@@ -60,6 +63,11 @@ export default function App() {
           <Routes>
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Homepage />} />
+              <Route path="/policies" element={<Policies/>}/>
+              <Route path="/care" element={<PublicDirectory/>}/>
+              <Route path="/care/select/:offering" element={<OfferingEntry/>}/>
+              <Route path="/care/clinicians/:clinicianId" element={<PublicClinicianProfile/>}/>
+              <Route path="/request" element={<GuestRequest/>}/>
               <Route path="/for-clinicians" element={<PublicJourney clinician />} />
               <Route path="/how-it-works" element={<PublicJourney />} />
               <Route path="/couple-invitation" element={<CoupleInvitation />} />

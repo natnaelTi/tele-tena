@@ -1,3 +1,40 @@
+## Sharing and immediate-request continuity —19October2026
+
+New patient accounts default preferred-name and saved text-history sharing on,
+with editable controls. Existing choices are unchanged. When both are on, open
+requests publish from Preferences without a separate privacy step; the inline
+notice and optional sharing editor remain. Requests disclose name/request text
+only, never full history to the recipient pool. Offer acceptance uses a compact
+price/funding confirmation with collapsed sharing controls and server-generated
+encounter disclosure; disabled preferences open the editor. Individual history
+files retain explicit selection and encounter-scoped grants. Acceptance is the
+affirmative authorization; no disclosure snapshot or financial check is removed.
+Manual request start persists as intent across capacity pauses and expired leases;
+effective readiness still requires a fresh authenticated heartbeat, approved
+published service and feasible session. Manual pause always wins. The shared
+availability card appears on Today and Requests.
+
+## Guest role navigation clarification —18October2026
+
+Guest/non-patient directory cards open the clinician preview only. Booking actions
+inside the preview/full profile read Sign in to Book until a patient is signed in.
+The selected offering survives authentication. Verified existing sessions visiting
+home return to their existing role destination;navigation intent grants no roles.
+Horizontal menus align right and use the current role’s supported workspace links.
+
+## Guest-first MVP revision — approved17October2026
+
+The18October instruction supersedes the interpreted-care-query and account-type
+chooser entries below. AI care search and its natural-language bar move together
+to post-MVP. Public clinicians/services use an allowlisted eligible projection;
+selection returns through verified authentication to the chosen offering. Guest
+request text stays bounded in memory,not broadcast or stored before authenticated
+consent. Existing records/preferences remain unchanged. New-patient alias and text
+sharing are visible editable proposals;per-recipient encounter consent remains
+mandatory. Universal invitation expansion is not authorized by this revision.
+The sole screen matrix's guest_first_revision section tracks requested work and
+verification independently;historical acceptance evidence remains historical.
+
 # Agreed product contract
 
 ## MVP handover priority — 2026-10-08
@@ -412,3 +449,47 @@ sharing into encounters or requests. Clinicians choose public-profile visibility
 current discovery eligibility is enforced again on photo download. A photo
 provides no credential verification. See `profile-photos.md` for limits, storage,
 fictional presentation setup and revocation limitations.
+
+### Connected automatic request availability (19 October revision)
+Schedules may opt into immediate-request presence during their Published local intervals,
+including replacements and excluding breaks/unavailable dates. Default is off. This is
+not unattended on-call coverage: an authenticated reachable clinician workspace renews
+a bounded presence lease. Closing/disconnecting the workspace expires availability.
+Manual pause persists across navigation, reconnects and expiry until explicitly resumed.
+Approval, scope, language, immediate-care policy and full-session/buffer/conflict checks
+still apply; automatic preference never reserves a slot. Today owns the controls; the
+workspace owns the headless heartbeat. Current booked/buffer time is shown as Occupied,
+or In consultation for an opened call within that occupied interval.
+
+An Open consultation row is evidence a call was opened, not evidence of indefinite
+participation. After its booked/extended end, lists show Outcome not recorded and Past
+until an explicit authorized outcome is recorded. No call, appointment or ledger is
+mutated by this presentation rule. Call activity says Call opened, never claims measured
+connected time. Existing End/revocation and documentation controls are unchanged.
+
+### Service-grouped public directory (19 October)
+Clinicians & services presents the existing approved cards under public service-name
+headings with service shortcuts. Filters remain server-enforced; each offering keeps
+its own scope, clinician, price, format and booking reference. Display grouping does
+not merge catalog definitions or grant additional authorization. Guest cards retain
+View profile, with Sign in to Book inside the profile; patients keep direct scheduling.
+
+## Booking Notifications — 19 October Follow-up
+
+Patients use one neutral notification bell for appointment, follow-up, account and system events; appointment delivery history remains on Appointments. Authorization is rechecked on fetch/read/link access, including individual couples consent. Private note content never enters notifications.
+
+New booking policy version `booking-notices-v2` records a 180-second clinician reminder threshold and an explicit confirmation deadline (configured hours, capped at start). One follow-up email is queued after that threshold; minute scheduling and provider availability determine actual sending. Existing bookings retain their accepted policy. Expiry releases the demonstration reservation once under the existing cancellation rules; no new penalty or external refund is implied.
+
+Email/SMS operational booking preferences default on only when no saved choice exists; explicit opt-outs remain honored, with verified contacts, site/provider gates and send caps. Reservation receipts identify demonstration funds. ProviderAccepted is not delivery. The 90-day, minimum-five presented-booking-prompt response metric is separate from clinical competency and patient experience; responsible declines count, unseen expiries do not.
+
+## Compact Account Settings — 19 October
+
+Patient and clinician Account pages expose all account groups through one index and local editors. Profile/history/privacy, notifications, contact methods, language/timezone and help remain discoverable without returning to a separate overview. Practice and shared-care workflows retain explicit authorized entry links. Text entered in an editor survives local section changes; only explicit saves persist it. Unsupported contact changes remain accurately unavailable.
+
+Profile photo selection/drop opens an in-memory crop/zoom/position preview with keyboard alternatives. Cancellation uploads nothing. Saving uses the existing owner-authorized, size/type-validated, normalized private photo API and existing public-visibility choice; no additional sharing permission is implied. No image data is stored in browser persistence or external services.
+
+## Consolidated Private Requests — 19 October Follow-up
+
+Patient Requests contains composition, preferences, immutable disclosure preview, publication, live progress, clinician inspection, private offer comparison, funding and acceptance. Clinician Requests contains the eligible inbox, authorized disclosure, approved-offering response editor and private active/history outcomes. Existing deep links select the corresponding record in these workspaces; only opaque references belong in URLs. Draft clinical text stays in React memory and survives local view/step changes, not a page reload. Hidden drafts still protect against tour navigation; published/sent drafts clear only after durable success.
+
+Acceptance uses the existing atomic appointment/reservation command; this presentation change introduces no parallel booking or accounting workflow. The patient remains on the matched request until opening the authorized appointment. Offer acceptance is a historical event, distinct from the appointment's current status: cancelled/ended/completed appointments are not relabeled confirmed by their old matched request. Schedule-for-later prepares a new draft without silently cancelling or rewriting the original request.

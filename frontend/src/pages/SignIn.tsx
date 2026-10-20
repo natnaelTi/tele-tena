@@ -1,3 +1,5 @@
+import {journeyApi} from '../journey-api';
+import {returnPath,rememberReturn,startAuthTiming} from '../guest-intent';
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, LockKeyhole } from "lucide-react";
@@ -33,6 +35,7 @@ export default function SignIn() {
   const [options, setOptions] = useState<SignInOptions | null>(null);
   const [optionsError, setOptionsError] = useState(false);
   const requestKey = useRef("");
+  useEffect(()=>{startAuthTiming();},[]);
   useEffect(() => {
     let active = true;
     void api<SignInOptions>("tele_tena.api.contact_auth.sign_in_options")
@@ -108,7 +111,22 @@ export default function SignIn() {
     });
   }
   async function proceed() {
+    const directNext=params.get('next')||'';
+    const selected=/^\/patient\/book\/([a-f0-9-]{36})$/.exec(directNext);
+    if(selected)rememberReturn({kind:'offering',ref:selected[1]});
+    const linked=/^\/patient\/book-link\/([a-f0-9]{64})$/.exec(directNext);if(linked)rememberReturn({kind:'booking-link',ref:linked[1]});
+    const state=routeLocation.state as {coupleInvitationToken?:string;relationshipInvitationToken?:string}|null;
+    const explicitInvitation=(directNext==='/couple-invitation'&&/^[A-Za-z0-9_-]{40,64}$/.test(state?.coupleInvitationToken||''))||(directNext==='/relationship-invitation'&&/^[A-Za-z0-9_-]{40,64}$/.test(state?.relationshipInvitationToken||''));
     const current = await refresh();
+    const pending=returnPath();
+    if(pending&&!explicitInvitation&&params.get("intent")!=="clinician"){
+      if(current?.profile?.kind==='patient'){navigate(pending,{replace:true});return;}
+      if(!current?.profile&&!current?.roles.some(role=>['Tele Tena Approver','Tele Tena Medical Lead','Tele Tena Clinician'].includes(role))){navigate('/onboarding?intent=patient',{replace:true});return;}
+      setError(w('You are signed in to a professional workspace. Use a patient account to continue; no patient role has been added.'));return;
+    }
+    if(params.get('intent')==='clinician'&&current?.profile?.kind==='patient'){
+      setError(w('This account has a patient profile. Use your professional account to apply; your existing profile and permissions are unchanged.'));return;
+    }
     const next = params.get("next") || "";
     const inviteToken = (routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken || "";
     const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken||"";
@@ -149,7 +167,7 @@ export default function SignIn() {
       </p>
       {session && (
         <p>
-          <a href={destination(session)}>Return to your workspace</a>
+          <Link to={destination(session)}>{w("Return to your workspace")}</Link><Button variant="quiet" onClick={()=>void run(async()=>{await journeyApi.logout();await refresh();})}>{w("Sign out and use another account")}</Button>
         </p>
       )}
       {error && <InlineNotice tone="danger">{error}</InlineNotice>}
@@ -293,8 +311,8 @@ export default function SignIn() {
       )}
       {!challenge && <div className="auth-registration">
         <p>{w("New to TeleTena?")}</p>
-        <Link to="/sign-in?intent=patient&mode=register">{w("Create an account")}</Link>
-        <Link to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}</Link>
+        {options?.patient_registration?<Link to="/sign-in?intent=patient&mode=register">{w("Create an account")}</Link>:<span aria-disabled="true">{w("Patient registration is unavailable on this site.")}</span>}
+        {options?.clinician_registration?<Link to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}</Link>:<span aria-disabled="true">{w("Clinician applications are unavailable on this site.")}</span>}
       </div>}
       <p className="auth-privacy">
         <LockKeyhole size={16} />

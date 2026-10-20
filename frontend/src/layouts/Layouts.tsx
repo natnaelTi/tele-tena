@@ -1,8 +1,10 @@
+import {RequestPresenceProvider} from '../components/RequestPresence';
+import {UserNotifications} from '../components/UserNotifications';
 import {AccountMenu} from "../components/AccountMenu";
 import "./ProductShell.css";
 import { ClinicianNotifications } from "../components/ClinicianNotifications";
-import { Link, Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useRef, useState } from "react";
 import {
   CalendarDays,
   ClipboardCheck,
@@ -20,10 +22,9 @@ import {
 import { Brand } from "../components/Brand";
 import { Button, Dialog, InlineNotice, Skeleton } from "../components/ui";
 import { LanguageSelect, useLocale } from "../hooks/useLocale";
-import { useSession } from "../hooks/useSession";
+import { useSession, destination } from "../hooks/useSession";
 import { journeyApi } from "../journey-api";
-import { useResource } from "../hooks/useResource";
-import { ApiError } from "../api";
+
 export function DemoBar() {
   return (
     <div className="demo-bar" role="note" aria-label="Demonstration environment">
@@ -54,75 +55,15 @@ export function MedicalLeadLayout(){
     <div className="workspace-body"><DemoBar/><header className="workspace-header"><span>{w('Clinical standards')}</span><LanguageSelect/><AccountMenu accountPath={session.roles.includes('Tele Tena Approver')?'/admin/account':'/admin/rubrics/account'} onSignout={()=>void signout()} busy={busy}/></header>{error&&<InlineNotice tone="danger">{w('We could not sign you out. Try again.')}</InlineNotice>}<nav className="workspace-mobile-nav" aria-label={w('Clinical standards')}><NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>{session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}</nav><main className="workspace-main" id="main-content"><Outlet/></main></div></div>;
 }
 
-function ClinicianRequestAvailability() {
-  const location = useLocation();
-  const {w} = useLocale();
-  const load = useCallback(() => journeyApi.requestPresence(), []);
-  const presence = useResource<any>(load);
-  const refresh = presence.refresh;
-  const ready = !!presence.data?.ready;
-  const [busy, setBusy] = useState(false);
-  const [failure, setFailure] = useState<"network" | "session" | "permission" | "update" | null>(null);
-  const failureMessage = failure === "network"
-    ? "Connection interrupted; request availability may expire."
-    : failure === "session"
-      ? "Your session expired. Sign in again to update request availability."
-      : failure === "permission"
-        ? "You don’t have permission to change request availability."
-        : failure === "update"
-          ? "Could not update request availability. Review the setup items and try again."
-          : null;
-  const recordFailure = useCallback((error: unknown) => {
-    if (error instanceof ApiError && error.code === "no_immediate_capacity") {setFailure(null);void refresh();return;}
-    if (error instanceof ApiError && error.code === "session_required") setFailure("session");
-    else if (error instanceof ApiError && error.code === "permission_denied") setFailure("permission");
-    else if (error instanceof TypeError) setFailure("network");
-    else setFailure("update");
-    void refresh().catch(() => undefined);
-  }, [refresh]);
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      if (!ready) { void refresh(); return; }
-      void journeyApi.setRequestPresence(true)
-        .then(() => { setFailure(null); void refresh(); })
-        .catch(recordFailure);
-    }, 30000);
-    return () => window.clearInterval(timer);
-  }, [ready, refresh, recordFailure]);
-  const toggle = async () => {
-    setBusy(true);
-    try {
-      await journeyApi.setRequestPresence(!presence.data?.ready);
-      setFailure(null);
-      await presence.refresh();
-    } catch (error) {
-      recordFailure(error);
-    } finally { setBusy(false); }
-  };
-  const data = presence.data;
-  const guidance:Record<string,{label:string;to:string}>={
-    approval_required:{label:"Approval required",to:"/clinician/vetting"},
-    language_required:{label:"Add a care language",to:"/clinician/account"},
-    offering_required:{label:"Publish an offering",to:"/clinician/services"},
-    scope_approval_required:{label:"Get approval for a service scope",to:"/clinician/vetting"},
-    published_schedule_required:{label:"Publish availability",to:"/clinician/availability"},
-    no_immediate_capacity:{label:"Review availability",to:"/clinician/availability"},
-  };
-  const pausedMessage = data?.reasons?.includes("no_immediate_capacity")
-    ? `${w("No full session can start within")} ${data.immediate_window_minutes || 30} ${w("minutes. Your published hours can still be used for scheduled requests.")}`
-    : "Complete setup before receiving requests.";
-  return <section hidden={location.pathname.includes("/consultations/")} className="request-presence-shell" aria-label={w("Request availability")}>
-    <details className="request-presence-details" open={failureMessage?true:undefined}><summary><strong>{w(failureMessage || (data?.ready ? "Available for requests" : "Requests paused"))}</strong>{!data?.ready&&!failureMessage&&!data?.configured&&<span>{w(data?.reasons?.includes("no_immediate_capacity")?"No immediate opening":"Setup needed")}</span>}</summary><div>
-      <span>{w(data?.ready ? "Ready status expires if this session disconnects." : pausedMessage)}</span>
-      {data?.reasons?.includes("immediate_policy_required") && <span>{w("A reviewer must enable immediate requests for this service. Service-scope approval alone does not enable this. This does not guarantee a request or match.")}</span>}
-      {!!data?.reasons?.length && <nav className="request-readiness-actions" aria-label={w("Setup needed")}>{data.reasons.filter((reason: string)=>reason!=="immediate_policy_required").map((reason: string) => {const item=guidance[reason];return item?<Link key={reason} to={item.to}>{w(item.label)}</Link>:<span key={reason}>{w("Complete setup before receiving requests.")}</span>;})}</nav>}
-    </div></details>
-    <Button className="compact-button" variant={data?.ready ? "secondary" : "primary"} loading={busy} disabled={!data?.configured && !data?.ready} onClick={() => void toggle()}>{w(data?.ready ? "Pause" : "Go available")}</Button>
-    {failureMessage && <InlineNotice tone="danger">{w(failureMessage)}</InlineNotice>}
-  </section>;
-}
 export function PublicLayout() {
   const { w } = useLocale();
+  const {session,refresh}=useSession(),navigate=useNavigate();
+  const [signingOut,setSigningOut]=useState(false),[signoutError,setSignoutError]=useState(false);
+  const home=destination(session);
+  const isReviewer=!!session?.roles.some(role=>['Tele Tena Approver','Tele Tena Medical Lead'].includes(role));
+  const links=!session?[]:isReviewer?[[home,'Home'],...(session.roles.includes('Tele Tena Approver')?[['/admin/applications','Applications'],['/admin/vetting','Service scopes'],['/admin/services','Services']]:[])]:session.profile?.kind==='patient'?[[home,'Home'],['/care','Find care'],['/patient/appointments','Appointments'],['/patient/requests','My requests']]:session.profile?.kind==='clinician'?[[home,'Home'],...(session.roles.includes('Tele Tena Clinician')?[['/clinician/appointments','Appointments'],['/clinician/requests','Requests']]:[['/clinician/vetting','Professional review']])]:[[home,'Continue']];
+  const accountPath=isReviewer?(session?.roles.includes('Tele Tena Approver')?'/admin/account':'/admin/rubrics/account'):session?.profile?'/'+session.profile.kind+'/account':home;
+  const signout=async()=>{setSigningOut(true);setSignoutError(false);try{await journeyApi.logout();await refresh();navigate('/sign-in');}catch{setSignoutError(true);}finally{setSigningOut(false);}};
   const location=useLocation();
   const informationPage=["/how-it-works","/for-clinicians"].includes(location.pathname);
   return (
@@ -130,21 +71,23 @@ export function PublicLayout() {
       <DemoBar />
       <header className={`public-header reference-public-header ${informationPage?"reference-information-header":""}`}>
         <Brand />
-        <nav aria-label="Main navigation">
-          {!informationPage&&<Link to="/patient/discovery">{w("Find care")}</Link>}
-          <Link to="/how-it-works">{w("How it works")}</Link>
-          <Link to="/for-clinicians">{w("For clinicians")}</Link>
+        <nav aria-label={w(session?"Workspace":"Main navigation")}>
+          {session?links.map(([to,label])=><Link key={to} className={to===home?"button secondary":""} to={to}>{w(label)}</Link>):<>
+            {!informationPage&&<Link to="/care">{w("Find care")}</Link>}
+            <Link to="/how-it-works">{w("How it works")}</Link>
+            <Link to="/for-clinicians">{w("For clinicians")}</Link>
+          </>}
+          {session?.profile?.kind==='patient'&&<UserNotifications/>}
           <LanguageSelect />
-          <Link className="button secondary" to="/sign-in">
-            {w("Sign in")}
-          </Link>
+          {session?<AccountMenu accountPath={accountPath} onSignout={()=>void signout()} busy={signingOut}/>:<Link className="button secondary" to="/sign-in">{w("Sign in")}</Link>}
         </nav>
       </header>
+      {signoutError&&<InlineNotice tone="danger">{w("We could not sign you out. Try again.")}</InlineNotice>}
       <Outlet />
       <footer className="public-footer reference-public-footer">
         <Brand />
         <p>{w("Personal care, connected. Adults 18+ · Not an emergency service.")}</p>
-        <Link to="/sign-in">{w("Find care")}</Link>
+        <Link to="/care">{w("Find care")}</Link>
         <TranslationNote />
       </footer>
     </>
@@ -310,10 +253,9 @@ export function WorkspaceLayout({
     return <Navigate to="/onboarding" replace />;
   if (kind === "patient" || kind === "clinician") return <div className="reference-workspace">
     <DemoBar />
-    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button>}</nav><div className="product-user">{kind==="clinician"&&session?.roles.includes("Tele Tena Clinician")&&<ClinicianNotifications/>}<LanguageSelect /><AccountMenu accountPath={'/'+kind+'/account'} onSignout={()=>void signout()} busy={signoutBusy}/></div></header>
+    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button>}</nav><div className="product-user">{kind==='patient'&&<UserNotifications/>}{kind==="clinician"&&session?.roles.includes("Tele Tena Clinician")&&<ClinicianNotifications/>}<LanguageSelect /><AccountMenu accountPath={'/'+kind+'/account'} onSignout={()=>void signout()} busy={signoutBusy}/></div></header>
     {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
-    {kind === "clinician" && session?.roles.includes("Tele Tena Clinician") && <ClinicianRequestAvailability />}
-    <main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') ? 'workspace-wide' : ''}`} id="main-content"><Outlet /></main>
+    <RequestPresenceProvider enabled={kind === "clinician" && !!session?.roles.includes("Tele Tena Clinician")}><main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') ? 'workspace-wide' : ''}`} id="main-content"><Outlet /></main></RequestPresenceProvider>
     <nav className="product-mobile-nav" aria-label={w("Mobile workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} /><span>{w("More")}</span></Button>}</nav>
     <Dialog open={moreOpen} onOpenChange={open => { setMoreOpen(open); if (!open) requestAnimationFrame(() => moreTrigger.current?.focus()); }} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer>{groupedMore}<TranslationNote /></Dialog>
   </div>;

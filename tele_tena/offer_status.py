@@ -14,4 +14,4 @@ def effective_offer_state(offer_state, request_state, valid_until, current_time)
 
 def offer_patient_label(disclosure):
     # The snapshot is the only identity source. Never use the account profile.
-    return str(disclosure.get('name') or 'Patient · alias')[:120]
+    return str((disclosure.get('name') or disclosure.get('alias')) or 'Patient · alias')[:120]

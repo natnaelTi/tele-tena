@@ -167,6 +167,10 @@ class Integration(unittest.TestCase):
             frappe.db.sql('DELETE FROM tt_dispute WHERE earning IN (SELECT id FROM tt_earning WHERE appointment IN %s)',
                           (tuple(appointment_ids),))
             frappe.db.sql('DELETE FROM tt_earning WHERE appointment IN %s', (tuple(appointment_ids),))
+        frappe.db.sql('DELETE FROM tt_confirmation_observation WHERE clinician IN %s',(tuple(USERS.values()),))
+        frappe.db.sql('DELETE FROM tt_user_notification WHERE user IN %s',(tuple(USERS.values()),))
+        frappe.db.sql('DELETE FROM tt_booking_notice WHERE user IN %s',(tuple(USERS.values()),))
+        frappe.db.sql('DELETE FROM tt_notice_preference WHERE user IN %s',(tuple(USERS.values()),))
         frappe.db.sql('DELETE FROM tt_payout WHERE clinician IN %s', (tuple(USERS.values()),))
         account_ids = frappe.db.sql('SELECT id FROM tt_financial_account WHERE owner IN %s',
                                     (tuple(USERS.values()),), pluck=True)

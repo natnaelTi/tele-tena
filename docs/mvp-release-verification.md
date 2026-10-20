@@ -1,3 +1,5 @@
+> Historical pre-guest-first report. Current revision: [18October verification](guest-first-mvp-verification-2026-10-18.md);the existing matrix remains authoritative.
+
 # MVP release verification — current bounded release
 
 > Historical checkpoint. Current source, checks and open gates: [9 October journey verification](mvp-journey-verification-2026-10-09.md).

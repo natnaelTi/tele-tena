@@ -76,6 +76,24 @@ class Couples(unittest.TestCase):
         frappe.db.commit()
         return invitation, booked['id'], one, two
 
+    def test_booking_notices_are_individual_and_neutral(self):
+        from tele_tena import booking_notifications
+        invitation,appointment,one,two=self.consented_plan()
+        booking_notifications.create(appointment,'Booked')
+        notices=journey.rows('SELECT user,event,channel,state FROM tt_booking_notice WHERE appointment=%s',(appointment,))
+        self.assertEqual({item.user for item in notices},{base.fixtures.USERS[key] for key in ('p1','p2','c1')})
+        self.assertEqual(len([n for n in notices if n.channel=='in_app']),3)
+        self.assertEqual(len({(n.user,n.event,n.channel) for n in notices}),len(notices))
+        for key in ('p1','p2','c1'):
+            base.fixtures.login(key)
+            own=[item for item in booking_notifications.notices() if item.appointment==appointment]
+            self.assertEqual(len([n for n in own if n.channel=='in_app']),1)
+            self.assertNotIn(one['request'],json.dumps(own,default=str))
+            self.assertNotIn(two['request'],json.dumps(own,default=str))
+            self.assertNotIn('patient',own[0]);self.assertNotIn('clinician',own[0])
+        base.fixtures.login('admin')
+        self.assertFalse(any(item.appointment==appointment for item in booking_notifications.notices()))
+
     def test_concurrent_couple_confirmation_reserves_once(self):
         invitation, _, _, _ = self.consented_plan(book=False)
         barrier = threading.Barrier(2)
@@ -264,11 +282,17 @@ class Couples(unittest.TestCase):
         self.assertTrue(presentation.finalize_consultation(appointment, True)['idempotent'])
         self.assertEqual(len(journey.rows('SELECT id FROM tt_earning WHERE appointment=%s',(appointment,))), 1)
         base.fixtures.login('p1')
+        from tele_tena.notifications import feed
+        self.assertFalse(any(n['kind']=='SummaryReady' and n['appointment']==appointment for n in feed()))
         first = presentation.appointment_detail(appointment)
-        self.assertEqual(couples.my_plans()[0]['appointment_state'], 'Completed')
+        # Other retained plans and same-second creation times must not select
+        # a different encounter when checking this finalization's projection.
+        own_plan = next(plan for plan in couples.my_plans() if plan['id'] == invitation['id'])
+        self.assertEqual(own_plan['appointment_state'], 'Completed')
         self.assertNotIn('Summary for second adult', json.dumps(first, default=str))
         self.assertNotIn('Clinician private note', json.dumps(first, default=str))
         base.fixtures.login('p2')
+        self.assertEqual(len([n for n in feed() if n['kind']=='SummaryReady' and n['appointment']==appointment]),1)
         second = presentation.appointment_detail(appointment)
         self.assertIn('Summary for second adult', json.dumps(second, default=str))
         self.assertNotIn('Clinician private note', json.dumps(second, default=str))
@@ -332,6 +356,8 @@ class Couples(unittest.TestCase):
         base.fixtures.login('p1')
         self.assertNotIn('Private next step', json.dumps(presentation.appointment_detail(appointment),default=str))
         base.fixtures.login('p2')
+        from tele_tena.notifications import feed
+        self.assertEqual(len([n for n in feed() if n['kind']=='FollowUpReady' and n['appointment']==appointment]),1)
         visible = presentation.appointment_detail(appointment)['individual_followup_revisions']
         self.assertEqual(len(visible),1)
         self.assertEqual(visible[0]['text'],'Private next step')

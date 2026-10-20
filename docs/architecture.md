@@ -1,3 +1,7 @@
+## Guest-first additive boundary —18October2026
+
+Public directory APIs expose explicit approved-professional/offering projections only;booking,private requests,records and file grants remain authenticated. v1.40 adds nullable care_alias and empty policy/grant/notice tables,without historical preference backfills or financial schema changes. Binary document snapshots copy inside the existing transaction;neutral notification jobs claim durable per-recipient events before provider I/O. Unknown delivery outcomes are not auto-retried. Guest health drafts stay in memory;safe opaque navigation intent alone may use sessionStorage. No new Python/Node dependencies,framework or real payment rails. See guest-first-mvp-verification-2026-10-18.md.
+
 # Architecture decision 001 — Frappe-backed PWA
 
 Status: accepted direction; foundation installation verified on Frappe 15.121.2
@@ -274,3 +278,18 @@ File/public routes. Authenticated opaque download endpoints enforce owner access
 or explicit clinician publication plus current discovery eligibility. Raster
 re-encoding removes EXIF; no patient photo enters clinical/disclosure/call models.
 Existing sites awaiting migration retain session/discovery without photos.
+
+### Connected schedule presence v1.41
+`tt_schedule.auto_requests` is off by default. `tt_clinician_request_presence.control_mode`
+records legacy manual, explicit started, paused or automatic behavior. Authenticated POST
+heartbeats serialize on approved application/profile locks with manual commands, renew
+short leases and recompute current eligibility/capacity. Schedule hours use the booking
+engine's timezone/rule/exception projection. No background process advertises a clinician
+without an active reachable workspace. Dashboard visibility is separate from the shell's
+headless heartbeat; notifications and appointment authorization are unchanged.
+
+## v1.42 Neutral Notification Inbox
+
+Empty additive `tt_user_notification` and `tt_confirmation_observation` tables preserve durable owner/read state and actual booking-prompt observations. They are not publicly exposed DocTypes. Custom endpoints authorize the owner and current encounter membership; recipient-specific publication resolves participant row IDs only within the consented encounter. Stable lifecycle/event keys and existing booking-outbox unique keys make retries idempotent.
+
+Minute cron queues reminders through the existing provider outbox; booking gate and row locks serialize reminders against decisions. Durable Sending claims precede network I/O; uncertain outcomes are not automatically retried. SQL batching excludes legacy policy rows before limiting so they cannot starve current reminders. Existing LiveKit End/revocation implementation is unchanged; ended-call notices reconcile without mutating room security transactions.

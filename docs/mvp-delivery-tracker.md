@@ -1,3 +1,7 @@
+## Guest-first review —18October2026
+
+Guest public directory,reactive eligibility/availability filters,intent-aware auth,volatile request drafts,explicit encounter history/file sharing and state-aware neutral notices are implemented and locally tested. The existing guest_first_revision matrix and guest-first-mvp-verification-2026-10-18.md contain exact evidence. Owner review,live delivery,physical devices,native translations and production policy/retention approval remain separate. No reseed,merge,Selfmade/shared-repair change or real-money activation.
+
 # TeleTena delivery tracker
 
 ## Active final bounded checkpoint —14October2026
@@ -895,3 +899,23 @@ retain the history textarea and can save multiple private PDF/JPEG/PNG files
 during eligible onboarding and in Personal profile. These files are not
 automatically shared with clinicians. Evidence: history-country-verification.md.
 Native-language approval and live delivery remain external, not claimed.
+
+- 19 October follow-up: opt-in connected schedule presence, persistent manual pause,
+  Today readiness/occupancy card, historical-open appointment display correction and
+  native dropdown/section styling implemented; verification recorded in the current
+  guest-first report and existing screen matrix. No remote deployment or owner acceptance.
+
+- 19 October directory follow-up: approved cards grouped by public service with
+  shortcut links and clinician counts; real-backend guest/patient filters, previews
+  and scheduling handoff verified. Screenshots/current packaged identity recorded
+  in the existing acceptance matrix and current19 October verification report.
+
+- 19 October notification follow-up: patient universal bell/read persistence; Appointments-only delivery history; SMS/email reservation and booking messages; one three-minute manual-confirmation email reminder; recorded expiry/release; separate presented-prompt responsiveness metric; Title Case headings; directory shortcuts removed. See patient-notifications-verification-2026-10-19.md and the existing screen matrix. Real-backend tests and isolated automatic scheduler/private-transport processing verified; live delivery and owner acceptance remain external. No historical financial/policy backfill, reseed or remote deployment.
+
+- 19 October Account follow-up: patient/clinician settings consolidated into a compact desktop index/native mobile selector with in-page editors. Photo crop/zoom/drag/reset/cancel and failed-save retry verified against persisted Frappe16 records; retained preview read-only. Existing H01/H03/H04 components adapted to the owner's explicit compact-account instruction. See account-settings-verification-2026-10-19.md and the existing screen matrix. No schema/dependency/permission changes; owner visual/native-language acceptance pending.
+
+- 19 October request-workspace follow-up: both roles' open-request journeys consolidated through patient acceptance. Compact selectors, local composition/responding, profile/disclosure/funding dialogs, private paginated outcomes and preserved deep links. Real Frappe16 browser publication/offer/funding/acceptance, retry/ownership, withdrawal/cancellation, no-supply fallback and current appointment status verified; actual200%/mobile/locales inspected. Four focused backend regressions and owner reconciliation pass. See request-workspace-verification-2026-10-19.md and existing screen matrix. Backend/schema/providers unchanged; owner/native-language acceptance pending.
+
+- 19 October sharing/presence follow-up: new patient name/text-history defaults on without existing-choice backfill; enabled defaults skip separate publication sharing review and condense acceptance controls. Requests includes shared availability card; manually started intent survives lease/capacity pauses, effective presence still expires without a fresh authenticated heartbeat. Eight backend checks plus two-role real-browser and retained-preview checks pass. See request-sharing-presence-verification-2026-10-19.md. Files remain explicitly selected per encounter; owner/native/live validation separate.
+
+- 20 October release preparation: pinned d8f11c8 package, fresh combined v1.42 + repeat migrations and populated preservation verified on Frappe16. Current registration/private-transport, guest return, notification scheduler and individual/couples/financial checks recorded in guest-first-release-readiness.md. Corrected stale test assumptions without changing product guards. Retained aborted-fixture warning is explicit; original/presentation owner reconciliation passes. Exact existing-Bench update/backup/rollback guide added; no shared repair/reseed/merge/deployment. Owner and external activation checks remain separate.
