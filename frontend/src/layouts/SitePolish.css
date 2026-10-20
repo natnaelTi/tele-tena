@@ -2,7 +2,7 @@
 .site-masthead{position:sticky;top:0;z-index:45;min-height:84px;padding:18px 48px;display:flex;align-items:center;gap:24px;border-bottom:1px solid #dce8ed;background:#ffffffed;backdrop-filter:blur(18px);box-shadow:0 8px 30px #145d7a06}
 .site-masthead>.brand{flex-shrink:0;align-items:center}.site-masthead>.brand img{width:40px;height:40px;border-radius:9px}.site-masthead .bilingual-wordmark{display:grid;gap:3px;line-height:1.06;min-width:0}.site-masthead .bilingual-wordmark>span{display:block;text-align:left;text-align-last:left}.site-masthead .bilingual-wordmark>[lang=am]{font-family:'Noto Sans Ethiopic',sans-serif;font-size:.66em;letter-spacing:0}
 .site-masthead>.product-desktop-nav,.site-masthead>nav{margin-left:auto;justify-content:flex-end;align-items:center}.site-masthead>.language-select{margin-left:auto}.site-masthead .product-user{flex-shrink:0;gap:12px}.site-masthead .product-desktop-nav a{color:var(--muted);border-radius:10px;padding-inline:6px;transition:background-color .18s,color .18s}.site-masthead .product-desktop-nav a.active{color:var(--brand);background:#eaf4f8}.site-masthead .product-desktop-nav a:hover{color:var(--brand);background:#f1f7fa}
-.auth-layout .site-masthead{max-width:none;margin:0;padding-inline:max(40px,calc((100vw - 1240px)/2))}
+.auth-layout .site-masthead{max-width:none;margin:0;padding-inline:48px}
 .reference-workspace{background:linear-gradient(180deg,#f4f9fc 0,#fff 620px)}
 .reference-workspace-main{min-width:0}.reference-workspace-main>*{min-width:0}.reference-workspace-main .page-title h1{color:#123e52;letter-spacing:-.04em}.reference-workspace-main .page-title p{line-height:1.7}
 :where(.reference-workspace) .card{border-radius:20px;border-color:#dbe8ed;box-shadow:0 7px 28px #145d7a04}
