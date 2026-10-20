@@ -919,3 +919,13 @@ Native-language approval and live delivery remain external, not claimed.
 - 19 October sharing/presence follow-up: new patient name/text-history defaults on without existing-choice backfill; enabled defaults skip separate publication sharing review and condense acceptance controls. Requests includes shared availability card; manually started intent survives lease/capacity pauses, effective presence still expires without a fresh authenticated heartbeat. Eight backend checks plus two-role real-browser and retained-preview checks pass. See request-sharing-presence-verification-2026-10-19.md. Files remain explicitly selected per encounter; owner/native/live validation separate.
 
 - 20 October release preparation: pinned d8f11c8 package, fresh combined v1.42 + repeat migrations and populated preservation verified on Frappe16. Current registration/private-transport, guest return, notification scheduler and individual/couples/financial checks recorded in guest-first-release-readiness.md. Corrected stale test assumptions without changing product guards. Retained aborted-fixture warning is explicit; original/presentation owner reconciliation passes. Exact existing-Bench update/backup/rollback guide added; no shared repair/reseed/merge/deployment. Owner and external activation checks remain separate.
+
+- 20 October bounded public redesign: explicit Find Care/For Clinicians landing
+  modes from the supplied sketch, tailored steps/FAQ/illustrations, shared public
+  header/footer/directory/profile/help/policy composition. Real selected-offering
+  and guest-request authentication returns, three-role navigation/logout,
+  responsive/actual200%/reduced-motion/failure recovery and asset privacy pass.
+  Concrete async request-catalog and mobile navigation defects fixed. No backend,
+  schema, dependency, seed or remote changes. Current public evidence and paired
+  screenshots: public-experience-acceptance.md; authoritative matrix overlay
+  public_experience_revision. Owner visual/native-language acceptance pending.

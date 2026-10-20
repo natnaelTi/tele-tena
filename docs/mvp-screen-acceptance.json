@@ -15443,8 +15443,8 @@
     },
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
-  "current_verification_report": "docs/automatic-request-availability-verification-2026-10-19.md",
-  "current_packaged_source": "d8f11c8c8b16148c8b68e42320e847a13106c299",
+  "current_verification_report": "docs/public-experience-acceptance.md",
+  "current_packaged_source": "2067a34951c0c6f687584526b56104814f902064",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15455,12 +15455,12 @@
     "url": "http://127.0.0.1:8017/teletena/",
     "site": "teletena-mvp-presentation.localhost",
     "bench": "/home/frappe/frappe/frappe-bench",
-    "branch": "feat/mvp-release-handover",
-    "build_source": "bc20f722848a84b7b857284b1599bef0f8b1f451",
-    "date": "2026-10-11",
-    "report": "docs/mvp-journey-verification-2026-10-09.md",
-    "note": "Compatibility Bench is separate and not serving this URL. Evidence/docs-only commits may differ; compare runtime diff before rebuilding.",
-    "packaged_source": "7daf9c084dcf9982cd1ee622b7cf2c0413417a4d"
+    "branch": "feat/public-experience",
+    "build_source": "2067a34951c0c6f687584526b56104814f902064",
+    "packaged_source": "2067a34951c0c6f687584526b56104814f902064",
+    "date": "2026-10-20",
+    "report": "docs/public-experience-acceptance.md",
+    "note": "Public redesign overlay. Prior private/backend release evidence remains guest-first-release-readiness.md. Compatibility Bench is separate; evidence-only commits differ from runtime pin."
   },
   "historical_checkpoints": {
     "before_2026_10_11": {
@@ -16279,6 +16279,37 @@
         "Live delivery/physical devices/native-language review",
         "Owner visual acceptance and approved production policies"
       ]
+    }
+  },
+  "public_experience_revision": {
+    "date": "2026-10-20",
+    "scope": "Bounded public redesign; user written two-mode brief and external sketch supersede old A01 composition only.",
+    "branch": "feat/public-experience",
+    "parent_pr": 47,
+    "parent_head": "f534f4ba950969319a5a313f011d4b30ce5129e8",
+    "packaged_source": "2067a34951c0c6f687584526b56104814f902064",
+    "preview": "http://127.0.0.1:8017/teletena/",
+    "route_state_evidence": "docs/public-experience-acceptance.md",
+    "screenshots": "docs/screenshots/public-experience/",
+    "functional_status": "Functionally verified for changed public routes and real-backend guest authentication returns; prior private-workflow evidence retained.",
+    "visual_status": "Visually verified by Codex at390/768/1440 and actual200%; awaiting owner acceptance.",
+    "external_dependencies": [
+      "Native Amharic/Afaan Oromo review",
+      "Owner visual acceptance",
+      "Physical-device/assistive-technology review",
+      "Existing production policy approval"
+    ],
+    "preservation": "No backend/schema/dependency/provider/access/seed/financial changes; site configuration and24 private files unchanged.",
+    "previous_preview_metadata": {
+      "url": "http://127.0.0.1:8017/teletena/",
+      "site": "teletena-mvp-presentation.localhost",
+      "bench": "/home/frappe/frappe/frappe-bench",
+      "branch": "feat/mvp-release-handover",
+      "build_source": "bc20f722848a84b7b857284b1599bef0f8b1f451",
+      "date": "2026-10-11",
+      "report": "docs/mvp-journey-verification-2026-10-09.md",
+      "note": "Compatibility Bench is separate and not serving this URL. Evidence/docs-only commits may differ; compare runtime diff before rebuilding.",
+      "packaged_source": "7daf9c084dcf9982cd1ee622b7cf2c0413417a4d"
     }
   }
 }
