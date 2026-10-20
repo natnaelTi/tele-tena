@@ -115,12 +115,13 @@ class ContactAuth(unittest.TestCase):
         self.assertNotIn('Tele Tena Clinician', frappe.get_roles(user))
         frappe.db.commit()
 
-    def test_optional_patient_background_preserves_owned_draft_and_private_defaults(self):
+    def test_optional_patient_background_preserves_owned_draft_and_explicit_private_choices(self):
         result, code = self.challenge()
         user = self.verify(result, code)
         frappe.set_user(user)
         answers = {'name': 'Fictional alias', 'adult': True, 'consent': True,
-                   'history': 'Fictional optional care background', 'language': 'en'}
+                   'history': 'Fictional optional care background', 'language': 'en',
+                   'share_name': False, 'share_history': False}
         auth.save_onboarding('patient', 4, answers)
         draft = auth.onboarding()
         self.assertEqual(draft['step'], 4)
