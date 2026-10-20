@@ -15444,7 +15444,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/public-atmosphere-verification.md",
-  "current_packaged_source": "4e5483b2643c0e329bfd09eb26d1d24b3042d75e",
+  "current_packaged_source": "69f33ae628201fbf2bc7f8c1e91ed9fb09659d2b",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15456,8 +15456,8 @@
     "site": "teletena-mvp-presentation.localhost",
     "bench": "/home/frappe/frappe/frappe-bench",
     "branch": "feat/public-experience",
-    "build_source": "4e5483b2643c0e329bfd09eb26d1d24b3042d75e",
-    "packaged_source": "4e5483b2643c0e329bfd09eb26d1d24b3042d75e",
+    "build_source": "69f33ae628201fbf2bc7f8c1e91ed9fb09659d2b",
+    "packaged_source": "69f33ae628201fbf2bc7f8c1e91ed9fb09659d2b",
     "date": "2026-10-20",
     "report": "docs/public-atmosphere-verification.md",
     "note": "Public redesign overlay. Prior private/backend release evidence remains guest-first-release-readiness.md. Compatibility Bench is separate; evidence-only commits differ from runtime pin."
@@ -16287,12 +16287,12 @@
     "branch": "feat/public-experience",
     "parent_pr": 47,
     "parent_head": "f534f4ba950969319a5a313f011d4b30ce5129e8",
-    "packaged_source": "4e5483b2643c0e329bfd09eb26d1d24b3042d75e",
+    "packaged_source": "69f33ae628201fbf2bc7f8c1e91ed9fb09659d2b",
     "preview": "http://127.0.0.1:8017/teletena/",
     "route_state_evidence": "docs/public-atmosphere-verification.md",
-    "screenshots": "docs/screenshots/public-atmosphere/",
+    "screenshots": "docs/screenshots/hero-correction/after/",
     "functional_status": "Functionally verified: real guest returns, three-role navigation, reviewer save/reload/publish and backend authorization/version acceptance. Interactive tour is explicitly local fictional state.",
-    "visual_status": "Visually inspected by Codex at390/768/1440,actual200%,reduced motion and locale samples; awaiting owner acceptance.",
+    "visual_status": "Current hero correction inspected at390/768/1440/1920 and actual200%; awaiting owner acceptance. Earlier other-route comparisons remain inherited.",
     "external_dependencies": [
       "Native Amharic/Afaan Oromo review",
       "Owner visual acceptance",
@@ -16384,6 +16384,21 @@
         "visual": "Visually verified by Codex; awaiting owner acceptance",
         "evidence": "docs/public-atmosphere-verification.md"
       }
-    ]
+    ],
+    "hero_correction": {
+      "reference": "Owner annotation hero-section-correction-direction.png outside repository",
+      "packaged_source": "69f33ae628201fbf2bc7f8c1e91ed9fb09659d2b",
+      "routes": [
+        "/ patient hero",
+        "/ clinician hero",
+        "public Help & Tours motion preference"
+      ],
+      "functional_status": "Functionally verified with focused browser and real-backend intent regressions",
+      "visual_status": "Paired annotated-direction/before/after comparison inspected by Codex; awaiting owner acceptance",
+      "evidence": "docs/public-atmosphere-verification.md",
+      "before": "docs/screenshots/hero-correction/before/",
+      "after": "docs/screenshots/hero-correction/after/",
+      "preservation": "No backend/schema/dependency changes; configuration and24 original private files unchanged; no reseed or remote changes"
+    }
   }
 }

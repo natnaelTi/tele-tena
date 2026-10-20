@@ -1,3 +1,95 @@
+# Hero Composition Correction — 20 October 2026
+
+This is the current follow-up in the existing public-experience acceptance matrix.
+The earlier atmosphere/content checkpoint below is historical; its visible Pause
+Motion button, image breathing and oval image treatment have been superseded.
+
+## Current Local Candidate
+
+- Branch `feat/public-experience`, draft [PR48](https://github.com/natnaelTi/tele-tena/pull/48)
+  still depends on PR47. No merge or remote deployment.
+- Packaged runtime: `69f33ae628201fbf2bc7f8c1e91ed9fb09659d2b`.
+  Later evidence/test-only commits are not a different application build.
+- <http://127.0.0.1:8017/teletena/> — site
+  `teletena-mvp-presentation.localhost`, Bench `/home/frappe/frappe/frappe-bench`.
+  Observed Frappe15.121.2 / ERPNext15.121.6 / Python3.12.3; Node24.13.0 build.
+  The separate Frappe16 compatibility Bench is not serving this URL.
+- Scoped preview status: web314550, Redis1999, worker314529, scheduler314544;
+  HTTP200. No service restart, migration or setting change was needed.
+-45 HTTP-served artifacts match every SHA256 in `release.json`.
+  CSS `index-71HdNKoa.css`:
+  `00e9e7b8540a19f5ed9ee4f75d3e89fa407bd3be4f3831510a7b15fb80889dfc`.
+  JS `index-BSawgYdA.js`:
+  `81bcf885600c37e25500f8788d5aa6a910c2c55335c3dd160d490a420ab4010a`.
+  Frontend dependency lock unchanged:
+  `a5f7a16b739627b44fcb73fb348f6c71a7974a55fec90a0d3c3caa4d6345e696`.
+
+## Direction, Implementation and Paired Inspection
+
+Reference: the owner's local `hero-section-correction-direction.png`, visually
+inspected outside Git. It contains browser chrome and is intentionally not copied
+into this repository. This approved annotation supersedes the old gallery hero
+composition; it does not change private workspaces.
+
+| Route/state | Before | Current | Comparison result |
+| --- | --- | --- | --- |
+| `/`, Find Care,1440 | [Before](screenshots/hero-correction/before/hero-patient-1440.png) | [After](screenshots/hero-correction/after/hero-patient-1440.png), [viewport](screenshots/hero-correction/after/viewport-patient-1440.png) | Removed blurry foreground plant and opaque wall. Décor/furniture retained as a transparent room diorama. Entire rug inside raised wood stage; front/right edges visible and uncut. Hero gradient serves as wall; scene reaches the right edge. |
+| `/`, For Clinicians,1440 | [Before](screenshots/hero-correction/before/hero-clinician-1440.png) | [After](screenshots/hero-correction/after/hero-clinician-1440.png), [viewport](screenshots/hero-correction/after/viewport-clinician-1440.png) | Existing clinician/phone/screens/office concept retained; white gown and teal stethoscope added to viewer-right armrest. Wall extracted; narrow edge feather blends existing crop into blue. No replacement stage or new scene. |
+| Image explanation | Inline caption | [Keyboard tooltip](screenshots/hero-correction/after/hero-tooltip-1440.png) | Hidden normally; hover, focus or touch reveals; Escape/blur dismisses. Concept/facility/hologram disclosure retained. |
+| Responsive room | Earlier small masked scene | [390](screenshots/hero-correction/after/hero-patient-390.png), [768](screenshots/hero-correction/after/hero-patient-768.png), [1920](screenshots/hero-correction/after/hero-patient-1920.png) | CTAs first, image stacks at tablet widths, complete stage stays visible; desktop copy and image occupy separate regions. |
+| Responsive practice | Earlier small masked scene | [390](screenshots/hero-correction/after/hero-clinician-390.png), [768](screenshots/hero-correction/after/hero-clinician-768.png), [1920](screenshots/hero-correction/after/hero-clinician-1920.png) | Readable headings/actions, larger scene, gown/stethoscope visible, no page-width clipping. |
+| Motion/access | Prominent hero play/pause | Help & Tours → Motion Preferences | Removed hero button as requested. Optional decorative motion remains stoppable, memory-only. OS reduced-motion always wins. Three independent wave layers have varied durations/delays and crossing vertical motion. |
+
+Manually inspected these paired compositions, not just overflow assertions.
+The first enlarged render overlapped copy; it was rejected and corrected before
+this evidence. Natural image proportions and all patient stage edges take priority
+over stretching an image vertically. At narrower widths the scene follows the
+copy instead of overlapping it. The clinician image is an AI-assisted edit and
+has small generative detail variations; no claim of pixel-identical preservation.
+Its original framing/crop is blended, whereas the patient's newly bounded stage
+is not faded away. These are illustrations, not a real facility or practitioner.
+
+## Actual Checks on This Runtime
+
+- Production TypeScript/Vite build and frontend lint pass (existing lint warnings
+  and existing bundle-size advisory remain; no new dependency).
+- `browser-public-atmosphere.cjs`: pass; both modes390/768/1440/1920, separate
+  desktop text/image regions, image decoding, hidden caption/focus/Escape,
+  removed hero button, Help motion preference, independently animated waves,
+  reduced motion, bounded loader, navigation threshold, pointer gradients,
+  Contact mock safety, patient/clinician tour without operational writes,
+  public/internal policy visibility.
+- `browser-public-experience.cjs`: pass against the real retained backend;
+  reactive directory filters, profile focus return, password sign-in to the exact
+  selected offering, reload, guest draft → authentication → Requests without
+  publication or browser-persistent health text; clinician application intent,
+  mobile menu dismissal, provisional Amharic/Afaan Oromo samples and reduced motion.
+  No live OTP, booking publication or financial fixture writes.
+- `browser-public-zoom.cjs`: pass at actual Chromium200% (`tabs.setZoom(2)`,
+  inner720/outer1440/DPR2/visualViewport1), both modes, CTA keyboard focus,
+  navigation, directory and profile booking action. Scroll remains available;
+  [patient](screenshots/hero-correction/after/landing-patient-200-percent.png) /
+  [clinician](screenshots/hero-correction/after/landing-clinician-200-percent.png).
+- `check_review_assets.py`: pass; artifact hashes, scope, no source maps/config,
+  exact scan of20 private credential values without printing them.
+- Retained-site preservation: configuration values and24 original private
+  manifests/provider/key files byte-identical; no reseed/access/provider changes.
+- Diff from preceding `fe702a4` has no backend, schema, dependency-lock or build-
+  helper changes. Unchanged financial/couples/hosted-call/fresh-install suites
+  were not repeated for this image/CSS/public-motion patch; prior evidence below
+  remains inherited, not newly asserted on this UI correction.
+
+## Remaining Review
+
+Owner visual acceptance is pending. Native-language review, assistive technology,
+physical devices and live SMS/email receipt are not established by these checks.
+This patch does not approve production policies, enable real money, alter clinical
+records, or change Selfmade. Asset prompts/hashes: [provenance](public-atmosphere-assets.md).
+
+---
+
+## Historical Atmosphere / Editable Content Checkpoint
+
 # Public Atmosphere and Editable Review Content — 20 October 2026
 
 Current evidence addendum to the single `mvp-screen-acceptance.json` matrix.

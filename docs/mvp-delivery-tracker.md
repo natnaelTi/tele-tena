@@ -941,3 +941,14 @@ Native-language approval and live delivery remain external, not claimed.
   public-atmosphere-verification.md; same authoritative matrix overlay. Owner
   acceptance, full translations and production legal/contact activation remain
   pending. No merge, remote change, scenario reseed or real-money activation.
+
+- 20 October annotated hero correction: genuine transparent room wall, complete
+  rug/raised stage, foreground plant removed; clinician concept retains its
+  framing with gown/stethoscope on the right armrest and edge blending. Caption
+  moved to hover/focus tooltip; prominent hero motion button removed while
+  accessible memory-only control remains in Help & Tours. Independently varied
+  wave motion respects reduced-motion. Runtime69f33ae; production build/lint,
+  public/browser backend-intent regressions, actual200%,390/768/1440/1920 paired
+  inspection,45 served hashes and private preservation pass. Evidence above in
+  public-atmosphere-verification.md; owner visual acceptance still pending.
+  No backend/schema/dependency/provider/data/remote changes. PR48 remains draft.
