@@ -15444,7 +15444,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/automatic-request-availability-verification-2026-10-19.md",
-  "current_packaged_source": "cc5886f3a5378bb7964aff1fe9042d495c183ef6",
+  "current_packaged_source": "d8f11c8c8b16148c8b68e42320e847a13106c299",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15902,8 +15902,8 @@
         "localization": "English;provisional Amharic/Afaan Oromo rendered with actual translated headings. Native review pending;catalog content remains as approved/stored."
       }
     ],
-    "last_verified_runtime": "cd995539be4d4fd583358082f3bb324a8e4b6d94",
-    "verification_report": "docs/guest-first-mvp-verification-2026-10-18.md",
+    "last_verified_runtime": "d8f11c8c8b16148c8b68e42320e847a13106c299",
+    "verification_report": "docs/guest-first-release-readiness.md",
     "owner_acceptance": "Awaiting owner acceptance",
     "historical_evidence": "Earlier entries remain historical; this section supersedes AI query and account-chooser requirements only.",
     "route_state_acceptance": [
@@ -16257,6 +16257,28 @@
         "Live provider/physical-device checks remain external"
       ],
       "privacy": "No full history broadcast; files remain individually selected; atomic encounter consent snapshot and server file grants unchanged."
+    },
+    "release_readiness_2026_10_20": {
+      "installation_source": "d8f11c8c8b16148c8b68e42320e847a13106c299",
+      "schema": "v1_42_patient_notifications",
+      "status": "Incremental package prepared for operator deployment; target preflight and owner acceptance separate",
+      "evidence": "docs/guest-first-release-readiness.md",
+      "update_guide": "docs/selfmade-guest-first-mvp-update.md",
+      "fresh_combined_install": "Locally verified: fresh v1.42 Frappe16/ERPNext16, two repeat migrations",
+      "populated_upgrade": "Locally verified: Fresh clone of original800a591:61original tables/1225rows/six files unchanged through v1.39–v1.42 and repeat migration; historical hold1 preserved; owner reconciliation6patient/5clinician",
+      "retained_preview": "Locally verified: 11patient/8clinician owner reconciliation;24private files unchanged;guest/auth offering return;actual SW recovery",
+      "registration": "Real backend browser test transport verified; isolated disabled-mode verified; live delivery external",
+      "backend_checks": "27guest/presence/file/notice +8contact-auth +21individual/couples/finance tests; 8dependency guard +1backup test",
+      "processing": "Current isolated native scheduler/worker reminder/dispatch/expiry verified; current release job execution; previous timed release/worker restart evidence inherited",
+      "qa_warning": "Initially overlapping disposable suites deadlocked during teardown; sequential rerun passes. One temporary tt-test owner remains inconsistent and preserved. Full disposable-site owner reconciliation is NOT passed; no original/presentation/migration-source discrepancy.",
+      "visual": "Existing reference comparisons inherited unchanged; no new redesign or owner approval",
+      "external_manual": [
+        "Current Selfmade baseline and loaded services",
+        "Shared-Bench maintenance window and verified remote backup",
+        "HTTPS/PWA/operator smoke tests after installation",
+        "Live delivery/physical devices/native-language review",
+        "Owner visual acceptance and approved production policies"
+      ]
     }
   }
 }
