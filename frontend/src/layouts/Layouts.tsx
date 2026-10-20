@@ -4,7 +4,7 @@ import {AccountMenu} from "../components/AccountMenu";
 import "./ProductShell.css";
 import { ClinicianNotifications } from "../components/ClinicianNotifications";
 import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CalendarDays,
   ClipboardCheck,
@@ -17,6 +17,7 @@ import {
   FileHeart,
   Building2,
   MoreHorizontal,
+  Menu,
   HeartHandshake,
 } from "lucide-react";
 import { Brand } from "../components/Brand";
@@ -66,31 +67,35 @@ export function PublicLayout() {
   const signout=async()=>{setSigningOut(true);setSignoutError(false);try{await journeyApi.logout();await refresh();navigate('/sign-in');}catch{setSignoutError(true);}finally{setSigningOut(false);}};
   const location=useLocation();
   const informationPage=["/how-it-works","/for-clinicians"].includes(location.pathname);
+  const [menuOpen,setMenuOpen]=useState(false);
+  const menuTrigger=useRef<HTMLButtonElement|null>(null);
+  useEffect(()=>{if(["#how-it-works","#public-faq"].includes(location.hash)){const tick=requestAnimationFrame(()=>document.getElementById(location.hash.slice(1))?.scrollIntoView());return()=>cancelAnimationFrame(tick);}},[location.pathname,location.hash]);
+  const publicLinks=[["/care","Find care"],["/how-it-works","How it works"],["/for-clinicians","For clinicians"]];
   return (
-    <>
+    <div className="public-experience-shell">
       <DemoBar />
       <header className={`public-header reference-public-header ${informationPage?"reference-information-header":""}`}>
         <Brand />
         <nav aria-label={w(session?"Workspace":"Main navigation")}>
-          {session?links.map(([to,label])=><Link key={to} className={to===home?"button secondary":""} to={to}>{w(label)}</Link>):<>
-            {!informationPage&&<Link to="/care">{w("Find care")}</Link>}
-            <Link to="/how-it-works">{w("How it works")}</Link>
-            <Link to="/for-clinicians">{w("For clinicians")}</Link>
+          {session?links.map(([to,label])=><Link key={to} className={"public-desktop-link "+(to===home?"button secondary":"")} to={to}>{w(label)}</Link>):<>
+            {publicLinks.map(([to,label])=><Link className="public-desktop-link" aria-current={location.pathname===to?"page":undefined} key={to} to={to}>{w(label)}</Link>)}
           </>}
           {session?.profile?.kind==='patient'&&<UserNotifications/>}
           <LanguageSelect />
+          <button type="button" className="public-menu-button" ref={menuTrigger} aria-label={w("Open navigation")} aria-haspopup="dialog" onClick={()=>setMenuOpen(true)}><Menu size={22}/></button>
           {session?<AccountMenu accountPath={accountPath} onSignout={()=>void signout()} busy={signingOut}/>:<Link className="button secondary" to="/sign-in">{w("Sign in")}</Link>}
         </nav>
       </header>
       {signoutError&&<InlineNotice tone="danger">{w("We could not sign you out. Try again.")}</InlineNotice>}
       <Outlet />
       <footer className="public-footer reference-public-footer">
-        <Brand />
-        <p>{w("Personal care, connected. Adults 18+ · Not an emergency service.")}</p>
-        <Link to="/care">{w("Find care")}</Link>
-        <TranslationNote />
+        <div className="public-footer-brand"><Brand/><p>{w("Personal care, connected. Adults 18+ · Not an emergency service.")}</p></div>
+        <nav aria-label={w("Care")}><h2>{w("Care")}</h2><Link to="/care">{w("Clinicians & services")}</Link><Link to="/request">{w("Request a Consultation")}</Link></nav>
+        <nav aria-label={w("For clinicians")}><h2>{w("For clinicians")}</h2><Link to="/for-clinicians">{w("Explore the practice tools")}</Link><Link to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}</Link></nav>
+        <nav aria-label={w("Information")}><h2>{w("Information")}</h2><Link to="/how-it-works#public-faq">{w("Help & FAQ")}</Link><Link to="/policies">{w("Terms & Privacy — review environment")}</Link><TranslationNote/></nav>
       </footer>
-    </>
+      <Dialog open={menuOpen} onOpenChange={setMenuOpen} title={w("Navigation")} description={w("Choose where to go next.")} focusReturnTarget={menuTrigger.current} className="public-mobile-menu"><nav aria-label={w("Main navigation")}>{(session?links:publicLinks).map(([to,label])=><Link key={to} to={to} onClick={()=>setMenuOpen(false)}>{w(label)}</Link>)}</nav><LanguageSelect/></Dialog>
+    </div>
   );
 }
 export function AuthLayout() {
