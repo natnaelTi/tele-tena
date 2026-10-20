@@ -135,8 +135,12 @@ class GuestFirst(unittest.TestCase):
   booking_notifications.save_preferences(email_enabled=True)
   frappe.db.sql("INSERT IGNORE INTO tt_contact_identity VALUES ('email',%s,%s,UTC_TIMESTAMP(6))",('guest-first-retry@example.invalid',users['patient']))
   result,args,offer=self.book()
+  # Dispatch intentionally processes at most20 rows. Retained synthetic notices
+  # may precede this test's notice: exercise enough real batches, without deleting
+  # records, changing timestamps, or assuming an empty shared fixture queue.
+  pending=frappe.db.sql("SELECT COUNT(*) FROM tt_booking_notice WHERE state='Pending' AND channel IN ('email','sms')")[0][0]
   with patch.object(frappe.db,'commit'),patch('tele_tena.email_delivery.send_notice',side_effect=DeliveryUnavailable('email_not_configured')):
-   booking_notifications.dispatch()
+   for _ in range(1+pending//20):booking_notifications.dispatch()
   notice=frappe.db.sql("SELECT id,state FROM tt_booking_notice WHERE appointment=%s AND user=%s AND channel='email'",(result['id'],users['patient']),as_dict=True)[0]
   self.assertEqual(notice.state,'Unavailable');booking_notifications.retry(notice.id)
   with patch.object(frappe.db,'commit'),patch('tele_tena.email_delivery.send_notice') as transport:
