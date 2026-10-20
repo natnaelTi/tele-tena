@@ -52,6 +52,7 @@ import Relationships, { RelationshipInvitationEntry } from "./pages/Relationship
 import FinancialActivityDetail from "./pages/FinancialActivity";
 import PWAUpdateNotice from "./components/PWAUpdateNotice";
 import "./App.css";
+import "./layouts/SitePolish.css";
 export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.PROD ? "/teletena" : "/"}>

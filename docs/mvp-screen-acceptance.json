@@ -16442,6 +16442,20 @@
       "packaged_source": "151d178eb8dc7fb21a1fabdb71a6341f1f2faf73",
       "evidence": "docs/public-atmosphere-verification.md",
       "screenshots": "docs/screenshots/public-stage-v3/"
+    },
+    "final_polish": {
+      "status": "Implementation in progress",
+      "scope": "Owner stage-correction geometry; consistent visible role navigation; bounded shared surface/spacing retouch and responsive review",
+      "reference": "/home/frappe/teletena-design-reference/stage-correction.png (kept outside Git) plus approved existing product compositions",
+      "routes": [
+        "Public pages and auth shell",
+        "Patient home/discovery/requests/appointments/account/balance/couples",
+        "Clinician Today/services/availability/requests/offers/appointments/care/account/earnings/vetting/affiliations",
+        "Reviewer overview/applications/scopes/vetting/catalog/clinics/matching/disputes/account and Medical Lead rubric",
+        "Existing focused call layout retained with its functional header"
+      ],
+      "functional": "Implemented but unverified",
+      "visual": "Implemented but unverified"
     }
   }
 }

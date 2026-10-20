@@ -50,11 +50,12 @@ export function MedicalLeadLayout(){
   const [busy,setBusy]=useState(false),[error,setError]=useState(false);
   const signout=async()=>{setBusy(true);setError(false);try{await journeyApi.logout();await refresh();}catch{setError(true);}finally{setBusy(false);}};
   if(!session?.roles.includes('Tele Tena Medical Lead'))return <main className="container"><InlineNotice tone="danger">{w('You do not have access to clinical rubric governance.')}</InlineNotice></main>;
-  return <div className="workspace workspace-medical-lead"><aside className="sidebar"><Brand/><div className="workspace-label">{w('Clinical standards')}</div><nav className="workspace-nav" aria-label={w('Clinical standards')}>
-    <NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>
-    {session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}
-  </nav><div className="sidebar-bottom"><TranslationNote/></div></aside>
-    <div className="workspace-body"><DemoBar/><header className="workspace-header"><span>{w('Clinical standards')}</span><LanguageSelect/><AccountMenu accountPath={session.roles.includes('Tele Tena Approver')?'/admin/account':'/admin/rubrics/account'} onSignout={()=>void signout()} busy={busy}/></header>{error&&<InlineNotice tone="danger">{w('We could not sign you out. Try again.')}</InlineNotice>}<nav className="workspace-mobile-nav" aria-label={w('Clinical standards')}><NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>{session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}</nav><main className="workspace-main" id="main-content"><Outlet/></main></div></div>;
+  return <div className="reference-workspace workspace-role-medical-lead"><DemoBar/>
+    <header className="product-header site-masthead"><Brand bilingual/><nav className="product-desktop-nav" aria-label={w('Clinical standards')}><NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>{session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}</nav><div className="product-user"><LanguageSelect/><AccountMenu accountPath={session.roles.includes('Tele Tena Approver')?'/admin/account':'/admin/rubrics/account'} onSignout={()=>void signout()} busy={busy}/></div></header>
+    {error&&<InlineNotice tone="danger">{w('We could not sign you out. Try again.')}</InlineNotice>}
+    <nav className="product-mobile-nav" aria-label={w('Clinical standards')}><NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>{session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}</nav>
+    <main className="reference-workspace-main" id="main-content"><Outlet/></main>
+  </div>;
 }
 
 export function PublicLayout() {
@@ -80,7 +81,7 @@ export function PublicLayout() {
     <div className={`public-experience-shell ${heroRoute&&!sessionError?"has-immersive-hero":""}`}>
       <PublicMotion/>
       <DemoBar />
-      <header className={`public-header reference-public-header ${informationPage?"reference-information-header":""} ${headerVisible?"is-revealed":"is-concealed"}`} inert={!headerVisible}>
+      <header className={`public-header reference-public-header site-masthead ${informationPage?"reference-information-header":""} ${headerVisible?"is-revealed":"is-concealed"}`} inert={!headerVisible}>
         <Brand bilingual />
         <nav aria-label={w(session?"Workspace":"Main navigation")}>
           {session?links.map(([to,label])=><Link key={to} className={"public-desktop-link "+(to===home?"button secondary":"")} to={to}>{w(label)}</Link>):<>
@@ -108,8 +109,8 @@ export function AuthLayout() {
   return (
     <div className="auth-layout">
       <DemoBar />
-      <header className="auth-header">
-        <Brand />
+      <header className="auth-header site-masthead">
+        <Brand bilingual />
         <LanguageSelect />
       </header>
       <main className="auth-main">
@@ -262,66 +263,12 @@ export function WorkspaceLayout({
     );
   if (kind !== "admin" && kind !== "clinic" && session?.profile?.kind !== kind)
     return <Navigate to="/onboarding" replace />;
-  if (kind === "patient" || kind === "clinician") return <div className="reference-workspace">
+  return <div className={"reference-workspace workspace-role-"+kind}>
     <DemoBar />
-    <header className="product-header"><Brand /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button>}</nav><div className="product-user">{kind==='patient'&&<UserNotifications/>}{kind==="clinician"&&session?.roles.includes("Tele Tena Clinician")&&<ClinicianNotifications/>}<LanguageSelect /><AccountMenu accountPath={'/'+kind+'/account'} onSignout={()=>void signout()} busy={signoutBusy}/></div></header>
+    <header className="product-header site-masthead"><Brand bilingual /><nav className="product-desktop-nav" aria-label={w("Workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} />{w("More")}</Button>}</nav><div className="product-user">{kind==='patient'&&<UserNotifications/>}{kind==="clinician"&&session?.roles.includes("Tele Tena Clinician")&&<ClinicianNotifications/>}<LanguageSelect /><AccountMenu accountPath={'/'+kind+'/account'} onSignout={()=>void signout()} busy={signoutBusy}/></div></header>
     {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
-    <RequestPresenceProvider enabled={kind === "clinician" && !!session?.roles.includes("Tele Tena Clinician")}><main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') ? 'workspace-wide' : ''}`} id="main-content"><Outlet /></main></RequestPresenceProvider>
+    <RequestPresenceProvider enabled={kind === "clinician" && !!session?.roles.includes("Tele Tena Clinician")}><main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') || kind==='admin' ? 'workspace-wide' : ''}`} id="main-content"><Outlet /></main></RequestPresenceProvider>
     <nav className="product-mobile-nav" aria-label={w("Mobile workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} /><span>{w("More")}</span></Button>}</nav>
     <Dialog open={moreOpen} onOpenChange={open => { setMoreOpen(open); if (!open) requestAnimationFrame(() => moreTrigger.current?.focus()); }} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer>{groupedMore}<TranslationNote /></Dialog>
   </div>;
-  return (
-    <div className={`workspace workspace-${kind}`}>
-      <aside className="sidebar">
-        <Brand />
-        <div className="workspace-label">
-          {kind === "admin"
-            ? "Review workspace"
-            : kind === "clinic"
-              ? w("Clinic workspace")
-            : kind === "clinician"
-              ? "Clinician workspace"
-              : "Your space for care"}
-        </div>
-        <nav className={`workspace-nav workspace-nav-${kind}`} aria-label="Workspace">
-          {items.map((item) => renderNavLink(item))}
-        </nav>
-        <nav className="workspace-mobile-nav" aria-label={w("Mobile workspace")}>
-          {mobilePrimary.map((item) => renderNavLink(item))}
-          {mobileMore.length > 0 && <Button variant="quiet" className="mobile-nav-more" onClick={(event) => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}>
-            <MoreHorizontal size={20} /><span>{w("More")}</span>
-          </Button>}
-        </nav>
-        <div className="sidebar-bottom">
-          <TranslationNote />
-        </div>
-      </aside>
-      <div className="workspace-body">
-        <DemoBar />
-        <header className="workspace-header">
-          <span>
-            {kind === "admin"
-              ? "Administration"
-              : kind === "clinic"
-                ? w("Clinic workspace")
-                : session?.profile?.display_name}
-          </span>
-          <LanguageSelect />
-          <AccountMenu accountPath={"/"+kind+"/account"} onSignout={()=>void signout()} busy={signoutBusy}/>
-        </header>
-
-        {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
-
-        <main className="workspace-main" id="main-content">
-          <Outlet />
-        </main>
-      </div>
-      {mobileMore.length > 0 && <Dialog open={moreOpen} onOpenChange={(open) => {
-        setMoreOpen(open);
-        if (!open) window.requestAnimationFrame(() => moreTrigger.current?.focus());
-      }} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer>
-        {groupedMore}
-      </Dialog>}
-    </div>
-  );
 }

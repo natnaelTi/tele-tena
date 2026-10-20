@@ -1,0 +1,18 @@
+/* Final shared visual pass. Operational layouts and call-room CSS stay authoritative. */
+.site-masthead{position:sticky;top:0;z-index:45;min-height:84px;padding:18px 48px;display:flex;align-items:center;gap:24px;border-bottom:1px solid #dce8ed;background:#ffffffed;backdrop-filter:blur(18px);box-shadow:0 8px 30px #145d7a06}
+.site-masthead>.brand{flex-shrink:0;align-items:center}.site-masthead>.brand img{width:40px;height:40px;border-radius:9px}.site-masthead .bilingual-wordmark{display:grid;gap:3px;line-height:1.06;min-width:0}.site-masthead .bilingual-wordmark>span{display:block;text-align:left;text-align-last:left}.site-masthead .bilingual-wordmark>[lang=am]{font-family:'Noto Sans Ethiopic',sans-serif;font-size:.66em;letter-spacing:0}
+.site-masthead>.product-desktop-nav,.site-masthead>nav{margin-left:auto;justify-content:flex-end;align-items:center}.site-masthead>.language-select{margin-left:auto}.site-masthead .product-user{flex-shrink:0;gap:12px}.site-masthead .product-desktop-nav a{color:var(--muted);border-radius:10px;padding-inline:6px;transition:background-color .18s,color .18s}.site-masthead .product-desktop-nav a.active{color:var(--brand);background:#eaf4f8}.site-masthead .product-desktop-nav a:hover{color:var(--brand);background:#f1f7fa}
+.auth-layout .site-masthead{max-width:none;margin:0;padding-inline:max(40px,calc((100vw - 1240px)/2))}
+.reference-workspace{background:linear-gradient(180deg,#f4f9fc 0,#fff 620px)}
+.reference-workspace-main{min-width:0}.reference-workspace-main>*{min-width:0}.reference-workspace-main .page-title h1{color:#123e52;letter-spacing:-.04em}.reference-workspace-main .page-title p{line-height:1.7}
+:where(.reference-workspace) .card{border-radius:20px;border-color:#dbe8ed;box-shadow:0 7px 28px #145d7a04}
+:where(.reference-workspace) :is(.settings-section,.patient-dashboard-panel){border-color:#dbe8ed;box-shadow:0 5px 22px #145d7a04}
+:where(.reference-workspace,.auth-layout) .button:where(:not(.secondary,.quiet,.danger)){background:var(--brand);border-color:var(--brand);color:#fff}
+:where(.reference-workspace,.auth-layout) .button:where(:not(.secondary,.quiet,.danger)):hover{background:#104a62}
+:where(.reference-workspace) th{background:#edf5f8;font-weight:650}:where(.reference-workspace) .table-scroll{max-width:100%;overflow-x:auto}
+:where(.reference-workspace,.auth-layout) :is(input,select,textarea):focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+:where(.reference-workspace) .empty-state{border-color:#d6e6ec;background:linear-gradient(135deg,#f3f8fb,#fff)}
+@media(max-width:1100px){.site-masthead{gap:16px;padding-inline:28px}.site-masthead .product-user{gap:8px}}
+@media(max-width:800px){.site-masthead{padding:14px 20px;gap:12px;min-height:76px}.site-masthead .product-user{margin-left:auto;gap:6px}.auth-layout .site-masthead{padding-inline:20px}.reference-workspace-main{padding-bottom:110px}.site-masthead .product-desktop-nav{display:none}}
+@media(max-width:420px){.site-masthead{flex-wrap:wrap;gap:8px;padding-inline:16px}.site-masthead>.brand{font-size:22px;gap:8px}.site-masthead>.brand img{width:34px;height:34px}.site-masthead .product-user{gap:4px}.auth-layout .site-masthead{flex-wrap:nowrap}.reference-workspace-main .page-title{gap:16px}.reference-workspace-main .page-title h1{font-size:30px}}
+@media(prefers-reduced-motion:reduce){.site-masthead .product-desktop-nav a{transition:none}}
