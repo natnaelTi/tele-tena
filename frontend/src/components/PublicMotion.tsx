@@ -4,6 +4,7 @@ import {Stethoscope} from 'lucide-react';
 
 /** A decorative, bounded transition. Never intercepts input or waits on an API. */
 export function PublicMotion(){
+ const [motion]=useDecorativeMotion();
  const {pathname}=useLocation(),first=useRef(true),[phase,setPhase]=useState<'intro'|'route'|null>('intro');
  const target=useRef<HTMLDivElement>(null);
  useEffect(()=>{
@@ -15,7 +16,7 @@ export function PublicMotion(){
   const timer=window.setTimeout(()=>{clearInterval(tracking);setPhase(null);},intro?800:420);
   return()=>{cancelAnimationFrame(frame);clearTimeout(timer);clearInterval(tracking);};
  },[pathname]);
- return phase?<div className={'public-transition '+phase} aria-hidden="true" ref={target}><div className="transition-mark"><Stethoscope size={68} strokeWidth={1.6}/></div></div>:null;
+ return phase&&motion?<div className={'public-transition '+phase} aria-hidden="true" ref={target}><div className="transition-mark"><Stethoscope size={68} strokeWidth={1.6}/></div></div>:null;
 }
 
 /** Progressive enhancement: content is visible even if observation fails. */
@@ -28,4 +29,12 @@ export function usePublicReveals(key:string){
   elements.forEach(el=>{el.classList.add('motion-section');observer.observe(el);});
   return()=>{observer.disconnect();elements.forEach(el=>el.classList.remove('motion-section','is-in-view'));};
  },[key]);
+}
+
+// In-memory, non-sensitive UI preference shared with Help & Tours.
+let decorativeMotion=true;
+export function useDecorativeMotion():[boolean,(value:boolean)=>void]{
+ const [enabled,setEnabled]=useState(decorativeMotion);
+ useEffect(()=>{const update=()=>setEnabled(decorativeMotion);window.addEventListener('teletena-decorative-motion',update);return()=>window.removeEventListener('teletena-decorative-motion',update);},[]);
+ return [enabled,(value:boolean)=>{decorativeMotion=value;document.documentElement.dataset.teletenaMotion=value?'on':'off';window.dispatchEvent(new Event('teletena-decorative-motion'));}];
 }
