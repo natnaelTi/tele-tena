@@ -16399,6 +16399,41 @@
       "before": "docs/screenshots/hero-correction/before/",
       "after": "docs/screenshots/hero-correction/after/",
       "preservation": "No backend/schema/dependency changes; configuration and24 original private files unchanged; no reseed or remote changes"
+    },
+    "current_requested_followup": {
+      "date": "2026-10-20",
+      "scope": "Clinician floor stage and illustrative screen motion; continuous hero waves; cohesive supporting sections; left-aligned wordmark; shared language picker; smooth nav conceal; realistic tour; clinician application guide",
+      "status": "Implementation in progress",
+      "routes": [
+        {
+          "route": "/ and /for-clinicians",
+          "states": "Staged clinician scene, phone/hologram activity, motion on/off, waves, language, brand, reveal/retract navigation and supporting sections",
+          "reference": "Owner20October2026 written follow-up plus local annotated hero correction",
+          "functional": "Implementation in progress",
+          "visual": "Implemented but unverified"
+        },
+        {
+          "route": "/how-it-works#clinician-application",
+          "states": "Guided professional application questions, distinct general/scope approval, private evidence and correction/resubmission",
+          "reference": "Existing guided vetting workflow and current owner direction",
+          "functional": "Implementation in progress",
+          "visual": "Implemented but unverified"
+        },
+        {
+          "route": "/how-it-works#product-tour",
+          "states": "Patient/clinician tour with coherent illustrative names, portraits and content",
+          "reference": "Current public learning-tour layout, owner20October2026 copy correction",
+          "functional": "Implementation in progress",
+          "visual": "Implemented but unverified"
+        },
+        {
+          "route": "All public/authenticated navigation and /policies",
+          "states": "Styled native language selector, policy label without review-environment suffix; legal draft status stays truthful in policy content",
+          "reference": "Existing shared dropdown tokens and current owner direction",
+          "functional": "Implementation in progress",
+          "visual": "Implemented but unverified"
+        }
+      ]
     }
   }
 }

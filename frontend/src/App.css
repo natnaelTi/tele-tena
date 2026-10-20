@@ -1989,14 +1989,20 @@ button { color: inherit; background: transparent; }
 @media(prefers-reduced-motion:reduce){.field select{transition:none}}
 /* Progressive native picker styling: unsupported browsers keep native controls. */
 @supports (appearance:base-select){
- .field select:not([multiple]):not([size]),.field select:not([multiple]):not([size])::picker(select){appearance:base-select}
- .field select:not([multiple]):not([size])::picker-icon{display:none}
- .field select:not([multiple]):not([size])::picker(select){background:var(--surface-card,#fff);border:1px solid var(--border-default,#dfe7e9);border-radius:14px;padding:6px;box-shadow:0 12px 32px #102a3324;max-height:min(320px,60dvh);overflow:auto;margin-block:6px;position-try-fallbacks:flip-block}
- .field select:not([multiple]):not([size]) option{min-height:44px;padding:10px 12px;border-radius:9px;font:inherit;white-space:normal;cursor:pointer;display:flex;align-items:center;gap:12px}
- .field select:not([multiple]):not([size]) option:is(:hover,:focus){background:var(--surface-subtle,#eaf5f5);color:var(--text-primary,#102a33);outline:2px solid var(--brand-primary,#145d7a);outline-offset:-2px}
- .field select:not([multiple]):not([size]) option:checked{background:var(--surface-subtle,#eaf5f5);color:var(--brand-primary,#145d7a);font-weight:650}
- .field select:not([multiple]):not([size]) option:disabled{color:var(--text-secondary,#52636a);cursor:not-allowed}
+ :is(.field select,.language-select):not([multiple]):not([size]),:is(.field select,.language-select):not([multiple]):not([size])::picker(select){appearance:base-select}
+ :is(.field select,.language-select):not([multiple]):not([size])::picker-icon{display:none}
+ :is(.field select,.language-select):not([multiple]):not([size])::picker(select){background:var(--surface-card,#fff);border:1px solid var(--border-default,#dfe7e9);border-radius:14px;padding:6px;box-shadow:0 12px 32px #102a3324;max-height:min(320px,60dvh);overflow:auto;margin-block:6px;position-try-fallbacks:flip-block}
+ :is(.field select,.language-select):not([multiple]):not([size]) option{min-height:44px;padding:10px 12px;border-radius:9px;font:inherit;white-space:normal;cursor:pointer;display:flex;align-items:center;gap:12px}
+ :is(.field select,.language-select):not([multiple]):not([size]) option:is(:hover,:focus){background:var(--surface-subtle,#eaf5f5);color:var(--text-primary,#102a33);outline:2px solid var(--brand-primary,#145d7a);outline-offset:-2px}
+ :is(.field select,.language-select):not([multiple]):not([size]) option:checked{background:var(--surface-subtle,#eaf5f5);color:var(--brand-primary,#145d7a);font-weight:650}
+ :is(.field select,.language-select):not([multiple]):not([size]) option:disabled{color:var(--text-secondary,#52636a);cursor:not-allowed}
 }
 /* Approved Title Case presentation for headings; body/clinical content stays verbatim. */
 :is(h1,h2,h3,h4,h5,h6,summary),.page-title>div>p,.eyebrow,.workspace-label{text-transform:capitalize}
 .booking-notifications{border:1px solid var(--border-default);border-radius:16px;background:var(--surface-card,#fff);padding:12px 16px;margin:16px 0}.booking-notifications>summary{cursor:pointer;min-height:44px;align-content:center;font-weight:650}.booking-notifications>ul{padding-inline-start:20px}.booking-notifications li{margin-block:10px}.booking-notifications a{display:inline-block;padding-block:6px}
+
+/* Same accessible native picker treatment in every role's navigation. */
+.language-select{appearance:none;border:1px solid var(--border,#dfe7e9);border-radius:12px;min-height:44px;padding:8px 36px 8px 12px;cursor:pointer;color:var(--ink);background-color:var(--surface-card,#fff);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23445f60' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .15s,box-shadow .15s}
+.language-select:hover{border-color:var(--brand)}.language-select:focus-visible{outline:2px solid var(--brand);outline-offset:3px}.language-select option{color:var(--ink);background:#fff}
+@supports(appearance:base-select){.language-select,.language-select::picker(select){appearance:base-select}}
+@media(prefers-reduced-motion:reduce){.language-select{transition:none}}
