@@ -3,6 +3,8 @@ export const publicExperienceTranslations:Record<string,[string,string]>={
 'That service is no longer published. Choose another service.':['ያ አገልግሎት አሁን አልታተመም። ሌላ አገልግሎት ይምረጡ።','Tajaajilli sun amma hin maxxanfamne. Tajaajila biraa filadhaa.'],
 'Navigation':['መዳረሻ','Qajeelcha'],
 'Recurring hours, date exceptions and booking rules that fit your practice.':['ለሙያዎ የሚስማሙ ተደጋጋሚ ሰዓቶች፣ የቀን ልዩነቶችና የቦታ ማስያዣ ደንቦች።','Sa’aatii deddeebi’u, guyyoota addaa fi seera beellamaa hojii keessaniif mijatan.'],
+'Adults 18+ · Not an emergency service.':['ለ18 ዓመት እና ከዚያ በላይ · የአስቸኳይ ጊዜ አገልግሎት አይደለም።','Ga’eessota18+ · Tajaajila hatattamaa miti.'],
+'Individual counseling':['የግለሰብ ምክር','Gorsa dhuunfaa'],
 'Find Care':['እንክብካቤ ያግኙ','Kunuunsa Argadhaa'],
 'For Clinicians':['ለባለሙያዎች','Ogeessotaaf'],
 'Find Care That Fits You.':['ለእርስዎ የሚስማማ እንክብካቤ ያግኙ።','Kunuunsa Isiniif Ta’u Argadhaa.'],
