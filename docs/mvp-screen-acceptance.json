@@ -15444,7 +15444,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/public-atmosphere-verification.md",
-  "current_packaged_source": "151d178eb8dc7fb21a1fabdb71a6341f1f2faf73",
+  "current_packaged_source": "f679e6ce8a1a8169b9bba16626a2880e5e212a75",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15456,8 +15456,8 @@
     "site": "teletena-mvp-presentation.localhost",
     "bench": "/home/frappe/frappe/frappe-bench",
     "branch": "feat/public-experience",
-    "build_source": "151d178eb8dc7fb21a1fabdb71a6341f1f2faf73",
-    "packaged_source": "151d178eb8dc7fb21a1fabdb71a6341f1f2faf73",
+    "build_source": "f679e6ce8a1a8169b9bba16626a2880e5e212a75",
+    "packaged_source": "f679e6ce8a1a8169b9bba16626a2880e5e212a75",
     "date": "2026-10-20",
     "report": "docs/public-atmosphere-verification.md",
     "note": "Public redesign overlay. Prior private/backend release evidence remains guest-first-release-readiness.md. Compatibility Bench is separate; evidence-only commits differ from runtime pin."
@@ -16444,7 +16444,7 @@
       "screenshots": "docs/screenshots/public-stage-v3/"
     },
     "final_polish": {
-      "status": "Implementation in progress",
+      "status": "Locally verified; awaiting owner acceptance",
       "scope": "Owner stage-correction geometry; consistent visible role navigation; bounded shared surface/spacing retouch and responsive review",
       "reference": "/home/frappe/teletena-design-reference/stage-correction.png (kept outside Git) plus approved existing product compositions",
       "routes": [
@@ -16454,8 +16454,13 @@
         "Reviewer overview/applications/scopes/vetting/catalog/clinics/matching/disputes/account and Medical Lead rubric",
         "Existing focused call layout retained with its functional header"
       ],
-      "functional": "Implemented but unverified",
-      "visual": "Implemented but unverified"
+      "functional": "Functionally verified for navigation, real-backend intent returns, keyboard menus, language controls and sign-out; route rendering does not replace prior workflow evidence",
+      "visual": "Visually inspected by Codex against owner stage annotation and before/after route compositions; awaiting owner acceptance",
+      "packaged_source": "f679e6ce8a1a8169b9bba16626a2880e5e212a75",
+      "evidence": "docs/public-atmosphere-verification.md#final-stage-and-shared-layout-pass--20-october-2026",
+      "route_survey": "docs/screenshots/final-polish/after/route-survey.json",
+      "screenshots": "docs/screenshots/final-polish/",
+      "limits": "Existing focused call composition retained; no fresh claim of hosted calls, physical devices, live delivery, native translation or full financial acceptance from this CSS pass"
     }
   }
 }

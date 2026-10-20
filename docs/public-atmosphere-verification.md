@@ -1,3 +1,89 @@
+# Final Stage and Shared Layout Pass — 20 October 2026
+
+This is the current bounded follow-up. Earlier sections below are historical;
+their source pins must not be confused with the build now served.
+
+- Preview: <http://127.0.0.1:8017/teletena/>. Site
+  `teletena-mvp-presentation.localhost`, Bench `/home/frappe/frappe/frappe-bench`.
+- Branch `feat/public-experience`, draft [PR48](https://github.com/natnaelTi/tele-tena/pull/48),
+  dependent on draft PR47 (`feat/guest-first-mvp`). Earlier ancestry preserved.
+- **Packaged runtime f679e6ce8a1a8169b9bba16626a2880e5e212a75**. Subsequent evidence-only commits do not change runtime.
+  Frappe15.121.2, ERPNext15.121.6, Python3.12.3; build Node24.13.0.
+  The separate Frappe16 compatibility Bench is not the preview and was untouched.
+-49 HTTP-served artifact hashes match `release.json`. JS
+  `assets/index-r5bd3fIg.js` SHA256
+  `ed3cb437f489aa1488cfc6a7cb88c889aac099a82f6449eec18aa65037dfd0cb`;
+  CSS hash is recorded in [release identity](screenshots/final-polish/release.json).
+- Scoped local web, Redis, worker and scheduler remained running. No restart,
+  migration, seed, provider/access switch, framework or shared dependency change.
+
+## Concrete Visual Corrections
+
+The owner annotation `/home/frappe/teletena-design-reference/stage-correction.png`
+was opened and visually inspected; it remains outside the repository. Green
+marks require the complete projecting wooden corner; yellow marks require the
+rug to continue to its own complete corner. These supersede the earlier cropped
+stage images, while the accepted composition and hero colors remain.
+
+| Requirement | Implemented / visually inspected | Paired evidence |
+|---|---|---|
+| Full patient stage | Complete V-shaped wood fascia and rug corner, transparent margin; no mask or clipped foreground. Desktop scene keeps its scale and bleeds over the wave boundary. | [Before](screenshots/public-stage-v3/patient-1440.png) / [after](screenshots/final-polish/hero/patient-1440.png) |
+| Full clinician stage | Complete floor/rug and transparent surroundings. Phone/hologram SVG motion remapped to the new asset; no new live media. | [Before](screenshots/public-stage-v3/clinician-1440.png) / [after](screenshots/final-polish/hero/clinician-1440.png); [detail](screenshots/final-polish/scene-detail.png) |
+| Shared role navigation | Logo left, bilingual wordmark left-aligned, role links/account/language/notifications right. Header visible on ordinary routes. Patient/clinician/reviewer/Medical Lead use the same masthead and mobile More navigation. Only homepage hero retains initial conceal. | [Patient before](screenshots/final-polish/before/patient-patient-account-1440.png) / [after](screenshots/final-polish/after/patient-patient-account-1440.png); [reviewer before](screenshots/final-polish/before/reviewer-admin-applications-1440.png) / [after](screenshots/final-polish/after/reviewer-admin-applications-1440.png) |
+| Cohesive surfaces | Blue-gray canvas, blue heading hierarchy, subtle borders/shadows, consistent cards, readable controls and focus. Low-specificity shared rules retain page-specific wallet, calendar and call patterns. | [Services](screenshots/final-polish/after/counselor-clinician-services-768.png), [earnings](screenshots/final-polish/after/counselor-clinician-earnings-1440.png), [review queue](screenshots/final-polish/after/reviewer-admin-vetting-1440.png) |
+| Mobile directory | Removed duplicate workspace gutters, full-width request action, one disclosure arrow. Initial final-pass render still constrained the action to35%; computed-style inspection found the inherited max-width and corrected it. | [Before](screenshots/final-polish/before/patient-patient-discovery-390.png) / [after](screenshots/final-polish/after/patient-patient-discovery-390.png) |
+| Responsive content | All46 route/actor views rendered at390/768/1440. Entire mobile survey inspected; key desktop/tablet compositions and full-page hero images inspected. Actual200% browser zoom tested independently. Tables and tabs retain intentional accessible scrolling rather than clipping content. | [Route-by-route evidence](screenshots/final-polish/after/route-survey.json); [availability390](screenshots/final-polish/after/counselor-clinician-availability-390.png); [patient requests390](screenshots/final-polish/after/patient-patient-requests-390.png) |
+
+The original task images touched the canvas bottom and were rejected. Final RGBA
+assets have real transparent space below their lowest corners. At1440/1920 the
+complete floor may extend beyond the hero; on mobile the image fits available
+width. No page overflow is hidden to obtain a pass. The reference annotation is
+composition guidance, not an automated universal pixel-match claim.
+
+## Focused Functional Results and Provenance
+
+| Check | Result / source |
+|---|---|
+| Production build | Pass on f679e6ce8a1a8169b9bba16626a2880e5e212a75; clean runtime checkout, locked dependencies. Existing large-chunk warning remains. |
+| Route/actor survey | Pass46 actual backend views ×3 widths on f679e6ce8a1a8169b9bba16626a2880e5e212a75. Guest/public/auth; patient, clinician, applicant, reviewer, couples partner; existing patient/clinician consultation details. `/clinician/offers` intentionally redirects to the accepted consolidated Requests workspace. Read-only navigation does not prove every underlying operation. |
+| Hero/state suite | Pass on81085a4f61eeb31052ca0e6bc0aa732f1428986c: both modes390/768/1440/1920; four screen waveforms/five figure layers, no mask, guide accordion, styled language picker, reduced motion, no media/protected writes. Later changes only remove duplicate directory gutters/arrows and widen its mobile action. |
+| Real backend public journeys | Pass on81085a: reactive filters/profile focus, password sign-in→exact selected offering/reload, guest draft→authentication→Requests without publication/storage, clinician application intent, public information/policies, provisional locale/mobile states. No request/booking/finance API changes. |
+| Navigation and sign-out | Pass on81085a: patient/clinician/reviewer home redirects, role menus,390/768/1440 headers, Account/Escape focus and server-session invalidation. Later directory-only styles leave this behavior unchanged. |
+| Language and keyboard | Pass on81085a: real-role native picker1440/390, keyboard open/Escape/focus return; existing locales retained. |
+| Actual200% browser zoom | Pass9 authenticated views on81085a: patient Account/Requests/Appointments; clinician Availability/Requests/Account; reviewer Applications/Vetting/Catalog. Chromium tabs.setZoom(2), inner720/outer1440/DPR2. Public hero/directory/profile/application guide pass on98c7d84; final change only removes private directory action max-width. [Zoom evidence](screenshots/final-polish/zoom/), [public zoom](screenshots/final-polish/zoom-public/). |
+| Lint | Pass; existing warnings only. No new lint errors. |
+| Asset/privacy | Pass on f679e6ce8a1a8169b9bba16626a2880e5e212a75: all49 HTTP-served hashes verified; exact20 private credential values absent from packaged artifacts; no maps/config/environment files. |
+| Preservation | Site configuration and24 original private manifests/provider/key files remain byte-identical. No data reseed/reset, balances/credentials/consent changes or private upload modifications. |
+
+Commands: `scripts/browser-mvp-polish.cjs`, `browser-mvp-polish-zoom.cjs`,
+`browser-public-stage.cjs`, `browser-public-experience.cjs`,
+`browser-role-navigation.cjs`, `browser-private-language.cjs`,
+`browser-public-zoom.cjs`, `scripts/check_review_assets.py`, locked production build
+and frontend lint. Browser scripts use private local manifests, never output passwords.
+[Served identity](screenshots/final-polish/release.json) records the current asset hashes.
+
+No backend/schema/dependency or consultation-core change: inherited financial,
+couples, migration and hosted-call evidence remains in the authoritative MVP
+matrix. Those expensive suites were not repeated for these visual-only changes.
+The active consultation keeps its accepted dark focused header and media-left /
+details-right layout; marketing navigation is not inserted into an active room.
+
+## Reviewer Walkthrough and Remaining Limits
+
+Open the stable preview, compare both hero modes and the complete front stage
+corners. Scroll down/up to exercise homepage nav. Open Directory→View Profile→Sign
+in to Book. Sign in using the existing private account manifest and inspect
+patient/clinician/reviewer header, Account, Requests, calendar, care records and
+review forms; on mobile use More and Escape/backdrop dismissal. Existing credentials
+remain in the site's private `tt-demo-mvp-v2-accounts.json`.
+
+Codex visual inspection is recorded separately from owner acceptance. Owner
+review is pending; no claim of owner approval. Native Amharic/Afaan Oromo review,
+physical-device calls and live SMS/email delivery remain external validation;
+this styling pass does not change or newly verify them. No remote deploy or merge.
+
+---
+
 # Clinician Stage, Public Composition and Application Guide —20October2026
 
 This is the current follow-up to the owner-reviewed hero correction below. The
