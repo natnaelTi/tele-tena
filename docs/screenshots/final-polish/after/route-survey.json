@@ -1,0 +1,729 @@
+{
+  "phase": "after",
+  "source": "f679e6ce8a1a8169b9bba16626a2880e5e212a75",
+  "checks": [
+    {
+      "role": "guest",
+      "route": "/",
+      "actual": "/",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "guest-home-1440.png",
+        "guest-home-768.png",
+        "guest-home-390.png"
+      ],
+      "expected": "/"
+    },
+    {
+      "role": "guest",
+      "route": "/for-clinicians",
+      "actual": "/for-clinicians",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "guest-for-clinicians-1440.png",
+        "guest-for-clinicians-768.png",
+        "guest-for-clinicians-390.png"
+      ],
+      "expected": "/for-clinicians"
+    },
+    {
+      "role": "guest",
+      "route": "/care",
+      "actual": "/care",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "guest-care-1440.png",
+        "guest-care-768.png",
+        "guest-care-390.png"
+      ],
+      "expected": "/care"
+    },
+    {
+      "role": "guest",
+      "route": "/request",
+      "actual": "/request",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "guest-request-1440.png",
+        "guest-request-768.png",
+        "guest-request-390.png"
+      ],
+      "expected": "/request"
+    },
+    {
+      "role": "guest",
+      "route": "/contact",
+      "actual": "/contact",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "guest-contact-1440.png",
+        "guest-contact-768.png",
+        "guest-contact-390.png"
+      ],
+      "expected": "/contact"
+    },
+    {
+      "role": "guest",
+      "route": "/how-it-works",
+      "actual": "/how-it-works",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "guest-how-it-works-1440.png",
+        "guest-how-it-works-768.png",
+        "guest-how-it-works-390.png"
+      ],
+      "expected": "/how-it-works"
+    },
+    {
+      "role": "guest",
+      "route": "/policies",
+      "actual": "/policies",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "guest-policies-1440.png",
+        "guest-policies-768.png",
+        "guest-policies-390.png"
+      ],
+      "expected": "/policies"
+    },
+    {
+      "role": "guest",
+      "route": "/sign-in",
+      "actual": "/sign-in",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "guest-sign-in-1440.png",
+        "guest-sign-in-768.png",
+        "guest-sign-in-390.png"
+      ],
+      "expected": "/sign-in"
+    },
+    {
+      "role": "patient",
+      "route": "/patient",
+      "actual": "/patient",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "patient-patient-1440.png",
+        "patient-patient-768.png",
+        "patient-patient-390.png"
+      ],
+      "expected": "/patient"
+    },
+    {
+      "role": "patient",
+      "route": "/patient/discovery",
+      "actual": "/patient/discovery",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "patient-patient-discovery-1440.png",
+        "patient-patient-discovery-768.png",
+        "patient-patient-discovery-390.png"
+      ],
+      "expected": "/patient/discovery"
+    },
+    {
+      "role": "patient",
+      "route": "/patient/requests",
+      "actual": "/patient/requests",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "patient-patient-requests-1440.png",
+        "patient-patient-requests-768.png",
+        "patient-patient-requests-390.png"
+      ],
+      "expected": "/patient/requests"
+    },
+    {
+      "role": "patient",
+      "route": "/patient/appointments",
+      "actual": "/patient/appointments",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "patient-patient-appointments-1440.png",
+        "patient-patient-appointments-768.png",
+        "patient-patient-appointments-390.png"
+      ],
+      "expected": "/patient/appointments"
+    },
+    {
+      "role": "patient",
+      "route": "/patient/account",
+      "actual": "/patient/account",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "patient-patient-account-1440.png",
+        "patient-patient-account-768.png",
+        "patient-patient-account-390.png"
+      ],
+      "expected": "/patient/account"
+    },
+    {
+      "role": "patient",
+      "route": "/patient/payments",
+      "actual": "/patient/payments",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "patient-patient-payments-1440.png",
+        "patient-patient-payments-768.png",
+        "patient-patient-payments-390.png"
+      ],
+      "expected": "/patient/payments"
+    },
+    {
+      "role": "patient",
+      "route": "/patient/couples",
+      "actual": "/patient/couples",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "patient-patient-couples-1440.png",
+        "patient-patient-couples-768.png",
+        "patient-patient-couples-390.png"
+      ],
+      "expected": "/patient/couples"
+    },
+    {
+      "role": "patient",
+      "route": "/patient/relationships",
+      "actual": "/patient/relationships",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "patient-patient-relationships-1440.png",
+        "patient-patient-relationships-768.png",
+        "patient-patient-relationships-390.png"
+      ],
+      "expected": "/patient/relationships"
+    },
+    {
+      "role": "patient",
+      "route": "/patient/clinic-access",
+      "actual": "/patient/clinic-access",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "patient-patient-clinic-access-1440.png",
+        "patient-patient-clinic-access-768.png",
+        "patient-patient-clinic-access-390.png"
+      ],
+      "expected": "/patient/clinic-access"
+    },
+    {
+      "role": "patient",
+      "route": "consultation detail (existing opaque appointment)",
+      "widths": [
+        1440,
+        768,
+        390
+      ]
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician",
+      "actual": "/clinician",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-1440.png",
+        "counselor-clinician-768.png",
+        "counselor-clinician-390.png"
+      ],
+      "expected": "/clinician"
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician/services",
+      "actual": "/clinician/services",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-services-1440.png",
+        "counselor-clinician-services-768.png",
+        "counselor-clinician-services-390.png"
+      ],
+      "expected": "/clinician/services"
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician/availability",
+      "actual": "/clinician/availability",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-availability-1440.png",
+        "counselor-clinician-availability-768.png",
+        "counselor-clinician-availability-390.png"
+      ],
+      "expected": "/clinician/availability"
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician/requests",
+      "actual": "/clinician/requests",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-requests-1440.png",
+        "counselor-clinician-requests-768.png",
+        "counselor-clinician-requests-390.png"
+      ],
+      "expected": "/clinician/requests"
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician/offers",
+      "actual": "/clinician/requests",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-offers-1440.png",
+        "counselor-clinician-offers-768.png",
+        "counselor-clinician-offers-390.png"
+      ],
+      "expected": "/clinician/requests"
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician/appointments",
+      "actual": "/clinician/appointments",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-appointments-1440.png",
+        "counselor-clinician-appointments-768.png",
+        "counselor-clinician-appointments-390.png"
+      ],
+      "expected": "/clinician/appointments"
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician/care",
+      "actual": "/clinician/care",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-care-1440.png",
+        "counselor-clinician-care-768.png",
+        "counselor-clinician-care-390.png"
+      ],
+      "expected": "/clinician/care"
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician/account",
+      "actual": "/clinician/account",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-account-1440.png",
+        "counselor-clinician-account-768.png",
+        "counselor-clinician-account-390.png"
+      ],
+      "expected": "/clinician/account"
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician/earnings",
+      "actual": "/clinician/earnings",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-earnings-1440.png",
+        "counselor-clinician-earnings-768.png",
+        "counselor-clinician-earnings-390.png"
+      ],
+      "expected": "/clinician/earnings"
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician/vetting",
+      "actual": "/clinician/vetting",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-vetting-1440.png",
+        "counselor-clinician-vetting-768.png",
+        "counselor-clinician-vetting-390.png"
+      ],
+      "expected": "/clinician/vetting"
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician/affiliations",
+      "actual": "/clinician/affiliations",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-affiliations-1440.png",
+        "counselor-clinician-affiliations-768.png",
+        "counselor-clinician-affiliations-390.png"
+      ],
+      "expected": "/clinician/affiliations"
+    },
+    {
+      "role": "counselor",
+      "route": "/clinician/clinic-access",
+      "actual": "/clinician/clinic-access",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "counselor-clinician-clinic-access-1440.png",
+        "counselor-clinician-clinic-access-768.png",
+        "counselor-clinician-clinic-access-390.png"
+      ],
+      "expected": "/clinician/clinic-access"
+    },
+    {
+      "role": "counselor",
+      "route": "consultation detail (existing opaque appointment)",
+      "widths": [
+        1440,
+        768,
+        390
+      ]
+    },
+    {
+      "role": "applicant",
+      "route": "/clinician",
+      "actual": "/clinician",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "applicant-clinician-1440.png",
+        "applicant-clinician-768.png",
+        "applicant-clinician-390.png"
+      ],
+      "expected": "/clinician"
+    },
+    {
+      "role": "applicant",
+      "route": "/clinician/vetting",
+      "actual": "/clinician/vetting",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "applicant-clinician-vetting-1440.png",
+        "applicant-clinician-vetting-768.png",
+        "applicant-clinician-vetting-390.png"
+      ],
+      "expected": "/clinician/vetting"
+    },
+    {
+      "role": "applicant",
+      "route": "/clinician/account",
+      "actual": "/clinician/account",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "applicant-clinician-account-1440.png",
+        "applicant-clinician-account-768.png",
+        "applicant-clinician-account-390.png"
+      ],
+      "expected": "/clinician/account"
+    },
+    {
+      "role": "reviewer",
+      "route": "/admin",
+      "actual": "/admin",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "reviewer-admin-1440.png",
+        "reviewer-admin-768.png",
+        "reviewer-admin-390.png"
+      ],
+      "expected": "/admin"
+    },
+    {
+      "role": "reviewer",
+      "route": "/admin/applications",
+      "actual": "/admin/applications",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "reviewer-admin-applications-1440.png",
+        "reviewer-admin-applications-768.png",
+        "reviewer-admin-applications-390.png"
+      ],
+      "expected": "/admin/applications"
+    },
+    {
+      "role": "reviewer",
+      "route": "/admin/scopes",
+      "actual": "/admin/scopes",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "reviewer-admin-scopes-1440.png",
+        "reviewer-admin-scopes-768.png",
+        "reviewer-admin-scopes-390.png"
+      ],
+      "expected": "/admin/scopes"
+    },
+    {
+      "role": "reviewer",
+      "route": "/admin/vetting",
+      "actual": "/admin/vetting",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "reviewer-admin-vetting-1440.png",
+        "reviewer-admin-vetting-768.png",
+        "reviewer-admin-vetting-390.png"
+      ],
+      "expected": "/admin/vetting"
+    },
+    {
+      "role": "reviewer",
+      "route": "/admin/services",
+      "actual": "/admin/services",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "reviewer-admin-services-1440.png",
+        "reviewer-admin-services-768.png",
+        "reviewer-admin-services-390.png"
+      ],
+      "expected": "/admin/services"
+    },
+    {
+      "role": "reviewer",
+      "route": "/admin/clinics",
+      "actual": "/admin/clinics",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "reviewer-admin-clinics-1440.png",
+        "reviewer-admin-clinics-768.png",
+        "reviewer-admin-clinics-390.png"
+      ],
+      "expected": "/admin/clinics"
+    },
+    {
+      "role": "reviewer",
+      "route": "/admin/matching",
+      "actual": "/admin/matching",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "reviewer-admin-matching-1440.png",
+        "reviewer-admin-matching-768.png",
+        "reviewer-admin-matching-390.png"
+      ],
+      "expected": "/admin/matching"
+    },
+    {
+      "role": "reviewer",
+      "route": "/admin/financial-disputes",
+      "actual": "/admin/financial-disputes",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "reviewer-admin-financial-disputes-1440.png",
+        "reviewer-admin-financial-disputes-768.png",
+        "reviewer-admin-financial-disputes-390.png"
+      ],
+      "expected": "/admin/financial-disputes"
+    },
+    {
+      "role": "reviewer",
+      "route": "/admin/account",
+      "actual": "/admin/account",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "reviewer-admin-account-1440.png",
+        "reviewer-admin-account-768.png",
+        "reviewer-admin-account-390.png"
+      ],
+      "expected": "/admin/account"
+    },
+    {
+      "role": "reviewer",
+      "route": "/admin/rubrics",
+      "actual": "/admin/rubrics",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "reviewer-admin-rubrics-1440.png",
+        "reviewer-admin-rubrics-768.png",
+        "reviewer-admin-rubrics-390.png"
+      ],
+      "expected": "/admin/rubrics"
+    },
+    {
+      "role": "couple_partner",
+      "route": "/patient/couples",
+      "actual": "/patient/couples",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "couple_partner-patient-couples-1440.png",
+        "couple_partner-patient-couples-768.png",
+        "couple_partner-patient-couples-390.png"
+      ],
+      "expected": "/patient/couples"
+    },
+    {
+      "role": "couple_partner",
+      "route": "/patient/appointments",
+      "actual": "/patient/appointments",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "screenshots": [
+        "couple_partner-patient-appointments-1440.png",
+        "couple_partner-patient-appointments-768.png",
+        "couple_partner-patient-appointments-390.png"
+      ],
+      "expected": "/patient/appointments"
+    }
+  ],
+  "failures": []
+}

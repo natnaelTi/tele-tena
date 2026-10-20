@@ -1,3 +1,4 @@
+import Contact from './pages/Contact';
 import Policies from './pages/Policies';
 import PublicDirectory,{OfferingEntry} from './pages/PublicDirectory';
 import GuestRequest from './pages/GuestRequest';
@@ -51,6 +52,7 @@ import Relationships, { RelationshipInvitationEntry } from "./pages/Relationship
 import FinancialActivityDetail from "./pages/FinancialActivity";
 import PWAUpdateNotice from "./components/PWAUpdateNotice";
 import "./App.css";
+import "./layouts/SitePolish.css";
 export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.PROD ? "/teletena" : "/"}>
@@ -63,6 +65,7 @@ export default function App() {
           <Routes>
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Homepage />} />
+              <Route path="/contact" element={<Contact/>}/>
               <Route path="/policies" element={<Policies/>}/>
               <Route path="/care" element={<PublicDirectory/>}/>
               <Route path="/care/select/:offering" element={<OfferingEntry/>}/>

@@ -15443,8 +15443,8 @@
     },
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
-  "current_verification_report": "docs/automatic-request-availability-verification-2026-10-19.md",
-  "current_packaged_source": "d8f11c8c8b16148c8b68e42320e847a13106c299",
+  "current_verification_report": "docs/public-atmosphere-verification.md",
+  "current_packaged_source": "f679e6ce8a1a8169b9bba16626a2880e5e212a75",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15455,12 +15455,12 @@
     "url": "http://127.0.0.1:8017/teletena/",
     "site": "teletena-mvp-presentation.localhost",
     "bench": "/home/frappe/frappe/frappe-bench",
-    "branch": "feat/mvp-release-handover",
-    "build_source": "bc20f722848a84b7b857284b1599bef0f8b1f451",
-    "date": "2026-10-11",
-    "report": "docs/mvp-journey-verification-2026-10-09.md",
-    "note": "Compatibility Bench is separate and not serving this URL. Evidence/docs-only commits may differ; compare runtime diff before rebuilding.",
-    "packaged_source": "7daf9c084dcf9982cd1ee622b7cf2c0413417a4d"
+    "branch": "feat/public-experience",
+    "build_source": "f679e6ce8a1a8169b9bba16626a2880e5e212a75",
+    "packaged_source": "f679e6ce8a1a8169b9bba16626a2880e5e212a75",
+    "date": "2026-10-20",
+    "report": "docs/public-atmosphere-verification.md",
+    "note": "Public redesign overlay. Prior private/backend release evidence remains guest-first-release-readiness.md. Compatibility Bench is separate; evidence-only commits differ from runtime pin."
   },
   "historical_checkpoints": {
     "before_2026_10_11": {
@@ -16279,6 +16279,188 @@
         "Live delivery/physical devices/native-language review",
         "Owner visual acceptance and approved production policies"
       ]
+    }
+  },
+  "public_experience_revision": {
+    "date": "2026-10-20",
+    "scope": "Owner-approved atmospheric public experience plus reviewer-editable fictional contact and review policy templates; prior public evidence retained.",
+    "branch": "feat/public-experience",
+    "parent_pr": 47,
+    "parent_head": "f534f4ba950969319a5a313f011d4b30ce5129e8",
+    "packaged_source": "151d178eb8dc7fb21a1fabdb71a6341f1f2faf73",
+    "preview": "http://127.0.0.1:8017/teletena/",
+    "route_state_evidence": "docs/public-atmosphere-verification.md",
+    "screenshots": "docs/screenshots/public-stage-v3/",
+    "functional_status": "Functionally verified: real guest returns, three-role navigation, reviewer save/reload/publish and backend authorization/version acceptance. Interactive tour is explicitly local fictional state.",
+    "visual_status": "Current public stage/supporting-section/guide/tour/native-picker comparisons visually inspected by Codex at390/768/1440/1920 and actual200%; awaiting owner acceptance.",
+    "external_dependencies": [
+      "Native Amharic/Afaan Oromo review",
+      "Owner visual acceptance",
+      "Physical-device/assistive-technology review",
+      "Existing production policy approval"
+    ],
+    "preservation": "Additive v1.43 content-only migration; native backup verified;11 protected compatibility tables unchanged across repeat patch; original24 private files/config unchanged. No scenario reseed or financial/provider/access changes.",
+    "previous_preview_metadata": {
+      "url": "http://127.0.0.1:8017/teletena/",
+      "site": "teletena-mvp-presentation.localhost",
+      "bench": "/home/frappe/frappe/frappe-bench",
+      "branch": "feat/mvp-release-handover",
+      "build_source": "bc20f722848a84b7b857284b1599bef0f8b1f451",
+      "date": "2026-10-11",
+      "report": "docs/mvp-journey-verification-2026-10-09.md",
+      "note": "Compatibility Bench is separate and not serving this URL. Evidence/docs-only commits may differ; compare runtime diff before rebuilding.",
+      "packaged_source": "7daf9c084dcf9982cd1ee622b7cf2c0413417a4d"
+    },
+    "routes": [
+      {
+        "route": "/",
+        "actor": "Guest",
+        "state": "Patient/clinician hero, bounded motion, nav threshold, errors,sections",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/care",
+        "actor": "Guest/patient",
+        "state": "Public grouped filters,profile pane,exact booking return",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/care/clinicians/:id",
+        "actor": "Guest/patient",
+        "state": "Existing approved profile/Sign in to Book",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/request",
+        "actor": "Guest/patient",
+        "state": "Volatile draft/authentication return,publication still authenticated",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/for-clinicians",
+        "actor": "Guest",
+        "state": "Clinician mode/application intent",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/how-it-works",
+        "actor": "Guest",
+        "state": "Interactive patient/clinician learning tour;no operational writes",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/contact",
+        "actor": "Guest",
+        "state": "Published fictional/real contact projection,error/retry,safe mock labels",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/policies",
+        "actor": "Guest",
+        "state": "Published public review versions;internal documents denied",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/admin/account",
+        "actor": "Tele Tena Approver",
+        "state": "Contact/policy drafts,publish,history,validation,internal editor",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      }
+    ],
+    "hero_correction": {
+      "reference": "Owner annotation hero-section-correction-direction.png outside repository",
+      "packaged_source": "69f33ae628201fbf2bc7f8c1e91ed9fb09659d2b",
+      "routes": [
+        "/ patient hero",
+        "/ clinician hero",
+        "public Help & Tours motion preference"
+      ],
+      "functional_status": "Functionally verified with focused browser and real-backend intent regressions",
+      "visual_status": "Paired annotated-direction/before/after comparison inspected by Codex; awaiting owner acceptance",
+      "evidence": "docs/public-atmosphere-verification.md",
+      "before": "docs/screenshots/hero-correction/before/",
+      "after": "docs/screenshots/hero-correction/after/",
+      "preservation": "No backend/schema/dependency changes; configuration and24 original private files unchanged; no reseed or remote changes",
+      "status": "Historical; clinician crop superseded by current_requested_followup stage-v3"
+    },
+    "current_requested_followup": {
+      "date": "2026-10-20",
+      "scope": "Clinician floor stage and illustrative screen motion; continuous hero waves; cohesive supporting sections; left-aligned wordmark; shared language picker; smooth nav conceal; realistic tour; clinician application guide",
+      "status": "Locally verified; awaiting owner visual acceptance",
+      "routes": [
+        {
+          "route": "/ and /for-clinicians",
+          "states": "Staged clinician scene, phone/hologram activity, motion on/off, waves, language, brand, reveal/retract navigation and supporting sections",
+          "reference": "Owner20October2026 written follow-up plus local annotated hero correction",
+          "functional": "Functionally verified",
+          "visual": "Visually verified by Codex; awaiting owner acceptance",
+          "evidence": "docs/public-atmosphere-verification.md"
+        },
+        {
+          "route": "/how-it-works#clinician-application",
+          "states": "Guided professional application questions, distinct general/scope approval, private evidence and correction/resubmission",
+          "reference": "Existing guided vetting workflow and current owner direction",
+          "functional": "Functionally verified",
+          "visual": "Visually verified by Codex; awaiting owner acceptance",
+          "evidence": "docs/public-atmosphere-verification.md"
+        },
+        {
+          "route": "/how-it-works#product-tour",
+          "states": "Patient/clinician tour with coherent illustrative names, portraits and content",
+          "reference": "Current public learning-tour layout, owner20October2026 copy correction",
+          "functional": "Functionally verified",
+          "visual": "Visually verified by Codex; awaiting owner acceptance",
+          "evidence": "docs/public-atmosphere-verification.md"
+        },
+        {
+          "route": "All public/authenticated navigation and /policies",
+          "states": "Styled native language selector, policy label without review-environment suffix; legal draft status stays truthful in policy content",
+          "reference": "Existing shared dropdown tokens and current owner direction",
+          "functional": "Functionally verified",
+          "visual": "Visually verified by Codex; awaiting owner acceptance",
+          "evidence": "docs/public-atmosphere-verification.md"
+        }
+      ],
+      "packaged_source": "151d178eb8dc7fb21a1fabdb71a6341f1f2faf73",
+      "evidence": "docs/public-atmosphere-verification.md",
+      "screenshots": "docs/screenshots/public-stage-v3/"
+    },
+    "final_polish": {
+      "status": "Locally verified; awaiting owner acceptance",
+      "scope": "Owner stage-correction geometry; consistent visible role navigation; bounded shared surface/spacing retouch and responsive review",
+      "reference": "/home/frappe/teletena-design-reference/stage-correction.png (kept outside Git) plus approved existing product compositions",
+      "routes": [
+        "Public pages and auth shell",
+        "Patient home/discovery/requests/appointments/account/balance/couples",
+        "Clinician Today/services/availability/requests/offers/appointments/care/account/earnings/vetting/affiliations",
+        "Reviewer overview/applications/scopes/vetting/catalog/clinics/matching/disputes/account and Medical Lead rubric",
+        "Existing focused call layout retained with its functional header"
+      ],
+      "functional": "Functionally verified for navigation, real-backend intent returns, keyboard menus, language controls and sign-out; route rendering does not replace prior workflow evidence",
+      "visual": "Visually inspected by Codex against owner stage annotation and before/after route compositions; awaiting owner acceptance",
+      "packaged_source": "f679e6ce8a1a8169b9bba16626a2880e5e212a75",
+      "evidence": "docs/public-atmosphere-verification.md#final-stage-and-shared-layout-pass--20-october-2026",
+      "route_survey": "docs/screenshots/final-polish/after/route-survey.json",
+      "screenshots": "docs/screenshots/final-polish/",
+      "limits": "Existing focused call composition retained; no fresh claim of hosted calls, physical devices, live delivery, native translation or full financial acceptance from this CSS pass"
     }
   }
 }

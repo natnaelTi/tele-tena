@@ -247,7 +247,7 @@ export const guestFirstTranslations:Record<string,[string,string]>={
  "Choose your next step":["ቀጣዩን እርምጃ ይምረጡ", "Tarkaanfii itti aanu filadhu"],
  "Browse clinicians and services, or post a private request.":["ባለሙያዎችንና አገልግሎቶችን ይመልከቱ፣ ወይም የግል ጥያቄ ይላኩ።", "Ogeessotaa fi tajaajiloota ilaali,yookaan gaaffii dhuunfaa maxxansi."],
  "Current review versions":["አሁን ያሉ የግምገማ ስሪቶች", "Wixineewwan gamaaggamaa ammaa"],
- "Terms & Privacy — review environment":["ውሎችና ግላዊነት — የግምገማ አካባቢ", "Waliigaltee fi iccitii — naannoo gamaaggamaa"],
+ "Terms & Privacy":["ውሎችና ግላዊነት", "Waliigaltee fi iccitii"],
  "Encounter sharing":["ለዚህ ምክክር ማጋራት", "Qoodinsa marii kanaa"],
  "Policy versions could not be loaded. Reload to try again.":["የፖሊሲ ስሪቶች አልተጫኑም። ዳግም ይክፈቱ።", "Wixineewwan imaammataa hin banamne. Haaromsiitii irra deebiʼi."],
  "Approved production policy content is pending review. This page does not claim legal approval or compliance.":["ለእውነተኛ አገልግሎት የፖሊሲ ይዘት ግምገማ ይጠብቃል። ይህ ገጽ ሕጋዊ ፈቃድን አያረጋግጥም።", "Qabiyyeen imaammataa tajaajila dhugaaf gamaaggama eega. Fuulli kun hayyama seeraa hin mirkaneessu."],

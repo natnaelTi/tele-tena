@@ -919,3 +919,53 @@ Native-language approval and live delivery remain external, not claimed.
 - 19 October sharing/presence follow-up: new patient name/text-history defaults on without existing-choice backfill; enabled defaults skip separate publication sharing review and condense acceptance controls. Requests includes shared availability card; manually started intent survives lease/capacity pauses, effective presence still expires without a fresh authenticated heartbeat. Eight backend checks plus two-role real-browser and retained-preview checks pass. See request-sharing-presence-verification-2026-10-19.md. Files remain explicitly selected per encounter; owner/native/live validation separate.
 
 - 20 October release preparation: pinned d8f11c8 package, fresh combined v1.42 + repeat migrations and populated preservation verified on Frappe16. Current registration/private-transport, guest return, notification scheduler and individual/couples/financial checks recorded in guest-first-release-readiness.md. Corrected stale test assumptions without changing product guards. Retained aborted-fixture warning is explicit; original/presentation owner reconciliation passes. Exact existing-Bench update/backup/rollback guide added; no shared repair/reseed/merge/deployment. Owner and external activation checks remain separate.
+
+- 20 October bounded public redesign: explicit Find Care/For Clinicians landing
+  modes from the supplied sketch, tailored steps/FAQ/illustrations, shared public
+  header/footer/directory/profile/help/policy composition. Real selected-offering
+  and guest-request authentication returns, three-role navigation/logout,
+  responsive/actual200%/reduced-motion/failure recovery and asset privacy pass.
+  Concrete async request-catalog and mobile navigation defects fixed. No backend,
+  schema, dependency, seed or remote changes. Current public evidence and paired
+  screenshots: public-experience-acceptance.md; authoritative matrix overlay
+  public_experience_revision. Owner visual/native-language acceptance pending.
+
+- 20 October owner-directed atmosphere/content follow-up: layered pointer-responsive
+  hero, generated room/practice concepts, bounded public transitions, delayed
+  navigation, bilingual public wordmark, interactive learning workspace and Contact.
+  Explicit owner addition: reviewer-managed contact and eight review-only policy/
+  procedure templates, immutable versions/audit, internal visibility and policy
+  acceptance preservation in additive v1.43. Native backup/migration,4 content+
+ 17 guest-first compatibility tests, real reviewer/guest browsers, actual200%,
+  responsive/asset/privacy/PWA recovery checks pass. Evidence and screenshots:
+  public-atmosphere-verification.md; same authoritative matrix overlay. Owner
+  acceptance, full translations and production legal/contact activation remain
+  pending. No merge, remote change, scenario reseed or real-money activation.
+
+- 20 October annotated hero correction: genuine transparent room wall, complete
+  rug/raised stage, foreground plant removed; clinician concept retains its
+  framing with gown/stethoscope on the right armrest and edge blending. Caption
+  moved to hover/focus tooltip; prominent hero motion button removed while
+  accessible memory-only control remains in Help & Tours. Independently varied
+  wave motion respects reduced-motion. Runtime69f33ae; production build/lint,
+  public/browser backend-intent regressions, actual200%,390/768/1440/1920 paired
+  inspection,45 served hashes and private preservation pass. Evidence above in
+  public-atmosphere-verification.md; owner visual acceptance still pending.
+  No backend/schema/dependency/provider/data/remote changes. PR48 remains draft.
+
+- 20 October public-stage follow-up: complete transparent clinician floor stage,
+  TeleTena phone/hologram activity with reduced-motion fallback, uncropped wave
+  boundary, coherent supporting homepage surfaces, left-aligned bilingual wordmark,
+  hero language selector, smooth header retract and shared native navigation pickers.
+  How It Works uses coherent illustrative personas/portraits and a six-part public
+  clinician application guide linked directly from the hero's approval section.
+  Terms & Privacy label shortened; policy draft/version status retained. Runtime
+  151d178; focused real-backend/public/three-role/browser/actual200%/privacy/SW checks
+  pass. Existing matrix updated; paired evidence in public-atmosphere-verification.md.
+  Owner visual and native-language approval remain external. No backend/schema/
+  dependency/settings/seed/provider/finance/remote changes; PR48 stays draft.
+
+
+###20 October2026 — Complete Stage and Shared Layout Pass
+
+Packaged `f679e6ce8a1a8169b9bba16626a2880e5e212a75` on the retained presentation site. Owner stage annotation applied to both assets; shared visible role masthead and subtle reusable surfaces complete. Real-backend46-view responsive survey, intent/navigation/sign-out, native language controls and actual200% zoom evidence recorded in [current public verification](public-atmosphere-verification.md). Single MVP matrix updated; owner visual acceptance remains pending. No backend/schema, reseed, remote deploy or merge.
