@@ -929,3 +929,15 @@ Native-language approval and live delivery remain external, not claimed.
   schema, dependency, seed or remote changes. Current public evidence and paired
   screenshots: public-experience-acceptance.md; authoritative matrix overlay
   public_experience_revision. Owner visual/native-language acceptance pending.
+
+- 20 October owner-directed atmosphere/content follow-up: layered pointer-responsive
+  hero, generated room/practice concepts, bounded public transitions, delayed
+  navigation, bilingual public wordmark, interactive learning workspace and Contact.
+  Explicit owner addition: reviewer-managed contact and eight review-only policy/
+  procedure templates, immutable versions/audit, internal visibility and policy
+  acceptance preservation in additive v1.43. Native backup/migration,4 content+
+ 17 guest-first compatibility tests, real reviewer/guest browsers, actual200%,
+  responsive/asset/privacy/PWA recovery checks pass. Evidence and screenshots:
+  public-atmosphere-verification.md; same authoritative matrix overlay. Owner
+  acceptance, full translations and production legal/contact activation remain
+  pending. No merge, remote change, scenario reseed or real-money activation.

@@ -15443,8 +15443,8 @@
     },
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
-  "current_verification_report": "docs/public-experience-acceptance.md",
-  "current_packaged_source": "2067a34951c0c6f687584526b56104814f902064",
+  "current_verification_report": "docs/public-atmosphere-verification.md",
+  "current_packaged_source": "4e5483b2643c0e329bfd09eb26d1d24b3042d75e",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15456,10 +15456,10 @@
     "site": "teletena-mvp-presentation.localhost",
     "bench": "/home/frappe/frappe/frappe-bench",
     "branch": "feat/public-experience",
-    "build_source": "2067a34951c0c6f687584526b56104814f902064",
-    "packaged_source": "2067a34951c0c6f687584526b56104814f902064",
+    "build_source": "4e5483b2643c0e329bfd09eb26d1d24b3042d75e",
+    "packaged_source": "4e5483b2643c0e329bfd09eb26d1d24b3042d75e",
     "date": "2026-10-20",
-    "report": "docs/public-experience-acceptance.md",
+    "report": "docs/public-atmosphere-verification.md",
     "note": "Public redesign overlay. Prior private/backend release evidence remains guest-first-release-readiness.md. Compatibility Bench is separate; evidence-only commits differ from runtime pin."
   },
   "historical_checkpoints": {
@@ -16283,23 +16283,23 @@
   },
   "public_experience_revision": {
     "date": "2026-10-20",
-    "scope": "Bounded public redesign; user written two-mode brief and external sketch supersede old A01 composition only.",
+    "scope": "Owner-approved atmospheric public experience plus reviewer-editable fictional contact and review policy templates; prior public evidence retained.",
     "branch": "feat/public-experience",
     "parent_pr": 47,
     "parent_head": "f534f4ba950969319a5a313f011d4b30ce5129e8",
-    "packaged_source": "2067a34951c0c6f687584526b56104814f902064",
+    "packaged_source": "4e5483b2643c0e329bfd09eb26d1d24b3042d75e",
     "preview": "http://127.0.0.1:8017/teletena/",
-    "route_state_evidence": "docs/public-experience-acceptance.md",
-    "screenshots": "docs/screenshots/public-experience/",
-    "functional_status": "Functionally verified for changed public routes and real-backend guest authentication returns; prior private-workflow evidence retained.",
-    "visual_status": "Visually verified by Codex at390/768/1440 and actual200%; awaiting owner acceptance.",
+    "route_state_evidence": "docs/public-atmosphere-verification.md",
+    "screenshots": "docs/screenshots/public-atmosphere/",
+    "functional_status": "Functionally verified: real guest returns, three-role navigation, reviewer save/reload/publish and backend authorization/version acceptance. Interactive tour is explicitly local fictional state.",
+    "visual_status": "Visually inspected by Codex at390/768/1440,actual200%,reduced motion and locale samples; awaiting owner acceptance.",
     "external_dependencies": [
       "Native Amharic/Afaan Oromo review",
       "Owner visual acceptance",
       "Physical-device/assistive-technology review",
       "Existing production policy approval"
     ],
-    "preservation": "No backend/schema/dependency/provider/access/seed/financial changes; site configuration and24 private files unchanged.",
+    "preservation": "Additive v1.43 content-only migration; native backup verified;11 protected compatibility tables unchanged across repeat patch; original24 private files/config unchanged. No scenario reseed or financial/provider/access changes.",
     "previous_preview_metadata": {
       "url": "http://127.0.0.1:8017/teletena/",
       "site": "teletena-mvp-presentation.localhost",
@@ -16310,6 +16310,80 @@
       "report": "docs/mvp-journey-verification-2026-10-09.md",
       "note": "Compatibility Bench is separate and not serving this URL. Evidence/docs-only commits may differ; compare runtime diff before rebuilding.",
       "packaged_source": "7daf9c084dcf9982cd1ee622b7cf2c0413417a4d"
-    }
+    },
+    "routes": [
+      {
+        "route": "/",
+        "actor": "Guest",
+        "state": "Patient/clinician hero, bounded motion, nav threshold, errors,sections",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/care",
+        "actor": "Guest/patient",
+        "state": "Public grouped filters,profile pane,exact booking return",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/care/clinicians/:id",
+        "actor": "Guest/patient",
+        "state": "Existing approved profile/Sign in to Book",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/request",
+        "actor": "Guest/patient",
+        "state": "Volatile draft/authentication return,publication still authenticated",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/for-clinicians",
+        "actor": "Guest",
+        "state": "Clinician mode/application intent",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/how-it-works",
+        "actor": "Guest",
+        "state": "Interactive patient/clinician learning tour;no operational writes",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/contact",
+        "actor": "Guest",
+        "state": "Published fictional/real contact projection,error/retry,safe mock labels",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/policies",
+        "actor": "Guest",
+        "state": "Published public review versions;internal documents denied",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      },
+      {
+        "route": "/admin/account",
+        "actor": "Tele Tena Approver",
+        "state": "Contact/policy drafts,publish,history,validation,internal editor",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; awaiting owner acceptance",
+        "evidence": "docs/public-atmosphere-verification.md"
+      }
+    ]
   }
 }

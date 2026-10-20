@@ -1,4 +1,8 @@
-# Public Experience Redesign — 20 October 2026
+# Public Experience Redesign — Historical 2067a34 Checkpoint
+
+Current owner-directed atmospheric/contact/policy work and packaged identity are
+recorded in [public-atmosphere-verification.md](public-atmosphere-verification.md).
+The evidence below is retained for before/after comparison, not the current build.
 
 This is the bounded public overlay of the existing MVP matrix, not a new MVP
 tracker. PR47/f534f4ba950969319a5a313f011d4b30ce5129e8 remains its parent.
