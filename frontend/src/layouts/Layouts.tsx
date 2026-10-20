@@ -59,7 +59,7 @@ export function MedicalLeadLayout(){
 
 export function PublicLayout() {
   const { w } = useLocale();
-  const {session,refresh}=useSession(),navigate=useNavigate();
+  const {session,refresh,error:sessionError}=useSession(),navigate=useNavigate();
   const [signingOut,setSigningOut]=useState(false),[signoutError,setSignoutError]=useState(false);
   const home=destination(session);
   const isReviewer=!!session?.roles.some(role=>['Tele Tena Approver','Tele Tena Medical Lead'].includes(role));
@@ -74,9 +74,9 @@ export function PublicLayout() {
   const publicLinks=[["/care","Find care"],["/how-it-works","How it works"],["/contact","Contact"]];
   const heroRoute=location.pathname==='/'||location.pathname==='/for-clinicians';
   const [headerVisible,setHeaderVisible]=useState(!heroRoute);
-  useEffect(()=>{const update=()=>{const hero=document.querySelector('.public-audience-hero');setHeaderVisible(!heroRoute||!!hero&&scrollY>=hero.getBoundingClientRect().height*.75);};update();window.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);return()=>{window.removeEventListener('scroll',update);window.removeEventListener('resize',update);};},[heroRoute,location.pathname]);
+  useEffect(()=>{const update=()=>{const hero=document.querySelector('.public-audience-hero');setHeaderVisible(!heroRoute||!!sessionError||!!hero&&scrollY>=hero.getBoundingClientRect().height*.75);};update();window.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);return()=>{window.removeEventListener('scroll',update);window.removeEventListener('resize',update);};},[heroRoute,location.pathname,sessionError]);
   return (
-    <div className={`public-experience-shell ${heroRoute?"has-immersive-hero":""}`}>
+    <div className={`public-experience-shell ${heroRoute&&!sessionError?"has-immersive-hero":""}`}>
       <PublicMotion/>
       <DemoBar />
       <header className={`public-header reference-public-header ${informationPage?"reference-information-header":""} ${headerVisible?"is-revealed":"is-concealed"}`} inert={!headerVisible}>
