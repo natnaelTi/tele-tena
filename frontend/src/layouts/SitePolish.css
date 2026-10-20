@@ -21,4 +21,4 @@
    a second disclosure chevron when embedded for signed-in patients. */
 .reference-workspace .public-directory{padding:0;max-width:none}
 :where(.reference-workspace,.workspace) details>summary:has(>.lucide-chevron-down,>.lucide-chevron-right)::after{content:none}
-@media(max-width:700px){:is(.reference-workspace,.public-experience-shell) .public-directory .request-entry{flex-direction:column;align-items:stretch}:is(.reference-workspace,.public-experience-shell) .public-directory .request-entry>.button{width:100%;justify-content:center}}
+@media(max-width:700px){:is(.reference-workspace,.public-experience-shell) .public-directory .request-entry{flex-direction:column;align-items:stretch}:is(.reference-workspace,.public-experience-shell) .public-directory .request-entry>.button{width:100%;max-width:none;justify-content:center}}
