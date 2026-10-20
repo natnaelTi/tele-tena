@@ -157,3 +157,6 @@ def install():
 
     from tele_tena.patches.v1_42_patient_notifications import execute as patient_notifications
     patient_notifications()
+
+    from tele_tena.patches.v1_43_public_content import execute as public_content
+    public_content()
