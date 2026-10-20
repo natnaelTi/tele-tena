@@ -1,3 +1,106 @@
+# Clinician Stage, Public Composition and Application Guide —20October2026
+
+This is the current follow-up to the owner-reviewed hero correction below. The
+preceding crop/feathered clinician image is superseded by the complete stage.
+The single MVP matrix retains the earlier evidence and records this revision.
+
+## Current Preview and Identity
+
+- <http://127.0.0.1:8017/teletena/>; site
+  `teletena-mvp-presentation.localhost`, Bench `/home/frappe/frappe/frappe-bench`.
+  Observed Frappe15.121.2/ERPNext15.121.6/Python3.12.3; Node24.13.0 build.
+- Branch `feat/public-experience`, draft [PR48](https://github.com/natnaelTi/tele-tena/pull/48),
+  still dependent on PR47. No merge/deploy/reseed or environment repair.
+- Exact packaged runtime `151d178eb8dc7fb21a1fabdb71a6341f1f2faf73`.
+  Later test/evidence commits do not change application runtime or assets.
+-47 HTTP-served artifacts match `release.json`; JS `assets/index-C9Cxch6n.js`
+  SHA256 `0ad2335485a6799e1fdb747fa25e070de9da88239fa0df6d8ca7947614db9bbd`;
+  CSS `assets/index-CPhKWpYa.css`
+  `ec4e3491c305639de28b7658282ae8002554cf7c787c9c903fd54074e695d3cd`.
+- Scoped web314550/Redis1999/worker314529/scheduler314544 remain running;
+  HTTP200, production-built Frappe route, no Vite. No service restart/migration.
+
+## Requirement and Visual Comparison
+
+The owner's new written direction supersedes the earlier annotated clinician
+crop. The patient stage remains unchanged. The current two-mode public design,
+shared tokens and accepted private workspaces are preserved.
+
+| Requirement / route | Implemented behavior | Functional / visual evidence |
+| --- | --- | --- |
+| Clinician hero `/for-clinicians` or clinician tab | Genuine transparent left/right walls; clinician, gown/stethoscope, furniture, window and complete rug enclosed by an uncut raised wood stage. No oval crop or whole-scene fading. Phone shows a TeleTena consultation with a faceless patient and media controls. | [Before](screenshots/hero-correction/after/hero-clinician-1440.png) / [after](screenshots/public-stage-v3/clinician-1440.png); also [390](screenshots/public-stage-v3/clinician-390.png), [768](screenshots/public-stage-v3/clinician-768.png), [1920](screenshots/public-stage-v3/clinician-1920.png). Visually inspected by Codex; awaiting owner acceptance. |
+| Illustrative screen activity | Three holograms and phone have screen-aligned audio bars with varied durations/delays; clipped image layers add gentle character motion, including the clinician. SVG coordinates scale with the image, not viewport offsets. No media capture, live audio or real participant activity is claimed. | Four waveform groups,20 bars and5 character layers; actual computed waveform motion checked. Static reduced-motion and Help motion-off inherited; [reduced-motion](screenshots/public-stage-v3/reduced-motion-390.png). |
+| Wave boundary and supporting homepage | Hero no longer clips its wave SVG. White closing layer extends below colored layers to avoid a flat colored strip. Steps, service/benefit surfaces, privacy/approval panel, FAQ and final CTA reuse the blue–teal hierarchy. | [Patient before](screenshots/hero-correction/after/hero-patient-1440.png) / [after](screenshots/public-stage-v3/patient-1440.png). First v3 render exposed a bottom strip; it was rejected and corrected before final screenshots. Natural vertical scrolling retained. |
+| Hero brand/language/nav | Both wordmark lines align left; Amharic words no longer spread apart. Native language selector sits beside Sign In. Header conceals with transform/opacity first and delayed visibility, remaining inert during conceal. | Keyboard locale selection; reveal/retract timing and responsive screenshots pass. Native dropdown styling shared with public/authenticated navigation. |
+| How It Works tour | Coherent illustrative personas Mekdes Abebe/Samuel Tadesse, generated portraits, readable service/time/price/request/call content. One introductory disclosure replaces repeated Example/Fictional labels. Local interactions remain isolated from booking, finance, roles and media. | [Patient](screenshots/public-stage-v3/tour-patient-1440.png) / [clinician](screenshots/public-stage-v3/tour-clinician-1440.png), full tour click-through with zero protected writes. These personas/photos are not public directory or clinical data. |
+| Clinician application questions | Read the Application Questions opens `/how-it-works#clinician-application`, with six keyboard-native accordions: profile, credentials, scopes, affiliations, individual human review and approval-to-publication readiness. Explains private evidence, separate scope decisions, requests for information and resubmission. | [1440](screenshots/public-stage-v3/application-guide-1440.png), [768](screenshots/public-stage-v3/application-guide-768.png), [390](screenshots/public-stage-v3/application-guide-390.png), [actual200%](screenshots/public-stage-v3/application-guide-200-percent.png). Deep link, scroll position, clinician tour intent and keyboard expansion pass. |
+| Shared language picker | Existing native select now reuses the established field-picker radius, chevron, hover/focus, selected option and popup surface. Chromium base-select enhancement; other browsers retain native keyboard controls. No new dropdown dependency. | Real-role sign-in and popup/Escape/focus checks at1440/390: [patient](screenshots/public-stage-v3/language-patient-390.png), [clinician](screenshots/public-stage-v3/language-counselor-390.png), [reviewer](screenshots/public-stage-v3/language-reviewer-1440.png). Locale choices unchanged. |
+| Terms & Privacy | Removed review-environment suffix from link/heading in all current public locations and translations. Policy body/version draft notice remains truthful. | Policy route and public/internal content boundary pass; no policy versions or prior acceptance records changed. |
+
+Paired screenshots were opened and inspected for composition, stage edges, text
+clearance, picker states and responsive wrapping. No universal pixel score or owner
+acceptance is claimed. At tablet/mobile widths the image follows the copy; the
+stage remains fully visible. Actual200% uses browser zoom and scrolling, not CSS
+zoom or clipping. Long text/Amharic/Afaan Oromo layout samples passed, but new guide
+body copy has English fallback and still needs translation/native-language review.
+
+## Actual Checks and Evidence Reuse
+
+- Production TypeScript/Vite build and lint pass; existing warnings/bundle-size
+  advisory remain. No dependency/lockfile/backend/schema changes.
+- Final runtime: `browser-public-stage.cjs` passes both modes390/768/1440/1920,
+  actual image decoding, left brand, hero language keyboard, animated nav retract,
+  waves overflow, screen activity, guide link/keyboard, coherent tour, policy
+  label/draft notice and reduced motion with no media/protected writes.
+- `browser-private-language.cjs` passes real patient/clinician/reviewer sign-in,
+  shared picker appearance, keyboard open/Escape/focus return and no locale change.
+  Initial test selected a detached auth-header control during routing; the test
+  now waits for the actual workspace, without relaxing style/focus assertions.
+- Final actual Chromium200%: both modes, CTA focus, mobile navigation, directory,
+  profile booking action and guide keyboard accordion pass. Screenshot capture
+  waits for the bounded transition to finish so evidence shows usable content.
+- Real-backend `browser-public-experience.cjs` and `browser-role-navigation.cjs`
+  pass on bff32b9 (same application except three wave-path closure coordinates):
+  filters/profile, exact offering return and reload, guest draft→auth→Requests
+  without publication/persistent health text, clinician intent, role redirects,
+  mobile curated navigation and session-invalidating sign-out. These tests were
+  not repeated after the wave-only fix.
+- `browser-public-atmosphere.cjs` passes the full updated tour click-through,
+  Help motion preference, caption focus/Escape, Contact safety and policy boundary.
+- Explicitly injected loading/empty/error/retry tests pass on the final runtime;
+  these verify UI resilience, not real-backend matching behavior.
+- Asset/privacy scan passes:47 artifacts, no source maps/config and exact scan
+  against20 private values. Retained configuration and24 original private
+  manifests/provider/key files remain byte-identical.
+- Public-only SW cache, current built deep links, offline fallback and online
+  recovery pass. Full old-browser→new-build update evidence remains inherited
+  because service-worker/update logic is unchanged.
+- Unchanged finance/couples/LiveKit/OTP/provider/fresh-install suites are inherited,
+  not rerun or claimed as new UI-patch evidence. No outbound notifications or
+  real-money/provider operations occurred.
+
+## Owner Walkthrough and Remaining External Review
+
+1. Open the preview signed out. Try the hero language selector and both modes.
+   Inspect the complete stage, phone and holograms; hover/focus the illustration
+   for its disclosure. Help & Tours can disable decorative motion.
+2. Scroll through the supporting sections, then back up: the navigation should
+   retract smoothly and the wave edge should have no straight colored strip.
+3. In clinician mode, Read the Application Questions opens the dedicated guide.
+   Expand its sections with mouse or keyboard. Apply preserves clinician intent.
+4. Try both How It Works tours: real-looking illustrative personas, schedule,
+   sharing/offer/call states; no real booking or media is created by the tour.
+5. Use existing privately stored review accounts for each role's language menu.
+   The existing profile/booking/Requests journeys and account credentials remain.
+
+Owner visual acceptance remains pending. Native translations, assistive technology
+and physical devices are separate review; no live SMS/email/clinical or real-money
+claims are made. No remote change or merge. [Asset provenance and prompts](public-atmosphere-assets.md).
+
+---
+
+## Historical Hero Composition Checkpoint
+
 # Hero Composition Correction — 20 October 2026
 
 This is the current follow-up in the existing public-experience acceptance matrix.

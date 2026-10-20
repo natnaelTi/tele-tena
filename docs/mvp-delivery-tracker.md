@@ -952,3 +952,15 @@ Native-language approval and live delivery remain external, not claimed.
   inspection,45 served hashes and private preservation pass. Evidence above in
   public-atmosphere-verification.md; owner visual acceptance still pending.
   No backend/schema/dependency/provider/data/remote changes. PR48 remains draft.
+
+- 20 October public-stage follow-up: complete transparent clinician floor stage,
+  TeleTena phone/hologram activity with reduced-motion fallback, uncropped wave
+  boundary, coherent supporting homepage surfaces, left-aligned bilingual wordmark,
+  hero language selector, smooth header retract and shared native navigation pickers.
+  How It Works uses coherent illustrative personas/portraits and a six-part public
+  clinician application guide linked directly from the hero's approval section.
+  Terms & Privacy label shortened; policy draft/version status retained. Runtime
+  151d178; focused real-backend/public/three-role/browser/actual200%/privacy/SW checks
+  pass. Existing matrix updated; paired evidence in public-atmosphere-verification.md.
+  Owner visual and native-language approval remain external. No backend/schema/
+  dependency/settings/seed/provider/finance/remote changes; PR48 stays draft.

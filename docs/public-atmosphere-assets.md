@@ -59,3 +59,37 @@ preservation. CSS feathers only narrow boundaries to blend the existing crop.
 Selected built-in edit prompt (original v1 practice image):
 
 > Minimal precise edit of this ORIGINAL photograph. Preserve the exact framing, crop, scale, camera viewpoint, clinician pose/hair/clothes/phone, every hologram screen and participant, original cabinet and lamp, original right window and plants, and original chair. Do NOT zoom out, do NOT add furniture or a new stage, do NOT replace the scene, do NOT move any existing object. ONLY add a neatly folded/draped white medical gown on the chair's visible right armrest (viewer right, across the visible near/right wooden arm area) with a teal stethoscope laid on the gown. Also extract the opaque plain teal wall at the left/behind the existing objects into transparent alpha, while leaving all objects and the bright right window/city view unchanged. Preserve soft light/shadow halos close to objects on alpha; no broad colored background fill. Existing furniture framing/crop must remain exactly as the original. No text/captions/annotations. Output genuine RGBA transparency where the wall was. Two changes only: wall removal and gown/stethoscope.
+
+## Complete Clinician Stage, v3 —20October2026
+
+Current project asset: `frontend/public/public-experience/connected-practice-stage-v3.webp`.
+SHA256: `1953babd7bc65b492d6cc62a6b4f0d7baa1ba423d0ea8b03d059e0915c53a441`.
+1536×1024 RGBA;503543 fully transparent pixels. Built-in image editing only;
+Pillow was used solely for WebP encoding/alpha inspection, not visual editing.
+The owner explicitly superseded the earlier crop with a complete isolated stage.
+The v2 clinician image was the edit target; the patient stage was a composition
+reference. Source PNG remains outside Git in the generated-images directory.
+No private site image or account photo was used.
+
+Final selected built-in prompt:
+
+> Use case: background-extraction and compositing. Edit target image1 existing TeleTena clinician office; image2 ONLY a reference for a complete isolated wood floor stage. Turn image1 into a photorealistic architectural diorama CUTOUT, all objects fully within a complete raised wood floor platform with visible front/left/right edges, rug fully inside platform, modest transparent margin, NO cut furniture or stage corners. Zoom out enough to see the entire seated clinician chair, legs, cabinet and left bookshelf, lamp/plants, coffee table and right window frame. Keep the same faceless Ethiopian woman clinician in dark teal clothes seen from behind/three-quarter view, curly hair, chair with Ethiopian textile, white gown and teal stethoscope on chair right armrest, phone in right hand. Keep inviting Ethiopian contemporary professional office mood, premium warm wood and sunlight, original general layout. Both left AND right solid walls MUST be removed to actual transparent alpha, suspended shelving and window frame/decor retained with localized soft shadows; no solid room backdrop, no external floor beyond the stage, no opaque wall gradient. All surroundings genuinely transparent, website background will form the walls. Three floating holographic video screens above her phone, each containing a distinct faceless adult patient and subtle dark teal conferencing frame. Make three screens clearly separated with enough upper-right corner space for a tiny animated waveform later. Her phone held at an angle visible to viewer, slightly larger legible dark teal TeleTena video conference interface containing a faceless adult patient, small self-view, bottom media controls; no blank phone. No patient names or medical text. No extra people in room. No captions, no words except small TeleTena on phone if readable, no markings. Landscape3:2 composition1536x1024. Preserve visual arrangement/concept, but reveal full stage as requested. Output actual RGBA transparency.
+
+Animation is repository-native SVG/CSS layered on the asset, not generated video,
+a live session or recorded audio. Four fitted waveforms and clipped character
+layers use varied timings; Help motion-off and OS reduced-motion make them static.
+The phone wordmark is rendered in SVG for legibility. No camera/microphone API is
+used. This remains an illustrative concept; the hover/focus caption says so.
+
+## Learning-Tour Portraits, v1
+
+Project path: `frontend/public/public-experience/tour-portraits-v1.webp`.
+SHA256: `33ba1e56d61e3bc2860a0cf1da9170b76fa34ba57fcc5fcc410949b42905bdc3`.
+1774×887 two-person diptych. Built-in generation; WebP encoding only afterward.
+These original fictional portraits belong solely to the isolated learning tour,
+not the directory, demonstration account records or professional verification.
+The tour introduction discloses illustrative people/appointments once.
+
+Final selected built-in prompt:
+
+> Use case: photorealistic-natural. Website interactive learning-tour asset for TeleTena. Two separate equal square portrait photographs side by side in one wide2:1 diptych, clean vertical division at center, no text or borders. LEFT: a wholly fictional Ethiopian woman counseling professional aged around40, warm composed expression, natural curly dark hair, modest contemporary teal blouse, softly lit cozy professional office backdrop, head and shoulders centered, no lab coat or medical equipment, no credentials or badges. RIGHT: a wholly fictional Ethiopian adult man aged around30, friendly calm expression, short dark hair, warm beige casual shirt, softly lit neutral interior background, head and shoulders centered. Both original fictional people, not celebrities or real experts. Realistic editorial portrait lighting, warm natural skin tones, calm blue teal and neutral palette, each face fully within its own half with generous headroom so circular crops work. No logos, no writing, no clinical data.

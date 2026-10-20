@@ -15444,7 +15444,7 @@
     "note": "Actual 142-screen source takes precedence over older descriptive handoff counts. Functional evidence is separate from visual comparison."
   },
   "current_verification_report": "docs/public-atmosphere-verification.md",
-  "current_packaged_source": "69f33ae628201fbf2bc7f8c1e91ed9fb09659d2b",
+  "current_packaged_source": "151d178eb8dc7fb21a1fabdb71a6341f1f2faf73",
   "latest_rendered_reference_mapping": {
     "source": "/home/frappe/teletena-design-reference",
     "count": 99,
@@ -15456,8 +15456,8 @@
     "site": "teletena-mvp-presentation.localhost",
     "bench": "/home/frappe/frappe/frappe-bench",
     "branch": "feat/public-experience",
-    "build_source": "69f33ae628201fbf2bc7f8c1e91ed9fb09659d2b",
-    "packaged_source": "69f33ae628201fbf2bc7f8c1e91ed9fb09659d2b",
+    "build_source": "151d178eb8dc7fb21a1fabdb71a6341f1f2faf73",
+    "packaged_source": "151d178eb8dc7fb21a1fabdb71a6341f1f2faf73",
     "date": "2026-10-20",
     "report": "docs/public-atmosphere-verification.md",
     "note": "Public redesign overlay. Prior private/backend release evidence remains guest-first-release-readiness.md. Compatibility Bench is separate; evidence-only commits differ from runtime pin."
@@ -16287,12 +16287,12 @@
     "branch": "feat/public-experience",
     "parent_pr": 47,
     "parent_head": "f534f4ba950969319a5a313f011d4b30ce5129e8",
-    "packaged_source": "69f33ae628201fbf2bc7f8c1e91ed9fb09659d2b",
+    "packaged_source": "151d178eb8dc7fb21a1fabdb71a6341f1f2faf73",
     "preview": "http://127.0.0.1:8017/teletena/",
     "route_state_evidence": "docs/public-atmosphere-verification.md",
-    "screenshots": "docs/screenshots/hero-correction/after/",
+    "screenshots": "docs/screenshots/public-stage-v3/",
     "functional_status": "Functionally verified: real guest returns, three-role navigation, reviewer save/reload/publish and backend authorization/version acceptance. Interactive tour is explicitly local fictional state.",
-    "visual_status": "Current hero correction inspected at390/768/1440/1920 and actual200%; awaiting owner acceptance. Earlier other-route comparisons remain inherited.",
+    "visual_status": "Current public stage/supporting-section/guide/tour/native-picker comparisons visually inspected by Codex at390/768/1440/1920 and actual200%; awaiting owner acceptance.",
     "external_dependencies": [
       "Native Amharic/Afaan Oromo review",
       "Owner visual acceptance",
@@ -16398,42 +16398,50 @@
       "evidence": "docs/public-atmosphere-verification.md",
       "before": "docs/screenshots/hero-correction/before/",
       "after": "docs/screenshots/hero-correction/after/",
-      "preservation": "No backend/schema/dependency changes; configuration and24 original private files unchanged; no reseed or remote changes"
+      "preservation": "No backend/schema/dependency changes; configuration and24 original private files unchanged; no reseed or remote changes",
+      "status": "Historical; clinician crop superseded by current_requested_followup stage-v3"
     },
     "current_requested_followup": {
       "date": "2026-10-20",
       "scope": "Clinician floor stage and illustrative screen motion; continuous hero waves; cohesive supporting sections; left-aligned wordmark; shared language picker; smooth nav conceal; realistic tour; clinician application guide",
-      "status": "Implementation in progress",
+      "status": "Locally verified; awaiting owner visual acceptance",
       "routes": [
         {
           "route": "/ and /for-clinicians",
           "states": "Staged clinician scene, phone/hologram activity, motion on/off, waves, language, brand, reveal/retract navigation and supporting sections",
           "reference": "Owner20October2026 written follow-up plus local annotated hero correction",
-          "functional": "Implementation in progress",
-          "visual": "Implemented but unverified"
+          "functional": "Functionally verified",
+          "visual": "Visually verified by Codex; awaiting owner acceptance",
+          "evidence": "docs/public-atmosphere-verification.md"
         },
         {
           "route": "/how-it-works#clinician-application",
           "states": "Guided professional application questions, distinct general/scope approval, private evidence and correction/resubmission",
           "reference": "Existing guided vetting workflow and current owner direction",
-          "functional": "Implementation in progress",
-          "visual": "Implemented but unverified"
+          "functional": "Functionally verified",
+          "visual": "Visually verified by Codex; awaiting owner acceptance",
+          "evidence": "docs/public-atmosphere-verification.md"
         },
         {
           "route": "/how-it-works#product-tour",
           "states": "Patient/clinician tour with coherent illustrative names, portraits and content",
           "reference": "Current public learning-tour layout, owner20October2026 copy correction",
-          "functional": "Implementation in progress",
-          "visual": "Implemented but unverified"
+          "functional": "Functionally verified",
+          "visual": "Visually verified by Codex; awaiting owner acceptance",
+          "evidence": "docs/public-atmosphere-verification.md"
         },
         {
           "route": "All public/authenticated navigation and /policies",
           "states": "Styled native language selector, policy label without review-environment suffix; legal draft status stays truthful in policy content",
           "reference": "Existing shared dropdown tokens and current owner direction",
-          "functional": "Implementation in progress",
-          "visual": "Implemented but unverified"
+          "functional": "Functionally verified",
+          "visual": "Visually verified by Codex; awaiting owner acceptance",
+          "evidence": "docs/public-atmosphere-verification.md"
         }
-      ]
+      ],
+      "packaged_source": "151d178eb8dc7fb21a1fabdb71a6341f1f2faf73",
+      "evidence": "docs/public-atmosphere-verification.md",
+      "screenshots": "docs/screenshots/public-stage-v3/"
     }
   }
 }
