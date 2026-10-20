@@ -1,3 +1,4 @@
+import {PublicMotion} from '../components/PublicMotion';
 import {RequestPresenceProvider} from '../components/RequestPresence';
 import {UserNotifications} from '../components/UserNotifications';
 import {AccountMenu} from "../components/AccountMenu";
@@ -70,12 +71,16 @@ export function PublicLayout() {
   const [menuOpen,setMenuOpen]=useState(false);
   const menuTrigger=useRef<HTMLButtonElement|null>(null);
   useEffect(()=>{if(["#how-it-works","#public-faq"].includes(location.hash)){const tick=requestAnimationFrame(()=>document.getElementById(location.hash.slice(1))?.scrollIntoView());return()=>cancelAnimationFrame(tick);}},[location.pathname,location.hash]);
-  const publicLinks=[["/care","Find care"],["/how-it-works","How it works"],["/for-clinicians","For clinicians"]];
+  const publicLinks=[["/care","Find care"],["/how-it-works","How it works"],["/contact","Contact"]];
+  const heroRoute=location.pathname==='/'||location.pathname==='/for-clinicians';
+  const [headerVisible,setHeaderVisible]=useState(!heroRoute);
+  useEffect(()=>{const update=()=>{const hero=document.querySelector('.public-audience-hero');setHeaderVisible(!heroRoute||!!hero&&scrollY>=hero.getBoundingClientRect().height*.75);};update();window.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);return()=>{window.removeEventListener('scroll',update);window.removeEventListener('resize',update);};},[heroRoute,location.pathname]);
   return (
-    <div className="public-experience-shell">
+    <div className={`public-experience-shell ${heroRoute?"has-immersive-hero":""}`}>
+      <PublicMotion/>
       <DemoBar />
-      <header className={`public-header reference-public-header ${informationPage?"reference-information-header":""}`}>
-        <Brand />
+      <header className={`public-header reference-public-header ${informationPage?"reference-information-header":""} ${headerVisible?"is-revealed":"is-concealed"}`} inert={!headerVisible}>
+        <Brand bilingual />
         <nav aria-label={w(session?"Workspace":"Main navigation")}>
           {session?links.map(([to,label])=><Link key={to} className={"public-desktop-link "+(to===home?"button secondary":"")} to={to}>{w(label)}</Link>):<>
             {publicLinks.map(([to,label])=><Link className="public-desktop-link" aria-current={location.pathname===to?"page":undefined} key={to} to={to}>{w(label)}</Link>)}
@@ -89,10 +94,10 @@ export function PublicLayout() {
       {signoutError&&<InlineNotice tone="danger">{w("We could not sign you out. Try again.")}</InlineNotice>}
       <Outlet />
       <footer className="public-footer reference-public-footer">
-        <div className="public-footer-brand"><Brand/><p>{w("Personal care, connected. Adults 18+ · Not an emergency service.")}</p></div>
+        <div className="public-footer-brand"><Brand bilingual/><p>{w("Personal care, connected. Adults 18+ · Not an emergency service.")}</p></div>
         <nav aria-label={w("Care")}><h2>{w("Care")}</h2><Link to="/care">{w("Clinicians & services")}</Link><Link to="/request">{w("Request a Consultation")}</Link></nav>
         <nav aria-label={w("For clinicians")}><h2>{w("For clinicians")}</h2><Link to="/for-clinicians">{w("Explore the practice tools")}</Link><Link to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}</Link></nav>
-        <nav aria-label={w("Information")}><h2>{w("Information")}</h2><Link to="/how-it-works#public-faq">{w("Help & FAQ")}</Link><Link to="/policies">{w("Terms & Privacy — review environment")}</Link><TranslationNote/></nav>
+        <nav aria-label={w("Information")}><h2>{w("Information")}</h2><Link to="/contact">{w("Contact")}</Link><Link to="/how-it-works#public-faq">{w("Help & FAQ")}</Link><Link to="/policies">{w("Terms & Privacy — review environment")}</Link><TranslationNote/></nav>
       </footer>
       <Dialog open={menuOpen} onOpenChange={setMenuOpen} title={w("Navigation")} description={w("Choose where to go next.")} focusReturnTarget={menuTrigger.current} className="public-mobile-menu"><nav aria-label={w("Main navigation")}>{(session?links:publicLinks).map(([to,label])=><Link key={to} to={to} onClick={()=>setMenuOpen(false)}>{w(label)}</Link>)}</nav><LanguageSelect/></Dialog>
     </div>
