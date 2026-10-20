@@ -56,3 +56,5 @@
 @media(prefers-reduced-motion:reduce){.public-experience *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .public-experience-shell .public-desktop-link[aria-current=page]{color:var(--brand);text-decoration:underline;text-underline-offset:7px}
+/* Keep authenticated public navigation compact without altering workspace menus. */
+@media(max-width:700px){.public-experience-shell .public-header.reference-public-header{padding-inline:16px;gap:8px}.public-experience-shell .public-header .brand{font-size:21px;gap:8px}.public-experience-shell .public-header .brand img{width:32px;height:32px}.public-experience-shell .public-header>nav{gap:6px}.public-experience-shell .public-header .account-menu-trigger{gap:6px;padding:4px}.public-experience-shell .public-header .account-menu-trigger>span:not(.avatar){max-width:44px}.public-experience-shell .public-header .account-menu-trigger>.avatar{width:32px;height:32px;flex-shrink:0}}
