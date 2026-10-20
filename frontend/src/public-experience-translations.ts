@@ -1,5 +1,21 @@
 /** Provisional Amharic/Afaan Oromo. Native-language approval remains external. */
 export const publicExperienceTranslations:Record<string,[string,string]>={
+'Your Application, Step by Step':['የእርስዎ ማመልከቻ፣ ደረጃ በደረጃ','Iyyannoo Keessan, Tarkaanfii Tarkaanfiin'],
+'Application Journey':['የማመልከቻ ሂደት','Adeemsa Iyyannoo'],
+'Your Professional Profile':['የሙያ መገለጫዎ','Piroofaayilii Ogummaa Keessan'],
+'Credentials and Supporting Documents':['የሙያ ማስረጃዎችና ደጋፊ ሰነዶች','Ragaa Ogummaa fi Sanadoota Deeggarsaa'],
+'Services You Want to Provide':['ለመስጠት የሚፈልጉት አገልግሎት','Tajaajiloota Kennuu Barbaaddan'],
+'Independent or Clinic-Based Practice':['የግል ወይም የክሊኒክ ሥራ','Hojii Dhuunfaa ykn Kilinikaa'],
+'Human Review and Individual Decisions':['የሰው ግምገማና የተለያዩ ውሳኔዎች','Gamaaggama Namaa fi Murtii Dhuunfaa'],
+'From Approval to Your First Consultation':['ከፈቃድ እስከ መጀመሪያው ምክክር','Hayyama Irraa Gara Marii Jalqabaatti'],
+'Interactive Tour':['ተግባራዊ መመሪያ','Daawwannaa Walqunnamtii'],
+'Tour Schedule':['የመመሪያ መርሐግብር','Sagantaa Daawwannaa'],
+'Appointment Preview':['የቀጠሮ ቅድመ እይታ','Durargii Beellamaa'],
+'Start Availability':['መገኘትን ያስጀምሩ','Jiraachuu Jalqabaa'],
+'Save Hours':['ሰዓቶችን ያስቀምጡ','Sa’aatii Olkaa’aa'],
+'Hours Saved in This Tour':['ሰዓቶች በዚህ መመሪያ ተቀምጠዋል','Sa’aatiin Daawwannaa Kana Keessatti Olkaa’ame'],
+'Ready to Apply?':['ለማመልከት ዝግጁ ነዎት?','Iyyachuuf Qophiidhaa?'],
+
 'That service is no longer published. Choose another service.':['ያ አገልግሎት አሁን አልታተመም። ሌላ አገልግሎት ይምረጡ።','Tajaajilli sun amma hin maxxanfamne. Tajaajila biraa filadhaa.'],
 'Navigation':['መዳረሻ','Qajeelcha'],
 'Recurring hours, date exceptions and booking rules that fit your practice.':['ለሙያዎ የሚስማሙ ተደጋጋሚ ሰዓቶች፣ የቀን ልዩነቶችና የቦታ ማስያዣ ደንቦች።','Sa’aatii deddeebi’u, guyyoota addaa fi seera beellamaa hojii keessaniif mijatan.'],

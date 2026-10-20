@@ -71,7 +71,7 @@ export function PublicLayout() {
   useEffect(()=>{if(!location.hash)window.scrollTo({top:0,left:0,behavior:"instant"});},[location.pathname]);
   const [menuOpen,setMenuOpen]=useState(false);
   const menuTrigger=useRef<HTMLButtonElement|null>(null);
-  useEffect(()=>{if(["#how-it-works","#public-faq"].includes(location.hash)){const tick=requestAnimationFrame(()=>document.getElementById(location.hash.slice(1))?.scrollIntoView());return()=>cancelAnimationFrame(tick);}},[location.pathname,location.hash]);
+  useEffect(()=>{if(["#how-it-works","#public-faq","#clinician-application","#product-tour"].includes(location.hash)){const tick=requestAnimationFrame(()=>document.getElementById(location.hash.slice(1))?.scrollIntoView());return()=>cancelAnimationFrame(tick);}},[location.pathname,location.hash]);
   const publicLinks=[["/care","Find care"],["/how-it-works","How it works"],["/contact","Contact"]];
   const heroRoute=location.pathname==='/'||location.pathname==='/for-clinicians';
   const [headerVisible,setHeaderVisible]=useState(!heroRoute);
@@ -98,7 +98,7 @@ export function PublicLayout() {
         <div className="public-footer-brand"><Brand bilingual/><p>{w("Personal care, connected. Adults 18+ · Not an emergency service.")}</p></div>
         <nav aria-label={w("Care")}><h2>{w("Care")}</h2><Link to="/care">{w("Clinicians & services")}</Link><Link to="/request">{w("Request a Consultation")}</Link></nav>
         <nav aria-label={w("For clinicians")}><h2>{w("For clinicians")}</h2><Link to="/for-clinicians">{w("Explore the practice tools")}</Link><Link to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}</Link></nav>
-        <nav aria-label={w("Information")}><h2>{w("Information")}</h2><Link to="/contact">{w("Contact")}</Link><Link to="/how-it-works#public-faq">{w("Help & FAQ")}</Link><Link to="/policies">{w("Terms & Privacy — review environment")}</Link><TranslationNote/></nav>
+        <nav aria-label={w("Information")}><h2>{w("Information")}</h2><Link to="/contact">{w("Contact")}</Link><Link to="/how-it-works#public-faq">{w("Help & FAQ")}</Link><Link to="/policies">{w("Terms & Privacy")}</Link><TranslationNote/></nav>
       </footer>
       <Dialog open={menuOpen} onOpenChange={setMenuOpen} title={w("Navigation")} description={w("Choose where to go next.")} focusReturnTarget={menuTrigger.current} className="public-mobile-menu"><nav aria-label={w("Main navigation")}>{(session?links:publicLinks).map(([to,label])=><Link key={to} to={to} onClick={()=>setMenuOpen(false)}>{w(label)}</Link>)}</nav><LanguageSelect/></Dialog>
     </div>
