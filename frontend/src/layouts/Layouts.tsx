@@ -68,6 +68,7 @@ export function PublicLayout() {
   const signout=async()=>{setSigningOut(true);setSignoutError(false);try{await journeyApi.logout();await refresh();navigate('/sign-in');}catch{setSignoutError(true);}finally{setSigningOut(false);}};
   const location=useLocation();
   const informationPage=["/how-it-works","/for-clinicians"].includes(location.pathname);
+  useEffect(()=>{if(!location.hash)window.scrollTo({top:0,left:0,behavior:"instant"});},[location.pathname]);
   const [menuOpen,setMenuOpen]=useState(false);
   const menuTrigger=useRef<HTMLButtonElement|null>(null);
   useEffect(()=>{if(["#how-it-works","#public-faq"].includes(location.hash)){const tick=requestAnimationFrame(()=>document.getElementById(location.hash.slice(1))?.scrollIntoView());return()=>cancelAnimationFrame(tick);}},[location.pathname,location.hash]);
@@ -92,7 +93,7 @@ export function PublicLayout() {
         </nav>
       </header>
       {signoutError&&<InlineNotice tone="danger">{w("We could not sign you out. Try again.")}</InlineNotice>}
-      <Outlet />
+      <div id="main-content" tabIndex={-1}><Outlet /></div>
       <footer className="public-footer reference-public-footer">
         <div className="public-footer-brand"><Brand bilingual/><p>{w("Personal care, connected. Adults 18+ · Not an emergency service.")}</p></div>
         <nav aria-label={w("Care")}><h2>{w("Care")}</h2><Link to="/care">{w("Clinicians & services")}</Link><Link to="/request">{w("Request a Consultation")}</Link></nav>
