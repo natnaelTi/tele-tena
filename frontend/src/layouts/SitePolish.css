@@ -16,3 +16,9 @@
 @media(max-width:800px){.site-masthead{padding:14px 20px;gap:12px;min-height:76px}.site-masthead .product-user{margin-left:auto;gap:6px}.auth-layout .site-masthead{padding-inline:20px}.reference-workspace-main{padding-bottom:110px}.site-masthead .product-desktop-nav{display:none}}
 @media(max-width:420px){.site-masthead{flex-wrap:wrap;gap:8px;padding-inline:16px}.site-masthead>.brand{font-size:22px;gap:8px}.site-masthead>.brand img{width:34px;height:34px}.site-masthead .product-user{gap:4px}.auth-layout .site-masthead{flex-wrap:nowrap}.reference-workspace-main .page-title{gap:16px}.reference-workspace-main .page-title h1{font-size:30px}}
 @media(prefers-reduced-motion:reduce){.site-masthead .product-desktop-nav a{transition:none}}
+
+/* Shared directory presentation must not acquire a second workspace gutter or
+   a second disclosure chevron when embedded for signed-in patients. */
+.reference-workspace .public-directory{padding:0;max-width:none}
+:where(.reference-workspace,.workspace) details>summary:has(>.lucide-chevron-down,>.lucide-chevron-right)::after{content:none}
+@media(max-width:700px){:is(.reference-workspace,.public-experience-shell) .public-directory .request-entry{flex-direction:column;align-items:stretch}:is(.reference-workspace,.public-experience-shell) .public-directory .request-entry>.button{width:100%;justify-content:center}}
