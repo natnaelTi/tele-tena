@@ -16478,7 +16478,7 @@
       "Identity retention governance",
       "Native-language review"
     ],
-    "runtime_commit": "c68a0de222e2d97907630e1b1644583edcf49aac",
+    "runtime_commit": "25458576cf42c18b6afc4e76160c7f1b397ce92f",
     "functional_evidence": "docs/clinician-onboarding-context-sprint.md#candidate-and-verification",
     "visual_evidence": "docs/clinician-onboarding-context-sprint.md#rendered-comparisons-and-specific-exceptions",
     "screenshots": "docs/screenshots/clinician-onboarding-context/",
@@ -16490,6 +16490,12 @@
       "route_survey": "46 actor/routes x3widths",
       "zoom": "actual Chromium200%, five sections and auth"
     },
-    "competency_revision": "Per-domain uploads removed; native1–5 slider/numbered buttons and anchored meaning verified; existing evidence retained; explanation optional."
+    "competency_revision": "Per-domain uploads removed; native1–5 slider/numbered buttons and anchored meaning verified; existing evidence retained; explanation optional.",
+    "account_revision": {
+      "functional": "Verified real-backend load/shared-draft tab retention/failed-save recovery/photo only Personal",
+      "visual": "Inspected desktop/mobile and actual200%; owner acceptance pending",
+      "reference": "H02 with B06/B07 field extensions",
+      "evidence": "docs/clinician-onboarding-context-sprint.md#clinician-account-organization--22october2026"
+    }
   }
 }

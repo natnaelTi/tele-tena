@@ -1,3 +1,48 @@
+## Clinician Account Organization —22October2026
+
+Current runtime: `25458576cf42c18b6afc4e76160c7f1b397ce92f`.
+Account now incorporates the same persisted professional claims/evidence model as
+onboarding. Personal Profile alone contains photo upload/crop/visibility plus
+prefix, confirmed first/last names, private ID type and private evidence. The old
+combined clinician-name field, whose generic save ignored changes, is removed.
+Name/ID edits save as private drafts; explicit professional submission applies the
+confirmed public name/bio under the existing validation and review controls.
+
+Professional Profile & Practice exposes an open editor with5 labeled sections:
+profession/public bio; qualifications/CV/certifications; license; competency
+self-assessment; clinic claims/declaration. Desktop uses a descriptive section rail;
+mobile uses a labeled native selector. Scope applications and actual clinic
+confirmation remain distinct links; care languages and operational practice links
+have their own clearly labeled groups. No duplicate photo editor or editable
+combined name appears in this tab. Historical content is available in a collapsed
+area, with only the original name shown in Personal Profile.
+
+One mounted editor retains its entire draft while switching account tabs and
+professional sections. Save/upload errors retain current entries; a saved draft
+still requires explicit submission before it changes the public name/bio or can
+be reviewed as a submitted version. No scope approval, credential verification,
+private ID access, historical snapshot or clinic permission rule changes.
+
+Verification on the production-built real-backend preview:
+- `browser-clinician-account.cjs`:own private application load, photo only Personal,
+  name/ID versus practice separation, all5 sections/links, name/ID/certification
+  retention across tabs, aborted-save recovery,390/768/1440. Edits remain unsaved;
+  no professional data, photo or evidence is changed for this UI test.
+- `browser-clinician-account-zoom.cjs`:actual Chromium200% on clinician Personal
+  and all5 professional sections; patient Personal regression; accessible document
+  scrolling and no horizontal page overflow. No CSS-only zoom claim.
+- Build/lint and asset/privacy checks pass; existing lint warnings remain. Original
+  site configuration and24 provider/key/account files remain byte-identical. No
+  schema, backend permission, provider, balance or credential change; prior9/6
+  backend/scope checks are inherited, not unnecessarily repeated for layout work.
+
+Visual comparison: current owner-requested revision extends H02 Professional
+Account using B06/B07 professional-field components. Before/after at matching
+390/768/1440 are in `docs/screenshots/clinician-onboarding-context/account-before`
+and `account-after`. Codex inspected desktop Personal/Professional, mobile
+qualifications and actual200% license composition; owner acceptance remains pending.
+The earlier dated runtime evidence below remains historical.
+
 ## Owner-Requested Competency Simplification —22October2026
 
 Current packaged runtime: `c68a0de222e2d97907630e1b1644583edcf49aac`.

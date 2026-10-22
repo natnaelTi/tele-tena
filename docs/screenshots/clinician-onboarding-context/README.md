@@ -29,3 +29,12 @@ Functional verification and Codex visual inspection are distinct from owner acce
 `sha256.json` records image integrity; image existence is not acceptance.
 
 Owner-requested simplification: [Mobile range card](after/competency-range-card-390.png) · [Desktop range card](after/competency-range-card-1440.png). Replaces per-domain upload and rating dropdown; historical evidence retained.
+
+Clinician Account follow-up (H02, new B06/B07 fields):
+[Before desktop](account-before/professional-1440.png) ·
+[After desktop](account-after/professional-0-1440.png) ·
+[Personal desktop](account-after/personal-1440.png) ·
+[Mobile qualifications](account-after/professional-1-390.png) ·
+[Actual200% license](account-after/counselor-section-2-200-percent.png).
+Account screenshots contain deliberately unsaved UI test entries; no approval,
+credential or actual professional-record change is implied.
