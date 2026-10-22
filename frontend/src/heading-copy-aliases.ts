@@ -223,5 +223,12 @@ export const headingCopyAliases:Record<string,string>={
   "Ready When You Are": "Ready when you are",
   "Your Privacy Stays with You.": "Your privacy stays with you.",
   "Session Details and Extra Time": "Session details and extra time",
-  "End for Everyone?": "End for everyone?"
+  "End for Everyone?": "End for everyone?",
+  "A Little about You": "A little about you",
+  "Adult Eligibility": "Adult eligibility",
+  "Your Privacy Defaults": "Your privacy defaults",
+  "You’re Ready": "You’re ready",
+  "Care Background": "Care background",
+  "Review Your Application": "Review your application",
+  "Your Account": "Your account"
 };

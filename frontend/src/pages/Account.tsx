@@ -59,7 +59,7 @@ export default function Account() {
   useEffect(()=>{if(prefs.data){setPreferredLocale(prefs.data.locale as typeof locale);setZone(prefs.data.timezone||"Africa/Addis_Ababa");setLocale(prefs.data.locale as typeof locale);}},[prefs.data]);
   useEffect(()=>{const receive=(event:Event)=>{event.preventDefault();setInstallPrompt(event);};window.addEventListener("beforeinstallprompt",receive);return()=>window.removeEventListener("beforeinstallprompt",receive);},[]);
   const saveProfile=()=>void action.run(async()=>{await journeyApi.saveProfile({kind:profile.kind,display_name:profile.kind==='clinician'?profile.display_name:name,adult:1,history,...(profile.kind==='patient'?{care_alias:alias}:{}),share_name:shareName,share_history:shareHistory,languages:careLanguages});await refresh();setDirty(false);},profile.kind==="clinician"?"Your professional profile and care languages are saved.":"Your profile and privacy defaults are saved.");
-  const title = "Your account";
+  const title = "Your Account";
   const description = "Your details, preferences and privacy, all in one place.";
   const practiceLinks = [
     ...(canManagePractice ? [

@@ -97,18 +97,18 @@ export default function Onboarding() {
         "Your Professional Profile",
         "Qualifications and Certifications",
         "Clinic Affiliations and Declaration",
-        "Review your application",
+        "Review Your Application",
         "",
         "Choose Your Service Scopes",
         "Professional License",
         "Competency Domains",
       ]
     : [
-        "A little about you",
-        "Adult eligibility",
-        "Your privacy defaults",
-        "You’re ready",
-        "Care background",
+        "A Little about You",
+        "Adult Eligibility",
+        "Your Privacy Defaults",
+        "You’re Ready",
+        "Care Background",
       ];
   const update = (value: Partial<Answers>) => {
     setAnswers({ ...answers, ...value });

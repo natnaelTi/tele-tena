@@ -48,6 +48,7 @@ def pending_facilities():
 def review_facility(id,decision,reason,merge_into=''):
     user=actor('Tele Tena Approver');reason=text(reason,500)
     if decision not in ('Reviewed','Rejected','Merged'):fail('Choose a facility decision.')
+    frappe.db.sql('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     found=rows("SELECT * FROM tt_reference WHERE id=%s AND kind='facility' FOR UPDATE",(id,))
     if not found:fail('Facility unavailable.')
     if decision=='Merged':

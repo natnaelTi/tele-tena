@@ -125,6 +125,18 @@ def application(clinician=None):
     legacy=json.loads(legacy[0].answers) if legacy else {}
     public=rows("SELECT display_name,introduction FROM tt_profile WHERE user=%s AND kind='clinician'",(clinician,))
     payload=json.loads(saved[0].payload) if saved else {'bio':public[0].introduction or ''} if public else {}
+    if not saved:
+        claims=legacy.get('professional',{})
+        if isinstance(claims,dict):
+            for target,key in [('qualification_title','qualification'),('license_number','registration_number'),('jurisdiction','jurisdiction'),('valid_from','credential_valid_from'),('valid_until','credential_expiry'),('experience_years','experience_years')]:
+                if claims.get(key) is not None:payload[target]=str(claims[key])
+            for target,key in [('issuer','issuing_institution'),('authority','issuing_authority')]:
+                if claims.get(key):payload[target]='Other';payload[target+'_other']=claims[key]
+            if claims.get('professional_category'):
+                matched=rows("SELECT id FROM tt_reference WHERE kind='profession' AND label=%s AND merged_into IS NULL",(claims['professional_category'],))
+                payload['profession']=matched[0].id if matched else 'Other'
+                if not matched:payload['profession_other']=claims['professional_category']
+
     if not identity_access:payload.pop('identity_files',None);payload.pop('identification_type',None)
     submissions=rows('SELECT id,payload,digest,created,declaration_version,reference_snapshot FROM tt_professional_submission WHERE user=%s ORDER BY created DESC LIMIT 30',(clinician,))
     for row in submissions:
