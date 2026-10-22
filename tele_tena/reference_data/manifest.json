@@ -1,0 +1,25 @@
+{
+  "source": "https://zenodo.org/records/23500708",
+  "release": "v2.15-2026-10-20",
+  "license": "CC0-1.0",
+  "license_source": "https://ror.readme.io/docs/data-dump",
+  "retrieved": "2026-10-22",
+  "coverage": "Complete valid records from the downloaded JSON prefix only; network interrupted full dump. Not global completeness. Education/healthcare organization membership does not prove credential-awarding authorization or accreditation.",
+  "raw_complete_records": 48133,
+  "imported_by_kind": {
+    "issuer": 8308,
+    "facility": 7028
+  },
+  "countries": 194,
+  "ethiopia_by_kind": {
+    "facility": 3,
+    "issuer": 10
+  },
+  "normalized_sha256": "32bc3fa17f98224ea011ae6ed63a38189eefc3d0baed75690904af62c689a9f7",
+  "gaps": [
+    "Ethiopian MOH MFR requires approved API access and reuse terms",
+    "WDOMS subscription/permission required; no scraping performed",
+    "No complete international regulator or awarding-body directory yet",
+    "Configured profession/specialty/domain vocabulary is source-informed and awaiting professional review; self-rating scale is proposed, independent of rubric reviewer scores"
+  ]
+}

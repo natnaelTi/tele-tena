@@ -243,7 +243,11 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
         language_values = sorted(set(languages)) if kind == 'clinician' else []
     if introduction is not None and kind != 'clinician':
         fail('Public introductions are for clinician profiles')
+    introduction_supplied = introduction is not None
     introduction = (existing[0].introduction if existing else None) if introduction is None else text(introduction, 2000, False)
+    if introduction_supplied and kind=='clinician':
+        from tele_tena.api.professional import validate_bio
+        validate_bio(introduction)
     public_id = existing[0].public_id if existing else str(uuid.uuid4())
     frappe.db.sql('''INSERT INTO tt_profile (user,kind,display_name,history,share_name,share_history,languages,public_id,introduction)
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE display_name=VALUES(display_name),
@@ -285,6 +289,9 @@ def apply(statement, requested_services='[]'):
 
 def _initial_application_profile(user):
     # Only called after owner/reviewer authorization; never part of discovery.
+    from tele_tena.api.professional import submitted_legacy_claims
+    structured=submitted_legacy_claims(user)
+    if structured:return structured
     saved = rows('SELECT answers FROM tt_onboarding WHERE user=%s AND kind=%s AND completed IS NOT NULL',
                  (user, 'clinician'))
     if not saved:
@@ -319,7 +326,8 @@ def applications():
                 item.requested_service_labels.append(label[0].service_label if label else 'Unavailable service')
             evidence = rows('SELECT content_size,revision,uploaded_at FROM tt_resume_evidence WHERE clinician=%s',
                             (item.user,))
-            item.resume_uploaded = bool(evidence)
+            from tele_tena.api.professional import cv_available
+            item.resume_uploaded = bool(evidence) or cv_available(item.user)
             item.resume_size = evidence[0].content_size if evidence else None
             item.resume_revision = evidence[0].revision if evidence else None
             item.submission_date_available = bool(item.submitted_at)

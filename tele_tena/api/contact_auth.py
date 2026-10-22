@@ -201,7 +201,7 @@ def application_services():
 @command
 def save_onboarding(kind, step, answers, complete=0):
     user = actor()
-    if kind not in ('patient', 'clinician') or str(step) not in ('0', '1', '2', '3', '4', '5') or (str(step) == '4' and kind != 'patient') or (str(step) == '5' and kind != 'clinician'):
+    if kind not in ('patient', 'clinician') or str(step) not in ('0', '1', '2', '3', '4', '5', '6', '7') or (str(step) == '4' and kind != 'patient') or (str(step) == '5' and kind != 'clinician'):
         fail('Invalid onboarding step')
     from tele_tena.review import registration_enabled
     if not registration_enabled(kind):
@@ -247,6 +247,19 @@ def save_onboarding(kind, step, answers, complete=0):
     if 'introduction' in answers:
         clean['introduction'] = text(answers['introduction'], 2000, False)
     finish = boolean(complete)
+    if finish and kind == 'clinician':
+        from tele_tena.api.professional import validate, persist, validate_bio
+        draft = frappe.db.sql('SELECT payload FROM tt_professional_draft WHERE user=%s', (user,))
+        if draft:
+            structured = validate(json.loads(draft[0][0]), user, True)
+            def label(key,other):
+                id=structured.get(key,'')
+                if id=='Other':return structured.get(other,'')
+                found=frappe.db.sql('SELECT label FROM tt_reference WHERE id=%s',(id,))
+                return found[0][0] if found else ''
+            clean['name']=' '.join(filter(None,[structured.get('prefix_other') if structured.get('prefix')=='Other' else structured.get('prefix'),structured['first_name'],structured['last_name']]))
+            clean['adult']=structured['adult'];clean['introduction']=structured.get('bio','')
+            clean['professional']={'professional_category':label('profession','profession_other'),'qualification':structured['qualification_title'],'issuing_institution':label('issuer','issuer_other'),'registration_number':structured.get('license_number',''),'issuing_authority':label('authority','authority_other'),'jurisdiction':structured.get('jurisdiction',''),'credential_valid_from':structured.get('valid_from',''),'credential_expiry':structured.get('valid_until',''),'experience_years':structured.get('experience_years') or '0'}
     if finish:
         from tele_tena.api.policies import record
         record(user,clean)
@@ -258,7 +271,7 @@ def save_onboarding(kind, step, answers, complete=0):
                 text(clean.get('statement', ''), 2000)
             if not requested_services:
                 fail('Choose at least one service for review')
-            if not frappe.db.sql('SELECT clinician FROM tt_resume_evidence WHERE clinician=%s', (user,)):
+            if not frappe.db.sql('SELECT clinician FROM tt_resume_evidence WHERE clinician=%s', (user,)) and not (draft and structured.get('cv_files')):
                 fail('Upload a PDF resume before submitting your application', 'resume_required')
         if kind == 'clinician' and clean.get('professional'):
             if any(not clean['professional'].get(key) for key in ('professional_category', 'qualification', 'issuing_institution')) or not clean.get('care_languages'):
@@ -282,4 +295,6 @@ def save_onboarding(kind, step, answers, complete=0):
     frappe.db.sql('''UPDATE tt_onboarding SET kind=%s,step=%s,answers=%s,
         completed=IF(%s,UTC_TIMESTAMP(6),NULL),modified=UTC_TIMESTAMP(6) WHERE user=%s''',
         (kind, int(step), json.dumps(clean), finish, user))
+    if finish and kind=='clinician' and draft:
+        persist(user,structured,submit=True)
     return {'saved': True, 'completed': finish}

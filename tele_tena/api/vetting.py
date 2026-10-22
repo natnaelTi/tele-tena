@@ -607,7 +607,8 @@ def save_scope_application(service, values, submit=False, reverification_of=None
             fail('Add your professional category, qualification and issuing institution before submission.', 'scope_qualification_required')
         if not form.get('population_adults'):
             fail('Confirm that this application is limited to adult care.', 'scope_adult_required')
-        if not rows('SELECT clinician FROM tt_resume_evidence WHERE clinician=%s', (user,)):
+        from tele_tena.api.professional import cv_available
+        if not rows('SELECT clinician FROM tt_resume_evidence WHERE clinician=%s', (user,)) and not cv_available(user):
             fail('Upload a PDF CV before submitting for review.', 'resume_required')
         if renewal_ref:
             if not form.get('issuing_authority') or not form.get('jurisdiction'):

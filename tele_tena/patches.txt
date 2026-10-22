@@ -53,3 +53,5 @@ tele_tena.patches.v1_41_schedule_presence
 tele_tena.patches.v1_42_patient_notifications
 
 tele_tena.patches.v1_43_public_content
+
+tele_tena.patches.v1_44_professional_onboarding
