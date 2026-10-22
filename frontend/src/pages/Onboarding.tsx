@@ -182,6 +182,8 @@ export default function Onboarding() {
               setError("Choose at least one service for review.");
               return;
             }
+            if(clinician&&step===0&&(!professional.profession||!professional.first_name?.trim()||!professional.last_name?.trim())){setError('Complete First Name, Last Name and Profession before continuing.');return;}
+            if(clinician&&step===1&&(!professional.issuer||!professional.qualification_title?.trim())){setError('Complete the awarded qualification and issuing institution before continuing.');return;}
             if (clinician && step === 0 && !(answers.care_languages||[]).length) {setError("Choose at least one consultation language.");return;}
             void save(steps[Math.min(position + 1, steps.length - 1)], step === 3);
           }}

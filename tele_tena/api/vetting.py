@@ -17,9 +17,9 @@ SCOPE_EVIDENCE_TYPES = {
     'Approach experience', 'Other supporting evidence',
 }
 APPLICANT_FIELDS = {
-    'professional_category': 80, 'qualification': 180, 'issuing_institution': 180,
+    'professional_category': 80, 'qualification': 240, 'issuing_institution': 240,
     'competencies': 2000, 'certifications': 2000, 'credential_valid_from': 10,
-    'registration_number': 100, 'issuing_authority': 180, 'jurisdiction': 120,
+    'registration_number': 100, 'issuing_authority': 240, 'jurisdiction': 120,
     'credential_expiry': 10, 'experience_years': 2, 'approach_keys': 800,
     'population_adults': 1, 'independent_practice': 1, 'clinic_affiliations': 1000,
     'relevant_training': 2000, 'applicant_statement': 2000, 'applicant_response': 2000,
@@ -533,12 +533,13 @@ def application_context():
         requested = []
     eligible = {item.name for item in rows("""SELECT name FROM `tabTele Tena Service`
         WHERE vetting_required=1 AND catalog_status IN ('Draft','Active')""")}
+    from tele_tena.api.professional import cv_available
     return {'professional': journey._initial_application_profile(user),
             'requested_services': [key for key in requested if isinstance(key, str) and key in eligible],
             'treatment_approaches': rows('''SELECT catalog_key AS id,label_en,label_am,label_om,
                 definition,evidence_requirements FROM `tabTele Tena Treatment Approach`
                 WHERE status='Active' ORDER BY label_en,catalog_key'''),
-            'resume_uploaded': bool(rows('SELECT 1 FROM tt_resume_evidence WHERE clinician=%s', (user,)))}
+            'resume_uploaded': bool(rows('SELECT 1 FROM tt_resume_evidence WHERE clinician=%s', (user,))) or cv_available(user)}
 
 
 @journey.query()
@@ -624,6 +625,9 @@ def save_scope_application(service, values, submit=False, reverification_of=None
         status = prior_status
     now = frappe.utils.now_datetime()
     values = {**form, 'status': status, 'submitted_at': now if submit else None}
+    if submit:
+        structured=rows('SELECT id FROM tt_professional_submission WHERE user=%s ORDER BY created DESC,id DESC LIMIT 1',(user,))
+        if structured:values['professional_submission']=structured[0].id
     if renewal_ref:
         values['reverification_of'] = renewal_ref
     if submit:

@@ -152,6 +152,7 @@ export default function SignIn() {
     );
   }
   useEffect(()=>{if(registering){setPasswordMode(false);setPassword('');}},[registering]);
+  const usingPassword=passwordMode&&!registering;
   const masked =
     channel === "phone"
       ? "•••• " + contact.slice(-4)
@@ -167,7 +168,7 @@ export default function SignIn() {
       <p className="auth-description">
         {challenge
           ? "Enter the six-digit code sent to " + masked + "."
-        : passwordMode
+        : usingPassword
             ? t("emailPasswordPrompt")
             : w(registering?'Verify your contact, then complete your profile. Verification does not approve professional services.':'Verify your phone or email to continue. Your selected service or request stays with you.')}
       </p>
@@ -197,7 +198,7 @@ export default function SignIn() {
               );
               await proceed();
             });
-          else if (passwordMode)
+          else if (usingPassword)
             void run(async () => {
               await signIn(contact, password);
               await proceed();
@@ -230,7 +231,7 @@ export default function SignIn() {
             required
           />
         )}
-        {!challenge && passwordMode && (
+        {!challenge && usingPassword && (
           <TextField
             label={w("Password")}
             type="password"
@@ -240,10 +241,10 @@ export default function SignIn() {
             required
           />
         )}
-        <Button type="submit" loading={busy} disabled={!options || (channel === "phone" && !options.phone_otp) || (channel === "email" && !passwordMode && !options.email_otp)} className="full">
+        <Button type="submit" loading={busy} disabled={!options || (registering&&!(clinicianIntent?options.clinician_registration:options.patient_registration)) || (channel === "phone" && !options.phone_otp) || (channel === "email" && !passwordMode && !options.email_otp)} className="full">
           {challenge
             ? w("Verify and continue")
-            : passwordMode
+            : usingPassword
               ? w("Sign in")
               : w("Continue")}
           <ArrowRight size={20} />

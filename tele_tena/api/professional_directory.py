@@ -6,7 +6,7 @@ from tele_tena.api.journey import actor,query,command,rows,text,integer,fail,aud
 
 
 @query()
-def search(kind,search='',country='',offset=0,limit=20):
+def search(kind,search='',country='',offset=0,limit=20,prefer_country='',profession=''):
     user=actor()
     if kind not in ('profession','specialty','domain','issuer','authority','facility'):fail('Unknown directory.')
     offset=integer(offset,0,1000000);limit=integer(limit,1,50);search=text(search,120,False);country=text(country,2,False)
@@ -15,7 +15,11 @@ def search(kind,search='',country='',offset=0,limit=20):
     where="kind=%s AND merged_into IS NULL AND (status IN ('Listed','Reviewed') OR submitted_by=%s) AND (label LIKE %s ESCAPE '!' OR aliases LIKE %s ESCAPE '!')"
     values=[kind,user,term,term]
     if country:where+=' AND country=%s';values.append(country)
-    found=rows('SELECT id,label,country,region,entity_type,status FROM tt_reference WHERE '+where+' ORDER BY label,id LIMIT %s OFFSET %s',tuple(values+[limit+1,offset]))
+    prefer_country=text(prefer_country,2,False)
+    profession=text(profession,100,False)
+    profession_label=rows("SELECT label FROM tt_reference WHERE id=%s AND kind='profession'",(profession,))
+    professional_term='%'+(profession_label[0].label if profession_label else '__no_profession__')+'%'
+    found=rows('SELECT id,label,country,region,entity_type,status FROM tt_reference WHERE '+where+' ORDER BY (country=%s AND country!=\'\') DESC,(aliases LIKE %s) DESC,label,id LIMIT %s OFFSET %s',tuple(values+[prefer_country,professional_term,limit+1,offset]))
     return {'items':found[:limit],'has_more':len(found)>limit,'offset':offset,'limit':limit}
 
 
@@ -28,6 +32,7 @@ def add_facility(label,country,region,entity_type,identifier='',website=''):
     frappe.db.sql('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     existing=rows("SELECT id FROM tt_reference WHERE kind='facility' AND LOWER(label)=LOWER(%s) AND country=%s AND LOWER(region)=LOWER(%s) AND (status IN ('Listed','Reviewed') OR submitted_by=%s) AND merged_into IS NULL",(label,country.upper(),region,user))
     if existing:return {'id':existing[0].id,'label':label,'existing':True}
+    if rows("SELECT COUNT(*) AS total FROM tt_reference WHERE submitted_by=%s AND kind='facility' AND accessed=CURRENT_DATE",(user,))[0].total>=20:fail('You have reached the daily facility submission limit. Try again tomorrow.','facility_submission_limit')
     id='facility:'+str(uuid.uuid4())
     frappe.db.sql('''INSERT INTO tt_reference (id,kind,label,aliases,country,region,entity_type,source_id,source_url,accessed,permitted_use,status,submitted_by) VALUES (%s,'facility',%s,'[]',%s,%s,%s,%s,%s,CURRENT_DATE,'Applicant submitted; unverified','Pending',%s)''',(id,label,country.upper(),region,entity_type,identifier,website,user))
     return {'id':id,'label':label,'existing':False}

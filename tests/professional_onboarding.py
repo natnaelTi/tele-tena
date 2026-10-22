@@ -7,10 +7,13 @@ os.chdir(BENCH/'sites');sys.path.insert(0,str(REPO))
 import frappe
 frappe.init(site=SITE);frappe.connect();frappe.local.lang='en';frappe.set_user('Administrator')
 from tele_tena.api import professional as p,professional_directory as directory
+assert Path(p.__file__).resolve()==REPO/'tele_tena/api/professional.py'
 from tele_tena.patches.v1_44_professional_onboarding import execute
 
+columns={}
 def fingerprint(table):
- values=frappe.db.sql('SELECT * FROM `'+table+'`')
+ if table not in columns:columns[table]=[r[0] for r in frappe.db.sql('SHOW COLUMNS FROM `'+table+'`')]
+ values=frappe.db.sql('SELECT '+','.join('`'+c+'`' for c in columns[table])+' FROM `'+table+'`')
  return hashlib.sha256(json.dumps(sorted([json.dumps(v,default=lambda x:hashlib.sha256(bytes(x)).hexdigest() if isinstance(x,(bytes,bytearray,memoryview)) else str(x),sort_keys=True) for v in values]),sort_keys=True).encode()).hexdigest()
 protected=[t[0] for t in frappe.db.sql('SHOW TABLES') if t[0]!='tt_reference' and ( t[0].startswith(('tt_','tabTele Tena ')) or t[0] in ('tabUser','tabHas Role','__Auth'))]
 before={t:fingerprint(t) for t in protected};execute();frappe.db.commit();assert before=={t:fingerprint(t) for t in protected},'Migration changed preexisting data'
@@ -48,6 +51,23 @@ class Professional(unittest.TestCase):
   c=directory.add_facility('Fictional Clinic '+uuid.uuid4().hex[:8],'ET','Addis Ababa','Clinic');label=c['label'];self.assertEqual(c['id'],directory.add_facility(label,'ET','Addis Ababa','Clinic')['id'])
   self.assertTrue(any(x.id==c['id'] for x in directory.search('facility',search=label)['items']))
   frappe.set_user(users['therapist']);self.assertFalse(directory.search('facility',search=label)['items'])
+ def test_identity_assignment_and_facility_review(self):
+  from PIL import Image
+  f=io.BytesIO();Image.new('RGB',(8,8),'white').save(f,format='PNG');id=p.upload('Identification','fictional-id.png',base64.b64encode(f.getvalue()).decode())['id']
+  clinic=directory.add_facility('Fictional Reviewed Facility '+uuid.uuid4().hex[:8],'ET','Addis Ababa','Clinic')
+  frappe.set_user('Administrator');p.assign_identity_reviewer(users['counselor'],users['reviewer'],'Explicit synthetic credential review assignment')
+  frappe.set_user(users['reviewer']);self.assertEqual(p.download(id).status_code,200)
+  self.assertTrue(directory.review_facility(clinic['id'],'Reviewed','Directory name reviewed, not affiliation or accreditation')['saved'])
+  frappe.set_user('Administrator');p.revoke_identity_reviewer(users['counselor'],users['reviewer'],'Review complete')
+  frappe.set_user(users['reviewer'])
+  with self.assertRaises(frappe.PermissionError):p.download(id)
+ def test_new_cv_legacy_projection(self):
+  from pypdf import PdfWriter
+  f=io.BytesIO();writer=PdfWriter();writer.add_blank_page(width=100,height=100);writer.write(f)
+  id=p.upload('CV','fictional-cv.pdf',base64.b64encode(f.getvalue()).decode())['id'];state=p.application();p.save({**self.payload(),'cv_files':[id]},state['revision'],True)
+  self.assertTrue(p.cv_available(users['counselor']));self.assertEqual(p.submitted_legacy_claims(users['counselor'])['qualification'],'Master of Arts in Counseling')
+  from tele_tena.api import journey
+  frappe.set_user(users['reviewer']);record=next(x for x in journey.applications() if x.user==users['counselor']);self.assertTrue(record.resume_uploaded);self.assertTrue(record.evidence_complete)
  def test_generic_api_denial(self):
   frappe.set_user(users['patient'])
   with self.assertRaises(frappe.PermissionError):p.application(users['counselor'])

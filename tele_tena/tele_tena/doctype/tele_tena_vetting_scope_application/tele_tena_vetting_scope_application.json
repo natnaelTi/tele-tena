@@ -55,13 +55,15 @@
       "fieldname": "qualification",
       "label": "Relevant qualification",
       "fieldtype": "Data",
-      "reqd": 1
+      "reqd": 1,
+      "length": 240
     },
     {
       "fieldname": "issuing_institution",
       "label": "Issuing institution",
       "fieldtype": "Data",
-      "reqd": 1
+      "reqd": 1,
+      "length": 240
     },
     {
       "fieldname": "registration_number",
@@ -71,7 +73,8 @@
     {
       "fieldname": "issuing_authority",
       "label": "Issuing authority",
-      "fieldtype": "Data"
+      "fieldtype": "Data",
+      "length": 240
     },
     {
       "fieldname": "jurisdiction",
@@ -186,6 +189,12 @@
       "fieldname": "credential_valid_from",
       "label": "Credential valid from",
       "fieldtype": "Date"
+    },
+    {
+      "fieldname": "professional_submission",
+      "label": "Professional Submission Reference",
+      "fieldtype": "Data",
+      "read_only": 1
     }
   ],
   "permissions": [

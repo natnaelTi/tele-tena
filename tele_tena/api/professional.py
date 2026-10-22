@@ -14,7 +14,7 @@ RATING_DEFINITIONS={1:'Training or introductory exposure',2:'Practice with super
 
 def word_count(value):
     """A word is a non-empty Unicode-whitespace-delimited token; hyphens stay inside it."""
-    return len(value.split())
+    return len([part for part in re.split(r'[\u0009-\u000d\u0020\u0085\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+',value) if part])
 
 
 def validate_bio(value):
@@ -45,12 +45,15 @@ def reference(id,kind,user):
 
 def validate(value,user,submit=False):
     if not isinstance(value,dict):fail('Review the professional application fields.','professional_fields')
-    keys={'prefix','prefix_other','first_name','last_name','profession','profession_other','specialties','bio','identification_type','identity_files','qualification_area','qualification_area_other','qualification_title','issuer','issuer_other','issuer_country','certifications','license_number','authority','authority_other','jurisdiction','valid_from','valid_until','non_expiring','license_files','competencies','independent','clinics','declaration','adult','experience_years','cv_files'}
+    keys={'prefix','prefix_other','first_name','last_name','profession','profession_other','specialties','bio','identification_type','identity_files','qualification_area','qualification_area_other','qualification_title','issuer','issuer_other','issuer_country','certifications','license_number','authority','authority_other','jurisdiction','valid_from','valid_until','non_expiring','license_files','competencies','independent','clinics','declaration','adult','experience_years','cv_files','practice_country'}
     if set(value)-keys:fail('Application contains unsupported fields.','professional_fields')
     result={}
     for key in keys-{'specialties','identity_files','certifications','license_files','competencies','clinics','non_expiring','independent','declaration','adult','cv_files'}:
-        if key in value:result[key]=text(str(value[key]),4000 if key=='bio' else 240,False)
-    result['bio']=validate_bio(result.get('bio',''))
+        if key in value:result[key]=text(str(value[key]),4000 if key=='bio' else {'profession_other':80,'qualification_title':240,'issuer_other':240,'authority_other':240,'license_number':100,'jurisdiction':120}.get(key,240),False)
+    if result.get('experience_years'):
+        from tele_tena.api.journey import integer
+        result['experience_years']=str(integer(result['experience_years'],0,60))
+    result['bio']=validate_bio(result.get('bio','')) if submit else text(result.get('bio',''),4000,False)
     for key in ('non_expiring','independent','declaration','adult'):result[key]=value.get(key) is True
     if result.get('prefix') not in (None,'','Dr','Mr','Ms','Mrs','Mx','Prof','Other'):fail('Choose a prefix or Other.','prefix_invalid')
     for key,kind in [('profession','profession'),('issuer','issuer'),('authority','authority')]:
@@ -123,7 +126,7 @@ def application(clinician=None):
     public=rows("SELECT display_name,introduction FROM tt_profile WHERE user=%s AND kind='clinician'",(clinician,))
     payload=json.loads(saved[0].payload) if saved else {'bio':public[0].introduction or ''} if public else {}
     if not identity_access:payload.pop('identity_files',None);payload.pop('identification_type',None)
-    submissions=rows('SELECT id,payload,digest,created,declaration_version FROM tt_professional_submission WHERE user=%s ORDER BY created DESC LIMIT 30',(clinician,))
+    submissions=rows('SELECT id,payload,digest,created,declaration_version,reference_snapshot FROM tt_professional_submission WHERE user=%s ORDER BY created DESC LIMIT 30',(clinician,))
     for row in submissions:
         row.payload=json.loads(row.payload)
         if not identity_access:row.payload.pop('identity_files',None);row.payload.pop('identification_type',None)
@@ -145,12 +148,16 @@ def persist(user,payload,revision=None,submit=False):
     if old:frappe.db.sql('UPDATE tt_professional_draft SET payload=%s,revision=revision+1,modified=UTC_TIMESTAMP(6) WHERE user=%s',(encoded,user))
     else:frappe.db.sql('INSERT INTO tt_professional_draft VALUES (%s,%s,1,UTC_TIMESTAMP(6))',(user,encoded))
     if submit:
-        frappe.db.sql('INSERT IGNORE INTO tt_professional_submission VALUES (%s,%s,%s,%s,UTC_TIMESTAMP(6),%s)',(str(uuid.uuid4()),user,encoded,digest,DECLARATION))
+        already_submitted=bool(rows('SELECT id FROM tt_professional_submission WHERE user=%s AND digest=%s',(user,digest)))
+        selected={clean.get(k) for k in ('profession','issuer','authority')}|set(clean.get('specialties',[]))|set(clean.get('clinics',[]))|{c.get('domain') for c in clean.get('competencies',[])}|{c.get('issuer') for c in clean.get('certifications',[])}
+        selected.discard(None);selected.discard('');selected.discard('Other')
+        snapshot=rows('SELECT id,label,country,region,entity_type,source_id,source_url,accessed,permitted_use,status FROM tt_reference WHERE id IN ('+','.join(['%s']*len(selected))+')',tuple(selected)) if selected else []
+        frappe.db.sql('INSERT IGNORE INTO tt_professional_submission (id,user,payload,digest,created,declaration_version,reference_snapshot) VALUES (%s,%s,%s,%s,UTC_TIMESTAMP(6),%s,%s)',(str(uuid.uuid4()),user,encoded,digest,DECLARATION,json.dumps(snapshot,default=str,ensure_ascii=False)))
         # Only structured name + explicitly public bio. Never copies qualifications or ID into public fields.
         name=' '.join(filter(None,[clean.get('prefix_other') if clean.get('prefix')=='Other' else clean.get('prefix'),clean['first_name'],clean['last_name']]))
         name=text(name,120)
         frappe.db.sql('UPDATE tt_profile SET display_name=%s,introduction=%s WHERE user=%s',(name,clean.get('bio',''),user))
-        audit(user,'ProfessionalDeclaration',{'version':DECLARATION,'digest':digest})
+        if not already_submitted:audit(user,'ProfessionalDeclaration',{'version':DECLARATION,'digest':digest})
     return clean
 
 
@@ -226,3 +233,18 @@ def revoke_identity_reviewer(clinician,reviewer,reason):
     frappe.db.sql('DELETE FROM tt_identity_reviewer WHERE clinician=%s AND reviewer=%s',(clinician,reviewer))
     audit(clinician,'IdentityReviewerRevoked',{'reviewer':reviewer,'reason':reason})
     return {'revoked':True}
+
+
+@query()
+def submission(id):
+    user=actor();found=rows('SELECT id,user,payload,digest,created,declaration_version,reference_snapshot FROM tt_professional_submission WHERE id=%s',(id,))
+    if not found or not may_review(user,found[0].user):frappe.throw('Submitted application unavailable',frappe.PermissionError)
+    row=found[0];payload=json.loads(row.payload)
+    identity=user==row.user or ('Tele Tena Approver' in frappe.get_roles(user) and bool(rows('SELECT clinician FROM tt_identity_reviewer WHERE clinician=%s AND reviewer=%s',(row.user,user))))
+    if not identity:payload.pop('identity_files',None);payload.pop('identification_type',None)
+    ids=set()
+    for key in ('identity_files','license_files','cv_files'):ids.update(payload.get(key,[]))
+    for item in payload.get('certifications',[])+payload.get('competencies',[]):ids.update(item.get('files',[]))
+    evidence=rows('SELECT id,purpose,filename FROM tt_professional_evidence WHERE user=%s AND id IN ('+','.join(['%s']*len(ids))+')',(row.user,*ids)) if ids else []
+    references=json.loads(row.reference_snapshot or '[]')
+    return {'payload':payload,'reference_labels':{r['id']:r['label'] for r in references},'evidence':evidence,'identity_access':identity,'id':row.id,'created':row.created,'declaration_version':row.declaration_version}

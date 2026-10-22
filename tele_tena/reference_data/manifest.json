@@ -21,5 +21,17 @@
     "WDOMS subscription/permission required; no scraping performed",
     "No complete international regulator or awarding-body directory yet",
     "Configured profession/specialty/domain vocabulary is source-informed and awaiting professional review; self-rating scale is proposed, independent of rubric reviewer scores"
-  ]
+  ],
+  "ethiopia_supplement": {
+    "source": "https://api.ror.org/v2/organizations?filter=locations.geonames_details.country_code:ET",
+    "retrieved_unique_records": 126,
+    "reported_total": 159,
+    "filtered_by_kind": {
+      "facility": 8,
+      "issuer": 62
+    },
+    "coverage": "Partial,126 unique source records from8 pages; API duplicated/omitted records across pages. Completeness assertion failed, so NOT a complete ROR country directory or MOH register.",
+    "paging_limit_documentation": "https://ror.readme.io/docs/api-paging",
+    "normalized_sha256": "8a73a25353ae06a8a6187898d0b0874c4e2223ed47cace03abc5c38d2817f140"
+  }
 }

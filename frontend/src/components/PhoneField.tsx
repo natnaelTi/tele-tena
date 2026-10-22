@@ -20,7 +20,7 @@ export function PhoneField({label,error,onValueChange,...props}:Omit<InputHTMLAt
    touched.current=true;setSource(false);const next=event.target.value as CountryCode;
    const prefix='+'+getCountryCallingCode(selected);const national=raw.startsWith(prefix)?raw.slice(prefix.length):raw;
    setCountry(next);setRaw(national);onValueChange?.(national?'+'+getCountryCallingCode(next)+national.replace(/^0/,''):'');
-  }}>{getCountries().map(code=><option key={code} value={code}>{flag(code)} +{getCountryCallingCode(code)} · {names.of(code)||code}</option>)}</select>
+  }}>{getCountries().map(code=><option key={code} value={code}>{names.of(code)||code} · {flag(code)} +{getCountryCallingCode(code)}</option>)}</select>
   <input {...props} value={raw} id={props.id||id} type="tel" autoComplete="tel-national" inputMode="tel" placeholder={selected==='ET'?'09…':w('Phone number')} aria-invalid={!!error} aria-describedby={id+'-help'} onChange={event=>{
    touched.current=true;const next=event.target.value;setRaw(next);
    onValueChange?.(!next?'':next.startsWith('+')?next:next.startsWith('00')?'+'+next.slice(2):'+'+getCountryCallingCode(selected)+next.replace(/^0/,''));

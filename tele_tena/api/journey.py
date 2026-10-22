@@ -197,7 +197,7 @@ def session():
     user = actor()
     p = rows('SELECT * FROM tt_profile WHERE user=%s', (user,))
     from tele_tena.api.profile_photos import owner_photo
-    return {'user': user, 'display_name': frappe.db.get_value('User', user, 'full_name'), 'photo': owner_photo(user), 'roles': frappe.get_roles(user), 'profile': p[0] if p else None,
+    return {'user': user, 'display_name': p[0].display_name if p else frappe.db.get_value('User', user, 'full_name'), 'photo': owner_photo(user), 'roles': frappe.get_roles(user), 'profile': p[0] if p else None,
             'clinic_workspace': _clinic_workspace_available(user),
             'clinic_schedule_workspace': _clinic_schedule_workspace_available(user),
             'csrf_token': get_csrf_token(), 'simulation': simulation_enabled()}
@@ -228,6 +228,11 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
     if care_alias is not None and existing and kind=='patient':
         frappe.db.sql('UPDATE tt_profile SET care_alias=%s WHERE user=%s',(text(care_alias,120,False),user))
     name = text(display_name, 120)
+    if kind=='clinician':
+        confirmed=rows('SELECT payload FROM tt_professional_submission WHERE user=%s ORDER BY created DESC,id DESC LIMIT 1',(user,))
+        if confirmed:
+            structured=json.loads(confirmed[0].payload)
+            name=text(' '.join(filter(None,[structured.get('prefix_other') if structured.get('prefix')=='Other' else structured.get('prefix'),structured['first_name'],structured['last_name']])),120)
     history = text(history, 4000, False) if kind == 'patient' else ''
     if languages is None:
         language_values = json.loads(existing[0].languages or '[]') if existing else []
@@ -331,7 +336,7 @@ def applications():
             item.resume_size = evidence[0].content_size if evidence else None
             item.resume_revision = evidence[0].revision if evidence else None
             item.submission_date_available = bool(item.submitted_at)
-            item.evidence_complete = bool(evidence and (item.statement.strip() or all(
+            item.evidence_complete = bool(item.resume_uploaded and (item.statement.strip() or all(
                 item.application_profile.get(key) for key in ('professional_category', 'qualification', 'issuing_institution'))))
             item.verified_contacts = rows('SELECT channel,contact,verified_at FROM tt_contact_identity WHERE user=%s',
                                           (item.user,))

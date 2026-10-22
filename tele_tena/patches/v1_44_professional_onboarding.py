@@ -1,4 +1,5 @@
 """Additive structured applications and private evidence. No inferred legacy names/roles."""
+import re
 import frappe
 
 
@@ -25,5 +26,15 @@ def execute():
     }
     for key,definition in definitions.items():
         frappe.db.sql_ddl(f'CREATE TABLE IF NOT EXISTS tt_{key} ({definition}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4')
+    if not frappe.db.sql("SHOW COLUMNS FROM tt_professional_submission LIKE 'reference_snapshot'"):
+        frappe.db.sql_ddl('ALTER TABLE tt_professional_submission ADD COLUMN reference_snapshot LONGTEXT NULL')
+    if frappe.db.table_exists('Tele Tena Vetting Scope Application') and not frappe.db.sql("SHOW COLUMNS FROM `tabTele Tena Vetting Scope Application` LIKE 'professional_submission'"):
+        frappe.db.sql_ddl('ALTER TABLE `tabTele Tena Vetting Scope Application` ADD COLUMN professional_submission CHAR(36) NULL')
+    if frappe.db.table_exists('Tele Tena Vetting Scope Application'):
+        for column in ('qualification','issuing_institution','issuing_authority'):
+            found=frappe.db.sql('SHOW COLUMNS FROM `tabTele Tena Vetting Scope Application` LIKE %s',(column,))
+            width=re.fullmatch(r'varchar\((\d+)\)',str(found[0][1]).lower()) if found else None
+            if width and int(width[1]) < 240:
+                frappe.db.sql_ddl(f'ALTER TABLE `tabTele Tena Vetting Scope Application` MODIFY `{column}` VARCHAR(240) NULL')
     from tele_tena.professional_reference import import_bundled
     import_bundled()
