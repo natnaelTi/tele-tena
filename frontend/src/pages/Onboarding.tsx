@@ -172,7 +172,7 @@ export default function Onboarding() {
       </div>
       <h1>{w(titles[step])}</h1><RequiredFieldsNotice/>
       {error && <InlineNotice tone="danger">{w(error)}</InlineNotice>}
-      {!ready||!access ? (
+      {!ready||!access||(clinician&&!professionalState) ? (
         <Skeleton />
       ) : (
         <form
