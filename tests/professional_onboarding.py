@@ -87,6 +87,11 @@ class Professional(unittest.TestCase):
   with self.assertRaises(frappe.ValidationError):p.attach_scope_license(scope['name'],identity)
   frappe.set_user(users['therapist'])
   with self.assertRaises(frappe.PermissionError):p.attach_scope_license(scope['name'],id)
+ def test_patient_cannot_use_clinician_sections(self):
+  from tele_tena.api import contact_auth
+  frappe.set_user(users['patient'])
+  for step in (5,6,7):
+   with self.assertRaises(frappe.ValidationError):contact_auth.save_onboarding('patient',step,{})
  def test_generic_api_denial(self):
   frappe.set_user(users['patient'])
   with self.assertRaises(frappe.PermissionError):p.application(users['counselor'])

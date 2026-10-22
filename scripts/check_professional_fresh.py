@@ -3,7 +3,9 @@ import os,secrets,sys,subprocess,json
 from pathlib import Path
 from unittest.mock import patch
 BENCH=Path('/home/frappe/teletena-compat/bench');ROOT=Path(__file__).resolve().parents[1]
-SITE='teletena-onboarding-v144-fresh.localhost';DB='tt_onboarding_v144_fresh';SOCKET=BENCH.parent/'runtime/mariadb-target.sock'
+SITE=os.environ.get('TELE_TENA_FRESH_SITE','teletena-onboarding-v144-fresh.localhost')
+assert SITE in ('teletena-onboarding-v144-fresh.localhost','teletena-onboarding-v144-final.localhost')
+DB='tt_onboarding_v144_final' if SITE.endswith('-final.localhost') else 'tt_onboarding_v144_fresh';SOCKET=BENCH.parent/'runtime/mariadb-target.sock'
 assert SOCKET.is_socket() and not (BENCH/'sites'/SITE).exists()
 os.chdir(BENCH/'sites');sys.path.insert(0,str(ROOT))
 import frappe,pymysql
@@ -17,6 +19,8 @@ frappe.init(site=SITE,sites_path=str(BENCH/'sites'));frappe.connect()
 for table in ('tt_professional_draft','tt_professional_submission','tt_professional_evidence','tt_identity_reviewer'):assert frappe.db.sql('SELECT COUNT(*) FROM '+table)[0][0]==0
 counts=frappe.db.sql('SELECT kind,COUNT(*) FROM tt_reference GROUP BY kind');assert dict(counts)['issuer']>8000
 assert frappe.db.has_column('Tele Tena Vetting Scope Application','professional_submission')
+assert frappe.db.sql("SHOW COLUMNS FROM tt_professional_draft LIKE 'legacy_name'")
+assert frappe.db.sql("SHOW COLUMNS FROM tt_professional_submission LIKE 'reference_snapshot'")
 for field in ('qualification','issuing_institution','issuing_authority'):
  width=frappe.db.sql('SELECT CHARACTER_MAXIMUM_LENGTH FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=%s AND COLUMN_NAME=%s',('tabTele Tena Vetting Scope Application',field))[0][0]
  assert width>=240
