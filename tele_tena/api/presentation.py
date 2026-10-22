@@ -1027,10 +1027,9 @@ def download_resume(clinician):
         frappe.throw('CV unavailable', frappe.PermissionError)
     found = rows('SELECT filename,content FROM tt_resume_evidence WHERE clinician=%s', (clinician,))
     if not found:
-        from tele_tena.api.professional import cv_available, download
+        from tele_tena.api.professional import cv_available, retained_cv_ids, download
         if cv_available(clinician):
-            value=rows('SELECT payload FROM tt_professional_draft WHERE user=%s',(clinician,))
-            return download(json.loads(value[0].payload)['cv_files'][0])
+            return download(retained_cv_ids(clinician)[0])
         frappe.throw('CV unavailable', frappe.DoesNotExistError)
     frappe.local.response.filename = found[0].filename
     frappe.local.response.filecontent = bytes(found[0].content)

@@ -188,7 +188,7 @@ export default function Onboarding() {
             void save(steps[Math.min(position + 1, steps.length - 1)], step === 3);
           }}
         >
-          {clinician&&[0,1,2,6,7].includes(step)&&<ProfessionalStep step={step===6?2:step===7?3:step===2?4:step} value={professional} onChange={setProfessional} evidence={professionalState?.evidence||[]} onEvidence={refreshProfessional}/> }
+          {clinician&&[0,1,2,6,7].includes(step)&&<ProfessionalStep step={step===6?2:step===7?3:step===2?4:step} value={professional} onChange={change=>{setProfessional(change);setSaved(false);setError('');}} evidence={professionalState?.evidence||[]} onEvidence={refreshProfessional}/> }
           {step === 0 && !clinician && (
             <>
               <p>
@@ -298,9 +298,9 @@ export default function Onboarding() {
                 <h2>{w("Professional Details")}</h2>
                 <dl>
                   <div><dt>{w("Professional name")}</dt><dd>{[professional.prefix==='Other'?professional.prefix_other:professional.prefix,professional.first_name,professional.last_name].filter(Boolean).join(' ')||w('Not Provided')}</dd></div>
-                  <div><dt>{w("Profession")}</dt><dd>{professional.profession_other||professionalState?.reference_labels?.[professional.profession||'']||w('Selected Profession')}</dd></div>
+                  <div><dt>{w("Profession")}</dt><dd>{(professional.profession==='Other'?professional.profession_other:professionalState?.reference_labels?.[professional.profession||''])||w('Selected Profession')}</dd></div>
                   <div><dt>{w("Primary qualification")}</dt><dd>{professional.qualification_title||w('Not Provided')}</dd></div>
-                  <div><dt>{w("Issuing institution")}</dt><dd>{professional.issuer_other||professionalState?.reference_labels?.[professional.issuer||'']||w('Selected Institution')}</dd></div>
+                  <div><dt>{w("Issuing institution")}</dt><dd>{(professional.issuer==='Other'?professional.issuer_other:professionalState?.reference_labels?.[professional.issuer||''])||w('Selected Institution')}</dd></div>
                   <div><dt>{w("Consultation languages")}</dt><dd>{(answers.care_languages||[]).map(code=>w(code==="en"?"English":code==="am"?"Amharic":"Afaan Oromo")).join(", ")||w("Not provided")}</dd></div>
                   <div><dt>{w("Credentials & scope")}</dt><dd>{answers.statement}</dd></div>
                   <div><dt>{w("CV")}</dt><dd>{w(resumeUploaded||(professional.cv_files||[]).length?"CV uploaded for authorized review.":"Not provided")}</dd></div>

@@ -68,6 +68,25 @@ class Professional(unittest.TestCase):
   self.assertTrue(p.cv_available(users['counselor']));self.assertEqual(p.submitted_legacy_claims(users['counselor'])['qualification'],'Master of Arts in Counseling')
   from tele_tena.api import journey
   frappe.set_user(users['reviewer']);record=next(x for x in journey.applications() if x.user==users['counselor']);self.assertTrue(record.resume_uploaded);self.assertTrue(record.evidence_complete)
+ def test_license_reuse_is_private_and_retry_safe(self):
+  from tele_tena.api import vetting
+  candidates=frappe.db.sql("SELECT name FROM `tabTele Tena Service` s WHERE vetting_required=1 AND catalog_status IN ('Draft','Active') AND NOT EXISTS (SELECT name FROM `tabTele Tena Vetting Scope Application` a WHERE a.clinician=%s AND a.service=s.name) LIMIT 1",(users['counselor'],))
+  self.assertTrue(candidates,'Fixture needs an unapplied structured scope')
+  scope=vetting.save_scope_application(candidates[0][0],{'professional_category':'Counselor','qualification':'Fictional development qualification','issuing_institution':'Fictional college','population_adults':True},False)
+  from pypdf import PdfWriter
+  f=io.BytesIO();writer=PdfWriter();writer.add_blank_page(width=100,height=100);writer.write(f)
+  id=p.upload('License','fictional-license.pdf',base64.b64encode(f.getvalue()).decode())['id']
+  first=p.attach_scope_license(scope['name'],id);second=p.attach_scope_license(scope['name'],id);self.assertEqual(first['id'],second['id']);self.assertTrue(second['already_attached'])
+  self.assertEqual(frappe.db.sql("SELECT COUNT(*) FROM `tabTele Tena Scope Evidence` WHERE scope_application=%s AND evidence_type='License or registration'",(scope['name'],))[0][0],1)
+  cv=p.upload('CV','fictional-cv.pdf',base64.b64encode(f.getvalue()).decode())['id'];state=p.application();p.save({**self.payload(),'cv_files':[cv],'license_files':[id]},state['revision'],True);version=p.application()['submissions'][0]['id']
+  submitted=vetting.save_scope_application(candidates[0][0],{'professional_category':'Counselor','qualification':'Fictional development qualification','issuing_institution':'Fictional college','population_adults':True},True)
+  self.assertEqual(frappe.db.get_value('Tele Tena Vetting Scope Application',submitted['name'],'professional_submission'),version)
+
+  from PIL import Image
+  image=io.BytesIO();Image.new('RGB',(8,8),'white').save(image,format='PNG');identity=p.upload('Identification','fictional-id.png',base64.b64encode(image.getvalue()).decode())['id']
+  with self.assertRaises(frappe.ValidationError):p.attach_scope_license(scope['name'],identity)
+  frappe.set_user(users['therapist'])
+  with self.assertRaises(frappe.PermissionError):p.attach_scope_license(scope['name'],id)
  def test_generic_api_denial(self):
   frappe.set_user(users['patient'])
   with self.assertRaises(frappe.PermissionError):p.application(users['counselor'])

@@ -132,6 +132,9 @@ export default function SignIn() {
     if(params.get('intent')==='clinician'&&current?.profile?.kind==='patient'){
       setError(w('This account has a patient profile. Use your professional account to apply; your existing profile and permissions are unchanged.'));return;
     }
+    if(params.get('intent')==='clinician'&&current?.profile?.kind==='clinician'){
+      navigate('/clinician/vetting',{replace:true});return;
+    }
     const next = params.get("next") || "";
     const inviteToken = (routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken || "";
     const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken||"";

@@ -65,6 +65,7 @@ def validate(value,user,submit=False):
         for id in values:reference(id,'specialty' if key=='specialties' else 'facility',user)
         result[key]=values
     if result.get('qualification_area') and result['qualification_area'] not in result['specialties']+['Other']:fail('Choose a selected specialty area or Other.','qualification_area_invalid')
+    if submit and result.get('qualification_area')=='Other' and not result.get('qualification_area_other'):fail('Enter the qualification’s related area, or leave the optional area unselected.','qualification_area_other_required')
     if submit and result.get('issuer')=='Other' and not re.fullmatch('[A-Z]{2}',result.get('issuer_country','')):fail('Choose the institution country.','issuer_country_required')
     if result['non_expiring'] and result.get('valid_until'):fail('Clear Valid Until for a non-expiring credential.','credential_date_range')
     for key in ('valid_from','valid_until'):
@@ -108,6 +109,8 @@ def validate(value,user,submit=False):
         for key,label in [('first_name','First Name'),('last_name','Last Name'),('profession','Profession'),('qualification_title','Awarded Qualification Title'),('issuer','Issuing Institution')]:
             if not result.get(key):fail('Complete '+label+' before submitting.','professional_required')
         if result.get('prefix')=='Other' and not result.get('prefix_other'):fail('Enter your preferred prefix.','prefix_invalid')
+        full_name=' '.join(filter(None,[result.get('prefix_other') if result.get('prefix')=='Other' else result.get('prefix'),result['first_name'],result['last_name']]))
+        if len(full_name)>120:fail('Keep your combined professional name to 120 characters or fewer.','professional_name_invalid')
         if not result['adult']:fail('Professional registration remains restricted to adults.','adult_required')
         if not result['declaration']:fail('Confirm your application declaration before submitting.','declaration_required')
     return result
@@ -148,8 +151,9 @@ def application(clinician=None):
     for key in ('specialties','clinics'):selected.update(payload.get(key,[]))
     selected.update(c.get('domain','') for c in payload.get('competencies',[]))
     selected.update(c.get('issuer','') for c in payload.get('certifications',[]))
-    reference_labels={r.id:r.label for r in rows('SELECT id,label FROM tt_reference WHERE id IN ('+','.join(['%s']*len(selected))+')',tuple(selected))} if selected else {}
-    return {'reference_labels':reference_labels,'legacy':{'name':public[0].display_name if public else legacy.get('name',''),'professional':legacy.get('professional',{}),'statement':legacy.get('statement','')},'payload':payload,'revision':saved[0].revision if saved else 0,'evidence':evidence,'identity_access':identity_access,'submissions':submissions,'rating_definitions':RATING_DEFINITIONS,'declaration_version':DECLARATION}
+    reference_rows=rows('SELECT id,label,country FROM tt_reference WHERE id IN ('+','.join(['%s']*len(selected))+')',tuple(selected)) if selected else []
+    reference_labels={r.id:r.label for r in reference_rows}
+    return {'reference_countries':{r.id:r.country for r in reference_rows},'reference_labels':reference_labels,'legacy':{'name':public[0].display_name if public else legacy.get('name',''),'professional':legacy.get('professional',{}),'statement':legacy.get('statement','')},'payload':payload,'revision':saved[0].revision if saved else 0,'evidence':evidence,'identity_access':identity_access,'submissions':submissions,'rating_definitions':RATING_DEFINITIONS,'declaration_version':DECLARATION}
 
 
 def persist(user,payload,revision=None,submit=False):
@@ -220,11 +224,18 @@ def assign_identity_reviewer(clinician,reviewer,reason):
     return {'assigned':True}
 
 
-def cv_available(user):
+def retained_cv_ids(user):
     saved=rows('SELECT payload FROM tt_professional_draft WHERE user=%s',(user,))
-    if not saved:return False
-    ids=json.loads(saved[0].payload).get('cv_files',[])
-    return any(rows("SELECT id FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose='CV'",(id,user)) for id in ids)
+    snapshots=rows('SELECT payload FROM tt_professional_submission WHERE user=%s ORDER BY created DESC,id DESC',(user,))
+    ids=[]
+    for row in saved+snapshots:
+        for id in json.loads(row.payload).get('cv_files',[]):
+            if id not in ids and rows("SELECT id FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose='CV'",(id,user)):ids.append(id)
+    return ids
+
+
+def cv_available(user):
+    return bool(retained_cv_ids(user))
 
 
 def submitted_legacy_claims(user):
@@ -259,4 +270,20 @@ def submission(id):
     for item in payload.get('certifications',[])+payload.get('competencies',[]):ids.update(item.get('files',[]))
     evidence=rows('SELECT id,purpose,filename FROM tt_professional_evidence WHERE user=%s AND id IN ('+','.join(['%s']*len(ids))+')',(row.user,*ids)) if ids else []
     references=json.loads(row.reference_snapshot or '[]')
-    return {'payload':payload,'reference_labels':{r['id']:r['label'] for r in references},'evidence':evidence,'identity_access':identity,'id':row.id,'created':row.created,'declaration_version':row.declaration_version}
+    return {'payload':payload,'reference_labels':{r['id']:r['label'] for r in references},'reference_countries':{r['id']:r.get('country','') for r in references},'evidence':evidence,'identity_access':identity,'id':row.id,'created':row.created,'declaration_version':row.declaration_version}
+
+
+@command
+def attach_scope_license(application,id):
+    user=owner()
+    from tele_tena.api.vetting import _authorized_scope_application,upload_scope_evidence
+    scope=_authorized_scope_application(application,user)
+    if scope.clinician!=user:frappe.throw('Scope evidence unavailable',frappe.PermissionError)
+    document=rows("SELECT filename,mime,content,content_sha256 FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose='License'",(id,user))
+    if not document or document[0].mime!='application/pdf':fail('Choose a private license PDF from your professional profile. Identification files cannot be attached to scope applications.','scope_license_pdf_required')
+    rows('SELECT name FROM `tabTele Tena Vetting Scope Application` WHERE name=%s AND clinician=%s FOR UPDATE',(application,user))
+    prior=rows("SELECT name FROM `tabTele Tena Scope Evidence` WHERE scope_application=%s AND evidence_type='License or registration' AND content_sha256=%s FOR UPDATE",(scope.name,document[0].content_sha256))
+    if prior:return {'id':prior[0].name,'already_attached':True}
+    result=upload_scope_evidence(application,'License or registration',document[0].filename,base64.b64encode(bytes(document[0].content)).decode())
+    audit(user,'ProfessionalLicenseAttached',{'application':application,'source_evidence':id,'sha256':document[0].content_sha256})
+    return result
