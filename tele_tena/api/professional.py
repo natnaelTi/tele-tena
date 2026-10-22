@@ -120,7 +120,7 @@ def validate(value,user,submit=False):
 def application(clinician=None):
     user=actor();clinician=clinician or owner()
     if not may_review(user,clinician):frappe.throw('Application unavailable',frappe.PermissionError)
-    saved=rows('SELECT payload,revision FROM tt_professional_draft WHERE user=%s',(clinician,))
+    saved=rows('SELECT payload,revision,legacy_name FROM tt_professional_draft WHERE user=%s',(clinician,))
     evidence=rows('SELECT id,purpose,filename,mime,content_size,content_sha256,created FROM tt_professional_evidence WHERE user=%s ORDER BY created',(clinician,))
     identity_access=user==clinician or bool(rows('SELECT clinician FROM tt_identity_reviewer WHERE clinician=%s AND reviewer=%s',(clinician,user)))
     evidence=[e for e in evidence if e.purpose!='Identification' or identity_access]
@@ -153,7 +153,7 @@ def application(clinician=None):
     selected.update(c.get('issuer','') for c in payload.get('certifications',[]))
     reference_rows=rows('SELECT id,label,country FROM tt_reference WHERE id IN ('+','.join(['%s']*len(selected))+')',tuple(selected)) if selected else []
     reference_labels={r.id:r.label for r in reference_rows}
-    return {'reference_countries':{r.id:r.country for r in reference_rows},'reference_labels':reference_labels,'legacy':{'name':public[0].display_name if public else legacy.get('name',''),'professional':legacy.get('professional',{}),'statement':legacy.get('statement','')},'payload':payload,'revision':saved[0].revision if saved else 0,'evidence':evidence,'identity_access':identity_access,'submissions':submissions,'rating_definitions':RATING_DEFINITIONS,'declaration_version':DECLARATION}
+    return {'reference_countries':{r.id:r.country for r in reference_rows},'reference_labels':reference_labels,'legacy':{'name':saved[0].legacy_name if saved and saved[0].legacy_name is not None else legacy.get('name') or (public[0].display_name if public else ''),'professional':legacy.get('professional',{}),'statement':legacy.get('statement','')},'payload':payload,'revision':saved[0].revision if saved else 0,'evidence':evidence,'identity_access':identity_access,'submissions':submissions,'rating_definitions':RATING_DEFINITIONS,'declaration_version':DECLARATION}
 
 
 def persist(user,payload,revision=None,submit=False):
@@ -161,8 +161,10 @@ def persist(user,payload,revision=None,submit=False):
     if revision is not None and int(revision)!=(old[0].revision if old else 0):fail('This application changed in another tab. Reload before saving; your entries remain here.','professional_conflict')
     clean=validate(payload,user,submit)
     encoded=json.dumps(clean,ensure_ascii=False,sort_keys=True,separators=(',',':'));digest=hashlib.sha256(encoded.encode()).hexdigest()
-    if old:frappe.db.sql('UPDATE tt_professional_draft SET payload=%s,revision=revision+1,modified=UTC_TIMESTAMP(6) WHERE user=%s',(encoded,user))
-    else:frappe.db.sql('INSERT INTO tt_professional_draft VALUES (%s,%s,1,UTC_TIMESTAMP(6))',(user,encoded))
+    original=rows("SELECT display_name FROM tt_profile WHERE user=%s AND kind='clinician'",(user,))
+    original_name=original[0].display_name if original else None
+    if old:frappe.db.sql('UPDATE tt_professional_draft SET payload=%s,revision=revision+1,modified=UTC_TIMESTAMP(6),legacy_name=COALESCE(legacy_name,%s) WHERE user=%s',(encoded,original_name,user))
+    else:frappe.db.sql('INSERT INTO tt_professional_draft (user,payload,revision,modified,legacy_name) VALUES (%s,%s,1,UTC_TIMESTAMP(6),%s)',(user,encoded,original_name))
     if submit:
         already_submitted=bool(rows('SELECT id FROM tt_professional_submission WHERE user=%s AND digest=%s',(user,digest)))
         selected={clean.get(k) for k in ('profession','issuer','authority')}|set(clean.get('specialties',[]))|set(clean.get('clinics',[]))|{c.get('domain') for c in clean.get('competencies',[])}|{c.get('issuer') for c in clean.get('certifications',[])}

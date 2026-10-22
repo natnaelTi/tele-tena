@@ -132,6 +132,7 @@ export default function SignIn() {
     if(params.get('intent')==='clinician'&&current?.profile?.kind==='patient'){
       setError(w('This account has a patient profile. Use your professional account to apply; your existing profile and permissions are unchanged.'));return;
     }
+    if(params.get('intent')==='patient'&&current?.profile?.kind==='clinician'){setError(w('You are signed in to a professional workspace. Use a patient account to continue; no patient role has been added.'));return;}
     if(params.get('intent')==='clinician'&&current?.profile?.kind==='clinician'){
       navigate('/clinician/vetting',{replace:true});return;
     }
@@ -146,6 +147,7 @@ export default function SignIn() {
       navigate("/onboarding?intent=patient", { replace:true, state:{relationshipInvitationToken:inviteToken} });
       return;
     }
+    if(params.get('intent')==='patient'&&current?.profile?.kind==='patient'&&!safeBookingReturn&&!safeRelationshipReturn&&next!=='/patient/discovery'){navigate(pendingCareQuery()?'/patient/discovery':'/patient',{replace:true});return;}
     navigate(
       (safeBookingReturn || safeRelationshipReturn || (next === "/patient/discovery" && current?.profile?.kind === "patient")) ? next : !current?.profile && ["patient", "clinician"].includes(params.get("intent") || "")
         ? "/onboarding?intent=" + params.get("intent")

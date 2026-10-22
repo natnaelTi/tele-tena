@@ -12,7 +12,7 @@ def execute():
             submitted_by VARCHAR(140),merged_into VARCHAR(100),clinic VARCHAR(140),
             KEY reference_search(kind,status,country,label),KEY source_identity(kind,source_id)''',
         'professional_draft':'''user VARCHAR(140) PRIMARY KEY,payload LONGTEXT NOT NULL,
-            revision INT NOT NULL DEFAULT 1,modified DATETIME(6) NOT NULL''',
+            revision INT NOT NULL DEFAULT 1,modified DATETIME(6) NOT NULL,legacy_name VARCHAR(120) NULL''',
         'professional_submission':'''id CHAR(36) PRIMARY KEY,user VARCHAR(140) NOT NULL,
             payload LONGTEXT NOT NULL,digest CHAR(64) NOT NULL,created DATETIME(6) NOT NULL,
             declaration_version VARCHAR(60) NOT NULL,KEY owner_submissions(user,created),UNIQUE KEY same_submission(user,digest)''',
@@ -26,6 +26,8 @@ def execute():
     }
     for key,definition in definitions.items():
         frappe.db.sql_ddl(f'CREATE TABLE IF NOT EXISTS tt_{key} ({definition}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4')
+    if not frappe.db.sql("SHOW COLUMNS FROM tt_professional_draft LIKE 'legacy_name'"):
+        frappe.db.sql_ddl('ALTER TABLE tt_professional_draft ADD COLUMN legacy_name VARCHAR(120) NULL')
     if not frappe.db.sql("SHOW COLUMNS FROM tt_professional_submission LIKE 'reference_snapshot'"):
         frappe.db.sql_ddl('ALTER TABLE tt_professional_submission ADD COLUMN reference_snapshot LONGTEXT NULL')
     if frappe.db.table_exists('Tele Tena Vetting Scope Application') and not frappe.db.sql("SHOW COLUMNS FROM `tabTele Tena Vetting Scope Application` LIKE 'professional_submission'"):
