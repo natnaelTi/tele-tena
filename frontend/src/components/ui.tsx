@@ -52,6 +52,8 @@ export function IconButton({
     </Button>
   );
 }
+export function FieldLabel({children,required=false,htmlFor}:{children:ReactNode;required?:boolean;htmlFor?:string}){return <label htmlFor={htmlFor}>{children}{required&&<span className="required-marker" title="Required" aria-label="Required"> *</span>}</label>;}
+export function RequiredFieldsNotice(){return <p className="supporting">Fields marked <span className="required-marker">*</span> are required.</p>;}
 export function TextField({
   label,
   hint,
@@ -66,7 +68,7 @@ export function TextField({
   const id = props.id || uid;
   return (
     <div className="field">
-      <label htmlFor={id}>{label}</label>
+      <FieldLabel htmlFor={id} required={props.required}>{label}</FieldLabel>
       <input
         {...props}
         id={id}
@@ -104,7 +106,7 @@ export function Select({
   const id = useId();
   return (
     <div className="field">
-      <label htmlFor={id}>{label}</label>
+      <FieldLabel htmlFor={id} required={props.required}>{label}</FieldLabel>
       <select {...props} id={id} aria-invalid={!!error} aria-describedby={error ? id + "-error" : undefined}>
         {children}
       </select>
@@ -123,7 +125,7 @@ export function Checkbox({
     <label className={`check-field${variant === "card" ? " check-card" : ""}`}>
       <input {...props} type="checkbox" aria-labelledby={props["aria-labelledby"] || id + "-label"}
         aria-describedby={[props["aria-describedby"], description ? id + "-description" : undefined].filter(Boolean).join(" ") || undefined} />
-      <span><span id={id + "-label"}>{label}</span>{description && <small id={id + "-description"}>{description}</small>}</span>
+      <span><span id={id + "-label"}>{label}{props.required&&<span className="required-marker" title="Required" aria-label="Required"> *</span>}</span>{description && <small id={id + "-description"}>{description}</small>}</span>
     </label>
   );
 }

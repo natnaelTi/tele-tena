@@ -1,1 +1,7 @@
 .phone-entry{display:grid;grid-template-columns:minmax(120px,40%) minmax(0,1fr);gap:8px}.phone-entry select,.phone-entry input{min-width:0;width:100%}.phone-entry select{font-size:14px}.phone-field .supporting{margin:0}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}@media(max-width:360px){.phone-entry{grid-template-columns:120px minmax(0,1fr)}}
+/* Keep the native searchable/keyboard country control. Only its collapsed visual
+   is compact; every option and its accessible label retains country identity. */
+.phone-entry select{grid-column:1;grid-row:1;color:transparent;caret-color:transparent;position:relative;z-index:2;background-color:transparent}
+.phone-entry select option{color:var(--ink);background:#fff}
+.phone-country-compact{grid-column:1;grid-row:1;align-self:center;padding-left:14px;pointer-events:none;z-index:1;white-space:nowrap;font-size:14px}
+.phone-entry input{grid-column:2;grid-row:1}
