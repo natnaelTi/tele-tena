@@ -1,17 +1,48 @@
 import {useEffect,useState} from 'react';
 import {api} from '../api';
-import {Button,InlineNotice,TextField} from './ui';
+import {Button,InlineNotice,TextField,Select,RequiredFieldsNotice} from './ui';
 import {ProfessionalStep,professionalError} from './ProfessionalApplication';
 import type{ApplicationState,ProfessionalClaims}from './ProfessionalApplication';
 import {useSession}from '../hooks/useSession';
 import {useLocale}from '../hooks/useLocale';
 const legacyLabels:Record<string,string>={professional_category:'Profession',qualification:'Qualification',issuing_institution:'Issuing Institution',registration_number:'License Number',issuing_authority:'Licensing Authority',jurisdiction:'Credential Jurisdiction',credential_valid_from:'Valid From',credential_expiry:'Valid Until',experience_years:'Years of Practice',competencies:'Earlier Competency Narrative',certifications:'Earlier Certification Narrative'};
 const groups=['Your Professional Profile','Qualifications and Certifications','Professional License','Competency Domains','Clinic Affiliations and Declaration'];
-export function ProfessionalEditor(){const{refresh}=useSession();const{w}=useLocale(),[state,setState]=useState<ApplicationState|null>(null),[payload,setPayload]=useState<ProfessionalClaims>({}),[step,setStep]=useState(0),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
+export function ProfessionalEditor({accountView=false,accountSection,onOpenPersonal,onOpenProfessional}:{accountView?:boolean;accountSection?:'personal'|'professional';onOpenPersonal?:()=>void;onOpenProfessional?:()=>void}){
+ const{refresh}=useSession(),{w}=useLocale();
+ const[state,setState]=useState<ApplicationState|null>(null),[payload,setPayload]=useState<ProfessionalClaims>({}),[step,setStep]=useState(0),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
+ const personal=accountView&&accountSection==='personal';
+ const sectionLabels=accountView?['Profession and Public Bio',...groups.slice(1)]:groups;
+ const descriptions=['Profession, specialties and experience','Awarded qualifications, CV and certificates','Authority, jurisdiction and validity','Your self-assessment and explanation','Practice affiliations and accuracy declaration'];
  async function load(){const r=await api<ApplicationState>('tele_tena.api.professional.application');setState(r);return r;}
- useEffect(()=>{void load().then(r=>setPayload(r.payload)).catch(()=>setError('Your professional application could not be loaded.'));},[]);
+ const recover=()=>{setError('');void load().then(r=>setPayload(r.payload)).catch(()=>setError('Your professional application could not be loaded.'));};
+ useEffect(recover,[]);
  async function save(submit=false){setBusy(true);setError('');try{const r=await api<ApplicationState>('tele_tena.api.professional.save',{payload,revision:state?.revision,submit},true);setState(r);if(submit)await refresh();setNotice(submit?'Professional claims submitted. Your service scopes retain their individual review decisions.':'Draft saved.');}catch(e){setError(professionalError(e));}finally{setBusy(false);}}
- return <details className="card"><summary>{w('Professional Profile and Credentials')}</summary><p>{w('Update your private professional claims here. Each service application below still needs its own evidence and decision.')}</p>{error&&<InlineNotice tone="danger">{error}</InlineNotice>}{notice&&<p role="status">{w(notice)}</p>}{state&&<><nav className="actions" aria-label={w('Professional Application Sections')}>{groups.map((label,i)=><Button key={label} variant={i===step?'primary':'quiet'} aria-current={i===step?'step':undefined} onClick={()=>setStep(i)}>{i+1}. {w(label)}</Button>)}</nav><h2>{w(groups[step])}</h2>{state.legacy?.name&&<details><summary>{w("Historical Application Details")}</summary><p>{w("Confirm structured names yourself; earlier names and evidence have not been split or overwritten.")}</p><p>{state.legacy.name}</p><p>{state.legacy.statement}</p><dl>{Object.entries(state.legacy.professional||{}).map(([key,value])=><div key={key}><dt>{w(legacyLabels[key]||'Earlier Application Detail')}</dt><dd>{String(value??"")}</dd></div>)}</dl></details>}<ProfessionalStep step={step} value={payload} onChange={change=>{setPayload(change);setError('');setNotice('');}} evidence={state.evidence} legacyCV={state.legacy_cv} onEvidence={async()=>{await load();}}/><div className="actions"><Button variant="quiet" disabled={!step} onClick={()=>setStep(step-1)}>{w('Back')}</Button><Button variant="secondary" loading={busy} onClick={()=>void save()}>{w('Save Draft')}</Button>{step<4?<Button onClick={()=>setStep(step+1)}>{w('Continue')}</Button>:<Button loading={busy} onClick={()=>void save(true)}>{w('Submit Professional Update')}</Button>}</div></>}</details>;
+ if(accountView&&!accountSection)return null;
+ const content=<>
+  {error&&<InlineNotice tone="danger">{w(error)}</InlineNotice>}{notice&&<p role="status">{w(notice)}</p>}
+  {!state&&!error&&<p role="status">{w('Loading your professional details…')}</p>}
+  {!state&&error&&<Button variant="secondary" onClick={recover}>{w('Try again')}</Button>}
+  {state&&<>
+   {accountView&&<header className="professional-editor-header"><div><h2>{w(personal?'Name and Private Identification':'Your Professional Details')}</h2><p className="supporting">{w(personal?'Confirm your structured name and manage private identification here. Your photo is managed above.':'Choose a section to edit your credentials. Save a draft at any time, then submit your professional update for review.')}</p></div>{!personal&&onOpenPersonal&&<Button variant="quiet" onClick={onOpenPersonal}>{w('Edit Personal Details')}</Button>}</header>}
+   {accountView&&<RequiredFieldsNotice/>}
+   <div className={accountView&&!personal?'professional-editor-layout':undefined}>
+   {accountView&&!personal&&<div className="professional-editor-mobile"><Select label={w('Professional Section')} value={step} onChange={e=>setStep(Number(e.target.value))}>{sectionLabels.map((label,i)=><option value={i} key={label}>{w(label)}</option>)}</Select></div>}
+   {!personal&&<nav className={accountView?'professional-editor-nav':'actions'} aria-label={w('Professional Application Sections')}>{sectionLabels.map((label,i)=><Button key={label} variant={accountView?'quiet':i===step?'primary':'quiet'} aria-current={i===step?'step':undefined} onClick={()=>setStep(i)}><span className="professional-editor-section-number" aria-hidden="true">{i+1}</span><span>{w(label)}{accountView&&<small>{w(descriptions[i])}</small>}</span></Button>)}</nav>}
+   <div className="professional-editor-content">
+   {!personal&&<h3>{w(sectionLabels[step])}</h3>}
+   <ProfessionalStep step={personal?0:step} profilePart={accountView?(personal?'identity':'practice'):'all'} value={payload} onChange={change=>{setPayload(change);setError('');setNotice('');}} evidence={state.evidence} legacyCV={state.legacy_cv} onEvidence={async()=>{await load();}}/>
+   {accountView&&<p className="supporting">{w('Drafts are private. Submit a professional update to apply your confirmed display name and bio; credentials and service scopes still require their separate reviews.')}</p>}
+   <div className="actions professional-editor-actions">
+    {!personal&&<Button variant="quiet" disabled={!step||busy} onClick={()=>setStep(step-1)}>{w('Back')}</Button>}
+    <Button variant="secondary" loading={busy} onClick={()=>void save()}>{w('Save Draft')}</Button>
+    {!personal&&(step<4?<Button disabled={busy} onClick={()=>setStep(step+1)}>{w('Continue')}</Button>:<Button loading={busy} onClick={()=>void save(true)}>{w('Submit Professional Update')}</Button>)}
+    {personal&&onOpenProfessional&&<Button disabled={busy} onClick={onOpenProfessional}>{w('Continue to Professional Details')}</Button>}
+   </div>
+   </div></div>
+   {state.legacy?.name&&<details className="professional-legacy-details"><summary>{w('Historical Application Details')}</summary><p>{w('Confirm structured names yourself; earlier names and evidence have not been split or overwritten.')}</p><p>{state.legacy.name}</p>{!personal&&<><p>{state.legacy.statement}</p><dl>{Object.entries(state.legacy.professional||{}).map(([key,value])=><div key={key}><dt>{w(legacyLabels[key]||'Earlier Application Detail')}</dt><dd>{String(value??'')}</dd></div>)}</dl></>}</details>}
+  </>}
+ </>;
+ return accountView?<section className="settings-section professional-account-editor">{content}</section>:<details className="card"><summary>{w('Professional Profile and Credentials')}</summary><p>{w('Update your private professional claims here. Each service application below still needs its own evidence and decision.')}</p>{content}</details>;
 }
 export function ProfessionalReview({clinician,submission}:{clinician:string;submission?:string}){const{w}=useLocale(),{session}=useSession(),[state,setState]=useState<ApplicationState|null>(null),[error,setError]=useState(''),[reason,setReason]=useState('');
  const load=()=>api<ApplicationState>('tele_tena.api.professional.application',{clinician}).then(async state=>{const selected=submission||state.submissions[0]?.id;if(selected){const snapshot=await api<Partial<ApplicationState>>('tele_tena.api.professional.submission',{id:selected});setState({...state,...snapshot});}else setState(state);}).catch(()=>setError(w('Professional details could not be loaded.')));
