@@ -98,7 +98,7 @@ export function PublicLayout() {
       <footer className="public-footer reference-public-footer">
         <div className="public-footer-brand"><Brand bilingual/><p>{w("Personal care, connected. Adults 18+ · Not an emergency service.")}</p></div>
         <nav aria-label={w("Care")}><h2>{w("Care")}</h2><Link to="/care">{w("Clinicians & services")}</Link><Link to="/request">{w("Request a Consultation")}</Link></nav>
-        <nav aria-label={w("For clinicians")}><h2>{w("For clinicians")}</h2><Link to="/for-clinicians">{w("Explore the practice tools")}</Link><Link to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}</Link></nav>
+        <nav aria-label={w("For clinicians")}><h2>{w("For Clinicians")}</h2><Link to="/for-clinicians">{w("Explore the practice tools")}</Link><Link to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}</Link></nav>
         <nav aria-label={w("Information")}><h2>{w("Information")}</h2><Link to="/contact">{w("Contact")}</Link><Link to="/how-it-works#public-faq">{w("Help & FAQ")}</Link><Link to="/policies">{w("Terms & Privacy")}</Link><TranslationNote/></nav>
       </footer>
       <Dialog open={menuOpen} onOpenChange={setMenuOpen} title={w("Navigation")} description={w("Choose where to go next.")} focusReturnTarget={menuTrigger.current} className="public-mobile-menu"><nav aria-label={w("Main navigation")}>{(session?links:publicLinks).map(([to,label])=><Link key={to} to={to} onClick={()=>setMenuOpen(false)}>{w(label)}</Link>)}</nav><LanguageSelect/></Dialog>
@@ -269,6 +269,6 @@ export function WorkspaceLayout({
     {signoutError&&<InlineNotice tone="danger">{signoutError}</InlineNotice>}
     <RequestPresenceProvider enabled={kind === "clinician" && !!session?.roles.includes("Tele Tena Clinician")}><main className={`reference-workspace-main ${location.pathname.includes('/discovery') || location.pathname.includes('/availability') || kind==='admin' ? 'workspace-wide' : ''}`} id="main-content"><Outlet /></main></RequestPresenceProvider>
     <nav className="product-mobile-nav" aria-label={w("Mobile workspace")}>{mobilePrimary.map(item => renderNavLink(item))}{mobileMore.length > 0 && <Button variant="quiet" onClick={event => { moreTrigger.current = event.currentTarget; setMoreOpen(true); }}><MoreHorizontal size={20} /><span>{w("More")}</span></Button>}</nav>
-    <Dialog open={moreOpen} onOpenChange={open => { setMoreOpen(open); if (!open) requestAnimationFrame(() => moreTrigger.current?.focus()); }} title={w("More workspace links")} description={w("Choose another area of your workspace.")} drawer>{groupedMore}<TranslationNote /></Dialog>
+    <Dialog open={moreOpen} onOpenChange={open => { setMoreOpen(open); if (!open) requestAnimationFrame(() => moreTrigger.current?.focus()); }} title={w("More Workspace Links")} description={w("Choose another area of your workspace.")} drawer>{groupedMore}<TranslationNote /></Dialog>
   </div>;
 }

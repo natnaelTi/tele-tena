@@ -1,3 +1,17 @@
+## Clinician Onboarding / Contextual Access —22October2026
+
+Bounded revision from PR48, branch `feat/clinician-onboarding-context`; packaged
+runtime `6a3fb4df2cc73bbb11480f1853ef80ed439e2366`. Five private professional groups,
+repeatable evidence, explicit identity-reviewer grants, sourced directory search,
+manual/pending facilities, immutable scope-linked claims and contextual access are
+implemented.9 focused Frappe16 tests,6 existing scope regressions, real new-clinician
+OTP/onboarding/reviewer browser flows and actual200% checks pass. Fresh final v1.44
+Frappe16/ERPNext16 install plus two native migrations pass. No provider/access,
+credential, balance or existing scenario reset. The existing matrix's
+`clinician_onboarding_context_revision` records this evidence separately from owner
+acceptance. See `clinician-onboarding-context-sprint.md` for field checklist,
+actual source counts and remaining permission/curation/governance/translation gates.
+
 ## Guest-first review —18October2026
 
 Guest public directory,reactive eligibility/availability filters,intent-aware auth,volatile request drafts,explicit encounter history/file sharing and state-aware neutral notices are implemented and locally tested. The existing guest_first_revision matrix and guest-first-mvp-verification-2026-10-18.md contain exact evidence. Owner review,live delivery,physical devices,native translations and production policy/retention approval remain separate. No reseed,merge,Selfmade/shared-repair change or real-money activation.

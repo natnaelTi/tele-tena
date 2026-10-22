@@ -965,7 +965,7 @@ def _resume_owner():
     draft = rows('SELECT kind,completed FROM tt_onboarding WHERE user=%s', (user,))
     if not ((p and p[0].kind == 'clinician') or
             (draft and draft[0].kind == 'clinician' and not draft[0].completed)):
-        frappe.throw('Resume unavailable', frappe.PermissionError)
+        frappe.throw('CV unavailable', frappe.PermissionError)
     return user
 
 
@@ -980,7 +980,7 @@ def resume_status():
 def upload_resume(filename, content_base64):
     user = _resume_owner()
     if not isinstance(filename, str) or len(filename) > 255 or not filename.lower().endswith('.pdf'):
-        fail('Upload a PDF resume')
+        fail('Upload a PDF CV')
     filename = re.sub(r'[^A-Za-z0-9 ._()-]', '_', filename.split('/')[-1].split('\\')[-1])[:180]
     if not isinstance(content_base64, str) or len(content_base64) > ((MAX_RESUME_BYTES + 2) // 3) * 4 + 8:
         fail('The PDF must be 5 MiB or smaller')
@@ -993,7 +993,7 @@ def upload_resume(filename, content_base64):
         fail('The uploaded file is not a valid PDF within the 5 MiB limit')
     app = rows('SELECT status FROM tt_application WHERE user=%s', (user,))
     if app and app[0].status not in ('Rejected',):
-        fail('Resume changes are available before application submission')
+        fail('CV changes are available before application submission')
     old = rows('SELECT revision FROM tt_resume_evidence WHERE clinician=%s FOR UPDATE', (user,))
     revision = int(old[0].revision) + 1 if old else 1
     frappe.db.sql('''INSERT INTO tt_resume_evidence
@@ -1020,14 +1020,17 @@ def remove_resume():
 def download_resume(clinician):
     user = actor()
     if user != clinician and 'Tele Tena Approver' not in frappe.get_roles(user):
-        frappe.throw('Resume unavailable', frappe.PermissionError)
+        frappe.throw('CV unavailable', frappe.PermissionError)
     if user == clinician:
         _resume_owner()
     elif not rows('SELECT user FROM tt_application WHERE user=%s', (clinician,)):
-        frappe.throw('Resume unavailable', frappe.PermissionError)
+        frappe.throw('CV unavailable', frappe.PermissionError)
     found = rows('SELECT filename,content FROM tt_resume_evidence WHERE clinician=%s', (clinician,))
     if not found:
-        frappe.throw('Resume unavailable', frappe.DoesNotExistError)
+        from tele_tena.api.professional import cv_available, retained_cv_ids, download
+        if cv_available(clinician):
+            return download(retained_cv_ids(clinician)[0])
+        frappe.throw('CV unavailable', frappe.DoesNotExistError)
     frappe.local.response.filename = found[0].filename
     frappe.local.response.filecontent = bytes(found[0].content)
     frappe.local.response.type = 'download'

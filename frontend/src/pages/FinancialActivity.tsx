@@ -40,7 +40,7 @@ export default function FinancialActivityDetail() {
   } as Record<string, string>)[bucket] || w('Balance change');
   return <>
     <p><Link className="text-link" to={href}>← {role === 'clinician' ? w('Back to earnings') : w('Back to payments')}</Link></p>
-    <PageTitle title={w('Transaction details')} description={w('A record of how this amount changed your balance.')}/>
+    <PageTitle title={w('Transaction Details')} description={w('A record of how this amount changed your balance.')}/>
     {resource.error ? <InlineNotice tone="danger">
       {errorCode === 'transaction_unavailable' || errorCode === 'permission_denied'
         ? w('Transaction unavailable.')
@@ -57,8 +57,8 @@ export default function FinancialActivityDetail() {
           <div><dt>{w('Net')}</dt><dd>ETB {money(item.net_minor || 0)}</dd></div>
           {item.release_at && <div><dt>{w(item.state === 'Released' ? 'Released at' : 'Expected release')}</dt><dd>{date(item.release_at)}</dd></div>}
         </dl>}
-        {item.account_changes?.length ? <section><h3>{w('Balance changes')}</h3><ul className="transaction-changes">{item.account_changes.map(change=><li key={change.bucket}><span>{label(change.bucket)}</span><strong>{change.delta_minor > 0 ? '+' : '−'}ETB {money(Math.abs(change.delta_minor))}</strong></li>)}</ul></section> : null}
-        {item.appointment && <section><h3>{w('Related appointment')}</h3><p>{item.appointment.service_label} · {date(item.appointment.start)} · {item.appointment.minutes} {w('minutes')}</p><StatusBadge>{w(item.appointment.state)}</StatusBadge><p><Link className="text-link" to={`/${role}/consultations/${item.appointment.id}`}>{w('View appointment')}</Link></p></section>}
+        {item.account_changes?.length ? <section><h3>{w('Balance Changes')}</h3><ul className="transaction-changes">{item.account_changes.map(change=><li key={change.bucket}><span>{label(change.bucket)}</span><strong>{change.delta_minor > 0 ? '+' : '−'}ETB {money(Math.abs(change.delta_minor))}</strong></li>)}</ul></section> : null}
+        {item.appointment && <section><h3>{w('Related Appointment')}</h3><p>{item.appointment.service_label} · {date(item.appointment.start)} · {item.appointment.minutes} {w('minutes')}</p><StatusBadge>{w(item.appointment.state)}</StatusBadge><p><Link className="text-link" to={`/${role}/consultations/${item.appointment.id}`}>{w('View appointment')}</Link></p></section>}
         {role === 'clinician' && item.activity_id.startsWith('payout-') && <p className="supporting">{w('No external transfer was made.')}</p>}
         {item.source === 'simulation_log' && <p className="supporting">{w('This is an earlier activity record. Its original history is preserved.')}</p>}
       </Card>

@@ -1,3 +1,4 @@
+import {RequiredFieldsNotice} from '../components/ui';
 import {journeyApi} from '../journey-api';
 import {returnPath,rememberReturn,startAuthTiming} from '../guest-intent';
 import { useEffect, useRef, useState } from "react";
@@ -21,6 +22,10 @@ export default function SignIn() {
   const navigate = useNavigate();
   const routeLocation=useLocation();
   const [params] = useSearchParams();
+  const registering=params.get('mode')==='register';
+  const clinicianIntent=params.get('intent')==='clinician';
+  const contextual=clinicianIntent?'Clinician':params.get('intent')==='patient'||!!returnPath()?'Patient':'';
+  function modeLink(register:boolean){const next=new URLSearchParams(params);if(register)next.set('mode','register');else next.delete('mode');return {pathname:'/sign-in',search:'?'+next.toString()};}
   const [channel, setChannel] = useState<"phone" | "email">("phone");
   const [contact, setContact] = useState("");
   const [passwordMode, setPasswordMode] = useState(false);
@@ -127,6 +132,10 @@ export default function SignIn() {
     if(params.get('intent')==='clinician'&&current?.profile?.kind==='patient'){
       setError(w('This account has a patient profile. Use your professional account to apply; your existing profile and permissions are unchanged.'));return;
     }
+    if(params.get('intent')==='patient'&&current?.profile?.kind==='clinician'){setError(w('You are signed in to a professional workspace. Use a patient account to continue; no patient role has been added.'));return;}
+    if(params.get('intent')==='clinician'&&current?.profile?.kind==='clinician'){
+      navigate('/clinician/vetting',{replace:true});return;
+    }
     const next = params.get("next") || "";
     const inviteToken = (routeLocation.state as {relationshipInvitationToken?:string}|null)?.relationshipInvitationToken || "";
     const coupleToken=(routeLocation.state as {coupleInvitationToken?:string}|null)?.coupleInvitationToken||"";
@@ -138,6 +147,7 @@ export default function SignIn() {
       navigate("/onboarding?intent=patient", { replace:true, state:{relationshipInvitationToken:inviteToken} });
       return;
     }
+    if(params.get('intent')==='patient'&&current?.profile?.kind==='patient'&&!safeBookingReturn&&!safeRelationshipReturn&&next!=='/patient/discovery'){navigate(pendingCareQuery()?'/patient/discovery':'/patient',{replace:true});return;}
     navigate(
       (safeBookingReturn || safeRelationshipReturn || (next === "/patient/discovery" && current?.profile?.kind === "patient")) ? next : !current?.profile && ["patient", "clinician"].includes(params.get("intent") || "")
         ? "/onboarding?intent=" + params.get("intent")
@@ -146,6 +156,8 @@ export default function SignIn() {
       { replace: true, state: routeLocation.state },
     );
   }
+  useEffect(()=>{if(registering){setPasswordMode(false);setPassword('');}},[registering]);
+  const usingPassword=passwordMode&&!registering;
   const masked =
     channel === "phone"
       ? "•••• " + contact.slice(-4)
@@ -156,20 +168,21 @@ export default function SignIn() {
       <h1>
         {challenge
           ? "Check your " + (channel === "phone" ? "phone" : "email")
-          : w(channel === "phone" ? "What’s your number?" : "Sign in with email")}
+          : w(registering?(clinicianIntent?'Clinician Registration':'Create Your Patient Account'):(contextual?contextual+' Sign-In':'Sign In to TeleTena'))}
       </h1>
       <p className="auth-description">
         {challenge
           ? "Enter the six-digit code sent to " + masked + "."
-        : passwordMode
+        : usingPassword
             ? t("emailPasswordPrompt")
-            : w("We’ll send a code to sign you in or get you started.")}
+            : w(registering?'Verify your contact, then complete your profile. Verification does not approve professional services.':'Verify your phone or email to continue. Your selected service or request stays with you.')}
       </p>
       {session && (
         <p>
           <Link to={destination(session)}>{w("Return to your workspace")}</Link><Button variant="quiet" onClick={()=>void run(async()=>{await journeyApi.logout();await refresh();})}>{w("Sign out and use another account")}</Button>
         </p>
       )}
+      <RequiredFieldsNotice/>
       {error && <InlineNotice tone="danger">{error}</InlineNotice>}
       {optionsError && <InlineNotice tone="danger">{t("authOptionsUnavailable")}</InlineNotice>}
       {!options && !error && !optionsError ? <p role="status">Checking sign-in options…</p> : null}
@@ -190,7 +203,7 @@ export default function SignIn() {
               );
               await proceed();
             });
-          else if (passwordMode)
+          else if (usingPassword)
             void run(async () => {
               await signIn(contact, password);
               await proceed();
@@ -223,7 +236,7 @@ export default function SignIn() {
             required
           />
         )}
-        {!challenge && passwordMode && (
+        {!challenge && usingPassword && (
           <TextField
             label={w("Password")}
             type="password"
@@ -233,10 +246,10 @@ export default function SignIn() {
             required
           />
         )}
-        <Button type="submit" loading={busy} disabled={!options || (channel === "phone" && !options.phone_otp) || (channel === "email" && !passwordMode && !options.email_otp)} className="full">
+        <Button type="submit" loading={busy} disabled={!options || (registering&&!(clinicianIntent?options.clinician_registration:options.patient_registration)) || (channel === "phone" && !options.phone_otp) || (channel === "email" && !passwordMode && !options.email_otp)} className="full">
           {challenge
             ? w("Verify and continue")
-            : passwordMode
+            : usingPassword
               ? w("Sign in")
               : w("Continue")}
           <ArrowRight size={20} />
@@ -297,7 +310,7 @@ export default function SignIn() {
           >
             {w("Use email instead")}
           </Button>}
-          {channel === "email" && (
+          {channel === "email" && !registering && (
             <Button
               variant="quiet"
               onClick={() => setPasswordMode(!passwordMode)}
@@ -310,9 +323,9 @@ export default function SignIn() {
         </div>
       )}
       {!challenge && <div className="auth-registration">
-        <p>{w("New to TeleTena?")}</p>
-        {options?.patient_registration?<Link to="/sign-in?intent=patient&mode=register">{w("Create an account")}</Link>:<span aria-disabled="true">{w("Patient registration is unavailable on this site.")}</span>}
-        {options?.clinician_registration?<Link to="/sign-in?intent=clinician&mode=register">{w("Apply as a clinician")}</Link>:<span aria-disabled="true">{w("Clinician applications are unavailable on this site.")}</span>}
+        <p>{w(registering?'Already have an account?':'New to TeleTena?')}</p>
+        {registering?<Link to={modeLink(false)} state={routeLocation.state}>{w(contextual?contextual+' Sign-In':'Sign In')}</Link>:
+        (clinicianIntent?options?.clinician_registration:options?.patient_registration)?<Link to={modeLink(true)} state={routeLocation.state}>{w('Create an Account')}</Link>:<span aria-disabled="true">{w('Registration is unavailable on this site.')}</span>}
       </div>}
       <p className="auth-privacy">
         <LockKeyhole size={16} />

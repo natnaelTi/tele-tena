@@ -16462,5 +16462,40 @@
       "screenshots": "docs/screenshots/final-polish/",
       "limits": "Existing focused call composition retained; no fresh claim of hosted calls, physical devices, live delivery, native translation or full financial acceptance from this CSS pass"
     }
+  },
+  "clinician_onboarding_context_revision": {
+    "date": "2026-10-22",
+    "status": "Functionally verified in focused real-backend journeys; rendered comparisons inspected by Codex; owner acceptance and external data/human gates pending",
+    "scope": "Five-section professional application, typed reference directories, private identification and repeatable evidence, individual scope review continuity, contextual auth, compact country display, required labels and static Title Case",
+    "checklist": "docs/clinician-onboarding-context-sprint.md",
+    "reference_manifest": "tele_tena/reference_data/manifest.json",
+    "baseline_source": "25fa5acbfe0acd513e2bf0c138de5f8aada65578",
+    "baseline_build": "f679e6ce8a1a8169b9bba16626a2880e5e212a75",
+    "external_dependencies": [
+      "Approved Ethiopian MFR API/reuse access",
+      "WDOMS reuse permission if selected",
+      "Broader regulator/awarding-body curation",
+      "Identity retention governance",
+      "Native-language review"
+    ],
+    "runtime_commit": "25458576cf42c18b6afc4e76160c7f1b397ce92f",
+    "functional_evidence": "docs/clinician-onboarding-context-sprint.md#candidate-and-verification",
+    "visual_evidence": "docs/clinician-onboarding-context-sprint.md#rendered-comparisons-and-specific-exceptions",
+    "screenshots": "docs/screenshots/clinician-onboarding-context/",
+    "tests": {
+      "frappe16": "9/9 permission/state/migration",
+      "scope_regressions": "6/6",
+      "registration": "real isolated OTP and persisted new clinician",
+      "reviewer": "same applicant/private evidence/general approval, no auto scopes",
+      "route_survey": "46 actor/routes x3widths",
+      "zoom": "actual Chromium200%, five sections and auth"
+    },
+    "competency_revision": "Per-domain uploads removed; native1–5 slider/numbered buttons and anchored meaning verified; existing evidence retained; explanation optional.",
+    "account_revision": {
+      "functional": "Verified real-backend load/shared-draft tab retention/failed-save recovery/photo only Personal",
+      "visual": "Inspected desktop/mobile and actual200%; owner acceptance pending",
+      "reference": "H02 with B06/B07 field extensions",
+      "evidence": "docs/clinician-onboarding-context-sprint.md#clinician-account-organization--22october2026"
+    }
   }
 }

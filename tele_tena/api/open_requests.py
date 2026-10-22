@@ -1199,4 +1199,4 @@ def preview_acceptance(request_id,offer_id,sharing):
     req=one("SELECT request_text FROM tt_open_request WHERE id=%s AND patient=%s",(request_id,patient.user))
     item=one("SELECT clinician FROM tt_request_offer WHERE id=%s AND request_id=%s AND state='Active'",(offer_id,request_id))
     return {'disclosure':journey.disclosure(patient,req.request_text,journey.choices(sharing)),
-            'recipient':frappe.db.get_value('User',item.clinician,'full_name')}
+            'recipient':frappe.db.sql('SELECT display_name FROM tt_profile WHERE user=%s',(item.clinician,))[0][0]}

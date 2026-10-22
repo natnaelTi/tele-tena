@@ -1,3 +1,5 @@
+import {professionalTranslations} from '../professional-translations';
+import {headingCopyAliases} from '../heading-copy-aliases';
 import {publicExperienceTranslations} from '../public-experience-translations';
 import {guestFirstTranslations} from '../guest-first-translations';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -13,6 +15,7 @@ import { useSession } from "./useSession";
 import { journeyApi } from "../journey-api";
 type Locale = keyof typeof locales;
 const words: Record<string, [string, string]> = {
+  ...professionalTranslations,
   // Upload/country additions are provisional pending native review.
   "Country code": ["የአገር መደወያ ኮድ", "Koodii bilbilaa biyya"],
   "SMS sign-in currently supports Ethiopian mobile numbers. For other countries, use email.": ["በSMS መግባት ለኢትዮጵያ ሞባይል ቁጥሮች ብቻ ይሠራል። ለሌሎች አገሮች ኢሜይል ይጠቀሙ።", "Seensi SMS lakkoofsa moobaayilaa Itoophiyaa qofa deeggara. Biyyoota biroof imeelii fayyadami."],
@@ -943,7 +946,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
         w: (english) =>
           locale === "en"
             ? english
-            : words[english]?.[locale === "am" ? 0 : 1] || english,
+            : (words[english]||words[headingCopyAliases[english]])?.[locale === "am" ? 0 : 1] || english,
       }}
     >
       {children}

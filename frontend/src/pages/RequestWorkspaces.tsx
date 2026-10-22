@@ -394,7 +394,7 @@ export function PatientRequestsWorkspace() {
   return (
     <section className="request-workspace" data-tour="patient-private-requests" data-tour-unsaved={!!narrative.trim()}>
       <PageTitle
-        title={w("Your private requests")}
+        title={w("Your Private Requests")}
         description={w(
           "Post a request, compare offers and choose your clinician here.",
         )}
@@ -504,7 +504,7 @@ export function PatientRequestsWorkspace() {
           {composing ? (
             <>
               <div className="request-composer-intro">
-                <h2>{w("Post a private request")}</h2>
+                <h2>{w("Post a Private Request")}</h2>
                 <p>
                   {w(
                     "Posting is free. Your balance is checked only when you accept an offer.",
@@ -542,7 +542,7 @@ export function PatientRequestsWorkspace() {
                 </ol>
                 {composerStep === 0 && (
                   <>
-                    <h2>{w("What would you like help with?")}</h2>
+                    <h2>{w("What Would You Like Help With?")}</h2>
                     <div className="field">
                       <label htmlFor="request-narrative">
                         {w("Describe what you are looking for")}
@@ -1099,7 +1099,7 @@ function PatientRequestThread({
         onOpenChange={(open) => {
           if (!action.busy) setCancel(open);
         }}
-        title={w("Cancel this request?")}
+        title={w("Cancel This Request?")}
         description={w(
           "Clinicians will no longer be able to respond. Existing appointments are managed separately.",
         )}
@@ -1178,7 +1178,7 @@ function RequestClinicianPane({
             </div>
           </div>
           {profile.introduction && <p>{profile.introduction}</p>}
-          <h3>{w("Approved services")}</h3>
+          <h3>{w("Approved Services")}</h3>
           <ul>
             {[
               ...new Set<string>(
@@ -1299,7 +1299,7 @@ export function ClinicianRequestsWorkspace() {
   return (
     <section className="request-workspace" data-tour="clinician-offers" data-tour-unsaved={Object.keys(drafts).length>0}>
       <PageTitle
-        title={w("Requests & offers")}
+        title={w("Requests & Offers")}
         description={w(
           "Review eligible requests, send a private offer and follow its outcome here.",
         )}
@@ -1566,9 +1566,9 @@ function ClinicianResponsePanel({
       </header>
       <div className="request-response-layout">
         <section className="request-authorized-context">
-          <h3>{w("Patient request")}</h3>
+          <h3>{w("Patient Request")}</h3>
           <p className="prewrap request-authorized-narrative">{request.request_text}</p>
-          <details className="request-context"><summary>{w('Patient-authorized disclosure')}</summary><DisclosurePreview disclosure={request.disclosure_snapshot} context="received"/><p className="supporting">{w('The patient chose what to share for this request. Do not use it outside this response.')}</p></details>
+          <details className="request-context"><summary>{w('Patient-authorized Disclosure')}</summary><DisclosurePreview disclosure={request.disclosure_snapshot} context="received"/><p className="supporting">{w('The patient chose what to share for this request. Do not use it outside this response.')}</p></details>
           <dl className="request-inline-facts">
             <div>
               <dt>{w("Language")}</dt>
@@ -1605,7 +1605,7 @@ function ClinicianResponsePanel({
           </dl>
         </section>
         <section className="request-response-editor">
-          <h3>{w("Your private offer")}</h3>
+          <h3>{w("Your Private Offer")}</h3>
           {request.own_offer_id ? (
             <>
               <p>{w("Your offer is with the patient")}</p>
@@ -1731,7 +1731,7 @@ function ClinicianResponsePanel({
                     </Button>
                   )}
                   <details className="request-context" ref={priceSection}>
-                    <summary>{w("Custom quote (optional)")}</summary>
+                    <summary>{w("Custom Quote (optional)")}</summary>
                     <TextField
                       label={w("Total price (ETB)")}
                       inputMode="decimal"
@@ -1859,7 +1859,7 @@ function ClinicianQuotePanel({
         onOpenChange={(open) => {
           if (!action.busy) setWithdraw(open);
         }}
-        title={w("Withdraw this offer?")}
+        title={w("Withdraw This Offer?")}
         description={w(
           "The patient will no longer be able to accept this quote.",
         )}

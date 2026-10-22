@@ -1,3 +1,30 @@
+## Clinician Onboarding and Contextual Access — 22 October 2026
+
+The five professional groups are Profile, Qualifications/Certifications, License,
+Competency Domains, and Clinic Affiliations/Declaration. Applicant-confirmed prefix,
+first and last name replace the editable combined name; legacy names remain intact
+without inferred splitting. Bio is limited to50 Unicode-whitespace-delimited words
+on submission/public editing; existing longer text is retained for correction.
+Profession/specialty, awarded qualification/related area, issuer country/practice
+jurisdiction, self-rating/reviewer assessment, and affiliation/clinic verification
+are distinct. Directories and manual entries confer no authorization.
+
+Private identification is available only to its owner and an explicitly assigned
+credential reviewer who already has the review role. Other private professional
+records remain under existing owner/reviewer permissions. CV/certification/license
+selections and immutable submitted versions preserve historical evidence. Accuracy
+declaration is versioned and separate from adult eligibility and policy choices.
+General application approval never approves individual requested scopes. Existing
+manual grants, scope evidence requirements and publication/re-review gates remain.
+
+Contextual sign-in/signup preserves care/application returns without adding roles.
+Signup is verification-first and has no password alternative; existing-user sign-in
+retains explicit password access. Flag/calling-code display does not expand
+Ethiopian-only SMS support. See `clinician-onboarding-context-sprint.md` for coverage,
+limits and evidence. Directory completeness, credential verification, proposed
+self-rating review, identity retention governance and native translation remain
+human/external decisions; no clinical approval is invented by these changes.
+
 ## Sharing and immediate-request continuity —19October2026
 
 New patient accounts default preferred-name and saved text-history sharing on,

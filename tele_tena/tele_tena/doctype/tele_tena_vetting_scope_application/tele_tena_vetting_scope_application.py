@@ -25,6 +25,8 @@ class TeleTenaVettingScopeApplication(Document):
         if previous and (self.reverification_of != previous.reverification_of or
                          self.reverification_payload_hash != previous.reverification_payload_hash):
             frappe.throw('Credential re-verification references are immutable.', frappe.PermissionError)
+        if self.professional_submission and (not previous or previous.professional_submission != self.professional_submission):
+            frappe.throw('Professional submission references are assigned by the scope submission command.', frappe.PermissionError)
         allowed = {'Draft', 'Clarification', 'Submitted', 'Resubmitted'}
         if self.status not in allowed:
             frappe.throw('Applicants cannot set a vetting decision', frappe.PermissionError)

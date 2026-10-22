@@ -1,3 +1,4 @@
+import {ProfessionalReview} from '../components/ProfessionalReview';
 import "./AdminWorkspace.css";
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../api";
@@ -24,15 +25,15 @@ export function AdminOverview() {
   const applications=useResource(journeyApi.applications);
   const pending=applications.data?.filter(item=>item.status==='Pending');
   return <>
-    <PageTitle title={w("Review workspace")} description={w("Focus on the decisions that need a person.")}/>
+    <PageTitle title={w("Review Workspace")} description={w("Focus on the decisions that need a person.")}/>
     {applications.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void applications.refresh()}>{w("Retry")}</Button></InlineNotice>:!applications.data?<Skeleton/>:<>
       <div className="review-overview-metrics">{[
         [w("Applications"),applications.data.length,w("Submitted professional applications")],
         [w("Awaiting decision"),pending?.length??0,w("Manual application review")],
         [w("Evidence ready"),pending?.filter(item=>item.evidence_complete).length??0,w("Received evidence still requires verification")],
       ].map(([label,count,detail])=><section key={label}><span>{label}</span><strong>{count}</strong><p>{detail}</p></section>)}</div>
-      <div className="review-overview-layout"><section className="review-overview-panel"><h2>{w("Needs your review")}</h2>
-        {pending?.length?pending.slice(0,5).map(item=><Link className="review-overview-row" key={item.user} to="/admin/applications" state={{applicationUser:item.user}}><ClipboardCheck size={24}/><div><strong>{item.display_name||w("Clinician application")}</strong><p>{item.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p></div><StatusBadge>{w(item.evidence_complete?"Ready for review":"Needs evidence")}</StatusBadge></Link>):<EmptyState title={w("No applications awaiting a decision.")}/>}
+      <div className="review-overview-layout"><section className="review-overview-panel"><h2>{w("Needs Your Review")}</h2>
+        {pending?.length?pending.slice(0,5).map(item=><Link className="review-overview-row" key={item.user} to="/admin/applications" state={{applicationUser:item.user}}><ClipboardCheck size={24}/><div><strong>{item.display_name||w("Clinician application")}</strong><p>{item.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p></div><StatusBadge>{w(item.evidence_complete?"Ready for review":"Needs evidence")}</StatusBadge></Link>):<EmptyState title={w("No Applications Awaiting a Decision.")}/>}
         <Link className="text-link" to="/admin/applications">{w("View all applications")} <ArrowRight size={16}/></Link>
       </section><section className="review-overview-panel"><h2>{w("Operations")}</h2>{[
         ["/admin/scopes",w("Service scopes"),w("Review each service authorization separately"),ShieldCheck],
@@ -52,27 +53,27 @@ export function Applications() {
   const [query,setQuery]=useState((location.state as {returnQuery?:string}|null)?.returnQuery||"");
   const [status,setStatus]=useState((location.state as {returnStatus?:string}|null)?.returnStatus||"");
   const selectedUser=(location.state as {applicationUser?:string}|null)?.applicationUser || null;
-  const [resumeError,setResumeError]=useState("");
+  const [resumeError,setCVError]=useState("");
   const [applicationStep,setApplicationStep]=useState(0);
-  const applicationSteps=["Professional profile","Private documents","General application decision"];
+  const applicationSteps=["Professional Profile","Private Documents","General Application Decision"];
   const selected=resource.data?.find(item=>applicationId?item.application_id===applicationId:item.user===selectedUser);
   const shown=resource.data?.filter(item=>(!status||item.status===status)&&(!query||item.display_name?.toLocaleLowerCase().includes(query.toLocaleLowerCase())));
-  const review=(user:string)=>{const item=resource.data?.find(value=>value.user===user);setResumeError("");navigate(item?.application_id?`/admin/applications/${encodeURIComponent(item.application_id)}`:"/admin/application-review",{state:{applicationUser:user,returnQuery:query,returnStatus:status}});};
+  const review=(user:string)=>{const item=resource.data?.find(value=>value.user===user);setCVError("");navigate(item?.application_id?`/admin/applications/${encodeURIComponent(item.application_id)}`:"/admin/application-review",{state:{applicationUser:user,returnQuery:query,returnStatus:status}});};
   const reviewContent=selected&&<>
       <div className="application-review-meta"><StatusBadge>{w(selected.status)}</StatusBadge><span>{w("Submitted")}: {selected.submitted_at?new Date(selected.submitted_at).toLocaleDateString():w("Date unavailable")}</span></div>
       <nav className="guided-step-nav" aria-label={w("Application review progress")}>{applicationSteps.map((label,index)=><button key={label} type="button" aria-current={applicationStep===index?"step":undefined} onClick={()=>setApplicationStep(index)}><span>{index+1}</span>{w(label)}</button>)}</nav>
       <div className="application-review-layout"><div>
         <div hidden={applicationStep!==0}>
-        <section className="application-review-panel"><h2>{w("Professional profile")}</h2>{selected.application_profile&&Object.keys(selected.application_profile).length>0&&<><p className="supporting">{w("Self-reported application details — verification is recorded separately.")}</p><dl>{([["professional_category","Profession"],["qualification","Primary qualification"],["issuing_institution","Issuing institution"],["experience_years","Years of practice"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl><details className="application-credential-details"><summary>{w("Credential details")}</summary><dl>{([["issuing_authority","Licensing authority"],["registration_number","License number"],["jurisdiction","Credential jurisdiction"],["credential_valid_from","License valid from"],["credential_expiry","License expiry"],["competencies","Professional competencies"],["certifications","Certifications"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl></details></>}<h3>{w("Professional statement")}</h3><p className="prewrap">{selected.statement||w("Not provided")}</p>
-          <h3>{w("Requested service scopes")}</h3><ul>{(selected.requested_service_labels||[]).map(label=><li key={label}>{label}</li>)}</ul>{!selected.requested_service_labels?.length&&<p>{w("No requested scopes recorded")}</p>}
-          <details><summary>{w("Contact / account reference")}</summary><p className="supporting">{selected.user}</p></details>
+        <section className="application-review-panel"><h2>{w("Professional Profile")}</h2>{selected.application_profile&&Object.keys(selected.application_profile).length>0&&<><p className="supporting">{w("Self-reported application details — verification is recorded separately.")}</p><dl>{([["professional_category","Profession"],["qualification","Primary Qualification"],["issuing_institution","Issuing Institution"],["experience_years","Years of Practice"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl><details className="application-credential-details"><summary>{w("Credential Details")}</summary><dl>{([["issuing_authority","Licensing Authority"],["registration_number","License Number"],["jurisdiction","Credential Jurisdiction"],["credential_valid_from","Valid From"],["credential_expiry","Valid Until"],["competencies","Earlier Competency Narrative"],["certifications","Certifications"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl></details></>}<h3>{w("Professional Statement")}</h3><p className="prewrap">{selected.statement||w("Not provided")}</p>
+          <h3>{w("Requested Service Scopes")}</h3><ul>{(selected.requested_service_labels||[]).map(label=><li key={label}>{label}</li>)}</ul>{!selected.requested_service_labels?.length&&<p>{w("No requested scopes recorded")}</p>}
+          <details><summary>{w("Contact / Account Reference")}</summary><p className="supporting">{selected.user}</p></details>
         </section>
-        </div><div hidden={applicationStep!==1}><section className="application-review-panel"><h2>{w("Private documents")}</h2><div className="application-document-row"><FileText size={24} aria-hidden="true"/><div><strong>{w("Resume")}</strong><p>{w(selected.resume_uploaded?"Uploaded":"Not uploaded")}</p></div></div>
-      {selected.resume_uploaded&&<Button variant="secondary" onClick={async()=>{setResumeError("");try{const response=await fetch(`/api/method/tele_tena.api.presentation.download_resume?clinician=${encodeURIComponent(selected.user)}`,{credentials:"same-origin",cache:"no-store"});if(!response.ok)throw new Error();const blob=await response.blob();const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="clinician-resume.pdf";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch{setResumeError(w("Resume could not be opened. Check your reviewer access and try again."));}}}>{w("Open resume")}</Button>}
+        </div><div hidden={applicationStep!==1}><ProfessionalReview clinician={selected.user}/><section className="application-review-panel"><h2>{w("Private Documents")}</h2><div className="application-document-row"><FileText size={24} aria-hidden="true"/><div><strong>{w("CV")}</strong><p>{w(selected.resume_uploaded?"Uploaded":"Not uploaded")}</p></div></div>
+      {selected.resume_uploaded&&<Button variant="secondary" onClick={async()=>{setCVError("");try{const response=await fetch(`/api/method/tele_tena.api.presentation.download_resume?clinician=${encodeURIComponent(selected.user)}`,{credentials:"same-origin",cache:"no-store"});if(!response.ok)throw new Error();const blob=await response.blob();const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="clinician-cv.pdf";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch{setCVError(w("CV could not be opened. Check your reviewer access and try again."));}}}>{w("Open CV")}</Button>}
       {resumeError&&<InlineNotice tone="danger">{resumeError}</InlineNotice>}
 
         </section>
-      </div></div><aside className="application-review-panel" hidden={applicationStep!==2}><h2>{w("General application decision")}</h2>
+      </div></div><aside className="application-review-panel" hidden={applicationStep!==2}><h2>{w("General Application Decision")}</h2>
         <p>{w("Evidence")}: {w(selected.evidence_complete?"Complete":"Incomplete")}</p>
         <InlineNotice>{w("Application approval does not approve every requested service. Review each scope and its evidence separately.")}</InlineNotice>
         <Link className="settings-link-row" to="/admin/vetting">{w("Review scope applications")} <ArrowRight size={18} aria-hidden="true"/></Link>
@@ -80,17 +81,17 @@ export function Applications() {
       </aside></div><div className="guided-review-footer"><Button variant="quiet" disabled={applicationStep===0} onClick={()=>setApplicationStep(applicationStep-1)}>{w("Back")}</Button>{applicationStep<2&&<Button onClick={()=>setApplicationStep(applicationStep+1)}>{w("Continue")}</Button>}<span>{w("General application approval does not grant service-scope approval.")}</span></div>
   </>;
   if(applicationId||location.pathname==="/admin/application-review")return <section className="application-review-page">
-    <PageTitle title={w("Application review")} description={selected?.display_name||w("Clinician application")} action={<Link className="button secondary" to="/admin/applications" state={{returnQuery:(location.state as {returnQuery?:string}|null)?.returnQuery,returnStatus:(location.state as {returnStatus?:string}|null)?.returnStatus}}>{w("Back to applications")}</Link>}/>
-    {resource.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice>:!resource.data?<Skeleton/>:selected?reviewContent:<EmptyState title={w("Application unavailable")}>{w("Return to applications to choose an available record.")}</EmptyState>}
+    <PageTitle title={w("Application Review")} description={selected?.display_name||w("Clinician application")} action={<Link className="button secondary" to="/admin/applications" state={{returnQuery:(location.state as {returnQuery?:string}|null)?.returnQuery,returnStatus:(location.state as {returnStatus?:string}|null)?.returnStatus}}>{w("Back to applications")}</Link>}/>
+    {resource.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice>:!resource.data?<Skeleton/>:selected?reviewContent:<EmptyState title={w("Application Unavailable")}>{w("Return to applications to choose an available record.")}</EmptyState>}
   </section>;
   if(selectedUser&&selected)return <Navigate replace to={selected.application_id?`/admin/applications/${encodeURIComponent(selected.application_id)}`:"/admin/application-review"} state={{applicationUser:selectedUser}}/>;
   return <>
-    <PageTitle title={w("Clinician applications")} description={w("Review people by name, with their requested scopes visible.")}/>
+    <PageTitle title={w("Clinician Applications")} description={w("Review people by name, with their requested scopes visible.")}/>
     <div className="review-queue-filters"><TextField label={w("Search clinician name")} placeholder={w("Search clinician name")} value={query} onChange={event=>setQuery(event.target.value)}/><Select label={w("Application status")} value={status} onChange={event=>setStatus(event.target.value)}><option value="">{w("All statuses")}</option>{["Pending","Approved","Rejected"].map(value=><option key={value} value={value}>{w(value)}</option>)}</Select></div>
     {resource.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice>:!resource.data?<Skeleton/>:shown?.length?<>
       <div className="table-scroll review-queue-table"><table><thead><tr>{["Clinician","Application status","Requested services","Submitted","Evidence","Action"].map(label=><th key={label}>{w(label)}</th>)}</tr></thead><tbody>{shown.map(item=><tr key={item.user}><td><strong>{item.display_name||w("Clinician application")}</strong></td><td><StatusBadge>{w(item.status)}</StatusBadge></td><td>{item.requested_service_labels?.join(", ")||w("Not recorded")}</td><td>{item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w("Date unavailable")}</td><td>{w(item.evidence_complete?"Complete":"Incomplete")}</td><td><Button variant="quiet" onClick={()=>review(item.user)}>{w("Review")}</Button></td></tr>)}</tbody></table></div>
       <div className="review-queue-cards">{shown.map(item=><Card key={item.user}><header><h2>{item.display_name||w("Clinician application")}</h2><StatusBadge>{w(item.status)}</StatusBadge></header><p>{item.requested_service_labels?.join(", ")||w("No requested scopes recorded")}</p><p className="supporting">{w("Evidence")}: {w(item.evidence_complete?"Complete":"Incomplete")}</p><Button variant="secondary" onClick={()=>review(item.user)}>{w("Review")}</Button></Card>)}</div>
-    </>:<EmptyState title={w("No applications to review.")}>{w("Submitted applications will appear here.")}</EmptyState>}
+    </>:<EmptyState title={w("No Applications to Review.")}>{w("Submitted applications will appear here.")}</EmptyState>}
 
 
   </>;
@@ -165,7 +166,7 @@ export function Scopes() {
         <InlineNotice tone="danger">{action.error}</InlineNotice>
       )}
       <Card className="immediate-policy-review">
-        <h2>{w("Immediate requests")}</h2>
+        <h2>{w("Immediate Requests")}</h2>
         <p>{w("A reviewer controls this service setting. It does not replace clinician approval, approved scope, language, presence, or available time.")}</p>
         {immediateServices.error ? <InlineNotice tone="danger">{w("Service policies could not be loaded.")}</InlineNotice> : !immediateServices.data ? <Skeleton /> : <>
           <TextField label={w("Find a service")} value={policySearch} onChange={(e)=>{setPolicySearch(e.target.value);setPolicyService("");setPolicyReason("");}} />
@@ -180,7 +181,7 @@ export function Scopes() {
               <Button disabled={action.busy || !policyReason.trim() || !!policy.immediate_care_enabled} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.setImmediatePolicy(policy.id,true,policyReason,crypto.randomUUID());setPolicyReason("");await immediateServices.refresh();},w("Immediate requests enabled for this service."))}>{w("Enable immediate requests")}</Button>
               <Button variant="secondary" disabled={action.busy || !policyReason.trim() || !policy.immediate_care_enabled} loading={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.setImmediatePolicy(policy.id,false,policyReason,crypto.randomUUID());setPolicyReason("");await immediateServices.refresh();},w("Immediate requests paused for this service."))}>{w("Pause immediate requests")}</Button>
             </div>
-            <h3>{w("Recent policy decisions")}</h3>
+            <h3>{w("Recent Policy Decisions")}</h3>
             {policyHistory.error ? <InlineNotice tone="danger">{w("Policy history could not be loaded.")}</InlineNotice> : policyHistory.data?.length ? <ul className="policy-history">{policyHistory.data.map((event:any)=><li key={event.id}><strong>{event.enabled ? w("Immediate requests enabled") : w("Immediate requests paused")}</strong><span className="supporting"> · {date(event.created)} · {event.reviewer}</span><p>{event.reason}</p></li>)}</ul> : <p className="supporting">{w("No policy decisions recorded yet.")}</p>}
           </>}
         </>}
@@ -292,15 +293,15 @@ export function ServiceCatalog() {
     await journeyApi.submitServiceForReview(selected);await catalog.refresh();
   },w("Sent for clinical terminology review. This does not activate bookings."));
   if(!serviceId&&!isCreate)return <>
-    <PageTitle eyebrow={w("REVIEW WORKSPACE")} title={w("Service catalog")} description={w("A structured catalog of services, separate from clinician-specific offerings.")} action={<Button onClick={startNew}>{w("Add service definition")}</Button>}/>
+    <PageTitle eyebrow={w("REVIEW WORKSPACE")} title={w("Service Catalog")} description={w("A structured catalog of services, separate from clinician-specific offerings.")} action={<Button onClick={startNew}>{w("Add service definition")}</Button>}/>
     <div className="review-queue-filters"><TextField label={w("Search service or category")} value={catalogSearch} onChange={e=>setCatalogSearch(e.target.value)}/><Select label={w("Category")} value={catalogCategory} onChange={e=>setCatalogCategory(e.target.value)}><option value="">{w("All categories")}</option>{(catalog.data?.categories||[]).map((item:any)=><option key={item.id} value={item.id}>{item.label}</option>)}</Select></div>
     {catalog.error?<InlineNotice tone="danger">{w("Service catalog could not be loaded.")} <Button onClick={()=>void catalog.refresh()}>{w("Retry")}</Button></InlineNotice>:!catalog.data?<Skeleton/>:<div className="catalog-table-wrap"><table className="catalog-definition-table"><thead><tr>{["Service","Category","Population","Required profession","Status"].map(label=><th key={label}>{w(label)}</th>)}</tr></thead><tbody>{filteredDefinitions.map((item:any)=><tr key={item.id}><td><Link to={`/admin/services/${encodeURIComponent(item.id)}/edit`}>{item.service_label}</Link></td><td>{catalog.data.categories.find((category:any)=>category.id===item.category)?.label||w("Not provided")}</td><td>{w(item.population_restriction||"Not specified")}</td><td>{item.professional_categories||w("Clinical definition review pending")}</td><td><StatusBadge>{w(item.catalog_status)}</StatusBadge></td></tr>)}</tbody></table>{!filteredDefinitions.length&&<EmptyState title={w(definitions.length?"No services match this search. Try another term.":"No service definitions yet.")}/>}</div>}
   </>;
-  if(catalog.data&&!isCreate&&!definitions.some((item:any)=>item.id===serviceId))return <EmptyState title={w("Service definition unavailable")}><Link to="/admin/services">{w("Back to service catalog")}</Link></EmptyState>;
+  if(catalog.data&&!isCreate&&!definitions.some((item:any)=>item.id===serviceId))return <EmptyState title={w("Service Definition Unavailable")}><Link to="/admin/services">{w("Back to service catalog")}</Link></EmptyState>;
   if(serviceId && catalog.data && selected !== serviceId)return <Skeleton/>;
   return <>
     <Link className="button quiet" to="/admin/services">{w("Back to service catalog")}</Link>
-    <PageTitle eyebrow={w("REVIEW WORKSPACE")} title={w("Service definition")} description={w("Maintain typed service definitions and versioned attributes. Patient concerns remain navigation terms, not diagnoses.")} />
+    <PageTitle eyebrow={w("REVIEW WORKSPACE")} title={w("Service Definition")} description={w("Maintain typed service definitions and versioned attributes. Patient concerns remain navigation terms, not diagnoses.")} />
     <InlineNotice tone="info">{w("Definitions remain drafts until medical-lead review. Clinician scope approval is a separate decision.")}</InlineNotice>
     {action.error&&<InlineNotice tone="danger">{action.error}</InlineNotice>}
     {action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
@@ -309,9 +310,9 @@ export function ServiceCatalog() {
       <section className="service-catalog-editor">
         <header><h2>{selected?form.service_label||form.service_key:w("New service definition")}</h2>
           {chosen&&<StatusBadge>{w(chosen.clinical_review_status||chosen.catalog_status)}</StatusBadge>}</header>
-        {catalog.data?.can_review&&chosen?.clinical_review_status==='In review'&&<section className="catalog-clinical-decision"><h3>{w("Medical-lead definition review")}</h3><p>{w("This reviews the service requirements. It does not approve any clinician or independently verify their credentials.")}</p><TextField label={w("Clinical review reason")} value={clinicalReason} onChange={e=>setClinicalReason(e.target.value)} maxLength={1000}/><div className="action-row"><Button disabled={action.busy||!clinicalReason.trim()} onClick={()=>void action.run(async()=>{await journeyApi.reviewServiceDefinition(selected,'Approved',clinicalReason);setClinicalReason('');await catalog.refresh();})}>{w("Approve service definition")}</Button><Button variant="secondary" disabled={action.busy||!clinicalReason.trim()} onClick={()=>void action.run(async()=>{await journeyApi.reviewServiceDefinition(selected,'Needs information',clinicalReason);setClinicalReason('');await catalog.refresh();})}>{w("Return definition for correction")}</Button></div></section>}
+        {catalog.data?.can_review&&chosen?.clinical_review_status==='In review'&&<section className="catalog-clinical-decision"><h3>{w("Medical-lead Definition Review")}</h3><p>{w("This reviews the service requirements. It does not approve any clinician or independently verify their credentials.")}</p><TextField label={w("Clinical review reason")} value={clinicalReason} onChange={e=>setClinicalReason(e.target.value)} maxLength={1000}/><div className="action-row"><Button disabled={action.busy||!clinicalReason.trim()} onClick={()=>void action.run(async()=>{await journeyApi.reviewServiceDefinition(selected,'Approved',clinicalReason);setClinicalReason('');await catalog.refresh();})}>{w("Approve service definition")}</Button><Button variant="secondary" disabled={action.busy||!clinicalReason.trim()} onClick={()=>void action.run(async()=>{await journeyApi.reviewServiceDefinition(selected,'Needs information',clinicalReason);setClinicalReason('');await catalog.refresh();})}>{w("Return definition for correction")}</Button></div></section>}
         {!editable&&<InlineNotice tone="info">{w("This definition is locked after terminology review begins. Create a new version for future changes; existing definitions and records are preserved.")}</InlineNotice>}
-        <div className="definition-panel-grid"><section className="definition-core"><h3>{w("Core definition")}</h3><fieldset disabled={!editable||action.busy}>
+        <div className="definition-panel-grid"><section className="definition-core"><h3>{w("Core Definition")}</h3><fieldset disabled={!editable||action.busy}>
           <div className="form-grid two-column">
             <TextField label={w("Patient-facing name (English)")} value={form.service_label} onChange={e=>set("service_label",e.target.value)} required maxLength={120}/>
             <Select label={w("Service category")} value={form.category} onChange={e=>set("category",e.target.value)} required>
@@ -327,11 +328,11 @@ export function ServiceCatalog() {
           </Select>
           <fieldset className="definition-delivery"><legend>{w("Allowed delivery formats")}</legend>{[["video","Video"],["audio","Audio"],["in_person","In person"]].map(([key,label])=><Checkbox key={key} variant="card" label={w(label)} checked={form.supported_formats.split("\n").includes(key)} onChange={event=>{const formats=form.supported_formats.split("\n").filter(Boolean);set("supported_formats",(event.target.checked?[...formats.filter(value=>value!==key),key]:formats.filter(value=>value!==key)).join("\n"));}}/>)}</fieldset>
           <TextField label={w("Definition version")} value={form.definition_version} onChange={e=>set("definition_version",e.target.value)} required maxLength={80}/>
-          <details className="service-catalog-advanced"><summary>{w("Language & translation review")}</summary>
+          <details className="service-catalog-advanced"><summary>{w("Language & Translation Review")}</summary>
             <TextField label={w("Amharic name (provisional)")} value={form.service_label_am} onChange={e=>set("service_label_am",e.target.value)} maxLength={120}/>
             <TextField label={w("Afaan Oromo name (provisional)")} value={form.service_label_om} onChange={e=>set("service_label_om",e.target.value)} maxLength={120}/>
           </details>
-          <details className="service-catalog-advanced"><summary>{w("Professional eligibility and workflow rules")}</summary>
+          <details className="service-catalog-advanced"><summary>{w("Professional Eligibility and Workflow Rules")}</summary>
             <TextField label={w("Stable service code")} value={form.service_key} onChange={e=>set("service_key",e.target.value)} required maxLength={80} hint={w("Lowercase letters, numbers, and hyphens; stable after creation.")}/>
             <label className="field">{w("Search names and synonyms (one per line)")}<textarea rows={2} maxLength={1000} value={form.synonyms} onChange={e=>set("synonyms",e.target.value)}/></label>
             <label className="field">{w("Eligible professional categories")}<textarea rows={3} value={form.professional_categories} onChange={e=>set("professional_categories",e.target.value)}/></label>
@@ -350,11 +351,11 @@ export function ServiceCatalog() {
             {selected&&chosen?.clinical_review_status!=="In review"&&<Button variant="secondary" loading={action.busy} onClick={submit}>{w("Request clinical review")}</Button>}</div>}
         </fieldset>
         {saved&&<InlineNotice tone="success">{w("Draft definition saved. It is not bookable.")}</InlineNotice>}
-        </section><section className="service-attribute-editor"><h3>{w("Required attributes")}</h3>
+        </section><section className="service-attribute-editor"><h3>{w("Required Attributes")}</h3>
           <p className="supporting">{w("These definitions are metadata only. Runtime intake collection and validation are not implemented yet.")}</p>
           {!chosen?.attributes?.length&&<p className="supporting">{w("No service-specific attributes defined.")}</p>}
           {(chosen?.attributes||[]).map((item:any)=><article className="service-attribute-row" key={item.id}><strong>{item.label_en} · {item.field_key}</strong><span>{item.data_type} · {item.visibility} · {item.sensitivity} · v{item.definition_version}</span>{item.allowed_values&&<span className="supporting">{item.allowed_values.split("\n").join(" · ")}</span>}</article>)}
-          {editable&&selected&&<details className="service-catalog-advanced"><summary>{w("Add or edit an attribute")}</summary><fieldset disabled={action.busy}>
+          {editable&&selected&&<details className="service-catalog-advanced"><summary>{w("Add or Edit an Attribute")}</summary><fieldset disabled={action.busy}>
             <div className="form-grid two-column"><TextField label={w("Stable field key")} value={attribute.field_key} onChange={e=>setAttribute({...attribute,field_key:e.target.value})}/>
               <TextField label={w("English field label")} value={attribute.label_en} onChange={e=>setAttribute({...attribute,label_en:e.target.value})}/>
               <TextField label={w("Amharic field label (provisional)")} value={attribute.label_am} onChange={e=>setAttribute({...attribute,label_am:e.target.value})}/>
@@ -393,7 +394,7 @@ export function FinancialDisputes() {
   const [snapshotReasons, setSnapshotReasons] = useState<Record<string, string>>({});
   const reviewCases = reconciliation.data?.filter((item) => item.status === "ReviewRequired") || [];
   return <>
-    <PageTitle title={w("Financial disputes")} description={w("Financial disputes review only payment concerns. No clinical note access is included.")} />
+    <PageTitle title={w("Financial Disputes")} description={w("Financial disputes review only payment concerns. No clinical note access is included.")} />
     {action.error && <InlineNotice tone="danger">{action.error}</InlineNotice>}
     {resource.error ? <InlineNotice tone="danger">Disputes could not be loaded. <Button onClick={() => void resource.refresh()}>Try again</Button></InlineNotice> : !resource.data ? <Skeleton /> : resource.data.length ? <div className="stack">{resource.data.map(item => <Card key={item.earning_id}>
       <div className="row-between"><h2>ETB {money(item.net_minor)} {w("On hold")}</h2><StatusBadge tone="warning">{w("Disputed")}</StatusBadge></div>
@@ -401,13 +402,13 @@ export function FinancialDisputes() {
       <h3>Patient’s dispute reason</h3><p className="prewrap">{item.reason}</p>
       <TextField label={w("Resolution record")} value={resolutionReason} onChange={e => setResolutionReason(e.target.value)} maxLength={500} hint={w("Record a short reason. This does not add or change clinical documentation.")} />
       <div className="actions"><Button loading={action.busy} disabled={action.busy || !resolutionReason.trim()} onClick={() => void action.run(async () => { await api("tele_tena.accounting.resolve_earning_dispute", { appointment: item.appointment, resolution: "release", reason: resolutionReason }, true); setResolutionReason(""); await resource.refresh(); }, w("Hold resolved. Eligible release will run through the scheduled process."))}>{w("Release after review")}</Button><Button variant="secondary" loading={action.busy} disabled={action.busy || !resolutionReason.trim()} onClick={() => void action.run(async () => { await api("tele_tena.accounting.resolve_earning_dispute", { appointment: item.appointment, resolution: "refund", reason: resolutionReason }, true); setResolutionReason(""); await resource.refresh(); }, w("Refund recorded in the demonstration ledger."))}>{w("Refund patient")}</Button></div>
-    </Card>)}</div> : <EmptyState title={w("No open financial disputes.")} />}
+    </Card>)}</div> : <EmptyState title={w("No Open Financial Disputes.")} />}
     <section className="stack" aria-labelledby="wallet-reconciliation-title">
-      <div><h2 id="wallet-reconciliation-title">{w("Wallet reconciliation")}</h2><p className="supporting">{w("Review existing balance differences. Accepting a snapshot does not change balances or erase history.")}</p></div>
+      <div><h2 id="wallet-reconciliation-title">{w("Wallet Reconciliation")}</h2><p className="supporting">{w("Review existing balance differences. Accepting a snapshot does not change balances or erase history.")}</p></div>
       {reconciliation.error ? <InlineNotice tone="danger">{w("Reconciliation cases could not be loaded.")} <Button onClick={() => void reconciliation.refresh()}>{w("Try again")}</Button></InlineNotice>
         : !reconciliation.data ? <Skeleton />
         : reviewCases.length ? reviewCases.map(item => <Card key={item.case_ref}>
-          <div className="row-between"><h3>{w("Balance review required")}</h3><StatusBadge tone="warning">{w("Review required")}</StatusBadge></div>
+          <div className="row-between"><h3>{w("Balance Review Required")}</h3><StatusBadge tone="warning">{w("Review required")}</StatusBadge></div>
           <p className="supporting">{w("Case reference")}: {item.case_ref.slice(0, 15)} · {w("Recorded")}: {date(item.created)}</p>
           <div className="form-grid two-column reconciliation-balances">
             <p>{w("Activity record")}: ETB {money(item.legacy_available)} {w("available")}; ETB {money(item.legacy_reserved)} {w("reserved")}</p>
@@ -422,7 +423,7 @@ export function FinancialDisputes() {
             setSnapshotReasons(previous => ({...previous, [item.case_ref]: ""}));
             await reconciliation.refresh();
           }, w("Decision recorded. The historical difference remains preserved."))}>{w("Accept unchanged snapshot")}</Button>
-        </Card>) : <EmptyState title={w("No wallet reconciliation cases need review.")} />}
+        </Card>) : <EmptyState title={w("No Wallet Reconciliation Cases Need Review.")} />}
     </section>
     {action.success && <InlineNotice tone="success">{action.success}</InlineNotice>}
   </>;

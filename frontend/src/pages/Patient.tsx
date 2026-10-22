@@ -52,13 +52,13 @@ export function PatientHome() {
   return (
     <>
       <PageTitle
-        title={w("Your care, in one place.")}
+        title={w("Your Care, in One Place.")}
         description={`${w("Welcome")}, ${session?.profile?.display_name || w("there")}.`}
       />
       <div className="patient-dashboard-layout"><section className="patient-dashboard-primary">
-      <section className="patient-home-hero"><h2>{w("A little space")}<br />{w("for yourself.")}</h2><p>{w("Find the right support for today.")}</p>
+      <section className="patient-home-hero"><h2>{w("A Little Space")}<br />{w("for yourself.")}</h2><p>{w("Find the right support for today.")}</p>
       <Link className="button" to="/patient/discovery">{w("Find care")} <ArrowRight size={18}/></Link></section>
-      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let clinicians respond to you")}</h2><p>{w("Post for free and compare private offers.")}</p></div><Link className="text-link" to="/patient/requests">{w("Post a request")}</Link></section>
+      <section className="request-entry"><Sparkles size={20} aria-hidden="true" /><div><h2>{w("Let Clinicians Respond to You")}</h2><p>{w("Post for free and compare private offers.")}</p></div><Link className="text-link" to="/patient/requests">{w("Post a request")}</Link></section>
       {!!requests.data?.some((item:any)=>item.state==='Open')&&<section className="active-request-summary"><div className="section-line"><h2>Active care requests</h2><Link to="/patient/requests">Review requests and offers <ArrowRight size={16}/></Link></div>{requests.data.filter((item:any)=>item.state==='Open').slice(0,3).map((item:any)=><Link className="active-request-row" key={item.id} to={'/patient/requests/'+encodeURIComponent(item.id)}><span>{item.urgency==='immediate'?'As soon as possible':'Schedule for later'} · {item.category}</span><strong>{item.offers.filter((offer:any)=>offer.state==='Active').length} new offers</strong></Link>)}</section>}
       <section className="patient-dashboard-panel">
       <div className="section-line">
@@ -90,7 +90,7 @@ export function PatientHome() {
       )}
       </section><section className="patient-dashboard-panel">
       <div className="section-line">
-        <h2>{w("People you’ve spoken with")}</h2>
+        <h2>{w("People You’ve Spoken With")}</h2>
         <Link to="/patient/appointments">{w("Appointments")} <ArrowRight size={16} /></Link>
       </div>
       {previousClinicians.error ? (
@@ -315,7 +315,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
           </section>
         )}
         {step === 2 && preview && offer.participant_structure === 'couple' && <Card>
-          <h2>{w("Invite the other adult")}</h2><p>{w("Each adult chooses what to share. One participant pays the total session price after both consent.")}</p>
+          <h2>{w("Invite the Other Adult")}</h2><p>{w("Each adult chooses what to share. One participant pays the total session price after both consent.")}</p>
           <DisclosurePreview disclosure={preview}/>
           <Checkbox label={w("I am 18 or older and freely consent to this shared consultation.")} checked={adultConsent} onChange={event=>setAdultConsent(event.target.checked)}/>
           <Button disabled={!adultConsent||action.busy} loading={action.busy} onClick={()=>void action.run(async()=>{
@@ -376,7 +376,7 @@ export function Payments() {
   return (
     <>
       <PageTitle
-        title={w("Your balance")}
+        title={w("Your Balance")}
         description={w("Your funds, clearly separated.")}
       />
       <div className="patient-payments-layout"><section>
@@ -389,7 +389,7 @@ export function Payments() {
       )}
       <AddFundsDialog open={fundsOpen} close={() => setFundsOpen(false)} refresh={wallet.refresh} />
       </section><section className="patient-dashboard-panel">
-      {wallet.data?.activity?.length ? <section><h2>{w("Recent activity")}</h2><PaymentActivity items={wallet.data.activity}/></section>:<EmptyState title="No payment activity yet." />}
+      {wallet.data?.activity?.length ? <section><h2>{w("Recent Activity")}</h2><PaymentActivity items={wallet.data.activity}/></section>:<EmptyState title="No payment activity yet." />}
       </section></div>
     </>
   );

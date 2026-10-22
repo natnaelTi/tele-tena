@@ -10,16 +10,18 @@ export function PhoneField({label,error,onValueChange,...props}:Omit<InputHTMLAt
  const [raw,setRaw]=useState(typeof props.value==='string'?props.value:'');
  useEffect(()=>{if(!props.value)setRaw('');},[props.value]);
  useEffect(()=>{let active=true;void api<{country:CountryCode|null;source:string|null}>('tele_tena.api.country.suggestion').then(value=>{if(active&&!touched.current&&!props.value&&value.country&&getCountries().includes(value.country)){setCountry(value.country);setSource(!!value.source);}}).catch(()=>{});return()=>{active=false;};},[]);
+ const flag=(code:string)=>[...code].map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join('');
  const names=new Intl.DisplayNames([locale==='am'?'am':locale==='om'?'om':'en'],{type:'region'});
  const selected=(raw.startsWith('+')?parsePhoneNumberFromString(raw)?.country:null)||country;
- return <div className="field phone-field"><label htmlFor={props.id||id}>{label}</label><div className="phone-entry">
+ return <div className="field phone-field"><label htmlFor={props.id||id}>{label}{props.required&&<span className="required-marker" title="Required" aria-hidden="true"> *</span>}</label><div className="phone-entry">
   <label className="sr-only" htmlFor={id+'-country'}>{w('Country code')}</label>
-  <select id={id+'-country'} aria-label={w('Country code')} value={selected} disabled={props.disabled} onChange={event=>{
+  <span className="phone-country-compact" aria-hidden="true">{flag(selected)} +{getCountryCallingCode(selected)}</span>
+  <select id={id+'-country'} aria-label={w('Country code')} value={selected} title={`${names.of(selected)||selected} +${getCountryCallingCode(selected)}`} disabled={props.disabled} onChange={event=>{
    touched.current=true;setSource(false);const next=event.target.value as CountryCode;
    const prefix='+'+getCountryCallingCode(selected);const national=raw.startsWith(prefix)?raw.slice(prefix.length):raw;
    setCountry(next);setRaw(national);onValueChange?.(national?'+'+getCountryCallingCode(next)+national.replace(/^0/,''):'');
-  }}>{getCountries().map(code=><option key={code} value={code}>+{getCountryCallingCode(code)} · {names.of(code)||code}</option>)}</select>
-  <input {...props} value={raw} id={props.id||id} type="tel" autoComplete="tel-national" inputMode="tel" placeholder={selected==='ET'?'09…':w('Phone number')} aria-invalid={!!error} aria-describedby={id+'-help'} onChange={event=>{
+  }}>{getCountries().map(code=><option key={code} value={code}>{names.of(code)||code} · {flag(code)} +{getCountryCallingCode(code)}</option>)}</select>
+  <input {...props} aria-label={props["aria-label"]||label} value={raw} id={props.id||id} type="tel" autoComplete="tel-national" inputMode="tel" placeholder={selected==='ET'?'09…':w('Phone number')} aria-invalid={!!error} aria-describedby={id+'-help'} onChange={event=>{
    touched.current=true;const next=event.target.value;setRaw(next);
    onValueChange?.(!next?'':next.startsWith('+')?next:next.startsWith('00')?'+'+next.slice(2):'+'+getCountryCallingCode(selected)+next.replace(/^0/,''));
   }}/></div>
