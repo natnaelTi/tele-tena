@@ -1,3 +1,24 @@
+## Owner-Requested Competency Simplification —22October2026
+
+Current packaged runtime: `c68a0de222e2d97907630e1b1644583edcf49aac`.
+Per-domain uploads are removed from both the new application and shared profile
+editor. Existing file references and historical evidence remain unchanged and
+available through their authorized review paths. No schema or permission change.
+Self-assessment uses a native1–5 range with numbered selection buttons and live
+anchored definitions. A new domain remains unrated until deliberately selected;
+optional supporting explanation remains. Native keyboard controls and accessible
+value text are preserved. No self-rating grants a service or affects ranking.
+
+`browser-competency-rating.cjs` passes against the production-built real-backend
+preview: no upload, explicit unset→each1–5 definition, Home/ArrowRight, retained
+explanation,390/768/1440. Changes are unsaved; professional data is not modified.
+Build/lint and artifact/privacy checks pass (existing lint warnings retained).
+Rendered desktop/mobile range screenshots were inspected; see
+`docs/screenshots/clinician-onboarding-context/after/competency-range-*.png`.
+Earlier sprint evidence below retains its original build identity; backend tests
+are inherited unchanged for this frontend-only adjustment. Owner acceptance of
+this adjustment remains separate.
+
 # Clinician Onboarding and Contextual Access — 22 October 2026
 
 Draft [PR49](https://github.com/natnaelTi/tele-tena/pull/49), dependent on public redesign PR48; branch `feat/clinician-onboarding-context`.

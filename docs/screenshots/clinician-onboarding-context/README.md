@@ -27,3 +27,5 @@ browser zoom; these are not CSS-scaled or artificially narrowed screenshots.
 See [the field checklist and verification](../../clinician-onboarding-context-sprint.md).
 Functional verification and Codex visual inspection are distinct from owner acceptance.
 `sha256.json` records image integrity; image existence is not acceptance.
+
+Owner-requested simplification: [Mobile range card](after/competency-range-card-390.png) · [Desktop range card](after/competency-range-card-1440.png). Replaces per-domain upload and rating dropdown; historical evidence retained.

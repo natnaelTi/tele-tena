@@ -16478,7 +16478,7 @@
       "Identity retention governance",
       "Native-language review"
     ],
-    "runtime_commit": "6a3fb4df2cc73bbb11480f1853ef80ed439e2366",
+    "runtime_commit": "c68a0de222e2d97907630e1b1644583edcf49aac",
     "functional_evidence": "docs/clinician-onboarding-context-sprint.md#candidate-and-verification",
     "visual_evidence": "docs/clinician-onboarding-context-sprint.md#rendered-comparisons-and-specific-exceptions",
     "screenshots": "docs/screenshots/clinician-onboarding-context/",
@@ -16489,6 +16489,7 @@
       "reviewer": "same applicant/private evidence/general approval, no auto scopes",
       "route_survey": "46 actor/routes x3widths",
       "zoom": "actual Chromium200%, five sections and auth"
-    }
+    },
+    "competency_revision": "Per-domain uploads removed; native1–5 slider/numbered buttons and anchored meaning verified; existing evidence retained; explanation optional."
   }
 }
