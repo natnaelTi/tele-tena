@@ -1,6 +1,6 @@
 # Clinician Onboarding and Contextual Access — 22 October 2026
 
-Bounded follow-up to public redesign PR48; branch `feat/clinician-onboarding-context`.
+Draft [PR49](https://github.com/natnaelTi/tele-tena/pull/49), dependent on public redesign PR48; branch `feat/clinician-onboarding-context`.
 Baseline source `25fa5acbfe0acd513e2bf0c138de5f8aada65578`, packaged/owner-confirmed
 `f679e6ce8a1a8169b9bba16626a2880e5e212a75`. No merge, remote deployment, existing
 scenario reseed, provider/access change or shared dependency repair is authorized.
@@ -110,7 +110,8 @@ branch's backend; it is not the preview's older app checkout.
 | Guest return regressions | `browser-public-experience.cjs`:real directory/filter/profile→password→exact selected offering and reload; volatile guest request→auth→request workspace with no publication/storage leakage; clinician application intent; reduced motion and provisional locales. |
 | Keyboard and actual zoom | `browser-professional-accessibility.cjs`:Chromium extension sets actual200% (inner720, DPR2, visualViewport1); patient/clinician registration never offers password; five persisted application sections; native directory keyboard/Escape/focus; empty and failed real query/retry retain selection. A single query is aborted for failure testing, never mocked as a success. |
 | Shared route regression | `browser-mvp-polish.cjs`:46 real-backend role/route views at390/768/1440; navigation/deep links and page width. This survey is functional/layout evidence, not universal visual acceptance. |
-| Build/lint/assets | TypeScript/production build passes; lint has existing hook/purity warnings, no errors. `check_review_assets.py` verifies all packaged hashes/scope/no source maps/config files and scans20 private credential values without printing them. No package/lockfile dependency changes. |
+| Build/lint/assets | TypeScript/production build passes; lint has existing hook/purity warnings, no errors. `check_review_assets.py` verifies all packaged hashes/scope/no source maps/config files and scans20 private credential values without printing them; all49 served asset hashes and deep links match. No package/lockfile dependency changes. |
+| Current PWA | Actual service-worker registration/controller/update check, static-only cache inspection, offline fallback and online recovery pass on the final package. Prior real cross-version explicit-refresh evidence is inherited; no fake waiting-worker result is claimed. |
 | Retained private state | Original presentation config and24 original provider/key/account manifest files byte-identical; database/public/private-file backup was verified before migration. No balances, credentials, preferences, scope grants or existing scenarios reset. |
 
 Private detailed logs are under `/home/frappe/teletena-onboarding-sprint` (mode700).
