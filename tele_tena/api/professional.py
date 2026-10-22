@@ -64,7 +64,7 @@ def validate(value,user,submit=False):
         if not isinstance(values,list) or len(values)>100 or len(set(values))!=len(values):fail('Review selected entries.','reference_invalid')
         for id in values:reference(id,'specialty' if key=='specialties' else 'facility',user)
         result[key]=values
-    if result.get('qualification_area') and result['qualification_area'] not in result['specialties']+['Other']:fail('Choose a selected specialty area or Other.','qualification_area_invalid')
+    if submit and result.get('qualification_area') and result['qualification_area'] not in result['specialties']+['Other']:fail('Choose a selected specialty area or Other.','qualification_area_invalid')
     if submit and result.get('qualification_area')=='Other' and not result.get('qualification_area_other'):fail('Enter the qualification’s related area, or leave the optional area unselected.','qualification_area_other_required')
     if submit and result.get('issuer')=='Other' and not re.fullmatch('[A-Z]{2}',result.get('issuer_country','')):fail('Choose the institution country.','issuer_country_required')
     if result['non_expiring'] and result.get('valid_until'):fail('Clear Valid Until for a non-expiring credential.','credential_date_range')
@@ -74,8 +74,12 @@ def validate(value,user,submit=False):
             except Exception:fail('Enter a valid credential date.','credential_date_invalid')
     if result.get('valid_from') and result.get('valid_until') and result['valid_until']<result['valid_from']:fail('Valid Until must be on or after Valid From.','credential_date_range')
     if result.get('identification_type') not in (None,'','National ID',"Driver’s License",'Passport'):fail('Choose an identification type.','identification_type_invalid')
+    file_references=0
     def files(values,purpose):
+        nonlocal file_references
         if not isinstance(values,list) or len(values)>100 or len(set(values))!=len(values):fail('Review supporting files.','evidence_invalid')
+        file_references+=len(values)
+        if file_references>2000:fail('An application can reference up to 2,000 supporting files.','evidence_reference_limit')
         for id in values:
             if not rows('SELECT id FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose=%s',(id,user,purpose)):fail('Supporting file is unavailable to this application.','evidence_invalid')
         return values
@@ -153,7 +157,8 @@ def application(clinician=None):
     selected.update(c.get('issuer','') for c in payload.get('certifications',[]))
     reference_rows=rows('SELECT id,label,country FROM tt_reference WHERE id IN ('+','.join(['%s']*len(selected))+')',tuple(selected)) if selected else []
     reference_labels={r.id:r.label for r in reference_rows}
-    return {'reference_countries':{r.id:r.country for r in reference_rows},'reference_labels':reference_labels,'legacy':{'name':saved[0].legacy_name if saved and saved[0].legacy_name is not None else legacy.get('name') or (public[0].display_name if public else ''),'professional':legacy.get('professional',{}),'statement':legacy.get('statement','')},'payload':payload,'revision':saved[0].revision if saved else 0,'evidence':evidence,'identity_access':identity_access,'submissions':submissions,'rating_definitions':RATING_DEFINITIONS,'declaration_version':DECLARATION}
+    legacy_cv=rows('SELECT filename,content_size,revision FROM tt_resume_evidence WHERE clinician=%s',(clinician,))
+    return {'legacy_cv':dict(legacy_cv[0]) if legacy_cv else None,'reference_countries':{r.id:r.country for r in reference_rows},'reference_labels':reference_labels,'legacy':{'name':saved[0].legacy_name if saved and saved[0].legacy_name is not None else legacy.get('name') or (public[0].display_name if public else ''),'professional':legacy.get('professional',{}),'statement':legacy.get('statement','')},'payload':payload,'revision':saved[0].revision if saved else 0,'evidence':evidence,'identity_access':identity_access,'submissions':submissions,'rating_definitions':RATING_DEFINITIONS,'declaration_version':DECLARATION}
 
 
 def persist(user,payload,revision=None,submit=False):

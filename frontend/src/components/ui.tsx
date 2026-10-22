@@ -52,7 +52,7 @@ export function IconButton({
     </Button>
   );
 }
-export function FieldLabel({children,required=false,htmlFor}:{children:ReactNode;required?:boolean;htmlFor?:string}){return <label htmlFor={htmlFor}>{children}{required&&<span className="required-marker" title="Required" aria-label="Required"> *</span>}</label>;}
+export function FieldLabel({children,required=false,htmlFor}:{children:ReactNode;required?:boolean;htmlFor?:string}){return <label htmlFor={htmlFor}>{children}{required&&<span className="required-marker" title="Required" aria-hidden="true"> *</span>}</label>;}
 export function RequiredFieldsNotice(){return <p className="supporting">Fields marked <span className="required-marker">*</span> are required.</p>;}
 export function TextField({
   label,
@@ -72,6 +72,7 @@ export function TextField({
       <input
         {...props}
         id={id}
+        aria-label={props["aria-label"]||label}
         aria-invalid={!!error}
         aria-describedby={error || hint ? id + "-note" : undefined}
       />
@@ -107,7 +108,7 @@ export function Select({
   return (
     <div className="field">
       <FieldLabel htmlFor={id} required={props.required}>{label}</FieldLabel>
-      <select {...props} id={id} aria-invalid={!!error} aria-describedby={error ? id + "-error" : undefined}>
+      <select {...props} id={id} aria-label={props["aria-label"]||label} aria-invalid={!!error} aria-describedby={error ? id + "-error" : undefined}>
         {children}
       </select>
       {error&&<p className="field-error" id={id+"-error"}>{error}</p>}
@@ -125,7 +126,7 @@ export function Checkbox({
     <label className={`check-field${variant === "card" ? " check-card" : ""}`}>
       <input {...props} type="checkbox" aria-labelledby={props["aria-labelledby"] || id + "-label"}
         aria-describedby={[props["aria-describedby"], description ? id + "-description" : undefined].filter(Boolean).join(" ") || undefined} />
-      <span><span id={id + "-label"}>{label}{props.required&&<span className="required-marker" title="Required" aria-label="Required"> *</span>}</span>{description && <small id={id + "-description"}>{description}</small>}</span>
+      <span><span id={id + "-label"}>{label}</span>{props.required&&<span className="required-marker" title="Required" aria-hidden="true"> *</span>}{description && <small id={id + "-description"}>{description}</small>}</span>
     </label>
   );
 }

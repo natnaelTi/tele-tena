@@ -188,7 +188,7 @@ export default function Onboarding() {
             void save(steps[Math.min(position + 1, steps.length - 1)], step === 3);
           }}
         >
-          {clinician&&[0,1,2,6,7].includes(step)&&<ProfessionalStep step={step===6?2:step===7?3:step===2?4:step} value={professional} onChange={change=>{setProfessional(change);setSaved(false);setError('');}} evidence={professionalState?.evidence||[]} onEvidence={refreshProfessional}/> }
+          {clinician&&[0,1,2,6,7].includes(step)&&<ProfessionalStep step={step===6?2:step===7?3:step===2?4:step} value={professional} onChange={change=>{setProfessional(change);setSaved(false);setError('');}} evidence={professionalState?.evidence||[]} legacyCV={professionalState?.legacy_cv} onEvidence={refreshProfessional}/> }
           {step === 0 && !clinician && (
             <>
               <p>
