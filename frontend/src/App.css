@@ -1998,7 +1998,7 @@ button { color: inherit; background: transparent; }
  :is(.field select,.language-select):not([multiple]):not([size]) option:disabled{color:var(--text-secondary,#52636a);cursor:not-allowed}
 }
 /* Approved Title Case presentation for headings; body/clinical content stays verbatim. */
-:is(h1,h2,h3,h4,h5,h6,summary),.page-title>div>p,.eyebrow,.workspace-label{text-transform:capitalize}
+:is(h1,h2,h3,h4,h5,h6,summary),.page-title>div>p,.eyebrow,.workspace-label{text-transform:none}
 .booking-notifications{border:1px solid var(--border-default);border-radius:16px;background:var(--surface-card,#fff);padding:12px 16px;margin:16px 0}.booking-notifications>summary{cursor:pointer;min-height:44px;align-content:center;font-weight:650}.booking-notifications>ul{padding-inline-start:20px}.booking-notifications li{margin-block:10px}.booking-notifications a{display:inline-block;padding-block:6px}
 
 /* Same accessible native picker treatment in every role's navigation. */

@@ -96,7 +96,7 @@ export default function ClinicCalendar() {
 
   const currentWeek = monday(dateInZone(new Date(), timezone));
   return <div className="clinic-calendar-page">
-    <PageTitle eyebrow={w("CLINIC OPERATIONS")} title={w("Clinic calendar")}
+    <PageTitle eyebrow={w("CLINIC OPERATIONS")} title={w("Clinic Calendar")}
       description={w("Appointments appear here only when a patient has shared their schedule with this verified clinic.")}
       action={<Button variant="secondary" onClick={() => setWeekStart(currentWeek)}><CalendarDays size={18}/>{w("Today")}</Button>} />
     <div className="clinic-calendar-toolbar">
@@ -113,7 +113,7 @@ export default function ClinicCalendar() {
     </div>
     {calendar.error && <InlineNotice tone="danger">{w("Clinic calendar could not be loaded. Check your clinic access and timezone.")} <Button variant="secondary" onClick={() => void calendar.refresh()}>{w("Try again")}</Button></InlineNotice>}
     {!calendar.error && !calendar.data && <Skeleton />}
-    {calendar.data && calendar.data.appointments.length === 0 && <EmptyState title={w("No patient-shared appointments this week.")}>{w("Appointments appear only after a patient shares a future booking with this clinic.")}</EmptyState>}
+    {calendar.data && calendar.data.appointments.length === 0 && <EmptyState title={w("No Patient-shared Appointments This Week.")}>{w("Appointments appear only after a patient shares a future booking with this clinic.")}</EmptyState>}
     {calendar.data && calendar.data.appointments.length > 0 && <div className="clinic-week-grid" aria-label={w("Patient-shared appointment week")}>
       {days.map(day => {
         const appointments = eventsByDay.get(day) || [];

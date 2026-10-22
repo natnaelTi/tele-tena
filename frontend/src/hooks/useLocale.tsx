@@ -1,3 +1,4 @@
+import {headingCopyAliases} from '../heading-copy-aliases';
 import {publicExperienceTranslations} from '../public-experience-translations';
 import {guestFirstTranslations} from '../guest-first-translations';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -943,7 +944,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
         w: (english) =>
           locale === "en"
             ? english
-            : words[english]?.[locale === "am" ? 0 : 1] || english,
+            : (words[english]||words[headingCopyAliases[english]])?.[locale === "am" ? 0 : 1] || english,
       }}
     >
       {children}

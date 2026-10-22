@@ -72,7 +72,7 @@ export function RelationshipInvitationEntry() {
   return <main className="container relationship-entry">
     <Card className="relationship-card">
       <HeartHandshake size={28} aria-hidden="true"/>
-      <h1>{w('A private adult relationship link')}</h1>
+      <h1>{w('A Private Adult Relationship Link')}</h1>
       {sessionError && <InlineNotice tone="danger">{w('We could not check your sign-in. Try again.')}</InlineNotice>}
       {!token && <InlineNotice tone="danger">{w('This invitation link is missing or invalid. Ask for a new link.')}</InlineNotice>}
       {token && !session && <>
@@ -129,12 +129,12 @@ export default function Relationships() {
   useEffect(()=>{ if(patient) void refresh(); },[patient,refresh]);
   if (!patient) return <InlineNotice tone="danger">{w('This page is for patient accounts.')}</InlineNotice>;
   return <>
-    <PageTitle title={w('Shared care')} description={w('Create an optional adult relationship link. It does not share clinical records or appointments.')}/>
+    <PageTitle title={w('Shared Care')} description={w('Create an optional adult relationship link. It does not share clinical records or appointments.')}/>
     {action.success&&<InlineNotice tone="success">{action.success}</InlineNotice>}
     <div className="relationship-workspace">
       <Link className="button secondary" to="/patient/couples">{w("Shared consultations")}</Link>
       <Card className="relationship-create">
-        <div className="relationship-heading"><Link2 size={22}/><h2>{w('Invite an adult you trust')}</h2></div>
+        <div className="relationship-heading"><Link2 size={22}/><h2>{w('Invite an Adult You Trust')}</h2></div>
         <p>{w('Create a private link and share it directly with the intended person. Anyone who receives the link can try to accept it, so share it carefully.')}</p>
         <Checkbox label={w('I confirm that I am 18 or older and agree to create this link.')} checked={adult} onChange={event=>setAdult(event.target.checked)}/>
         <Button disabled={!adult||action.busy} loading={action.busy} onClick={()=>void action.run(async()=>{
@@ -149,15 +149,15 @@ export default function Relationships() {
         {action.error&&<InlineNotice tone="danger">{w('The invitation could not be created. Check your connection, consent, and active invitation limit.')}</InlineNotice>}
       </Card>
       <section className="relationship-list" aria-labelledby="relationship-list-heading">
-        <h2 id="relationship-list-heading">{w('Your relationship links')}</h2>
+        <h2 id="relationship-list-heading">{w('Your Relationship Links')}</h2>
         {loadError&&<InlineNotice tone="danger">{w('Relationships could not be loaded.')} <Button variant="secondary" onClick={()=>void refresh()}>{w('Try again')}</Button></InlineNotice>}
         {!data&&!loadError&&<Skeleton/>}
-        {data&&!data.relationships.length&&<EmptyState title={w('No relationship links yet.')}>{w('A link is created only after both adults accept.')}</EmptyState>}
+        {data&&!data.relationships.length&&<EmptyState title={w('No Relationship Links Yet.')}>{w('A link is created only after both adults accept.')}</EmptyState>}
         {data?.relationships.map((item:any)=><Card className="relationship-row" key={item.id}>
           <UserRound size={20}/><div><strong>{item.other_name}</strong><p className="supporting" data-relationship-state={item.state}>{w(item.state)} · {w('No records are shared')}</p></div>
           {item.state==='Active'&&<Button variant="danger" disabled={action.busy} onClick={()=>void action.run(async()=>{await journeyApi.revokeRelationship(item.id);await refresh();},w('Relationship link revoked.'))}>{w('Revoke link')}</Button>}
         </Card>)}
-        {data?.invitations.length>0&&<details className="relationship-invitations"><summary>{w('Invitation history')} ({data.invitations.length})</summary>{data.invitations.map((item:any)=><div className="relationship-row" key={item.id}><div><strong>{w(item.state)}</strong><p className="supporting">{w('Expires')} {new Date(item.expires_at).toLocaleString()}</p></div>{item.state==='Pending'&&<Button variant="quiet" onClick={()=>void action.run(async()=>{await journeyApi.revokeRelationshipInvitation(item.id);await refresh();})}>{w('Withdraw invitation')}</Button>}</div>)}</details>}
+        {data?.invitations.length>0&&<details className="relationship-invitations"><summary>{w('Invitation History')} ({data.invitations.length})</summary>{data.invitations.map((item:any)=><div className="relationship-row" key={item.id}><div><strong>{w(item.state)}</strong><p className="supporting">{w('Expires')} {new Date(item.expires_at).toLocaleString()}</p></div>{item.state==='Pending'&&<Button variant="quiet" onClick={()=>void action.run(async()=>{await journeyApi.revokeRelationshipInvitation(item.id);await refresh();})}>{w('Withdraw invitation')}</Button>}</div>)}</details>}
       </section>
     </div>
   </>;

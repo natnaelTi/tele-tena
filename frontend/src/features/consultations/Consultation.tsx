@@ -464,8 +464,8 @@ export default function Consultation({
       {(fullscreen || expanded) && <div className="room-demo" role="note">{w("Demonstration environment — no real payments or clinical care.")}</div>}
       {connected && !audioOnly && !sharedRoom && <header className="room-heading"><Brand/><div><strong>{appointment.service_label}</strong><span>{appointment.display_identity} · {appointment.minutes} {w("minutes")}</span></div><span className="room-private"><ShieldCheck size={18}/>{w("Private consultation")}</span></header>}
       {(!connected || audioOnly || sharedRoom) && <header className="light-call-header"><Brand/><Link className="text-link" to={detailRoute}>{w("Back to consultation details")}</Link></header>}
-      {connected&&sharedRoom&&!audioOnly&&<div className="audio-page-title"><h1>{w("Together in consultation")}</h1><p>{appointment.service_label} · 3 {w("participants")}</p></div>}
-      {connected && audioOnly && <div className="audio-page-title"><h1>{w("Audio consultation")}</h1><p>{w("More room to listen. Less bandwidth.")}</p></div>}
+      {connected&&sharedRoom&&!audioOnly&&<div className="audio-page-title"><h1>{w("Together in Consultation")}</h1><p>{appointment.service_label} · 3 {w("participants")}</p></div>}
+      {connected && audioOnly && <div className="audio-page-title"><h1>{w("Audio Consultation")}</h1><p>{w("More room to listen. Less bandwidth.")}</p></div>}
       {!connected && <><h2>{info?.state === "Ended" ? w("Call ended") : w("Check your devices")}</h2>{info?.state !== "Ended" && <p>{w("Make sure you’re comfortable before joining.")}</p>}</>}
       {!connected && info?.state === "Ended" && <p>
         {t("sessionLifecycle")}: {t(lifecycleStatus)}
@@ -513,7 +513,7 @@ export default function Consultation({
           >
             {t(audioOnly ? "checkMicrophone" : "checkDevices")}
           </button>
-          </div><aside className="device-check-summary"><h2>{w("Ready when you are")}</h2><h3>{appointment.display_identity || w("Private participant")}</h3><p>{appointment.service_label}</p><p>{appointment.minutes} {w("minutes")} · {t(audioOnly ? "audioOnly" : "consultation")}</p><div className="preflight-state"><p role="status">{t("sessionLifecycle")}: {t(lifecycleStatus)}</p><p role="status">{t("mediaStatus")}: {t(mediaStatus)}</p></div><p>{w("Find a private space")}. {w("Use headphones if possible.")}</p>{info?.join_opens_at&&<p className="supporting">{w("Join window")}: {joinTime(info.join_opens_at)} – {joinTime(info.join_closes_at)} · {appointment.timezone || "UTC"}</p>}
+          </div><aside className="device-check-summary"><h2>{w("Ready When You Are")}</h2><h3>{appointment.display_identity || w("Private participant")}</h3><p>{appointment.service_label}</p><p>{appointment.minutes} {w("minutes")} · {t(audioOnly ? "audioOnly" : "consultation")}</p><div className="preflight-state"><p role="status">{t("sessionLifecycle")}: {t(lifecycleStatus)}</p><p role="status">{t("mediaStatus")}: {t(mediaStatus)}</p></div><p>{w("Find a private space")}. {w("Use headphones if possible.")}</p>{info?.join_opens_at&&<p className="supporting">{w("Join window")}: {joinTime(info.join_opens_at)} – {joinTime(info.join_closes_at)} · {appointment.timezone || "UTC"}</p>}
           <button className="button"
             disabled={busy || !checked || !info?.can_join}
             onClick={() => void join()}
@@ -572,9 +572,9 @@ export default function Consultation({
               {t("endConsultation")}
             </button>
           )}
-        </div></div><aside className={`room-session-details ${audioOnly||sharedRoom?"room-optional-details":""}`}><h3>{appointment.display_identity || w("Private participant")}</h3><dl><dt>{w("Service")}</dt><dd>{appointment.service_label}</dd><dt>{w("Booked duration")}</dt><dd>{appointment.minutes} {w("minutes")}</dd></dl><p>{w("Booked duration is not measured connected time.")}</p><Link to={detailRoute}>{w("Back to consultation details")}</Link><div className="room-privacy-note"><ShieldCheck size={20}/><h4>{w("Your privacy stays with you.")}</h4><p>{w("Your clinician sees only the information you chose to share for this session.")}</p></div>{info?.state === "Open" && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</aside></div>}
-      {connected && sharedRoom && !audioOnly && info?.state === "Open" && <details className="audio-session-more"><summary>{w("Session details and extra time")}</summary><ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/></details>}
-      {connected && audioOnly && <details className="audio-session-more"><summary>{w("Session details and extra time")}</summary><p>{appointment.service_label} · {appointment.minutes} {w("minutes")}</p><Link to={detailRoute}>{w("Back to consultation details")}</Link>{info?.state === "Open" && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</details>}
+        </div></div><aside className={`room-session-details ${audioOnly||sharedRoom?"room-optional-details":""}`}><h3>{appointment.display_identity || w("Private participant")}</h3><dl><dt>{w("Service")}</dt><dd>{appointment.service_label}</dd><dt>{w("Booked duration")}</dt><dd>{appointment.minutes} {w("minutes")}</dd></dl><p>{w("Booked duration is not measured connected time.")}</p><Link to={detailRoute}>{w("Back to consultation details")}</Link><div className="room-privacy-note"><ShieldCheck size={20}/><h4>{w("Your Privacy Stays with You.")}</h4><p>{w("Your clinician sees only the information you chose to share for this session.")}</p></div>{info?.state === "Open" && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</aside></div>}
+      {connected && sharedRoom && !audioOnly && info?.state === "Open" && <details className="audio-session-more"><summary>{w("Session Details and Extra Time")}</summary><ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/></details>}
+      {connected && audioOnly && <details className="audio-session-more"><summary>{w("Session Details and Extra Time")}</summary><p>{appointment.service_label} · {appointment.minutes} {w("minutes")}</p><Link to={detailRoute}>{w("Back to consultation details")}</Link>{info?.state === "Open" && <ExtensionPanel appointment={appointment.id} role={info.role} open={true} t={t}/>}</details>}
       {info?.can_end && !connected && (
         <button
           className="end-call"
@@ -589,7 +589,7 @@ export default function Consultation({
       <Dialog
         open={confirmEnd}
         onOpenChange={setConfirmEnd}
-        title={w("End for everyone?")}
+        title={w("End for Everyone?")}
         description={w("Ends the consultation for everyone. Room closure must be confirmed before finalizing notes.")}
       >
         <div className="actions">
