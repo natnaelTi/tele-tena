@@ -1,3 +1,15 @@
+## Professional application v1.44 —22October2026
+
+App-owned private draft/version/evidence/identity-reviewer tables are additive.
+Typed, source-attributed reference rows support bounded server-side directory
+search; no giant client registry or new dependency is added. Structured submissions
+freeze evidence hashes and reference metadata; scope applications link the exact
+submitted version. IDs require explicit reviewer assignment even when another
+professional document would be reviewable. Evidence is served only through checked
+no-store attachment commands, with no public File record. Original full names,
+legacy claims/CVs, scope approvals, clinic verification and financial history are
+preserved. See `clinician-onboarding-context-sprint.md` for limits and retention gates.
+
 ## Guest-first additive boundary —18October2026
 
 Public directory APIs expose explicit approved-professional/offering projections only;booking,private requests,records and file grants remain authenticated. v1.40 adds nullable care_alias and empty policy/grant/notice tables,without historical preference backfills or financial schema changes. Binary document snapshots copy inside the existing transaction;neutral notification jobs claim durable per-recipient events before provider I/O. Unknown delivery outcomes are not auto-retried. Guest health drafts stay in memory;safe opaque navigation intent alone may use sessionStorage. No new Python/Node dependencies,framework or real payment rails. See guest-first-mvp-verification-2026-10-18.md.

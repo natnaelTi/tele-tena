@@ -16465,7 +16465,7 @@
   },
   "clinician_onboarding_context_revision": {
     "date": "2026-10-22",
-    "status": "Implementation in progress; backend and compile checks passed, browser verification pending",
+    "status": "Functionally verified in focused real-backend journeys; rendered comparisons inspected by Codex; owner acceptance and external data/human gates pending",
     "scope": "Five-section professional application, typed reference directories, private identification and repeatable evidence, individual scope review continuity, contextual auth, compact country display, required labels and static Title Case",
     "checklist": "docs/clinician-onboarding-context-sprint.md",
     "reference_manifest": "tele_tena/reference_data/manifest.json",
@@ -16477,6 +16477,18 @@
       "Broader regulator/awarding-body curation",
       "Identity retention governance",
       "Native-language review"
-    ]
+    ],
+    "runtime_commit": "6a3fb4df2cc73bbb11480f1853ef80ed439e2366",
+    "functional_evidence": "docs/clinician-onboarding-context-sprint.md#candidate-and-verification",
+    "visual_evidence": "docs/clinician-onboarding-context-sprint.md#rendered-comparisons-and-specific-exceptions",
+    "screenshots": "docs/screenshots/clinician-onboarding-context/",
+    "tests": {
+      "frappe16": "9/9 permission/state/migration",
+      "scope_regressions": "6/6",
+      "registration": "real isolated OTP and persisted new clinician",
+      "reviewer": "same applicant/private evidence/general approval, no auto scopes",
+      "route_survey": "46 actor/routes x3widths",
+      "zoom": "actual Chromium200%, five sections and auth"
+    }
   }
 }

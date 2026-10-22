@@ -33,5 +33,18 @@
     "coverage": "Partial,126 unique source records from8 pages; API duplicated/omitted records across pages. Completeness assertion failed, so NOT a complete ROR country directory or MOH register.",
     "paging_limit_documentation": "https://ror.readme.io/docs/api-paging",
     "normalized_sha256": "8a73a25353ae06a8a6187898d0b0874c4e2223ed47cace03abc5c38d2817f140"
+  },
+  "combined_unique_by_kind": {
+    "profession": 30,
+    "specialty": 32,
+    "domain": 14,
+    "authority": 8,
+    "issuer": 8362,
+    "facility": 7034
+  },
+  "combined_ethiopia_by_kind": {
+    "authority": 1,
+    "facility": 9,
+    "issuer": 64
   }
 }
