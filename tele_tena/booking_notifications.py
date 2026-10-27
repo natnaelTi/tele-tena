@@ -22,7 +22,11 @@ def create(appointment,state,plan_id=None):
       AND p.state='Consented'""",(appointment,plan_id,app.patient,app.offering))
     recipients.update(p.user for p in people)
     if event=='Pending':
-        policy=rows('SELECT policy_snapshot,created FROM tt_appointment WHERE id=%s',(appointment,))[0]
+        policy=rows('SELECT policy_snapshot,created,payment_mode FROM tt_appointment WHERE id=%s',(appointment,))[0]
+        if policy.payment_mode=='Offline':
+            payment=rows("SELECT verified_at FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment'",(appointment,))
+            if not payment or not payment[0].verified_at:return
+            policy.created=payment[0].verified_at
         import json
         if json.loads(policy.policy_snapshot or '{}').get('notifications',{}).get('version')=='booking-notices-v2':
             frappe.db.sql('INSERT IGNORE INTO tt_confirmation_observation (appointment,clinician,requested_at) VALUES (%s,%s,%s)',(appointment,app.clinician,policy.created))
@@ -80,7 +84,7 @@ def retry(id):
     return {'state':'Pending'}
 
 
-EVENT_STATES={'Confirmed':('Booked',),'Pending':('PendingConfirmation',),'ConfirmationReminder':('PendingConfirmation',),
+EVENT_STATES={**{k:('PendingConfirmation','Booked','Expired','Cancelled','Completed') for k in ('PaymentSubmitted','PaymentVerified','PaymentCorrection','PaymentReconciliation','PaymentReminder','PaymentVerificationReminder')},'Confirmed':('Booked',),'Pending':('PendingConfirmation',),'ConfirmationReminder':('PendingConfirmation',),
               'AppointmentReminder':('Booked',),'Cancelled':('Cancelled',),'Declined':('Cancelled',),'Expired':('Expired',)}
 
 def dispatch():
@@ -97,6 +101,11 @@ def dispatch():
         app=rows('SELECT * FROM tt_appointment WHERE id=%s',(notice.appointment,))
         if not app or app[0].state not in EVENT_STATES.get(notice.event,()):
             frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
+        if notice.event.startswith('Payment'):
+            payments=rows('SELECT p.state FROM tt_direct_payment p JOIN tt_direct_payment_event e ON e.payment=p.id WHERE e.id=%s',(notice.context_key,))
+            valid={'PaymentReminder':('AwaitingPayment','CorrectionRequired'),'PaymentVerificationReminder':('Submitted',),'PaymentSubmitted':('Submitted','ReconciliationRequired'),'PaymentVerified':('Verified',),'PaymentCorrection':('CorrectionRequired','Rejected'),'PaymentReconciliation':('ReconciliationRequired','RefundRequired','RefundReported','RefundConfirmed')}
+            if not payments or payments[0].state not in valid.get(notice.event,()):
+                frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded' WHERE id=%s",(item.id,));frappe.db.commit();continue
         if not frappe.db.get_value('User',notice.user,'enabled'):
             frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
         if notice.user not in (app[0].patient,app[0].clinician):
@@ -116,7 +125,7 @@ def dispatch():
                 frappe.db.sql("UPDATE tt_booking_notice SET state='Unavailable',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
         frappe.db.sql("UPDATE tt_booking_notice SET state='Sending',attempts=attempts+1,modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit()
         app=app[0];state='Unknown'
-        label={'Confirmed':'confirmed','Pending':'awaiting your confirmation' if notice.user==app.clinician else 'awaiting clinician confirmation',
+        label={'PaymentReminder':'direct payment awaiting submission','PaymentVerificationReminder':'payment receipt awaiting your verification','PaymentSubmitted':'payment submitted for verification','PaymentVerified':'payment receipt verified','PaymentCorrection':'payment correction requested','PaymentReconciliation':'payment reconciliation updated','Confirmed':'confirmed','Pending':'awaiting your confirmation' if notice.user==app.clinician else 'awaiting clinician confirmation',
                'ConfirmationReminder':'still awaiting your confirmation; please confirm or decline before the deadline',
                'AppointmentReminder':'coming up soon','Cancelled':'cancelled','Declined':'declined','Expired':'expired without confirmation'}.get(notice.event,'updated')
         when=app.start.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(app.timezone or 'Africa/Addis_Ababa')).strftime('%d %b %Y %H:%M')
@@ -151,20 +160,22 @@ def dispatch():
         frappe.db.sql('UPDATE tt_booking_notice SET state=%s,modified=UTC_TIMESTAMP(6) WHERE id=%s',(state,item.id));frappe.db.commit()
 
 
-def queue_external(appointment,event,recipients,channels=('email','sms')):
+def queue_external(appointment,event,recipients,channels=('email','sms'),context_key=''):
     if event not in EVENT_STATES:raise ValueError('Unsupported delivery event')
     for user in recipients:
         prefs=rows('SELECT * FROM tt_notice_preference WHERE user=%s',(user,))
         for channel in channels:
             state='Suppressed' if prefs and not prefs[0][channel+'_enabled'] else 'Pending'
             frappe.db.sql("""INSERT IGNORE INTO tt_booking_notice
-              (id,appointment,user,event,channel,state,created,modified)
-              VALUES (%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))""",
-              (str(uuid.uuid4()),appointment,user,event,channel,state))
+              (id,appointment,user,event,channel,state,context_key,created,modified)
+              VALUES (%s,%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))""",
+              (str(uuid.uuid4()),appointment,user,event,channel,state,context_key))
 
 
 def process_reminders():
     """Minute scheduler job. Durable keys and gate serialize with clinician response."""
+    from tele_tena.api.direct_payments import process_reminders as payment_reminders
+    payment_reminders()
     from tele_tena.notifications import emit,participants
     from tele_tena.api.journey import one
     candidates=rows("""SELECT a.id FROM tt_appointment a JOIN tt_confirmation_observation o ON o.appointment=a.id

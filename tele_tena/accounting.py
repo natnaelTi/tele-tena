@@ -257,6 +257,9 @@ def request_payout(amount_minor, idempotency_key):
             frappe.local.response['tele_tena_error'] = 'financial_retry_changed'
             frappe.throw('Payout retry amount changed', frappe.ValidationError)
         return {'id': old[0].id, 'state': old[0].state, 'idempotent': True, 'external_transfer': False}
+    from tele_tena.api.direct_payments import config
+    if config().mode!='Wallet':
+        frappe.throw('New platform payout requests are unavailable in direct-payment mode. Historical requests remain accessible.',frappe.ValidationError)
     payout_id = str(uuid.uuid4())
     reference = 'payout-request:' + payout_id
     from_account = account_id('clinician', clinician, 'earnings_available')

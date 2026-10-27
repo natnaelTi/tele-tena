@@ -49,15 +49,16 @@ def _items():
 def offerings(service='',language='',consultation_format='',availability_filter='',offering=''):
     for value in (service,language,consultation_format,availability_filter,offering):
         if not isinstance(value,str) or len(value)>140:fail('Invalid directory filter')
-    if language not in ('','en','am','om') or consultation_format not in ('','audio','video') or availability_filter not in ('','now','appointment'):
+    from tele_tena.api.care_languages import valid
+    if (language and not valid(language)) or consultation_format not in ('','audio','video') or availability_filter not in ('','now','appointment'):
         fail('Choose supported filters')
-    items=_items();categories=sorted({item['service_category'] for item in items})
+    items=_items();language_codes=sorted({code for item in items for code in item['care_languages']});language_options=rows('SELECT code,english,amharic,afaan_oromo FROM tt_care_language WHERE code IN ('+','.join(['%s']*len(language_codes))+') ORDER BY english,code',tuple(language_codes)) if language_codes else [];categories=sorted({item['service_category'] for item in items})
     items=[item for item in items if (not service or item['service_category']==service)
            and (not language or language in item['care_languages'])
            and (not consultation_format or item['consultation_format']==consultation_format)
            and (not offering or item['id']==offering)
            and (not availability_filter or (item['availability']['available_now'] if availability_filter=='now' else item['availability']['has_booking_times'] and not item['availability']['available_now']))]
-    return {'items':items,'categories':categories,'checked_at':datetime.now(timezone.utc).isoformat(),'poll_after_seconds':30}
+    return {'items':items,'categories':categories,'language_options':language_options,'checked_at':datetime.now(timezone.utc).isoformat(),'poll_after_seconds':30}
 
 
 @frappe.whitelist(allow_guest=True,methods=['GET'])

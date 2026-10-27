@@ -241,13 +241,15 @@ def save_onboarding(kind, step, answers, complete=0):
         clean['professional'] = _validated_form(values)
     if 'care_languages' in answers:
         languages = answers['care_languages']
-        if not isinstance(languages, list) or any(not isinstance(value, str) for value in languages) or len(languages) != len(set(languages)) or not set(languages).issubset({'en', 'am', 'om'}):
+        if not isinstance(languages, list) or any(not isinstance(value, str) for value in languages) or len(languages) != len(set(languages)) or any(not __import__('tele_tena.api.care_languages',fromlist=['valid']).valid(code) for code in languages):
             fail('Choose supported care languages')
         clean['care_languages'] = sorted(languages)
     if 'introduction' in answers:
         clean['introduction'] = text(answers['introduction'], 2000, False)
     finish = boolean(complete)
     if finish and kind == 'clinician':
+        languages_review=rows('SELECT language,proficiency FROM tt_care_language_claim WHERE clinician=%s AND active=1',(user,))
+        if not languages_review or any(not item.proficiency for item in languages_review):fail('Select and self-assess your care languages before submission.','care_language_assessment_required')
         from tele_tena.api.professional import validate, persist, validate_bio
         draft = frappe.db.sql('SELECT payload FROM tt_professional_draft WHERE user=%s', (user,))
         if draft:

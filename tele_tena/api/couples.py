@@ -182,7 +182,7 @@ def get_plan(plan_id):
 
 
 @j.command
-def confirm(plan_id):
+def confirm(plan_id,expected_payment_mode=None,payment_mode_revision=None):
     payer = j.actor('Tele Tena Patient')
     j.one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     plan = j.one('SELECT * FROM tt_couple_plan WHERE id=%s AND payer=%s FOR UPDATE', (plan_id,payer))
@@ -201,7 +201,7 @@ def confirm(plan_id):
     try:
         result = j.book(plan.offering,j.iso(plan.start),json.loads(own.disclosure)['request'],
                         json.loads(own.choices),'couple-'+plan.id,plan.price,plan.minutes,
-                        json.loads(own.disclosure),plan.timezone,couple_plan_id=plan.id)
+                        json.loads(own.disclosure),plan.timezone,couple_plan_id=plan.id,expected_payment_mode=expected_payment_mode,payment_mode_revision=payment_mode_revision)
         frappe.db.sql("UPDATE tt_couple_plan SET state='Booked',appointment=%s WHERE id=%s", (result['id'],plan.id))
         return result
     finally:

@@ -85,21 +85,21 @@ def validate(value,user,submit=False):
         return values
     for key,purpose in [('identity_files','Identification'),('license_files','License'),('cv_files','CV')]:result[key]=files(value.get(key,[]),purpose)
     certs=value.get('certifications',[])
-    if not isinstance(certs,list) or len(certs)>200:fail('Up to 200 certifications may be saved per application.','certifications_limit')
+    if not isinstance(certs,list) or len(certs)>200:fail('Up to 200 credentials may be saved per application.','certifications_limit')
     result['certifications']=[];seen=set()
     for item in certs:
-        if not isinstance(item,dict) or set(item)-{'id','title','description','issuer','issuer_other','country','issued','expires','files'}:fail('Review certification fields.','certification_invalid')
+        if not isinstance(item,dict) or set(item)-{'id','title','description','issuer','issuer_other','country','issued','expires','files'}:fail('Review credential fields.','certification_invalid')
         cert={k:text(str(v),1000 if k=='description' else 240,False) for k,v in item.items() if k!='files'}
-        if not re.fullmatch(r'[a-f0-9-]{36}',cert.get('id','')) or cert['id'] in seen:fail('Certification row is invalid.','certification_invalid')
+        if not re.fullmatch(r'[a-f0-9-]{36}',cert.get('id','')) or cert['id'] in seen:fail('Credential row is invalid.','certification_invalid')
         seen.add(cert['id']);cert['files']=files(item.get('files',[]),'Certification')
-        if submit and not cert.get('title'):fail('Enter a title for every certification, or remove its empty row.','certification_title_required')
+        if submit and not cert.get('title'):fail('Enter a title for every credential, or remove its empty row.','certification_title_required')
         if cert.get('issuer') and cert['issuer']!='Other':reference(cert['issuer'],'issuer',user)
-        if submit and cert.get('issuer')=='Other' and not (cert.get('issuer_other') and cert.get('country')):fail('Enter the certification issuer and country.','issuer_country_required')
+        if submit and cert.get('issuer')=='Other' and not (cert.get('issuer_other') and cert.get('country')):fail('Enter the credential issuer and country.','issuer_country_required')
         for k in ('issued','expires'):
             if cert.get(k):
                 try:cert[k]=frappe.utils.getdate(cert[k]).isoformat()
-                except Exception:fail('Enter valid certification dates.','credential_date_invalid')
-        if cert.get('issued') and cert.get('expires') and cert['expires']<cert['issued']:fail('Certification expiry must follow its issue date.','credential_date_range')
+                except Exception:fail('Enter valid credential dates.','credential_date_invalid')
+        if cert.get('issued') and cert.get('expires') and cert['expires']<cert['issued']:fail('Credential expiry must follow its issue date.','credential_date_range')
         result['certifications'].append(cert)
     domains=value.get('competencies',[])
     if not isinstance(domains,list) or len(domains)>100:fail('Review selected competency domains.','competency_invalid')

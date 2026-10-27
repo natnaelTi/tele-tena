@@ -12,7 +12,8 @@ from frappe.sessions import get_csrf_token
 
 def fail(message, code='invalid_input'):
     frappe.local.response['tele_tena_error'] = code
-    frappe.throw(message, frappe.ValidationError)
+    from tele_tena.localization import translate
+    frappe.throw(translate(message,getattr(frappe.local,'lang','en')), frappe.ValidationError)
 
 
 def actor(role=None):
@@ -197,7 +198,8 @@ def session():
     user = actor()
     p = rows('SELECT * FROM tt_profile WHERE user=%s', (user,))
     from tele_tena.api.profile_photos import owner_photo
-    return {'user': user, 'display_name': p[0].display_name if p else frappe.db.get_value('User', user, 'full_name'), 'photo': owner_photo(user), 'roles': frappe.get_roles(user), 'profile': p[0] if p else None,
+    from tele_tena.api.direct_payments import config
+    return {'payment_mode':config().mode,'user': user, 'display_name': p[0].display_name if p else frappe.db.get_value('User', user, 'full_name'), 'photo': owner_photo(user), 'roles': frappe.get_roles(user), 'profile': p[0] if p else None,
             'clinic_workspace': _clinic_workspace_available(user),
             'clinic_schedule_workspace': _clinic_schedule_workspace_available(user),
             'csrf_token': get_csrf_token(), 'simulation': simulation_enabled()}
@@ -242,7 +244,8 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
                 languages = json.loads(languages)
             except ValueError:
                 fail('Choose the languages you can provide care in')
-        supported = {'en', 'am', 'om'}
+        from tele_tena.api.care_languages import valid
+        supported={code for code in languages if isinstance(code,str) and valid(code)} if isinstance(languages,list) else set()
         if not isinstance(languages, list) or len(set(languages)) != len(languages) or not set(languages).issubset(supported):
             fail('Choose supported care languages')
         language_values = sorted(set(languages)) if kind == 'clinician' else []
@@ -486,7 +489,7 @@ def services():
 
 
 @command
-def publish(service, price, minutes, title=None, description='', offering_id=None, retry_key=None):
+def publish(service, price, minutes, title=None, description='', offering_id=None, retry_key=None,care_languages=None):
     """Create an offering or edit one owned offering without widening scope.
 
     New clients supply a retry key for safe create retries. Legacy clients keep
@@ -506,6 +509,11 @@ def publish(service, price, minutes, title=None, description='', offering_id=Non
                'price': fee, 'minutes': duration}
     payload_hash = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
+    if care_languages is not None:
+        if isinstance(care_languages,str):care_languages=json.loads(care_languages)
+        if not isinstance(care_languages,list) or len(care_languages)>80:fail('Choose supported offering languages.','offering_language_invalid')
+        payload['care_languages']=care_languages
+        payload_hash=hashlib.sha256(json.dumps(payload,sort_keys=True,separators=(',',':')).encode()).hexdigest()
     # The same short-lived gate used by booking commands serializes create
     # retries so a duplicate browser submission cannot create another row.
     frappe.db.sql('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
@@ -519,6 +527,9 @@ def publish(service, price, minutes, title=None, description='', offering_id=Non
 
     approved(p.user, True)
     approved_service(p.user, service, True)
+    from tele_tena.api.care_languages import approved_for
+    allowed_languages=approved_for(p.user);selected_languages=care_languages if care_languages is not None else allowed_languages
+    if not selected_languages or any(code not in allowed_languages for code in selected_languages):fail('Obtain approval for each consultation language before publishing.','offering_language_approval_required')
     if offering_id:
         current = rows('SELECT id,service FROM tt_offering WHERE id=%s AND clinician=%s FOR UPDATE',
                        (offering_id, p.user))
@@ -552,7 +563,8 @@ def publish(service, price, minutes, title=None, description='', offering_id=Non
                 (saved_id, p.user, service, normalized_title, normalized_description, fee, duration,
                  key or None, payload_hash))
             action_name = 'Offering published'
-    audit(p.user, action_name, {'offering': saved_id, **payload})
+    frappe.db.sql('UPDATE tt_offering SET care_languages=%s WHERE id=%s',(json.dumps(list(dict.fromkeys(selected_languages))),saved_id))
+    audit(p.user, action_name, {'offering': saved_id, **payload,'care_languages':selected_languages})
     return {'saved': True, 'offering': saved_id, 'replayed': False}
 
 
@@ -580,7 +592,7 @@ def _approved_offerings(service=None):
     # Internal eligibility source; public callers still require an explicit projection.
     from tele_tena.review import enabled as review_enabled
     legacy_allowed = int(review_enabled() or frappe.local.site == 'erp.localhost')
-    results = rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,p.languages AS care_languages,o.clinician,o.service,
+    results = rows('''SELECT o.id,p.public_id AS clinician_id,p.display_name,COALESCE(o.care_languages,p.languages) AS care_languages,o.clinician,o.service,
         COALESCE(NULLIF(o.title,''),s.service_label) AS label,s.service_label AS service_category,s.participant_structure,o.description,o.price,o.minutes,
         sc.id AS schedule_id,sc.timezone AS schedule_timezone,sc.consultation_format
         FROM tt_offering o JOIN tt_profile p ON p.user=o.clinician
@@ -603,7 +615,11 @@ def _approved_offerings(service=None):
             languages = []
         if not isinstance(languages, list):
             languages = []
-        item.care_languages = sorted({value for value in languages if value in {'en', 'am', 'om'}})
+        from tele_tena.api.care_languages import offering_languages
+        item.care_languages=offering_languages(item.id)
+        if not item.care_languages:continue
+        from tele_tena.api.direct_payments import config
+        if config().mode=='Offline' and not rows('SELECT clinician FROM tt_telebirr_payee WHERE clinician=%s',(item.clinician,)):continue
         # The account key is needed only for the server-side eligibility
         # filter. Never serialize an account email to patient discovery.
         from tele_tena.api.profile_photos import public_photo
@@ -684,6 +700,8 @@ def simulation_enabled():
 
 @command
 def simulated_deposit(amount, retry_key):
+    from tele_tena.api.direct_payments import config
+    if config().mode!='Wallet':fail('Balance funding is unavailable in direct-payment mode.','wallet_mode_required')
     p = profile('patient')
     if not simulation_enabled():
         frappe.throw('Development simulation disabled', frappe.PermissionError)
@@ -716,7 +734,7 @@ def simulation_log(patient, kind, amount, reference):
 @command
 def book(offering, start, request_text, sharing, retry_key, expected_price, expected_minutes,
          expected_disclosure, booked_timezone='UTC', custom_offer_id=None,
-         booking_link_token=None, couple_plan_id=None,care_language=None,expected_format=None):
+         booking_link_token=None, couple_plan_id=None,care_language=None,expected_format=None,expected_payment_mode=None,payment_mode_revision=None):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     p = profile('patient', True)
     selected = choices(sharing)
@@ -746,14 +764,23 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         payload_values.append({'couple_plan':couple_plan_id})
     payload = json.dumps(payload_values, sort_keys=True)
     digest = hashlib.sha256(payload.encode()).hexdigest()
-    wallet = one('SELECT * FROM tt_wallet WHERE patient=%s FOR UPDATE', (p.user,))
+    from tele_tena.api.direct_payments import config as payment_config,require_payee,begin as begin_direct_payment
+    payment=payment_config(True)
+    offline=payment.mode=='Offline'
+    wallet=None
     from tele_tena.accounting import account_id, check_wallet_projection, post
-    check_wallet_projection(p.user, wallet)
+    if not offline:
+        wallet=one('SELECT * FROM tt_wallet WHERE patient=%s FOR UPDATE',(p.user,))
+        check_wallet_projection(p.user,wallet)
     prior = rows('SELECT id,payload_hash FROM tt_appointment WHERE patient=%s AND retry_key=%s FOR UPDATE', (p.user, key))
     if prior:
         if prior[0].payload_hash != digest:
             fail('Retry key payload changed', 'retry_changed')
-        return {'id': prior[0].id, 'simulated': True}
+        existing=one('SELECT state,payment_mode FROM tt_appointment WHERE id=%s',(prior[0].id,))
+        direct=rows("SELECT id,state FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment'",(prior[0].id,))
+        return {'id':prior[0].id,'state':existing.state,'payment_mode':existing.payment_mode,'payment':direct[0].id if direct else None,'simulated':existing.payment_mode=='Wallet'}
+    if (expected_payment_mode is not None and expected_payment_mode!=payment.mode) or (payment_mode_revision is not None and int(payment_mode_revision)!=payment.revision) or (offline and expected_payment_mode!='Offline'):
+        fail('Payment mode changed. Review the current payment instructions before continuing.','payment_mode_changed')
     trusted_disclosure = getattr(frappe.local, 'tele_tena_offer_disclosure', None)
     if custom_offer_id and getattr(frappe.local, 'tele_tena_accepting_offer', None) == custom_offer_id:
         shared = trusted_disclosure
@@ -815,9 +842,11 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
                 fail('Clinician immediate availability has expired', 'request_presence_stale')
     if integer(expected_price, 1, 100000000) != booking_price or integer(expected_minutes, 5, 240) != o.minutes:
         fail('Offering changed; review price and duration again', 'offering_changed')
-    if care_language is not None:
-        if care_language not in ('en','am','om') or care_language not in json.loads(one('SELECT languages FROM tt_profile WHERE user=%s',(o.clinician,)).languages or '[]'):
-            fail('The selected care language is no longer available. Review the service.','care_language_changed')
+    from tele_tena.api.care_languages import offering_languages
+    allowed_languages=offering_languages(o.id)
+    if not allowed_languages:fail('No approved consultation language is available for this offering.','care_language_unavailable')
+    if care_language is None:care_language=p.get('preferred_care_language') if p.get('preferred_care_language') in allowed_languages else allowed_languages[0]
+    if care_language not in allowed_languages:fail('The selected care language is no longer approved for this offering.','care_language_changed')
     end = start + timedelta(minutes=o.minutes)
     if start <= datetime.now(timezone.utc).replace(tzinfo=None):
         fail('Appointment must be in the future', 'future_required')
@@ -843,11 +872,12 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         fail('Appointment conflict', 'appointment_conflict')
     from tele_tena.api.couples import conflicts
     conflicts([p.user], start, end)
-    if wallet.available < booking_price:
+    payee=require_payee(o.clinician) if offline else None
+    if not offline and wallet.available < booking_price:
         fail('Insufficient simulated funds', 'insufficient_funds')
     appointment = str(uuid.uuid4())
     # Accepting the clinician's offer is already explicit confirmation.
-    mode = 'automatic' if custom_offer_id else (schedule.confirmation_mode if schedule else 'automatic')
+    mode = 'automatic' if custom_offer_id and not offline else (schedule.confirmation_mode if schedule else 'automatic')
     expires = None
     state = 'Booked'
     confirmed = datetime.now(timezone.utc).replace(tzinfo=None) if mode == 'automatic' else None
@@ -869,6 +899,11 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     policy['notifications']={'version':'booking-notices-v2','confirmation_reminder_seconds':180,
                              'confirmation_deadline':iso(expires) if expires else None,
                              'expiry_effect':'full_reservation_release'}
+    if offline:
+        policy['version']='offline-prestart-refund-v1'
+        policy['cancel_before_start']='clinician_external_refund_if_verified'
+        policy['financial']={'version':'offline-telebirr-v1','payment_mode':'Offline','platform_custody':False,'platform_fee_collected':False,'hold_minutes':payment.hold_minutes,'verification_hours':payment.verification_hours}
+    else:policy['financial']['payment_mode']='Wallet'
     if care_language is not None:policy['care_language']=care_language
     created = datetime.now(timezone.utc).replace(tzinfo=None)
     frappe.db.sql('''INSERT INTO tt_appointment (id,patient,clinician,offering,start,end,state,price,acquisition_source,minutes,
@@ -886,6 +921,9 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     from tele_tena.api.encounter_files import grant_booking
     grant_booking(appointment,p.user,o.clinician,shared)
     from tele_tena.booking_notifications import create
+    if offline:
+        payment_id=begin_direct_payment(appointment,payee,payment)
+        return {'id':appointment,'state':'AwaitingPayment','payment':payment_id,'payment_mode':'Offline','simulated':False}
     create(appointment,state,plan_id=couple_plan_id)
     frappe.db.sql('UPDATE tt_wallet SET available=available-%s,reserved=reserved+%s WHERE patient=%s', (booking_price, booking_price, p.user))
     simulation_log(p.user, 'Reservation', booking_price, 'booking:' + appointment)
@@ -911,7 +949,8 @@ def appointments():
     field = 'patient' if p.kind == 'patient' else 'clinician'
     # Clinician never receives patient account identity, history or mutable profile.
     result = rows(f'''SELECT a.id,a.start,a.end,a.state,a.price,a.minutes,a.service_label,a.disclosure,a.choices,
-        a.timezone,a.consultation_format,a.confirmation_mode,a.expires_at,a.confirmed_at,
+        a.timezone,a.consultation_format,a.confirmation_mode,a.expires_at,a.confirmed_at,a.payment_mode,
+        (SELECT dp.state FROM tt_direct_payment dp WHERE dp.appointment=a.id AND dp.reference_type='Appointment' LIMIT 1) AS direct_payment_state,
         a.cancelled_by,a.cancelled_at,a.cancel_reason,a.policy_snapshot,
         c.state AS call_state,c.ended AS call_ended,n.status AS documentation_state,
         provider.display_name AS clinician_display_name

@@ -1,3 +1,31 @@
+## Direct Telebirr Revision — 27 October 2026
+
+The requested MVP payment model is Offline Direct Payment, subject to explicit
+financial-administrator selection after deployment. Installation/upgrade keeps
+Wallet and never changes the remote mode automatically. Each appointment keeps
+its original mode, quote and policy. Existing wallet balances, holds, postings,
+disputes, release/payout history and credentials are preserved.
+
+Offline intents reserve appointment capacity, not money. The authorized payer
+transfers externally to the snapshotted clinician receiving number, then submits
+a private receipt and transaction reference. The receiving clinician records a
+human verification, independently of appointment acceptance. A submitted image
+is not verified receipt. No platform custody, fee collection, automated refund,
+settlement or payout follows. Late/mismatched/disputed claims stay auditable in
+reconciliation/refund states. An extension needs its own consent and payment.
+
+Care-language claims, explicit self-assessment, individual reviewer decisions,
+offering languages and patient preference are separate. Prior declarations are
+preserved as pending claims without invented ratings/verification; existing
+appointments remain intact and authorization changes flag future care for human
+review. New booking/publication/matching requires approved offering languages.
+The expanded competency/navigation vocabulary and language scale are proposed
+for clinical-owner review. Directory priority conveys no accreditation.
+
+Implementation and acceptance remain tracked in `offline-telebirr-sprint.md` and
+the existing screen matrix; this section records requested behavior, not a claim
+that all browser/scheduler/visual acceptance has passed.
+
 ## Clinician Onboarding and Contextual Access — 22 October 2026
 
 The five professional groups are Profile, Qualifications/Certifications, License,

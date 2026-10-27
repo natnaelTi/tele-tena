@@ -163,3 +163,10 @@ def install():
 
     from tele_tena.patches.v1_44_professional_onboarding import execute as professional_onboarding
     professional_onboarding()
+
+    from tele_tena.patches.v1_45_direct_payments import execute as direct_payments
+    direct_payments()
+    from tele_tena.patches.v1_46_reference_navigation import execute as reference_navigation
+    reference_navigation()
+    from tele_tena.patches.v1_47_care_languages import execute as care_languages
+    care_languages()

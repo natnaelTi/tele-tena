@@ -5,6 +5,12 @@ import frappe
 from tele_tena.api.journey import actor,rows,query,command
 
 KINDS={
+ 'PaymentReminder':('Direct Payment Reminder','reminders'),
+ 'PaymentVerificationReminder':('Payment Verification Reminder','reminders'),
+ 'PaymentSubmitted':('Payment Submitted for Verification','appointments'),
+ 'PaymentVerified':('Payment Receipt Verified','appointments'),
+ 'PaymentCorrection':('Payment Correction Requested','appointments'),
+ 'PaymentReconciliation':('Payment Reconciliation Update','appointments'),
  'Confirmed':('Appointment Confirmed','appointments'),
  'Pending':('Awaiting Clinician Confirmation','appointments'),
  'ConfirmationReminder':('Booking Confirmation Reminder','appointments'),

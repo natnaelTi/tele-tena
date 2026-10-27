@@ -55,3 +55,9 @@ tele_tena.patches.v1_42_patient_notifications
 tele_tena.patches.v1_43_public_content
 
 tele_tena.patches.v1_44_professional_onboarding
+
+tele_tena.patches.v1_45_direct_payments
+
+tele_tena.patches.v1_46_reference_navigation
+
+tele_tena.patches.v1_47_care_languages
