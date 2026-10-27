@@ -77,6 +77,7 @@ def detail(id):
     for field in ('hold_until','verify_until','verified_at','created'):out[field]=iso(out[field]) if out[field] else None
     for h in out['history']:
         h.created=iso(h.created);h.details=json.loads(h.details or '{}')
+    out['reported_amount']=next((h.details.get('amount') for h in reversed(out['history']) if h.event=='PaymentSubmitted'),None)
     out['can_verify']=user==p.clinician;out['payer']=user==p.patient;out['external_verification']=False
     return out
 @query()
@@ -187,8 +188,12 @@ def ledger(page=0):
         row.counterparty=row.pop('clinician_name') or json.loads(row.pop('disclosure') or '{}').get('name') or 'Private Patient'
         row.pop('disclosure',None)
         row.created=iso(row.created);row.verified_at=iso(row.verified_at) if row.verified_at else None
+    claim="(SELECT CAST(JSON_UNQUOTE(JSON_EXTRACT(e.details,'$.amount')) AS UNSIGNED) FROM tt_direct_payment_event e WHERE e.payment=p.id AND e.event='PaymentSubmitted' ORDER BY e.created DESC,e.id DESC LIMIT 1)"
+    for item in data:
+        reported=rows("SELECT details FROM tt_direct_payment_event WHERE payment=%s AND event='PaymentSubmitted' ORDER BY created DESC,id DESC LIMIT 1",(item.id,))
+        item.reported_amount=json.loads(reported[0].details).get('amount') if reported else None
     totals={}
-    for p in rows('SELECT state,SUM(amount) AS total FROM tt_direct_payment WHERE patient=%s OR clinician=%s GROUP BY state',(user,user)):totals[p.state]=int(p.total)
+    for p in rows('SELECT p.state,SUM(COALESCE('+claim+',p.amount)) AS total FROM tt_direct_payment p WHERE p.patient=%s OR p.clinician=%s GROUP BY p.state',(user,user)):totals[p.state]=int(p.total)
     return {'items':data,'totals_minor':totals,'currency':'ETB','custody':False,'page':page,'has_more':has_more}
 
 @command

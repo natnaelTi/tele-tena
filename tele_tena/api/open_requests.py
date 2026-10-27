@@ -234,6 +234,8 @@ def _set_request_presence(ready, manual=True):
     approved(clinician, lock=True)
     p = profile('clinician', lock=True)
     if ready:
+        from tele_tena.api.direct_payments import config,require_payee
+        if config().mode=='Offline':require_payee(clinician)
         languages = clinician_languages(clinician)
         if not languages:
             fail('Choose at least one language you can provide care in before becoming available for requests',
@@ -249,7 +251,9 @@ def _set_request_presence(ready, manual=True):
         if not scoped:
             fail('An active service scope must be approved before you can receive requests.',
                  'scope_approval_required')
-        scheduled = [item for item in scoped if item.schedule_id]
+        from tele_tena.api.care_languages import offering_languages
+        if not any(offering_languages(item.id) for item in scoped):fail('Obtain care-language approval for a published offering before receiving requests.','request_languages_required')
+        scheduled = [item for item in scoped if item.schedule_id and offering_languages(item.id)]
         if not scheduled:
             fail('Publish recurring availability for an approved service before receiving requests.',
                  'request_schedule_required')
@@ -735,7 +739,11 @@ def request_presence():
     scoped = [item for item in all_offerings if journey.service_scope_is_current(clinician, item.service)]
     if all_offerings and not scoped:
         reasons.append('scope_approval_required')
-    scheduled = [item for item in scoped if item.schedule_id]
+    from tele_tena.api.care_languages import offering_languages
+    if scoped and not any(offering_languages(item.id) for item in scoped) and 'language_required' not in reasons:reasons.append('language_required')
+    from tele_tena.api.direct_payments import config
+    if config().mode=='Offline' and not rows('SELECT clinician FROM tt_telebirr_payee WHERE clinician=%s',(clinician,)):reasons.append('telebirr_payee_required')
+    scheduled = [item for item in scoped if item.schedule_id and offering_languages(item.id)]
     if scoped and not scheduled:
         reasons.append('published_schedule_required')
     immediate_services = [item for item in scheduled if immediate_service_enabled(item)]
@@ -929,7 +937,7 @@ def clinician_notifications():
     pref = rows('SELECT notification_preferences FROM tt_preferences WHERE user=%s', (clinician,))
     settings = json.loads(pref[0].notification_preferences or '{}') if pref else {}
     seen = set(settings.get('accepted_offer_seen', []))
-    found = rows("""SELECT o.id,a.id appointment,r.matched_at accepted_at
+    found = rows("""SELECT o.id,a.id appointment,a.state appointment_state,a.payment_mode,r.matched_at accepted_at
         FROM tt_request_offer o JOIN tt_open_request r ON r.id=o.request_id
         JOIN tt_appointment a ON a.id=o.appointment AND a.clinician=o.clinician
         WHERE o.clinician=%s AND o.state='Accepted' AND r.state='Matched'

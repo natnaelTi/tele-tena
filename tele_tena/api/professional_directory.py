@@ -14,6 +14,10 @@ def search(kind,search='',country='',offset=0,limit=20,prefer_country='',profess
     term='%'+search.replace('!','!!').replace('%','!%').replace('_','!_')+'%'
     where="kind=%s AND merged_into IS NULL AND (status IN ('Listed','Reviewed') OR submitted_by=%s) AND (label LIKE %s ESCAPE '!' OR aliases LIKE %s ESCAPE '!' OR group_label LIKE %s ESCAPE '!' OR description LIKE %s ESCAPE '!')"
     values=[kind,user,term,term,term,term]
+    if kind=='facility':
+        # Only explicit shared clinic identities are deduplicated. Never merge
+        # organizations by a guessed similar name or infer affiliations.
+        where+=" AND (clinic IS NULL OR NOT EXISTS (SELECT 1 FROM tt_reference peer WHERE peer.kind='facility' AND peer.clinic=tt_reference.clinic AND peer.merged_into IS NULL AND (peer.status IN ('Listed','Reviewed') OR peer.submitted_by=%s) AND (CASE WHEN peer.id LIKE 'clinic:%%' THEN 1 ELSE 0 END,peer.id)<(CASE WHEN tt_reference.id LIKE 'clinic:%%' THEN 1 ELSE 0 END,tt_reference.id)))";values.append(user)
     if country:where+=' AND country=%s';values.append(country)
     prefer_country=text(prefer_country,2,False)
     profession=text(profession,100,False)

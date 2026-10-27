@@ -14,7 +14,7 @@ class DirectPayment(unittest.TestCase):
  def setUp(self):
   frappe.db.savepoint('payment_test');frappe.set_user('Administrator');frappe.local.lang='en'
  def tearDown(self):frappe.db.rollback(save_point='payment_test');frappe.set_user('Administrator')
- def book(self,mode='Offline',key=None):
+ def book(self,mode='Offline',key=None,expensive=False):
   c=pay.config()
   if c.mode!=mode:pay.configure(mode,c.revision,'Isolated rollback test only')
   frappe.set_user(users['counselor']);pay.save_payee('+251911234567',pay.payee()['revision'],'Synthetic payee for rollback test')
@@ -22,6 +22,9 @@ class DirectPayment(unittest.TestCase):
   care_languages.save_claims([{'code':'en','proficiency':3,'explanation':'Explicit synthetic self-assessment for rollback-only test'}])
   frappe.set_user('Administrator');care_languages.decide(users['counselor'],'en','Approved','Synthetic language decision for rollback-only acceptance test')
   frappe.set_user(users['patient']);ids={r.id for r in j.rows('SELECT id FROM tt_offering WHERE clinician=%s AND active=1',(users['counselor'],))};offer=next(x for x in j.discover() if x.id in ids)
+  if expensive:
+   amount=j.one('SELECT available FROM tt_wallet WHERE patient=%s',(users['patient'],)).available+1
+   current=j.one('SELECT * FROM tt_offering WHERE id=%s',(offer.id,));frappe.set_user(users['counselor']);j.publish(current.service,amount,current.minutes,title=current.title,description=current.description,offering_id=current.id,care_languages=['en']);frappe.set_user(users['patient']);offer=next(x for x in j.discover() if x.id==current.id)
   from datetime import datetime,timedelta,timezone
   start=None
   for n in range(1,15):
@@ -113,6 +116,16 @@ class DirectPayment(unittest.TestCase):
   self.assertEqual(language.offering_languages(args['offering']),[])
   self.assertEqual(j.one('SELECT state FROM tt_appointment WHERE id=%s',(result['id'],)).state,'PendingConfirmation')
   self.assertTrue(j.rows('SELECT appointment FROM tt_language_appointment_review WHERE appointment=%s',(result['id'],)))
+ def test_retained_wallet_shortfall_does_not_create_direct_payment(self):
+  before=j.one('SELECT COUNT(*) n FROM tt_direct_payment').n
+  with self.assertRaises(frappe.ValidationError):self.book('Wallet',expensive=True)
+  self.assertEqual(j.one('SELECT COUNT(*) n FROM tt_direct_payment').n,before)
+ def test_reference_priority_is_stable_and_never_pins_nonmatching_entries(self):
+  from tele_tena.api import professional_directory as directory
+  frappe.set_user(users['counselor']);items=directory.search('issuer')['items'];priorities=[x for x in items if x.priority_et]
+  self.assertTrue(priorities);self.assertEqual([x.id for x in items], [x.id for x in directory.search('issuer')['items']]);self.assertEqual(items[:len(priorities)],priorities)
+  self.assertFalse(any(x.priority_et for x in directory.search('issuer',search='Harvard')['items']))
+  with self.assertRaises(frappe.PermissionError):directory.set_priority(priorities[0].id,False,'https://ror.org/','Not an authorized navigation reviewer')
  def test_mode_configuration_is_privileged(self):
   frappe.set_user(users['reviewer'])
   if 'Tele Tena Financial Configuration' not in frappe.get_roles():

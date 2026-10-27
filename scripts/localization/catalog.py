@@ -12,6 +12,10 @@ def extract():
     for file in sorted((ROOT/'tele_tena').rglob('*.py')):
         if '/localization/' in str(file):continue
         tree=ast.parse(file.read_text())
+        if file.name in ('notifications.py','booking_notifications.py','public_content_defaults.py','email_delivery.py','sms.py'):
+            for node in ast.walk(tree):
+                if isinstance(node,ast.Constant) and isinstance(node.value,str) and re.search('[A-Za-z]',node.value) and (' ' in node.value or re.fullmatch('[A-Z][a-z]+',node.value)) and not re.match(r'(?i)^(https?://|SELECT |INSERT |UPDATE |DELETE |CREATE |ALTER |\s*SELECT |\s*INSERT |\s*UPDATE )',node.value) and len(node.value)<50000:
+                    entries.append({'english':node.value,'context':'Notification or default public copy / '+file.stem,'source_location':str(file.relative_to(ROOT))+':'+str(node.lineno)})
         for node in ast.walk(tree):
             if not isinstance(node,ast.Call) or not node.args:continue
             name=ast.unparse(node.func)

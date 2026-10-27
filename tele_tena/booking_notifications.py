@@ -135,7 +135,11 @@ def dispatch():
         parsed=urlsplit(link)
         if parsed.hostname and not parsed.hostname.endswith('.localhost') and parsed.hostname not in ('localhost','127.0.0.1'):
             link=urlunsplit(('https',parsed.netloc,parsed.path,'',''))
-        message=f'TeleTena appointment {label}. {when} ({app.timezone}). Reference {app.id[:8]}. Sign in: {link}'
+        from tele_tena.localization import translate
+        locale=rows('SELECT locale FROM tt_preferences WHERE user=%s',(notice.user,))
+        locale=locale[0].locale if locale else 'en'
+        template=translate('TeleTena appointment {status}. {time} ({timezone}). Reference {reference}. Sign in: {link}',locale)
+        message=template.format(status=translate(label,locale),time=when,timezone=app.timezone,reference=app.id[:8],link=link)
         if notice.user==app.patient and notice.event in ('Confirmed','Pending') and rows('SELECT id FROM tt_journal WHERE event_ref=%s',('booking:'+app.id,)):
             minor=int(app.price);message+=f' Demonstration balance: ETB {minor//100}.{minor%100:02d} reserved. No external payment collected.'
         if notice.user==app.patient and notice.event in ('Cancelled','Declined','Expired') and rows('SELECT id FROM tt_journal WHERE event_ref=%s',('release:'+app.id,)):

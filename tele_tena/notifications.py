@@ -105,11 +105,11 @@ def mark_read(id,source):
     user=actor()
     if source not in ('user','booking'):frappe.throw('Notification unavailable',frappe.PermissionError)
     table='tt_user_notification' if source=='user' else 'tt_booking_notice'
-    found=rows(f'SELECT appointment FROM {table} WHERE id=%s AND user=%s',(id,user))
+    found=rows(f"SELECT appointment,{'kind' if source=='user' else 'event'} notice_kind FROM {table} WHERE id=%s AND user=%s",(id,user))
     if not found or (found[0].appointment and user not in participants(found[0].appointment)):
         frappe.throw('Notification unavailable',frappe.PermissionError)
     frappe.db.sql(f'UPDATE {table} SET read_at=COALESCE(read_at,UTC_TIMESTAMP(6)) WHERE id=%s AND user=%s',(id,user))
-    if found[0].appointment and user==rows('SELECT clinician FROM tt_appointment WHERE id=%s',(found[0].appointment,))[0].clinician:
+    if found[0].notice_kind in ('Pending','ConfirmationReminder') and found[0].appointment and user==rows('SELECT clinician FROM tt_appointment WHERE id=%s',(found[0].appointment,))[0].clinician:
         confirmation_presented(found[0].appointment)
     return {'read':True}
 
