@@ -1,3 +1,5 @@
+import {usePaymentCapabilities,DirectLedger,DirectLedgerSummary} from '../components/DirectPayments';
+import {languageName} from '../components/CareLanguages';
 import {BookingNotices} from '../components/BookingNotices';
 import {discoveryFilters} from '../care-intent';
 import {clearReturn,returnIntent} from '../guest-intent';
@@ -40,6 +42,7 @@ import { useSession } from "../hooks/useSession";
 import { useAction } from "../hooks/useAction";
 import { useLocale } from "../hooks/useLocale";
 export function PatientHome() {
+  const paymentCapabilities=usePaymentCapabilities();
   const { w } = useLocale();
   const [now] = useState(() => Date.now());
   const { session } = useSession();
@@ -113,7 +116,7 @@ export function PatientHome() {
       ) : (
         <p className="supporting">{w("Clinicians you have completed a consultation with will appear here when they have current approved services available.")}</p>
       )}
-      </section></section><aside className="patient-dashboard-aside">{wallet.data ? <WalletSummary available={wallet.data.available} reserved={wallet.data.reserved} /> : wallet.error ? <InlineNotice tone="danger">{w("Balance unavailable.")} <Button variant="secondary" onClick={() => void wallet.refresh()}>{w("Try again")}</Button></InlineNotice> : <Skeleton />}<PatientCareLinks appointments={appointments.data} /></aside></div>
+      </section></section><aside className="patient-dashboard-aside">{paymentCapabilities.data?.mode==='Offline'?<DirectLedgerSummary role="patient"/>:wallet.data ? <WalletSummary available={wallet.data.available} reserved={wallet.data.reserved} /> : wallet.error ? <InlineNotice tone="danger">{w("Balance unavailable.")} <Button variant="secondary" onClick={() => void wallet.refresh()}>{w("Try again")}</Button></InlineNotice> : <Skeleton />}<PatientCareLinks appointments={appointments.data} /></aside></div>
     </>
   );
 }
@@ -166,6 +169,7 @@ export function BookingLink() {
 }
 
 export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverride?: string; bookingLinkToken?: string }) {
+  const paymentCapabilities=usePaymentCapabilities();
   const { w } = useLocale();
   const route = useParams();
   const offering = offeringOverride || route.offering;
@@ -173,6 +177,8 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
   const navigate = useNavigate();
   const selectedIntent=returnIntent();
   const [careLanguage,setCareLanguage]=useState(selectedIntent?.kind==='offering'?selectedIntent.language||discoveryFilters().language:discoveryFilters().language);
+  const languageOffering=useRef<string|undefined>(undefined);
+  const languageExplicit=useRef(!!careLanguage);
   const [selectedDate, setSelectedDate] = useState("");
   const [calendarFrom, setCalendarFrom] = useState("");
   const [displayZone, setDisplayZone] = useState("Africa/Addis_Ababa");
@@ -213,20 +219,26 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
     key: string;
     fingerprint: string;
   } | null>(null);
+  const languageSet=(data?.offer?.care_languages||[]).join('|');
+  useEffect(()=>{
+    const allowed=data?.offer?.care_languages||[];if(!data?.offer)return;
+    if(languageOffering.current!==offering){languageOffering.current=offering;setCareLanguage(current=>languageExplicit.current&&allowed.includes(current)?current:allowed.includes(session?.profile?.preferred_care_language||'')?session!.profile!.preferred_care_language!:allowed[0]||'');}
+    else if(!languageExplicit.current)setCareLanguage(allowed.includes(session?.profile?.preferred_care_language||'')?session!.profile!.preferred_care_language!:allowed[0]||'');
+  },[offering,languageSet,session?.profile?.preferred_care_language]);
   if (error)
     return (
       <InlineNotice tone="danger">
         This offering is unavailable. Return to Find care and choose another.
       </InlineNotice>
     );
-  if (!data) return <Skeleton />;
+  if (!data||!paymentCapabilities.data) return <Skeleton />;
   if (!data.offer)
     return <EmptyState title="This service is no longer available." />;
   const requiredFormat=selectedIntent?.kind==='offering'?selectedIntent.format:undefined;
   if(requiredFormat&&requiredFormat!==data.calendar.format)return <InlineNotice tone="danger">{w('Your selected consultation format is no longer available. Review your filters before continuing.')} <Link to="/care">{w('Find care')}</Link></InlineNotice>;
   const offer: Offer = data.offer;
-  const selectedLanguage=careLanguage||(offer.care_languages?.length===1?offer.care_languages[0]:'');
-  const languageUnavailable=!!selectedLanguage&&!offer.care_languages?.includes(selectedLanguage as 'en'|'am'|'om');
+  const selectedLanguage=careLanguage;
+  const languageUnavailable=!!selectedLanguage&&!offer.care_languages?.includes(selectedLanguage);
   return (
     <div className={step === 1 ? "booking-sharing-flow" : "reference-booking"} data-tour-unsaved={Boolean(start||request)||undefined}>
       <section className="guided-content">
@@ -247,7 +259,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
         {step === 0 && (
           <>
             <section className="booking-selection-panel"><div className="booking-selection-heading"><Avatar url={offer.photo_url} name={offer.display_name}/><div><span className="verified">{w("Approved for this service")}</span><h2>{offer.display_name}</h2><p>{offer.label} · {offer.minutes} {w("minutes")} · ETB {money(offer.price)}</p></div></div>
-            <div className="booking-preferences"><Select label={w("Care language")} value={selectedLanguage} onChange={event=>setCareLanguage(event.target.value)}><option value="">{w("Choose a language")}</option>{languageUnavailable&&<option value={selectedLanguage} disabled>{w("Selected language no longer offered")}</option>}{offer.care_languages?.map(value=><option key={value} value={value}>{({en:'English',am:'አማርኛ',om:'Afaan Oromo'})[value]}</option>)}</Select>{languageUnavailable&&<InlineNotice tone="danger">{w("This service no longer offers your selected language. Choose another language explicitly or return to Find care.")}</InlineNotice>}
+            <div className="booking-preferences"><Select label={w("Care language")} value={selectedLanguage} onChange={event=>{languageExplicit.current=true;setCareLanguage(event.target.value);}}><option value="">{w("Choose a language")}</option>{languageUnavailable&&<option value={selectedLanguage} disabled>{w("Selected language no longer offered")}</option>}{offer.care_languages?.map(value=><option key={value} value={value}>{languageName(value)}</option>)}</Select>{languageUnavailable&&<InlineNotice tone="danger">{w("This service no longer offers your selected language. Choose another language explicitly or return to Find care.")}</InlineNotice>}
             <Select label="Show times in timezone" value={displayZone} onChange={e=>{setDisplayZone(e.target.value);setStart("");setSelectedDate("");}}><option value="Africa/Addis_Ababa">Addis Ababa (EAT)</option><option value="UTC">UTC</option><option value="Africa/Nairobi">Nairobi (EAT)</option></Select></div>
             <BookingCalendar days={data.calendar.days} fromDate={calendarFrom || data.calendar.days[0]?.date || new Date().toISOString().slice(0,10)} selectedDate={selectedDate} selectedStart={start} duration={offer.minutes}
               onMonth={date => { setCalendarFrom(date); setSelectedDate(""); setStart(""); }}
@@ -327,11 +339,12 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
           <p className="supporting">{w("The invitation does not reserve a time or charge either wallet.")}</p>
         </Card>}
         {step === 2 && preview && offer.participant_structure !== 'couple' && (
-          <BookingReview offer={offer} start={start} zone={displayZone} format={data.calendar.format} disclosure={preview} balance={wallet.data} balanceError={Boolean(wallet.error)} onRetry={()=>void wallet.refresh()} busy={action.busy}
+          <BookingReview offline={paymentCapabilities.data?.mode==='Offline'} offer={offer} start={start} zone={displayZone} format={data.calendar.format} disclosure={preview} balance={wallet.data} balanceError={Boolean(wallet.error)} onRetry={()=>void wallet.refresh()} busy={action.busy}
               onConfirm={() =>
                 void action.run(async () => {
                   const payload = {
                     offering: offer.id,
+                    expected_payment_mode:paymentCapabilities.data?.mode,payment_mode_revision:paymentCapabilities.data?.revision,
                     start,
                     booked_timezone: displayZone,
                     care_language:selectedLanguage||undefined,expected_format:data.calendar.format,
@@ -352,7 +365,7 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
                     ...(bookingLinkToken ? { booking_link_token: bookingLinkToken } : {}),
                     retry_key: key,
                   });
-                  clearReturn();navigate("/patient/booked/"+booked.id);
+                  clearReturn();navigate((booked as any).payment?"/patient/direct-payments/"+(booked as any).payment:"/patient/booked/"+booked.id);
                 }, "")
               }/>
         )}
@@ -370,9 +383,11 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
   );
 }
 export function Payments() {
+  const paymentCapabilities=usePaymentCapabilities();
   const { w } = useLocale();
   const wallet = useResource(journeyApi.walletActivity);
   const [fundsOpen, setFundsOpen] = useState(false);
+  if(paymentCapabilities.data?.mode==='Offline'&&new URLSearchParams(window.location.search).get('history')!=='wallet')return <DirectLedger role="patient"/>;
   return (
     <>
       <PageTitle
@@ -380,7 +395,7 @@ export function Payments() {
         description={w("Your funds, clearly separated.")}
       />
       <div className="patient-payments-layout"><section>
-      {wallet.data && <section className="reference-wallet"><span>{w("Available to spend")}</span><strong>ETB {money(wallet.data.available)}</strong><Button variant="secondary" onClick={() => setFundsOpen(true)}>{w("Add funds")}</Button><p className="wallet-reserved-total">{w("Reserved for appointments")} · ETB {money(wallet.data.reserved)}</p></section>}
+      {wallet.data && <section className="reference-wallet"><span>{w("Available to spend")}</span><strong>ETB {money(wallet.data.available)}</strong><Button disabled={paymentCapabilities.data?.mode==='Offline'} variant="secondary" onClick={() => setFundsOpen(true)}>{w("Add funds")}</Button><p className="wallet-reserved-total">{w("Reserved for appointments")} · ETB {money(wallet.data.reserved)}</p></section>}
       {wallet.error && (
         <InlineNotice tone="danger">
           Balance unavailable.{" "}

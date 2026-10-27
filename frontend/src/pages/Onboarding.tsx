@@ -1,14 +1,17 @@
+import {CareLanguageEditor} from '../components/CareLanguages';
+import type {CareLanguageHandle} from '../components/CareLanguages';
 import {RequiredFieldsNotice} from '../components/ui';
 import {ProfessionalStep,professionalError} from '../components/ProfessionalApplication';
 import type {ApplicationState,ProfessionalClaims} from '../components/ProfessionalApplication';
-import {returnPath} from '../guest-intent';
+import {returnPath,discardGuestDraft} from '../guest-intent';
 import HistoryDocuments from "../components/HistoryDocuments";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link,Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { pendingCareQuery } from "../care-intent";
 import { api, ApiError } from "../api";
 import {
   Button,
+  Dialog,
   Checkbox,
   InlineNotice,
   Select,
@@ -41,6 +44,7 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const routeLocation = useLocation();
   const [params] = useSearchParams();
+  const careLanguageEditor=useRef<CareLanguageHandle>(null);
   const [step, setStep] = useState(0);
   const [kind, setKind] = useState("patient");
   const [resumeKind,setResumeKind]=useState("");
@@ -52,6 +56,9 @@ export default function Onboarding() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const [signingOut,setSigningOut]=useState(false);
+  const [signOutOpen,setSignOutOpen]=useState(false);
+  const [signOutError,setSignOutError]=useState("");
   const [catalog, setCatalog] = useState<{id:string;label:string}[]>([]);
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [scopeSearch, setScopeSearch] = useState("");
@@ -95,7 +102,7 @@ export default function Onboarding() {
   const titles = clinician
     ? [
         "Your Professional Profile",
-        "Qualifications and Certifications",
+        "Qualifications and Credentials",
         "Clinic Affiliations and Declaration",
         "Review Your Application",
         "",
@@ -123,6 +130,7 @@ export default function Onboarding() {
     setBusy(true);
     setError("");
     try {
+      if(clinician&&careLanguageEditor.current)await careLanguageEditor.current.save();
       if(clinician){if(!professionalState)throw new Error('Professional application is not loaded');const state=await api<ApplicationState>('tele_tena.api.professional.save',{payload:professional,revision:professionalState.revision},true);setProfessionalState(state);}
       await api(
         "tele_tena.api.contact_auth.save_onboarding",
@@ -141,6 +149,7 @@ export default function Onboarding() {
         navigate(invitationToken && current?.profile?.kind==='patient' ? '/relationship-invitation' : current?.profile?.kind === 'patient' && pendingCareQuery() ? '/patient/discovery' : destination(current),
           { replace:true, state: invitationToken ? {relationshipInvitationToken:invitationToken} : undefined });
       }
+      return true;
     } catch (failure) {
       const code = failure instanceof ApiError ? failure.code : "network_error";
       setError(failure instanceof ApiError && failure.message && ["bio_word_limit","professional_required","declaration_required","competency_rating_required","credential_date_range","reference_other_required","issuer_country_required"].includes(code)?professionalError(failure):code === "adult_required"
@@ -154,12 +163,26 @@ export default function Onboarding() {
             : code === "registration_unavailable"
               ? "Registration is unavailable on this site. Your saved progress has not been submitted."
               : "We couldn’t save this step. Your entries are still here; check your connection and try again.");
+      return false;
     } finally {
       setBusy(false);
     }
   }
+  async function signOut(saveFirst:boolean){
+    setSignOutError('');
+    if(saveFirst&&document.querySelector('.onboarding-guided .upload-dropzone[aria-busy="true"]')){setSignOutError('Wait for the upload to finish before saving, or explicitly discard unsaved changes and sign out.');return;}
+    if(saveFirst&&!(await save(step))){setSignOutError('Your draft could not be saved. Retry, or explicitly discard unsaved changes and sign out.');return;}
+    setSigningOut(true);
+    try{await journeyApi.logout();discardGuestDraft();setAnswers({});setProfessional({});setProfessionalState(null);window.location.replace('/teletena/sign-in?intent='+kind);}
+    catch{setSigningOut(false);setSignOutError('Sign-out could not finish. Try again; your entries remain here.');}
+  }
   return (
     <>
+    <div className="onboarding-session-actions"><Button variant="quiet" onClick={()=>setSignOutOpen(true)}>{w('Sign Out')}</Button></div>
+    <Dialog open={signOutOpen} onOpenChange={setSignOutOpen} title={w('Sign Out of Onboarding')} description={w('Saved progress stays with your account. Unsaved text and selections will be discarded unless you save first. An upload that already finished remains private.')}>
+      {signOutError&&<InlineNotice tone="danger">{w(signOutError)}</InlineNotice>}
+      <div className="actions"><Button loading={busy||signingOut} onClick={()=>void signOut(true)}>{w('Save and Sign Out')}</Button><Button variant="secondary" disabled={signingOut} onClick={()=>void signOut(false)}>{w('Discard Unsaved Changes and Sign Out')}</Button><Button variant="quiet" disabled={signingOut} onClick={()=>setSignOutOpen(false)}>{w('Keep Editing')}</Button></div>
+    </Dialog>
     <section className={`guided-panel onboarding-guided ${!clinician&&step===3?"onboarding-ready-page":""}`}>
       <p className="eyebrow">
         {w(clinician ? "CLINICIAN APPLICATION" : "YOUR SPACE FOR CARE")} · {w("STEP")}{" "}
@@ -205,7 +228,7 @@ export default function Onboarding() {
               /></div>
             </>
           )}
-          {clinician&&step===0&&<fieldset><legend>{w('Consultation Languages')}</legend>{[['en','English'],['am','Amharic'],['om','Afaan Oromo']].map(([code,label])=><Checkbox key={code} label={label} checked={(answers.care_languages||[]).includes(code)} onChange={e=>update({care_languages:e.target.checked?[...(answers.care_languages||[]),code]:(answers.care_languages||[]).filter(v=>v!==code)})}/>)}</fieldset>}
+          {clinician&&step===0&&<CareLanguageEditor ref={careLanguageEditor} onboarding onChange={codes=>setAnswers(previous=>({...previous,care_languages:codes}))}/>}
           {step === 1 && !clinician && <p className="supporting">{w("For a shared session, every participating adult completes their own registration and consent.")}</p>}
           {step === 1 &&
             (clinician ? (

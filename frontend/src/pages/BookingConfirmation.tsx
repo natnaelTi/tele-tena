@@ -1,3 +1,4 @@
+import {DirectPaymentPanel} from '../components/DirectPayments';
 import {useCallback} from 'react';
 import {Link,useParams} from 'react-router-dom';
 import {Check,Clock} from 'lucide-react';
@@ -16,6 +17,7 @@ export default function BookingConfirmation(){
   if(detail.error)return <InlineNotice tone="danger">{w('This appointment could not be loaded. Check your access and try again.')} <Button variant="secondary" onClick={()=>void detail.refresh()}>{w('Retry')}</Button></InlineNotice>;
   if(!detail.data)return <Skeleton/>;
   const item=detail.data;
+  if((item as any).payment_mode==='Offline')return <><PageTitle title={w((item as any).direct_payment_state==='Verified'?(item.status==='Booked'?'Your Appointment Is Confirmed':'Awaiting Clinician Acceptance'):'Direct Payment and Verification')}/><DirectPaymentPanel appointment={id}/></>;
   const pending=item.status==='PendingConfirmation';
   const confirmed=item.status==='Booked';
   if(!confirmed&&!pending)return <><PageTitle title={w('Appointment Updated')} description={w('Open the appointment for its current status.')}/><Link className="button primary" to={'/patient/consultations/'+id}>{w('View appointment')}</Link></>;

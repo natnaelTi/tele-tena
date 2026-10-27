@@ -1,3 +1,4 @@
+import CareLanguageSelect from '../components/CareLanguageSelect';
 import {RequestAvailabilityCard} from '../components/RequestPresence';
 import {appointmentStatus} from '../appointment-status';
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -143,7 +144,7 @@ const loadServices = () => journeyApi.services();
 const loadPractice = () => api<any>("practice");
 
 export function PatientRequestsWorkspace() {
-  const { w, locale } = useLocale();
+  const { w } = useLocale();
   const [search, setSearch] = useSearchParams();
   const { requestId, offerId } = useParams();
   const navigate = useNavigate();
@@ -185,7 +186,7 @@ export function PatientRequestsWorkspace() {
     guestDraft()?.urgency || "immediate",
   );
   const [language, setLanguage] = useState(
-    () => requestDraft?.language || locale,
+    () => requestDraft?.language || session?.profile?.preferred_care_language || "en",
   );
   const [format, setFormat] = useState<"video" | "audio">(
     requestDraft?.format || "video",
@@ -605,15 +606,7 @@ export function PatientRequestsWorkspace() {
                           {w("Schedule for later")}
                         </option>
                       </Select>
-                      <Select
-                        label={w("Language")}
-                        value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
-                      >
-                        <option value="en">English</option>
-                        <option value="am">Amharic</option>
-                        <option value="om">Afaan Oromo</option>
-                      </Select>
+                      <CareLanguageSelect label={w("Consultation Language")} value={language} onChange={setLanguage} required/>
                       <Select
                         label={w("Session format")}
                         value={format}

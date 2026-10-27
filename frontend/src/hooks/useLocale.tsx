@@ -1,3 +1,4 @@
+import {reviewedCopy} from '../localization/runtime';
 import {professionalTranslations} from '../professional-translations';
 import {headingCopyAliases} from '../heading-copy-aliases';
 import {publicExperienceTranslations} from '../public-experience-translations';
@@ -942,11 +943,11 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       value={{
         locale,
         setLocale,
-        t: (key) => locales[locale][key],
+        t: (key) => reviewedCopy(locales.en[key],locale) || locales[locale][key],
         w: (english) =>
           locale === "en"
             ? english
-            : (words[english]||words[headingCopyAliases[english]])?.[locale === "am" ? 0 : 1] || english,
+            : reviewedCopy(english,locale) || (words[english]||words[headingCopyAliases[english]])?.[locale === "am" ? 0 : 1] || english,
       }}
     >
       {children}

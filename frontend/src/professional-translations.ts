@@ -1,7 +1,7 @@
 // Provisional interface translations. Native professional review is pending.
 export const professionalTranslations:Record<string,[string,string]>={
 'Your Professional Profile':['የእርስዎ ሙያዊ መገለጫ','Piroofaayilii Ogummaa Keessanii'],
-'Qualifications and Certifications':['ትምህርት እና የስልጠና ማስረጃዎች','Barnootaa fi Ragaa Leenjii'],
+'Qualifications and Credentials':['ትምህርት እና የስልጠና ማስረጃዎች','Barnootaa fi Ragaa Leenjii'],
 'Professional License':['የሙያ ፈቃድ','Hayyama Ogummaa'],
 'Competency Domains':['የብቃት ዘርፎች','Dameewwan Dandeettii'],
 'Clinic Affiliations and Declaration':['የክሊኒክ ግንኙነቶች እና ማረጋገጫ','Walitti Dhufeenya Kilinikaa fi Mirkaneessa'],
@@ -20,7 +20,7 @@ export const professionalTranslations:Record<string,[string,string]>={
 'Awarded Qualification Title':['የተሰጠው የትምህርት ማስረጃ ስም','Maqaa Ragaa Barnootaa Argame'],
 'Issuing Institution':['ማስረጃ የሰጠው ተቋም','Dhaabbata Ragaa Kenne'],
 'Institution Name':['የተቋም ስም','Maqaa Dhaabbataa'],
-'Certifications':['የስልጠና ማስረጃዎች','Ragaalee Leenjii'],
+'Credentials':['የስልጠና ማስረጃዎች','Ragaalee Leenjii'],
 'Certification Title':['የማስረጃ ስም','Maqaa Ragaa'],
 'Issue Date':['የተሰጠበት ቀን','Guyyaa Kenname'],
 'Expiry Date (If Applicable)':['የሚያበቃበት ቀን (ካለ)','Guyyaa Yeroon Itti Dhumu (Yoo Jiraate)'],

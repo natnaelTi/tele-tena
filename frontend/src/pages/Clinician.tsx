@@ -1,3 +1,4 @@
+import {usePaymentCapabilities,DirectLedger,DirectLedgerSummary} from '../components/DirectPayments';
 import {RequestAvailabilityCard} from '../components/RequestPresence';
 import { CalendarDays, Layers, ShieldCheck } from "lucide-react";
 import { appointmentStatus } from "../appointment-status";
@@ -40,6 +41,7 @@ const practice = () => api<Practice>("practice");
 export function ClinicianToday() {
   const {w}=useLocale();
   const {session}=useSession();
+  const paymentMode=usePaymentCapabilities();
   const approved=!!session?.roles.includes("Tele Tena Clinician");
   const [now,setNow]=useState(()=>Date.now());
   useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),60000);return()=>clearInterval(timer);},[]);
@@ -69,7 +71,7 @@ export function ClinicianToday() {
     <div className="practice-metrics">
       <section><span>{w("Today’s sessions")}</span><strong>{appointments.error?w("Unavailable"):today?.length??"—"}</strong><p>{w("Appointments on your calendar")}</p></section>
       <section><span>{w("Open requests")}</span><strong>{inbox.error?w("Unavailable"):inbox.data?.length??"—"}</strong><Link to="/clinician/requests">{w("View eligible requests")}</Link></section>
-      <section><span>{w("Available earnings")}</span><strong>{earnings.data?`ETB ${money(earnings.data.balances.earnings_available)}`:earnings.error?w("Unavailable"):"—"}</strong><Link to="/clinician/earnings">{w("View earnings")}</Link></section>
+      {paymentMode.data?.mode==='Offline'?<DirectLedgerSummary role="clinician"/>:<section><span>{w("Available earnings")}</span><strong>{earnings.data?`ETB ${money(earnings.data.balances.earnings_available)}`:earnings.error?w("Unavailable"):"—"}</strong><Link to="/clinician/earnings">{w("View earnings")}</Link></section>}
     </div>
     <div className="clinician-today-layout"><section>
       {appointments.error?<InlineNotice tone="danger">{w("Appointments couldn’t be loaded.")} <Button onClick={()=>void appointments.refresh()}>{w("Retry")}</Button></InlineNotice>:!appointments.data?<Skeleton/>:groups.length?<div className="appointment-groups practice-panel practice-schedule">{groups.map(([label,items])=><section key={label}><h2>{w(label === "Upcoming" ? "Up next" : label)}</h2><div>{items.slice(0,5).map(item=><ScheduleAppointmentRow key={item.id} appointment={item}/>)}</div>{items.length>5&&<Link className="text-link" to="/clinician/appointments">{w("View all appointments")}</Link>}</section>)}</div>:<EmptyState title={w("Your Next Conversation Will Appear Here.")}>{w("Review your services and availability so patients can find a suitable time.")}</EmptyState>}
@@ -278,6 +280,7 @@ type EarningsView = {
 };
 
 export function ClinicianEarnings() {
+  const paymentCapabilities=usePaymentCapabilities();
   const completedSessions=useResource(journeyApi.appointments);
   const [activityFilter,setActivityFilter]=useState<"All activity"|"Pending"|"Payouts">("All activity");
   const { w } = useLocale();
@@ -303,12 +306,13 @@ export function ClinicianEarnings() {
     ...resource.data.earnings.map(item => ({ kind: "Consultation earnings", id: `earning-${item.id}`, at: item.completed_at, amount: item.net_minor, state: item.state, item })),
     ...resource.data.payouts.map(item => ({ kind: "Payout request", id: `payout-${item.id}`, at: item.created, amount: item.amount_minor, state: item.state, item })),
   ].sort((a,b) => String(b.at||"").localeCompare(String(a.at||""))) : [];
+  if(paymentCapabilities.data?.mode==='Offline'&&new URLSearchParams(window.location.search).get('history')!=='wallet')return <DirectLedger role="clinician"/>;
   const shownHistory=history.filter(entry=>activityFilter==="All activity"||(activityFilter==="Payouts"?entry.kind==="Payout request":["Pending","Disputed","LegacyHold"].includes(entry.state)));
   return <>
     <PageTitle title={w("Earnings")} description={w("See what is pending, available, and reserved for payout requests.")} />
     {resource.error ? <InlineNotice tone="danger">Earnings could not be loaded. <Button onClick={() => void resource.refresh()}>Try again</Button></InlineNotice> : !resource.data ? <Skeleton /> : <>
       <div className="earnings-overview">
-        <Card className="earnings-available"><p>{w("Available earnings")}</p><h2>ETB {money(resource.data.balances.earnings_available)}</h2><p className="supporting">{w("Available to request")}</p><Button variant="secondary" disabled={resource.data.balances.earnings_available<=0} onClick={()=>setPayoutOpen(true)}>{w("Request payout")}</Button></Card>
+        <Card className="earnings-available"><p>{w("Available earnings")}</p><h2>ETB {money(resource.data.balances.earnings_available)}</h2><p className="supporting">{w("Available to request")}</p><Button variant="secondary" disabled={paymentCapabilities.data?.mode!=='Wallet'||resource.data.balances.earnings_available<=0} onClick={()=>setPayoutOpen(true)}>{w("Request payout")}</Button></Card>
         <dl className="earnings-supporting">
           <div><dt>{w("Pending")}</dt><dd>ETB {money(resource.data.balances.pending)}</dd><p className="supporting">{w("Held until the saved review window ends or a dispute is resolved.")}</p></div>
           <div><dt>{w("Payout requested")}</dt><dd>ETB {money(resource.data.balances.payout_reserved)}</dd><p className="supporting">{w("Reserved for open requests")}</p></div>

@@ -2006,3 +2006,5 @@ button { color: inherit; background: transparent; }
 .language-select:hover{border-color:var(--brand)}.language-select:focus-visible{outline:2px solid var(--brand);outline-offset:3px}.language-select option{color:var(--ink);background:#fff}
 @supports(appearance:base-select){.language-select,.language-select::picker(select){appearance:base-select}}
 @media(prefers-reduced-motion:reduce){.language-select{transition:none}}
+/* Hide a protected document before a possible browser-history snapshot. Revalidate before revealing it. */
+html[data-session-hidden=true] #root{visibility:hidden}

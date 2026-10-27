@@ -142,7 +142,7 @@ export function RequireSession() {
         </InlineNotice>
       </main>
     );
-  return session ? <Outlet /> : <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname)}`} state={location.state} replace />;
+  return session ? <Outlet key={session.user}/> : <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname)}`} state={location.state} replace />;
 }
 const patientNav = [
   ["/patient", "Home", Home],
@@ -150,6 +150,7 @@ const patientNav = [
   ["/patient/appointments", "Appointments", CalendarDays],
   ["/patient/requests", "My requests", ClipboardCheck],
   ["/patient/account", "Account", Settings2],
+  ["/patient/payments", "Balance", Wallet],
   ["/patient/clinic-access", "Clinic access", Building2],
   ["/patient/couples", "Shared care", HeartHandshake],
 ] as const;
@@ -236,7 +237,7 @@ export function WorkspaceLayout({
   const renderNavLink = (item: (typeof items)[number], closeMore = false) => {
     const [to, label, Icon] = item;
     return <NavLink key={to} to={to} end={to === "/"+kind} data-tour={tourTargets[to]} onClick={closeMore ? () => setMoreOpen(false) : undefined}>
-      <Icon size={20} /><span>{w(label)}</span>
+      <Icon size={20} /><span>{w(session?.payment_mode==='Offline'?(to==='/patient/payments'?'Expenses Ledger':to==='/clinician/earnings'?'Revenue Ledger':label):label)}</span>
     </NavLink>;
   };
   const groups = [
