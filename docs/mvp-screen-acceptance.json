@@ -16497,5 +16497,193 @@
       "reference": "H02 with B06/B07 field extensions",
       "evidence": "docs/clinician-onboarding-context-sprint.md#clinician-account-organization--22october2026"
     }
+  },
+  "offline_telebirr_revision": {
+    "date": "2026-10-27",
+    "branch": "feat/offline-telebirr-mvp",
+    "backend_checkpoint": "ee8399b",
+    "scope": "docs/offline-telebirr-sprint.md",
+    "owner_acceptance": "Pending",
+    "requirements": [
+      {
+        "group": 1,
+        "title": "Contextual Uploads",
+        "reference_screens": [
+          "B06",
+          "B07",
+          "H01",
+          "H02",
+          "I03"
+        ],
+        "functional_status": "Implemented but unverified",
+        "visual_status": "Implemented but unverified",
+        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "evidence": [
+          "docs/offline-telebirr-sprint.md"
+        ],
+        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "design_exception": null
+      },
+      {
+        "group": 2,
+        "title": "Ethiopian Reference Priority",
+        "reference_screens": [
+          "B06",
+          "B07",
+          "H02",
+          "I04"
+        ],
+        "functional_status": "Implemented but unverified",
+        "visual_status": "Implemented but unverified",
+        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "evidence": [
+          "docs/offline-telebirr-sprint.md"
+        ],
+        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "design_exception": null
+      },
+      {
+        "group": 3,
+        "title": "Credentials Wording",
+        "reference_screens": [
+          "B07",
+          "H02",
+          "I03"
+        ],
+        "functional_status": "Implemented but unverified",
+        "visual_status": "Implemented but unverified",
+        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "evidence": [
+          "docs/offline-telebirr-sprint.md"
+        ],
+        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "design_exception": null
+      },
+      {
+        "group": 4,
+        "title": "Expanded Competencies",
+        "reference_screens": [
+          "B06",
+          "H02",
+          "I03"
+        ],
+        "functional_status": "Implemented but unverified",
+        "visual_status": "Implemented but unverified",
+        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "evidence": [
+          "docs/offline-telebirr-sprint.md"
+        ],
+        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "design_exception": null
+      },
+      {
+        "group": 5,
+        "title": "Onboarding Sign-Out",
+        "reference_screens": [
+          "B06"
+        ],
+        "functional_status": "Implemented but unverified",
+        "visual_status": "Implemented but unverified",
+        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "evidence": [
+          "docs/offline-telebirr-sprint.md"
+        ],
+        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "design_exception": null
+      },
+      {
+        "group": 6,
+        "title": "Booking Language Defaults",
+        "reference_screens": [
+          "C06",
+          "C08",
+          "D06"
+        ],
+        "functional_status": "Implemented but unverified",
+        "visual_status": "Implemented but unverified",
+        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "evidence": [
+          "docs/offline-telebirr-sprint.md"
+        ],
+        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "design_exception": null
+      },
+      {
+        "group": 7,
+        "title": "Administrator Payment Mode",
+        "reference_screens": [
+          "G01",
+          "G05",
+          "H01",
+          "I04"
+        ],
+        "functional_status": "Backend scenarios functionally verified; browser/concurrency/job acceptance pending",
+        "visual_status": "Implemented but unverified",
+        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "evidence": [
+          "docs/offline-telebirr-sprint.md"
+        ],
+        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "design_exception": "Offline payment claims/verification/ledgers extend existing booking and financial components; prototype wallet states are retained for Wallet mode only."
+      },
+      {
+        "group": 8,
+        "title": "Direct Telebirr Payments",
+        "reference_screens": [
+          "C08",
+          "D06",
+          "G01",
+          "G03",
+          "G04",
+          "G05",
+          "N02"
+        ],
+        "functional_status": "Backend scenarios functionally verified; browser/concurrency/job acceptance pending",
+        "visual_status": "Implemented but unverified",
+        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "evidence": [
+          "docs/offline-telebirr-sprint.md"
+        ],
+        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "design_exception": "Offline payment claims/verification/ledgers extend existing booking and financial components; prototype wallet states are retained for Wallet mode only."
+      },
+      {
+        "group": 9,
+        "title": "Localization Exchange",
+        "reference_screens": [
+          "A01",
+          "B06",
+          "H01",
+          "I03"
+        ],
+        "functional_status": "Implemented but unverified",
+        "visual_status": "Implemented but unverified",
+        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "evidence": [
+          "docs/offline-telebirr-sprint.md"
+        ],
+        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "design_exception": null
+      },
+      {
+        "group": 10,
+        "title": "Reviewed Care Languages",
+        "reference_screens": [
+          "B06",
+          "C06",
+          "D02",
+          "H02",
+          "I03"
+        ],
+        "functional_status": "Backend scenarios functionally verified; browser/concurrency/job acceptance pending",
+        "visual_status": "Implemented but unverified",
+        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "evidence": [
+          "docs/offline-telebirr-sprint.md"
+        ],
+        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "design_exception": null
+      }
+    ]
   }
 }
