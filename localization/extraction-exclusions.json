@@ -1,0 +1,1152 @@
+[
+  {
+    "english": "Escape",
+    "source_location": "frontend/src/components/AccountMenu.tsx:15",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Home",
+    "source_location": "frontend/src/components/AccountMenu.tsx:15",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "End",
+    "source_location": "frontend/src/components/AccountMenu.tsx:15",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "ArrowUp",
+    "source_location": "frontend/src/components/AccountMenu.tsx:15",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "availability-radar ",
+    "source_location": "frontend/src/components/AvailabilityStatus.tsx:3",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "M54 183C54 101 110 51 192 51h51c55 0 84 33 84 85v81c0 48-32 78-80 78h-73l-64 42 11-62c-45-13-67-45-67-92Z",
+    "source_location": "frontend/src/components/Brand.tsx:19",
+    "reason": "Technical JSX attribute d"
+  },
+  {
+    "english": "M253 172h55c84 0 139 48 139 113 0 42-22 72-58 88l9 43-49-29h-96c-49 0-78-30-78-80v-55c0-49 29-80 78-80Z",
+    "source_location": "frontend/src/components/Brand.tsx:23",
+    "reason": "Technical JSX attribute d"
+  },
+  {
+    "english": "M110 160c15-19 34-28 55-25m-60 57c26-3 43 6 58 20",
+    "source_location": "frontend/src/components/Brand.tsx:27",
+    "reason": "Technical JSX attribute d"
+  },
+  {
+    "english": "M299 261c15-11 33-11 49 0m-50 46c18 12 35 12 51 0",
+    "source_location": "frontend/src/components/Brand.tsx:34",
+    "reason": "Technical JSX attribute d"
+  },
+  {
+    "english": "m359 70 13-25m18 46 28-8",
+    "source_location": "frontend/src/components/Brand.tsx:41",
+    "reason": "Technical JSX attribute d"
+  },
+  {
+    "english": "ArrowDown",
+    "source_location": "frontend/src/components/CareLanguages.tsx:23",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Enter",
+    "source_location": "frontend/src/components/CareLanguages.tsx:23",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "M457 277 Q514 246 558 266 Q607 278 604 328 L585 370 L627 401 L657 462 L432 462 L447 403 L466 380 Q434 335 457 277Z",
+    "source_location": "frontend/src/components/ClinicianHeroScene.tsx:17",
+    "reason": "Technical JSX attribute d"
+  },
+  {
+    "english": "scene-person clinician-person",
+    "source_location": "frontend/src/components/ClinicianHeroScene.tsx:18",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "scene-screen scene-screen-",
+    "source_location": "frontend/src/components/ClinicianHeroScene.tsx:19",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/components/ClinicianPreview.tsx:29",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Enter",
+    "source_location": "frontend/src/components/CompetencyRating.tsx:10",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Wallet",
+    "source_location": "frontend/src/components/DirectPayments.tsx:9",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/components/DirectPayments.tsx:9",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/components/DirectPayments.tsx:26",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Wallet",
+    "source_location": "frontend/src/components/DirectPayments.tsx:26",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "card direct-payment-panel",
+    "source_location": "frontend/src/components/DirectPayments.tsx:41",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "card direct-payment-timeline",
+    "source_location": "frontend/src/components/DirectPayments.tsx:41",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/components/DirectPayments.tsx:41",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "card direct-payment-status",
+    "source_location": "frontend/src/components/DirectPayments.tsx:47",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/components/DirectPayments.tsx:47",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "card pending-payment-reviews",
+    "source_location": "frontend/src/components/DirectPayments.tsx:48",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/components/DirectPayments.tsx:48",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "clinician-card reference-clinician-card",
+    "source_location": "frontend/src/components/Domain.tsx:58",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/components/Domain.tsx:77",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/components/Domain.tsx:77",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/components/Domain.tsx:113",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "settings-disclosure encounter-file-history",
+    "source_location": "frontend/src/components/EncounterFiles.tsx:5",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": " is-compact",
+    "source_location": "frontend/src/components/FileUpload.tsx:18",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": " is-dragging",
+    "source_location": "frontend/src/components/FileUpload.tsx:18",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": " is-disabled",
+    "source_location": "frontend/src/components/FileUpload.tsx:18",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "tour-portrait ",
+    "source_location": "frontend/src/components/InteractiveProductTour.tsx:7",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "tour-readiness ",
+    "source_location": "frontend/src/components/InteractiveProductTour.tsx:23",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": " sharing-condensed",
+    "source_location": "frontend/src/components/OfferAcceptance.tsx:23",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "patient-dashboard-panel patient-care-links",
+    "source_location": "frontend/src/components/PatientCareLinks.tsx:25",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "field phone-field",
+    "source_location": "frontend/src/components/PhoneField.tsx:17",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "ArrowDown",
+    "source_location": "frontend/src/components/PhoneField.tsx:19",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "professional-grid professional-name-grid",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:29",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "bio-count bio-help",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:29",
+    "reason": "Technical JSX attribute aria-describedby"
+  },
+  {
+    "english": "Other",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:30",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "actions professional-editor-actions",
+    "source_location": "frontend/src/components/ProfessionalReview.tsx:35",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "settings-section professional-account-editor",
+    "source_location": "frontend/src/components/ProfessionalReview.tsx:45",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "avatar profile-avatar ",
+    "source_location": "frontend/src/components/ProfilePhoto.tsx:13",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "settings-section profile-photo-editor",
+    "source_location": "frontend/src/components/ProfilePhoto.tsx:23",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "content-management settings-section",
+    "source_location": "frontend/src/components/PublicContentEditor.tsx:17",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "hero-atmosphere ",
+    "source_location": "frontend/src/components/PublicExperience.tsx:20",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Escape",
+    "source_location": "frontend/src/components/PublicExperience.tsx:20",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "M0 70 C240 10 480 130 720 70 S1200 10 1440 70 V140 H0Z",
+    "source_location": "frontend/src/components/PublicExperience.tsx:23",
+    "reason": "Technical JSX attribute d"
+  },
+  {
+    "english": "M0 90 C240 140 480 20 720 90 S1200 140 1440 90 V140 H0Z",
+    "source_location": "frontend/src/components/PublicExperience.tsx:23",
+    "reason": "Technical JSX attribute d"
+  },
+  {
+    "english": "M0 115 C240 70 480 155 720 115 S1200 70 1440 115 V170 H0Z",
+    "source_location": "frontend/src/components/PublicExperience.tsx:23",
+    "reason": "Technical JSX attribute d"
+  },
+  {
+    "english": "Home",
+    "source_location": "frontend/src/components/PublicExperience.tsx:28",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "End",
+    "source_location": "frontend/src/components/PublicExperience.tsx:28",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "landing-page public-experience immersive-public",
+    "source_location": "frontend/src/components/PublicExperience.tsx:38",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "landing-hero public-audience-hero",
+    "source_location": "frontend/src/components/PublicExperience.tsx:38",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/components/PublicExperience.tsx:40",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/components/PublicExperience.tsx:40",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "public-section public-how",
+    "source_location": "frontend/src/components/PublicExperience.tsx:41",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "public-section public-choice",
+    "source_location": "frontend/src/components/PublicExperience.tsx:43",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "public-section public-faq",
+    "source_location": "frontend/src/components/PublicExperience.tsx:44",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "public-section public-final-cta",
+    "source_location": "frontend/src/components/PublicExperience.tsx:45",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "public-transition ",
+    "source_location": "frontend/src/components/PublicMotion.tsx:18",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Enter",
+    "source_location": "frontend/src/components/ReferencePicker.tsx:13",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "ArrowDown",
+    "source_location": "frontend/src/components/ReferencePicker.tsx:13",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Escape",
+    "source_location": "frontend/src/components/ReferencePicker.tsx:13",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "request-availability-card state-",
+    "source_location": "frontend/src/components/RequestPresence.tsx:70",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/components/WalletSummary.tsx:6",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Dismissed",
+    "source_location": "frontend/src/components/WorkspaceTour.tsx:64",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Completed",
+    "source_location": "frontend/src/components/WorkspaceTour.tsx:64",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": " check-card",
+    "source_location": "frontend/src/components/ui.tsx:125",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "dialog drawer",
+    "source_location": "frontend/src/components/ui.tsx:259",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "ArrowRight",
+    "source_location": "frontend/src/components/ui.tsx:304",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "ArrowLeft",
+    "source_location": "frontend/src/components/ui.tsx:306",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Home",
+    "source_location": "frontend/src/components/ui.tsx:308",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "End",
+    "source_location": "frontend/src/components/ui.tsx:310",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "reference-audio-stage shared-audio-stage",
+    "source_location": "frontend/src/features/consultations/AudioStage.tsx:11",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Not started",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:18",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Open",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:18",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Ended",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:18",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Escape",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:131",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Tab",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:132",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:478",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:522",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/features/consultations/ExtensionPanel.tsx:37",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Wallet",
+    "source_location": "frontend/src/journey-api.ts:5",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/journey-api.ts:5",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Pending",
+    "source_location": "frontend/src/journey-api.ts:8",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Approved",
+    "source_location": "frontend/src/journey-api.ts:8",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Rejected",
+    "source_location": "frontend/src/journey-api.ts:8",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Draft",
+    "source_location": "frontend/src/journey-api.ts:15",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Published",
+    "source_location": "frontend/src/journey-api.ts:15",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Paused",
+    "source_location": "frontend/src/journey-api.ts:15",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Dismissed",
+    "source_location": "frontend/src/journey-api.ts:64",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Completed",
+    "source_location": "frontend/src/journey-api.ts:64",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Approved",
+    "source_location": "frontend/src/journey-api.ts:72",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Rejected",
+    "source_location": "frontend/src/journey-api.ts:72",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Approved",
+    "source_location": "frontend/src/journey-api.ts:74",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Revoked",
+    "source_location": "frontend/src/journey-api.ts:74",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Active",
+    "source_location": "frontend/src/journey-api.ts:96",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "History",
+    "source_location": "frontend/src/journey-api.ts:96",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Acknowledge",
+    "source_location": "frontend/src/journey-api.ts:110",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Clear",
+    "source_location": "frontend/src/journey-api.ts:110",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Upheld",
+    "source_location": "frontend/src/journey-api.ts:111",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Reopen",
+    "source_location": "frontend/src/journey-api.ts:111",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Verified",
+    "source_location": "frontend/src/journey-api.ts:126",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Rejected",
+    "source_location": "frontend/src/journey-api.ts:126",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Suspended",
+    "source_location": "frontend/src/journey-api.ts:126",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Verified",
+    "source_location": "frontend/src/journey-api.ts:127",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Clarification",
+    "source_location": "frontend/src/journey-api.ts:127",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Rejected",
+    "source_location": "frontend/src/journey-api.ts:127",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Revoked",
+    "source_location": "frontend/src/journey-api.ts:127",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "reference-workspace workspace-role-medical-lead",
+    "source_location": "frontend/src/layouts/Layouts.tsx:52",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "product-header site-masthead",
+    "source_location": "frontend/src/layouts/Layouts.tsx:53",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "public-desktop-link ",
+    "source_location": "frontend/src/layouts/Layouts.tsx:86",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/layouts/Layouts.tsx:86",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/layouts/Layouts.tsx:92",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "public-footer reference-public-footer",
+    "source_location": "frontend/src/layouts/Layouts.tsx:97",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "auth-header site-masthead",
+    "source_location": "frontend/src/layouts/Layouts.tsx:111",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "reference-workspace workspace-role-",
+    "source_location": "frontend/src/layouts/Layouts.tsx:266",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "product-header site-masthead",
+    "source_location": "frontend/src/layouts/Layouts.tsx:268",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "settings-section account-at-a-glance",
+    "source_location": "frontend/src/pages/Account.tsx:83",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "settings-section settings-privacy-preview",
+    "source_location": "frontend/src/pages/Account.tsx:90",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "settings-section account-professional-intro",
+    "source_location": "frontend/src/pages/Account.tsx:92",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Account.tsx:92",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Admin.tsx:83",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "table-scroll review-queue-table",
+    "source_location": "frontend/src/pages/Admin.tsx:91",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button quiet",
+    "source_location": "frontend/src/pages/Admin.tsx:302",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "form-grid two-column",
+    "source_location": "frontend/src/pages/Admin.tsx:315",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "form-grid two-column",
+    "source_location": "frontend/src/pages/Admin.tsx:358",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "form-grid two-column",
+    "source_location": "frontend/src/pages/Admin.tsx:368",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "form-grid two-column reconciliation-balances",
+    "source_location": "frontend/src/pages/Admin.tsx:412",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/pages/BookingConfirmation.tsx:22",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/pages/BookingConfirmation.tsx:27",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "status-pill status-booked",
+    "source_location": "frontend/src/pages/ClinicCalendar.tsx:130",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "clinician-today-layout application-progress-layout",
+    "source_location": "frontend/src/pages/Clinician.tsx:57",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Clinician.tsx:60",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/pages/Clinician.tsx:64",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Clinician.tsx:68",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "appointment-groups practice-panel practice-schedule",
+    "source_location": "frontend/src/pages/Clinician.tsx:76",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Clinician.tsx:77",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Clinician.tsx:77",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Draft",
+    "source_location": "frontend/src/pages/Clinician.tsx:97",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Published",
+    "source_location": "frontend/src/pages/Clinician.tsx:97",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Paused",
+    "source_location": "frontend/src/pages/Clinician.tsx:97",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Draft",
+    "source_location": "frontend/src/pages/Clinician.tsx:200",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Published",
+    "source_location": "frontend/src/pages/Clinician.tsx:200",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Paused",
+    "source_location": "frontend/src/pages/Clinician.tsx:200",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": " date-edit-mode",
+    "source_location": "frontend/src/pages/Clinician.tsx:222",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "calendar-block availability-block",
+    "source_location": "frontend/src/pages/Clinician.tsx:227",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": " mobile-selected",
+    "source_location": "frontend/src/pages/Clinician.tsx:246",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "All activity",
+    "source_location": "frontend/src/pages/Clinician.tsx:284",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Pending",
+    "source_location": "frontend/src/pages/Clinician.tsx:284",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Payouts",
+    "source_location": "frontend/src/pages/Clinician.tsx:284",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "table-scroll earnings-activity-table",
+    "source_location": "frontend/src/pages/Clinician.tsx:330",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "earnings-history earnings-activity-cards",
+    "source_location": "frontend/src/pages/Clinician.tsx:330",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "table-scroll care-directory-table",
+    "source_location": "frontend/src/pages/Clinician.tsx:362",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Clinician.tsx:362",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Clinician.tsx:377",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Clinician.tsx:385",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Clinics.tsx:60",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "clinic-form clinic-team-invite",
+    "source_location": "frontend/src/pages/Clinics.tsx:77",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Clinic Manager",
+    "source_location": "frontend/src/pages/Clinics.tsx:80",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Scheduling",
+    "source_location": "frontend/src/pages/Clinics.tsx:80",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Billing",
+    "source_location": "frontend/src/pages/Clinics.tsx:80",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Care Coordination",
+    "source_location": "frontend/src/pages/Clinics.tsx:80",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "status-pill status-invited",
+    "source_location": "frontend/src/pages/Clinics.tsx:106",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "status-pill status-booked",
+    "source_location": "frontend/src/pages/Clinics.tsx:109",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "status-pill status-completed",
+    "source_location": "frontend/src/pages/Clinics.tsx:111",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Verified",
+    "source_location": "frontend/src/pages/Clinics.tsx:121",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Rejected",
+    "source_location": "frontend/src/pages/Clinics.tsx:121",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Suspended",
+    "source_location": "frontend/src/pages/Clinics.tsx:121",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Verified",
+    "source_location": "frontend/src/pages/Clinics.tsx:121",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Clarification",
+    "source_location": "frontend/src/pages/Clinics.tsx:121",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Rejected",
+    "source_location": "frontend/src/pages/Clinics.tsx:121",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Revoked",
+    "source_location": "frontend/src/pages/Clinics.tsx:121",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:77",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": " shared-care-record",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:82",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": " consultation-documenting",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:82",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:92",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:93",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:103",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "consultation-secondary-action consultation-audit-history",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:103",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": " reschedule-calendar-panel",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:159",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "public-info-page public-contact",
+    "source_location": "frontend/src/pages/Contact.tsx:7",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Couples.tsx:37",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/pages/Couples.tsx:37",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "shared-relationships-link text-link",
+    "source_location": "frontend/src/pages/Couples.tsx:39",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/pages/Couples.tsx:50",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Couples.tsx:60",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "container guided-panel shared-invitation",
+    "source_location": "frontend/src/pages/Couples.tsx:70",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "eyebrow sr-only",
+    "source_location": "frontend/src/pages/Couples.tsx:70",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "guided-panel guest-request",
+    "source_location": "frontend/src/pages/GuestRequest.tsx:14",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "review-overview-metrics compact",
+    "source_location": "frontend/src/pages/MatchingOperations.tsx:17",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "table-scroll matching-table",
+    "source_location": "frontend/src/pages/MatchingOperations.tsx:19",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "scope-picker onboarding-scope-picker",
+    "source_location": "frontend/src/pages/Onboarding.tsx:291",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "patient-dashboard-panel public-profile-services",
+    "source_location": "frontend/src/pages/OpenRequests.tsx:42",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/OpenRequests.tsx:42",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/pages/OpenRequests.tsx:43",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Patient.tsx:85",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Patient.tsx:111",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Patient.tsx:156",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "discovery-layout discovery-matching-layout",
+    "source_location": "frontend/src/pages/PublicDirectory.tsx:26",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/PublicJourneys.tsx:8",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "container relationship-entry",
+    "source_location": "frontend/src/pages/Relationships.tsx:71",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Relationships.tsx:134",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "open-request-composer request-guided-composer",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:520",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "text-link request-index-help",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1435",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "prewrap request-authorized-narrative",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1559",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "request-inline-facts quote-summary",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1805",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1882",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/ReviewerAccount.tsx:8",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "button full",
+    "source_location": "frontend/src/pages/ServiceDetails.tsx:17",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "table-scroll offering-table",
+    "source_location": "frontend/src/pages/ServiceOfferings.tsx:31",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "container showcase",
+    "source_location": "frontend/src/pages/Showcase.tsx:35",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Unavailable",
+    "source_location": "frontend/src/pages/Showcase.tsx:124",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "auth-secondary vertical",
+    "source_location": "frontend/src/pages/SignIn.tsx:285",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Upheld",
+    "source_location": "frontend/src/pages/Vetting.tsx:266",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Reopen",
+    "source_location": "frontend/src/pages/Vetting.tsx:266",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Upheld",
+    "source_location": "frontend/src/pages/Vetting.tsx:266",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "Reopen",
+    "source_location": "frontend/src/pages/Vetting.tsx:266",
+    "reason": "Type-only identifier; not rendered copy"
+  },
+  {
+    "english": "scope-review-card guided-review",
+    "source_location": "frontend/src/pages/Vetting.tsx:270",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Clarification",
+    "source_location": "frontend/src/pages/Vetting.tsx:314",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Approved",
+    "source_location": "frontend/src/pages/Vetting.tsx:314",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Rejected",
+    "source_location": "frontend/src/pages/Vetting.tsx:314",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Suspended",
+    "source_location": "frontend/src/pages/Vetting.tsx:314",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Expired",
+    "source_location": "frontend/src/pages/Vetting.tsx:314",
+    "reason": "Technical JSX attribute value"
+  }
+]

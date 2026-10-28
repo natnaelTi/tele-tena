@@ -49,7 +49,7 @@ def extract():
             for locale in ('amharic','afaan_oromo'):
                 if review.get(locale):canonical[key][locale]=review[locale]
             canonical[key]['review_status']='reviewed'
-    DIRECTORY.mkdir(exist_ok=True);old=json.loads(CATALOG.read_text()) if CATALOG.exists() else {};CATALOG.write_text(json.dumps(canonical,ensure_ascii=False,indent=2)+'\n')
+    DIRECTORY.mkdir(exist_ok=True);(DIRECTORY/'extraction-exclusions.json').write_text(json.dumps(raw.get('excluded',[]),ensure_ascii=False,indent=2)+'\n');old=json.loads(CATALOG.read_text()) if CATALOG.exists() else {};CATALOG.write_text(json.dumps(canonical,ensure_ascii=False,indent=2)+'\n')
     (DIRECTORY/'source-changes.json').write_text(json.dumps({'added':sorted(set(canonical)-set(old)),'stale':sorted(k for k in old if k not in canonical or old[k]['source_hash']!=canonical[k]['source_hash'])},indent=2)+'\n')
     return canonical
 
