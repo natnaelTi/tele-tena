@@ -133,6 +133,8 @@ def submit(id,transaction_ref,amount,filename,content_base64,retry_key):
     latest=rows("SELECT details FROM tt_direct_payment_event WHERE payment=%s AND event='PaymentSubmitted' ORDER BY created DESC,id DESC LIMIT 1",(id,))
     if p.state in ('Submitted','ReconciliationRequired') and latest and json.loads(latest[0].details or '{}')==values:
         event(p,user,'PaymentSubmitted',retry_key,values,create=False);return detail(id)
+    if p.state in ('Submitted','ReconciliationRequired') and latest:
+        fail('Your payment submission is under review. Wait for a correction request before replacing it.','payment_review_pending')
     eid=event(p,user,'PaymentSubmitted',retry_key,values)
     if not eid:return detail(id)
     if p.state in ('Verified','RefundRequired','RefundReported','RefundConfirmed'):fail('This payment already has a recorded verification or refund.','payment_resolved')

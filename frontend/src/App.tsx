@@ -1,3 +1,4 @@
+import PaymentActivityAlerts from './components/PaymentActivityAlerts';
 import {DirectPaymentPage,PaymentConfiguration,DirectLedger} from './components/DirectPayments';
 import Contact from './pages/Contact';
 import Policies from './pages/Policies';
@@ -59,7 +60,7 @@ export default function App() {
     <BrowserRouter basename={import.meta.env.PROD ? "/teletena" : "/"}>
       <SessionProvider>
         <LocaleProvider>
-          <PWAUpdateNotice />
+          <PWAUpdateNotice /><PaymentActivityAlerts/>
           <a className="skip-link" href="#main-content">
             Skip to content
           </a>

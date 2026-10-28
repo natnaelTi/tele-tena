@@ -1,4 +1,29 @@
 {
-  "added": [],
+  "added": [
+    "copy.backend_validation_direct_payments.your_payment_submission_is_under_review_wait_for_a_correction_request_",
+    "copy.directpayments.awaitingpayment",
+    "copy.directpayments.paymentsubmitted",
+    "copy.directpayments.the_clinician_has_verified_receipt_open_the_appointment_for_its_curren",
+    "copy.directpayments.view_submitted_receipt",
+    "copy.directpayments.your_payment_information_has_been_submitted_it_is_read_only_while_the_",
+    "copy.directpayments.your_payment_information_is_already_under_review_wait_for_the_clinicia",
+    "copy.directpayments.your_payment_information_remains_on_record_check_the_current_status_an",
+    "copy.directpayments.your_submitted_payment",
+    "copy.notification_or_default_public_copy_booking_notifications.this_records_a_payment_activity_open_the_link_for_the_current_payment_",
+    "copy.paymentactivityalerts.dismiss_payment_notification",
+    "copy.paymentactivityalerts.message",
+    "copy.paymentactivityalerts.payment_information_has_arrived_open_the_payment_page_to_check_the_rec",
+    "copy.paymentactivityalerts.paymentcorrection",
+    "copy.paymentactivityalerts.paymentreconciliation",
+    "copy.paymentactivityalerts.paymentsubmitted",
+    "copy.paymentactivityalerts.paymentverified",
+    "copy.paymentactivityalerts.review_payment",
+    "copy.paymentactivityalerts.tele_tena_clinician",
+    "copy.paymentactivityalerts.tele_tena_patient",
+    "copy.paymentactivityalerts.the_clinician_has_recorded_receipt_verification_your_payment_status_up",
+    "copy.paymentactivityalerts.there_is_an_update_to_your_payment_open_its_history_for_the_next_step",
+    "copy.paymentactivityalerts.this_notification_could_not_be_marked_as_read_try_again",
+    "copy.paymentactivityalerts.view_payment"
+  ],
   "stale": []
 }

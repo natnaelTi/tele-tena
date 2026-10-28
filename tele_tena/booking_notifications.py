@@ -107,9 +107,13 @@ def dispatch():
         if not app or app[0].state not in EVENT_STATES.get(notice.event,()):
             frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
         if notice.event.startswith('Payment'):
-            payments=rows('SELECT p.state FROM tt_direct_payment p JOIN tt_direct_payment_event e ON e.payment=p.id WHERE e.id=%s',(notice.context_key,))
+            payments=rows('SELECT p.state,e.event FROM tt_direct_payment p JOIN tt_direct_payment_event e ON e.payment=p.id WHERE e.id=%s',(notice.context_key,))
             valid={'PaymentReminder':('AwaitingPayment','CorrectionRequired'),'PaymentVerificationReminder':('Submitted',),'PaymentSubmitted':('Submitted','ReconciliationRequired'),'PaymentVerified':('Verified',),'PaymentCorrection':('CorrectionRequired','Rejected'),'PaymentReconciliation':('ReconciliationRequired','RefundRequired','RefundReported','RefundConfirmed')}
-            if not payments or payments[0].state not in valid.get(notice.event,()):
+            # These are durable activity receipts, even when verification happens
+            # before the submission email/SMS worker runs. Reminders remain state-bound.
+            fact={'PaymentSubmitted':'PaymentSubmitted','PaymentVerified':'ReceiptVerified'}.get(notice.event)
+            eligible=bool(payments and (payments[0].event==fact if fact else payments[0].state in valid.get(notice.event,())))
+            if not eligible:
                 frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded' WHERE id=%s",(item.id,));frappe.db.commit();continue
         if not frappe.db.get_value('User',notice.user,'enabled'):
             frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
@@ -149,6 +153,8 @@ def dispatch():
         locale=locale[0].locale if locale else 'en'
         template=translate('TeleTena appointment {status}. {time} ({timezone}). Reference {reference}. Sign in: {link}',locale)
         message=template.format(status=translate(label,locale),time=when,timezone=app.timezone,reference=app.id[:8],link=link)
+        if notice.event in ('PaymentSubmitted','PaymentVerified'):
+            message+=' '+translate('This records a payment activity. Open the link for the current payment and appointment status.',locale)
         if notice.user==app.patient and notice.event in ('Confirmed','Pending') and rows('SELECT id FROM tt_journal WHERE event_ref=%s',('booking:'+app.id,)):
             minor=int(app.price);message+=f' Demonstration balance: ETB {minor//100}.{minor%100:02d} reserved. No external payment collected.'
         if notice.user==app.patient and notice.event in ('Cancelled','Declined','Expired') and rows('SELECT id FROM tt_journal WHERE event_ref=%s',('release:'+app.id,)):
