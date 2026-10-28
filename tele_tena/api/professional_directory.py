@@ -1,4 +1,5 @@
 """Bounded server-side directory search; pending facilities remain owner-only."""
+from tele_tena.localization import localized_throw
 import json
 import uuid
 import frappe
@@ -88,7 +89,7 @@ def resolve(ids):
 @command
 def set_priority(id,enabled,source,reason):
     user=actor('Tele Tena Approver')
-    if 'Tele Tena Medical Lead' not in frappe.get_roles(user):frappe.throw('Medical Lead permission required',frappe.PermissionError)
+    if 'Tele Tena Medical Lead' not in frappe.get_roles(user):localized_throw('Medical Lead permission required',frappe.PermissionError)
     from tele_tena.api.journey import boolean
     source=text(source,500);reason=text(reason,1000)
     if not source.startswith('https://'):fail('Provide an HTTPS source for this curated selection.')

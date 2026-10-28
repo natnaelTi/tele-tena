@@ -1,4 +1,5 @@
 """Backfill missing refund activity only from exact subledger evidence."""
+from tele_tena.localization import localized_throw
 import uuid
 
 import frappe
@@ -14,7 +15,7 @@ def backfill_refund_activity(patient=None):
     inserted = 0
     for earning in earnings:
         if earning.event_type != 'EarningRefunded':
-            frappe.throw('Refund activity does not match its financial journal; review required',
+            localized_throw('Refund activity does not match its financial journal; review required',
                          frappe.ValidationError)
         amount = int(earning.net_minor)
         patient_account = 'patient:' + earning.patient + ':available'
@@ -24,7 +25,7 @@ def backfill_refund_activity(patient=None):
         clinician_debits = frappe.db.sql('''SELECT COALESCE(SUM(debit_minor),0) FROM tt_journal_line
             WHERE journal_id=%s AND account_id=%s''', (earning.journal_id, clinician_account))[0][0]
         if int(patient_credits) != amount or int(clinician_debits) != amount:
-            frappe.throw('Refund journal does not match its earning; review required',
+            localized_throw('Refund journal does not match its earning; review required',
                          frappe.ValidationError)
         reference = 'earning-refund:' + earning.earning_id
         existing = frappe.db.sql('''SELECT patient,kind,amount FROM tt_ledger WHERE reference=%s''',
@@ -33,7 +34,7 @@ def backfill_refund_activity(patient=None):
             event = existing[0]
             if (event.patient != earning.patient or event.kind != 'Refund' or
                     int(event.amount) != amount):
-                frappe.throw('Existing refund activity conflicts with its journal; review required',
+                localized_throw('Existing refund activity conflicts with its journal; review required',
                              frappe.ValidationError)
             continue
         frappe.db.sql('''INSERT INTO tt_ledger (id,patient,kind,amount,reference,created)

@@ -1,4 +1,5 @@
 """Care-language claims and human decisions confer no service/clinical permission."""
+from tele_tena.localization import localized_throw
 import json,uuid
 from functools import lru_cache
 from pathlib import Path
@@ -31,7 +32,7 @@ def catalog(search='',offset=0):
 @query()
 def claims(clinician=None):
     user=actor();clinician=clinician or user
-    if user!=clinician and 'Tele Tena Approver' not in frappe.get_roles(user):frappe.throw('Language application unavailable',frappe.PermissionError)
+    if user!=clinician and 'Tele Tena Approver' not in frappe.get_roles(user):localized_throw('Language application unavailable',frappe.PermissionError)
     return rows('SELECT c.*,l.english FROM tt_care_language_claim c JOIN tt_care_language l ON l.code=c.language WHERE clinician=%s ORDER BY l.english',(clinician,))
 @command
 def save_claims(values,draft=False):

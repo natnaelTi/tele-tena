@@ -1,4 +1,5 @@
 """Balanced, immutable demonstration postings; never calls an external provider."""
+from tele_tena.localization import localized_throw
 import json
 import hashlib
 import hmac
@@ -31,7 +32,7 @@ def post(event_ref, event_type, idempotency_key, entries, metadata=None):
     """Post balanced (account_id, debit, credit) lines once under caller transaction."""
     raw = [(str(a), int(d), int(c)) for a, d, c in entries if int(d) or int(c)]
     if not raw or any(d < 0 or c < 0 or bool(d) == bool(c) for _, d, c in raw):
-        frappe.throw('Invalid financial posting', frappe.ValidationError)
+        localized_throw('Invalid financial posting', frappe.ValidationError)
     canonical = []
     for account, debit, credit in raw:
         parts = account.split(':', 2)
@@ -40,7 +41,7 @@ def post(event_ref, event_type, idempotency_key, entries, metadata=None):
         else:
             owner, bucket = '', parts[-1].replace('-', '_')
         if bucket not in BUCKET_SIDE:
-            frappe.throw('Invalid financial account', frappe.ValidationError)
+            localized_throw('Invalid financial account', frappe.ValidationError)
         _ensure(account, owner, bucket)
         # A regular SELECT can reuse a repeatable-read snapshot established by
         # account/profile authorization earlier in the request. During a
@@ -52,18 +53,18 @@ def post(event_ref, event_type, idempotency_key, entries, metadata=None):
         canonical.append((found[0].id, debit, credit))
     normalized = sorted(canonical)
     if sum(d for _, d, _ in normalized) != sum(c for _, _, c in normalized):
-        frappe.throw('Financial posting is unbalanced', frappe.ValidationError)
+        localized_throw('Financial posting is unbalanced', frappe.ValidationError)
     existing = frappe.db.sql('SELECT id FROM tt_journal WHERE event_ref=%s OR idempotency_key=%s',
                              (event_ref, idempotency_key), as_dict=True)
     if existing:
         if len(existing) != 1:
-            frappe.throw('Financial retry reference conflict', frappe.ValidationError)
+            localized_throw('Financial retry reference conflict', frappe.ValidationError)
         old = frappe.db.sql('''SELECT account_id,debit_minor,credit_minor FROM tt_journal_line
             WHERE journal_id=%s ORDER BY account_id,debit_minor,credit_minor''',
             (existing[0].id,), as_dict=True)
         if [(x.account_id, int(x.debit_minor), int(x.credit_minor)) for x in old] != normalized:
             frappe.local.response['tele_tena_error'] = 'financial_retry_changed'
-            frappe.throw('Financial retry payload changed', frappe.ValidationError)
+            localized_throw('Financial retry payload changed', frappe.ValidationError)
         return existing[0].id, True
 
     account_ids = sorted({a for a, _, _ in normalized})
@@ -77,7 +78,7 @@ def post(event_ref, event_type, idempotency_key, entries, metadata=None):
     for account, delta in updates.items():
         if int(by_id[account].balance_minor) + delta < 0:
             frappe.local.response['tele_tena_error'] = 'financial_balance_insufficient'
-            frappe.throw('Financial balance is insufficient for this action', frappe.ValidationError)
+            localized_throw('Financial balance is insufficient for this action', frappe.ValidationError)
 
     journal_id = str(uuid.uuid4())
     frappe.db.sql('''INSERT INTO tt_journal
@@ -108,18 +109,18 @@ def check_wallet_projection(patient, wallet):
         WHERE patient=%s''', (patient,), as_dict=True)
     if review and review[0].status == 'ReviewRequired':
         frappe.local.response['tele_tena_error'] = 'financial_reconciliation_required'
-        frappe.throw('Balance requires authorized financial review before this action',
+        localized_throw('Balance requires authorized financial review before this action',
                      frappe.ValidationError)
     if balance('patient', patient, 'available') != int(wallet.available) or balance('patient', patient, 'reserved') != int(wallet.reserved):
         frappe.local.response['tele_tena_error'] = 'financial_reconciliation_required'
-        frappe.throw('Balance needs authorized reconciliation before this action', frappe.ValidationError)
+        localized_throw('Balance needs authorized reconciliation before this action', frappe.ValidationError)
 
 
 @frappe.whitelist()
 def financial_reconciliation_queue():
     reviewer = frappe.session.user
     if reviewer == 'Guest' or 'Tele Tena Approver' not in frappe.get_roles(reviewer):
-        frappe.throw('Authorized financial reviewer required', frappe.PermissionError)
+        localized_throw('Authorized financial reviewer required', frappe.PermissionError)
     rows = frappe.db.sql('''SELECT id,legacy_available,legacy_reserved,
         wallet_available,wallet_reserved,subledger_available,subledger_reserved,
         event_count,unknown_event_count,boundary_event_count,status,created
@@ -132,7 +133,7 @@ def financial_reconciliation_queue():
 def _reconciliation_case_ref(case_id):
     key = (frappe.conf.get('encryption_key') or '').encode()
     if not key:
-        frappe.throw('Financial review reference configuration unavailable', frappe.ValidationError)
+        localized_throw('Financial review reference configuration unavailable', frappe.ValidationError)
     digest = hmac.new(key, ('tele-tena:wallet-reconciliation:' + str(case_id)).encode(), hashlib.sha256).hexdigest()
     return 'wr_' + digest
 
@@ -145,28 +146,28 @@ def accept_wallet_snapshot(patient, reason):
     """
     reviewer = frappe.session.user
     if reviewer == 'Guest' or 'Tele Tena Approver' not in frappe.get_roles(reviewer):
-        frappe.throw('Authorized financial reviewer required', frappe.PermissionError)
+        localized_throw('Authorized financial reviewer required', frappe.PermissionError)
     from tele_tena.api.journey import text
     reason = text(reason, 500)
     frappe.db.sql('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     rows = frappe.db.sql('''SELECT * FROM tt_financial_reconciliation
         WHERE patient=%s FOR UPDATE''', (patient,), as_dict=True)
     if not rows:
-        frappe.throw('Financial reconciliation case unavailable', frappe.PermissionError)
+        localized_throw('Financial reconciliation case unavailable', frappe.PermissionError)
     item = rows[0]
     wallet = frappe.db.sql('SELECT available,reserved FROM tt_wallet WHERE patient=%s FOR UPDATE',
                            (patient,), as_dict=True)
     if not wallet:
-        frappe.throw('Financial reconciliation case unavailable', frappe.PermissionError)
+        localized_throw('Financial reconciliation case unavailable', frappe.PermissionError)
     if (balance('patient', patient, 'available') != int(wallet[0].available) or
             balance('patient', patient, 'reserved') != int(wallet[0].reserved)):
         frappe.local.response['tele_tena_error'] = 'financial_reconciliation_required'
-        frappe.throw('Wallet and subledger must agree before authorizing the snapshot',
+        localized_throw('Wallet and subledger must agree before authorizing the snapshot',
                      frappe.ValidationError)
     if item.status == 'SnapshotAccepted':
         return {'status': item.status, 'idempotent': True}
     if item.status != 'ReviewRequired':
-        frappe.throw('Financial reconciliation case is not reviewable', frappe.ValidationError)
+        localized_throw('Financial reconciliation case is not reviewable', frappe.ValidationError)
     frappe.db.sql('''UPDATE tt_financial_reconciliation SET status='SnapshotAccepted',
         reviewed_by=%s,decision='AcceptCurrentSnapshot',decision_reason=%s,
         decided_at=UTC_TIMESTAMP(6),modified=UTC_TIMESTAMP(6) WHERE id=%s''',
@@ -179,7 +180,7 @@ def accept_reconciliation_case(case_ref, reason):
     """Accept a snapshot via its opaque audit reference, without exposing patient identity."""
     reviewer = frappe.session.user
     if reviewer == 'Guest' or 'Tele Tena Approver' not in frappe.get_roles(reviewer):
-        frappe.throw('Authorized financial reviewer required', frappe.PermissionError)
+        localized_throw('Authorized financial reviewer required', frappe.PermissionError)
     rows = frappe.db.sql('''SELECT id,patient FROM tt_financial_reconciliation
         WHERE status IN ('ReviewRequired','SnapshotAccepted')''', as_dict=True)
     selected_patient = None
@@ -188,7 +189,7 @@ def accept_reconciliation_case(case_ref, reason):
             selected_patient = row.patient
             break
     if not selected_patient:
-        frappe.throw('Financial reconciliation case unavailable', frappe.PermissionError)
+        localized_throw('Financial reconciliation case unavailable', frappe.PermissionError)
     return accept_wallet_snapshot(selected_patient, reason)
 
 
@@ -209,7 +210,7 @@ def _event_rows(account_ids, limit=100):
 def clinician_earnings():
     clinician = frappe.session.user
     if clinician == 'Guest' or 'Tele Tena Clinician' not in frappe.get_roles(clinician):
-        frappe.throw('Clinician account required', frappe.PermissionError)
+        localized_throw('Clinician account required', frappe.PermissionError)
     from tele_tena.api.journey import profile
     profile('clinician')
     buckets = ('pending', 'earnings_available', 'payout_reserved')
@@ -244,7 +245,7 @@ def clinician_earnings():
 def request_payout(amount_minor, idempotency_key):
     clinician = frappe.session.user
     if clinician == 'Guest' or 'Tele Tena Clinician' not in frappe.get_roles(clinician):
-        frappe.throw('Clinician account required', frappe.PermissionError)
+        localized_throw('Clinician account required', frappe.PermissionError)
     from tele_tena.api.journey import integer, profile, text
     profile('clinician')
     amount = integer(amount_minor, 1, 100000000)
@@ -255,11 +256,11 @@ def request_payout(amount_minor, idempotency_key):
     if old:
         if int(old[0].amount_minor) != amount:
             frappe.local.response['tele_tena_error'] = 'financial_retry_changed'
-            frappe.throw('Payout retry amount changed', frappe.ValidationError)
+            localized_throw('Payout retry amount changed', frappe.ValidationError)
         return {'id': old[0].id, 'state': old[0].state, 'idempotent': True, 'external_transfer': False}
     from tele_tena.api.direct_payments import config
     if config().mode!='Wallet':
-        frappe.throw('New platform payout requests are unavailable in direct-payment mode. Historical requests remain accessible.',frappe.ValidationError)
+        localized_throw('New platform payout requests are unavailable in direct-payment mode. Historical requests remain accessible.',frappe.ValidationError)
     payout_id = str(uuid.uuid4())
     reference = 'payout-request:' + payout_id
     from_account = account_id('clinician', clinician, 'earnings_available')
@@ -277,7 +278,7 @@ def request_payout(amount_minor, idempotency_key):
 def cancel_payout(payout, reason):
     clinician = frappe.session.user
     if clinician == 'Guest' or 'Tele Tena Clinician' not in frappe.get_roles(clinician):
-        frappe.throw('Clinician account required', frappe.PermissionError)
+        localized_throw('Clinician account required', frappe.PermissionError)
     from tele_tena.api.journey import profile, text
     profile('clinician')
     reason = text(reason, 500, required=False)
@@ -285,13 +286,13 @@ def cancel_payout(payout, reason):
     result = frappe.db.sql('SELECT * FROM tt_payout WHERE id=%s AND clinician=%s FOR UPDATE',
                            (payout, clinician), as_dict=True)
     if not result:
-        frappe.throw('Payout request unavailable', frappe.PermissionError)
+        localized_throw('Payout request unavailable', frappe.PermissionError)
     item = result[0]
     if item.state == 'Cancelled':
         return {'id': item.id, 'state': item.state, 'idempotent': True}
     if item.state != 'Requested':
         frappe.local.response['tele_tena_error'] = 'payout_cannot_cancel'
-        frappe.throw('This payout request can no longer be cancelled', frappe.ValidationError)
+        localized_throw('This payout request can no longer be cancelled', frappe.ValidationError)
     reference = 'payout-cancel:' + item.id
     post(reference, 'PayoutCancelled', reference,
          [(account_id('clinician', clinician, 'payout_reserved'), int(item.amount_minor), 0),
@@ -305,7 +306,7 @@ def cancel_payout(payout, reason):
 def open_earning_dispute(appointment, reason):
     patient = frappe.session.user
     if patient == 'Guest' or 'Tele Tena Patient' not in frappe.get_roles(patient):
-        frappe.throw('Patient account required', frappe.PermissionError)
+        localized_throw('Patient account required', frappe.PermissionError)
     from tele_tena.api.journey import profile, text
     profile('patient')
     reason = text(reason, 500)
@@ -313,13 +314,13 @@ def open_earning_dispute(appointment, reason):
     earning = frappe.db.sql('''SELECT * FROM tt_earning WHERE appointment=%s AND patient=%s FOR UPDATE''',
                             (appointment, patient), as_dict=True)
     if not earning:
-        frappe.throw('Earning record unavailable', frappe.PermissionError)
+        localized_throw('Earning record unavailable', frappe.PermissionError)
     item = earning[0]
     if item.state == 'Disputed':
         return {'state': 'Disputed', 'idempotent': True}
     if item.state != 'Pending' or not item.release_at or item.release_at <= datetime.now(timezone.utc).replace(tzinfo=None):
         frappe.local.response['tele_tena_error'] = 'dispute_window_closed'
-        frappe.throw('This earning is outside the supported demonstration dispute window', frappe.ValidationError)
+        localized_throw('This earning is outside the supported demonstration dispute window', frappe.ValidationError)
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     dispute_id = str(uuid.uuid4())
     frappe.db.sql('''INSERT INTO tt_dispute
@@ -333,9 +334,9 @@ def open_earning_dispute(appointment, reason):
 def resolve_earning_dispute(appointment, resolution, reason):
     reviewer = frappe.session.user
     if reviewer == 'Guest' or 'Tele Tena Approver' not in frappe.get_roles(reviewer):
-        frappe.throw('Authorized financial reviewer required', frappe.PermissionError)
+        localized_throw('Authorized financial reviewer required', frappe.PermissionError)
     if resolution not in ('release', 'refund'):
-        frappe.throw('Choose release or refund', frappe.ValidationError)
+        localized_throw('Choose release or refund', frappe.ValidationError)
     from tele_tena.api.journey import text
     reason = text(reason, 500)
     frappe.db.sql('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
@@ -343,7 +344,7 @@ def resolve_earning_dispute(appointment, resolution, reason):
         JOIN tt_dispute d ON d.earning=e.id WHERE e.appointment=%s FOR UPDATE''',
         (appointment,), as_dict=True)
     if not records:
-        frappe.throw('Financial dispute unavailable', frappe.PermissionError)
+        localized_throw('Financial dispute unavailable', frappe.PermissionError)
     item = records[0]
     if item.dispute_status != 'Open' or item.state != 'Disputed':
         return {'state': item.state, 'idempotent': True}
@@ -370,7 +371,7 @@ def resolve_earning_dispute(appointment, resolution, reason):
 def open_disputes():
     reviewer = frappe.session.user
     if reviewer == 'Guest' or 'Tele Tena Approver' not in frappe.get_roles(reviewer):
-        frappe.throw('Authorized financial reviewer required', frappe.PermissionError)
+        localized_throw('Authorized financial reviewer required', frappe.PermissionError)
     return frappe.db.sql('''SELECT e.id earning_id,e.appointment,e.net_minor,e.state,
         d.reason,d.opened_at FROM tt_earning e JOIN tt_dispute d ON d.earning=e.id
         WHERE d.status='Open' AND e.state='Disputed' ORDER BY d.opened_at LIMIT 100''', as_dict=True)
@@ -384,7 +385,7 @@ def release_eligible_earnings(appointments=None):
         # Explicit local demo/operations invocation can target its own records.
         # Scheduled execution retains the existing bounded all-eligible scan.
         if getattr(frappe.local, 'request', None) or frappe.session.user != 'Administrator':
-            frappe.throw('Local administrator required', frappe.PermissionError)
+            localized_throw('Local administrator required', frappe.PermissionError)
         if not isinstance(appointments, list) or not 1 <= len(appointments) <= 100:
             raise ValueError('Supply a bounded appointment list')
         filters = ' AND appointment IN %s'

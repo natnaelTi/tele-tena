@@ -1,4 +1,5 @@
 """Private, bounded open-request delivery and patient-only offer acceptance."""
+from tele_tena.localization import localized_throw
 import hashlib
 import json
 import re
@@ -780,7 +781,7 @@ def submit_offer(request_id, offering, start, price_minor=None):
     recipient = rows('SELECT clinician FROM tt_request_recipient WHERE request_id=%s AND clinician=%s FOR UPDATE',
                      (request_id, clinician))
     if not recipient:
-        frappe.throw('Request unavailable', frappe.PermissionError)
+        localized_throw('Request unavailable', frappe.PermissionError)
     start_at = timestamp(start)
     requested_price = None if price_minor in (None, '') else integer(price_minor, 1, 100000000)
     existing = rows("""SELECT * FROM tt_request_offer WHERE request_id=%s AND clinician=%s
@@ -990,7 +991,7 @@ def withdraw_offer(offer_id):
     item = rows('SELECT * FROM tt_request_offer WHERE id=%s AND clinician=%s FOR UPDATE',
                 (offer_id, clinician))
     if not item:
-        frappe.throw('Offer unavailable', frappe.PermissionError)
+        localized_throw('Offer unavailable', frappe.PermissionError)
     offer = item[0]
     if offer.state == 'Withdrawn':
         return {'state': 'Withdrawn', 'idempotent': True}
@@ -1127,7 +1128,7 @@ def record_accept_failure(request_id, offer_id, attempt_key, reason):
                (request_id, patient.user))
     offer = rows("SELECT id FROM tt_request_offer WHERE id=%s AND request_id=%s", (offer_id, request_id))
     if not req or not offer:
-        frappe.throw('Request unavailable', frappe.PermissionError)
+        localized_throw('Request unavailable', frappe.PermissionError)
     metric(request_id, 'AcceptFailed',
            external_event_id='accept-failure:' + request_id + ':' + key)
     return {'recorded': True}

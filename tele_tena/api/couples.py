@@ -1,4 +1,5 @@
 """Two adults consent separately; payer funds one existing appointment ledger."""
+from tele_tena.localization import localized_throw
 import hashlib
 import json
 import secrets
@@ -26,7 +27,7 @@ def participant(appointment, user, require_active=True):
         return None
     found = [p for p in participants(plans[0].id) if p.user == user]
     if not found or (require_active and found[0].state != 'Consented'):
-        frappe.throw('This consultation is unavailable.', frappe.PermissionError)
+        localized_throw('This consultation is unavailable.', frappe.PermissionError)
     return found[0]
 
 
@@ -165,7 +166,7 @@ def consent(token, request_text, sharing, expected_disclosure, adult_confirmed):
             j.fail('Consent details changed. Start a new invitation.', 'retry_changed')
         return _visible(plan,user)
     if plan.state!='Invited' or len(participants(plan.id))!=1:
-        frappe.throw('Invitation unavailable.',frappe.PermissionError)
+        localized_throw('Invitation unavailable.',frappe.PermissionError)
     _consent(plan.id,user,request_text,sharing,expected_disclosure,adult_confirmed)
     frappe.db.sql("UPDATE tt_couple_plan SET state='Consented' WHERE id=%s", (plan.id,))
     plan.state='Consented'
@@ -186,7 +187,7 @@ def get_plan(plan_id):
     plan = j.rows('''SELECT cp.* FROM tt_couple_plan cp
         JOIN tt_couple_participant p ON p.plan=cp.id WHERE cp.id=%s AND p.user=%s''', (plan_id,user))
     if not plan:
-        frappe.throw('This invitation is unavailable.', frappe.PermissionError)
+        localized_throw('This invitation is unavailable.', frappe.PermissionError)
     return _visible(plan[0],user)
 
 
@@ -244,7 +245,7 @@ def withdraw(plan_id):
     people = participants(plan.id)
     own = next((p for p in people if p.user == user), None)
     if not own:
-        frappe.throw('Shared session unavailable.', frappe.PermissionError)
+        localized_throw('Shared session unavailable.', frappe.PermissionError)
     if own.state == 'Withdrawn':
         _close_withdrawn_room(plan, people)
         return {'withdrawn':True,'idempotent':True}
@@ -314,7 +315,7 @@ def change_people(item, require_ready=True):
 def change_vote(item, kind, change_id, user, decision):
     required = change_people(item)
     if user not in required:
-        frappe.throw('Consultation unavailable', frappe.PermissionError)
+        localized_throw('Consultation unavailable', frappe.PermissionError)
     prior = j.rows('SELECT decision FROM tt_shared_change_consent WHERE kind=%s AND change_id=%s AND participant=%s',
                    (kind, change_id, user))
     if prior and prior[0].decision != decision:
@@ -355,7 +356,7 @@ def decline_invitation(token):
                                          ('invitation', plan.id, user, 'decline')):
         return {'state': 'Declined', 'idempotent': True}
     if user == plan.payer or plan.state != 'Invited' or plan.expires_at <= datetime.now(timezone.utc).replace(tzinfo=None):
-        frappe.throw('Invitation unavailable.', frappe.PermissionError)
+        localized_throw('Invitation unavailable.', frappe.PermissionError)
     frappe.db.sql('''INSERT INTO tt_shared_change_consent
         (kind,change_id,participant,decision,created) VALUES ('invitation',%s,%s,'decline',UTC_TIMESTAMP(6))''',
         (plan.id, user))

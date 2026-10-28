@@ -37,7 +37,7 @@ SERVICE_FIELDS = (
 def _lines(value, allowed, label, error_code='catalog_invalid_value'):
     values = [item.strip() for item in str(value or '').splitlines() if item.strip()]
     if len(values) != len(set(values)) or any(item not in allowed for item in values):
-        journey.fail(f'Choose supported {label}.', error_code)
+        journey.fail('Choose supported {label}.', error_code,template_values={'label':label})
     return '\n'.join(values)
 
 
@@ -52,15 +52,15 @@ def _date(value, label):
     try:
         return getdate(value)
     except Exception:
-        journey.fail(f'Enter a valid {label}.', 'catalog_invalid_date')
+        journey.fail('Enter a valid {label}.', 'catalog_invalid_date',template_values={'label':label})
 
 
 def _integer(value, label):
     if isinstance(value, bool) or not re.fullmatch(r'-?[0-9]+', str(value or '0')):
-        journey.fail(f'Enter a whole-number {label}.', 'catalog_invalid_attribute')
+        journey.fail('Enter a whole-number {label}.', 'catalog_invalid_attribute',template_values={'label':label})
     result = int(value or 0)
     if not -2147483648 <= result <= 2147483647:
-        journey.fail(f'The {label} is outside the supported range.', 'catalog_invalid_attribute')
+        journey.fail('The {label} is outside the supported range.', 'catalog_invalid_attribute',template_values={'label':label})
     return result
 
 

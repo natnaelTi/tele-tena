@@ -4,6 +4,8 @@ export class ApiError extends Error {
   constructor(code: string, status = 0) { super('Request failed'); this.code = code; this.status = status }
 }
 let csrf = ''
+let interfaceLocale='en'
+export function setInterfaceLocale(value:string){interfaceLocale=['en','am','om'].includes(value)?value:'en'}
 export function setCsrf(token: string) { csrf = token }
 async function classifyError(response: Response, method: string): Promise<ApiError> {
   const result = await response.json().catch(() => ({}))
@@ -22,7 +24,7 @@ export async function api<T>(method: string, data: Record<string, unknown> = {},
   const query = new URLSearchParams(Object.entries(data).map(([k, v]) => [k, String(v)]))
   const response = await fetch(path + (!post && query.size ? '?' + query : ''), {
     method: post ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store', signal,
-    headers: post ? { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': csrf } : {},
+    headers: post ? { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': csrf,'X-TeleTena-Locale':interfaceLocale } : {'X-TeleTena-Locale':interfaceLocale},
     body: post ? JSON.stringify(data) : undefined,
   })
   if (!response.ok) {
@@ -35,7 +37,7 @@ export async function signIn(email: string, password: string) {
   let response: Response
   try {
     response = await fetch('/api/method/login', { method: 'POST', credentials: 'same-origin', cache: 'no-store',
-      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usr: email, pwd: password }) })
+      headers: { 'Content-Type': 'application/json','X-TeleTena-Locale':interfaceLocale }, body: JSON.stringify({ usr: email, pwd: password }) })
   } catch {
     throw new ApiError('network_error')
   }
@@ -51,7 +53,7 @@ export async function phoneAuth<T>(method: string, data: Record<string, unknown>
   const bootstrap = method === 'csrf_token'
   const response = await fetch('/api/method/tele_tena.api.phone_auth.' + method, {
     method: bootstrap ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store',
-    headers: bootstrap ? {} : { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': csrf || '' },
+    headers: bootstrap ? {'X-TeleTena-Locale':interfaceLocale} : { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': csrf || '','X-TeleTena-Locale':interfaceLocale },
     body: bootstrap ? undefined : JSON.stringify(data),
   })
   if (!response.ok) {

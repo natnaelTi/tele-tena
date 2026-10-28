@@ -1,4 +1,5 @@
 """Explicit, prefunded consultation extensions using the existing subledger."""
+from tele_tena.localization import localized_throw
 import json
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -111,7 +112,7 @@ def propose_extension(appointment, retry_key):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role != 'clinician' or item.clinician != clinician:
-        frappe.throw('Consultation unavailable', frappe.PermissionError)
+        localized_throw('Consultation unavailable', frappe.PermissionError)
     previous = rows('SELECT id,state,duration_minutes,amount_minor,expires_at FROM tt_consultation_extension WHERE appointment=%s AND retry_key=%s',
                     (item.id, key))
     if previous:
@@ -173,7 +174,7 @@ def respond_extension(appointment, extension_id, decision):
     from tele_tena.api.couples import plan_for, change_vote
     shared = bool(plan_for(item.id))
     if role != 'patient' or (not shared and item.patient != patient):
-        frappe.throw('Consultation unavailable', frappe.PermissionError)
+        localized_throw('Consultation unavailable', frappe.PermissionError)
     _is_participant_open(item, patient, role)
     extension = one('''SELECT * FROM tt_consultation_extension
         WHERE id=%s AND appointment=%s FOR UPDATE''',
@@ -226,8 +227,8 @@ def respond_extension(appointment, extension_id, decision):
     if int(wallet.available) < amount:
         shortfall_minor = amount - int(wallet.available)
         shortfall_etb = f'{shortfall_minor // 100}.{shortfall_minor % 100:02d}'
-        fail(f'Add ETB {shortfall_etb} to your balance, then retry while this offer is available.',
-             'extension_insufficient_funds')
+        fail('Add ETB {shortfall_etb} to your balance, then retry while this offer is available.',
+             'extension_insufficient_funds',template_values={'shortfall_etb':shortfall_etb})
     from tele_tena.accounting import check_wallet_projection, post
     from tele_tena.api.journey import simulation_log
     check_wallet_projection(patient, wallet)
@@ -251,7 +252,7 @@ def withdraw_extension(appointment, extension_id):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role != 'clinician' or item.clinician != clinician:
-        frappe.throw('Consultation unavailable', frappe.PermissionError)
+        localized_throw('Consultation unavailable', frappe.PermissionError)
     extension = one('''SELECT * FROM tt_consultation_extension WHERE id=%s
         AND appointment=%s AND clinician=%s FOR UPDATE''',
         (extension_id, item.id, clinician))
@@ -271,7 +272,7 @@ def start_extension(appointment, extension_id):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role != 'clinician' or item.clinician != clinician:
-        frappe.throw('Consultation unavailable', frappe.PermissionError)
+        localized_throw('Consultation unavailable', frappe.PermissionError)
     call = _is_participant_open(item, clinician, role)
     extension = one('''SELECT * FROM tt_consultation_extension WHERE id=%s
         AND appointment=%s AND clinician=%s FOR UPDATE''',

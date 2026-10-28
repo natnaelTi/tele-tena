@@ -1,4 +1,5 @@
 """Authorized, transactional milestone commands. No real funds or clinical fixtures."""
+from tele_tena.localization import localized_throw
 import functools
 import hashlib
 import json
@@ -10,18 +11,20 @@ import frappe
 from frappe.sessions import get_csrf_token
 
 
-def fail(message, code='invalid_input'):
+def fail(message, code='invalid_input', template_values=None):
     frappe.local.response['tele_tena_error'] = code
-    from tele_tena.localization import translate
-    frappe.throw(translate(message,getattr(frappe.local,'lang','en')), frappe.ValidationError)
+    from tele_tena.localization import translate,request_locale
+    rendered=translate(message,request_locale())
+    if template_values is not None:rendered=rendered.format_map(template_values)
+    localized_throw(rendered, frappe.ValidationError)
 
 
 def actor(role=None):
     user = frappe.session.user
     if user == 'Guest' or not user:
-        frappe.throw('Authentication required', frappe.PermissionError)
+        localized_throw('Authentication required', frappe.PermissionError)
     if role and role not in frappe.get_roles(user):
-        frappe.throw('Role required', frappe.PermissionError)
+        localized_throw('Role required', frappe.PermissionError)
     return user
 
 
@@ -40,7 +43,7 @@ def profile(kind, lock=False):
     user = actor('Tele Tena ' + kind.title())
     p = one('SELECT * FROM tt_profile WHERE user=%s' + (' FOR UPDATE' if lock else ''), (user,))
     if p.kind != kind:
-        frappe.throw('Profile role mismatch', frappe.PermissionError)
+        localized_throw('Profile role mismatch', frappe.PermissionError)
     return p
 
 
@@ -224,7 +227,7 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
         # Contact-verified onboarding creates the applicant's profile. Editing
         # it is separate from approval; applicants cannot create a profile here
         # or use this command to gain any clinical/service authorization.
-        frappe.throw('Clinician profile access required', frappe.PermissionError)
+        localized_throw('Clinician profile access required', frappe.PermissionError)
     share_name = existing[0].share_name if share_name is None and existing else (kind == 'patient' if share_name is None else share_name)
     share_history = existing[0].share_history if share_history is None and existing else (kind == 'patient' if share_history is None else share_history)
     if care_alias is not None and existing and kind=='patient':
@@ -272,7 +275,7 @@ def apply(statement, requested_services='[]'):
     user = actor()
     p = one('SELECT * FROM tt_profile WHERE user=%s FOR UPDATE', (user,))
     if p.kind != 'clinician':
-        frappe.throw('Clinician profile required', frappe.PermissionError)
+        localized_throw('Clinician profile required', frappe.PermissionError)
     if isinstance(requested_services, str):
         try:
             requested_services = json.loads(requested_services)
@@ -346,7 +349,7 @@ def applications():
         return result
     p = one('SELECT kind FROM tt_profile WHERE user=%s', (user,))
     if p.kind != 'clinician':
-        frappe.throw('Clinician application unavailable', frappe.PermissionError)
+        localized_throw('Clinician application unavailable', frappe.PermissionError)
     result = rows('SELECT * FROM tt_application WHERE user=%s', (user,))
     for item in result:
         item.application_profile = _initial_application_profile(user)
@@ -534,7 +537,7 @@ def publish(service, price, minutes, title=None, description='', offering_id=Non
         current = rows('SELECT id,service FROM tt_offering WHERE id=%s AND clinician=%s FOR UPDATE',
                        (offering_id, p.user))
         if not current:
-            frappe.throw('Offering unavailable.', frappe.PermissionError)
+            localized_throw('Offering unavailable.', frappe.PermissionError)
         if current[0].service != service:
             fail('An offering cannot be changed to a different approved service. Create another offering instead.',
                  'offering_scope_immutable')
@@ -704,7 +707,7 @@ def simulated_deposit(amount, retry_key):
     if config().mode!='Wallet':fail('Balance funding is unavailable in direct-payment mode.','wallet_mode_required')
     p = profile('patient')
     if not simulation_enabled():
-        frappe.throw('Development simulation disabled', frappe.PermissionError)
+        localized_throw('Development simulation disabled', frappe.PermissionError)
     amount = integer(amount, 1, 100000000)
     key = text(retry_key, 80)
     wallet = one('SELECT * FROM tt_wallet WHERE patient=%s FOR UPDATE', (p.user,))
@@ -755,12 +758,12 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
         payload_values.append({'booking_link_token': booking_link_token})
     if custom_offer_id:
         if getattr(frappe.local, 'tele_tena_accepting_offer', None) != custom_offer_id:
-            frappe.throw('Offer acceptance must use its authorized request workflow', frappe.PermissionError)
+            localized_throw('Offer acceptance must use its authorized request workflow', frappe.PermissionError)
         payload_values.append({'request_offer': custom_offer_id})
     if couple_plan_id:
         plan = getattr(frappe.local, 'tele_tena_couple_booking', None)
         if not plan or plan.id != couple_plan_id or plan.payer != p.user or plan.offering != offering:
-            frappe.throw('Use the consented couples booking workflow.', frappe.PermissionError)
+            localized_throw('Use the consented couples booking workflow.', frappe.PermissionError)
         payload_values.append({'couple_plan':couple_plan_id})
     payload = json.dumps(payload_values, sort_keys=True)
     digest = hashlib.sha256(payload.encode()).hexdigest()
@@ -999,7 +1002,7 @@ def practice():
     user = actor()
     p = one('SELECT kind FROM tt_profile WHERE user=%s', (user,))
     if p.kind != 'clinician':
-        frappe.throw('Clinician profile required', frappe.PermissionError)
+        localized_throw('Clinician profile required', frappe.PermissionError)
     applications = rows('SELECT status,statement FROM tt_application WHERE user=%s', (user,))
     offerings = rows('''SELECT o.id,o.service,COALESCE(NULLIF(o.title,''),s.service_label) label,
         o.title,o.description,o.price,o.minutes,o.active,s.service_label service_label

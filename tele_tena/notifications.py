@@ -1,4 +1,5 @@
 """Owner-only neutral notification inbox. No health text or arbitrary destinations."""
+from tele_tena.localization import localized_throw
 import uuid
 from datetime import datetime,timezone
 import frappe
@@ -76,7 +77,7 @@ def lifecycle(appointment,event,event_key=None):
 def confirmation_presented(appointment):
     from tele_tena.api.presentation import _authorized
     app,user,role=_authorized(appointment)
-    if role!='clinician':frappe.throw('Confirmation prompt unavailable',frappe.PermissionError)
+    if role!='clinician':localized_throw('Confirmation prompt unavailable',frappe.PermissionError)
     if app.state=='PendingConfirmation':
         frappe.db.sql('UPDATE tt_confirmation_observation SET first_presented_at=COALESCE(first_presented_at,UTC_TIMESTAMP(6)) WHERE appointment=%s AND clinician=%s AND response IS NULL',(appointment,user))
     return {'recorded':True}
@@ -113,11 +114,11 @@ def feed():
 @command
 def mark_read(id,source):
     user=actor()
-    if source not in ('user','booking'):frappe.throw('Notification unavailable',frappe.PermissionError)
+    if source not in ('user','booking'):localized_throw('Notification unavailable',frappe.PermissionError)
     table='tt_user_notification' if source=='user' else 'tt_booking_notice'
     found=rows(f"SELECT appointment,{'kind' if source=='user' else 'event'} notice_kind FROM {table} WHERE id=%s AND user=%s",(id,user))
     if not found or (found[0].appointment and user not in participants(found[0].appointment)):
-        frappe.throw('Notification unavailable',frappe.PermissionError)
+        localized_throw('Notification unavailable',frappe.PermissionError)
     frappe.db.sql(f'UPDATE {table} SET read_at=COALESCE(read_at,UTC_TIMESTAMP(6)) WHERE id=%s AND user=%s',(id,user))
     if found[0].notice_kind in ('Pending','ConfirmationReminder') and found[0].appointment and user==rows('SELECT clinician FROM tt_appointment WHERE id=%s',(found[0].appointment,))[0].clinician:
         confirmation_presented(found[0].appointment)

@@ -1,4 +1,5 @@
 """Direct patient-to-clinician transfer claims. No custody, provider verification or wallet posting."""
+from tele_tena.localization import localized_throw
 import base64,hashlib,json,re,uuid
 from datetime import datetime,timedelta,timezone
 from urllib.parse import quote
@@ -9,7 +10,7 @@ def now():return datetime.now(timezone.utc).replace(tzinfo=None)
 def config(lock=False):return one('SELECT * FROM tt_payment_config WHERE id=1'+(' FOR UPDATE' if lock else ''))
 def administrator():
     user=actor()
-    if user!='Administrator' and 'Tele Tena Financial Configuration' not in frappe.get_roles(user):frappe.throw('Financial configuration permission required',frappe.PermissionError)
+    if user!='Administrator' and 'Tele Tena Financial Configuration' not in frappe.get_roles(user):localized_throw('Financial configuration permission required',frappe.PermissionError)
     return user
 @query()
 def capabilities():
@@ -54,7 +55,7 @@ def require_payee(clinician):
     return found[0]
 def authorize(id,lock=False):
     user=actor();found=rows('SELECT * FROM tt_direct_payment WHERE id=%s AND (patient=%s OR clinician=%s)'+(' FOR UPDATE' if lock else ''),(id,user,user))
-    if not found:frappe.throw('Payment unavailable',frappe.PermissionError)
+    if not found:localized_throw('Payment unavailable',frappe.PermissionError)
     return found[0],user
 
 def event(p,user,kind,key,values,evidence=None,reason='',create=True):
@@ -95,7 +96,7 @@ def detail(id):
 @query()
 def for_appointment(appointment):
     user=actor()
-    if not rows('SELECT id FROM tt_appointment WHERE id=%s AND (patient=%s OR clinician=%s)',(appointment,user,user)):frappe.throw('Payment unavailable',frappe.PermissionError)
+    if not rows('SELECT id FROM tt_appointment WHERE id=%s AND (patient=%s OR clinician=%s)',(appointment,user,user)):localized_throw('Payment unavailable',frappe.PermissionError)
     found=rows("SELECT id FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment'",(appointment,))
     return detail(found[0].id) if found else None
 
@@ -122,7 +123,7 @@ def pending_reviews():
 @command
 def submit(id,transaction_ref,amount,filename,content_base64,retry_key):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE');p,user=authorize(id,True)
-    if user!=p.patient:frappe.throw('Only the authorized payer may submit payment proof',frappe.PermissionError)
+    if user!=p.patient:localized_throw('Only the authorized payer may submit payment proof',frappe.PermissionError)
     ref=text(transaction_ref,100).upper().replace(' ','')
     if not re.fullmatch('[A-Z0-9-]{6,100}',ref):fail('Enter the Telebirr transaction reference.','transaction_reference_invalid')
     amount=integer(amount,1,100000000)
@@ -152,7 +153,7 @@ def submit(id,transaction_ref,amount,filename,content_base64,retry_key):
 @command
 def review(id,decision,retry_key,reason=''):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE');p,user=authorize(id,True)
-    if user!=p.clinician:frappe.throw('Only the receiving clinician may verify receipt',frappe.PermissionError)
+    if user!=p.clinician:localized_throw('Only the receiving clinician may verify receipt',frappe.PermissionError)
     if decision not in ('confirm','correct','reject','dispute'):fail('Choose a payment decision.')
     if decision in ('correct','reject') and not p.transaction_ref:fail('Review submitted payment evidence first.','receipt_required')
     reason=text(reason,1000,decision!='confirm')
@@ -225,7 +226,7 @@ def refund(id,decision,retry_key,reason):
 @query()
 def receipt(id):
     user=actor();found=rows('SELECT r.* FROM tt_direct_receipt r JOIN tt_direct_payment p ON BINARY p.id=BINARY r.payment WHERE r.id=%s AND (p.patient=%s OR p.clinician=%s)',(id,user,user))
-    if not found:frappe.throw('Payment receipt unavailable',frappe.PermissionError)
+    if not found:localized_throw('Payment receipt unavailable',frappe.PermissionError)
     r=found[0]
     from werkzeug.wrappers import Response
     return Response(bytes(r.content),mimetype=r.mime,headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Disposition':"attachment; filename*=UTF-8''"+quote(r.filename,safe=''),'Content-Security-Policy':"sandbox; default-src 'none'"})

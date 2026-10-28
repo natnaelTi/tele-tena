@@ -1,4 +1,5 @@
 """Allowlisted public professional facts. No patient,account or evidence projection."""
+from tele_tena.localization import localized_throw
 from datetime import datetime,timedelta,timezone
 from zoneinfo import ZoneInfo
 import frappe
@@ -76,11 +77,11 @@ def clinician(clinician_id):
 
 @frappe.whitelist(allow_guest=True,methods=['GET'])
 def photo(id):
-    if not isinstance(id,str) or len(id)!=36:frappe.throw('Photo unavailable',frappe.PermissionError)
+    if not isinstance(id,str) or len(id)!=36:localized_throw('Photo unavailable',frappe.PermissionError)
     from werkzeug.wrappers import Response
     eligible=_approved_offerings()
     expected='/api/method/tele_tena.api.profile_photos.download?id='+id
-    if not any(item.photo_url==expected for item in eligible):frappe.throw('Photo unavailable',frappe.PermissionError)
+    if not any(item.photo_url==expected for item in eligible):localized_throw('Photo unavailable',frappe.PermissionError)
     found=rows('SELECT content FROM tt_profile_photo WHERE id=%s AND published=1',(id,))
-    if not found:frappe.throw('Photo unavailable',frappe.PermissionError)
+    if not found:localized_throw('Photo unavailable',frappe.PermissionError)
     return Response(bytes(found[0].content),mimetype='image/jpeg',headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'})

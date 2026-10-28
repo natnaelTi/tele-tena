@@ -13,3 +13,21 @@ def translate(english,locale='en',key=None):
             value=entry.get('amharic' if locale=='am' else 'afaan_oromo')
             if value:return value
     return english
+
+
+def request_locale():
+    import frappe
+    request=getattr(frappe.local,'request',None)
+    selected=request.headers.get('X-TeleTena-Locale') if request else None
+    if selected in ('en','am','om'):return selected
+    value=getattr(frappe.local,'lang','en')
+    return value if value in ('en','am','om') else 'en'
+
+
+def localized_throw(message,*args,**kwargs):
+    """Localize app-owned error copy; preserve exception type and Frappe behavior."""
+    import frappe
+    locale=request_locale()
+    if isinstance(message,str):message=translate(message,locale)
+    if isinstance(kwargs.get('title'),str):kwargs['title']=translate(kwargs['title'],locale)
+    return frappe.throw(message,*args,**kwargs)

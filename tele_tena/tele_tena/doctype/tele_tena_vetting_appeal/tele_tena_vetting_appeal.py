@@ -1,3 +1,4 @@
+from tele_tena.localization import localized_throw
 import frappe
 from frappe.model.document import Document
 
@@ -5,13 +6,13 @@ from frappe.model.document import Document
 class TeleTenaVettingAppeal(Document):
     def validate(self):
         if not getattr(frappe.local, 'tele_tena_vetting_appeal_action', False):
-            frappe.throw('Use the audited appeal workflow; appeal records are immutable.',
+            localized_throw('Use the audited appeal workflow; appeal records are immutable.',
                          frappe.PermissionError)
         if not self.is_new():
-            frappe.throw('Vetting appeal history is immutable.', frappe.PermissionError)
+            localized_throw('Vetting appeal history is immutable.', frappe.PermissionError)
 
     def on_trash(self):
-        frappe.throw('Vetting appeals are retained as an audit trail.', frappe.PermissionError)
+        localized_throw('Vetting appeals are retained as an audit trail.', frappe.PermissionError)
 
 
 def get_permission_query_conditions(user=None):

@@ -12,14 +12,22 @@ def extract():
     for file in sorted((ROOT/'tele_tena').rglob('*.py')):
         if '/localization/' in str(file):continue
         tree=ast.parse(file.read_text())
+        parents={child:parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)}
         if file.name in ('notifications.py','booking_notifications.py','public_content_defaults.py','email_delivery.py','sms.py'):
             for node in ast.walk(tree):
                 if isinstance(node,ast.Constant) and isinstance(node.value,str) and re.search('[A-Za-z]',node.value) and (' ' in node.value or re.fullmatch('[A-Z][a-z]+',node.value)) and not re.match(r'(?i)^(https?://|SELECT |INSERT |UPDATE |DELETE |CREATE |ALTER |\s*SELECT |\s*INSERT |\s*UPDATE )',node.value) and len(node.value)<50000:
-                    entries.append({'english':node.value,'context':'Notification or default public copy / '+file.stem,'source_location':str(file.relative_to(ROOT))+':'+str(node.lineno)})
+                    parent=parents.get(node);sql_fragment=False
+                    if isinstance(parent,ast.JoinedStr):
+                        full=''.join(v.value if isinstance(v,ast.Constant) and isinstance(v.value,str) else '{}' for v in parent.values)
+                        sql_fragment=bool(re.match(r'(?is)^\s*(SELECT|INSERT|UPDATE|DELETE|ALTER|CREATE)\b',full))
+                    date_format=isinstance(parent,ast.Call) and isinstance(parent.func,ast.Attribute) and parent.func.attr=='strftime'
+                    if sql_fragment or date_format or (file.name=='sms.py' and node.value=='Bearer '):
+                        raw.setdefault('excluded',[]).append({'english':node.value,'source_location':str(file.relative_to(ROOT))+':'+str(node.lineno),'reason':'SQL fragment, date format or authentication protocol literal'})
+                    else:entries.append({'english':node.value,'context':'Notification or default public copy / '+file.stem,'source_location':str(file.relative_to(ROOT))+':'+str(node.lineno)})
         for node in ast.walk(tree):
             if not isinstance(node,ast.Call) or not node.args:continue
             name=ast.unparse(node.func)
-            if name not in ('fail','frappe.throw','ValueError','frappe._','text'):continue
+            if name not in ('fail','journey.fail','localized_throw','frappe.throw','ValueError','frappe._','text'):continue
             arg=node.args[0];english=arg.value if isinstance(arg,ast.Constant) and isinstance(arg.value,str) else ''.join(p.value if isinstance(p,ast.Constant) else '{'+ast.unparse(p.value)+'}' for p in arg.values) if isinstance(arg,ast.JoinedStr) else None
             if english:entries.append({'english':english,'context':'Backend validation / '+file.stem,'source_location':str(file.relative_to(ROOT))+':'+str(node.lineno)})
     # Shipped metadata only. Never query a database or export user submissions.

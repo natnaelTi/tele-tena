@@ -1,4 +1,5 @@
 """Transactional notice outbox;neutral content,explicit delivery opt-in,one send claim."""
+from tele_tena.localization import localized_throw
 from datetime import datetime,timezone
 from zoneinfo import ZoneInfo
 import uuid
@@ -84,7 +85,7 @@ def retry(id):
     # They can never be retried without a provider-supported reconciliation result.
     found=rows("SELECT state,attempts FROM tt_booking_notice WHERE id=%s AND user=%s FOR UPDATE",(id,user))
     if not found or found[0].state not in ('Unavailable','Rejected') or found[0].attempts>=3:
-        frappe.throw('This delivery cannot safely be retried.',frappe.PermissionError)
+        localized_throw('This delivery cannot safely be retried.',frappe.PermissionError)
     frappe.db.sql("UPDATE tt_booking_notice SET state='Pending',modified=UTC_TIMESTAMP(6) WHERE id=%s",(id,))
     return {'state':'Pending'}
 

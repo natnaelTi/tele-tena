@@ -1,4 +1,5 @@
 """Explicit, site-bound review setup. Never called by installation or HTTP."""
+from tele_tena.localization import localized_throw
 import json
 import fcntl
 import os
@@ -17,9 +18,9 @@ def enabled():
 
 def cli(require_enabled=True):
     if getattr(frappe.local, 'request', None) or frappe.session.user != 'Administrator':
-        frappe.throw('Local administrator command required', frappe.PermissionError)
+        localized_throw('Local administrator command required', frappe.PermissionError)
     if require_enabled and not enabled():
-        frappe.throw('This site is not explicitly configured for review', frappe.PermissionError)
+        localized_throw('This site is not explicitly configured for review', frappe.PermissionError)
 
 
 def phone_enabled():
@@ -49,14 +50,14 @@ def guard_contact_access(channel='phone', legacy=False):
         return
     if not enabled() or legacy or (channel == 'phone' and not phone_enabled()):
         frappe.local.response['tele_tena_error'] = 'review_password_required'
-        frappe.throw('Phone verification is unavailable on this site.', frappe.PermissionError)
+        localized_throw('Phone verification is unavailable on this site.', frappe.PermissionError)
     if channel == 'email':
         from tele_tena import email_delivery
         try:
             email_delivery.configuration()
         except email_delivery.DeliveryUnavailable:
             frappe.local.response['tele_tena_error'] = 'email_otp_unavailable'
-            frappe.throw('Email code delivery is not configured; use your password.', frappe.PermissionError)
+            localized_throw('Email code delivery is not configured; use your password.', frappe.PermissionError)
 
 
 def configure_contact_access():

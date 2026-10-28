@@ -1,4 +1,5 @@
 """State transitions and privacy-scoped presentation release APIs."""
+from tele_tena.localization import localized_throw
 import base64
 import hashlib
 import json
@@ -31,18 +32,18 @@ def _authorized(appointment, lock=False):
     item = rows('''SELECT * FROM tt_appointment WHERE id=%s AND (patient=%s OR clinician=%s OR EXISTS (SELECT 1 FROM tt_couple_plan cp JOIN tt_couple_participant p ON p.plan=cp.id WHERE cp.appointment=tt_appointment.id AND p.user=%s AND p.state='Consented'))''',
                 (appointment, user, user, user))
     if not item:
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
+        localized_throw('Appointment unavailable', frappe.PermissionError)
     item = item[0]
     if user != item.clinician:
         from tele_tena.api.couples import plan_for, participant
         if plan_for(item.id):
             participant(item.id,user)
         if 'Tele Tena Patient' not in frappe.get_roles(user):
-            frappe.throw('Appointment unavailable', frappe.PermissionError)
+            localized_throw('Appointment unavailable', frappe.PermissionError)
         role = 'patient'
     else:
         if 'Tele Tena Clinician' not in frappe.get_roles(user):
-            frappe.throw('Appointment unavailable', frappe.PermissionError)
+            localized_throw('Appointment unavailable', frappe.PermissionError)
         role = 'clinician'
     if lock:
         item = one('SELECT * FROM tt_appointment WHERE id=%s FOR UPDATE', (appointment,))
@@ -83,7 +84,7 @@ def respond_to_request(appointment, decision):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role != 'clinician' or item.clinician != clinician:
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
+        localized_throw('Appointment unavailable', frappe.PermissionError)
     if item.state != 'PendingConfirmation':
         if decision == 'confirm' and item.state == 'Booked':
             return {'state': item.state, 'idempotent': True}
@@ -125,7 +126,7 @@ def cancel_appointment(appointment, reason):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role == 'clinician' and item.clinician != user:
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
+        localized_throw('Appointment unavailable', frappe.PermissionError)
     if item.state == 'Cancelled' and item.cancelled_by == user and item.cancel_reason == reason:
         return {'state': 'Cancelled', 'idempotent': True}
     if item.state not in ('Booked', 'PendingConfirmation'):
@@ -235,7 +236,7 @@ def respond_to_reschedule(appointment, proposal, decision):
     record = rows('''SELECT * FROM tt_reschedule_proposal WHERE id=%s AND appointment=%s FOR UPDATE''',
                   (proposal, item.id))
     if not record:
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
+        localized_throw('Appointment unavailable', frappe.PermissionError)
     record = record[0]
     if record.state in ('Accepted', 'Declined'):
         if decision == 'accept' and record.state == 'Accepted':
@@ -244,7 +245,7 @@ def respond_to_reschedule(appointment, proposal, decision):
             return {'state': 'Declined', 'idempotent': True}
         fail('This time-change request is already resolved', 'reschedule_resolved')
     if record.proposer == user and not shared:
-        frappe.throw('Only the other appointment participant may respond', frappe.PermissionError)
+        localized_throw('Only the other appointment participant may respond', frappe.PermissionError)
     if record.state != 'Pending':
         fail('This time-change request is no longer available', 'reschedule_resolved')
     now = datetime.now(timezone.utc).replace(tzinfo=None)
@@ -328,9 +329,9 @@ def withdraw_reschedule(appointment, proposal):
     record = rows('''SELECT id,proposer,state FROM tt_reschedule_proposal
         WHERE id=%s AND appointment=%s FOR UPDATE''', (proposal, item.id))
     if not record:
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
+        localized_throw('Appointment unavailable', frappe.PermissionError)
     if record[0].proposer != user:
-        frappe.throw('Only the proposer may withdraw this request', frappe.PermissionError)
+        localized_throw('Only the proposer may withdraw this request', frappe.PermissionError)
     if record[0].state == 'Withdrawn':
         return {'state': 'Withdrawn', 'idempotent': True}
     if record[0].state != 'Pending':
@@ -585,7 +586,7 @@ def save_note_draft(appointment, private_note, patient_summary, share_note=0, su
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role != 'clinician' or item.clinician != clinician:
-        frappe.throw('Consultation record unavailable', frappe.PermissionError)
+        localized_throw('Consultation record unavailable', frappe.PermissionError)
     call = rows("SELECT state FROM tt_consultation WHERE appointment=%s", (item.id,))
     if not call or call[0].state != 'Ended' or item.state not in ('Booked', 'Completed'):
         fail('End the consultation before documenting it', 'documentation_not_ready')
@@ -638,7 +639,7 @@ def preview_patient_summary(appointment, summary=None):
     clinician = actor('Tele Tena Clinician')
     item, _, role = _authorized(appointment)
     if role != 'clinician' or item.clinician != clinician:
-        frappe.throw('Consultation record unavailable', frappe.PermissionError)
+        localized_throw('Consultation record unavailable', frappe.PermissionError)
     call = rows('SELECT state FROM tt_consultation WHERE appointment=%s', (item.id,))
     if not call or call[0].state != 'Ended' or item.state not in ('Booked', 'Completed'):
         fail('End the consultation before documenting it', 'documentation_not_ready')
@@ -669,7 +670,7 @@ def finalize_consultation(appointment, publish_summary=0, publish_note=0):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role != 'clinician' or item.clinician != clinician:
-        frappe.throw('Consultation record unavailable', frappe.PermissionError)
+        localized_throw('Consultation record unavailable', frappe.PermissionError)
     call = rows("SELECT state,room_closed FROM tt_consultation WHERE appointment=%s", (item.id,))
     note = one('SELECT current_revision,status FROM tt_consultation_note WHERE appointment=%s FOR UPDATE', (item.id,))
     if item.state == 'Completed' and note.status == 'Finalized':
@@ -851,7 +852,7 @@ def care_directory(search='', service='', status='', from_date='', to_date='', p
 def care_patient_record(appointment):
     item, clinician, role = _authorized(appointment)
     if role != 'clinician':
-        frappe.throw('Care record unavailable', frappe.PermissionError)
+        localized_throw('Care record unavailable', frappe.PermissionError)
     disclosure = json.loads(item.disclosure)
     shared_name = disclosure.get('name')
     if shared_name:
@@ -868,7 +869,7 @@ def care_patient_record(appointment):
 def care_detail(appointment):
     item, _, role = _authorized(appointment)
     if role != 'clinician':
-        frappe.throw('Care record unavailable', frappe.PermissionError)
+        localized_throw('Care record unavailable', frappe.PermissionError)
     return appointment_detail(appointment)
 
 
@@ -959,7 +960,7 @@ def tour_state(tour_id):
     user = actor()
     role = _tour_role(user)
     if not role or tour_id not in TOURS[role]:
-        frappe.throw('Tour unavailable', frappe.PermissionError)
+        localized_throw('Tour unavailable', frappe.PermissionError)
     saved = rows('''SELECT state FROM tt_tour_progress
         WHERE user=%s AND role=%s AND tour_id=%s AND version=%s''',
         (user, role, tour_id, TOUR_VERSION))
@@ -972,7 +973,7 @@ def save_tour_state(tour_id, state):
     user = actor()
     role = _tour_role(user)
     if not role or tour_id not in TOURS[role] or state not in ('Dismissed', 'Completed'):
-        frappe.throw('Tour unavailable', frappe.PermissionError)
+        localized_throw('Tour unavailable', frappe.PermissionError)
     frappe.db.sql('''INSERT INTO tt_tour_progress (user,role,tour_id,version,state,modified)
         VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
         state=VALUES(state),modified=VALUES(modified)''',
@@ -986,7 +987,7 @@ def _resume_owner():
     draft = rows('SELECT kind,completed FROM tt_onboarding WHERE user=%s', (user,))
     if not ((p and p[0].kind == 'clinician') or
             (draft and draft[0].kind == 'clinician' and not draft[0].completed)):
-        frappe.throw('CV unavailable', frappe.PermissionError)
+        localized_throw('CV unavailable', frappe.PermissionError)
     return user
 
 
@@ -1041,17 +1042,17 @@ def remove_resume():
 def download_resume(clinician):
     user = actor()
     if user != clinician and 'Tele Tena Approver' not in frappe.get_roles(user):
-        frappe.throw('CV unavailable', frappe.PermissionError)
+        localized_throw('CV unavailable', frappe.PermissionError)
     if user == clinician:
         _resume_owner()
     elif not rows('SELECT user FROM tt_application WHERE user=%s', (clinician,)):
-        frappe.throw('CV unavailable', frappe.PermissionError)
+        localized_throw('CV unavailable', frappe.PermissionError)
     found = rows('SELECT filename,content FROM tt_resume_evidence WHERE clinician=%s', (clinician,))
     if not found:
         from tele_tena.api.professional import cv_available, retained_cv_ids, download
         if cv_available(clinician):
             return download(retained_cv_ids(clinician)[0])
-        frappe.throw('CV unavailable', frappe.DoesNotExistError)
+        localized_throw('CV unavailable', frappe.DoesNotExistError)
     frappe.local.response.filename = found[0].filename
     frappe.local.response.filecontent = bytes(found[0].content)
     frappe.local.response.type = 'download'

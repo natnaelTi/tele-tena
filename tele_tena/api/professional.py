@@ -1,4 +1,5 @@
 """Structured applicant claims. Never grants scopes, clinical access or verification."""
+from tele_tena.localization import localized_throw
 import base64
 import hashlib
 import json
@@ -29,7 +30,7 @@ def owner():
     draft=rows('SELECT kind,completed FROM tt_onboarding WHERE user=%s',(user,))
     from tele_tena.review import registration_enabled
     if (p and p[0].kind=='clinician') or (draft and not draft[0].completed and not p and registration_enabled('clinician')):return user
-    frappe.throw('Professional application access required',frappe.PermissionError)
+    localized_throw('Professional application access required',frappe.PermissionError)
 
 
 def may_review(user,clinician):
@@ -123,7 +124,7 @@ def validate(value,user,submit=False):
 @query()
 def application(clinician=None):
     user=actor();clinician=clinician or owner()
-    if not may_review(user,clinician):frappe.throw('Application unavailable',frappe.PermissionError)
+    if not may_review(user,clinician):localized_throw('Application unavailable',frappe.PermissionError)
     saved=rows('SELECT payload,revision,legacy_name FROM tt_professional_draft WHERE user=%s',(clinician,))
     evidence=rows('SELECT id,purpose,filename,mime,content_size,content_sha256,created FROM tt_professional_evidence WHERE user=%s ORDER BY created',(clinician,))
     identity_access=user==clinician or bool(rows('SELECT clinician FROM tt_identity_reviewer WHERE clinician=%s AND reviewer=%s',(clinician,user)))
@@ -212,11 +213,11 @@ def upload(purpose,filename,content_base64):
 @query()
 def download(id):
     user=actor();found=rows('SELECT user,purpose,filename,mime,content FROM tt_professional_evidence WHERE id=%s',(id,))
-    if not found:frappe.throw('Evidence unavailable',frappe.PermissionError)
+    if not found:localized_throw('Evidence unavailable',frappe.PermissionError)
     d=found[0]
     allowed=may_review(user,d.user)
     if d.purpose=='Identification' and user!=d.user:allowed=bool(rows('SELECT clinician FROM tt_identity_reviewer WHERE clinician=%s AND reviewer=%s',(d.user,user))) and 'Tele Tena Approver' in frappe.get_roles(user)
-    if not allowed:frappe.throw('Evidence unavailable',frappe.PermissionError)
+    if not allowed:localized_throw('Evidence unavailable',frappe.PermissionError)
     from werkzeug.wrappers import Response
     return Response(bytes(d.content),mimetype=d.mime,headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Disposition':"attachment; filename*=UTF-8''"+quote(d.filename,safe=''),'Content-Security-Policy':"sandbox; default-src 'none'"})
 
@@ -268,7 +269,7 @@ def revoke_identity_reviewer(clinician,reviewer,reason):
 @query()
 def submission(id):
     user=actor();found=rows('SELECT id,user,payload,digest,created,declaration_version,reference_snapshot FROM tt_professional_submission WHERE id=%s',(id,))
-    if not found or not may_review(user,found[0].user):frappe.throw('Submitted application unavailable',frappe.PermissionError)
+    if not found or not may_review(user,found[0].user):localized_throw('Submitted application unavailable',frappe.PermissionError)
     row=found[0];payload=json.loads(row.payload)
     identity=user==row.user or ('Tele Tena Approver' in frappe.get_roles(user) and bool(rows('SELECT clinician FROM tt_identity_reviewer WHERE clinician=%s AND reviewer=%s',(row.user,user))))
     if not identity:payload.pop('identity_files',None);payload.pop('identification_type',None)
@@ -285,7 +286,7 @@ def attach_scope_license(application,id):
     user=owner()
     from tele_tena.api.vetting import _authorized_scope_application,upload_scope_evidence
     scope=_authorized_scope_application(application,user)
-    if scope.clinician!=user:frappe.throw('Scope evidence unavailable',frappe.PermissionError)
+    if scope.clinician!=user:localized_throw('Scope evidence unavailable',frappe.PermissionError)
     document=rows("SELECT filename,mime,content,content_sha256 FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose='License'",(id,user))
     if not document or document[0].mime!='application/pdf':fail('Choose a private license PDF from your professional profile. Identification files cannot be attached to scope applications.','scope_license_pdf_required')
     rows('SELECT name FROM `tabTele Tena Vetting Scope Application` WHERE name=%s AND clinician=%s FOR UPDATE',(application,user))

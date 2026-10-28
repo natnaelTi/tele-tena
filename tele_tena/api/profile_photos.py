@@ -1,4 +1,5 @@
 """No public file paths, EXIF, generic document access or patient photo sharing."""
+from tele_tena.localization import localized_throw
 import base64
 import io
 import uuid
@@ -78,7 +79,7 @@ def upload(filename, content_base64, published=0):
         fail('Choose a photo visibility.', 'photo_invalid')
     publish = str(published) in ('1', 'True')
     if publish and not can_publish(user):
-        frappe.throw('Public photo unavailable', frappe.PermissionError)
+        localized_throw('Public photo unavailable', frappe.PermissionError)
     content = _normalize(filename, content_base64)
     # Serialize replace/remove for this owner. Never accept a caller-supplied owner.
     frappe.db.sql('SELECT name FROM tabUser WHERE name=%s FOR UPDATE', (user,))
@@ -103,7 +104,7 @@ def set_visibility(published):
     if str(published) not in ('0', '1'):
         fail('Choose a photo visibility.', 'photo_invalid')
     if str(published) == '1' and not can_publish(user):
-        frappe.throw('Public photo unavailable', frappe.PermissionError)
+        localized_throw('Public photo unavailable', frappe.PermissionError)
     frappe.db.sql('SELECT name FROM tabUser WHERE name=%s FOR UPDATE', (user,))
     frappe.db.sql('UPDATE tt_profile_photo SET published=%s,modified=UTC_TIMESTAMP(6) WHERE user=%s', (int(published), user))
     return owner_photo(user)
@@ -114,15 +115,15 @@ def download(id):
     user = actor()
     found = rows('SELECT user,content,published FROM tt_profile_photo WHERE id=%s', (id,))
     if not found:
-        frappe.throw('Photo unavailable', frappe.PermissionError)
+        localized_throw('Photo unavailable', frappe.PermissionError)
     photo = found[0]
     if user != photo.user:
         if not photo.published or 'Tele Tena Patient' not in frappe.get_roles(user):
-            frappe.throw('Photo unavailable', frappe.PermissionError)
+            localized_throw('Photo unavailable', frappe.PermissionError)
         from tele_tena.api.journey import discover
         public_id = frappe.db.sql('SELECT public_id FROM tt_profile WHERE user=%s', (photo.user,))
         if not public_id or not any(item.clinician_id == public_id[0][0] for item in discover()):
-            frappe.throw('Photo unavailable', frappe.PermissionError)
+            localized_throw('Photo unavailable', frappe.PermissionError)
     from werkzeug.wrappers import Response
     return Response(bytes(photo.content), mimetype='image/jpeg', headers={
         'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff',
