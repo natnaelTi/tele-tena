@@ -16706,6 +16706,18 @@
       }
     ],
     "runtime_commit": "d553253d8dc24681ceaa5cd71c9bc6881fe46483",
-    "verification": "docs/offline-telebirr-verification-2026-10-28.md"
+    "verification": "docs/offline-telebirr-verification-2026-10-28.md",
+    "payment_configuration_validation_fix": {
+      "date": "2026-10-28",
+      "runtime_commit": "6f5cd6c387cc2b461ce0b7ef0e50a4973b990db2",
+      "route": "/financial-configuration",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex",
+      "owner_status": "Awaiting owner acceptance",
+      "evidence": [
+        "docs/payment-mode-validation-fix-2026-10-28.md"
+      ],
+      "preservation": "No mode, balances, holds or historical obligations changed by verification."
+    }
   }
 }
