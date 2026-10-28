@@ -17,11 +17,11 @@ async function classifyError(response: Response, method: string): Promise<ApiErr
   }
   return new ApiError(code, response.status)
 }
-export async function api<T>(method: string, data: Record<string, unknown> = {}, post = false): Promise<T> {
+export async function api<T>(method: string, data: Record<string, unknown> = {}, post = false, signal?: AbortSignal): Promise<T> {
   const path = method.startsWith('frappe.') || method.startsWith('tele_tena.') ? '/api/method/' + method : '/api/method/tele_tena.api.journey.' + method
   const query = new URLSearchParams(Object.entries(data).map(([k, v]) => [k, String(v)]))
   const response = await fetch(path + (!post && query.size ? '?' + query : ''), {
-    method: post ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store',
+    method: post ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store', signal,
     headers: post ? { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': csrf } : {},
     body: post ? JSON.stringify(data) : undefined,
   })

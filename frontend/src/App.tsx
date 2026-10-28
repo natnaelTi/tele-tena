@@ -1,3 +1,4 @@
+import {NotificationsProvider} from './hooks/useNotifications';
 import PaymentActivityAlerts from './components/PaymentActivityAlerts';
 import {DirectPaymentPage,PaymentConfiguration,DirectLedger} from './components/DirectPayments';
 import Contact from './pages/Contact';
@@ -59,7 +60,7 @@ export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.PROD ? "/teletena" : "/"}>
       <SessionProvider>
-        <LocaleProvider>
+        <LocaleProvider><NotificationsProvider>
           <PWAUpdateNotice /><PaymentActivityAlerts/>
           <a className="skip-link" href="#main-content">
             Skip to content
@@ -185,7 +186,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <HelpTools/>
-        </LocaleProvider>
+        </NotificationsProvider></LocaleProvider>
       </SessionProvider>
     </BrowserRouter>
   );
