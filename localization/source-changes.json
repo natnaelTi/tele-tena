@@ -1,34 +1,6 @@
 {
   "added": [
-    "copy.cliniciannotifications.payment",
-    "copy.cliniciannotifications.review_payment",
-    "copy.directpayments.card_direct_payment_status",
-    "copy.directpayments.card_direct_payment_timeline",
-    "copy.directpayments.card_pending_payment_reviews",
-    "copy.directpayments.check_submitted_receipts_against_your_telebirr_account_before_recordin",
-    "copy.directpayments.claimed_transaction_id",
-    "copy.directpayments.correctionrequired",
-    "copy.directpayments.direct_payment",
-    "copy.directpayments.expired",
-    "copy.directpayments.payment_instructions_evidence_and_history_are_managed_on_a_separate_pa",
-    "copy.directpayments.payment_status",
-    "copy.directpayments.payment_submission_reminder",
-    "copy.directpayments.payment_submissions_could_not_be_refreshed",
-    "copy.directpayments.payment_submitted_review_required",
-    "copy.directpayments.payment_timeline",
-    "copy.directpayments.payments_awaiting_your_review",
-    "copy.directpayments.receipt_verification_reminder",
-    "copy.directpayments.rejected",
-    "copy.directpayments.review_payment",
-    "copy.directpayments.the_payer_has_submitted_payment_information_check_the_receipt_and_your",
-    "copy.directpayments.view_payment",
-    "copy.notification_or_default_public_copy_notifications.payment",
-    "copy.usernotifications.paymentsubmitted",
-    "copy.usernotifications.paymentverificationreminder",
-    "copy.usernotifications.review_payment",
-    "copy.usernotifications.view_payment"
+    "copy.consultationdetails.offline"
   ],
-  "stale": [
-    "copy.directpayments.payment_history"
-  ]
+  "stale": []
 }
