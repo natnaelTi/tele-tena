@@ -1,27 +1,4 @@
 {
-  "added": [
-    "copy.usenotifications.notification_provider_unavailable",
-    "copy.usenotifications.offeraccepted",
-    "copy.usenotifications.payment",
-    "copy.usenotifications.your_offer_was_accepted",
-    "copy.usernotifications.payments_accepted_offers_appointments_and_updates_for_your_practice",
-    "copy.usernotifications.some_notifications_could_not_be_refreshed_previously_loaded_updates_ar"
-  ],
-  "stale": [
-    "copy.cliniciannotifications.accepted_offers_and_your_consultation_links",
-    "copy.cliniciannotifications.appointment_confirmed",
-    "copy.cliniciannotifications.appointment_updates_could_not_be_refreshed_accepted_offers_remain_avai",
-    "copy.cliniciannotifications.available",
-    "copy.cliniciannotifications.awaiting_clinician_approval",
-    "copy.cliniciannotifications.mark_as_read",
-    "copy.cliniciannotifications.no_notifications_yet",
-    "copy.cliniciannotifications.notifications",
-    "copy.cliniciannotifications.notifications_could_not_be_loaded",
-    "copy.cliniciannotifications.payment",
-    "copy.cliniciannotifications.pendingconfirmation",
-    "copy.cliniciannotifications.retry",
-    "copy.cliniciannotifications.review_payment",
-    "copy.cliniciannotifications.view_account",
-    "copy.cliniciannotifications.view_appointment_update"
-  ]
+  "added": [],
+  "stale": []
 }
