@@ -7,6 +7,8 @@ class Extraction(unittest.TestCase):
   data=json.loads((ROOT/'localization/catalog.json').read_text())
   self.assertNotIn('copy.accountmenu.escape',data)
   self.assertNotIn('copy.admin.button_quiet',data)
+  self.assertNotIn('copy.clinician.noshow',data)
+  self.assertTrue(any(r['english']=='No-show recorded' for r in data.values()))
   for english in ['End for everyone','ETB','TeleTena','View Payment','English and Ethiopian Languages','Search Care Languages']:
    self.assertTrue(any(r['english']==english for r in data.values()),english)
  def test_exclusions_are_source_attributed_and_no_reviewed_values_lost(self):

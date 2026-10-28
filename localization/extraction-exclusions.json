@@ -25,6 +25,21 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Ended",
+    "source_location": "frontend/src/appointment-groups.ts:8",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Finalized",
+    "source_location": "frontend/src/appointment-groups.ts:8",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Open",
+    "source_location": "frontend/src/appointment-groups.ts:9",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "Booked",
     "source_location": "frontend/src/appointment-groups.ts:10",
     "reason": "Keyboard or machine-code comparison"
@@ -50,7 +65,22 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Ended",
+    "source_location": "frontend/src/appointment-groups.ts:27",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Finalized",
+    "source_location": "frontend/src/appointment-groups.ts:27",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "Booked",
+    "source_location": "frontend/src/appointment-groups.ts:28",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Ended",
     "source_location": "frontend/src/appointment-groups.ts:28",
     "reason": "Keyboard or machine-code comparison"
   },
@@ -80,13 +110,58 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Offline",
+    "source_location": "frontend/src/appointment-status.ts:7",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Verified",
+    "source_location": "frontend/src/appointment-status.ts:7",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Submitted",
+    "source_location": "frontend/src/appointment-status.ts:7",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "CorrectionRequired",
+    "source_location": "frontend/src/appointment-status.ts:7",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "ReconciliationRequired",
+    "source_location": "frontend/src/appointment-status.ts:7",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "PendingConfirmation",
     "source_location": "frontend/src/appointment-status.ts:8",
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Ended",
+    "source_location": "frontend/src/appointment-status.ts:9",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Finalized",
+    "source_location": "frontend/src/appointment-status.ts:9",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Open",
+    "source_location": "frontend/src/appointment-status.ts:10",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "Booked",
     "source_location": "frontend/src/appointment-status.ts:11",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Open",
+    "source_location": "frontend/src/appointment-status.ts:12",
     "reason": "Keyboard or machine-code comparison"
   },
   {
@@ -205,6 +280,46 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "766px 260px",
+    "source_location": "frontend/src/components/ClinicianHeroScene.tsx:7",
+    "reason": "SVG/CSS geometry value"
+  },
+  {
+    "english": "translate(815 190) rotate(5)",
+    "source_location": "frontend/src/components/ClinicianHeroScene.tsx:7",
+    "reason": "SVG/CSS geometry value"
+  },
+  {
+    "english": "688px 357px",
+    "source_location": "frontend/src/components/ClinicianHeroScene.tsx:8",
+    "reason": "SVG/CSS geometry value"
+  },
+  {
+    "english": "translate(721 303) rotate(5)",
+    "source_location": "frontend/src/components/ClinicianHeroScene.tsx:8",
+    "reason": "SVG/CSS geometry value"
+  },
+  {
+    "english": "857px 370px",
+    "source_location": "frontend/src/components/ClinicianHeroScene.tsx:9",
+    "reason": "SVG/CSS geometry value"
+  },
+  {
+    "english": "translate(877 299) rotate(-5)",
+    "source_location": "frontend/src/components/ClinicianHeroScene.tsx:9",
+    "reason": "SVG/CSS geometry value"
+  },
+  {
+    "english": "708px 444px",
+    "source_location": "frontend/src/components/ClinicianHeroScene.tsx:10",
+    "reason": "SVG/CSS geometry value"
+  },
+  {
+    "english": "translate(724 414) rotate(9) scale(.4)",
+    "source_location": "frontend/src/components/ClinicianHeroScene.tsx:10",
+    "reason": "SVG/CSS geometry value"
+  },
+  {
     "english": "M457 277 Q514 246 558 266 Q607 278 604 328 L585 370 L627 401 L657 462 L432 462 L447 403 L466 380 Q434 335 457 277Z",
     "source_location": "frontend/src/components/ClinicianHeroScene.tsx:17",
     "reason": "Technical JSX attribute d"
@@ -230,6 +345,16 @@
     "reason": "Technical JSX attribute transform"
   },
   {
+    "english": "Booked",
+    "source_location": "frontend/src/components/ClinicianNotifications.tsx:15",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/components/ClinicianNotifications.tsx:15",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "button secondary",
     "source_location": "frontend/src/components/ClinicianPreview.tsx:29",
     "reason": "Technical JSX attribute className"
@@ -237,6 +362,21 @@
   {
     "english": "Enter",
     "source_location": "frontend/src/components/CompetencyRating.tsx:10",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/components/ConsultationDetails.tsx:12",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Unavailable",
+    "source_location": "frontend/src/components/ConsultationDetails.tsx:12",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Unavailable",
+    "source_location": "frontend/src/components/ConsultationDetails.tsx:12",
     "reason": "Keyboard or machine-code comparison"
   },
   {
@@ -390,6 +530,16 @@
     "reason": "Technical JSX attribute className"
   },
   {
+    "english": "Submitted",
+    "source_location": "frontend/src/components/DirectPayments.tsx:47",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "ReconciliationRequired",
+    "source_location": "frontend/src/components/DirectPayments.tsx:47",
+    "reason": "Keyboard or state matching set"
+  },
+  {
     "english": "card direct-payment-status",
     "source_location": "frontend/src/components/DirectPayments.tsx:47",
     "reason": "Technical JSX attribute className"
@@ -423,6 +573,11 @@
     "english": "button secondary",
     "source_location": "frontend/src/components/Domain.tsx:77",
     "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Ended",
+    "source_location": "frontend/src/components/Domain.tsx:89",
+    "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Completed",
@@ -488,6 +643,26 @@
     "english": "patient-dashboard-panel patient-care-links",
     "source_location": "frontend/src/components/PatientCareLinks.tsx:25",
     "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "PaymentSubmitted",
+    "source_location": "frontend/src/components/PaymentActivityAlerts.tsx:9",
+    "reason": "Payment-event matching set"
+  },
+  {
+    "english": "PaymentVerified",
+    "source_location": "frontend/src/components/PaymentActivityAlerts.tsx:9",
+    "reason": "Payment-event matching set"
+  },
+  {
+    "english": "PaymentCorrection",
+    "source_location": "frontend/src/components/PaymentActivityAlerts.tsx:9",
+    "reason": "Payment-event matching set"
+  },
+  {
+    "english": "PaymentReconciliation",
+    "source_location": "frontend/src/components/PaymentActivityAlerts.tsx:9",
+    "reason": "Payment-event matching set"
   },
   {
     "english": "PaymentSubmitted",
@@ -610,6 +785,11 @@
     "reason": "Technical JSX attribute className"
   },
   {
+    "english": "(prefers-reduced-motion: reduce)",
+    "source_location": "frontend/src/components/PublicExperience.tsx:38",
+    "reason": "DOM selector or media query"
+  },
+  {
     "english": "button secondary",
     "source_location": "frontend/src/components/PublicExperience.tsx:40",
     "reason": "Technical JSX attribute className"
@@ -645,6 +825,11 @@
     "reason": "Technical JSX attribute className"
   },
   {
+    "english": "(prefers-reduced-motion: reduce)",
+    "source_location": "frontend/src/components/PublicMotion.tsx:24",
+    "reason": "DOM selector or media query"
+  },
+  {
     "english": "IntersectionObserver",
     "source_location": "frontend/src/components/PublicMotion.tsx:26",
     "reason": "Property-presence identifier"
@@ -675,6 +860,16 @@
     "reason": "Technical JSX attribute className"
   },
   {
+    "english": "Open",
+    "source_location": "frontend/src/components/RequestProgress.tsx:8",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "Active",
+    "source_location": "frontend/src/components/RequestProgress.tsx:8",
+    "reason": "Keyboard or state matching set"
+  },
+  {
     "english": "Matched",
     "source_location": "frontend/src/components/RequestProgress.tsx:9",
     "reason": "Keyboard or machine-code comparison"
@@ -703,6 +898,16 @@
     "english": "Open",
     "source_location": "frontend/src/components/RequestProgress.tsx:33",
     "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Open",
+    "source_location": "frontend/src/components/RequestProgress.tsx:34",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "Matched",
+    "source_location": "frontend/src/components/RequestProgress.tsx:34",
+    "reason": "Keyboard or state matching set"
   },
   {
     "english": "Accepted",
@@ -905,9 +1110,24 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Finalized",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:477",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Completed",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:477",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "button primary",
     "source_location": "frontend/src/features/consultations/Consultation.tsx:478",
     "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Finalized",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:478",
+    "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Ended",
@@ -1000,6 +1220,16 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Offline",
+    "source_location": "frontend/src/features/consultations/ExtensionPanel.tsx:33",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/features/consultations/ExtensionPanel.tsx:33",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "Proposed",
     "source_location": "frontend/src/features/consultations/ExtensionPanel.tsx:34",
     "reason": "Keyboard or machine-code comparison"
@@ -1013,6 +1243,31 @@
     "english": "button secondary",
     "source_location": "frontend/src/features/consultations/ExtensionPanel.tsx:37",
     "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Missing locale provider",
+    "source_location": "frontend/src/hooks/useLocale.tsx:960",
+    "reason": "Internal provider diagnostic; user-facing recovery copy is separate"
+  },
+  {
+    "english": "OfferAccepted",
+    "source_location": "frontend/src/hooks/useNotifications.tsx:18",
+    "reason": "Machine event/state identifier; display title is separate"
+  },
+  {
+    "english": "Notification provider unavailable",
+    "source_location": "frontend/src/hooks/useNotifications.tsx:31",
+    "reason": "Internal provider diagnostic; user-facing recovery copy is separate"
+  },
+  {
+    "english": "Session unavailable",
+    "source_location": "frontend/src/hooks/useSession.tsx:39",
+    "reason": "Internal provider diagnostic; user-facing recovery copy is separate"
+  },
+  {
+    "english": "Missing session provider",
+    "source_location": "frontend/src/hooks/useSession.tsx:62",
+    "reason": "Internal provider diagnostic; user-facing recovery copy is separate"
   },
   {
     "english": "Wallet",
@@ -1195,6 +1450,11 @@
     "reason": "Technical JSX attribute className"
   },
   {
+    "english": "Offline",
+    "source_location": "frontend/src/layouts/Layouts.tsx:239",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "reference-workspace workspace-role-",
     "source_location": "frontend/src/layouts/Layouts.tsx:266",
     "reason": "Technical JSX attribute className"
@@ -1285,14 +1545,34 @@
     "reason": "Controlled schema-key example; must retain wire values"
   },
   {
+    "english": "Draft",
+    "source_location": "frontend/src/pages/Admin.tsx:260",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Not reviewed",
+    "source_location": "frontend/src/pages/Admin.tsx:260",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "button quiet",
     "source_location": "frontend/src/pages/Admin.tsx:302",
     "reason": "Technical JSX attribute className"
   },
   {
+    "english": "In review",
+    "source_location": "frontend/src/pages/Admin.tsx:312",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "form-grid two-column",
     "source_location": "frontend/src/pages/Admin.tsx:315",
     "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "In review",
+    "source_location": "frontend/src/pages/Admin.tsx:350",
+    "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "form-grid two-column",
@@ -1313,6 +1593,16 @@
     "english": "form-grid two-column reconciliation-balances",
     "source_location": "frontend/src/pages/Admin.tsx:412",
     "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/pages/BookingConfirmation.tsx:19",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Verified",
+    "source_location": "frontend/src/pages/BookingConfirmation.tsx:19",
+    "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Booked",
@@ -1685,6 +1975,16 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "PendingConfirmation",
+    "source_location": "frontend/src/pages/Clinician.tsx:353",
+    "reason": "Appointment filter wire state; explicit display labels are separate"
+  },
+  {
+    "english": "NoShow",
+    "source_location": "frontend/src/pages/Clinician.tsx:353",
+    "reason": "Appointment filter wire state; explicit display labels are separate"
+  },
+  {
     "english": "table-scroll care-directory-table",
     "source_location": "frontend/src/pages/Clinician.tsx:362",
     "reason": "Technical JSX attribute className"
@@ -1880,8 +2180,23 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Booked",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:35",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "PendingConfirmation",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:35",
+    "reason": "Keyboard or state matching set"
+  },
+  {
     "english": "PendingConfirmation",
     "source_location": "frontend/src/pages/ConsultationPage.tsx:39",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Ended",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:58",
     "reason": "Keyboard or machine-code comparison"
   },
   {
@@ -1895,7 +2210,27 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Finalized",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:66",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "PendingConfirmation",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:73",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:73",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Verified",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:73",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Offline",
     "source_location": "frontend/src/pages/ConsultationPage.tsx:73",
     "reason": "Keyboard or machine-code comparison"
   },
@@ -1910,9 +2245,29 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Finalized",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:75",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Finalized",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:76",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Open",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:77",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "button primary",
     "source_location": "frontend/src/pages/ConsultationPage.tsx:77",
     "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:78",
+    "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Booked",
@@ -1928,6 +2283,11 @@
     "english": " consultation-documenting",
     "source_location": "frontend/src/pages/ConsultationPage.tsx:82",
     "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:82",
+    "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Completed",
@@ -1955,6 +2315,11 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Finalized",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:89",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "button primary",
     "source_location": "frontend/src/pages/ConsultationPage.tsx:92",
     "reason": "Technical JSX attribute className"
@@ -1967,6 +2332,11 @@
   {
     "english": "Booked",
     "source_location": "frontend/src/pages/ConsultationPage.tsx:94",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Disputed",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:100",
     "reason": "Keyboard or machine-code comparison"
   },
   {
@@ -2145,6 +2515,31 @@
     "reason": "Keyboard or state matching set"
   },
   {
+    "english": "Completed",
+    "source_location": "frontend/src/pages/Couples.tsx:48",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Cancelled",
+    "source_location": "frontend/src/pages/Couples.tsx:48",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Expired",
+    "source_location": "frontend/src/pages/Couples.tsx:48",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Ended",
+    "source_location": "frontend/src/pages/Couples.tsx:48",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Booked",
+    "source_location": "frontend/src/pages/Couples.tsx:48",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "Booked",
     "source_location": "frontend/src/pages/Couples.tsx:48",
     "reason": "Keyboard or machine-code comparison"
@@ -2185,6 +2580,21 @@
     "reason": "Keyboard or state matching set"
   },
   {
+    "english": "Completed",
+    "source_location": "frontend/src/pages/Couples.tsx:51",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "Cancelled",
+    "source_location": "frontend/src/pages/Couples.tsx:51",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "Expired",
+    "source_location": "frontend/src/pages/Couples.tsx:51",
+    "reason": "Keyboard or state matching set"
+  },
+  {
     "english": "Booked",
     "source_location": "frontend/src/pages/Couples.tsx:59",
     "reason": "Keyboard or machine-code comparison"
@@ -2208,6 +2618,21 @@
     "english": "Completed",
     "source_location": "frontend/src/pages/Couples.tsx:60",
     "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Invited",
+    "source_location": "frontend/src/pages/Couples.tsx:60",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "Consented",
+    "source_location": "frontend/src/pages/Couples.tsx:60",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "PendingConfirmation",
+    "source_location": "frontend/src/pages/Couples.tsx:60",
+    "reason": "Keyboard or state matching set"
   },
   {
     "english": "button secondary",
@@ -2271,6 +2696,11 @@
   },
   {
     "english": "Booked",
+    "source_location": "frontend/src/pages/Patient.tsx:52",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Ended",
     "source_location": "frontend/src/pages/Patient.tsx:52",
     "reason": "Keyboard or machine-code comparison"
   },
@@ -2525,6 +2955,11 @@
     "reason": "Keyboard or state matching set"
   },
   {
+    "english": "Approved",
+    "source_location": "frontend/src/pages/Vetting.tsx:191",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "Draft",
     "source_location": "frontend/src/pages/Vetting.tsx:216",
     "reason": "Keyboard or state matching set"
@@ -2581,6 +3016,16 @@
   },
   {
     "english": "Expired",
+    "source_location": "frontend/src/pages/Vetting.tsx:230",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "Approved",
+    "source_location": "frontend/src/pages/Vetting.tsx:230",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "Revoked",
     "source_location": "frontend/src/pages/Vetting.tsx:230",
     "reason": "Keyboard or state matching set"
   },
@@ -2658,6 +3103,11 @@
     "english": "scope-review-card guided-review",
     "source_location": "frontend/src/pages/Vetting.tsx:270",
     "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Approved",
+    "source_location": "frontend/src/pages/Vetting.tsx:310",
+    "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Clarification",

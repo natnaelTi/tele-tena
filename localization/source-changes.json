@@ -1,4 +1,11 @@
 {
   "added": [],
-  "stale": []
+  "stale": [
+    "copy.clinician.noshow",
+    "copy.clinician.pendingconfirmation",
+    "copy.clinicianheroscene.translate_721_303_rotate_5",
+    "copy.clinicianheroscene.translate_724_414_rotate_9_scale_4",
+    "copy.clinicianheroscene.translate_815_190_rotate_5",
+    "copy.clinicianheroscene.translate_877_299_rotate_5"
+  ]
 }

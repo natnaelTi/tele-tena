@@ -4,19 +4,33 @@ const root=path.resolve(__dirname,'../..'),entries=[],translations={},excluded=[
 function walk(dir){return fs.readdirSync(dir,{withFileTypes:true}).flatMap(x=>x.isDirectory()?walk(path.join(dir,x.name)):[path.join(dir,x.name)]);}
 function add(english,file,node,context){if(!english?.trim())return;entries.push({english,source_location:path.relative(root,file)+':'+node.getSourceFile().getLineAndCharacterOfPosition(node.getStart()).line,context});}
 function human(s){return /[A-Za-z]/.test(s)&&s.length>1&&s.length<10000&&!/^(?:https?:|[./#]|\w+@|--|SELECT |INSERT |UPDATE |DELETE |CREATE |ALTER )/i.test(s)&&!/[{}<>][^ ]*[{}<>]/.test(s)&&(/\s/.test(s)||/^[A-Z][a-z]+(?:[A-Z][a-z]+)*[.!?…]?$/.test(s));}
+function machineSelector(n){
+ if(ts.isParenthesizedExpression(n)||ts.isAsExpression(n)||ts.isNonNullExpression(n))return machineSelector(n.expression);
+ if(ts.isCallExpression(n)&&n.expression.getText()==='String'&&n.arguments.length===1)return machineSelector(n.arguments[0]);
+ if(ts.isBinaryExpression(n)&&n.operatorToken.kind===ts.SyntaxKind.BarBarToken)return machineSelector(n.left);
+ return /(?:^|\.)(?:\w+_)?(key|code|state|status|kind|phase|event|channel|decision|mode)$/.test(n.getText());
+}
 function technical(node){
  for(let n=node;n;n=n.parent){
   if(ts.isLiteralTypeNode(n))return 'Type-only identifier; not rendered copy';
   if(ts.isJsxAttribute(n)&&(['className','id','role','type','name','value','htmlFor','aria-controls','aria-labelledby','aria-describedby','autoComplete','inputMode','pattern','d','viewBox','style','transform','transformOrigin'].includes(n.name.getText())||n.name.getText().startsWith('data-')))return 'Technical JSX attribute '+n.name.getText();
   if(ts.isJsxElement(n)||ts.isSourceFile(n))break;
  }
- if(ts.isBinaryExpression(node.parent)){const other=node.parent.left===node?node.parent.right:node.parent.left;if(/(?:^|\.)(key|code|state|status|kind|phase|event|channel|decision|mode)$/.test(other.getText()))return 'Keyboard or machine-code comparison';}
+ if(ts.isBinaryExpression(node.parent)){const other=node.parent.left===node?node.parent.right:node.parent.left;if(machineSelector(other))return 'Keyboard or machine-code comparison';}
  if(ts.isBinaryExpression(node.parent)&&node.parent.operatorToken.kind===ts.SyntaxKind.InKeyword)return 'Property-presence identifier';
- if(ts.isCallExpression(node.parent)&&/\.(querySelector|querySelectorAll|closest|getElementById|matchMedia)$/.test(node.parent.expression.getText()))return 'DOM selector or media query';
+ if(ts.isCallExpression(node.parent)&&/(?:^|\.)(querySelector|querySelectorAll|closest|getElementById|matchMedia)$/.test(node.parent.expression.getText()))return 'DOM selector or media query';
  let parent=node.parent;
  if(ts.isArrayLiteralExpression(parent)&&ts.isPropertyAccessExpression(parent.parent)&&ts.isCallExpression(parent.parent.parent)){
-  const call=parent.parent.parent;if(parent.parent.name.text==='includes'&&call.arguments.some(a=>/\.(key|code|state|status|kind|event|channel|decision|mode)$/.test(a.getText())))return 'Keyboard or state matching set';
+  const call=parent.parent.parent;if(parent.parent.name.text==='includes'&&call.arguments.some(machineSelector))return 'Keyboard or state matching set';
  }
+ if(ts.isPropertyAssignment(node.parent)&&node.parent.initializer===node){
+  const field=node.parent.name.getText().replace(/["']/g,'');
+  if(['transform','transformOrigin'].includes(field)||node.getSourceFile().fileName.endsWith('/ClinicianHeroScene.tsx')&&['origin','wave'].includes(field))return 'SVG/CSS geometry value';
+  if(['kind','source','event','state','status','channel'].includes(field)&&/[a-z][A-Z]/.test(node.text||''))return 'Machine event/state identifier; display title is separate';
+ }
+ if(node.getSourceFile().fileName.endsWith('/pages/Clinician.tsx')&&['PendingConfirmation','NoShow'].includes(node.text||'')&&ts.isArrayLiteralExpression(node.parent))return 'Appointment filter wire state; explicit display labels are separate';
+ if(node.getSourceFile().fileName.endsWith('/PaymentActivityAlerts.tsx')){for(let n=node;n;n=n.parent){if(ts.isVariableDeclaration(n)&&n.name.getText()==='kinds')return 'Payment-event matching set';}}
+ if(/\/hooks\/use(?:Locale|Session|Notifications)\.tsx$/.test(node.getSourceFile().fileName)&&['Missing locale provider','Missing session provider','Notification provider unavailable','Session unavailable'].includes(node.text||''))return 'Internal provider diagnostic; user-facing recovery copy is separate';
  if(node.getSourceFile().fileName.endsWith('/care-search.ts')&&node.text.startsWith('i me my am im have been'))return 'Legacy lexical stop-word data; not visible copy';
  if(node.getSourceFile().fileName.endsWith('/Admin.tsx')&&['audio\nvideo','direct-booking\nscheduled'].includes(node.text))return 'Controlled schema-key example; must retain wire values';
  return null;
