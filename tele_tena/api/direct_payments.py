@@ -24,9 +24,13 @@ def configure(mode,revision,reason,hold_minutes=30,verification_hours=24,transit
     user=administrator();one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE');c=config(True)
     if mode not in ('Wallet','Offline'):fail('Choose a supported payment mode.')
     if int(revision)!=c.revision:fail('Payment configuration changed. Reload before saving.','payment_mode_changed')
+    if not re.fullmatch('[0-9]+',str(hold_minutes)) or not 5<=int(hold_minutes)<=120:fail('Enter a whole number from 5 to 120 minutes.','payment_hold_invalid')
+    if not re.fullmatch('[0-9]+',str(verification_hours)) or not 1<=int(verification_hours)<=72:fail('Enter a whole number from 1 to 72 hours.','payment_verification_window_invalid')
+    if not isinstance(reason,str) or not 1<=len(reason.strip())<=1000:fail('Enter a change reason using 1–1,000 characters.','payment_change_reason_required')
     reason=text(reason,1000);hold_minutes=integer(hold_minutes,5,120);verification_hours=integer(verification_hours,1,72)
     if rows("SELECT id FROM tt_direct_payment WHERE state IN ('AwaitingPayment','Submitted','CorrectionRequired') LIMIT 1"):
         fail('Resolve active direct-payment holds before changing payment configuration.','payment_transition_blocked')
+    if not isinstance(transition_plan,str) or len(transition_plan.strip())>2000:fail('Keep the transition plan within 2,000 characters.','payment_transition_plan_invalid')
     obligations=transition_obligations();transition_plan=text(transition_plan,2000,False)
     if mode!=c.mode and any(obligations.values()) and len(transition_plan)<20:fail('Record how existing wallet holds and external payment/refund obligations will be managed before changing mode.','payment_transition_plan_required')
     frappe.db.sql('UPDATE tt_payment_config SET mode=%s,revision=revision+1,hold_minutes=%s,verification_hours=%s,modified=UTC_TIMESTAMP(6) WHERE id=1',(mode,hold_minutes,verification_hours))

@@ -111,6 +111,15 @@ class DirectPayment(unittest.TestCase):
   frappe.set_user(users['patient']);cancel_appointment(result['id'],'Synthetic cancellation, no external transfer')
   self.assertEqual(pay.detail(result['payment'])['state'],'RefundRequired')
   self.assertIsNotNone(pay.detail(result['payment'])['verified_at'])
+ def test_configuration_rejections_explain_fields_without_mutation(self):
+  before=dict(pay.config());events=j.one("SELECT COUNT(*) n FROM tt_audit WHERE action='PaymentModeChanged'").n
+  cases=[({'hold_minutes':0},'payment_hold_invalid'),({'verification_hours':0},'payment_verification_window_invalid'),({'verification_hours':'1.5'},'payment_verification_window_invalid'),({'reason':''},'payment_change_reason_required'),({'transition_plan':'x'*2001},'payment_transition_plan_invalid')]
+  for values,code in cases:
+   args={'mode':before['mode'],'revision':before['revision'],'reason':'Isolated configuration validation regression',**values}
+   with self.assertRaises(frappe.ValidationError):pay.configure(**args)
+   self.assertEqual(frappe.local.response['tele_tena_error'],code)
+   self.assertEqual(dict(pay.config()),before)
+  self.assertEqual(j.one("SELECT COUNT(*) n FROM tt_audit WHERE action='PaymentModeChanged'").n,events)
  def test_payment_reminder_is_idempotent_and_not_confirmation_score(self):
   result,_=self.book();id=result['payment'];frappe.db.sql('UPDATE tt_direct_payment SET created=DATE_SUB(UTC_TIMESTAMP(6),INTERVAL 2 HOUR) WHERE id=%s',(id,))
   pay.process_reminders();pay.process_reminders()
@@ -154,7 +163,8 @@ class DirectPayment(unittest.TestCase):
  def test_history_requires_a_transition_plan_without_converting_wallets(self):
   self.assertGreater(pay.transition_obligations()['legacy_wallet_holds'],0,'Retained compatibility fixture must include historical holds')
   before=frappe.db.sql('SELECT * FROM tt_wallet ORDER BY patient');count=j.one('SELECT COUNT(*) n FROM tt_journal').n;c=pay.config()
-  with self.assertRaises(frappe.ValidationError):pay.configure('Offline',c.revision,'No transition plan supplied')
+  with self.assertRaises(frappe.ValidationError):pay.configure('Offline',c.revision,'No transition plan supplied',transition_plan='None')
+  self.assertEqual(frappe.local.response['tele_tena_error'],'payment_transition_plan_required')
   pay.configure('Offline',c.revision,'Explicit isolated cutover test',transition_plan='Keep every historical wallet transaction under its original rules and retain authorized history, cancellation, dispute and release processing. No money is converted.')
   self.assertEqual(before,frappe.db.sql('SELECT * FROM tt_wallet ORDER BY patient'));self.assertEqual(count,j.one('SELECT COUNT(*) n FROM tt_journal').n)
  def test_couples_payment_keeps_payer_consent_and_language_separate(self):
