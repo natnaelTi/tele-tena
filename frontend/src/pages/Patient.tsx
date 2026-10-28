@@ -1,4 +1,4 @@
-import {usePaymentCapabilities,DirectLedger,DirectLedgerSummary} from '../components/DirectPayments';
+import {usePaymentCapabilities,DirectLedger,DirectLedgerSummary,PendingPaymentReviews} from '../components/DirectPayments';
 import {languageName} from '../components/CareLanguages';
 import {BookingNotices} from '../components/BookingNotices';
 import {discoveryFilters} from '../care-intent';
@@ -151,7 +151,7 @@ export function Appointments({ base = "/patient" }: { base?: string }) {
     return()=>observer.disconnect();
   },[view,resource.data,locale]);
   return <><PageTitle title={w(clinician?"Appointments":"Your appointments")} description={w("Upcoming care and past conversations, clearly separated.")} />
-    {!clinician&&<BookingNotices/>}
+    {clinician?<PendingPaymentReviews/>:<BookingNotices/>}
     {resource.error ? <InlineNotice tone="danger">{w("Appointments couldn’t be loaded.")} <Button onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice> : !resource.data ? <Skeleton/> : <>
       <nav ref={viewStrip} className="appointment-view-switch" aria-label={w("Appointment views")}>{views.map(([value,label])=><button type="button" key={value} aria-pressed={view===value} onClick={()=>setView(value)}>{w(label)} <span>{appointmentsForView(resource.data!,value,clinician,now).length}</span></button>)}</nav>
       {visible.length ? <div className="appointment-groups">{appointmentDisplayGroups(visible,view,clinician,now,locale).map(([title,rows])=><section key={title}><h2>{w(!clinician&&title==="Needs action"?"Awaiting confirmation":title)}</h2><div className="stack">{rows.map(a=><AppointmentCard key={a.id} appointment={a} base={base} view={view}/>)}</div></section>)}</div> : <EmptyState title={w(resource.data.length?"No appointments in this view.":"No appointments yet.")}><p>{w(resource.data.length?"Choose another view to find your conversations.":"Booked sessions will appear here.")}</p>{view!=="all"&&resource.data.length>0&&<Button variant="secondary" onClick={()=>setView("all")}>{w("View all appointments")}</Button>}{!clinician&&resource.data.length===0&&<Link className="button secondary" to="/patient/discovery">{w("Find care")}</Link>}</EmptyState>}

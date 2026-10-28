@@ -1,0 +1,14 @@
+.direct-payment-workspace{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,1fr);gap:24px;align-items:start}
+.direct-payment-workspace>.card{min-width:0;margin:0}
+.direct-payment-panel .summary-list dd{overflow-wrap:anywhere}
+.direct-payment-timeline ol{list-style:none;padding:0;margin:24px 0}
+.direct-payment-timeline li{position:relative;margin:0;padding:0 0 24px 24px;border-left:2px solid var(--border);overflow-wrap:anywhere}
+.direct-payment-timeline li::before{content:"";position:absolute;left:-6px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--brand)}
+.direct-payment-timeline time{display:block;color:var(--text-secondary);font-size:14px;margin-top:6px}
+.direct-payment-timeline>.button{white-space:normal;text-align:center}
+.direct-payment-status{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-block:20px}
+.direct-payment-status h2{font-size:20px}
+.pending-payment-reviews{margin-block:20px;background:var(--surface-subtle)}
+.pending-payment-reviews ul{list-style:none;padding:0;margin:0}
+.pending-payment-reviews li{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px;border-top:1px solid var(--border)}
+@media(max-width:900px){.direct-payment-workspace{grid-template-columns:1fr}.direct-payment-status{align-items:stretch;flex-direction:column}.pending-payment-reviews li{align-items:stretch;flex-direction:column}}
