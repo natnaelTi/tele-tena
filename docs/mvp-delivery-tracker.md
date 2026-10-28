@@ -1,3 +1,9 @@
+## Offline Telebirr Sprint — 28 October 2026
+
+Ten scoped groups are implemented and locally verified, with owner acceptance pending. Fresh Frappe16v1.47 install, populated upgrade/repeat preservation, direct and Wallet browsers, private evidence, full clinician onboarding, scheduler processing/recovery and translation exchange evidence are linked below. No hosted deployment or dataset refresh occurred.
+
+See [verification](offline-telebirr-verification-2026-10-28.md), [operator walkthrough](offline-telebirr-operator-walkthrough.md) and [update guide](selfmade-offline-telebirr-update.md).
+
 ## Clinician Onboarding / Contextual Access —22October2026
 
 Bounded revision from PR48, branch `feat/clinician-onboarding-context`; packaged

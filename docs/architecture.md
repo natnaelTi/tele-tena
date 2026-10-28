@@ -1,3 +1,9 @@
+## Direct-Payment and Language Revision — 28 October 2026
+
+Additivev1.45–v1.47 command tables store site mode/revision, immutable payable quote/payee/policy snapshots, private receipt bytes and append-only decisions. Existing appointment capacity gate serializes booking/acceptance/verification; no Offline Wallet posting occurs. Mode changes use the same lock and an audited legacy-obligation plan. Existing durable notification outbox and native scheduler/workers handle reminders/expiry. Language claims, decisions and offering selections are separate; legacy claims migrate Pending. Source-only CSV dictionaries import reviewed values with hash/placeholder validation and rollback. No shared Python dependency or framework/Amazon change.
+
+See [verification](offline-telebirr-verification-2026-10-28.md), [operator walkthrough](offline-telebirr-operator-walkthrough.md) and [update guide](selfmade-offline-telebirr-update.md).
+
 ## Professional application v1.44 —22October2026
 
 App-owned private draft/version/evidence/identity-reviewer tables are additive.

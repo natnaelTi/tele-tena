@@ -16499,11 +16499,11 @@
     }
   },
   "offline_telebirr_revision": {
-    "date": "2026-10-27",
+    "date": "2026-10-28",
     "branch": "feat/offline-telebirr-mvp",
     "backend_checkpoint": "ee8399b",
     "scope": "docs/offline-telebirr-sprint.md",
-    "owner_acceptance": "Pending",
+    "owner_acceptance": "Awaiting owner acceptance",
     "requirements": [
       {
         "group": 1,
@@ -16515,13 +16515,15 @@
           "H02",
           "I03"
         ],
-        "functional_status": "Implemented but unverified",
-        "visual_status": "Implemented but unverified",
-        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
         "evidence": [
-          "docs/offline-telebirr-sprint.md"
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
         ],
-        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "remaining_action": "Owner review of contextual labels; existing upload retention governance remains external.",
         "design_exception": null
       },
       {
@@ -16533,13 +16535,15 @@
           "H02",
           "I04"
         ],
-        "functional_status": "Implemented but unverified",
-        "visual_status": "Implemented but unverified",
-        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
         "evidence": [
-          "docs/offline-telebirr-sprint.md"
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
         ],
-        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "remaining_action": "Clinical-owner review of the seven proposed priority entries; partial source coverage remains disclosed.",
         "design_exception": null
       },
       {
@@ -16550,13 +16554,15 @@
           "H02",
           "I03"
         ],
-        "functional_status": "Implemented but unverified",
-        "visual_status": "Implemented but unverified",
-        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
         "evidence": [
-          "docs/offline-telebirr-sprint.md"
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
         ],
-        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "remaining_action": "Owner review; old storage identifiers and immutable submissions intentionally retained.",
         "design_exception": null
       },
       {
@@ -16567,13 +16573,15 @@
           "H02",
           "I03"
         ],
-        "functional_status": "Implemented but unverified",
-        "visual_status": "Implemented but unverified",
-        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
         "evidence": [
-          "docs/offline-telebirr-sprint.md"
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
         ],
-        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "remaining_action": "Clinical-owner approval of proposed domains/anchored self-rating vocabulary.",
         "design_exception": null
       },
       {
@@ -16582,13 +16590,15 @@
         "reference_screens": [
           "B06"
         ],
-        "functional_status": "Implemented but unverified",
-        "visual_status": "Implemented but unverified",
-        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
         "evidence": [
-          "docs/offline-telebirr-sprint.md"
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
         ],
-        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "remaining_action": "Owner review; live OTP delivery is separate from private transport verification.",
         "design_exception": null
       },
       {
@@ -16599,13 +16609,15 @@
           "C08",
           "D06"
         ],
-        "functional_status": "Implemented but unverified",
-        "visual_status": "Implemented but unverified",
-        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
         "evidence": [
-          "docs/offline-telebirr-sprint.md"
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
         ],
-        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "remaining_action": "Individual existing care-language claims need human review before new eligible booking.",
         "design_exception": null
       },
       {
@@ -16617,14 +16629,16 @@
           "H01",
           "I04"
         ],
-        "functional_status": "Backend scenarios functionally verified; browser/concurrency/job acceptance pending",
-        "visual_status": "Implemented but unverified",
-        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
         "evidence": [
-          "docs/offline-telebirr-sprint.md"
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
         ],
-        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
-        "design_exception": "Offline payment claims/verification/ledgers extend existing booking and financial components; prototype wallet states are retained for Wallet mode only."
+        "remaining_action": "Explicit financial-operator assignment/mode cutover and historical transaction plan on Selfmade.",
+        "design_exception": "New mode/payment/language states extend accepted shared cards and controls; exact older prototype does not contain these decisions. See comparison notes."
       },
       {
         "group": 8,
@@ -16638,14 +16652,16 @@
           "G05",
           "N02"
         ],
-        "functional_status": "Backend scenarios functionally verified; browser/concurrency/job acceptance pending",
-        "visual_status": "Implemented but unverified",
-        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
         "evidence": [
-          "docs/offline-telebirr-sprint.md"
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
         ],
-        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
-        "design_exception": "Offline payment claims/verification/ledgers extend existing booking and financial components; prototype wallet states are retained for Wallet mode only."
+        "remaining_action": "Owner review and bounded consenting external transfer/receipt/refund verification; no provider API or platform settlement.",
+        "design_exception": "New mode/payment/language states extend accepted shared cards and controls; exact older prototype does not contain these decisions. See comparison notes."
       },
       {
         "group": 9,
@@ -16656,13 +16672,15 @@
           "H01",
           "I03"
         ],
-        "functional_status": "Implemented but unverified",
-        "visual_status": "Implemented but unverified",
-        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "functional_status": "Functionally verified",
+        "visual_status": "Not applicable — source CSV tooling; reviewed dictionary UI falls back safely",
+        "owner_status": "Awaiting owner acceptance",
         "evidence": [
-          "docs/offline-telebirr-sprint.md"
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
         ],
-        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
+        "remaining_action": "Native-language translation review/import; missing/provisional values are not approved.",
         "design_exception": null
       },
       {
@@ -16675,15 +16693,19 @@
           "H02",
           "I03"
         ],
-        "functional_status": "Backend scenarios functionally verified; browser/concurrency/job acceptance pending",
-        "visual_status": "Implemented but unverified",
-        "owner_status": "Awaiting owner acceptance after sprint verification",
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
         "evidence": [
-          "docs/offline-telebirr-sprint.md"
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
         ],
-        "remaining_action": "Complete connected production-built browser, permissions, responsive/zoom and visual comparisons; remaining scoped regressions listed in sprint checklist.",
-        "design_exception": null
+        "remaining_action": "Clinical review of scale and individual language decisions; interface locales confer no care eligibility.",
+        "design_exception": "New mode/payment/language states extend accepted shared cards and controls; exact older prototype does not contain these decisions. See comparison notes."
       }
-    ]
+    ],
+    "runtime_commit": "d553253d8dc24681ceaa5cd71c9bc6881fe46483",
+    "verification": "docs/offline-telebirr-verification-2026-10-28.md"
   }
 }

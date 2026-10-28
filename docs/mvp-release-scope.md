@@ -1,3 +1,9 @@
+## Offline Payment and Care-Language Amendment — 28 October 2026
+
+New payable bookings can use administrator-selected Offline Direct Payment. Existing Wallet transactions retain their original rules. This supersedes mandatory Wallet funding for new Offline bookings, not historical finance. Individual care-language claims/reviewer decisions gate offering publication/discovery/matching/booking. No new real-money provider is activated.
+
+See [verification](offline-telebirr-verification-2026-10-28.md), [operator walkthrough](offline-telebirr-operator-walkthrough.md) and [update guide](selfmade-offline-telebirr-update.md).
+
 ## Guest-first direction —17October2026
 
 Public directory,structured reactive filters,intent-aware authentication,volatile

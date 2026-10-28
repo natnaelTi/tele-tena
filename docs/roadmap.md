@@ -1,3 +1,9 @@
+## MVP Payment Revision — 28 October 2026
+
+Offline patient-to-clinician Telebirr claim/verification and Expenses/Revenue Ledgers are implemented locally. Integrated Wallet remains selectable by financial administrators; new external collection/custody/payout rails remain deferred. Clinical vocabulary/language approval, real delivery, policy/translation and owner acceptance remain external gates. The public roadmap website has not been changed.
+
+See [verification](offline-telebirr-verification-2026-10-28.md), [operator walkthrough](offline-telebirr-operator-walkthrough.md) and [update guide](selfmade-offline-telebirr-update.md).
+
 ## Guest-first revision —17October2026
 
 AI care search and its natural-language bar are jointly deferred post-MVP. Structured guest clinicians/services,live filters,safe auth return and private request drafting are the current care entry. Existing invitation types remain;universal Invite needs optional owner review and is not authorized. Other MVP rules and post-handover modules remain unchanged. See the current guest-first verification report and existing matrix.

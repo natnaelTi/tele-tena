@@ -5,20 +5,20 @@ Baseline: PR49 `24baa364c65d666db7c4f35e69ef3a35ee4e8a56`, packaged
 is dependent on PR49, preserving earlier ancestry. No remote deployment, merge,
 scenario reseed, provider change or shared dependency repair.
 
-This checklist extends the authoritative MVP matrix. Requested is not verified.
+This checklist extends the authoritative MVP matrix. Initial request recorded27October; verified local evidence added28October. Owner acceptance is separate. See [final evidence](offline-telebirr-verification-2026-10-28.md).
 
 | Group | Status | Acceptance |
 |---|---|---|
-|1 Contextual uploads|Requested|Purpose-specific labels, accurate formats/limits, private permission checks|
-|2 Ethiopia priority|Requested|Sourced provisional curated priority, reviewer maintenance, server ordering before paging, no nonmatching pins/double entries|
-|3 Credentials wording|Requested|Repeatable titles/files/date/issuer preserved; old fields/submissions compatible|
-|4 Competencies|Requested|Grouped configurable proposed domains, explicit self-rating, no domain uploads/history loss|
-|5 Onboarding sign-out|Requested|Save/discard/error recovery, server logout, sensitive-state clearing and saved-step resume|
-|6 Booking language|Requested|Saved care preference/first valid default, explicit-choice retention, actual offering approval revalidation|
-|7 Payment modes|Requested|Explicit financial-admin control, no automatic remote mode change, historical mode snapshots/stale-client safety|
-|8 Direct Telebirr|Requested|Payee setup, protected payable intent, private immutable receipt history, human verification, booking acceptance, ledgers/refunds/extension/couples/outbox/jobs|
-|9 Localization exchange|Requested|Complete source-only CSV, safe reversible spreadsheet encoding, validated reviewed import/diff/history/rollback|
-|10 Care languages|Requested|Catalog, explicit claims/self-rating, individual reviewer decisions, offering/discovery/matching enforcement|
+|1 Contextual uploads|Locally verified; owner review pending|Purpose-specific labels, accurate formats/limits, private permission checks|
+|2 Ethiopia priority|Locally verified; owner review pending|Sourced provisional curated priority, reviewer maintenance, server ordering before paging, no nonmatching pins/double entries|
+|3 Credentials wording|Locally verified; owner review pending|Repeatable titles/files/date/issuer preserved; old fields/submissions compatible|
+|4 Competencies|Locally verified; owner review pending|Grouped configurable proposed domains, explicit self-rating, no domain uploads/history loss|
+|5 Onboarding sign-out|Locally verified; owner review pending|Save/discard/error recovery, server logout, sensitive-state clearing and saved-step resume|
+|6 Booking language|Locally verified; owner review pending|Saved care preference/first valid default, explicit-choice retention, actual offering approval revalidation|
+|7 Payment modes|Locally verified; owner review pending|Explicit financial-admin control, no automatic remote mode change, historical mode snapshots/stale-client safety|
+|8 Direct Telebirr|Locally verified; owner review pending|Payee setup, protected payable intent, private immutable receipt history, human verification, booking acceptance, ledgers/refunds/extension/couples/outbox/jobs|
+|9 Localization exchange|Locally verified; owner review pending|Complete source-only CSV, safe reversible spreadsheet encoding, validated reviewed import/diff/history/rollback|
+|10 Care languages|Locally verified; owner review pending|Catalog, explicit claims/self-rating, individual reviewer decisions, offering/discovery/matching enforcement|
 
 ## Payment decisions and safety boundary
 
@@ -55,3 +55,8 @@ clinical vocabulary/priority review, native translations and production policies
   duplicate/unknown/stale rejection, provisional exclusion, reviewed history).
 - Production preview still serves the previous packaged commit until the new
   source is checkpointed, packaged and browser-verified. No release acceptance.
+
+
+## Completion Evidence — 28 October
+
+Runtime/build `d553253d8dc24681ceaa5cd71c9bc6881fe46483`. The earlier development checks above remain historical. Final17 payment tests,9 professional tests,4 localization exchange tests, fresh/upgrade/repeat migrations, both-mode browsers, full clinician submission, actual scheduler/restart recovery and paired responsive/200% visual evidence are recorded in the final report. External/human gates are explicitly separate. No remote mode switch, deployment, merge or existing demo reseed.

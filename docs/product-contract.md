@@ -22,7 +22,7 @@ review. New booking/publication/matching requires approved offering languages.
 The expanded competency/navigation vocabulary and language scale are proposed
 for clinical-owner review. Directory priority conveys no accreditation.
 
-Implementation and acceptance remain tracked in `offline-telebirr-sprint.md` and
+Local implementation/verification is recorded in `offline-telebirr-verification-2026-10-28.md`; owner acceptance and external activation remain pending. Implementation and acceptance remain tracked in `offline-telebirr-sprint.md` and
 the existing screen matrix; this section records requested behavior, not a claim
 that all browser/scheduler/visual acceptance has passed.
 
