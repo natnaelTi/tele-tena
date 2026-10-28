@@ -569,3 +569,14 @@ verification must not supersede the queued submission email/SMS. Each respects
 recipient preferences, verified contact, site/provider availability and SMS caps.
 Provider acceptance is not delivery. Reminders remain conditional on current state.
 No mode, payment verification, appointment acceptance or money rules change here.
+
+### Shared Notifications Recovery — 28 October 2026
+
+Patient and clinician bells share the same pane and actor-scoped live feed. New
+payment popups use unseen server event IDs, never the browser wall clock; historical
+unread events remain in the bell. A five-second poll and visibility/focus/reconnect
+recovery refresh open payment queues and pages. A stalled request times out after
+eight seconds; one failed source does not suppress the other successful source.
+Accepted-offer popups and server-authorized deep links/read handling are preserved.
+This supersedes independent client pollers, not notification permissions or delivery
+semantics. Closed/unreachable browsers do not imply notification presentation.

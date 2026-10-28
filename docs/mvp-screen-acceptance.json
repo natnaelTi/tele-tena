@@ -16762,6 +16762,26 @@
         "docs/screenshots/payment-live",
         "scripts/browser-payment-live.cjs"
       ]
+    },
+    "clinician_notifications_revision": {
+      "date": "2026-10-28",
+      "runtime_commit": "3e6aa71765b90d68174e6a0783ec46633013461b",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex",
+      "owner_status": "Awaiting owner acceptance",
+      "routes": [
+        "All authenticated patient/clinician routes: shared notification feed",
+        "/clinician/requests",
+        "/clinician/account",
+        "/clinician/direct-payments/:id",
+        "/patient/direct-payments/:id"
+      ],
+      "reference": "Existing patient Notifications pane; owner-requested same component for clinician; accepted-offer popup preserved",
+      "evidence": [
+        "docs/clinician-notifications-verification-2026-10-28.md",
+        "docs/screenshots/clinician-notifications"
+      ],
+      "remaining": "Owner acceptance; no live external delivery claims"
     }
   }
 }
