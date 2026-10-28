@@ -16,7 +16,7 @@ class DirectPayment(unittest.TestCase):
  def tearDown(self):frappe.db.rollback(save_point='payment_test');frappe.set_user('Administrator')
  def book(self,mode='Offline',key=None,expensive=False):
   c=pay.config()
-  if c.mode!=mode:pay.configure(mode,c.revision,'Isolated rollback test only')
+  if c.mode!=mode:pay.configure(mode,c.revision,'Isolated rollback test only',transition_plan='Preserve all historical wallets and original transaction rules; this rollback fixture does not change existing financial data.')
   frappe.set_user(users['counselor']);pay.save_payee('+251911234567',pay.payee()['revision'],'Synthetic payee for rollback test')
   from tele_tena.api import care_languages
   care_languages.save_claims([{'code':'en','proficiency':3,'explanation':'Explicit synthetic self-assessment for rollback-only test'}])
@@ -42,10 +42,16 @@ class DirectPayment(unittest.TestCase):
  def test_direct_confirmation_no_wallet_postings(self):
   before=frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0];result,args=self.book();self.assertEqual(result['state'],'AwaitingPayment')
   id=result['payment'];self.assertEqual(j.book(**args)['payment'],id)
-  first=self.receipt(id);self.assertEqual(first['state'],'Submitted');self.assertEqual(self.receipt(id)['history'],first['history'])
+  self.assertIsNone(j.one('SELECT confirmed_at FROM tt_appointment WHERE id=%s',(result['id'],)).confirmed_at)
+  self.assertEqual(j.one("SELECT COUNT(*) n FROM tt_appointment_event WHERE appointment=%s AND event_type IN ('Booked','Confirmed')",(result['id'],)).n,0)
+  first=self.receipt(id);self.assertEqual(first['state'],'Submitted');self.assertEqual(self.receipt(id)['history'],first['history']);self.assertEqual(self.receipt(id,'another-tab')['history'],first['history'])
   frappe.set_user(users['therapist'])
   with self.assertRaises(frappe.PermissionError):pay.detail(id)
-  frappe.set_user(users['counselor']);verified=pay.review(id,'confirm','verify');self.assertEqual(verified['state'],'Verified');pay.review(id,'confirm','verify')
+  with self.assertRaises(frappe.PermissionError):pay.for_appointment(result['id'])
+  with self.assertRaises(frappe.PermissionError):pay.detail(str(uuid.uuid4()))
+  frappe.set_user(users['counselor']);verified=pay.review(id,'confirm','verify');self.assertEqual(verified['state'],'Verified');pay.review(id,'confirm','verify');pay.review(id,'confirm','other-tab')
+  self.assertEqual(j.one("SELECT COUNT(*) n FROM tt_direct_payment_event WHERE payment=%s AND event='ReceiptVerified'",(id,)).n,1)
+  with self.assertRaises(frappe.ValidationError):pay.review(id,'confirm','verify','Changed retry details')
   self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0],before)
   self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_direct_payment WHERE id=%s',(id,))[0][0],1)
  def test_late_claim_is_retained_for_reconciliation(self):
@@ -81,6 +87,7 @@ class DirectPayment(unittest.TestCase):
   self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0],before)
  def test_wrong_amount_retained_without_false_verification(self):
   result,_=self.book();id=result['payment'];self.assertEqual(self.receipt(id,amount=1)['state'],'ReconciliationRequired')
+  self.assertEqual(pay.ledger()['totals_minor']['ReconciliationRequired'],1)
   frappe.set_user(users['counselor']);self.assertEqual(pay.review(id,'confirm','wrong-amount')['state'],'RefundRequired')
   self.assertNotEqual(j.one('SELECT state FROM tt_appointment WHERE id=%s',(result['id'],)).state,'Booked')
  def test_manual_acceptance_is_distinct_from_receipt(self):
@@ -126,6 +133,53 @@ class DirectPayment(unittest.TestCase):
   self.assertTrue(priorities);self.assertEqual([x.id for x in items], [x.id for x in directory.search('issuer')['items']]);self.assertEqual(items[:len(priorities)],priorities)
   self.assertFalse(any(x.priority_et for x in directory.search('issuer',search='Harvard')['items']))
   with self.assertRaises(frappe.PermissionError):directory.set_priority(priorities[0].id,False,'https://ror.org/','Not an authorized navigation reviewer')
+ def test_finalization_does_not_credit_direct_payment_again(self):
+  from tele_tena.api import consultations,presentation
+  from unittest.mock import patch
+  result,_=self.book();id=result['payment'];self.receipt(id);frappe.set_user(users['counselor']);pay.review(id,'confirm','verify-before-call')
+  if j.one('SELECT state FROM tt_appointment WHERE id=%s',(result['id'],)).state=='PendingConfirmation':presentation.respond_to_request(result['id'],'confirm')
+  with patch('tele_tena.api.consultations._window',return_value=True),patch('tele_tena.livekit._credentials',return_value=('wss://test.invalid','test','test')),patch('tele_tena.livekit.participant_token',return_value='private-fake-provider-token'):
+   consultations.join(result['id'])
+  # Preserve this test's outer rollback while exercising unchanged End logic;
+  # room I/O and commit durability are inherited hosted-call evidence, not claimed here.
+  with patch.object(frappe.db,'commit'),patch('tele_tena.livekit.close_room'):
+   consultations.end(result['id'])
+  before=j.one('SELECT COUNT(*) n FROM tt_journal').n
+  presentation.save_note_draft(result['id'],'Private synthetic note for isolation assertion','Shared synthetic follow-up',False)
+  first=presentation.finalize_consultation(result['id'],True,False);again=presentation.finalize_consultation(result['id'],True,False)
+  self.assertEqual(first['revision'],again['revision']);self.assertTrue(again['idempotent']);self.assertEqual(again['earning_state'],'DirectReceiptRecorded')
+  self.assertEqual(j.one('SELECT COUNT(*) n FROM tt_earning WHERE appointment=%s',(result['id'],)).n,0)
+  self.assertEqual(j.one('SELECT COUNT(*) n FROM tt_journal').n,before)
+  frappe.set_user(users['patient']);view=presentation.appointment_detail(result['id']);self.assertNotIn('Private synthetic note for isolation assertion',json.dumps(view,default=str));self.assertEqual(view['status'],'Completed')
+ def test_history_requires_a_transition_plan_without_converting_wallets(self):
+  self.assertGreater(pay.transition_obligations()['legacy_wallet_holds'],0,'Retained compatibility fixture must include historical holds')
+  before=frappe.db.sql('SELECT * FROM tt_wallet ORDER BY patient');count=j.one('SELECT COUNT(*) n FROM tt_journal').n;c=pay.config()
+  with self.assertRaises(frappe.ValidationError):pay.configure('Offline',c.revision,'No transition plan supplied')
+  pay.configure('Offline',c.revision,'Explicit isolated cutover test',transition_plan='Keep every historical wallet transaction under its original rules and retain authorized history, cancellation, dispute and release processing. No money is converted.')
+  self.assertEqual(before,frappe.db.sql('SELECT * FROM tt_wallet ORDER BY patient'));self.assertEqual(count,j.one('SELECT COUNT(*) n FROM tt_journal').n)
+ def test_couples_payment_keeps_payer_consent_and_language_separate(self):
+  from tele_tena.api import couples,care_languages,presentation
+  pay.configure('Offline',pay.config().revision,'Isolated couples payment test',transition_plan='Preserve every historical wallet and original booking policy. Only new synthetic bookings use direct payment in this rollback.')
+  offer=j.one("SELECT o.* FROM tt_offering o JOIN `tabTele Tena Service` s ON s.name=o.service WHERE s.participant_structure='couple' AND o.active=1 LIMIT 1")
+  frappe.set_user(offer.clinician);care_languages.save_claims([{'code':'en','proficiency':3,'explanation':'Synthetic explicit couples language claim'}]);pay.save_payee('+251911234567',pay.payee()['revision'],'Synthetic receiving number for rollback couples test')
+  frappe.set_user('Administrator');care_languages.decide(offer.clinician,'en','Approved','Synthetic individual language decision, not clinical verification')
+  payer=users['couple_payer'];partner=users['couple_partner'];frappe.set_user(payer)
+  from datetime import datetime,timedelta,timezone
+  cal=scheduling.calendar(offer.id,(datetime.now(timezone.utc)+timedelta(days=2)).date().isoformat(),days=7,display_timezone='Africa/Addis_Ababa');start=next(slot['start'] for day in cal['days'] for slot in day['slots']);sharing={'name':False,'history':False};disclosure=j.disclosure(j.profile('patient'),'',sharing)
+  invitation=couples.invite(offer.id,start,'',sharing,disclosure,True,'couples-payment-language',care_language='en')
+  frappe.set_user(partner);other_disclosure=j.disclosure(j.profile('patient'),'',sharing);couples.consent(invitation['token'],'',sharing,other_disclosure,True)
+  with self.assertRaises((frappe.PermissionError,frappe.ValidationError)):couples.confirm(invitation['id'],expected_payment_mode='Offline',payment_mode_revision=pay.config().revision)
+  frappe.set_user(payer);before=j.one('SELECT COUNT(*) n FROM tt_journal').n;booking=couples.confirm(invitation['id'],expected_payment_mode='Offline',payment_mode_revision=pay.config().revision);self.assertEqual(couples.confirm(invitation['id'])['payment'],booking['payment'])
+  self.assertEqual(json.loads(j.one('SELECT policy_snapshot FROM tt_appointment WHERE id=%s',(booking['id'],)).policy_snapshot)['care_language'],'en')
+  self.receipt(booking['payment']);receipt_id=next(x.evidence for x in pay.detail(booking['payment'])['history'] if x.evidence)
+  frappe.set_user(partner)
+  with self.assertRaises(frappe.PermissionError):pay.detail(booking['payment'])
+  with self.assertRaises(frappe.PermissionError):pay.receipt(receipt_id)
+  frappe.set_user(offer.clinician);pay.review(booking['payment'],'confirm','couples-payment-review')
+  if j.one('SELECT state FROM tt_appointment WHERE id=%s',(booking['id'],)).state=='PendingConfirmation':presentation.respond_to_request(booking['id'],'confirm')
+  self.assertEqual(j.one("SELECT COUNT(*) n FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment'",(booking['id'],)).n,1)
+  self.assertEqual(j.one('SELECT COUNT(*) n FROM tt_journal').n,before)
+  frappe.set_user(partner);self.assertTrue(any(x.id==booking['id'] for x in j.appointments()))
  def test_mode_configuration_is_privileged(self):
   frappe.set_user(users['reviewer'])
   if 'Tele Tena Financial Configuration' not in frappe.get_roles():

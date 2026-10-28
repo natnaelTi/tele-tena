@@ -13,17 +13,24 @@ def administrator():
     return user
 @query()
 def capabilities():
-    c=config();user=actor();return {'mode':c.mode,'revision':c.revision,'hold_minutes':c.hold_minutes,'verification_hours':c.verification_hours,'can_configure':user=='Administrator' or 'Tele Tena Financial Configuration' in frappe.get_roles(user),'wallet_funding':c.mode=='Wallet','platform_payouts':c.mode=='Wallet'}
+    c=config();user=actor();allowed=user=='Administrator' or 'Tele Tena Financial Configuration' in frappe.get_roles(user)
+    out={'mode':c.mode,'revision':c.revision,'hold_minutes':c.hold_minutes,'verification_hours':c.verification_hours,'can_configure':allowed,'wallet_funding':c.mode=='Wallet','platform_payouts':c.mode=='Wallet'}
+    if allowed:out.update(transition_obligations())
+    return out
+def transition_obligations():
+    return {'unresolved_direct':one("SELECT COUNT(*) n FROM tt_direct_payment WHERE state IN ('ReconciliationRequired','RefundRequired','RefundReported')").n,'legacy_wallet_holds':one('SELECT COUNT(*) n FROM tt_wallet WHERE reserved>0').n+one("SELECT COUNT(*) n FROM tt_payout WHERE state IN ('Requested','Processing')").n}
 @command
-def configure(mode,revision,reason,hold_minutes=30,verification_hours=24):
+def configure(mode,revision,reason,hold_minutes=30,verification_hours=24,transition_plan=''):
     user=administrator();one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE');c=config(True)
     if mode not in ('Wallet','Offline'):fail('Choose a supported payment mode.')
     if int(revision)!=c.revision:fail('Payment configuration changed. Reload before saving.','payment_mode_changed')
     reason=text(reason,1000);hold_minutes=integer(hold_minutes,5,120);verification_hours=integer(verification_hours,1,72)
     if rows("SELECT id FROM tt_direct_payment WHERE state IN ('AwaitingPayment','Submitted','CorrectionRequired') LIMIT 1"):
         fail('Resolve active direct-payment holds before changing payment configuration.','payment_transition_blocked')
+    obligations=transition_obligations();transition_plan=text(transition_plan,2000,False)
+    if mode!=c.mode and any(obligations.values()) and len(transition_plan)<20:fail('Record how existing wallet holds and external payment/refund obligations will be managed before changing mode.','payment_transition_plan_required')
     frappe.db.sql('UPDATE tt_payment_config SET mode=%s,revision=revision+1,hold_minutes=%s,verification_hours=%s,modified=UTC_TIMESTAMP(6) WHERE id=1',(mode,hold_minutes,verification_hours))
-    audit(user,'PaymentModeChanged',{'before':c.mode,'after':mode,'prior_revision':c.revision,'reason':reason,'hold_minutes':hold_minutes,'verification_hours':verification_hours})
+    audit(user,'PaymentModeChanged',{'before':c.mode,'after':mode,'prior_revision':c.revision,'reason':reason,'hold_minutes':hold_minutes,'verification_hours':verification_hours,'transition_plan':transition_plan,'obligations':obligations})
     return capabilities()
 @query()
 def payee():
@@ -42,16 +49,17 @@ def require_payee(clinician):
     if not found:fail('This clinician must configure a Telebirr receiving number before accepting direct payments.','payee_required')
     return found[0]
 def authorize(id,lock=False):
-    user=actor();p=one('SELECT * FROM tt_direct_payment WHERE id=%s'+(' FOR UPDATE' if lock else ''),(id,))
-    if user not in (p.patient,p.clinician):frappe.throw('Payment unavailable',frappe.PermissionError)
-    return p,user
+    user=actor();found=rows('SELECT * FROM tt_direct_payment WHERE id=%s AND (patient=%s OR clinician=%s)'+(' FOR UPDATE' if lock else ''),(id,user,user))
+    if not found:frappe.throw('Payment unavailable',frappe.PermissionError)
+    return found[0],user
 
-def event(p,user,kind,key,values,evidence=None,reason=''):
+def event(p,user,kind,key,values,evidence=None,reason='',create=True):
     key=text(key,100);digest=hashlib.sha256(json.dumps([kind,values],sort_keys=True).encode()).hexdigest()
     old=rows('SELECT id,payload_hash FROM tt_direct_payment_event WHERE payment=%s AND actor=%s AND retry_key=%s',(p.id,user,key))
     if old:
         if old[0].payload_hash!=digest:fail('This retry contains different payment details.','retry_changed')
         return False
+    if not create:return False
     id=str(uuid.uuid4());frappe.db.sql('INSERT INTO tt_direct_payment_event (id,payment,actor,event,retry_key,payload_hash,evidence,reason,details,created) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))',(id,p.id,user,kind,key,digest,evidence,reason,json.dumps(values)))
     return id
 
@@ -82,6 +90,8 @@ def detail(id):
     return out
 @query()
 def for_appointment(appointment):
+    user=actor()
+    if not rows('SELECT id FROM tt_appointment WHERE id=%s AND (patient=%s OR clinician=%s)',(appointment,user,user)):frappe.throw('Payment unavailable',frappe.PermissionError)
     found=rows("SELECT id FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment'",(appointment,))
     return detail(found[0].id) if found else None
 @command
@@ -95,6 +105,9 @@ def submit(id,transaction_ref,amount,filename,content_base64,retry_key):
     filename,mime,content=validated(filename,content_base64)
     if mime not in ('image/jpeg','image/png'):fail('Upload a JPEG or PNG receipt screenshot up to 5 MB.','receipt_invalid')
     digest=hashlib.sha256(content).hexdigest();values={'ref':ref,'amount':amount,'receipt_hash':digest}
+    latest=rows("SELECT details FROM tt_direct_payment_event WHERE payment=%s AND event='PaymentSubmitted' ORDER BY created DESC,id DESC LIMIT 1",(id,))
+    if p.state in ('Submitted','ReconciliationRequired') and latest and json.loads(latest[0].details or '{}')==values:
+        event(p,user,'PaymentSubmitted',retry_key,values,create=False);return detail(id)
     eid=event(p,user,'PaymentSubmitted',retry_key,values)
     if not eid:return detail(id)
     if p.state in ('Verified','RefundRequired','RefundReported','RefundConfirmed'):fail('This payment already has a recorded verification or refund.','payment_resolved')
@@ -114,7 +127,11 @@ def review(id,decision,retry_key,reason=''):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE');p,user=authorize(id,True)
     if user!=p.clinician:frappe.throw('Only the receiving clinician may verify receipt',frappe.PermissionError)
     if decision not in ('confirm','correct','reject','dispute'):fail('Choose a payment decision.')
-    reason=text(reason,1000,decision!='confirm');eid=event(p,user,{'confirm':'ReceiptVerified','correct':'CorrectionRequested','reject':'ReceiptRejected','dispute':'PaymentDisputed'}[decision],retry_key,{'decision':decision,'reason':reason},reason=reason)
+    if decision in ('correct','reject') and not p.transaction_ref:fail('Review submitted payment evidence first.','receipt_required')
+    reason=text(reason,1000,decision!='confirm')
+    if decision=='confirm' and p.verified_at:
+        event(p,user,'ReceiptVerified',retry_key,{'decision':decision,'reason':reason},create=False);return detail(id)
+    eid=event(p,user,{'confirm':'ReceiptVerified','correct':'CorrectionRequested','reject':'ReceiptRejected','dispute':'PaymentDisputed'}[decision],retry_key,{'decision':decision,'reason':reason},reason=reason)
     if not eid:return detail(id)
     if decision=='dispute':
         state='ReconciliationRequired'
@@ -145,12 +162,17 @@ def review(id,decision,retry_key,reason=''):
         state='Verified' if safe else 'RefundRequired'
         frappe.db.sql('UPDATE tt_direct_payment SET verified_at=UTC_TIMESTAMP(6),verified_by=%s WHERE id=%s',(user,id))
         if safe and p.reference_type=='Appointment':
-            automatic=app.confirmation_mode=='automatic';expiry=None if automatic else min(app.start,now()+timedelta(hours=max(1,min(168,int(frappe.conf.get('tele_tena_pending_expiry_hours',24))))))
+            automatic=app.confirmation_mode=='automatic'
+            notice_policy=json.loads(app.policy_snapshot or '{}').get('notifications',{})
+            hours=max(1,min(168,int(notice_policy.get('confirmation_expiry_hours') or 24)))
+            expiry=None if automatic else min(app.start,now()+timedelta(hours=hours))
             frappe.db.sql('UPDATE tt_appointment SET state=%s,confirmed_at=%s,expires_at=%s WHERE id=%s',('Booked' if automatic else 'PendingConfirmation',now() if automatic else None,expiry,app.id))
     frappe.db.sql('UPDATE tt_direct_payment SET state=%s WHERE id=%s',(state,id))
     notify(p,'PaymentVerified' if state=='Verified' else 'PaymentCorrection' if state in ('CorrectionRequired','Rejected') else 'PaymentReconciliation',eid)
     if state=='Verified' and p.reference_type=='Appointment':
         from tele_tena.booking_notifications import create
+        from tele_tena.api.presentation import _event
+        _event(p.appointment,'Confirmed' if automatic else 'AwaitingClinicianAcceptance',user)
         create(p.appointment,'Booked' if automatic else 'PendingConfirmation')
     return detail(id)
 def cancel(appointment,reason):
@@ -159,7 +181,7 @@ def cancel(appointment,reason):
         state='RefundRequired' if p.verified_at else 'ReconciliationRequired' if p.transaction_ref else 'Expired'
         eid=event(p,frappe.session.user or 'System','BookingClosed','close:'+reason,{'reason':reason},reason=reason)
         frappe.db.sql('UPDATE tt_direct_payment SET state=%s WHERE id=%s',(state,p.id))
-        if eid:notify(p,'PaymentReconciliation',eid)
+        if eid and (p.transaction_ref or p.verified_at):notify(p,'PaymentReconciliation',eid)
     return False
 
 @command
@@ -175,17 +197,19 @@ def refund(id,decision,retry_key,reason):
     return detail(id)
 @query()
 def receipt(id):
-    actor()
-    r=one('SELECT * FROM tt_direct_receipt WHERE id=%s',(id,));authorize(r.payment)
+    user=actor();found=rows('SELECT r.* FROM tt_direct_receipt r JOIN tt_direct_payment p ON BINARY p.id=BINARY r.payment WHERE r.id=%s AND (p.patient=%s OR p.clinician=%s)',(id,user,user))
+    if not found:frappe.throw('Payment receipt unavailable',frappe.PermissionError)
+    r=found[0]
     from werkzeug.wrappers import Response
     return Response(bytes(r.content),mimetype=r.mime,headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Disposition':"attachment; filename*=UTF-8''"+quote(r.filename,safe=''),'Content-Security-Policy':"sandbox; default-src 'none'"})
 @query()
 def ledger(page=0):
-    user=actor();page=integer(page,0,100000);data=rows('SELECT p.id,p.appointment,p.amount,p.currency,p.state,p.transaction_ref,p.verified_at,p.created,p.reference_type,a.disclosure,IF(p.patient=%s,provider.display_name,NULL) clinician_name FROM tt_direct_payment p JOIN tt_appointment a ON a.id=p.appointment LEFT JOIN tt_profile provider ON provider.user=p.clinician WHERE p.patient=%s OR p.clinician=%s ORDER BY p.created DESC,p.id LIMIT 101 OFFSET %s',(user,user,user,page*100))
+    user=actor();page=integer(page,0,100000);data=rows('SELECT p.id,p.appointment,p.amount,p.currency,p.state,p.transaction_ref,p.verified_at,p.created,p.reference_type,a.disclosure,p.patient=%s you_pay,IF(p.patient=%s,provider.display_name,NULL) clinician_name FROM tt_direct_payment p JOIN tt_appointment a ON BINARY a.id=BINARY p.appointment LEFT JOIN tt_profile provider ON BINARY provider.user=BINARY p.clinician WHERE p.patient=%s OR p.clinician=%s ORDER BY p.created DESC,p.id LIMIT 101 OFFSET %s',(user,user,user,user,page*100))
     from tele_tena.api.journey import iso
     has_more=len(data)>100;data=data[:100]
     for row in data:
-        row.counterparty=row.pop('clinician_name') or json.loads(row.pop('disclosure') or '{}').get('name') or 'Private Patient'
+        disclosure=json.loads(row.pop('disclosure') or '{}');provider=row.pop('clinician_name')
+        row.counterparty=provider if row.you_pay else disclosure.get('name') or disclosure.get('alias')
         row.pop('disclosure',None)
         row.created=iso(row.created);row.verified_at=iso(row.verified_at) if row.verified_at else None
     claim="(SELECT CAST(JSON_UNQUOTE(JSON_EXTRACT(e.details,'$.amount')) AS UNSIGNED) FROM tt_direct_payment_event e WHERE e.payment=p.id AND e.event='PaymentSubmitted' ORDER BY e.created DESC,e.id DESC LIMIT 1)"
@@ -219,7 +243,7 @@ def close_extension(extension,reason):
         p=p[0];state='RefundRequired' if p.verified_at else 'ReconciliationRequired' if p.transaction_ref else 'Expired'
         eid=event(p,frappe.session.user or 'System','ExtensionClosed','extension-close',{'reason':reason},reason=reason)
         frappe.db.sql('UPDATE tt_direct_payment SET state=%s WHERE id=%s',(state,p.id))
-        if eid:notify(p,'PaymentReconciliation',eid)
+        if eid and (p.transaction_ref or p.verified_at):notify(p,'PaymentReconciliation',eid)
 
 
 def process_reminders():
@@ -228,17 +252,22 @@ def process_reminders():
     Timing derives from the snapshotted hold/verification deadline, never from
     the separate three-minute appointment-confirmation policy. No provider I/O.
     """
-    for candidate in rows("""SELECT id FROM tt_direct_payment WHERE
-        (state IN ('AwaitingPayment','CorrectionRequired') AND hold_until>UTC_TIMESTAMP(6)
-          AND UTC_TIMESTAMP(6)>=TIMESTAMPADD(SECOND,TIMESTAMPDIFF(SECOND,created,hold_until) DIV 2,created))
-        OR (state='Submitted' AND verify_until>UTC_TIMESTAMP(6)
-          AND UTC_TIMESTAMP(6)>=TIMESTAMPADD(SECOND,TIMESTAMPDIFF(SECOND,created,verify_until) DIV 2,created))
-        ORDER BY created,id LIMIT 100"""):
+    for candidate in rows("""SELECT p.id FROM tt_direct_payment p
+        LEFT JOIN (SELECT payment,MIN(created) submitted FROM tt_direct_payment_event
+          WHERE event='PaymentSubmitted' GROUP BY payment) proof ON proof.payment=p.id
+        WHERE p.state IN ('AwaitingPayment','CorrectionRequired','Submitted')
+        AND IF(p.state='AwaitingPayment',p.hold_until,p.verify_until)>UTC_TIMESTAMP(6)
+        AND UTC_TIMESTAMP(6)>=TIMESTAMPADD(SECOND,
+          TIMESTAMPDIFF(SECOND,IF(p.state='AwaitingPayment',p.created,COALESCE(proof.submitted,p.created)),
+            IF(p.state='AwaitingPayment',p.hold_until,p.verify_until)) DIV 2,
+          IF(p.state='AwaitingPayment',p.created,COALESCE(proof.submitted,p.created)))
+        ORDER BY p.created,p.id LIMIT 100"""):
         one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
         p=one('SELECT * FROM tt_direct_payment WHERE id=%s FOR UPDATE',(candidate.id,))
         if p.state not in ('AwaitingPayment','CorrectionRequired','Submitted'):continue
-        deadline=p.verify_until if p.state=='Submitted' else p.hold_until
+        deadline=p.hold_until if p.state=='AwaitingPayment' else p.verify_until
         if deadline<=now():continue
         kind='PaymentVerificationReminder' if p.state=='Submitted' else 'PaymentReminder'
+        if rows('SELECT id FROM tt_direct_payment_event WHERE payment=%s AND event=%s LIMIT 1',(p.id,kind)):continue
         eid=event(p,'System',kind,'reminder:'+kind,{'deadline':deadline.isoformat()})
         if eid:notify(p,kind,eid)

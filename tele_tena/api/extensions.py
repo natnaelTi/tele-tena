@@ -142,7 +142,7 @@ def propose_extension(appointment, retry_key):
         fail('The demonstration extension limit has been reached.', 'extension_limit_reached')
     now = _now()
     expiry = now + timedelta(minutes=expiry_minutes)
-    policy = {'version': 'demo-extension-v1', 'block_minutes': duration,
+    policy = {'version': 'demo-extension-v1','payment_mode':item.get('payment_mode','Wallet'), 'block_minutes': duration,
               'pricing': 'ceil(published_price_minor * block_minutes / booked_minutes)',
               'max_added_minutes': maximum, 'external_settlement': False}
     extension = str(uuid.uuid4())

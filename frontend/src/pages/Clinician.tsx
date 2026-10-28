@@ -309,7 +309,7 @@ export function ClinicianEarnings() {
   if(paymentCapabilities.data?.mode==='Offline'&&new URLSearchParams(window.location.search).get('history')!=='wallet')return <DirectLedger role="clinician"/>;
   const shownHistory=history.filter(entry=>activityFilter==="All activity"||(activityFilter==="Payouts"?entry.kind==="Payout request":["Pending","Disputed","LegacyHold"].includes(entry.state)));
   return <>
-    <PageTitle title={w("Earnings")} description={w("See what is pending, available, and reserved for payout requests.")} />
+    <PageTitle title={w("Earnings")} description={w("See what is pending, available, and reserved for payout requests.")} /><Link className="text-link" to="/clinician/direct-payment-history">{w("Direct Payment History")}</Link>
     {resource.error ? <InlineNotice tone="danger">Earnings could not be loaded. <Button onClick={() => void resource.refresh()}>Try again</Button></InlineNotice> : !resource.data ? <Skeleton /> : <>
       <div className="earnings-overview">
         <Card className="earnings-available"><p>{w("Available earnings")}</p><h2>ETB {money(resource.data.balances.earnings_available)}</h2><p className="supporting">{w("Available to request")}</p><Button variant="secondary" disabled={paymentCapabilities.data?.mode!=='Wallet'||resource.data.balances.earnings_available<=0} onClick={()=>setPayoutOpen(true)}>{w("Request payout")}</Button></Card>

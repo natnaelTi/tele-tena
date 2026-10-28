@@ -68,7 +68,7 @@ export default function Account() {
     ...(canManagePractice ? [
       {label:"Services and pricing",to:"/clinician/services",description:"Approved scopes and tailored offerings",Icon:Layers},
       {label:"Availability",to:"/clinician/availability",description:"Confirmation, buffers and notice",Icon:CalendarDays},
-      {label:"Earnings",to:"/clinician/earnings",description:"Balances and payment activity",Icon:WalletCards},
+      {label:paymentMode.data?.mode==='Offline'?"Revenue Ledger":"Earnings",to:"/clinician/earnings",description:paymentMode.data?.mode==='Offline'?"Direct Telebirr payments and verification":"Balances and payment activity",Icon:WalletCards},
     ] : []),
     {label:"Application & credentials",to:"/clinician/vetting",description:"Profile, languages and evidence",Icon:ShieldCheck},
   ];

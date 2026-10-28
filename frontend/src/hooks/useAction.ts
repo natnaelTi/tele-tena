@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { ApiError } from "../api";
 const messages: Record<string, string> = {
+  couple_language_required: 'This earlier invitation has no recorded consultation language. Create a new invitation so both adults agree to the same language.',
+  payment_mode_changed: "Payment settings changed. Reload and review the current payment instructions before continuing.",
+  payee_required: "The clinician must configure a Telebirr receiving number before a new direct-payment booking or offer can proceed.",
+  payment_verification_required: "Verify the direct payment receipt before accepting this appointment.",
+  offering_language_approval_required: "Obtain an individual approval for each care language selected for this offering.",
+  care_language_unavailable: "This offering has no approved consultation language. Choose another service or ask the clinician to complete language review.",
+  care_language_changed: "This consultation language is no longer approved for the selected offering. Review the service before continuing.",
+  care_language_assessment_required: "Select your care languages and deliberately choose a self-assessment level for each before submission.",
   vetting_rationale_required: "Add a rationale for each score you entered. Complete or clear unfinished scores before recording a decision.",
   vetting_findings_required: "Enter a specific decision reason, up to 2000 characters.",
   review_decision_required: "Choose whether to approve, request information or decline this application.",
@@ -20,7 +28,7 @@ const messages: Record<string, string> = {
   scope_adult_required: "Confirm that your service application is limited to adult care in the Relevant experience step.",
   scope_approach_invalid: "An approach is no longer available. In Relevant experience, move the unlisted entry to your training description before saving.",
   credential_date_invalid: "Enter a valid credential date.",
-  resume_required: "Upload a PDF resume before submitting your application.",
+  resume_required: "Upload your CV as a PDF before submitting your application.",
   scope_not_open: "This service is not accepting applications. Your other choices are still here.",
   scope_selection_invalid: "Choose between one and ten different services.",
   scope_application_locked: "This application is awaiting review. Respond to a clarification request to change it.",

@@ -1,10 +1,13 @@
 """Fresh v1.47, isolated compatibility socket only; no existing site changes."""
+assert __name__=='__main__', 'This fixture may run only as an explicit local CLI, never by import'
+
 import os,secrets,sys,subprocess,json
 from pathlib import Path
 from unittest.mock import patch
 BENCH=Path('/home/frappe/teletena-compat/bench');ROOT=Path(__file__).resolve().parents[1]
-SITE='teletena-payments-v147-fresh.localhost'
-DB='tt_payments_v147_fresh';SOCKET=BENCH.parent/'runtime/mariadb-target.sock'
+SITE=os.environ.get('TELE_TENA_FRESH_SITE','teletena-payments-v147-fresh.localhost')
+assert SITE in ('teletena-payments-v147-fresh.localhost','teletena-payments-v147-final.localhost','teletena-payments-v147-candidate.localhost')
+DB='tt_payments_v147_candidate' if SITE.endswith('-candidate.localhost') else 'tt_payments_v147_final' if SITE.endswith('-final.localhost') else 'tt_payments_v147_fresh';SOCKET=BENCH.parent/'runtime/mariadb-target.sock'
 assert SOCKET.is_socket() and not (BENCH/'sites'/SITE).exists()
 os.chdir(BENCH/'sites');sys.path.insert(0,str(ROOT))
 import frappe,pymysql
@@ -29,4 +32,5 @@ frappe.set_user('Guest');options=sign_in_options();assert not options['patient_r
 assert frappe.db.sql('SELECT mode FROM tt_payment_config WHERE id=1')[0][0]=='Wallet'
 assert frappe.db.sql('SELECT COUNT(*) FROM tt_care_language')[0][0]==630
 assert dict(counts)['domain']==78
+assert frappe.db.sql("SHOW COLUMNS FROM tt_couple_plan LIKE 'care_language'")
 frappe.destroy();print('PASS fresh Frappe16 installation and two native migrations; structured/evidence tables empty; full bundled directory imported; access/provider switches remain off. Counts:',dict(counts))

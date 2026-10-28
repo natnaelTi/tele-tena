@@ -1,3 +1,4 @@
+import {languageName} from './CareLanguages';
 import {useSession} from '../hooks/useSession';
 import {AvailabilityStatus} from './AvailabilityStatus';
 import {Avatar} from "./ProfilePhoto";
@@ -60,7 +61,7 @@ export function ClinicianCard({ offer }: { offer: Offer }) {
         <h3>{offer.display_name}</h3><p>{offer.label}</p>
         <span className="verified"><ShieldCheck size={16} />{w("Approved for this service")}</span>
         {offer.description && <p className="clinician-description">{offer.description}</p>}
-        <AvailabilityStatus value={offer.availability}/><div className="clinician-facts"><span><Languages size={16} aria-hidden="true" />{offer.care_languages?.map(language => ({ en: 'English', am: 'አማርኛ', om: 'Afaan Oromo' })[language]).join(', ') || w("Care language not listed")}</span><span>{offer.consultation_format === 'audio' ? <Headphones size={16} aria-hidden="true" /> : <Video size={16} aria-hidden="true" />}{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')}</span></div>
+        <AvailabilityStatus value={offer.availability}/><div className="clinician-facts"><span><Languages size={16} aria-hidden="true" />{offer.care_languages?.map(language => languageName(language)).join(', ') || w("Care language not listed")}</span><span>{offer.consultation_format === 'audio' ? <Headphones size={16} aria-hidden="true" /> : <Video size={16} aria-hidden="true" />}{w(offer.consultation_format === 'audio' ? 'Audio' : 'Video')}</span></div>
       </div></div>
       <div className="card-actions"><div><strong>ETB {money(offer.price)}</strong><small>{offer.minutes} {w("minutes")} · {w("per session")}</small></div><div className="actions"><Button variant="quiet" onClick={event => { trigger.current = event.currentTarget; setPreview(true); }}>{w("View profile")}</Button>{canBook&&<Link className="button" to={"/care/select/" + offer.id}>{w("Choose a time")}</Link>}</div></div>
     </Card>

@@ -99,6 +99,11 @@ def respond_to_request(appointment, decision):
         payment=rows("SELECT id FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment' AND state='Verified'",(item.id,))
         if not payment:fail('Verify the direct payment receipt before accepting the appointment.','payment_verification_required')
     if decision == 'confirm':
+        from tele_tena.api.journey import approved,approved_service
+        approved(item.clinician,True);approved_service(item.clinician,one('SELECT service FROM tt_offering WHERE id=%s',(item.offering,)).service,True)
+        from tele_tena.api.care_languages import offering_languages
+        language=json.loads(item.policy_snapshot or '{}').get('care_language')
+        if language and language not in offering_languages(item.offering):fail('This consultation language needs authorization review before confirmation.','care_language_changed')
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         frappe.db.sql("UPDATE tt_appointment SET state='Booked',confirmed_at=%s WHERE id=%s", (now, item.id))
         _event(item.id, 'Confirmed', clinician)

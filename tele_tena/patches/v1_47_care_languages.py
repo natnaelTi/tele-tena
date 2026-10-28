@@ -10,15 +10,22 @@ def execute():
       'care_language_event':"id CHAR(36) PRIMARY KEY,clinician VARCHAR(140) NOT NULL,language VARCHAR(16) NOT NULL,actor VARCHAR(140) NOT NULL,event VARCHAR(40) NOT NULL,details LONGTEXT NOT NULL,created DATETIME(6) NOT NULL",
       'language_appointment_review':"appointment CHAR(36) NOT NULL,language VARCHAR(16) NOT NULL,reason VARCHAR(300) NOT NULL,created DATETIME(6) NOT NULL,PRIMARY KEY(appointment,language)",
     }
-    for name,definition in tables.items():frappe.db.sql_ddl(f'CREATE TABLE IF NOT EXISTS tt_{name} ({definition}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4')
+    for name,definition in tables.items():frappe.db.sql_ddl(f'CREATE TABLE IF NOT EXISTS tt_{name} ({definition}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci')
     bundle=json.loads((Path(__file__).resolve().parents[1]/'reference_data/care-languages-v1.json').read_text())
     for r in bundle['records']:frappe.db.sql('INSERT IGNORE INTO tt_care_language (code,english,amharic,afaan_oromo,aliases,source) VALUES (%s,%s,%s,%s,%s,%s)',(r['code'],r['english'],r['amharic'],r['afaan_oromo'],json.dumps(r['aliases']),bundle['source']))
-    for table,column,definition in [('tt_profile','preferred_care_language','VARCHAR(16) NULL'),('tt_offering','care_languages','TEXT NULL')]:
+    for table,column,definition in [('tt_profile','preferred_care_language','VARCHAR(16) NULL'),('tt_offering','care_languages','TEXT NULL'),('tt_couple_plan','care_language','VARCHAR(16) NULL')]:
         if not frappe.db.sql('SHOW COLUMNS FROM '+table+' LIKE %s',(column,)):frappe.db.sql_ddl(f'ALTER TABLE {table} ADD COLUMN {column} {definition}')
     # Earlier lists are self-declarations, not individual human decisions.
-    for p in frappe.db.sql("SELECT user,languages FROM tt_profile WHERE kind='clinician'",as_dict=True):
+    declarations=list(frappe.db.sql("SELECT user,languages FROM tt_profile WHERE kind='clinician'",as_dict=True))
+    for draft in frappe.db.sql("SELECT user,answers FROM tt_onboarding WHERE kind='clinician'",as_dict=True):
+        try:values=json.loads(draft.answers or '{}').get('care_languages',[])
+        except (TypeError,ValueError):continue
+        if isinstance(values,list):declarations.append(frappe._dict(user=draft.user,languages=json.dumps(values)))
+    for p in declarations:
         try:values=json.loads(p.languages or '[]')
         except (TypeError,ValueError):continue
+        if not isinstance(values,list):continue
         for code in values:
+            if not isinstance(code,str):continue
             if frappe.db.sql('SELECT code FROM tt_care_language WHERE code=%s',(code,)):
                 frappe.db.sql("INSERT IGNORE INTO tt_care_language_claim (clinician,language,state,modified) VALUES (%s,%s,'Pending',UTC_TIMESTAMP(6))",(p.user,code))

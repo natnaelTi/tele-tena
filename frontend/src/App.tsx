@@ -1,4 +1,4 @@
-import {DirectPaymentPage,PaymentConfiguration} from './components/DirectPayments';
+import {DirectPaymentPage,PaymentConfiguration,DirectLedger} from './components/DirectPayments';
 import Contact from './pages/Contact';
 import Policies from './pages/Policies';
 import PublicDirectory,{OfferingEntry} from './pages/PublicDirectory';
@@ -120,7 +120,7 @@ export default function App() {
                 <Route path="couples" element={<Couples />} /><Route path="couples/:planId" element={<Couples />} />
                 <Route path="relationships" element={<Relationships />} />
                 <Route path="clinic-access" element={<ClinicMembershipPortal />} />
-                <Route path="payments" element={<Payments />} /><Route path="direct-payments/:id" element={<DirectPaymentPage/>}/>
+                <Route path="payments" element={<Payments />} /><Route path="direct-payment-history" element={<DirectLedger role="patient"/>}/><Route path="direct-payments/:id" element={<DirectPaymentPage/>}/>
                 <Route path="payments/transactions/:activityId" element={<FinancialActivityDetail />} />
                 <Route
                   path="consultations/:id"
@@ -151,7 +151,7 @@ export default function App() {
                 <Route path="offers/:offerId" element={<ClinicianOfferDetail />} />
                 <Route path="care" element={<CareRecords />} />
                 <Route path="care/:id" element={<CareRecordDetail />} />
-                <Route path="earnings" element={<ClinicianEarnings />} /><Route path="direct-payments/:id" element={<DirectPaymentPage/>}/>
+                <Route path="earnings" element={<ClinicianEarnings />} /><Route path="direct-payment-history" element={<DirectLedger role="clinician"/>}/><Route path="direct-payments/:id" element={<DirectPaymentPage/>}/>
                 <Route path="earnings/transactions/:activityId" element={<FinancialActivityDetail />} />
                 <Route path="vetting" element={<ClinicianScopeApplications />} />
                 <Route path="affiliations" element={<ClinicianAffiliations />} />

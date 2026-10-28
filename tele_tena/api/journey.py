@@ -881,11 +881,14 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
     expires = None
     state = 'Booked'
     confirmed = datetime.now(timezone.utc).replace(tzinfo=None) if mode == 'automatic' else None
+    hours=None
     if mode == 'manual':
         hours = int(frappe.conf.get('tele_tena_pending_expiry_hours', 24))
         hours = max(1, min(168, hours))
         expires = min(start, datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=hours))
         state = 'PendingConfirmation'
+    if offline:
+        state='PendingConfirmation';confirmed=None
     fee_bps = int(frappe.conf.get('tele_tena_demo_platform_fee_bps', 0))
     dispute_minutes = int(frappe.conf.get('tele_tena_demo_dispute_window_minutes', 60))
     if not 0 <= fee_bps <= 10000 or not 0 <= dispute_minutes <= 10080:
@@ -897,9 +900,11 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
                             'dispute_window_minutes': dispute_minutes,
                             'external_settlement': False}}
     policy['notifications']={'version':'booking-notices-v2','confirmation_reminder_seconds':180,
-                             'confirmation_deadline':iso(expires) if expires else None,
+                             'confirmation_deadline':iso(expires) if expires and not offline else None,
+                             'confirmation_expiry_hours':hours,'confirmation_start':'receipt_verified' if offline else 'booking_created',
                              'expiry_effect':'full_reservation_release'}
     if offline:
+        policy['notifications']['expiry_effect']='external_payment_reconciliation'
         policy['version']='offline-prestart-refund-v1'
         policy['cancel_before_start']='clinician_external_refund_if_verified'
         policy['financial']={'version':'offline-telebirr-v1','payment_mode':'Offline','platform_custody':False,'platform_fee_collected':False,'hold_minutes':payment.hold_minutes,'verification_hours':payment.verification_hours}
@@ -917,7 +922,7 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
          schedule.consultation_format if schedule else 'video', before, after, json.dumps(policy), created))
     frappe.db.sql('''INSERT INTO tt_appointment_event (id,appointment,event_type,actor,created)
         VALUES (%s,%s,%s,%s,%s)''', (str(uuid.uuid4()), appointment,
-        'Requested' if state == 'PendingConfirmation' else 'Booked', p.user, created))
+        'PaymentIntentCreated' if offline else 'Requested' if state == 'PendingConfirmation' else 'Booked', p.user, created))
     from tele_tena.api.encounter_files import grant_booking
     grant_booking(appointment,p.user,o.clinician,shared)
     from tele_tena.booking_notifications import create
@@ -950,7 +955,7 @@ def appointments():
     # Clinician never receives patient account identity, history or mutable profile.
     result = rows(f'''SELECT a.id,a.start,a.end,a.state,a.price,a.minutes,a.service_label,a.disclosure,a.choices,
         a.timezone,a.consultation_format,a.confirmation_mode,a.expires_at,a.confirmed_at,a.payment_mode,
-        (SELECT dp.state FROM tt_direct_payment dp WHERE dp.appointment=a.id AND dp.reference_type='Appointment' LIMIT 1) AS direct_payment_state,
+        (SELECT dp.state FROM tt_direct_payment dp WHERE BINARY dp.appointment=BINARY a.id AND dp.reference_type='Appointment' LIMIT 1) AS direct_payment_state,
         a.cancelled_by,a.cancelled_at,a.cancel_reason,a.policy_snapshot,
         c.state AS call_state,c.ended AS call_ended,n.status AS documentation_state,
         provider.display_name AS clinician_display_name

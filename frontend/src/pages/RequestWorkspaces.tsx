@@ -1,3 +1,4 @@
+import {languageName} from '../components/CareLanguages';
 import CareLanguageSelect from '../components/CareLanguageSelect';
 import {RequestAvailabilityCard} from '../components/RequestPresence';
 import {appointmentStatus} from '../appointment-status';
@@ -802,12 +803,7 @@ function PatientRequestThread({
                 : "Schedule for later",
             )}{" "}
             · {w(request.consultation_format === "audio" ? "Audio" : "Video")} ·{" "}
-            {(
-              { en: "English", am: "አማርኛ", om: "Afaan Oromo" } as Record<
-                string,
-                string
-              >
-            )[request.language] || request.language}
+            {languageName(request.language)}
           </p>
         </div>
         <StatusBadge>
@@ -1566,12 +1562,7 @@ function ClinicianResponsePanel({
             <div>
               <dt>{w("Language")}</dt>
               <dd>
-                {(
-                  { en: "English", am: "አማርኛ", om: "Afaan Oromo" } as Record<
-                    string,
-                    string
-                  >
-                )[request.language] || request.language}
+                {languageName(request.language)}
               </dd>
             </div>
             <div>
@@ -1745,7 +1736,7 @@ function ClinicianResponsePanel({
                   </details>
                   <p className="supporting">
                     {w(
-                      "No appointment is confirmed until the patient accepts. Your quote is private.",
+                      "Your quote is private. The patient selects an offer and completes the applicable payment and booking approvals.",
                     )}
                   </p>
                   <Button

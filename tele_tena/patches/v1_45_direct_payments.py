@@ -16,7 +16,7 @@ def execute():
       'direct_receipt':"id CHAR(36) PRIMARY KEY,payment CHAR(36) NOT NULL,owner VARCHAR(140) NOT NULL,filename VARCHAR(180) NOT NULL,mime VARCHAR(40) NOT NULL,content LONGBLOB NOT NULL,content_sha256 CHAR(64) NOT NULL,created DATETIME(6) NOT NULL",
       'direct_transaction_ref':"payee VARCHAR(16) NOT NULL,transaction_ref VARCHAR(100) NOT NULL,payment CHAR(36) NOT NULL,PRIMARY KEY(payee,transaction_ref)",
     }
-    for name,definition in tables.items():frappe.db.sql_ddl(f'CREATE TABLE IF NOT EXISTS tt_{name} ({definition}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4')
+    for name,definition in tables.items():frappe.db.sql_ddl(f'CREATE TABLE IF NOT EXISTS tt_{name} ({definition}) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci')
     if not frappe.db.sql("SHOW COLUMNS FROM tt_direct_payment LIKE 'reference_type'"):
         frappe.db.sql_ddl("ALTER TABLE tt_direct_payment ADD COLUMN reference_type VARCHAR(20) NOT NULL DEFAULT 'Appointment',ADD COLUMN reference_id CHAR(36) NULL,DROP INDEX appointment_payment,ADD UNIQUE KEY payable_reference(reference_type,reference_id)")
         frappe.db.sql('UPDATE tt_direct_payment SET reference_id=appointment WHERE reference_id IS NULL')

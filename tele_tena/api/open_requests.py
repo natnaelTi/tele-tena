@@ -1054,7 +1054,7 @@ def expire_requests():
 def request_metrics():
     actor('Tele Tena Approver')
     from statistics import median
-    requests = rows('''SELECT r.id,r.state,r.urgency,r.published_at,r.matched_at,a.confirmed_at
+    requests = rows('''SELECT r.id,r.state,r.urgency,r.published_at,r.matched_at,a.confirmed_at,a.state appointment_state
         FROM tt_open_request r LEFT JOIN tt_appointment a ON a.id=r.appointment
         WHERE r.published_at>=UTC_TIMESTAMP(6)-INTERVAL 90 DAY ORDER BY r.published_at''')
     def percentile(values, p):
@@ -1065,7 +1065,7 @@ def request_metrics():
     immediate = [req for req in requests if req.urgency == 'immediate']
     first_offer, confirmed, both_joined, booked_to_joined, guest_navigation, auth_navigation = [], [], [], [], [], []
     counts = {'matched': 0, 'unmatched': 0, 'expired': 0, 'cancelled': 0, 'open': 0,
-              'selected_awaiting_confirmation':0,'failed_acceptance': 0, 'matched_under_3_minutes': 0,'matched_under_5_minutes':0, 'eligible_supply_total': 0, 'no_eligible_supply': 0}
+              'selected_awaiting_confirmation':0,'selected_without_confirmation_closed':0,'cancelled_after_confirmation':0,'failed_acceptance': 0, 'matched_under_3_minutes': 0,'matched_under_5_minutes':0, 'eligible_supply_total': 0, 'no_eligible_supply': 0}
     for req in immediate:
         supply = rows("SELECT eligible_supply FROM tt_request_metric WHERE request_id=%s AND event='Published' LIMIT 1", (req.id,))
         if supply and supply[0].eligible_supply is not None and int(supply[0].eligible_supply) == 0:
@@ -1079,13 +1079,14 @@ def request_metrics():
             first_offer.append(int((events['FirstOffer'] - req.published_at).total_seconds()))
         if req.state == 'Matched' and req.confirmed_at:
             counts['matched'] += 1
+            if req.appointment_state=='Cancelled':counts['cancelled_after_confirmation']+=1
             delay = int((req.confirmed_at - req.published_at).total_seconds())
             confirmed.append(delay)
             if delay<=300:counts['matched_under_5_minutes']+=1
             if delay <= 180:
                 counts['matched_under_3_minutes'] += 1
         elif req.state=='Matched':
-            counts['selected_awaiting_confirmation']+=1
+            counts['selected_without_confirmation_closed' if req.appointment_state in ('Cancelled','Expired') else 'selected_awaiting_confirmation']+=1
         elif req.state == 'Expired':
             counts['expired'] += 1
         elif req.state == 'Cancelled':

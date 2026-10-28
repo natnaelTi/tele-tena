@@ -331,12 +331,12 @@ export function Booking({ offeringOverride, bookingLinkToken }: { offeringOverri
           <DisclosurePreview disclosure={preview}/>
           <Checkbox label={w("I am 18 or older and freely consent to this shared consultation.")} checked={adultConsent} onChange={event=>setAdultConsent(event.target.checked)}/>
           <Button disabled={!adultConsent||action.busy} loading={action.busy} onClick={()=>void action.run(async()=>{
-            const payload={offering:offer.id,start,request_text:request,sharing,expected_disclosure:preview,adult_confirmed:adultConsent,booked_timezone:displayZone};
+            const payload={offering:offer.id,start,request_text:request,sharing,expected_disclosure:preview,adult_confirmed:adultConsent,booked_timezone:displayZone,care_language:selectedLanguage};
             const fingerprint=JSON.stringify(payload);const key=submission?.fingerprint===fingerprint?submission.key:crypto.randomUUID();setSubmission({key,fingerprint});
             const result=await journeyApi.coupleInvite({...payload,retry_key:key});
             navigate('/patient/couples/'+result.id,{state:{coupleToken:result.token}});
           },'')}>{w("Create invitation link")}</Button>
-          <p className="supporting">{w("The invitation does not reserve a time or charge either wallet.")}</p>
+          <p className="supporting">{w("The invitation does not hold a time or collect payment.")}</p>
         </Card>}
         {step === 2 && preview && offer.participant_structure !== 'couple' && (
           <BookingReview offline={paymentCapabilities.data?.mode==='Offline'} offer={offer} start={start} zone={displayZone} format={data.calendar.format} disclosure={preview} balance={wallet.data} balanceError={Boolean(wallet.error)} onRetry={()=>void wallet.refresh()} busy={action.busy}
@@ -394,6 +394,7 @@ export function Payments() {
         title={w("Your Balance")}
         description={w("Your funds, clearly separated.")}
       />
+      <Link className="text-link" to="/patient/direct-payment-history">{w("Direct Payment History")}</Link>
       <div className="patient-payments-layout"><section>
       {wallet.data && <section className="reference-wallet"><span>{w("Available to spend")}</span><strong>ETB {money(wallet.data.available)}</strong><Button disabled={paymentCapabilities.data?.mode==='Offline'} variant="secondary" onClick={() => setFundsOpen(true)}>{w("Add funds")}</Button><p className="wallet-reserved-total">{w("Reserved for appointments")} · ETB {money(wallet.data.reserved)}</p></section>}
       {wallet.error && (
