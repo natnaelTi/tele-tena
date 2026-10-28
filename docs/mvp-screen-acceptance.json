@@ -16807,5 +16807,20 @@
         "tests/language_catalog.py"
       ]
     }
+  },
+  "localization_workbook_revision_2026_10_28": {
+    "requirement": "Independent human-reviewed Amharic/Afaan Oromo workbook integration across existing MVP routes/states",
+    "runtime_pin": "569537640665d9dcbb07738523fd49e4c5c5354a",
+    "functional_status": "Functionally verified: approved-only plumbing, locale propagation, template errors, default policy projection, browser returns and preservation",
+    "visual_status": "Current provisional/fallback UI inspected at 390/768/1440 and actual 200%; workbook-translated UI blocked pending language approval",
+    "approval_status": {
+      "amharic": "Blocked: 0 Approved; 8472 Draft; 218 Needs Clarification",
+      "afaan_oromo": "Blocked: 0 Approved; 8472 Draft; 218 Needs Clarification"
+    },
+    "scope": "All existing MVP public/patient/clinician/reviewer routes and significant states retain their exact design references below; no historical acceptance overwritten",
+    "evidence": "docs/localization-release-readiness.md",
+    "dictionary_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "remaining_action": "Native reviewers resolve flagged wording/fallback conflicts and 45 new templates; independently approve each locale; validated versioned import/build/rendered review with new immutable pin",
+    "external_manual": "Owner acceptance, policy approval, live delivery and physical-device testing separate; not claimed passed"
   }
 }

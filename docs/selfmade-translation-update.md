@@ -1,7 +1,7 @@
 # Selfmade Incremental Translation Release — Operator Procedure
 
 **Localization deployment is blocked by human review.** Technical candidate:
-`4e167dbba7f9f7352fef7caa78aa5d254271ed79`, branch
+`569537640665d9dcbb07738523fd49e4c5c5354a`, branch
 `feat/offline-telebirr-mvp`, draft [PR50](https://github.com/natnaelTi/tele-tena/pull/50)
 dependent on [PR49](https://github.com/natnaelTi/tele-tena/pull/49).
 It contains every completed current MVP refinement, but imports **zero** workbook
@@ -32,7 +32,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=4e167dbba7f9f7352fef7caa78aa5d254271ed79
+RELEASE_SHA=569537640665d9dcbb07738523fd49e4c5c5354a
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
 git -C apps/tele_tena status --short
@@ -46,6 +46,13 @@ git -C apps/ecommerce_integrations status --short
 env/bin/python --version
 node --version
 env/bin/python -m pip check
+env/bin/python - <<'PYVERSIONS'
+import importlib.metadata as m,platform,subprocess
+assert platform.python_version()=='3.14.2','STOP: unverified Python baseline'
+for name,version in [('frappe','16.2.1'),('erpnext','16.1.0')]:
+    assert m.version(name)==version,'STOP: unverified '+name+' baseline'
+assert subprocess.check_output(['node','--version'],text=True).strip()=='v24.13.0','STOP: unverified Node baseline'
+PYVERSIONS
 sudo supervisorctl status
 sudo nginx -t
 curl --fail --silent --show-error --max-redirs 0 \
@@ -117,7 +124,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=4e167dbba7f9f7352fef7caa78aa5d254271ed79
+RELEASE_SHA=569537640665d9dcbb07738523fd49e4c5c5354a
 UPDATE_BACKUP=/home/smcs/teletena-before-translations.RETAINED_PATH
 TOOLS="$UPDATE_BACKUP/tools"
 test -d "$UPDATE_BACKUP" && test ! -L "$UPDATE_BACKUP"

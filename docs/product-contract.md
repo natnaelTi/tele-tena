@@ -580,3 +580,18 @@ eight seconds; one failed source does not suppress the other successful source.
 Accepted-offer popups and server-authorized deep links/read handling are preserved.
 This supersedes independent client pollers, not notification permissions or delivery
 semantics. Closed/unreachable browsers do not imply notification presentation.
+
+
+## Translation Workbook Revision — 28 October 2026
+
+Current technical candidate569537640665d9dcbb07738523fd49e4c5c5354a preserves
+completed MVP scope and all existing financial modes/permissions. No schema,
+dependency, provider, access or payment-mode change is introduced. Workbook
+reconciliation and approved-only locale/template/policy plumbing are verified;
+no workbook draft was imported. Both Amharic and Afaan Oromo have zero human
+approvals. Native review, independent locale approval, new-template/conflict
+resolution and subsequent built-language/owner review remain release gates.
+Existing policy draft/publication status and consent versions remain unchanged.
+See [localization-release-readiness.md](localization-release-readiness.md), the
+existing screen matrix revision and [selfmade-translation-update.md](selfmade-translation-update.md).
+Historical evidence is retained; no separate roadmap website was changed.

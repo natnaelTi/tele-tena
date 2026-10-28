@@ -219,3 +219,18 @@ other adult, unrelated clinicians and vetting reviewers receive no message.
 An amendment retains previously published content. This does not create another
 charge or earning. Existing summaries, clinical notes and historical records are
 not rewritten. New Amharic/Afaan Oromo copy is provisional pending human review.
+
+
+## Translation Workbook Revision — 28 October 2026
+
+Current technical candidate569537640665d9dcbb07738523fd49e4c5c5354a preserves
+completed MVP scope and all existing financial modes/permissions. No schema,
+dependency, provider, access or payment-mode change is introduced. Workbook
+reconciliation and approved-only locale/template/policy plumbing are verified;
+no workbook draft was imported. Both Amharic and Afaan Oromo have zero human
+approvals. Native review, independent locale approval, new-template/conflict
+resolution and subsequent built-language/owner review remain release gates.
+Existing policy draft/publication status and consent versions remain unchanged.
+See [localization-release-readiness.md](localization-release-readiness.md), the
+existing screen matrix revision and [selfmade-translation-update.md](selfmade-translation-update.md).
+Historical evidence is retained; no separate roadmap website was changed.

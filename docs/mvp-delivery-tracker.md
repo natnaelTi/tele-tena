@@ -995,3 +995,18 @@ Native-language approval and live delivery remain external, not claimed.
 ###20 October2026 — Complete Stage and Shared Layout Pass
 
 Packaged `f679e6ce8a1a8169b9bba16626a2880e5e212a75` on the retained presentation site. Owner stage annotation applied to both assets; shared visible role masthead and subtle reusable surfaces complete. Real-backend46-view responsive survey, intent/navigation/sign-out, native language controls and actual200% zoom evidence recorded in [current public verification](public-atmosphere-verification.md). Single MVP matrix updated; owner visual acceptance remains pending. No backend/schema, reseed, remote deploy or merge.
+
+
+## Translation Workbook Revision — 28 October 2026
+
+Current technical candidate569537640665d9dcbb07738523fd49e4c5c5354a preserves
+completed MVP scope and all existing financial modes/permissions. No schema,
+dependency, provider, access or payment-mode change is introduced. Workbook
+reconciliation and approved-only locale/template/policy plumbing are verified;
+no workbook draft was imported. Both Amharic and Afaan Oromo have zero human
+approvals. Native review, independent locale approval, new-template/conflict
+resolution and subsequent built-language/owner review remain release gates.
+Existing policy draft/publication status and consent versions remain unchanged.
+See [localization-release-readiness.md](localization-release-readiness.md), the
+existing screen matrix revision and [selfmade-translation-update.md](selfmade-translation-update.md).
+Historical evidence is retained; no separate roadmap website was changed.

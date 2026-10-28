@@ -1,3 +1,5 @@
+> Latest translation-review candidate and approval gate: [selfmade-translation-update.md](selfmade-translation-update.md). This historical guide does not authorize a payment-mode change during that update.
+
 # Selfmade Offline Telebirr Incremental Update
 
 Operator procedure only; **nothing has been remotely deployed or merged**.
