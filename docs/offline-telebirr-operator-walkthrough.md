@@ -3,6 +3,26 @@
 This is a local review workflow, not a Telebirr integration or proof of settlement.
 The global demonstration ribbon remains. Never transfer money to fixture numbers.
 
+## Review Sites and Private Accounts
+
+The retained preview is http://127.0.0.1:8017/teletena/ on
+`teletena-mvp-presentation.localhost`. Its Wallet mode, accounts, provider settings
+and balances are preserved. Existing account passwords remain in the private
+site manifests (`tele_tena_presentation_accounts.json` and
+`tt-demo-mvp-v2-accounts.json`), not in this repository.
+
+The isolated Frappe16 Offline test preview is http://127.0.0.1:8021/teletena/ on
+`teletena-payments-v147-fresh.localhost`. Its separate patient/clinician/reviewer/
+financial-admin test accounts are in the mode600 file
+`/home/frappe/teletena-offline-sprint/test-accounts.json`. Use Email → Password
+sign-in for these accounts. This site has private test notification/OTP adapters
+and no live Telebirr transfers or hosted LiveKit configuration. It is not a new
+hosted deployment or replacement of the retained presentation dataset.
+
+For local reboot recovery of the stable8017 preview, follow
+[local-preview.md](local-preview.md). Starting the original Bench alone does not
+start that isolated web/worker/scheduler arrangement.
+
 ## State Model
 
 ```mermaid

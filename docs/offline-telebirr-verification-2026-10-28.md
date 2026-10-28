@@ -134,3 +134,9 @@ No public roadmap website or remote configuration was changed.
 ## Release-Tooling Follow-Up
 
 Current production-built worker: public-only cache inspection and actual offline/online recovery passed. The controlled waiting-worker UI test passes explicit refresh/activation without automatic reload; its obsolete pre-redesign homepage assertion was corrected to the current approved hero. This controlled adapter test is separate from the actual cache/recovery browser test. Local release/backup/lock guards2/2 and dependency-plan guards8/8 pass. GitHub frontend checks pass on Node22.23.3 and24.13.0. Initial Python CI jobs failed before tests because ubuntu-latest moved to26.04 without the requested Python3.12/3.14.2 artifacts. The Python job is pinned to Ubuntu24.04, supported by the official actions/python-versions manifest; application/framework Python pins are unchanged.
+
+After that CI-only correction, all four GitHub checks passed on source
+`7de7aac06f15b7c70ce4ccc87bf30122d672192f`:
+[push run](https://github.com/natnaelTi/tele-tena/actions/runs/40627199986) and
+[PR run](https://github.com/natnaelTi/tele-tena/actions/runs/40627204545).
+Subsequent handover documentation does not change application runtime or assets.

@@ -88,5 +88,6 @@
         0
       ]
     ]
-  }
+  },
+  "timestamp_basis": "Native job last_execution uses the Frappe site timezone; payment deadlines and domain event clocks are UTC. No timezone setting was changed."
 }
