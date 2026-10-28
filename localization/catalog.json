@@ -3203,6 +3203,18 @@
     "review_status": "missing",
     "translator_notes": ""
   },
+  "copy.carelanguages.english_and_ethiopian_languages": {
+    "key": "copy.carelanguages.english_and_ethiopian_languages",
+    "context": "CareLanguages",
+    "english": "English and Ethiopian Languages",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "frontend/src/components/CareLanguages.tsx:23",
+    "placeholders": "[]",
+    "source_hash": "efa3606817fc45b1b5ec2afab0ff0337e8c5d8947f976e2255dfa8bb2f2f6327",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
   "copy.carelanguages.english_and_ethiopian_catalog_languages_appear_first_flags_indicate_a_": {
     "key": "copy.carelanguages.english_and_ethiopian_catalog_languages_appear_first_flags_indicate_a_",
     "context": "CareLanguages",
@@ -3296,6 +3308,18 @@
     "source_location": "frontend/src/components/CareLanguages.tsx:23",
     "placeholders": "[]",
     "source_hash": "cc347ffdb57509a08da3f798766929d9fa5e6836a2dd9b943eadc62496a0a31f",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
+  "copy.carelanguages.other_languages": {
+    "key": "copy.carelanguages.other_languages",
+    "context": "CareLanguages",
+    "english": "Other Languages",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "frontend/src/components/CareLanguages.tsx:23",
+    "placeholders": "[]",
+    "source_hash": "f5a79728a7f15c5b0cab1bc1401f72f22effbd615249924ef72077695fa82d70",
     "review_status": "missing",
     "translator_notes": ""
   },

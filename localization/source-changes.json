@@ -1,28 +1,7 @@
 {
   "added": [
-    "copy.carelanguages.arrowdown",
-    "copy.carelanguages.english_and_ethiopian_catalog_languages_appear_first_flags_indicate_a_",
-    "copy.carelanguages.enter",
-    "copy.carelanguages.loading_languages",
-    "copy.carelanguages.message_bda05058",
-    "copy.carelanguages.page",
-    "copy.carelanguages.remove",
-    "copy.carelanguages.retry",
-    "copy.carelanguages.search_care_languages",
-    "copy.carelanguages.selected_care_languages",
-    "copy.carelanguages.type_a_language_name_or_alternative_name",
-    "copy.carelanguages.unlisted_language",
-    "copy.phonefield.arrowdown",
-    "copy.phonefield.choose_a_country",
-    "copy.phonefield.country_name_or_calling_code",
-    "copy.phonefield.no_countries_found",
-    "copy.phonefield.search_by_country_name_or_calling_code_sms_sign_in_currently_supports_",
-    "copy.phonefield.search_countries"
+    "copy.carelanguages.english_and_ethiopian_languages",
+    "copy.carelanguages.other_languages"
   ],
-  "stale": [
-    "copy.carelanguages.message",
-    "copy.carelanguages.search_languages",
-    "copy.onboarding.amharic",
-    "copy.phonefield.message_a137f17a"
-  ]
+  "stale": []
 }
