@@ -34,7 +34,13 @@ source = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=APP, text=Tru
 worker = dist / 'sw.js'
 worker.write_text(worker.read_text().replace('tele-tena-public-v2', 'tele-tena-public-' + source[:12]))
 lock = hashlib.sha256((FRONTEND / 'package-lock.json').read_bytes()).hexdigest()
+reviewed = json.loads((APP / 'localization/reviewed.json').read_text())
+assert reviewed == json.loads((FRONTEND / 'src/localization/reviewed.json').read_text()) == json.loads((APP / 'tele_tena/localization/reviewed.json').read_text()), 'Frontend/backend reviewed dictionaries differ'
+assert all(entry['source_hash'] == hashlib.sha256(entry['english'].encode()).hexdigest() for entry in reviewed.values()), 'Reviewed source hash mismatch'
+translation_hash = hashlib.sha256((json.dumps(reviewed,ensure_ascii=False,indent=2,sort_keys=True)+'\n').encode()).hexdigest()
 (dist / 'release.json').write_text(json.dumps({'source_commit': source, 'frontend_lock_sha256': lock,
+    'translation_dictionary_sha256': translation_hash,
+    'translation_reviewed_counts': {locale: sum(bool(entry.get(locale)) for entry in reviewed.values()) for locale in ('amharic','afaan_oromo')},
     'files': {str(p.relative_to(dist)): hashlib.sha256(p.read_bytes()).hexdigest()
               for p in sorted(dist.rglob('*')) if p.is_file() and p.name != 'release.json'}}, indent=2) + '\n')
 target = APP / 'tele_tena/public/review'
