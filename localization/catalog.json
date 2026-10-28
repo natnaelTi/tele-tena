@@ -17255,16 +17255,16 @@
     "review_status": "provisional",
     "translator_notes": ""
   },
-  "copy.workspacetour.add_a_pdf_resume_receipt_does_not_mean_your_credentials_are_verified": {
-    "key": "copy.workspacetour.add_a_pdf_resume_receipt_does_not_mean_your_credentials_are_verified",
+  "copy.workspacetour.add_a_pdf_cv_receipt_does_not_mean_your_credentials_are_verified": {
+    "key": "copy.workspacetour.add_a_pdf_cv_receipt_does_not_mean_your_credentials_are_verified",
     "context": "WorkspaceTour",
-    "english": "Add a PDF resume. Receipt does not mean your credentials are verified.",
-    "amharic": "የPDF የስራ ልምድ ሰነድ ያክሉ። መቀበሉ ምስክርነትዎ ተረጋግጧል ማለት አይደለም።",
-    "afaan_oromo": "CV PDF dabali. Fudhachuun ragaan kee mirkanaa'e jechuu miti.",
+    "english": "Add a PDF CV. Receipt does not mean your credentials are verified.",
+    "amharic": "",
+    "afaan_oromo": "",
     "source_location": "frontend/src/components/WorkspaceTour.tsx:38",
     "placeholders": "[]",
-    "source_hash": "76ddbcf4a04d13dd56dc6f86ce08e9c823271c0227a9bb0f9007e5b51c6bb242",
-    "review_status": "provisional",
+    "source_hash": "157acf6389c59c597f549655fc16b15ce5e3655cc0dc8415e3ab1211b4d7b5b5",
+    "review_status": "missing",
     "translator_notes": ""
   },
   "copy.workspacetour.upload_evidence": {
@@ -51947,18 +51947,6 @@
     "review_status": "provisional",
     "translator_notes": ""
   },
-  "copy.admin.certifications": {
-    "key": "copy.admin.certifications",
-    "context": "Admin",
-    "english": "Certifications",
-    "amharic": "የስልጠና ማረጋገጫዎች",
-    "afaan_oromo": "Ragaa leenjii",
-    "source_location": "frontend/src/pages/Admin.tsx:66",
-    "placeholders": "[]",
-    "source_hash": "471502f86c773c591d914c08da1b2e181e793a08bd85616b5edfd6094eb3f78b",
-    "review_status": "provisional",
-    "translator_notes": ""
-  },
   "copy.admin.credential_details": {
     "key": "copy.admin.credential_details",
     "context": "Admin",
@@ -51981,6 +51969,18 @@
     "placeholders": "[]",
     "source_hash": "74275487bacc6cb4861c5e169e55974a1271ef30a2b8ed5e45ded88a1aaf8f2e",
     "review_status": "missing",
+    "translator_notes": ""
+  },
+  "copy.admin.credentials": {
+    "key": "copy.admin.credentials",
+    "context": "Admin",
+    "english": "Credentials",
+    "amharic": "የስልጠና ማስረጃዎች",
+    "afaan_oromo": "Ragaalee Leenjii",
+    "source_location": "frontend/src/pages/Admin.tsx:66",
+    "placeholders": "[]",
+    "source_hash": "d48a617c7da5163c44f117b9b23d8c920e69b4aa83d7b6570d71a66f3a857183",
+    "review_status": "provisional",
     "translator_notes": ""
   },
   "copy.admin.earlier_competency_narrative": {
@@ -72383,18 +72383,6 @@
     "review_status": "missing",
     "translator_notes": ""
   },
-  "copy.vetting.certifications": {
-    "key": "copy.vetting.certifications",
-    "context": "Vetting",
-    "english": "Certifications",
-    "amharic": "የስልጠና ማረጋገጫዎች",
-    "afaan_oromo": "Ragaa leenjii",
-    "source_location": "frontend/src/pages/Vetting.tsx:218; frontend/src/pages/Vetting.tsx:276",
-    "placeholders": "[]",
-    "source_hash": "471502f86c773c591d914c08da1b2e181e793a08bd85616b5edfd6094eb3f78b",
-    "review_status": "provisional",
-    "translator_notes": ""
-  },
   "copy.vetting.credential_expiry_if_applicable": {
     "key": "copy.vetting.credential_expiry_if_applicable",
     "context": "Vetting",
@@ -72416,6 +72404,18 @@
     "source_location": "frontend/src/pages/Vetting.tsx:218",
     "placeholders": "[]",
     "source_hash": "9a891e50eac69579d8d35f1943d6037bf1f113822e9b68d1e8e6e69493551978",
+    "review_status": "provisional",
+    "translator_notes": ""
+  },
+  "copy.vetting.credentials": {
+    "key": "copy.vetting.credentials",
+    "context": "Vetting",
+    "english": "Credentials",
+    "amharic": "የስልጠና ማስረጃዎች",
+    "afaan_oromo": "Ragaalee Leenjii",
+    "source_location": "frontend/src/pages/Vetting.tsx:218; frontend/src/pages/Vetting.tsx:276",
+    "placeholders": "[]",
+    "source_hash": "d48a617c7da5163c44f117b9b23d8c920e69b4aa83d7b6570d71a66f3a857183",
     "review_status": "provisional",
     "translator_notes": ""
   },
@@ -81575,15 +81575,15 @@
     "review_status": "missing",
     "translator_notes": ""
   },
-  "copy.backend_validation_contact_auth.upload_a_pdf_resume_before_submitting_your_application": {
-    "key": "copy.backend_validation_contact_auth.upload_a_pdf_resume_before_submitting_your_application",
+  "copy.backend_validation_contact_auth.upload_a_pdf_cv_before_submitting_your_application": {
+    "key": "copy.backend_validation_contact_auth.upload_a_pdf_cv_before_submitting_your_application",
     "context": "Backend validation / contact_auth",
-    "english": "Upload a PDF resume before submitting your application",
+    "english": "Upload a PDF CV before submitting your application",
     "amharic": "",
     "afaan_oromo": "",
     "source_location": "tele_tena/api/contact_auth.py:277",
     "placeholders": "[]",
-    "source_hash": "2af24fdece865ce6355fd1468bc865060d15a4db574e4f1faadd6a9eb8fa6cfe",
+    "source_hash": "506246f49a39aea8a8b4d8c4fcb34d9b379cb5bf85b9730d435021cc36219eea",
     "review_status": "missing",
     "translator_notes": ""
   },

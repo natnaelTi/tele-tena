@@ -1,4 +1,14 @@
 {
-  "added": [],
-  "stale": []
+  "added": [
+    "copy.admin.credentials",
+    "copy.backend_validation_contact_auth.upload_a_pdf_cv_before_submitting_your_application",
+    "copy.vetting.credentials",
+    "copy.workspacetour.add_a_pdf_cv_receipt_does_not_mean_your_credentials_are_verified"
+  ],
+  "stale": [
+    "copy.admin.certifications",
+    "copy.backend_validation_contact_auth.upload_a_pdf_resume_before_submitting_your_application",
+    "copy.vetting.certifications",
+    "copy.workspacetour.add_a_pdf_resume_receipt_does_not_mean_your_credentials_are_verified"
+  ]
 }

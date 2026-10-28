@@ -274,7 +274,7 @@ def save_onboarding(kind, step, answers, complete=0):
             if not requested_services:
                 fail('Choose at least one service for review')
             if not frappe.db.sql('SELECT clinician FROM tt_resume_evidence WHERE clinician=%s', (user,)) and not (draft and structured.get('cv_files')):
-                fail('Upload a PDF resume before submitting your application', 'resume_required')
+                fail('Upload a PDF CV before submitting your application', 'resume_required')
         if kind == 'clinician' and clean.get('professional'):
             if any(not clean['professional'].get(key) for key in ('professional_category', 'qualification', 'issuing_institution')) or not clean.get('care_languages'):
                 fail('Complete your profession, qualification, institution and care languages before submission', 'professional_required')
