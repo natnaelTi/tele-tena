@@ -16785,7 +16785,7 @@
     },
     "care_language_selector_revision": {
       "date": "2026-10-28",
-      "runtime_commit": "a18c04f9ce4ebada3ba8171fe653093460f323ca",
+      "runtime_commit": "45e1600a35a9450bb26b50397749c01491b2d4a7",
       "functional_status": "Functionally verified",
       "visual_status": "Visually verified by Codex",
       "owner_status": "Awaiting owner acceptance",

@@ -1,6 +1,6 @@
 # Care-Language Names, Search and Flags — 28 October 2026
 
-Source/build: `a18c04f9ce4ebada3ba8171fe653093460f323ca`.
+Source/build: `45e1600a35a9450bb26b50397749c01491b2d4a7`.
 Branch `feat/offline-telebirr-mvp`, draft PR50 dependent on PR49.
 Preview: http://127.0.0.1:8017/teletena/;
 site `teletena-mvp-presentation.localhost`. Later test/document commits do not change runtime.
@@ -43,7 +43,7 @@ SMS restrictions are retained. No external image request or new runtime dependen
   association, not nationality, an exclusive language country or practice permission.
   International/historical/constructed languages without an applicable country use
   a neutral globe. English uses CLDR's US regional association.
-- Flags:257 two-letter4:3 SVGs from [flag-icons7.5.0](https://github.com/lipis/flag-icons/tree/v7.5.0),
+- Flags:259 locally served4:3 SVGs (257 two-letter originals plus2 territory mappings) from [flag-icons7.5.0](https://github.com/lipis/flag-icons/tree/v7.5.0),
   MIT; local `frontend/public/flags/LICENSE.txt` and `SOURCE.md` retain attribution,
   pinned archive URL and SHA256. The archive's npm SHA512 integrity was verified.
   SVGs were checked for script/foreignObject/image elements before vendoring.
@@ -69,8 +69,12 @@ SMS restrictions are retained. No external image request or new runtime dependen
   720CSS pixels/DPR2/visualViewport.scale1 at1440physical width. Country dialog,
   Account's shared care-language selector/group heading/search and scrollable
   controls verified without changing existing clinician claims. Screenshots inspected.
-  The earlier signup run used03d75dc; the only later runtime change makes the two
-  group headings explicit translation keys, with unchanged composition/behavior.
+  The signup run used03d75dc; actual200% useda18c04f, which only made the two
+  headings explicit translation keys. Final45e1600 has identical client/API code to
+  a18c04f, with two additional territory SVGs: AC from upstreamsh-ac and TA from
+  upstreamsh-ta. `tests/language_assets.cjs` verifies all245 supported phone countries
+  and630 names; actual built AC/TA/ET loading and selection checked separately.
+  No broader flow assertions were weakened to accommodate these mappings.
 - Production build and lint passed (existing warnings retained); packaged asset/hash
   and privacy checks passed. CSV updated including both group headings:
   **8,690** entries;4/4 translation-exchange tests passed. Missing/provisional
