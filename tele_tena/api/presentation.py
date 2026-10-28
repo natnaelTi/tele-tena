@@ -462,8 +462,9 @@ def appointment_detail(appointment):
         'can_propose_reschedule': _can_change_time(item) and not bool(reschedule),
     }
     if item.get('payment_mode')=='Offline':
-        direct=rows("SELECT state FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment'",(item.id,))
+        direct=rows("SELECT id,state FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment'",(item.id,))
         selected['direct_payment_state']=direct[0].state if direct else 'Unavailable'
+        if direct and (user==item.patient or role=='clinician'):selected['direct_payment_id']=direct[0].id
         selected['can_respond']=selected['can_respond'] and bool(direct and direct[0].state=='Verified')
     selected['is_couple'] = bool(shared_plan)
     selected['you_pay'] = user == item.patient

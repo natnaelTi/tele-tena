@@ -98,6 +98,21 @@ def for_appointment(appointment):
     if not rows('SELECT id FROM tt_appointment WHERE id=%s AND (patient=%s OR clinician=%s)',(appointment,user,user)):frappe.throw('Payment unavailable',frappe.PermissionError)
     found=rows("SELECT id FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment'",(appointment,))
     return detail(found[0].id) if found else None
+
+def notice_path(appointment,user,event_id=None):
+    """Allowlisted authenticated destination, including the exact extension payment."""
+    values=[appointment,user,user]
+    where=' AND EXISTS (SELECT 1 FROM tt_direct_payment_event e WHERE e.payment=p.id AND e.id=%s)' if event_id else " AND p.reference_type='Appointment'"
+    if event_id:values.append(event_id)
+    found=rows('SELECT p.id,p.clinician FROM tt_direct_payment p WHERE p.appointment=%s AND (p.patient=%s OR p.clinician=%s)'+where,tuple(values))
+    return ('/clinician' if found[0].clinician==user else '/patient')+'/direct-payments/'+found[0].id if found else None
+
+@query()
+def pending_reviews():
+    clinician=actor('Tele Tena Clinician');profile('clinician')
+    where="clinician=%s AND state IN ('Submitted','ReconciliationRequired') AND transaction_ref IS NOT NULL AND verified_at IS NULL"
+    return {'total':one('SELECT COUNT(*) n FROM tt_direct_payment WHERE '+where,(clinician,)).n,
+            'items':rows('SELECT id,appointment,reference_type,amount,currency,state,created FROM tt_direct_payment WHERE '+where+' ORDER BY created,id LIMIT 20',(clinician,))}
 @command
 def submit(id,transaction_ref,amount,filename,content_base64,retry_key):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE');p,user=authorize(id,True)

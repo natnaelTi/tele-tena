@@ -164,7 +164,7 @@ class Builder:
         doc=frappe.get_doc({'doctype':'User','email':user,'first_name':NAMES[key],
             'send_welcome_email':0,'user_type':'Website User'})
         doc.insert()
-        if key=='reviewer':doc.add_roles('Tele Tena Approver','Tele Tena Medical Lead')
+        if key=='reviewer':doc.add_roles('Tele Tena Approver','Tele Tena Medical Lead','Tele Tena Financial Configuration')
         elif key in ('counselor','therapist','psychiatrist','applicant'):doc.add_roles('Tele Tena Clinician')
         else:doc.add_roles('Tele Tena Patient')
         update_password(user,self.passwords[user])

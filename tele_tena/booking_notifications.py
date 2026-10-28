@@ -43,8 +43,13 @@ def create(appointment,state,plan_id=None):
 @query()
 def notices():
     user=actor()
-    return rows('''SELECT n.id,n.appointment,n.event,n.channel,n.state,n.created,n.read_at,a.state appointment_state
+    found=rows('''SELECT n.id,n.appointment,n.event,n.channel,n.state,n.created,n.read_at,n.context_key,a.state appointment_state
       FROM tt_booking_notice n JOIN tt_appointment a ON a.id=n.appointment WHERE n.user=%s ORDER BY n.created DESC LIMIT 50''',(user,))
+    from tele_tena.api.direct_payments import notice_path
+    for item in found:
+        if item.event.startswith('Payment'):item.href=notice_path(item.appointment,user,item.context_key or None)
+        del item['context_key']
+    return found
 
 
 @command
@@ -130,7 +135,11 @@ def dispatch():
                'AppointmentReminder':'coming up soon','Cancelled':'cancelled','Declined':'declined','Expired':'expired without confirmation'}.get(notice.event,'updated')
         when=app.start.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(app.timezone or 'Africa/Addis_Ababa')).strftime('%d %b %Y %H:%M')
         # Site-bound relative authenticated link;no permanent token or health text.
-        link=frappe.utils.get_url('/teletena/'+('clinician' if notice.user==app.clinician else 'patient')+'/consultations/'+app.id)
+        destination='/'+('clinician' if notice.user==app.clinician else 'patient')+'/consultations/'+app.id
+        if notice.event.startswith('Payment'):
+            from tele_tena.api.direct_payments import notice_path
+            destination=notice_path(app.id,notice.user,notice.context_key or None) or destination
+        link=frappe.utils.get_url('/teletena'+destination)
         from urllib.parse import urlsplit,urlunsplit
         parsed=urlsplit(link)
         if parsed.hostname and not parsed.hostname.endswith('.localhost') and parsed.hostname not in ('localhost','127.0.0.1'):

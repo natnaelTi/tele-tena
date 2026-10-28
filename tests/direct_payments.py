@@ -58,6 +58,18 @@ class DirectPayment(unittest.TestCase):
   result,_=self.book();id=result['payment'];frappe.db.sql('UPDATE tt_direct_payment SET hold_until=DATE_SUB(UTC_TIMESTAMP(6),INTERVAL 1 MINUTE) WHERE id=%s',(id,));frappe.db.sql("UPDATE tt_appointment SET state='Expired' WHERE id=%s",(result['id'],))
   self.assertEqual(self.receipt(id)['state'],'ReconciliationRequired');frappe.set_user(users['counselor']);self.assertEqual(pay.review(id,'confirm','late')['state'],'RefundRequired')
   pay.refund(id,'reported','reported','External refund claimed by synthetic clinician');frappe.set_user(users['patient']);self.assertEqual(pay.refund(id,'received','received','Synthetic payer confirms receipt')['state'],'RefundConfirmed')
+ def test_payment_notifications_and_pending_queue_are_party_scoped(self):
+  from tele_tena import notifications
+  result,_=self.book();self.receipt(result['payment']);frappe.set_user(users['counselor'])
+  self.assertIn(result['payment'],[p.id for p in pay.pending_reviews()['items']])
+  links=[n for n in notifications.feed() if n['kind']=='PaymentSubmitted' and n['appointment']==result['id']]
+  self.assertEqual(len(links),1);self.assertEqual(links[0]['href'],'/clinician/direct-payments/'+result['payment'])
+  from tele_tena.api.presentation import appointment_detail
+  self.assertEqual(appointment_detail(result['id'])['direct_payment_id'],result['payment'])
+  frappe.set_user(users['therapist']);self.assertNotIn(result['payment'],[p.id for p in pay.pending_reviews()['items']])
+  self.assertIsNone(pay.notice_path(result['id'],users['therapist']))
+  frappe.set_user(users['patient'])
+  with self.assertRaises(frappe.PermissionError):pay.pending_reviews()
  def test_correction_history_and_receipt_denial(self):
   result,_=self.book();id=result['payment'];self.receipt(id)
   frappe.set_user(users['counselor']);pay.review(id,'correct','correction','Please provide a readable complete screenshot')
@@ -81,7 +93,10 @@ class DirectPayment(unittest.TestCase):
   before=frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0]
   extension=extensions.propose_extension(app.id,'extension-quote');frappe.set_user(users['patient']);accepted=extensions.respond_extension(app.id,extension['id'],'accept')
   self.assertEqual(accepted['state'],'PaymentPending');self.assertEqual(extensions.respond_extension(app.id,extension['id'],'accept')['payment'],accepted['payment'])
-  self.receipt(accepted['payment'],'extension-proof','SYNTHETICEXT1234');frappe.set_user(users['counselor']);pay.review(accepted['payment'],'confirm','extension-verify')
+  self.receipt(accepted['payment'],'extension-proof','SYNTHETICEXT1234');frappe.set_user(users['counselor'])
+  from tele_tena import notifications
+  self.assertTrue(any(n['kind']=='PaymentSubmitted' and n['href']=='/clinician/direct-payments/'+accepted['payment'] for n in notifications.feed()))
+  pay.review(accepted['payment'],'confirm','extension-verify')
   self.assertEqual(j.one('SELECT state FROM tt_appointment WHERE id=%s',(app.id,)).state,'Booked')
   self.assertEqual(j.one('SELECT state FROM tt_consultation_extension WHERE id=%s',(extension['id'],)).state,'Accepted')
   self.assertEqual(frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0],before)

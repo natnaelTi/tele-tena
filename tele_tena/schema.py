@@ -170,3 +170,5 @@ def install():
     reference_navigation()
     from tele_tena.patches.v1_47_care_languages import execute as care_languages
     care_languages()
+    from tele_tena.patches.v1_48_reviewer_financial_defaults import execute as reviewer_defaults
+    reviewer_defaults()
