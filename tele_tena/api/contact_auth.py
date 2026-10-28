@@ -248,7 +248,7 @@ def save_onboarding(kind, step, answers, complete=0):
         clean['introduction'] = text(answers['introduction'], 2000, False)
     finish = boolean(complete)
     if finish and kind == 'clinician':
-        languages_review=rows('SELECT language,proficiency FROM tt_care_language_claim WHERE clinician=%s AND active=1',(user,))
+        languages_review=frappe.db.sql('SELECT language,proficiency FROM tt_care_language_claim WHERE clinician=%s AND active=1',(user,),as_dict=True)
         if not languages_review or any(not item.proficiency for item in languages_review):fail('Select and self-assess your care languages before submission.','care_language_assessment_required')
         from tele_tena.api.professional import validate, persist, validate_bio
         draft = frappe.db.sql('SELECT payload FROM tt_professional_draft WHERE user=%s', (user,))
