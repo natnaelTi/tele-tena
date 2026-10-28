@@ -1,7 +1,13 @@
 """Care-language claims and human decisions confer no service/clinical permission."""
 import json,uuid
+from functools import lru_cache
+from pathlib import Path
 import frappe
 from tele_tena.api.journey import actor,profile,rows,one,query,command,integer,text,fail,audit
+
+@lru_cache(maxsize=1)
+def display_catalog():
+    return json.loads((Path(__file__).resolve().parents[1]/'reference_data/care-language-display-v1.json').read_text())['records']
 
 def valid(code):return bool(rows('SELECT code FROM tt_care_language WHERE code=%s AND active=1',(code,)))
 def approved_for(clinician):return [r.language for r in rows("SELECT language FROM tt_care_language_claim WHERE clinician=%s AND active=1 AND state='Approved' ORDER BY language",(clinician,))]
@@ -13,8 +19,15 @@ def offering_languages(offering):
 @frappe.whitelist(allow_guest=True,methods=['GET'])
 def catalog(search='',offset=0):
     search=text(search,100,False);offset=integer(offset,0,10000);term='%'+search.replace('!','!!').replace('%','!%').replace('_','!_')+'%'
-    found=rows("SELECT code,english,amharic,afaan_oromo FROM tt_care_language WHERE active=1 AND (english LIKE %s ESCAPE '!' OR aliases LIKE %s ESCAPE '!' OR code=%s) ORDER BY english,code LIMIT 21 OFFSET %s",(term,term,search,offset))
+    priority=tuple(code for code,item in display_catalog().items() if item['priority'])
+    placeholders=','.join(['%s']*len(priority))
+    found=rows("SELECT code,english,amharic,afaan_oromo FROM tt_care_language WHERE active=1 AND (english LIKE %s ESCAPE '!' OR aliases LIKE %s ESCAPE '!' OR code=%s) ORDER BY CASE WHEN code IN ("+placeholders+") THEN 0 ELSE 1 END,english,code LIMIT 21 OFFSET %s",(term,term,search,*priority,offset))
+    for item in found:
+        display=display_catalog().get(item.code,{})
+        item.priority_group='English and Ethiopian Languages' if display.get('priority') else 'Other Languages'
+        item.region=display.get('region')
     return {'items':found[:20],'has_more':len(found)>20}
+
 @query()
 def claims(clinician=None):
     user=actor();clinician=clinician or user

@@ -1,4 +1,4 @@
-import {CareLanguageEditor} from '../components/CareLanguages';
+import {CareLanguageEditor,languageName} from '../components/CareLanguages';
 import type {CareLanguageHandle} from '../components/CareLanguages';
 import {RequiredFieldsNotice} from '../components/ui';
 import {ProfessionalStep,professionalError} from '../components/ProfessionalApplication';
@@ -40,7 +40,7 @@ type Answers = {
 };
 export default function Onboarding() {
   const { session, refresh } = useSession();
-  const { w,setLocale } = useLocale();
+  const { w,setLocale,locale } = useLocale();
   const navigate = useNavigate();
   const routeLocation = useLocation();
   const [params] = useSearchParams();
@@ -326,7 +326,7 @@ export default function Onboarding() {
                   <div><dt>{w("Profession")}</dt><dd>{(professional.profession==='Other'?professional.profession_other:professionalState?.reference_labels?.[professional.profession||''])||w('Selected Profession')}</dd></div>
                   <div><dt>{w("Primary qualification")}</dt><dd>{professional.qualification_title||w('Not Provided')}</dd></div>
                   <div><dt>{w("Issuing institution")}</dt><dd>{(professional.issuer==='Other'?professional.issuer_other:professionalState?.reference_labels?.[professional.issuer||''])||w('Selected Institution')}</dd></div>
-                  <div><dt>{w("Consultation languages")}</dt><dd>{(answers.care_languages||[]).map(code=>w(code==="en"?"English":code==="am"?"Amharic":"Afaan Oromo")).join(", ")||w("Not provided")}</dd></div>
+                  <div><dt>{w("Consultation languages")}</dt><dd>{(answers.care_languages||[]).map(code=>languageName(code,locale)).join(", ")||w("Not provided")}</dd></div>
                   <div><dt>{w("Credentials & scope")}</dt><dd>{answers.statement}</dd></div>
                   <div><dt>{w("CV")}</dt><dd>{w(resumeUploaded||(professional.cv_files||[]).length?"CV uploaded for authorized review.":"Not provided")}</dd></div>
                   <div><dt>{w("Clinic affiliations (optional)")}</dt><dd>{answers.affiliations||w("Not provided")}</dd></div>
