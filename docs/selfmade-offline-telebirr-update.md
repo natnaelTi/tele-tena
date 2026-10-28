@@ -2,7 +2,7 @@
 
 Operator procedure only; **nothing has been remotely deployed or merged**.
 Install/build pin: **d553253d8dc24681ceaa5cd71c9bc6881fe46483**.
-Fetch branch `feat/offline-telebirr-mvp`, draft release PR, dependent on unmerged [PR49](https://github.com/natnaelTi/tele-tena/pull/49). This pin preserves PR43–49 ancestry and the subsequent onboarding, Account, payment and language changes. Later guide/evidence commits need no runtime update. Read [sprint evidence](offline-telebirr-verification-2026-10-28.md) first.
+Fetch branch `feat/offline-telebirr-mvp`, draft [PR50](https://github.com/natnaelTi/tele-tena/pull/50), dependent on unmerged [PR49](https://github.com/natnaelTi/tele-tena/pull/49). This pin preserves PR43–49 ancestry and the subsequent onboarding, Account, payment and language changes. Later guide/evidence commits need no runtime update. Read [sprint evidence](offline-telebirr-verification-2026-10-28.md) first.
 
 Run as normal `smcs`, one checkpoint at a time in the same shell. Stop on **any**
 failed command, unexpected source/version/service/identity, preservation mismatch,

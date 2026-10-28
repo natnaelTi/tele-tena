@@ -1,7 +1,7 @@
 # Offline Telebirr MVP: Local Verification — 28 October 2026
 
 Runtime/build pin: **d553253d8dc24681ceaa5cd71c9bc6881fe46483**.
-Branch `feat/offline-telebirr-mvp`, dependent on draft PR49 at
+Draft [PR50](https://github.com/natnaelTi/tele-tena/pull/50), branch `feat/offline-telebirr-mvp`, dependent on draft PR49 at
 `24baa364c65d666db7c4f35e69ef3a35ee4e8a56`. Later evidence/guide-only commits
 do not change the packaged runtime. No merge or remote deployment occurred.
 
@@ -130,3 +130,7 @@ Use the [operator walkthrough](offline-telebirr-operator-walkthrough.md),
 [translation exchange](localization-review-guide.md), and
 [Selfmade update/backup/rollback procedure](selfmade-offline-telebirr-update.md).
 No public roadmap website or remote configuration was changed.
+
+## Release-Tooling Follow-Up
+
+Current production-built worker: public-only cache inspection and actual offline/online recovery passed. The controlled waiting-worker UI test passes explicit refresh/activation without automatic reload; its obsolete pre-redesign homepage assertion was corrected to the current approved hero. This controlled adapter test is separate from the actual cache/recovery browser test. Local release/backup/lock guards2/2 and dependency-plan guards8/8 pass. GitHub frontend checks pass on Node22.23.3 and24.13.0. Initial Python CI jobs failed before tests because ubuntu-latest moved to26.04 without the requested Python3.12/3.14.2 artifacts. The Python job is pinned to Ubuntu24.04, supported by the official actions/python-versions manifest; application/framework Python pins are unchanged.
