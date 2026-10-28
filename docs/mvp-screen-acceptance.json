@@ -16718,6 +16718,32 @@
         "docs/payment-mode-validation-fix-2026-10-28.md"
       ],
       "preservation": "No mode, balances, holds or historical obligations changed by verification."
+    },
+    "payment_navigation_revision": {
+      "date": "2026-10-28",
+      "runtime_commit": "ec94719809961bf54671baf4d52eb434b4f07a3e",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex",
+      "owner_status": "Awaiting owner acceptance",
+      "routes": [
+        "/patient/direct-payments/:id",
+        "/clinician/direct-payments/:id",
+        "/clinician/appointments",
+        "/clinician/requests",
+        "/clinician/consultations/:id",
+        "/admin/account"
+      ],
+      "reference_screens": [
+        "C08",
+        "D06",
+        "H01",
+        "H02"
+      ],
+      "design_exception": "Owner-approved standalone receipt workflow with payment timeline; older wallet-only reference does not contain this direct-payment state.",
+      "evidence": [
+        "docs/payment-navigation-verification-2026-10-28.md",
+        "docs/screenshots/payment-navigation"
+      ]
     }
   }
 }

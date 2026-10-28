@@ -1,3 +1,9 @@
+## Payment Navigation and Reviewer Defaults — 28 October 2026
+
+Owner-approved refinement: payment submission/review is a standalone page, with the form/status on the left and a payment-only timeline/appointment next-step link on the right. Appointment details retain a compact status/link; incoming receipts are actionable from clinician Appointments, Requests and notifications. No booking/receipt/appointment acceptance facts are merged.
+
+Reviewer accounts (Tele Tena Approver) now receive Tele Tena Financial Configuration by default through a versioned audited backfill and authorized new-reviewer assignment. This explicitly supersedes the earlier no-default-reviewer policy. It grants no receipt/clinical access beyond existing party/reviewer permissions, changes no payment mode and activates no providers. A later explicit removal is respected. See [verification](payment-navigation-verification-2026-10-28.md).
+
 ## Direct Telebirr Revision — 27 October 2026
 
 The requested MVP payment model is Offline Direct Payment, subject to explicit

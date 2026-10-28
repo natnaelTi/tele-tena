@@ -60,8 +60,7 @@ applies only to appointment acceptance; cancellation follows its policy snapshot
 ## Local Walkthrough
 
 1. Read the Financial Configuration role restriction and mode cutover in the
-   [update guide](selfmade-offline-telebirr-update.md). Ordinary reviewers cannot
-   change mode. Installation preserves Wallet and assigns the new role to nobody.
+   [update guide](selfmade-offline-telebirr-update.md). Reviewer accounts receive financial configuration by default under the owner-approvedv1.48 policy. Installation preserves Wallet; permission does not select a mode.
 2. Clinician: Account → Professional Profile & Practice → receiving number and
    Care Languages. Save explicit language self-assessments; these are claims.
 3. Reviewer: Applications → Private Documents → individual language decisions.

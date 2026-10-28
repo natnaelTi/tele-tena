@@ -1,3 +1,9 @@
+## Payment Routing and Reviewer Defaults — 28 October 2026
+
+Payment-specific notifications resolve their exact immutable payment event to an allowlisted party-authorized route, including extensions; duplicate in-app outbox projections are deduplicated. A bounded clinician review query exposes only owned pending claims and encounter-authorized identity/time, without payee or clinical text. Standalone payment pages keep timeline and appointment navigation separate from clinical details.
+
+Owner-approvedv1.48 backfills financial configuration for existing reviewers, with audit; privileged User role assignment supplies the same default to new reviewers. Client intent does not grant reviewer roles. Explicit later financial-role removal is respected. No new tables or payment-mode/balance change is part of this migration.
+
 ## Direct-Payment and Language Revision — 28 October 2026
 
 Additivev1.45–v1.47 command tables store site mode/revision, immutable payable quote/payee/policy snapshots, private receipt bytes and append-only decisions. Existing appointment capacity gate serializes booking/acceptance/verification; no Offline Wallet posting occurs. Mode changes use the same lock and an audited legacy-obligation plan. Existing durable notification outbox and native scheduler/workers handle reminders/expiry. Language claims, decisions and offering selections are separate; legacy claims migrate Pending. Source-only CSV dictionaries import reviewed values with hash/placeholder validation and rollback. No shared Python dependency or framework/Amazon change.

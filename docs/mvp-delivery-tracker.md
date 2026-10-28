@@ -1,3 +1,9 @@
+## Payment Navigation and Reviewer Defaults — 28 October 2026
+
+Owner-approved refinement: payment submission/review is a standalone page, with the form/status on the left and a payment-only timeline/appointment next-step link on the right. Appointment details retain a compact status/link; incoming receipts are actionable from clinician Appointments, Requests and notifications. No booking/receipt/appointment acceptance facts are merged.
+
+Reviewer accounts (Tele Tena Approver) now receive Tele Tena Financial Configuration by default through a versioned audited backfill and authorized new-reviewer assignment. This explicitly supersedes the earlier no-default-reviewer policy. It grants no receipt/clinical access beyond existing party/reviewer permissions, changes no payment mode and activates no providers. A later explicit removal is respected. See [verification](payment-navigation-verification-2026-10-28.md).
+
 ## Offline Telebirr Sprint — 28 October 2026
 
 Ten scoped groups are implemented and locally verified, with owner acceptance pending. Fresh Frappe16v1.47 install, populated upgrade/repeat preservation, direct and Wallet browsers, private evidence, full clinician onboarding, scheduler processing/recovery and translation exchange evidence are linked below. No hosted deployment or dataset refresh occurred.

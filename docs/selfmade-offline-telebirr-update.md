@@ -1,7 +1,7 @@
 # Selfmade Offline Telebirr Incremental Update
 
 Operator procedure only; **nothing has been remotely deployed or merged**.
-Install/build pin: **d553253d8dc24681ceaa5cd71c9bc6881fe46483**.
+Install/build pin: **ec94719809961bf54671baf4d52eb434b4f07a3e**.
 Fetch branch `feat/offline-telebirr-mvp`, draft [PR50](https://github.com/natnaelTi/tele-tena/pull/50), dependent on unmerged [PR49](https://github.com/natnaelTi/tele-tena/pull/49). This pin preserves PR43–49 ancestry and the subsequent onboarding, Account, payment and language changes. Later guide/evidence commits need no runtime update. Read [sprint evidence](offline-telebirr-verification-2026-10-28.md) first.
 
 Run as normal `smcs`, one checkpoint at a time in the same shell. Stop on **any**
@@ -33,7 +33,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=d553253d8dc24681ceaa5cd71c9bc6881fe46483
+RELEASE_SHA=ec94719809961bf54671baf4d52eb434b4f07a3e
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
 git -C apps/tele_tena status --short
@@ -177,6 +177,8 @@ mode700 bundle to protected backup storage before proceeding. The extra private
 archive preserves provider files/account manifests outside `private/files`.
 No passwords or clinical contents are printed. Do not change private permissions.
 
+This update intentionally grants financial configuration to current reviewers through the auditedv1.48 migration. It does not grant receipt/private clinical access, change payment mode or activate providers. New payment links resolve directly to the authorized receipt page. See [navigation verification](payment-navigation-verification-2026-10-28.md).
+
 ## 3. Pinned, guarded app update and packaged assets
 
 ```bash
@@ -229,7 +231,7 @@ no Vite server. The native app build maintains the existing assets link. Verify
 Public755/644 applies only to this output/root, **never** Bench/sites/backups,
 configuration or private files. If an ancestor is not traversable by Nginx, stop
 for a narrow ownership/group fix rather than recursively chmodding a home.
-Migration adds any missing earlier patches and v1.45–v1.47. Payment mode stays Wallet; new language claims are Pending, never automatically approved. It must not rewrite original records,
+Migration adds any missing earlier patches and v1.45–v1.48. Existing payment mode is preserved (fresh installations default to Wallet); new language claims are Pending, never automatically approved. It must not rewrite original records,
 credentials, sharing choices, wallets or historical holds. Preserve failure logs;
 do not skip patches or seed data to make migration/preservation pass.
 
@@ -389,7 +391,7 @@ and inspect the protected backup/restore log; do not edit balances to reconcile 
 
 The update **does not** switch modes or change provider/access settings. New language approval is a deliberate prerequisite: each existing clinician opens Account → Professional Profile & Practice → Care Languages, supplies an explicit self-assessment, and the authorized reviewer records an individual language decision. Ensure approved offering languages remain appropriate. Pending declarations are preserved without invented ratings. Existing appointments and their original payment rules remain intact; withdrawn language approval flags future appointments for operational review.
 
-1. Use Administrator or explicitly assign `Tele Tena Financial Configuration` to a trusted financial operator. Ordinary reviewers and clinicians must not receive it implicitly. Open `/teletena/financial-configuration`. Review current mode, revision, unresolved direct payments, legacy wallet holds and payout requests.
+1. Use Administrator or explicitly assign `Tele Tena Financial Configuration` to a trusted financial operator. Per the28October owner decision, v1.48 assigns this role to existing reviewers (Tele Tena Approver) and new administrator-assigned reviewers receive it by default. Clinicians do not receive it from their clinician role. Explicit later removals remain respected. Open `/teletena/financial-configuration`. Review current mode, revision, unresolved direct payments, legacy wallet holds and payout requests.
 2. Each participating clinician saves their own Telebirr receiving number in Account's practice/payment section. It must be an eligible Ethiopian number. This is a declared receiving account, not provider verification. Public discovery never receives this number.
 3. Agree the proposed hold/verification defaults (30 minutes/24 hours, capped at session start) and an operational late-proof/refund procedure before cutover. There is no three-minute payment cancellation rule.
 4. Pause new intake during cutover, resolve active direct intents if any. If historical wallet holds/payouts or unresolved external reconciliation remain, supply a concrete audited transition plan. Historical Wallet appointments, holds, earnings and payouts keep their original method/rules. No money is converted or discarded.
