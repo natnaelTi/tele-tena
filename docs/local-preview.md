@@ -43,6 +43,16 @@ Linux HTTP check alone is not evidence for it.
 Credentials stay in the mode-600 private site file
 `/home/frappe/frappe/frappe-bench/sites/teletena-mvp-presentation.localhost/private/tele_tena_presentation_accounts.json`.
 Use email instead → Use password instead for the existing private review accounts.
+For Frappe Administrator access, use
+http://127.0.0.1:8017/login?redirect-to=%2Fapp and the username `Administrator`.
+The TeleTena email/OTP form is intended for application accounts. The scoped
+preview adapter serves the existing Bench public `/assets` tree for native login
+and Desk bundles; site configuration/private files are not exported. On28October
+the missing native bundles were repaired: browser JS/CSS loaded without404s,
+and the Administrator form generated its login POST (intercepted before server
+authentication, without a real password). Encoded traversal attempts to private
+configuration/account files returned404. The owner's new Administrator password
+was not read, reset or tested.
 Observed18October:the retained presentation site reports phone/email code and both
 registration switches enabled;this revision did not change them or test their live
 delivery. Controlled registration tests use a separate site and loopback transport;
