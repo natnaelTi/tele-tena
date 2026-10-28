@@ -16782,6 +16782,30 @@
         "docs/screenshots/clinician-notifications"
       ],
       "remaining": "Owner acceptance; no live external delivery claims"
+    },
+    "care_language_selector_revision": {
+      "date": "2026-10-28",
+      "runtime_commit": "a18c04f9ce4ebada3ba8171fe653093460f323ca",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex",
+      "owner_status": "Awaiting owner acceptance",
+      "routes": [
+        "/onboarding?intent=clinician",
+        "/clinician/account",
+        "/sign-in"
+      ],
+      "requirements": [
+        "Complete catalog names, not browser-returned codes",
+        "Visible searchable selection with retained claims",
+        "Server alphabetic ordering and English/Ethiopian group before pagination",
+        "Local flag graphics independent of OS emoji fonts",
+        "Separate language claims/self-assessment/approval preserved"
+      ],
+      "evidence": [
+        "docs/care-language-selector-verification-2026-10-28.md",
+        "docs/screenshots/care-language-selector",
+        "tests/language_catalog.py"
+      ]
     }
   }
 }

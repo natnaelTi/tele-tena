@@ -1,7 +1,7 @@
 # Selfmade Offline Telebirr Incremental Update
 
 Operator procedure only; **nothing has been remotely deployed or merged**.
-Install/build pin: **3e6aa71765b90d68174e6a0783ec46633013461b**.
+Install/build pin: **a18c04f9ce4ebada3ba8171fe653093460f323ca**.
 Fetch branch `feat/offline-telebirr-mvp`, draft [PR50](https://github.com/natnaelTi/tele-tena/pull/50), dependent on unmerged [PR49](https://github.com/natnaelTi/tele-tena/pull/49). This pin preserves PR43–49 ancestry and the subsequent onboarding, Account, payment and language changes. Later guide/evidence commits need no runtime update. Read [sprint evidence](offline-telebirr-verification-2026-10-28.md) first.
 
 Run as normal `smcs`, one checkpoint at a time in the same shell. Stop on **any**
@@ -33,7 +33,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=3e6aa71765b90d68174e6a0783ec46633013461b
+RELEASE_SHA=a18c04f9ce4ebada3ba8171fe653093460f323ca
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
 git -C apps/tele_tena status --short
