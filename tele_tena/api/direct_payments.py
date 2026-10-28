@@ -111,8 +111,14 @@ def notice_path(appointment,user,event_id=None):
 def pending_reviews():
     clinician=actor('Tele Tena Clinician');profile('clinician')
     where="clinician=%s AND state IN ('Submitted','ReconciliationRequired') AND transaction_ref IS NOT NULL AND verified_at IS NULL"
+    found=rows('SELECT id,appointment,reference_type,amount,currency,state,created FROM tt_direct_payment WHERE '+where+' ORDER BY created,id LIMIT 20',(clinician,))
+    from tele_tena.api.journey import iso
+    for payment in found:
+        app=one('SELECT start,timezone,disclosure FROM tt_appointment WHERE id=%s AND clinician=%s',(payment.appointment,clinician))
+        payment.patient_label=json.loads(app.disclosure or '{}').get('name') or None
+        payment.start=iso(app.start);payment.timezone=app.timezone
     return {'total':one('SELECT COUNT(*) n FROM tt_direct_payment WHERE '+where,(clinician,)).n,
-            'items':rows('SELECT id,appointment,reference_type,amount,currency,state,created FROM tt_direct_payment WHERE '+where+' ORDER BY created,id LIMIT 20',(clinician,))}
+            'items':found}
 @command
 def submit(id,transaction_ref,amount,filename,content_base64,retry_key):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE');p,user=authorize(id,True)
