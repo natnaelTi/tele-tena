@@ -90,6 +90,7 @@ def working_copy(original,destination,sheet_path,annotations,corrections):
 
 def reconcile(original,output,baseline):
  output=Path(output);output.mkdir(mode=0o700,parents=True,exist_ok=True)
+ if Path(original).resolve()==(output/'TeleTena_Translation_Working_Copy.xlsx').resolve():raise ValueError('Working output must never overwrite the supplied workbook')
  if output.resolve().is_relative_to((exchange.ROOT/'frontend').resolve()) or output.resolve().is_relative_to((exchange.ROOT/'tele_tena/public').resolve()):raise ValueError('Review drafts must remain outside public frontend/build trees')
  book=sheets(original);sheet=book['Translations'];rows=sheet['rows'];header=rows[0]
  if [header.get(chr(65+i)) for i in range(len(HEADERS))]!=HEADERS:raise ValueError('Unexpected workbook columns')

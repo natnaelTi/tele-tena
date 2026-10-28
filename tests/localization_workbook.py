@@ -29,6 +29,12 @@ class Workbook(unittest.TestCase):
  def test_independent_locale_approval_and_existing_preview(self):
   result=self.runbook();self.assertEqual(result['eligible_exports'],{'amharic':1,'afaan_oromo':0})
   exported=list(csv.DictReader(io.StringIO((self.root/'out/approved-amharic.csv').read_text())));self.assertEqual(exported[0]['amharic'],'መነሻ');self.assertEqual(exported[0]['afaan_oromo'],'');self.assertFalse(w.exchange.preview(self.root/'out/approved-amharic.csv')['errors']);self.assertFalse((self.root/'reviewed.json').exists())
+ def test_oromo_approval_does_not_import_amharic_draft(self):
+  self.row.update(D='Draft',E='',G='Approved',H='Synthetic Oromo Test Reviewer');r=self.runbook();self.assertEqual(r['eligible_exports'],{'amharic':0,'afaan_oromo':1});rows=list(csv.DictReader(io.StringIO((self.root/'out/approved-afaan_oromo.csv').read_text())));self.assertEqual(rows[0]['amharic'],'');self.assertEqual(rows[0]['afaan_oromo'],'Mana')
+ def test_original_workbook_cannot_be_output_target(self):
+  self.book();original=self.root/'TeleTena_Translation_Working_Copy.xlsx';self.path.rename(original);before=original.read_bytes()
+  with self.assertRaises(ValueError):w.reconcile(original,self.root,self.baseline)
+  self.assertEqual(original.read_bytes(),before)
  def test_draft_and_missing_attribution_cannot_become_approved(self):
   self.row['D']='Draft';self.row['E']='';r=self.runbook();self.assertEqual(r['eligible_exports']['amharic'],0)
   self.row['D']='Approved';r=self.runbook();self.assertEqual(r['eligible_exports']['amharic'],0)
