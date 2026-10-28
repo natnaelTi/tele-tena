@@ -154,6 +154,8 @@ export default function Onboarding() {
       const code = failure instanceof ApiError ? failure.code : "network_error";
       setError(failure instanceof ApiError && failure.message && ["bio_word_limit","professional_required","declaration_required","competency_rating_required","credential_date_range","reference_other_required","issuer_country_required"].includes(code)?professionalError(failure):code === "adult_required"
         ? "Please check this step and try again. Adult eligibility and consent are required to finish."
+        : code === "care_language_assessment_required"
+          ? "Return to Your Professional Profile, choose your care languages and select a self-assessment level for each. Your saved details are retained."
         : code === "professional_required"
           ? "Complete your profession, qualification, institution and care languages before submission."
         : code === "resume_required"
