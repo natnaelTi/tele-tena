@@ -16,7 +16,7 @@ function FeedForUser({children,enabled,clinician}:{children:ReactNode;enabled:bo
    if(!active.current)return;
    const failed=general.status==='rejected',offerFailed=offers.status==='rejected';
    if(!failed)last.current.general=general.value;
-   if(!offerFailed)last.current.offers=offers.value.items.map(n=>({id:n.id,source:'offer',kind:'OfferAccepted',title:'Your Offer Was Accepted',category:'offers',appointment:n.appointment,created:n.accepted_at,read:n.read,appointment_state:n.appointment_state,payment_mode:n.payment_mode,href:'/clinician/consultations/'+n.appointment}));
+   if(!offerFailed)last.current.offers=offers.value.items.map(n=>({id:n.id,source:'offer',kind:'OfferAccepted',title:'Your Offer Was Accepted',category:'offers',appointment:n.appointment,created:n.accepted_at||'',read:n.read,appointment_state:n.appointment_state,payment_mode:n.payment_mode,href:'/clinician/consultations/'+n.appointment}));
    if(failed&&(!clinician||offerFailed)){setError(true);return;}
    const next=[...last.current.general,...last.current.offers].sort((a,b)=>b.created.localeCompare(a.created));
    const payments=next.some(n=>n.kind.startsWith('Payment')&&!known.current.has(n.source+n.id));
@@ -26,7 +26,7 @@ function FeedForUser({children,enabled,clinician}:{children:ReactNode;enabled:bo
   }catch{if(active.current)setError(true);}finally{clearTimeout(timeout);flight.current=null;}})();return flight.current;
  },[enabled,clinician]);
  useEffect(()=>{active.current=true;void refresh();const timer=setInterval(()=>void refresh(),5000);const resume=()=>{if(document.visibilityState==='visible')void refresh();};window.addEventListener('focus',resume);window.addEventListener('online',resume);document.addEventListener('visibilitychange',resume);return()=>{active.current=false;clearInterval(timer);abort.current?.abort();window.removeEventListener('focus',resume);window.removeEventListener('online',resume);document.removeEventListener('visibilitychange',resume);};},[refresh]);
- const mark=useCallback(async(item:Notice)=>{await api(item.source==='offer'?'tele_tena.api.open_requests.read_clinician_notification':'tele_tena.notifications.mark_read',item.source==='offer'?{offer_id:item.id}:{id:item.id,source:item.source},true);if(active.current)setItems(old=>old?.map(n=>n.source===item.source&&n.id===item.id?{...n,read:true}:n)||null);await refresh();},[refresh]);
+ const mark=useCallback(async(item:Notice)=>{await api(item.source==='offer'?'tele_tena.api.open_requests.read_clinician_notification':'tele_tena.notifications.mark_read',item.source==='offer'?{offer_id:item.id}:{id:item.id,source:item.source},true);await flight.current;if(active.current)setItems(old=>old?.map(n=>n.source===item.source&&n.id===item.id?{...n,read:true}:n)||null);await refresh();},[refresh]);
  return <Context.Provider value={{items,error,partial,refresh,mark}}>{children}</Context.Provider>;
 }
 export function useNotifications(){const value=useContext(Context);if(!value)throw new Error('Notification provider unavailable');return value;}
