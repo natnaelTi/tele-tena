@@ -554,3 +554,18 @@ Profile photo selection/drop opens an in-memory crop/zoom/position preview with 
 Patient Requests contains composition, preferences, immutable disclosure preview, publication, live progress, clinician inspection, private offer comparison, funding and acceptance. Clinician Requests contains the eligible inbox, authorized disclosure, approved-offering response editor and private active/history outcomes. Existing deep links select the corresponding record in these workspaces; only opaque references belong in URLs. Draft clinical text stays in React memory and survives local view/step changes, not a page reload. Hidden drafts still protect against tour navigation; published/sent drafts clear only after durable success.
 
 Acceptance uses the existing atomic appointment/reservation command; this presentation change introduces no parallel booking or accounting workflow. The patient remains on the matched request until opening the authorized appointment. Offer acceptance is a historical event, distinct from the appointment's current status: cancelled/ended/completed appointments are not relabeled confirmed by their old matched request. Schedule-for-later prepares a new draft without silently cancelling or rewriting the original request.
+
+### Direct Payment Live Activity — 28 October 2026
+
+After proof submission, the payer sees the immutable submitted details and private
+receipt rather than an editable replacement form. A correction/rejection explicitly
+reopens submission; identical retries return the same result. The server also
+rejects replacement while review is pending. Authorized payment pages and workspace
+alerts refresh within a bounded five-second polling cycle while reachable.
+Alerts are neutral, do not navigate automatically, and retain durable inbox/read
+state; historical unread items remain in the bell rather than flooding new popups.
+Submission and receipt verification are separate durable activity facts: fast
+verification must not supersede the queued submission email/SMS. Each respects
+recipient preferences, verified contact, site/provider availability and SMS caps.
+Provider acceptance is not delivery. Reminders remain conditional on current state.
+No mode, payment verification, appointment acceptance or money rules change here.

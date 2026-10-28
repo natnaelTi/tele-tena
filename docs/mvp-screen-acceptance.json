@@ -16744,6 +16744,24 @@
         "docs/payment-navigation-verification-2026-10-28.md",
         "docs/screenshots/payment-navigation"
       ]
+    },
+    "payment_live_updates": {
+      "date": "2026-10-28",
+      "runtime_commit": "cd89a9ff82484233caa4a8353341cde6c3b4a182",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex",
+      "owner_status": "Awaiting owner acceptance",
+      "routes": [
+        "/patient/direct-payments/:id",
+        "/clinician/direct-payments/:id",
+        "Authenticated patient/clinician pages: payment activity alert"
+      ],
+      "behavior": "Five-second authorized polling; pending proof read-only until correction; immutable submission/verification outbox facts; preference-aware email/SMS; durable notification read status. No real-time provider or physical delivery claim.",
+      "evidence": [
+        "docs/payment-live-updates-2026-10-28.md",
+        "docs/screenshots/payment-live",
+        "scripts/browser-payment-live.cjs"
+      ]
     }
   }
 }
