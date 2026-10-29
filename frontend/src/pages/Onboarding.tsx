@@ -1,3 +1,4 @@
+import ApplicationAttachments from '../components/ApplicationAttachments';
 import {CareLanguageEditor,languageName} from '../components/CareLanguages';
 import type {CareLanguageHandle} from '../components/CareLanguages';
 import {RequiredFieldsNotice} from '../components/ui';
@@ -332,6 +333,7 @@ export default function Onboarding() {
                   <div><dt>{w("Clinic affiliations (optional)")}</dt><dd>{answers.affiliations||w("Not provided")}</dd></div>
                 </dl>
               </section>
+              <ApplicationAttachments claims={professional} evidence={professionalState?.evidence||[]} legacyCV={professionalState?.legacy_cv}/>
               <section className="onboarding-review-panel">
                 <h2>{w("Requested Scopes")}</h2>
                 <ul>{(answers.requested_services||[]).map(id=><li key={id}><FileText size={22} aria-hidden="true"/><div><strong>{catalog.find(service=>service.id===id)?.label||w("Service details unavailable")}</strong><p>{w("Pending review")}</p></div></li>)}</ul>
