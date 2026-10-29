@@ -1,9 +1,4 @@
 {
-  "added": [
-    "copy.clinician.patient_care_record"
-  ],
-  "stale": [
-    "copy.consultationpage.private_patient",
-    "copy.consultationpage.your_clinician"
-  ]
+  "added": [],
+  "stale": []
 }

@@ -52,6 +52,7 @@ import "./RequestWorkspace.css";
 
 type Service = { id: string; label: string };
 type Offer = {
+  photo_url?:string|null;
   id: string;
   clinician_name: string;
   clinician_id: string;
@@ -913,7 +914,7 @@ function PatientRequestThread({
                     data-offer-id={offer.id}
                   >
                     <header>
-                      <Avatar name={offer.clinician_name} />
+                      <Avatar url={offer.photo_url} name={offer.clinician_name} />
                       <div>
                         <h4>{offer.clinician_name}</h4>
                         <p>{offer.specialty}</p>

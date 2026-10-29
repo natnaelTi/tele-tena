@@ -58,6 +58,12 @@ class AttachmentPhotos(DirectPayment):
    user=frappe.get_doc({'doctype':'User','email':email,'first_name':'Fictional Photo Patient','send_welcome_email':0,'user_type':'Website User'}).insert();user.add_roles('Tele Tena Patient')
   frappe.set_user(email);j.save_profile('patient','Fictional Photo Patient',1)
   self.assertTrue(photos.sharing()['share_photo']);self.assertEqual(j.one('SELECT share_photo FROM tt_patient_photo_preference WHERE user=%s',(email,)).share_photo,1)
+ def test_private_offer_cards_project_only_public_clinician_photo(self):
+  from tele_tena.api.open_requests import my_requests
+  frappe.set_user(users['counselor']);photos.upload('fictional-professional.png',self.image(),1);provider=j.one('SELECT public_id FROM tt_profile WHERE user=%s',(users['counselor'],)).public_id
+  frappe.set_user(users['patient']);offers=[o for r in my_requests() for o in r.offers];self.assertTrue(any(o.clinician_id==provider and o.photo_url for o in offers));self.assertTrue(all('photo_clinician' not in o for o in offers))
+  frappe.set_user(users['counselor'])
+  with self.assertRaises(frappe.PermissionError):my_requests()
  def test_couple_photo_preferences_and_recipient_isolation(self):
   from tele_tena.api import couples
   super().test_couples_payment_keeps_payer_consent_and_language_separate()

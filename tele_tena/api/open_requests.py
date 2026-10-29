@@ -458,13 +458,15 @@ def _serialize_patient_request(req):
         WHERE request_id=%s AND event='Published' ORDER BY occurred_at LIMIT 1''', (req.id,))
     req.eligible_supply = int(supply[0].eligible_supply or 0) if supply else None
     offers = rows('''SELECT o.id,o.start,o.duration_minutes,o.consultation_format,o.price_minor,o.timezone,
-        o.price_source,o.state,o.valid_until,p.display_name clinician_name,p.public_id clinician_id,
+        o.price_source,o.state,o.valid_until,p.display_name clinician_name,p.public_id clinician_id,p.user photo_clinician,
         s.service_label specialty
         FROM tt_request_offer o JOIN tt_profile p ON p.user=o.clinician
         JOIN tt_offering off ON off.id=o.offering
         JOIN `tabTele Tena Service` s ON s.name=off.service WHERE o.request_id=%s
         ORDER BY o.created_at DESC''', (req.id,))
     for offer in offers:
+        from tele_tena.api.profile_photos import public_photo
+        offer.photo_url=public_photo(offer.pop('photo_clinician'))
         offer.start = offer.start.isoformat() + 'Z'
         offer.valid_until = offer.valid_until.isoformat() + 'Z'
     req.offers = offers

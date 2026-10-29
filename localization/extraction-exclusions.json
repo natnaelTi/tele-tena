@@ -2861,87 +2861,87 @@
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:123",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:124",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Active",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:125",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:126",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:375",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:376",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:470",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:471",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "open-request-composer request-guided-composer",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:520",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:521",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:815",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:816",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:827",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:828",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:839",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:840",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Active",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:943",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:944",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Superseded",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1394",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1395",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "text-link request-index-help",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1435",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1436",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "prewrap request-authorized-narrative",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1559",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1560",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Superseded",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1800",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1801",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "request-inline-facts quote-summary",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1805",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1806",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Accepted",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1833",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1834",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Active",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1836",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1837",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "button primary",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1882",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1883",
     "reason": "Technical JSX attribute className"
   },
   {
