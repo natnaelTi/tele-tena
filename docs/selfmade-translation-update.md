@@ -1,18 +1,19 @@
-# Selfmade Incremental Translation Release — Operator Procedure
+# Selfmade Incremental MVP Demo / Localized Release — Operator Procedure
 
-**Localization deployment is blocked by human review.** Technical candidate:
-`569537640665d9dcbb07738523fd49e4c5c5354a`, branch
-`feat/offline-telebirr-mvp`, draft [PR50](https://github.com/natnaelTi/tele-tena/pull/50)
-dependent on [PR49](https://github.com/natnaelTi/tele-tena/pull/49).
-It contains every completed current MVP refinement, but imports **zero** workbook
-translations because neither locale has human approvals/reviewer names. Dictionary
-hash `ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356` is the
-unchanged empty reviewed dictionary, not a completed Amharic/Oromo release.
+This procedure distinguishes **Demo** from **Final Localized Release**. The owner
+explicitly authorizes the demo with existing permitted translations and truthful
+English fallbacks. It imports no workbook drafts and does not claim clinical,
+legal-policy, native-language or real-payment readiness. Final localization still
+requires genuine independent approvals, validated import and a new verified pin.
 
-The pre-outage approval gate below deliberately fails for this pin. Do not bypass
-it. After human review/import/local verification, prepare a new immutable pin and
-update this guide. The remaining checkpoints describe the exact guarded update
-procedure; they are not authorization to ship unapproved drafts.
+Candidate `553a6190b4c4a0431dc5126fc6d2d095e50f5faa`, branch `feat/offline-telebirr-mvp`, draft
+[PR50](https://github.com/natnaelTi/tele-tena/pull/50) dependent on draft PR49.
+This includes current MVP work plus primary patient navigation, private previews,
+sectioned onboarding attachments and encounter-authorized current photos with an
+independent revocable patient preference. v1.49 adds one preference table/default;
+no dependency, provider, payment-mode or historic disclosure change. Reviewed
+translation hash remains `ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356`,
+with zero human-approved workbook imports. See attachment-photo-release-readiness.md.
 
 Nothing has been remotely deployed or merged. Do not run the separate historical
 Offline mode-cutover section: this update preserves the current payment mode.
@@ -32,7 +33,8 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=569537640665d9dcbb07738523fd49e4c5c5354a
+RELEASE_SHA=553a6190b4c4a0431dc5126fc6d2d095e50f5faa
+RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
 git -C apps/tele_tena status --short
@@ -72,35 +74,38 @@ before backup; runtime checkout/install happens only in checkpoint6.
 ```bash
 git -C apps/tele_tena fetch origin feat/offline-telebirr-mvp
 git -C apps/tele_tena cat-file -e "$RELEASE_SHA^{commit}"
+git -C apps/tele_tena diff --stat "$OLD_SHA" "$RELEASE_SHA"
+git -C apps/tele_tena diff "$OLD_SHA" "$RELEASE_SHA" -- pyproject.toml frontend/package.json frontend/package-lock.json tele_tena/patches.txt
 git -C apps/tele_tena merge-base --is-ancestor "$OLD_SHA" "$RELEASE_SHA"
 git -C apps/tele_tena merge-base --is-ancestor \
   45e1600a35a9450bb26b50397749c01491b2d4a7 "$OLD_SHA"
-env/bin/python - "$RELEASE_SHA" <<'PY'
+env/bin/python - "$RELEASE_SHA" "$RELEASE_PURPOSE" <<'PY'
 import json,subprocess,sys
-sha=sys.argv[1]
+sha,purpose=sys.argv[1:];assert purpose in ('demo','localized')
 def read(path):return json.loads(subprocess.check_output(['git','-C','apps/tele_tena','show',sha+':'+path],text=True))
 reviewed=read('localization/reviewed.json');catalog=read('localization/catalog.json')
 required={e['english'] for e in catalog.values()}
 for locale in ('amharic','afaan_oromo'):
     supplied={e['english'] for e in reviewed.values() if e.get(locale)}
     print(locale,'reviewed unique phrases',len(required&supplied),'missing',len(required-supplied))
-    assert not required-supplied,'STOP: human-reviewed localization is incomplete; do not start maintenance'
+    if purpose=='localized':assert not required-supplied,'STOP: human-reviewed localization is incomplete; do not start maintenance'
+print('Purpose:',purpose,'; no draft dictionary import or provider/payment activation')
 PY
 ```
 
-The second ancestry guard defines the verified translation-only baseline. If the
+The second ancestry guard defines the verified v1.48-or-later update baseline. If the
 installed release predates45e1600 or is on unrelated ancestry, stop: collect the
 installed SHA and `git diff "$OLD_SHA" "$RELEASE_SHA" -- tele_tena/patches.txt
 pyproject.toml frontend/package-lock.json` for a baseline-specific functional/schema
 upgrade plan. The candidate includes older features, but unknown older migrations
-must not be silently treated as this verified translation-only delta.
+must not be silently treated as this verified v1.49 incremental delta.
 
 ## 3. Initialize Once, or Resume the Retained Bundle
 
 **Choose one block. Never rerun initialization when resuming.** Do not make a new
 empty backup directory to get past a missing/failed checkpoint.
 
-Initialize once, only after the approval/baseline gates pass:
+Initialize once, only after the purpose-specific localization and baseline gates pass:
 
 ```bash
 UPDATE_BACKUP=$(mktemp -d /home/smcs/teletena-before-translations.XXXXXXXX)
@@ -108,6 +113,7 @@ chmod 700 "$UPDATE_BACKUP"
 printf '%s\n' "$OLD_SHA" > "$UPDATE_BACKUP/tele_tena.sha"
 printf '%s\n' "$SITE" > "$UPDATE_BACKUP/site.txt"
 printf '%s\n' "$RELEASE_SHA" > "$UPDATE_BACKUP/candidate.sha"
+printf '%s\n' "$RELEASE_PURPOSE" > "$UPDATE_BACKUP/purpose.txt"
 TOOLS="$UPDATE_BACKUP/tools"
 mkdir -m 700 "$TOOLS"
 for TOOL in dependency_checkpoint.py release_preflight.py check_frappe_lock.py backup_review_release.py verify_release_backup.py restore_review_release.py export_loaded_supervisor.py release_preservation.py check_financial_owners.py; do
@@ -116,7 +122,11 @@ done
 printf 'RETAIN THIS EXACT BACKUP PATH: %s\n' "$UPDATE_BACKUP"
 ```
 
-Resume in a new shell **instead** (replace the example with the actual retained path):
+Resume in a new shell **instead** (replace the example with the actual retained path).
+If writers are already stopped, start here rather than rerunning the live HTTP/PID
+checks in checkpoints1/4. Retain their original reports; do not overwrite the
+pre-update baseline with the partly installed candidate. After validation, resume
+only the first unfinished checkpoint. Do not rerun completed backup initialization:
 
 ```bash
 set -euo pipefail
@@ -124,7 +134,8 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=569537640665d9dcbb07738523fd49e4c5c5354a
+RELEASE_SHA=553a6190b4c4a0431dc5126fc6d2d095e50f5faa
+RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 UPDATE_BACKUP=/home/smcs/teletena-before-translations.RETAINED_PATH
 TOOLS="$UPDATE_BACKUP/tools"
 test -d "$UPDATE_BACKUP" && test ! -L "$UPDATE_BACKUP"
@@ -132,7 +143,11 @@ test "$(stat -c %u "$UPDATE_BACKUP")" = "$(id -u)"
 test "$(stat -c %a "$UPDATE_BACKUP")" = 700
 test "$(cat "$UPDATE_BACKUP/site.txt")" = "$SITE"
 test "$(cat "$UPDATE_BACKUP/candidate.sha")" = "$RELEASE_SHA"
+test "$(cat "$UPDATE_BACKUP/purpose.txt")" = "$RELEASE_PURPOSE"
 OLD_SHA=$(cat "$UPDATE_BACKUP/tele_tena.sha")
+CURRENT_SHA=$(git -C apps/tele_tena rev-parse HEAD)
+test "$CURRENT_SHA" = "$OLD_SHA" || test "$CURRENT_SHA" = "$RELEASE_SHA"
+test -z "$(git -C apps/tele_tena status --porcelain)"
 test -s "$TOOLS/verify_release_backup.py"
 # Required before resuming checkout/install/migration:
 env/bin/python "$TOOLS/verify_release_backup.py" "$UPDATE_BACKUP/site-backups"
@@ -256,7 +271,11 @@ constraints, framework requirements installation or shared dependency repair.
 ## 7. Locked Production Build and Public Permissions
 
 ```bash
-env/bin/python apps/tele_tena/scripts/check_translation_release.py --require-complete
+if test "$RELEASE_PURPOSE" = localized; then
+  env/bin/python apps/tele_tena/scripts/check_translation_release.py --require-complete
+else
+  env/bin/python apps/tele_tena/scripts/check_translation_release.py
+fi
 env/bin/python apps/tele_tena/scripts/build_review.py > "$UPDATE_BACKUP/frontend-build.log" 2>&1
 "$BENCH_CLI" build --app tele_tena
 PUBLIC=/home/smcs/frappe-bench/apps/tele_tena/tele_tena/public
@@ -289,8 +308,10 @@ env/bin/python "$TOOLS/check_financial_owners.py" --bench /home/smcs/frappe-benc
 "$BENCH_CLI" --site "$SITE" clear-website-cache
 ```
 
-Current translation-only delta has no schema patch, requirement change or new
-payment mode. All protected native TeleTena/command records, users/auth, files,
+This incremental release adds v1.49: tt_patient_photo_preference, defaulting only
+missing patient preferences to enabled using INSERT IGNORE. Existing explicit
+opt-outs remain unchanged; no historical consent is invented and no disclosure
+snapshot is rewritten. No requirement/provider change or new payment mode occurs. All protected native TeleTena/command records, users/auth, files,
 configuration and financial history remain strict. Do not skip patches or delete
 holds. If an older separately planned upgrade executes the owner-approvedv1.48
 reviewer default, the helper has an explicit `--expect-reviewer-default-v148` mode:
@@ -298,7 +319,7 @@ it verifies only missing Financial Configuration grants to existing reviewers,
 matching audited events and associated modification/index metadata; all credentials,
 settings, other roles/records/files remain strict. It is not a general ignore flag.
 Use it only in that separately reviewed older-baseline plan, never to hide an
-unexplained mismatch in this translation-only procedure.
+unexplained mismatch in this v1.49 procedure.
 
 ## 9. Shared-State Checks and Scoped Recovery
 
@@ -373,7 +394,8 @@ exception. No authenticated API, medical data or OTP caching is authorized.
 
 Use retained private demo credentials; do not seed or print passwords. For each
 locale check proper Ethiopic/Oromo text, wrapping, dialogs/keyboard focus at390,
-768,1440 and actual200% zoom, with the approved translation hash from checkpoint10.
+768,1440 and actual200% zoom, with the packaged translation hash from checkpoint10. A demo deliberately retains
+unreviewed English fallbacks; it must not be labeled final localization acceptance.
 
 1. Guest directory → profile → Sign in to Book → exact offering calendar return.
 2. Patient Account saved locale → reload; privacy/file selection unchanged. Requests,
@@ -382,7 +404,19 @@ locale check proper Ethiopic/Oromo text, wrapping, dialogs/keyboard focus at390,
    payment notification/pane, manual pause, appointment handoff and Revenue Ledger.
 4. Reviewer application/credential/scope/language decisions remain separate; policy
    translations retain actual draft/publication state and do not approve legal text.
-5. Reuse authorized individual/couples consultation/notes/recipient/payment evidence;
+5. Patient primary navbar includes My Requests and Shared Care; More has neither.
+   At narrow widths/200% use the scrollable primary rail. Verify Back/Forward.
+6. Open a private receipt from patient and receiving clinician payment pages: dialog,
+   original filename, zoom/fit, Escape/focus return, explicit Download only. Reviewer
+   opens authorized professional evidence; ID still needs specific assignment.
+7. Clinician final onboarding review groups ID/CV/license/each credential files;
+   preview/close/reload must retain the step and inputs, never submit accidentally.
+8. Patient Account → Privacy & Sharing → Share My Profile Photo With My Clinicians.
+   Test withdrawal with a consenting demonstration patient, restore their chosen
+   preference afterward; no owner-only file selection/name/history reset. Authorized
+   image GET denies immediately after withdrawal, visible avatars revalidate every30s
+   while active/on returning to the tab. Partners/unrelated clinicians remain denied.
+9. Reuse authorized individual/couples consultation/notes/recipient/payment evidence;
    run a fresh bounded call only if changed behavior warrants it. No payment or live
    SMS/email smoke send without a separately consenting operator/recipient.
 

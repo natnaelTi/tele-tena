@@ -79,6 +79,11 @@ class AttachmentPhotos(DirectPayment):
   with self.assertRaises(frappe.PermissionError):photos.encounter_photo(app.id,payer.id)
   frappe.set_user(payer.user);photos.set_sharing(0);frappe.set_user(app.clinician)
   with self.assertRaises(frappe.PermissionError):photos.encounter_photo(app.id,payer.id)
+  from unittest.mock import patch
+  frappe.set_user(partner.user);photos.set_sharing(1)
+  with patch.object(frappe.db,'commit'):couples.withdraw(plan.id)
+  self.assertTrue(photos.patient_sharing(partner.user));frappe.set_user(app.clinician)
+  with self.assertRaises(frappe.PermissionError):photos.encounter_photo(app.id,partner.id)
 if __name__=='__main__':
  try:unittest.main(defaultTest='AttachmentPhotos')
  finally:frappe.db.rollback();frappe.destroy()

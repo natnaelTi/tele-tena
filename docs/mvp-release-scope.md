@@ -234,3 +234,27 @@ Existing policy draft/publication status and consent versions remain unchanged.
 See [localization-release-readiness.md](localization-release-readiness.md), the
 existing screen matrix revision and [selfmade-translation-update.md](selfmade-translation-update.md).
 Historical evidence is retained; no separate roadmap website was changed.
+
+
+## Navigation, Private Previews and Encounter Photos — 29 October 2026
+
+Owner-approved v1.49 adds an independent patient preference to share the current
+profile photo only with an otherwise authorized treating clinician. Missing new
+and legacy preferences default enabled; explicit opt-outs remain intact. This
+supersedes the earlier blanket owner-only patient-photo presentation, while name,
+history, file choices and immutable encounter consent remain unchanged. Withdrawal
+denies subsequent image requests and avatars revalidate on active-tab refresh.
+Couples participants never grant photo access for one another.
+
+Patient Requests and Shared Care are primary navigation. Private receipt and
+professional attachment previews retain underlying access/PDF restrictions. Final
+application review groups selected filenames by purpose. Encounter avatars are
+LEFT of the authorized person's name; page headings stay separate.
+
+Demo deployment is authorized with existing permitted translations and truthful
+fallbacks. Final localization remains blocked by independent human approvals; no
+Draft import or approval bypass was added. See the existing matrix revision and
+[attachment-photo-release-readiness.md](attachment-photo-release-readiness.md),
+[selfmade-translation-update.md](selfmade-translation-update.md). No remote
+deployment, merge, reseed, password/provider/access/mode change or public-roadmap
+website update is claimed.

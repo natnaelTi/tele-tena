@@ -1,3 +1,5 @@
+> Later owner authorization separates demo from final localization. Current integrated demo and unchanged language-approval gates are recorded in [attachment-photo-release-readiness.md](attachment-photo-release-readiness.md). Historical evidence below is retained.
+
 # Translation Workbook Release Readiness — 28 October 2026
 
 **Human language review blocks a localized deployment.** All independent local

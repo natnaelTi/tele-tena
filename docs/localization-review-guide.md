@@ -116,3 +116,19 @@ Review this separately through the existing CSV workflow, one locale at a time
 with the other blank and genuine attribution in translator_notes. Only change
 provisional to reviewed after human review; preview/import separately. Do not
 append new keys to the old-baseline workbook or fabricate source hashes.
+
+
+## Navigation/Attachment/Photo Delta — 29 October
+
+`localization/attachment-photo-delta.csv` contains38 new/changed source rows since
+253d5eb, all requiring independent review. The full current exchange has8,415 rows.
+Current workbook reconciliation is privately retained under
+`/home/frappe/teletena-attachment-release/localization-review/`; the earlier review
+package and original workbook remain unchanged. Source-confirmed evidence-purpose
+comparisons are technical identifiers. Established context/English keys now survive
+line-order changes, with a regression for Reason/Reason:. Two artificial key swaps
+were restored without editing workbook source/hash/review cells.
+
+Demo uses existing permitted copy/fallbacks only; final localized release still
+requires the existing reviewed-only per-locale preview/import/version/build process.
+See [current readiness](attachment-photo-release-readiness.md).
