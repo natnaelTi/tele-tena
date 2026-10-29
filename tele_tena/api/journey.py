@@ -265,6 +265,8 @@ def save_profile(kind, display_name, adult, history='', share_name=None, share_h
         history=VALUES(history),share_name=VALUES(share_name),share_history=VALUES(share_history),languages=VALUES(languages),introduction=VALUES(introduction)''',
         (user, kind, name, history, boolean(share_name), boolean(share_history), json.dumps(language_values), public_id, introduction))
     if kind == 'patient':
+        if frappe.db.sql("SHOW TABLES LIKE 'tt_patient_photo_preference'"):
+            frappe.db.sql('INSERT IGNORE INTO tt_patient_photo_preference (user,share_photo,modified) VALUES (%s,1,UTC_TIMESTAMP(6))',(user,))
         frappe.db.sql('INSERT IGNORE INTO tt_wallet (patient) VALUES (%s)', (user,))
     audit(user, 'ProfileConsent', {'adult_attested': True, 'share_name': boolean(share_name), 'share_history': boolean(share_history)})
     return {'saved': True}
@@ -663,6 +665,8 @@ def previous_clinicians():
     for item in history:
         if not service_scope_is_current_for_any_offering(item.clinician_account):
             continue
+        from tele_tena.api.profile_photos import public_photo
+        item.photo_url = public_photo(item.clinician_account)
         item.pop('clinician_account', None)
         item.completed_sessions = int(item.completed_sessions)
         visible.append(item)
@@ -961,7 +965,7 @@ def appointments():
         (SELECT dp.state FROM tt_direct_payment dp WHERE BINARY dp.appointment=BINARY a.id AND dp.reference_type='Appointment' LIMIT 1) AS direct_payment_state,
         a.cancelled_by,a.cancelled_at,a.cancel_reason,a.policy_snapshot,
         c.state AS call_state,c.ended AS call_ended,n.status AS documentation_state,
-        provider.display_name AS clinician_display_name
+        a.patient AS photo_patient,a.clinician AS photo_clinician,provider.display_name AS clinician_display_name
         FROM tt_appointment a LEFT JOIN tt_consultation c ON c.appointment=a.id
         LEFT JOIN tt_consultation_note n ON n.appointment=a.id
         LEFT JOIN tt_profile provider ON provider.user=a.clinician AND provider.kind='clinician'
@@ -983,6 +987,9 @@ def appointments():
         appointment.expires_at = iso(appointment.expires_at) if appointment.expires_at else None
         appointment.confirmed_at = iso(appointment.confirmed_at) if appointment.confirmed_at else None
         appointment.policy_snapshot = json.loads(appointment.policy_snapshot) if appointment.policy_snapshot else None
+        from tele_tena.api.profile_photos import encounter_url
+        photo_context=frappe._dict(id=appointment.id,patient=appointment.pop('photo_patient'),clinician=appointment.pop('photo_clinician'))
+        appointment.photo_url=encounter_url(photo_context,user,p.kind)
         clinician_name = appointment.pop('clinician_display_name', None)
         if p.kind == 'patient':
             appointment.display_identity = clinician_name or 'Your clinician'

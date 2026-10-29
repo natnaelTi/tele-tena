@@ -6,8 +6,8 @@ from pathlib import Path
 from unittest.mock import patch
 BENCH=Path('/home/frappe/teletena-compat/bench');ROOT=Path(__file__).resolve().parents[1]
 SITE=os.environ.get('TELE_TENA_FRESH_SITE','teletena-payments-v147-fresh.localhost')
-assert SITE in ('teletena-payments-v147-fresh.localhost','teletena-payments-v147-final.localhost','teletena-payments-v147-candidate.localhost','teletena-payments-v148-fresh.localhost')
-DB='tt_payments_v148_fresh' if SITE=='teletena-payments-v148-fresh.localhost' else 'tt_payments_v147_candidate' if SITE.endswith('-candidate.localhost') else 'tt_payments_v147_final' if SITE.endswith('-final.localhost') else 'tt_payments_v147_fresh';SOCKET=BENCH.parent/'runtime/mariadb-target.sock'
+assert SITE in ('teletena-payments-v147-fresh.localhost','teletena-payments-v147-final.localhost','teletena-payments-v147-candidate.localhost','teletena-payments-v148-fresh.localhost','teletena-photos-v149-fresh.localhost')
+DB='tt_photos_v149_fresh' if SITE=='teletena-photos-v149-fresh.localhost' else 'tt_payments_v148_fresh' if SITE=='teletena-payments-v148-fresh.localhost' else 'tt_payments_v147_candidate' if SITE.endswith('-candidate.localhost') else 'tt_payments_v147_final' if SITE.endswith('-final.localhost') else 'tt_payments_v147_fresh';SOCKET=BENCH.parent/'runtime/mariadb-target.sock'
 assert SOCKET.is_socket() and not (BENCH/'sites'/SITE).exists()
 os.chdir(BENCH/'sites');sys.path.insert(0,str(ROOT))
 import frappe,pymysql
@@ -34,4 +34,6 @@ assert frappe.db.sql('SELECT COUNT(*) FROM tt_care_language')[0][0]==630
 assert dict(counts)['domain']==78
 assert frappe.db.sql("SHOW COLUMNS FROM tt_couple_plan LIKE 'care_language'")
 frappe.set_user('Administrator');frappe.clear_cache();u=frappe.get_doc({'doctype':'User','email':'fresh-reviewer@offline-test.invalid','first_name':'Fictional Fresh Reviewer','send_welcome_email':0,'user_type':'Website User'}).insert();u.add_roles('Tele Tena Approver');assert 'Tele Tena Financial Configuration' in [r.role for r in u.roles];frappe.db.rollback()
+assert frappe.db.sql("SHOW TABLES LIKE 'tt_patient_photo_preference'")
+assert frappe.db.sql('SELECT COUNT(*) FROM tt_patient_photo_preference')[0][0]==0
 frappe.destroy();print('PASS fresh Frappe16 installation and two native migrations; structured/evidence tables empty; full bundled directory imported; access/provider switches remain off. Counts:',dict(counts))

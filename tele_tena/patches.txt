@@ -63,3 +63,5 @@ tele_tena.patches.v1_46_reference_navigation
 tele_tena.patches.v1_47_care_languages
 
 tele_tena.patches.v1_48_reviewer_financial_defaults
+
+tele_tena.patches.v1_49_patient_photo_sharing

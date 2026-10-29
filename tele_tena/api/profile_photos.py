@@ -1,4 +1,4 @@
-"""No public file paths, EXIF, generic document access or patient photo sharing."""
+"""No public file paths, EXIF, generic document access or blanket patient photo sharing."""
 from tele_tena.localization import localized_throw
 import base64
 import io
@@ -128,3 +128,71 @@ def download(id):
     return Response(bytes(photo.content), mimetype='image/jpeg', headers={
         'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff',
         'Content-Disposition': 'inline; filename="profile.jpg"'})
+
+
+def patient_sharing(user):
+    if not frappe.db.sql("SHOW TABLES LIKE 'tt_patient_photo_preference'"):
+        return False
+    found=rows('SELECT share_photo FROM tt_patient_photo_preference WHERE user=%s',(user,))
+    return bool(found[0].share_photo) if found else bool(rows("SELECT user FROM tt_profile WHERE user=%s AND kind='patient'",(user,)))
+
+
+@query()
+def sharing():
+    user=actor('Tele Tena Patient')
+    return {'share_photo':patient_sharing(user)}
+
+
+@command
+def set_sharing(share_photo):
+    user=actor('Tele Tena Patient')
+    if str(share_photo) not in ('0','1','False','True'):
+        fail('Choose whether to share your profile photo.','photo_preference_invalid')
+    allowed=str(share_photo) in ('1','True')
+    frappe.db.sql('SELECT name FROM tabUser WHERE name=%s FOR UPDATE',(user,))
+    frappe.db.sql('''INSERT INTO tt_patient_photo_preference (user,share_photo,modified)
+        VALUES (%s,%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE share_photo=VALUES(share_photo),modified=VALUES(modified)''',(user,int(allowed)))
+    from tele_tena.api.journey import audit
+    audit(user,'PatientPhotoSharingChanged',{'share_photo':allowed,'policy':'treating-clinician-photo-v1'})
+    return {'share_photo':allowed}
+
+
+def _encounter_target(item,user,role,participant=None):
+    if role=='patient':
+        if participant:localized_throw('Photo unavailable',frappe.PermissionError)
+        return item.clinician,True
+    from tele_tena.api.couples import plan_for,participants
+    plans=plan_for(item.id)
+    if plans:
+        people=participants(plans[0].id)
+        selected=next((p for p in people if p.id==participant),None) if participant else next((p for p in people if p.user==item.patient),None)
+        if not selected or selected.state!='Consented':localized_throw('Photo unavailable',frappe.PermissionError)
+        target=selected.user
+    else:
+        if participant:localized_throw('Photo unavailable',frappe.PermissionError)
+        target=item.patient
+    return target,False
+
+
+def encounter_url(item,user,role,participant=None):
+    try:target,public=_encounter_target(item,user,role,participant)
+    except frappe.PermissionError:return None
+    if not public and not patient_sharing(target):return None
+    found=rows('SELECT id,published FROM tt_profile_photo WHERE user=%s',(target,))
+    if not found or public and not found[0].published:return None
+    from urllib.parse import urlencode
+    return '/api/method/tele_tena.api.profile_photos.encounter_photo?'+urlencode({'appointment':item.id,**({'participant':participant} if participant else {})})
+
+
+@query()
+def encounter_photo(appointment,participant=None):
+    # Resolve current bytes and preference at request time. Historic disclosure
+    # never overrides withdrawal. No caller-supplied account identity is accepted.
+    from tele_tena.api.presentation import _authorized
+    item,user,role=_authorized(appointment)
+    target,public=_encounter_target(item,user,role,participant)
+    if not public and not patient_sharing(target):localized_throw('Photo unavailable',frappe.PermissionError)
+    found=rows('SELECT content,published FROM tt_profile_photo WHERE user=%s',(target,))
+    if not found or public and not found[0].published:localized_throw('Photo unavailable',frappe.PermissionError)
+    from werkzeug.wrappers import Response
+    return Response(bytes(found[0].content),mimetype='image/jpeg',headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Disposition':'inline; filename="profile.jpg"'})

@@ -295,3 +295,10 @@ def attach_scope_license(application,id):
     result=upload_scope_evidence(application,'License or registration',document[0].filename,base64.b64encode(bytes(document[0].content)).decode())
     audit(user,'ProfessionalLicenseAttached',{'application':application,'source_evidence':id,'sha256':document[0].content_sha256})
     return result
+
+
+@query()
+def legacy_cv(id=None):
+    """Owner-only adapter; never accepts another clinician's account in the URL."""
+    from tele_tena.api.presentation import download_resume
+    return download_resume(owner())

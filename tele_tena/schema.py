@@ -172,3 +172,5 @@ def install():
     care_languages()
     from tele_tena.patches.v1_48_reviewer_financial_defaults import execute as reviewer_defaults
     reviewer_defaults()
+    from tele_tena.patches.v1_49_patient_photo_sharing import execute as patient_photo_sharing
+    patient_photo_sharing()

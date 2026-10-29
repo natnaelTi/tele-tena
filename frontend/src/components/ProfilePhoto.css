@@ -12,3 +12,4 @@
 .photo-crop-sliders{display:grid;gap:12px}.photo-crop-sliders label{display:grid;grid-template-columns:145px minmax(0,1fr);gap:12px;align-items:center;font-size:14px;color:var(--ink)}
 .photo-crop-sliders input{width:100%;min-height:32px;accent-color:var(--brand-primary);padding:0}
 @media(max-width:450px){.photo-crop-preview{max-width:210px}.photo-crop-sliders label{grid-template-columns:minmax(0,1fr);gap:2px}}
+.consultation-summary>.profile-avatar{flex:none;width:48px;height:48px}.room-session-details>.profile-avatar{float:right;width:32px;height:32px;margin-left:8px}.care-directory-table .profile-avatar{display:inline-flex;vertical-align:middle;margin-right:10px;width:32px;height:32px}

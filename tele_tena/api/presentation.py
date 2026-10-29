@@ -467,11 +467,13 @@ def appointment_detail(appointment):
         selected['direct_payment_state']=direct[0].state if direct else 'Unavailable'
         if direct and (user==item.patient or role=='clinician'):selected['direct_payment_id']=direct[0].id
         selected['can_respond']=selected['can_respond'] and bool(direct and direct[0].state=='Verified')
+    from tele_tena.api.profile_photos import encounter_url
+    selected['photo_url']=encounter_url(item,user,role)
     selected['is_couple'] = bool(shared_plan)
     selected['you_pay'] = user == item.patient
     selected['supports_clinic_sharing'] = not bool(shared_plan)
     if shared_plan and role == 'clinician':
-        selected['couple_participants'] = [{'id':p.id,'label':json.loads(p.disclosure).get('name') or 'Participant '+str(index),'disclosure':json.loads(p.disclosure),'state':p.state} for index,p in enumerate(participants(shared_plan[0].id),1)]
+        selected['couple_participants'] = [{'id':p.id,'label':json.loads(p.disclosure).get('name') or 'Participant '+str(index),'disclosure':json.loads(p.disclosure),'state':p.state,'photo_url':encounter_url(item,user,role,p.id) if p.state=='Consented' else None} for index,p in enumerate(participants(shared_plan[0].id),1)]
     if shared_plan:
         from tele_tena.api.couples import ready
         selected['can_join'] = selected['can_join'] and ready(item.id)
@@ -823,6 +825,8 @@ def care_directory(search='', service='', status='', from_date='', to_date='', p
                                         'state': item.state, 'disclosure': disclosure,
                                         'start': item.start, 'end': item.end, 'timezone': item.timezone,
                                         'call_state': item.call_state, 'documentation_state': item.documentation_state})
+        from tele_tena.api.profile_photos import encounter_url
+        group['photo_url']=encounter_url(frappe._dict(id=item.id,patient=item.patient,clinician=clinician),clinician,'clinician')
         group['encounters'].append(item.id)
         if item.start < now and (
                 item.state == 'Completed' or item.call_state == 'Ended'):
@@ -861,7 +865,8 @@ def care_patient_record(appointment):
             (clinician, item.patient, shared_name))
     else:
         matches = [{'id': item.id}]
-    return {'patient_label': shared_name or disclosure.get('alias') or 'Private patient',
+    from tele_tena.api.profile_photos import encounter_url
+    return {'photo_url':encounter_url(item,clinician,role),'patient_label': shared_name or disclosure.get('alias') or 'Private patient',
             'encounters': [appointment_detail(row['id']) for row in matches]}
 
 
