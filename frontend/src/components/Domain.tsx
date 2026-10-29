@@ -1,7 +1,7 @@
 import {languageName} from './CareLanguages';
 import {useSession} from '../hooks/useSession';
 import {AvailabilityStatus} from './AvailabilityStatus';
-import {Avatar} from "./ProfilePhoto";
+import {Avatar,IdentityName} from "./ProfilePhoto";
 import type { AppointmentView } from "../appointment-groups";
 import { appointmentStatus } from "../appointment-status";
 import { useRef, useState } from "react";
@@ -74,7 +74,7 @@ export function HomeAppointmentPreview({ appointment }: { appointment: Appointme
   const status = appointmentStatus(appointment, false);
   const href = "/patient/consultations/" + appointment.id;
   return <div className="home-appointment-preview">
-    <div className="home-appointment-row"><Avatar url={appointment.photo_url} name={appointment.display_identity||appointment.service_label}/><div><h3><Link to={href}>{appointment.display_identity || appointment.service_label}</Link></h3><p>{date(appointment.start, appointment.timezone)} · {w(appointment.consultation_format === "audio" ? "Audio" : "Video")}</p></div><StatusBadge tone={status.tone}>{w(status.label)}</StatusBadge></div>
+    <div className="home-appointment-row"><span className="appointment-icon" aria-hidden="true">{appointment.consultation_format === "audio" ? <Headphones size={22}/> : <Video size={22}/>}</span><div><h3><IdentityName url={appointment.photo_url} name={appointment.display_identity||appointment.service_label}><Link to={href}>{appointment.display_identity || appointment.service_label}</Link></IdentityName></h3><p>{date(appointment.start, appointment.timezone)} · {w(appointment.consultation_format === "audio" ? "Audio" : "Video")}</p></div><StatusBadge tone={status.tone}>{w(status.label)}</StatusBadge></div>
     <div className="home-appointment-actions"><Link className="button primary" to={href}>{w("View appointment")}</Link><Link className="button secondary" to="/patient/appointments">{w("All appointments")}</Link></div>
   </div>;
 }
@@ -89,7 +89,7 @@ export function ScheduleAppointmentRow({ appointment }: { appointment: Appointme
   return <div className="schedule-appointment-row">
     <span className="schedule-appointment-icon" aria-hidden="true">{appointment.call_state === "Ended" ? <FileText size={20}/> : appointment.consultation_format === "audio" ? <Headphones size={20}/> : <Video size={20}/>}</span>
     <div className="schedule-appointment-copy">
-      <Avatar url={appointment.photo_url} name={appointment.display_identity||w("Private patient")}/><Link to={"/clinician/consultations/" + appointment.id}>{time} · {appointment.display_identity || w("Private patient")}</Link>
+      <IdentityName url={appointment.photo_url} name={appointment.display_identity||w("Private patient")}><Link to={"/clinician/consultations/" + appointment.id}>{time} · {appointment.display_identity || w("Private patient")}</Link></IdentityName>
       <p>{appointment.service_label} · {w(appointment.consultation_format === "audio" ? "Audio" : "Video")}</p>
       <p><time dateTime={appointment.start}>{new Intl.DateTimeFormat(locale, {month:"short",day:"numeric",timeZone:appointment.timezone || timezone}).format(instant)}</time> · {appointment.timezone || timezone}</p>
       {status.detail && <p>{w(status.detail)}</p>}
@@ -110,7 +110,7 @@ export function AppointmentCard({
   const presentation=appointmentStatus(appointment,base.startsWith("/clinician"));
   return <Card className="appointment-card">
     <div className="appointment-icon" aria-hidden="true">{appointment.state === "Completed" ? <FileText size={22}/> : appointment.consultation_format === "audio" ? <Headphones size={22}/> : <Video size={22}/>}</div>
-    <Avatar url={appointment.photo_url} name={appointment.display_identity||appointment.service_label}/><div className="appointment-details"><h3>{appointment.display_identity || appointment.service_label}</h3><p>{appointment.service_label} · {w(appointment.consultation_format === "audio" ? "Audio" : "Video")}</p><p className="supporting">{date(appointment.start,appointment.timezone)} · {appointment.minutes} {w("booked minutes")}</p><p className="supporting">{appointment.timezone || timezone} · ETB {money(appointment.price)}</p></div>
+    <div className="appointment-details"><h3><IdentityName url={appointment.photo_url} name={appointment.display_identity||appointment.service_label}/></h3><p>{appointment.service_label} · {w(appointment.consultation_format === "audio" ? "Audio" : "Video")}</p><p className="supporting">{date(appointment.start,appointment.timezone)} · {appointment.minutes} {w("booked minutes")}</p><p className="supporting">{appointment.timezone || timezone} · ETB {money(appointment.price)}</p></div>
     <div className="appointment-status-actions"><StatusBadge tone={presentation.tone}>{w(presentation.label)}</StatusBadge>{presentation.detail && <p className="supporting">{w(presentation.detail)}</p>}<Link className="button secondary" to={`${base}/consultations/${appointment.id}`} state={view?{appointmentView:view}:undefined}>{w("View consultation")}<ArrowRight size={18}/></Link></div>
   </Card>;
 }

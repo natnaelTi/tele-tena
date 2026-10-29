@@ -386,17 +386,17 @@
   },
   {
     "english": "Offline",
-    "source_location": "frontend/src/components/ConsultationDetails.tsx:12",
+    "source_location": "frontend/src/components/ConsultationDetails.tsx:13",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Unavailable",
-    "source_location": "frontend/src/components/ConsultationDetails.tsx:12",
+    "source_location": "frontend/src/components/ConsultationDetails.tsx:13",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Unavailable",
-    "source_location": "frontend/src/components/ConsultationDetails.tsx:12",
+    "source_location": "frontend/src/components/ConsultationDetails.tsx:13",
     "reason": "Keyboard or machine-code comparison"
   },
   {
@@ -791,7 +791,7 @@
   },
   {
     "english": "settings-section profile-photo-editor",
-    "source_location": "frontend/src/components/ProfilePhoto.tsx:27",
+    "source_location": "frontend/src/components/ProfilePhoto.tsx:31",
     "reason": "Technical JSX attribute className"
   },
   {

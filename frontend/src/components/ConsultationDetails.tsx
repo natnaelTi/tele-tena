@@ -1,3 +1,4 @@
+import {IdentityName} from './ProfilePhoto';
 import {paymentLabel} from './DirectPayments';
 import {FileText, Headphones, Video, ShieldCheck, Lock, Users} from 'lucide-react';
 import {Card} from './ui';
@@ -9,7 +10,7 @@ import './ConsultationDetails.css';
 export function ConversationFacts({item,clinician,status}:{item:any;clinician:boolean;status:string}){
   const {w}=useLocale();
   const identity=clinician?item.patient_identity:item.clinician;
-  return <><div className="conversation-participant"><span className="conversation-avatar" aria-hidden="true">{Array.from(identity||w('Private patient')).slice(0,1).join('')}</span><div><h3>{identity}</h3><p>{item.service}</p><p>{item.booked_minutes} {w('minutes')} · ETB {money(item.price)}</p></div></div>
+  return <><div className="conversation-participant"><div><h3><IdentityName url={item.photo_url} name={identity||w('Private patient')}/></h3><p>{item.service}</p><p>{item.booked_minutes} {w('minutes')} · ETB {money(item.price)}</p></div></div>
     <dl className="encounter-facts"><dt>{w('Time')}</dt><dd>{date(item.start,item.timezone)} – {new Intl.DateTimeFormat(undefined,{hour:'numeric',minute:'2-digit',timeZone:item.timezone||'UTC'}).format(new Date(item.end))}</dd><dt>{w('Timezone')}</dt><dd>{item.timezone||w('Unavailable')}</dd><dt>{w('Format')}</dt><dd>{w(item.format==='audio'?'Audio':'Video')}</dd><dt>{w('Session status')}</dt><dd>{status}</dd><dt>{w('Payment')}</dt><dd>ETB {money(item.price)} · {w(item.payment_mode==='Offline'?paymentLabel(item.direct_payment_state||'Unavailable'):item.reservation_state||'Unavailable')}</dd></dl>
   </>;
 }

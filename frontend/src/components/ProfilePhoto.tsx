@@ -1,6 +1,6 @@
 import PhotoCropDialog, {type PhotoDraft} from './PhotoCropDialog';
 import {FileUpload} from "./FileUpload";
-import {useEffect, useState} from 'react';
+import {useEffect, useState,type ReactNode} from 'react';
 import {api, ApiError} from '../api';
 import {useSession} from '../hooks/useSession';
 import {useLocale} from '../hooks/useLocale';
@@ -16,6 +16,10 @@ export function Avatar({url,name,className=''}:{url?:string|null;name:string;cla
     return()=>{active=false;abort.abort();clearInterval(timer);document.removeEventListener('visibilitychange',refresh);if(current)URL.revokeObjectURL(current);};
   },[url]);
   return <span className={'avatar profile-avatar '+className} aria-hidden="true">{image?<img src={image} alt="" onError={()=>setImage(null)}/>:Array.from(name||'?')[0]}</span>;
+}
+/** An encounter-authorized name and its current permitted photo form one identity. */
+export function IdentityName({url,name,children}:{url?:string|null;name:string;children?:ReactNode}){
+ return <span className="identity-with-avatar"><span className="identity-name">{children||name}</span><Avatar url={url} name={name}/></span>;
 }
 export default function ProfilePhoto() {
   const {session,refresh}=useSession(); const {w}=useLocale();

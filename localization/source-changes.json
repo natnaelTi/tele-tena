@@ -1,10 +1,9 @@
 {
-  "added": [],
+  "added": [
+    "copy.clinician.patient_care_record"
+  ],
   "stale": [
-    "copy.applicationattachments.certification",
-    "copy.carelanguages.identification",
-    "copy.consultationpage.patient_shared_summary",
-    "copy.professionalreview.certification",
-    "copy.vetting.license"
+    "copy.consultationpage.private_patient",
+    "copy.consultationpage.your_clinician"
   ]
 }
