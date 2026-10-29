@@ -1,4 +1,10 @@
 {
   "added": [],
-  "stale": []
+  "stale": [
+    "copy.applicationattachments.certification",
+    "copy.carelanguages.identification",
+    "copy.consultationpage.patient_shared_summary",
+    "copy.professionalreview.certification",
+    "copy.vetting.license"
+  ]
 }

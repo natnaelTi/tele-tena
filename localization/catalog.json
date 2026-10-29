@@ -1571,18 +1571,6 @@
     "review_status": "missing",
     "translator_notes": ""
   },
-  "copy.applicationattachments.certification": {
-    "key": "copy.applicationattachments.certification",
-    "context": "ApplicationAttachments",
-    "english": "Certification",
-    "amharic": "",
-    "afaan_oromo": "",
-    "source_location": "frontend/src/components/ApplicationAttachments.tsx:7",
-    "placeholders": "[]",
-    "source_hash": "86846f67dd19ad454801b74c1204d316574553797124bb914e5902c9d682d0af",
-    "review_status": "missing",
-    "translator_notes": ""
-  },
   "copy.applicationattachments.credential_document": {
     "key": "copy.applicationattachments.credential_document",
     "context": "ApplicationAttachments",
@@ -3393,18 +3381,6 @@
     "placeholders": "[]",
     "source_hash": "dce083a2c47ffdc44982315487afb6e121e96cef2df6dc1ec11bac7ab5052142",
     "review_status": "provisional",
-    "translator_notes": ""
-  },
-  "copy.carelanguages.identification": {
-    "key": "copy.carelanguages.identification",
-    "context": "CareLanguages",
-    "english": "Identification",
-    "amharic": "",
-    "afaan_oromo": "",
-    "source_location": "frontend/src/components/CareLanguages.tsx:25",
-    "placeholders": "[]",
-    "source_hash": "91f606b32dfc475eab99c1ea44b05add881751ee08d7b2e198eb6420e76290f0",
-    "review_status": "missing",
     "translator_notes": ""
   },
   "copy.carelanguages.individual_care_language_decisions": {
@@ -10847,18 +10823,6 @@
     "review_status": "missing",
     "translator_notes": ""
   },
-  "copy.professionalapplication.certification": {
-    "key": "copy.professionalapplication.certification",
-    "context": "ProfessionalApplication",
-    "english": "Certification",
-    "amharic": "",
-    "afaan_oromo": "",
-    "source_location": "frontend/src/components/ProfessionalApplication.tsx:26; frontend/src/components/ProfessionalApplication.tsx:30",
-    "placeholders": "[]",
-    "source_hash": "86846f67dd19ad454801b74c1204d316574553797124bb914e5902c9d682d0af",
-    "review_status": "missing",
-    "translator_notes": ""
-  },
   "copy.professionalapplication.credential_document": {
     "key": "copy.professionalapplication.credential_document",
     "context": "ProfessionalApplication",
@@ -10943,18 +10907,6 @@
     "review_status": "missing",
     "translator_notes": ""
   },
-  "copy.professionalapplication.identification": {
-    "key": "copy.professionalapplication.identification",
-    "context": "ProfessionalApplication",
-    "english": "Identification",
-    "amharic": "",
-    "afaan_oromo": "",
-    "source_location": "frontend/src/components/ProfessionalApplication.tsx:26; frontend/src/components/ProfessionalApplication.tsx:29",
-    "placeholders": "[]",
-    "source_hash": "91f606b32dfc475eab99c1ea44b05add881751ee08d7b2e198eb6420e76290f0",
-    "review_status": "missing",
-    "translator_notes": ""
-  },
   "copy.professionalapplication.identification_document": {
     "key": "copy.professionalapplication.identification_document",
     "context": "ProfessionalApplication",
@@ -10964,18 +10916,6 @@
     "source_location": "frontend/src/components/ProfessionalApplication.tsx:26",
     "placeholders": "[]",
     "source_hash": "74bba9c6e39be05269a984ec304b2a62c66ebe840a8e4991e1c5aad1f64f478c",
-    "review_status": "missing",
-    "translator_notes": ""
-  },
-  "copy.professionalapplication.license": {
-    "key": "copy.professionalapplication.license",
-    "context": "ProfessionalApplication",
-    "english": "License",
-    "amharic": "",
-    "afaan_oromo": "",
-    "source_location": "frontend/src/components/ProfessionalApplication.tsx:26; frontend/src/components/ProfessionalApplication.tsx:31",
-    "placeholders": "[]",
-    "source_hash": "c011d6097bfbc8e936280addcf2e3e7d06ea2223ffd596973191b800a7035c32",
     "review_status": "missing",
     "translator_notes": ""
   },
@@ -11267,6 +11207,18 @@
     "review_status": "missing",
     "translator_notes": ""
   },
+  "copy.professionalapplication.identification": {
+    "key": "copy.professionalapplication.identification",
+    "context": "ProfessionalApplication",
+    "english": "Identification",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:29",
+    "placeholders": "[]",
+    "source_hash": "91f606b32dfc475eab99c1ea44b05add881751ee08d7b2e198eb6420e76290f0",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
   "copy.professionalapplication.identification_is_accessible_only_to_you_and_specifically_assigned_cre": {
     "key": "copy.professionalapplication.identification_is_accessible_only_to_you_and_specifically_assigned_cre",
     "context": "ProfessionalApplication",
@@ -11555,6 +11507,18 @@
     "review_status": "missing",
     "translator_notes": ""
   },
+  "copy.professionalapplication.certification": {
+    "key": "copy.professionalapplication.certification",
+    "context": "ProfessionalApplication",
+    "english": "Certification",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:30",
+    "placeholders": "[]",
+    "source_hash": "86846f67dd19ad454801b74c1204d316574553797124bb914e5902c9d682d0af",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
   "copy.professionalapplication.choose_a_related_area": {
     "key": "copy.professionalapplication.choose_a_related_area",
     "context": "ProfessionalApplication",
@@ -11840,6 +11804,18 @@
     "source_location": "frontend/src/components/ProfessionalApplication.tsx:31",
     "placeholders": "[]",
     "source_hash": "cc2b56757211492123938509c6f8f90865664b86fba8bcccba5b1cbf916ce84e",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
+  "copy.professionalapplication.license": {
+    "key": "copy.professionalapplication.license",
+    "context": "ProfessionalApplication",
+    "english": "License",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:31",
+    "placeholders": "[]",
+    "source_hash": "c011d6097bfbc8e936280addcf2e3e7d06ea2223ffd596973191b800a7035c32",
     "review_status": "missing",
     "translator_notes": ""
   },
@@ -12896,18 +12872,6 @@
     "source_location": "frontend/src/components/ProfessionalReview.tsx:53",
     "placeholders": "[]",
     "source_hash": "432312168befef332ff0b8850488482a7eb24b2045333a7c6d2694862a516a50",
-    "review_status": "missing",
-    "translator_notes": ""
-  },
-  "copy.professionalreview.certification": {
-    "key": "copy.professionalreview.certification",
-    "context": "ProfessionalReview",
-    "english": "Certification",
-    "amharic": "",
-    "afaan_oromo": "",
-    "source_location": "frontend/src/components/ProfessionalReview.tsx:53",
-    "placeholders": "[]",
-    "source_hash": "86846f67dd19ad454801b74c1204d316574553797124bb914e5902c9d682d0af",
     "review_status": "missing",
     "translator_notes": ""
   },
@@ -55931,8 +55895,8 @@
     "review_status": "provisional",
     "translator_notes": ""
   },
-  "copy.consultationpage.reason": {
-    "key": "copy.consultationpage.reason",
+  "copy.consultationpage.reason_f81ab834": {
+    "key": "copy.consultationpage.reason_f81ab834",
     "context": "ConsultationPage",
     "english": "Reason",
     "amharic": "",
@@ -56276,18 +56240,6 @@
     "source_location": "frontend/src/pages/ConsultationPage.tsx:106",
     "placeholders": "[]",
     "source_hash": "424b4fe1c70f66e7c7cebd4ab864d530b08c4cc32db4e905257367e94c358d9d",
-    "review_status": "missing",
-    "translator_notes": ""
-  },
-  "copy.consultationpage.patient_shared_summary": {
-    "key": "copy.consultationpage.patient_shared_summary",
-    "context": "ConsultationPage",
-    "english": "Patient-shared summary",
-    "amharic": "",
-    "afaan_oromo": "",
-    "source_location": "frontend/src/pages/ConsultationPage.tsx:118",
-    "placeholders": "[]",
-    "source_hash": "bbad4e999f339bcfcd0b6e9712f0e1fa2dfcb7044315092ff838c070f5c2080d",
     "review_status": "missing",
     "translator_notes": ""
   },
@@ -57203,8 +57155,8 @@
     "review_status": "missing",
     "translator_notes": ""
   },
-  "copy.consultationpage.reason_3425d108": {
-    "key": "copy.consultationpage.reason_3425d108",
+  "copy.consultationpage.reason": {
+    "key": "copy.consultationpage.reason",
     "context": "ConsultationPage",
     "english": "Reason:",
     "amharic": "",
@@ -71891,18 +71843,6 @@
     "review_status": "missing",
     "translator_notes": ""
   },
-  "copy.vetting.license": {
-    "key": "copy.vetting.license",
-    "context": "Vetting",
-    "english": "License",
-    "amharic": "",
-    "afaan_oromo": "",
-    "source_location": "frontend/src/pages/Vetting.tsx:80",
-    "placeholders": "[]",
-    "source_hash": "c011d6097bfbc8e936280addcf2e3e7d06ea2223ffd596973191b800a7035c32",
-    "review_status": "missing",
-    "translator_notes": ""
-  },
   "copy.vetting.evidence_for_this_service": {
     "key": "copy.vetting.evidence_for_this_service",
     "context": "Vetting",
@@ -81908,6 +81848,18 @@
     "source_location": "tele_tena/api/professional.py:291",
     "placeholders": "[]",
     "source_hash": "8d5ccbe65b95ec8c3a227ff4d240f290ff5225be991a43bb69f3b2bac0ac1306",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
+  "copy.backend_validation_professional.cv_unavailable": {
+    "key": "copy.backend_validation_professional.cv_unavailable",
+    "context": "Backend validation / professional",
+    "english": "CV unavailable",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "tele_tena/api/professional.py:307",
+    "placeholders": "[]",
+    "source_hash": "0aa58a6fdf689b6e674bb0d6cf60114559cc7b5fca3cbce7e52bbf615fb3ba2e",
     "review_status": "missing",
     "translator_notes": ""
   },

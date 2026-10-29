@@ -12,6 +12,12 @@ class Exchange(unittest.TestCase):
  def write(self,rows):
   with self.file.open('w',newline='',encoding='utf-8') as f:
    writer=csv.DictWriter(f,fieldnames=m.COLUMNS);writer.writeheader();writer.writerows({k:m.encode(str(r[k])) for k in m.COLUMNS} for r in rows)
+ def test_existing_source_keys_survive_line_sort_reversal(self):
+  old={'copy.screen.reason':{'context':'Screen','english':'Reason:'},'copy.screen.reason_f81ab834':{'context':'Screen','english':'Reason'}}
+  previous={(r['context'],r['english']):k for k,r in old.items()};allocated={}
+  for english in ('Reason','Reason:'):
+   key=m.source_key(english,'Screen',previous,old,allocated);self.assertEqual(key,previous[('Screen',english)]);allocated[key]={'english':english}
+  self.assertNotEqual(m.source_key('Reason!','Screen',previous,old,allocated),'copy.screen.reason')
  def test_unicode_placeholder_newline_and_formula_roundtrip(self):
   for s in ['=SUM(A1)',' +1',"'actual",'አማርኛ\nAfaan Oromo','@contact','ordinary']:
    self.assertEqual(m.decode(m.encode(s)),s)

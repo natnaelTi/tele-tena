@@ -7,6 +7,15 @@ def digest(s):return hashlib.sha256(s.encode()).hexdigest()
 def placeholders(s):return sorted(re.findall(r'\$?\{[^{}]+\}|%(?:\([^)]+\))?[sdif]',s))
 def encode(s):return "'"+s if s and (s[0] in "'=+-@\t\r\n" or s[0].isspace() and s.lstrip().startswith(('=','+','-','@'))) else s
 def decode(s):return s[1:] if len(s)>1 and s[0]=="'" and (s[1] in "'=+-@\t\r\n" or s[1].isspace() and s[1:].lstrip().startswith(('=','+','-','@'))) else s
+def source_key(english,context,previous,reserved,allocated):
+    # Line-number sorting can change when a source crosses e.g.99 ->100.
+    # Never swap established keys for punctuation-equivalent English slugs.
+    if (context,english) in previous:return previous[(context,english)]
+    token=re.sub('[^a-z0-9]+','_',english.lower()).strip('_')[:70] or 'message'
+    key='copy.'+re.sub('[^a-z0-9]+','_',context.lower()).strip('_')[:65]+'.'+token
+    if any(key in table and table[key]['english']!=english for table in (reserved,allocated)):key+='_'+digest(english)[:8]
+    return key
+
 def extract():
     raw=json.loads(subprocess.check_output(['node',str(ROOT/'scripts/localization/extract.cjs')],text=True));entries=raw['entries'];translations=raw['translations']
     for file in sorted((ROOT/'tele_tena').rglob('*.py')):
@@ -45,10 +54,11 @@ def extract():
         for f in d.get('fields',[]):
             for field in ('label','description'):
                 if f.get(field):entries.append({'english':f[field],'context':d.get('name',file.stem)+' / '+f.get('fieldname',''),'source_location':str(file.relative_to(ROOT))})
+    old=json.loads(CATALOG.read_text()) if CATALOG.exists() else {}
+    previous={(r['context'],r['english']):key for key,r in old.items()}
     canonical={}
     for r in sorted(entries,key=lambda x:(x['source_location'],x['english'])):
-        english=r['english'];context=r['context'];token=re.sub('[^a-z0-9]+','_',english.lower()).strip('_')[:70] or 'message';key='copy.'+re.sub('[^a-z0-9]+','_',context.lower()).strip('_')[:65]+'.'+token
-        if key in canonical and canonical[key]['english']!=english:key+='_'+digest(english)[:8]
+        english=r['english'];context=r['context'];key=source_key(english,context,previous,old,canonical)
         if key not in canonical:
             am,om=translations.get(english,['','']);canonical[key]={'key':key,'context':context,'english':english,'amharic':am,'afaan_oromo':om,'source_location':r['source_location'],'placeholders':json.dumps(placeholders(english),ensure_ascii=False),'source_hash':digest(english),'review_status':'provisional' if am or om else 'missing','translator_notes':''}
         elif r['source_location'] not in canonical[key]['source_location']:canonical[key]['source_location']+='; '+r['source_location']

@@ -8,7 +8,7 @@ function machineSelector(n){
  if(ts.isParenthesizedExpression(n)||ts.isAsExpression(n)||ts.isNonNullExpression(n))return machineSelector(n.expression);
  if(ts.isCallExpression(n)&&n.expression.getText()==='String'&&n.arguments.length===1)return machineSelector(n.arguments[0]);
  if(ts.isBinaryExpression(n)&&n.operatorToken.kind===ts.SyntaxKind.BarBarToken)return machineSelector(n.left);
- return /(?:^|\.)(?:\w+_)?(key|code|state|status|kind|phase|event|channel|decision|mode)$/.test(n.getText());
+ return /(?:^|\.)(?:\w+_)?(key|code|state|status|kind|phase|event|channel|decision|mode|purpose)$/.test(n.getText());
 }
 function technical(node){
  for(let n=node;n;n=n.parent){

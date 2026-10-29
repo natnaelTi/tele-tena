@@ -210,6 +210,11 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Certification",
+    "source_location": "frontend/src/components/ApplicationAttachments.tsx:7",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "button secondary",
     "source_location": "frontend/src/components/AttachmentPreview.tsx:12",
     "reason": "Technical JSX attribute className"
@@ -281,6 +286,16 @@
   },
   {
     "english": "Pending",
+    "source_location": "frontend/src/components/CareLanguages.tsx:25",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Identification",
+    "source_location": "frontend/src/components/CareLanguages.tsx:25",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Identification",
     "source_location": "frontend/src/components/CareLanguages.tsx:25",
     "reason": "Keyboard or machine-code comparison"
   },
@@ -695,6 +710,46 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Identification",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:26",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Certification",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:26",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "License",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:26",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Identification",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:26",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "License",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:26",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Certification",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:26",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "License",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:26",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Certification",
+    "source_location": "frontend/src/components/ProfessionalApplication.tsx:26",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "professional-grid professional-name-grid",
     "source_location": "frontend/src/components/ProfessionalApplication.tsx:29",
     "reason": "Technical JSX attribute className"
@@ -718,6 +773,16 @@
     "english": "settings-section professional-account-editor",
     "source_location": "frontend/src/components/ProfessionalReview.tsx:46",
     "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Certification",
+    "source_location": "frontend/src/components/ProfessionalReview.tsx:53",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Certification",
+    "source_location": "frontend/src/components/ProfessionalReview.tsx:53",
+    "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "avatar profile-avatar ",
@@ -2390,6 +2455,11 @@
     "reason": "Technical JSX attribute className"
   },
   {
+    "english": "Patient-shared summary",
+    "source_location": "frontend/src/pages/ConsultationPage.tsx:118",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "Active",
     "source_location": "frontend/src/pages/ConsultationPage.tsx:119",
     "reason": "Keyboard or machine-code comparison"
@@ -2917,6 +2987,11 @@
   {
     "english": "Proposed",
     "source_location": "frontend/src/pages/Vetting.tsx:57",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "License",
+    "source_location": "frontend/src/pages/Vetting.tsx:80",
     "reason": "Keyboard or machine-code comparison"
   },
   {
