@@ -1,5 +1,6 @@
 """Real database, synthetic private bytes; rollback-only payment/photo fixtures."""
 from direct_payments import *
+import hashlib
 from tele_tena.api import profile_photos as photos,professional,presentation
 from tele_tena.patches.v1_49_patient_photo_sharing import execute
 class AttachmentPhotos(DirectPayment):
@@ -36,7 +37,20 @@ class AttachmentPhotos(DirectPayment):
   frappe.set_user(users['patient']);before=j.one('SELECT share_name,share_history,history FROM tt_profile WHERE user=%s',(users['patient'],));photos.set_sharing(0);execute();execute();self.assertFalse(photos.patient_sharing(users['patient']));after=j.one('SELECT share_name,share_history,history FROM tt_profile WHERE user=%s',(users['patient'],));self.assertEqual(before,after)
  def test_clinician_photo_in_appointment_record_and_history(self):
   result,_=self.book();app=result['id'];frappe.set_user(users['counselor']);photos.upload('clinician.png',self.image(),1);frappe.set_user(users['patient']);self.assertTrue(next(a for a in j.appointments() if a.id==app).photo_url);self.assertTrue(presentation.appointment_detail(app)['photo_url']);self.assertEqual(photos.encounter_photo(app).mimetype,'image/jpeg')
+  super().test_finalization_does_not_credit_direct_payment_again()
+  provider=j.one('SELECT public_id FROM tt_profile WHERE user=%s',(users['counselor'],)).public_id
+  self.assertTrue(any(c.clinician_id==provider and c.photo_url for c in j.previous_clinicians()))
   with self.assertRaises(frappe.PermissionError):photos.encounter_photo(app,'another-participant')
+ def test_legacy_cv_preview_revalidates_and_is_owner_only(self):
+  from frappe.utils.pdf import PdfWriter
+  writer=PdfWriter();writer.add_blank_page(width=400,height=300);stream=io.BytesIO();writer.write(stream);content=stream.getvalue();frappe.set_user(users['counselor'])
+  frappe.db.sql('DELETE FROM tt_resume_evidence WHERE clinician=%s',(users['counselor'],))
+  frappe.db.sql('INSERT INTO tt_resume_evidence (clinician,filename,content,content_size,content_sha256,revision,uploaded_by,uploaded_at) VALUES (%s,%s,FROM_BASE64(%s),%s,%s,1,%s,UTC_TIMESTAMP(6))',(users['counselor'],'fictional-cv.pdf',base64.b64encode(content).decode(),len(content),hashlib.sha256(content).hexdigest(),users['counselor']))
+  response=professional.legacy_cv();self.assertEqual(response.mimetype,'application/pdf');self.assertIn('no-store',response.headers['Cache-Control'])
+  frappe.db.sql('UPDATE tt_resume_evidence SET content=%s WHERE clinician=%s',(b'%PDF-1.4 unsafe %%EOF',users['counselor']))
+  with self.assertRaises(frappe.ValidationError):professional.legacy_cv()
+  frappe.set_user(users['patient'])
+  with self.assertRaises(frappe.PermissionError):professional.legacy_cv()
  def test_new_patient_persists_default_without_old_consent_rewrite(self):
   from unittest.mock import patch
   frappe.set_user('Administrator');email='photo-'+str(uuid.uuid4())+'@offline-test.invalid'

@@ -300,5 +300,15 @@ def attach_scope_license(application,id):
 @query()
 def legacy_cv(id=None):
     """Owner-only adapter; never accepts another clinician's account in the URL."""
-    from tele_tena.api.presentation import download_resume
-    return download_resume(owner())
+    user=owner()
+    found=rows('SELECT filename,content FROM tt_resume_evidence WHERE clinician=%s',(user,))
+    if not found:
+        ids=retained_cv_ids(user)
+        if not ids:localized_throw('CV unavailable',frappe.DoesNotExistError)
+        return download(ids[0])
+    # Earlier CV uploads used a weaker header-only check. Revalidate on this
+    # preview-specific route, without rewriting or broadening legacy downloads.
+    from tele_tena.api.history_documents import validated
+    filename,mime,content=validated(found[0].filename,base64.b64encode(bytes(found[0].content)).decode())
+    from werkzeug.wrappers import Response
+    return Response(content,mimetype=mime,headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Disposition':"attachment; filename*=UTF-8''"+quote(filename,safe=''),'Content-Security-Policy':"sandbox; default-src 'none'"})
