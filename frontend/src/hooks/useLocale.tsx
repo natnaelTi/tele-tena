@@ -1,3 +1,5 @@
+import {setInterfaceLocale} from '../api';
+import {reviewedCopy} from '../localization/runtime';
 import {professionalTranslations} from '../professional-translations';
 import {headingCopyAliases} from '../heading-copy-aliases';
 import {publicExperienceTranslations} from '../public-experience-translations';
@@ -921,7 +923,7 @@ const Context = createContext<{
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, updateLocale] = useState<Locale>("en");
   const choiceVersion=useRef(0);
-  const setLocale=useCallback((value:Locale)=>{choiceVersion.current++;updateLocale(value);},[]);
+  const setLocale=useCallback((value:Locale)=>{choiceVersion.current++;setInterfaceLocale(value);updateLocale(value);},[]);
   const {session,loading}=useSession();
   const loadedUser=useRef<string|null>(null);
   useEffect(()=>{
@@ -936,17 +938,18 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   },[session?.user,loading]);
   useEffect(() => {
     document.documentElement.lang = locale;
+    setInterfaceLocale(locale);
   }, [locale]);
   return (
     <Context.Provider
       value={{
         locale,
         setLocale,
-        t: (key) => locales[locale][key],
+        t: (key) => reviewedCopy(locales.en[key],locale) || locales[locale][key],
         w: (english) =>
           locale === "en"
             ? english
-            : (words[english]||words[headingCopyAliases[english]])?.[locale === "am" ? 0 : 1] || english,
+            : reviewedCopy(english,locale) || (words[english]||words[headingCopyAliases[english]])?.[locale === "am" ? 0 : 1] || english,
       }}
     >
       {children}

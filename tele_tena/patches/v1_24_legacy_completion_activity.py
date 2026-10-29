@@ -5,6 +5,7 @@ added only when the immutable completion journal, its patient reserved debit,
 and the matching earning all agree exactly. Ambiguous legacy discrepancies stay
 visible for authorized review.
 """
+from tele_tena.localization import localized_throw
 import uuid
 
 import frappe
@@ -20,13 +21,13 @@ def backfill_completion_activity(patient=None):
     inserted = 0
     for row in rows:
         if row.event_type != 'ConsultationFinalized':
-            frappe.throw('Completion activity does not match its financial journal; review required',
+            localized_throw('Completion activity does not match its financial journal; review required',
                          frappe.ValidationError)
         reserved_account = 'patient:' + row.patient + ':reserved'
         debits = frappe.db.sql('''SELECT COALESCE(SUM(debit_minor),0) FROM tt_journal_line
             WHERE journal_id=%s AND account_id=%s''', (row.journal_id, reserved_account))[0][0]
         if int(debits) != int(row.gross_minor):
-            frappe.throw('Completion journal amount does not match its earning; review required',
+            localized_throw('Completion journal amount does not match its earning; review required',
                          frappe.ValidationError)
         reference = 'completion:' + row.appointment
         existing = frappe.db.sql('''SELECT patient,kind,amount FROM tt_ledger WHERE reference=%s''',
@@ -35,7 +36,7 @@ def backfill_completion_activity(patient=None):
             event = existing[0]
             if (event.patient != row.patient or event.kind != 'Consumption' or
                     int(event.amount) != int(row.gross_minor)):
-                frappe.throw('Existing completion activity conflicts with its journal; review required',
+                localized_throw('Existing completion activity conflicts with its journal; review required',
                              frappe.ValidationError)
             continue
         frappe.db.sql('''INSERT INTO tt_ledger (id,patient,kind,amount,reference,created)

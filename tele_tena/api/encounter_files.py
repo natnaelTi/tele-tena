@@ -1,4 +1,5 @@
 """Explicit recipient-scoped snapshots; no generic File or clinic authorization."""
+from tele_tena.localization import localized_throw
 import json,uuid
 import frappe
 from tele_tena.api.journey import actor,profile,rows,fail,query,command
@@ -48,7 +49,7 @@ def download(id):
     user=actor();found=rows('''SELECT g.*,a.state FROM tt_history_grant g JOIN tt_appointment a ON a.id=g.appointment
       WHERE g.id=%s AND (g.patient=%s OR (g.recipient=%s AND a.clinician=%s AND g.revoked_at IS NULL
         AND a.state NOT IN ('Cancelled','Declined','Expired')))''',(id,user,user,user))
-    if not found:frappe.throw('File unavailable',frappe.PermissionError)
+    if not found:localized_throw('File unavailable',frappe.PermissionError)
     from werkzeug.wrappers import Response
     from urllib.parse import quote
     file=found[0]
@@ -59,7 +60,7 @@ def download(id):
 def revoke(id):
     patient=profile('patient').user
     found=rows('SELECT revoked_at FROM tt_history_grant WHERE id=%s AND patient=%s FOR UPDATE',(id,patient))
-    if not found:frappe.throw('Sharing unavailable',frappe.PermissionError)
+    if not found:localized_throw('Sharing unavailable',frappe.PermissionError)
     if not found[0].revoked_at:
         frappe.db.sql('UPDATE tt_history_grant SET revoked_at=UTC_TIMESTAMP(6) WHERE id=%s',(id,))
         frappe.db.sql("INSERT INTO tt_history_grant_event VALUES (%s,%s,%s,'Revoked',UTC_TIMESTAMP(6))",(str(uuid.uuid4()),id,patient))

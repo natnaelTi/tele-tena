@@ -1,4 +1,5 @@
 """Add isolated private phone-authentication storage without changing existing data."""
+from tele_tena.localization import localized_throw
 import os
 import secrets
 
@@ -19,7 +20,7 @@ def execute():
     key_path = Path(frappe.get_site_path('private', 'tele_tena_otp.key'))
     key_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     if key_path.is_symlink():
-        frappe.throw('OTP key path may not be a symbolic link')
+        localized_throw('OTP key path may not be a symbolic link')
     if not key_path.exists():
         fd = os.open(key_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
         with os.fdopen(fd, 'w') as stream:

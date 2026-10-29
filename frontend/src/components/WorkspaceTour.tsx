@@ -36,7 +36,7 @@ const routes:Record<string,{id:string;steps:TourStep[]}>={
   applicant:{id:"clinician-onboarding",steps:[
     {title:"Professional profile",text:"Enter the professional name that matches your credentials.",path:"/onboarding",target:"applicant-profile"},
     {title:"Request service scopes",text:"Select only the service types you want the reviewers to assess.",path:"/onboarding",target:"applicant-scopes"},
-    {title:"Upload evidence",text:"Add a PDF resume. Receipt does not mean your credentials are verified.",path:"/onboarding",target:"applicant-resume"},
+    {title:"Upload evidence",text:"Add a PDF CV. Receipt does not mean your credentials are verified.",path:"/onboarding",target:"applicant-resume"},
     {title:"Save and resume",text:"Save your progress before leaving this form.",path:"/onboarding",target:"applicant-save"},
     {title:"Manual review",text:"You cannot accept bookings until your application and each requested scope are approved.",path:"/onboarding",target:"applicant-submit"},
   ]},

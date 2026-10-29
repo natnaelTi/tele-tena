@@ -1,10 +1,11 @@
 /** Presentation only: elapsed time never mutates the persisted outcome. */
-export function appointmentStatus(item: { state?: string; status?: string; call_state?: string | null; documentation_state?: string | null; end: string }, clinician: boolean, now = Date.now()) {
+export function appointmentStatus(item: { state?: string; status?: string; payment_mode?:string;direct_payment_state?:string; call_state?: string | null; documentation_state?: string | null; end: string }, clinician: boolean, now = Date.now()) {
   const state = item.state || item.status;
   if (state === 'Completed') return { label: 'Completed', detail: '', tone: 'success' as const };
   if (state === 'Cancelled') return { label: 'Cancelled', detail: '', tone: 'danger' as const };
   if (state === 'Expired') return { label: 'Expired', detail: '', tone: 'neutral' as const };
   if (state === 'NoShow') return { label: 'No-show recorded', detail: '', tone: 'warning' as const };
+  if(state==='PendingConfirmation'&&item.payment_mode==='Offline'&&item.direct_payment_state!=='Verified')return {label:item.direct_payment_state==='Submitted'?'Payment verification pending':item.direct_payment_state==='CorrectionRequired'?'Payment correction needed':item.direct_payment_state==='ReconciliationRequired'?'Payment reconciliation required':'Awaiting payment',detail:'',tone:'warning' as const};
   if (state === 'PendingConfirmation') return { label: 'Needs confirmation', detail: '', tone: 'warning' as const };
   if (item.call_state === 'Ended') return { label: 'Call ended', detail: item.documentation_state === 'Finalized' ? '' : clinician ? 'Notes pending' : 'Summary being prepared', tone: 'neutral' as const };
   if (item.call_state === 'Open' && new Date(item.end).getTime() >= now) return { label: 'In progress', detail: '', tone: 'success' as const };

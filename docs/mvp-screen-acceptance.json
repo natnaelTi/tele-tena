@@ -1,7 +1,7 @@
 {
   "version": 3,
-  "release_branch": "feat/mvp-release-handover",
-  "source_checkpoint": "105cd15af1d1432e37b95de583f151d3056f6950",
+  "release_branch": "feat/offline-telebirr-mvp",
+  "source_checkpoint": "553a6190b4c4a0431dc5126fc6d2d095e50f5faa",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Single authoritative MVP matrix. Current bounded polish/portable dataset evidence is in final-mvp-polish-verification.md. Historical per-screen evidence is retained. Owner visual acceptance and external device/provider/native-language checks remain separate.",
   "screens": [
@@ -16497,5 +16497,414 @@
       "reference": "H02 with B06/B07 field extensions",
       "evidence": "docs/clinician-onboarding-context-sprint.md#clinician-account-organization--22october2026"
     }
+  },
+  "offline_telebirr_revision": {
+    "date": "2026-10-28",
+    "branch": "feat/offline-telebirr-mvp",
+    "backend_checkpoint": "ee8399b",
+    "scope": "docs/offline-telebirr-sprint.md",
+    "owner_acceptance": "Awaiting owner acceptance",
+    "requirements": [
+      {
+        "group": 1,
+        "title": "Contextual Uploads",
+        "reference_screens": [
+          "B06",
+          "B07",
+          "H01",
+          "H02",
+          "I03"
+        ],
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
+        "evidence": [
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
+        ],
+        "remaining_action": "Owner review of contextual labels; existing upload retention governance remains external.",
+        "design_exception": null
+      },
+      {
+        "group": 2,
+        "title": "Ethiopian Reference Priority",
+        "reference_screens": [
+          "B06",
+          "B07",
+          "H02",
+          "I04"
+        ],
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
+        "evidence": [
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
+        ],
+        "remaining_action": "Clinical-owner review of the seven proposed priority entries; partial source coverage remains disclosed.",
+        "design_exception": null
+      },
+      {
+        "group": 3,
+        "title": "Credentials Wording",
+        "reference_screens": [
+          "B07",
+          "H02",
+          "I03"
+        ],
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
+        "evidence": [
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
+        ],
+        "remaining_action": "Owner review; old storage identifiers and immutable submissions intentionally retained.",
+        "design_exception": null
+      },
+      {
+        "group": 4,
+        "title": "Expanded Competencies",
+        "reference_screens": [
+          "B06",
+          "H02",
+          "I03"
+        ],
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
+        "evidence": [
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
+        ],
+        "remaining_action": "Clinical-owner approval of proposed domains/anchored self-rating vocabulary.",
+        "design_exception": null
+      },
+      {
+        "group": 5,
+        "title": "Onboarding Sign-Out",
+        "reference_screens": [
+          "B06"
+        ],
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
+        "evidence": [
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
+        ],
+        "remaining_action": "Owner review; live OTP delivery is separate from private transport verification.",
+        "design_exception": null
+      },
+      {
+        "group": 6,
+        "title": "Booking Language Defaults",
+        "reference_screens": [
+          "C06",
+          "C08",
+          "D06"
+        ],
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
+        "evidence": [
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
+        ],
+        "remaining_action": "Individual existing care-language claims need human review before new eligible booking.",
+        "design_exception": null
+      },
+      {
+        "group": 7,
+        "title": "Administrator Payment Mode",
+        "reference_screens": [
+          "G01",
+          "G05",
+          "H01",
+          "I04"
+        ],
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
+        "evidence": [
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
+        ],
+        "remaining_action": "Explicit financial-operator assignment/mode cutover and historical transaction plan on Selfmade.",
+        "design_exception": "New mode/payment/language states extend accepted shared cards and controls; exact older prototype does not contain these decisions. See comparison notes."
+      },
+      {
+        "group": 8,
+        "title": "Direct Telebirr Payments",
+        "reference_screens": [
+          "C08",
+          "D06",
+          "G01",
+          "G03",
+          "G04",
+          "G05",
+          "N02"
+        ],
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
+        "evidence": [
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
+        ],
+        "remaining_action": "Owner review and bounded consenting external transfer/receipt/refund verification; no provider API or platform settlement.",
+        "design_exception": "New mode/payment/language states extend accepted shared cards and controls; exact older prototype does not contain these decisions. See comparison notes."
+      },
+      {
+        "group": 9,
+        "title": "Localization Exchange",
+        "reference_screens": [
+          "A01",
+          "B06",
+          "H01",
+          "I03"
+        ],
+        "functional_status": "Functionally verified",
+        "visual_status": "Not applicable — source CSV tooling; reviewed dictionary UI falls back safely",
+        "owner_status": "Awaiting owner acceptance",
+        "evidence": [
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
+        ],
+        "remaining_action": "Native-language translation review/import; missing/provisional values are not approved.",
+        "design_exception": null
+      },
+      {
+        "group": 10,
+        "title": "Reviewed Care Languages",
+        "reference_screens": [
+          "B06",
+          "C06",
+          "D02",
+          "H02",
+          "I03"
+        ],
+        "functional_status": "Functionally verified",
+        "visual_status": "Visually verified by Codex",
+        "owner_status": "Awaiting owner acceptance",
+        "evidence": [
+          "docs/offline-telebirr-verification-2026-10-28.md",
+          "docs/offline-telebirr-operator-walkthrough.md",
+          "docs/screenshots/offline-telebirr"
+        ],
+        "remaining_action": "Clinical review of scale and individual language decisions; interface locales confer no care eligibility.",
+        "design_exception": "New mode/payment/language states extend accepted shared cards and controls; exact older prototype does not contain these decisions. See comparison notes."
+      }
+    ],
+    "runtime_commit": "d553253d8dc24681ceaa5cd71c9bc6881fe46483",
+    "verification": "docs/offline-telebirr-verification-2026-10-28.md",
+    "payment_configuration_validation_fix": {
+      "date": "2026-10-28",
+      "runtime_commit": "6f5cd6c387cc2b461ce0b7ef0e50a4973b990db2",
+      "route": "/financial-configuration",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex",
+      "owner_status": "Awaiting owner acceptance",
+      "evidence": [
+        "docs/payment-mode-validation-fix-2026-10-28.md"
+      ],
+      "preservation": "No mode, balances, holds or historical obligations changed by verification."
+    },
+    "payment_navigation_revision": {
+      "date": "2026-10-28",
+      "runtime_commit": "ec94719809961bf54671baf4d52eb434b4f07a3e",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex",
+      "owner_status": "Awaiting owner acceptance",
+      "routes": [
+        "/patient/direct-payments/:id",
+        "/clinician/direct-payments/:id",
+        "/clinician/appointments",
+        "/clinician/requests",
+        "/clinician/consultations/:id",
+        "/admin/account"
+      ],
+      "reference_screens": [
+        "C08",
+        "D06",
+        "H01",
+        "H02"
+      ],
+      "design_exception": "Owner-approved standalone receipt workflow with payment timeline; older wallet-only reference does not contain this direct-payment state.",
+      "evidence": [
+        "docs/payment-navigation-verification-2026-10-28.md",
+        "docs/screenshots/payment-navigation"
+      ]
+    },
+    "payment_live_updates": {
+      "date": "2026-10-28",
+      "runtime_commit": "cd89a9ff82484233caa4a8353341cde6c3b4a182",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex",
+      "owner_status": "Awaiting owner acceptance",
+      "routes": [
+        "/patient/direct-payments/:id",
+        "/clinician/direct-payments/:id",
+        "Authenticated patient/clinician pages: payment activity alert"
+      ],
+      "behavior": "Five-second authorized polling; pending proof read-only until correction; immutable submission/verification outbox facts; preference-aware email/SMS; durable notification read status. No real-time provider or physical delivery claim.",
+      "evidence": [
+        "docs/payment-live-updates-2026-10-28.md",
+        "docs/screenshots/payment-live",
+        "scripts/browser-payment-live.cjs"
+      ]
+    },
+    "clinician_notifications_revision": {
+      "date": "2026-10-28",
+      "runtime_commit": "3e6aa71765b90d68174e6a0783ec46633013461b",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex",
+      "owner_status": "Awaiting owner acceptance",
+      "routes": [
+        "All authenticated patient/clinician routes: shared notification feed",
+        "/clinician/requests",
+        "/clinician/account",
+        "/clinician/direct-payments/:id",
+        "/patient/direct-payments/:id"
+      ],
+      "reference": "Existing patient Notifications pane; owner-requested same component for clinician; accepted-offer popup preserved",
+      "evidence": [
+        "docs/clinician-notifications-verification-2026-10-28.md",
+        "docs/screenshots/clinician-notifications"
+      ],
+      "remaining": "Owner acceptance; no live external delivery claims"
+    },
+    "care_language_selector_revision": {
+      "date": "2026-10-28",
+      "runtime_commit": "45e1600a35a9450bb26b50397749c01491b2d4a7",
+      "functional_status": "Functionally verified",
+      "visual_status": "Visually verified by Codex",
+      "owner_status": "Awaiting owner acceptance",
+      "routes": [
+        "/onboarding?intent=clinician",
+        "/clinician/account",
+        "/sign-in"
+      ],
+      "requirements": [
+        "Complete catalog names, not browser-returned codes",
+        "Visible searchable selection with retained claims",
+        "Server alphabetic ordering and English/Ethiopian group before pagination",
+        "Local flag graphics independent of OS emoji fonts",
+        "Separate language claims/self-assessment/approval preserved"
+      ],
+      "evidence": [
+        "docs/care-language-selector-verification-2026-10-28.md",
+        "docs/screenshots/care-language-selector",
+        "tests/language_catalog.py"
+      ]
+    }
+  },
+  "localization_workbook_revision_2026_10_28": {
+    "requirement": "Independent human-reviewed Amharic/Afaan Oromo workbook integration across existing MVP routes/states",
+    "runtime_pin": "569537640665d9dcbb07738523fd49e4c5c5354a",
+    "functional_status": "Functionally verified: approved-only plumbing, locale propagation, template errors, default policy projection, browser returns and preservation",
+    "visual_status": "Current provisional/fallback UI inspected at 390/768/1440 and actual 200%; workbook-translated UI blocked pending language approval",
+    "approval_status": {
+      "amharic": "Blocked: 0 Approved; 8472 Draft; 218 Needs Clarification",
+      "afaan_oromo": "Blocked: 0 Approved; 8472 Draft; 218 Needs Clarification"
+    },
+    "scope": "All existing MVP public/patient/clinician/reviewer routes and significant states retain their exact design references below; no historical acceptance overwritten",
+    "evidence": "docs/localization-release-readiness.md",
+    "dictionary_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "remaining_action": "Native reviewers resolve flagged wording/fallback conflicts and 45 new templates; independently approve each locale; validated versioned import/build/rendered review with new immutable pin",
+    "external_manual": "Owner acceptance, policy approval, live delivery and physical-device testing separate; not claimed passed"
+  },
+  "historical_initial_release_identity": {
+    "branch": "feat/mvp-release-handover",
+    "source_checkpoint": "105cd15af1d1432e37b95de583f151d3056f6950"
+  },
+  "attachment_photo_revision_2026_10_29": {
+    "runtime_pin": "553a6190b4c4a0431dc5126fc6d2d095e50f5faa",
+    "evidence": "docs/attachment-photo-release-readiness.md",
+    "demo_readiness": "Ready for owner review / guarded operator deployment with existing permitted translations and fallbacks",
+    "final_localized_release": "Blocked: independent human approvals/import/rendered acceptance pending",
+    "owner_visual_acceptance": "Awaiting owner acceptance; avatar is LEFT of encounter name, not in generic page heading",
+    "requirements": [
+      {
+        "role": "Patient",
+        "routes": [
+          "/patient",
+          "/patient/appointments",
+          "/patient/requests",
+          "/patient/couples"
+        ],
+        "references": [
+          "C01",
+          "D08",
+          "E02"
+        ],
+        "states": "Primary links, active state, More deduplication, desktop/mobile rail, Back/Forward",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; owner acceptance pending",
+        "evidence": "scripts/browser-attachment-photos.cjs"
+      },
+      {
+        "role": "Patient / Clinician / authorized reviewer",
+        "routes": [
+          "/patient/direct-payments/:id",
+          "/clinician/direct-payments/:id",
+          "/onboarding?intent=clinician",
+          "/admin/applications/:id"
+        ],
+        "references": [
+          "B06",
+          "G03",
+          "shared Dialog primitive; owner-requested operational extension"
+        ],
+        "states": "Contextual filenames, images/PDFs, loading/error/retry, zoom/fit, close/reopen, focus, stale abort, no automatic download; inherited unchanged auth sign-out recovery",
+        "functional": "Functionally verified; extra OTP replay rate-limited and not counted as passing",
+        "visual": "Visually verified by Codex; owner acceptance pending",
+        "permissions": "Existing receipt/owner/reviewer evidence grants; specific identification assignment retained"
+      },
+      {
+        "role": "Patient / Treating Clinician",
+        "routes": [
+          "/patient/account",
+          "/patient/appointments",
+          "/patient/consultations/:id",
+          "/clinician/appointments",
+          "/clinician/care",
+          "/clinician/care/:id",
+          "/clinician/consultations/:id",
+          "/consultation/:id/room"
+        ],
+        "references": [
+          "H03",
+          "E02",
+          "E05",
+          "E13",
+          "F10",
+          "F11",
+          "N07",
+          "N08"
+        ],
+        "states": "Default/current preference, opt-out save/reload, current replacement/deletion, authorized identity avatar LEFT of name, normal fallback, couples isolation",
+        "functional": "Functionally verified",
+        "visual": "Visually verified by Codex; owner acceptance pending",
+        "permissions": "Current per-request appointment/participant authorization; no public/unmatched/partner/reviewer grant"
+      }
+    ],
+    "external_manual": [
+      "Owner acceptance",
+      "Independent Amharic and Afaan Oromo approval",
+      "Consenting live message receipt",
+      "Physical-device calls",
+      "Policy approval"
+    ],
+    "data_preservation": "Native v1.49 default-only table; restored populated strict/repeat preservation; no balances/credentials/disclosures reset"
   }
 }

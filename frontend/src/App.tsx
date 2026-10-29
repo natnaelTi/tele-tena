@@ -1,3 +1,6 @@
+import {NotificationsProvider} from './hooks/useNotifications';
+import PaymentActivityAlerts from './components/PaymentActivityAlerts';
+import {DirectPaymentPage,PaymentConfiguration,DirectLedger} from './components/DirectPayments';
 import Contact from './pages/Contact';
 import Policies from './pages/Policies';
 import PublicDirectory,{OfferingEntry} from './pages/PublicDirectory';
@@ -57,8 +60,8 @@ export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.PROD ? "/teletena" : "/"}>
       <SessionProvider>
-        <LocaleProvider>
-          <PWAUpdateNotice />
+        <LocaleProvider><NotificationsProvider>
+          <PWAUpdateNotice /><PaymentActivityAlerts/>
           <a className="skip-link" href="#main-content">
             Skip to content
           </a>
@@ -89,7 +92,7 @@ export default function App() {
             <Route element={<AuthLayout />}>
               <Route path="/sign-in" element={<SignIn />} />
             <Route element={<RequireSession />}>
-              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/onboarding" element={<Onboarding />} /><Route path="/financial-configuration" element={<PaymentConfiguration/>}/>
             </Route>
             </Route>
             <Route element={<RequireSession />}>
@@ -119,7 +122,7 @@ export default function App() {
                 <Route path="couples" element={<Couples />} /><Route path="couples/:planId" element={<Couples />} />
                 <Route path="relationships" element={<Relationships />} />
                 <Route path="clinic-access" element={<ClinicMembershipPortal />} />
-                <Route path="payments" element={<Payments />} />
+                <Route path="payments" element={<Payments />} /><Route path="direct-payment-history" element={<DirectLedger role="patient"/>}/><Route path="direct-payments/:id" element={<DirectPaymentPage/>}/>
                 <Route path="payments/transactions/:activityId" element={<FinancialActivityDetail />} />
                 <Route
                   path="consultations/:id"
@@ -150,7 +153,7 @@ export default function App() {
                 <Route path="offers/:offerId" element={<ClinicianOfferDetail />} />
                 <Route path="care" element={<CareRecords />} />
                 <Route path="care/:id" element={<CareRecordDetail />} />
-                <Route path="earnings" element={<ClinicianEarnings />} />
+                <Route path="earnings" element={<ClinicianEarnings />} /><Route path="direct-payment-history" element={<DirectLedger role="clinician"/>}/><Route path="direct-payments/:id" element={<DirectPaymentPage/>}/>
                 <Route path="earnings/transactions/:activityId" element={<FinancialActivityDetail />} />
                 <Route path="vetting" element={<ClinicianScopeApplications />} />
                 <Route path="affiliations" element={<ClinicianAffiliations />} />
@@ -183,7 +186,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <HelpTools/>
-        </LocaleProvider>
+        </NotificationsProvider></LocaleProvider>
       </SessionProvider>
     </BrowserRouter>
   );

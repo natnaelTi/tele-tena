@@ -1,3 +1,5 @@
+import {IdentityName} from '../components/ProfilePhoto';
+import {usePaymentCapabilities,DirectLedger,DirectLedgerSummary} from '../components/DirectPayments';
 import {RequestAvailabilityCard} from '../components/RequestPresence';
 import { CalendarDays, Layers, ShieldCheck } from "lucide-react";
 import { appointmentStatus } from "../appointment-status";
@@ -40,6 +42,7 @@ const practice = () => api<Practice>("practice");
 export function ClinicianToday() {
   const {w}=useLocale();
   const {session}=useSession();
+  const paymentMode=usePaymentCapabilities();
   const approved=!!session?.roles.includes("Tele Tena Clinician");
   const [now,setNow]=useState(()=>Date.now());
   useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),60000);return()=>clearInterval(timer);},[]);
@@ -69,7 +72,7 @@ export function ClinicianToday() {
     <div className="practice-metrics">
       <section><span>{w("Today’s sessions")}</span><strong>{appointments.error?w("Unavailable"):today?.length??"—"}</strong><p>{w("Appointments on your calendar")}</p></section>
       <section><span>{w("Open requests")}</span><strong>{inbox.error?w("Unavailable"):inbox.data?.length??"—"}</strong><Link to="/clinician/requests">{w("View eligible requests")}</Link></section>
-      <section><span>{w("Available earnings")}</span><strong>{earnings.data?`ETB ${money(earnings.data.balances.earnings_available)}`:earnings.error?w("Unavailable"):"—"}</strong><Link to="/clinician/earnings">{w("View earnings")}</Link></section>
+      {paymentMode.data?.mode==='Offline'?<DirectLedgerSummary role="clinician"/>:<section><span>{w("Available earnings")}</span><strong>{earnings.data?`ETB ${money(earnings.data.balances.earnings_available)}`:earnings.error?w("Unavailable"):"—"}</strong><Link to="/clinician/earnings">{w("View earnings")}</Link></section>}
     </div>
     <div className="clinician-today-layout"><section>
       {appointments.error?<InlineNotice tone="danger">{w("Appointments couldn’t be loaded.")} <Button onClick={()=>void appointments.refresh()}>{w("Retry")}</Button></InlineNotice>:!appointments.data?<Skeleton/>:groups.length?<div className="appointment-groups practice-panel practice-schedule">{groups.map(([label,items])=><section key={label}><h2>{w(label === "Upcoming" ? "Up next" : label)}</h2><div>{items.slice(0,5).map(item=><ScheduleAppointmentRow key={item.id} appointment={item}/>)}</div>{items.length>5&&<Link className="text-link" to="/clinician/appointments">{w("View all appointments")}</Link>}</section>)}</div>:<EmptyState title={w("Your Next Conversation Will Appear Here.")}>{w("Review your services and availability so patients can find a suitable time.")}</EmptyState>}
@@ -278,6 +281,7 @@ type EarningsView = {
 };
 
 export function ClinicianEarnings() {
+  const paymentCapabilities=usePaymentCapabilities();
   const completedSessions=useResource(journeyApi.appointments);
   const [activityFilter,setActivityFilter]=useState<"All activity"|"Pending"|"Payouts">("All activity");
   const { w } = useLocale();
@@ -303,12 +307,13 @@ export function ClinicianEarnings() {
     ...resource.data.earnings.map(item => ({ kind: "Consultation earnings", id: `earning-${item.id}`, at: item.completed_at, amount: item.net_minor, state: item.state, item })),
     ...resource.data.payouts.map(item => ({ kind: "Payout request", id: `payout-${item.id}`, at: item.created, amount: item.amount_minor, state: item.state, item })),
   ].sort((a,b) => String(b.at||"").localeCompare(String(a.at||""))) : [];
+  if(paymentCapabilities.data?.mode==='Offline'&&new URLSearchParams(window.location.search).get('history')!=='wallet')return <DirectLedger role="clinician"/>;
   const shownHistory=history.filter(entry=>activityFilter==="All activity"||(activityFilter==="Payouts"?entry.kind==="Payout request":["Pending","Disputed","LegacyHold"].includes(entry.state)));
   return <>
-    <PageTitle title={w("Earnings")} description={w("See what is pending, available, and reserved for payout requests.")} />
+    <PageTitle title={w("Earnings")} description={w("See what is pending, available, and reserved for payout requests.")} /><Link className="text-link" to="/clinician/direct-payment-history">{w("Direct Payment History")}</Link>
     {resource.error ? <InlineNotice tone="danger">Earnings could not be loaded. <Button onClick={() => void resource.refresh()}>Try again</Button></InlineNotice> : !resource.data ? <Skeleton /> : <>
       <div className="earnings-overview">
-        <Card className="earnings-available"><p>{w("Available earnings")}</p><h2>ETB {money(resource.data.balances.earnings_available)}</h2><p className="supporting">{w("Available to request")}</p><Button variant="secondary" disabled={resource.data.balances.earnings_available<=0} onClick={()=>setPayoutOpen(true)}>{w("Request payout")}</Button></Card>
+        <Card className="earnings-available"><p>{w("Available earnings")}</p><h2>ETB {money(resource.data.balances.earnings_available)}</h2><p className="supporting">{w("Available to request")}</p><Button variant="secondary" disabled={paymentCapabilities.data?.mode!=='Wallet'||resource.data.balances.earnings_available<=0} onClick={()=>setPayoutOpen(true)}>{w("Request payout")}</Button></Card>
         <dl className="earnings-supporting">
           <div><dt>{w("Pending")}</dt><dd>ETB {money(resource.data.balances.pending)}</dd><p className="supporting">{w("Held until the saved review window ends or a dispute is resolved.")}</p></div>
           <div><dt>{w("Payout requested")}</dt><dd>ETB {money(resource.data.balances.payout_reserved)}</dd><p className="supporting">{w("Reserved for open requests")}</p></div>
@@ -356,7 +361,7 @@ export function CareRecords() {
       ) : !appointments.data ? (
         <Skeleton />
       ) : appointments.data?.rows.length ? (
-        <>{view==="table"?<div className="table-scroll care-directory-table"><table><thead><tr><th>Patient</th><th>Last consultation</th><th>Next appointment</th><th>Care status</th><th>Action</th></tr></thead><tbody>{appointments.data.rows.map((item:any)=><tr key={item.id}><td>{item.patient_label}</td><td>{item.last_consultation?date(item.last_consultation):"No completed consultation"}</td><td>{item.next_appointment?date(item.next_appointment):"None scheduled"}</td><td><StatusBadge>{w(appointmentStatus(item,true).label)}</StatusBadge></td><td><Link className="text-link" to={`/clinician/care/${item.id}`}>View record</Link></td></tr>)}</tbody></table></div>:<div className="offering-grid">{appointments.data.rows.map((item:any)=><Card key={item.id}><h2>{item.patient_label}</h2><p>Last consultation: {item.last_consultation?date(item.last_consultation):"None yet"}</p><p>Next appointment: {item.next_appointment?date(item.next_appointment):"None scheduled"}</p><StatusBadge>{w(appointmentStatus(item,true).label)}</StatusBadge><Link className="button secondary" to={`/clinician/care/${item.id}`}>View record</Link></Card>)}</div>}<div className="actions"><Button variant="secondary" disabled={page<=1} onClick={()=>setPage(page-1)}>Previous</Button><span>Page {page} of {appointments.data.pages||1} · {appointments.data.total} patients/encounters</span><Button variant="secondary" disabled={page>=(appointments.data.pages||1)} onClick={()=>setPage(page+1)}>Next</Button></div></>
+        <>{view==="table"?<div className="table-scroll care-directory-table"><table><thead><tr><th>Patient</th><th>Last consultation</th><th>Next appointment</th><th>Care status</th><th>Action</th></tr></thead><tbody>{appointments.data.rows.map((item:any)=><tr key={item.id}><td><IdentityName url={item.photo_url} name={item.patient_label}/></td><td>{item.last_consultation?date(item.last_consultation):"No completed consultation"}</td><td>{item.next_appointment?date(item.next_appointment):"None scheduled"}</td><td><StatusBadge>{w(appointmentStatus(item,true).label)}</StatusBadge></td><td><Link className="text-link" to={`/clinician/care/${item.id}`}>View record</Link></td></tr>)}</tbody></table></div>:<div className="offering-grid">{appointments.data.rows.map((item:any)=><Card key={item.id}><h2>{item.patient_label}</h2><p>Last consultation: {item.last_consultation?date(item.last_consultation):"None yet"}</p><p>Next appointment: {item.next_appointment?date(item.next_appointment):"None scheduled"}</p><StatusBadge>{w(appointmentStatus(item,true).label)}</StatusBadge><Link className="button secondary" to={`/clinician/care/${item.id}`}>View record</Link></Card>)}</div>}<div className="actions"><Button variant="secondary" disabled={page<=1} onClick={()=>setPage(page-1)}>Previous</Button><span>Page {page} of {appointments.data.pages||1} · {appointments.data.total} patients/encounters</span><Button variant="secondary" disabled={page>=(appointments.data.pages||1)} onClick={()=>setPage(page+1)}>Next</Button></div></>
       ) : (
         <EmptyState title="No matching care records." />
       )}
@@ -371,8 +376,8 @@ export function CareRecordDetail() {
   const record=useResource(load);
   if(record.error)return <InlineNotice tone="danger">{w("This care record is unavailable to your account.")}</InlineNotice>;
   if(!record.data)return <Skeleton/>;
-  return <><PageTitle title={record.data.patient_label} description={w("Authorized encounters only")} action={<Link className="button secondary" to="/clinician/care">{w("Back to care records")}</Link>}/>
-    <div className="care-record-layout"><section className="practice-panel"><h2>{w("Care Timeline")}</h2>
+  return <><PageTitle title={w("Patient Care Record")} description={w("Authorized encounters only")} action={<Link className="button secondary" to="/clinician/care">{w("Back to care records")}</Link>}/>
+    <div className="consultation-record-identity"><IdentityName url={record.data.photo_url} name={record.data.patient_label}/></div><div className="care-record-layout"><section className="practice-panel"><h2>{w("Care Timeline")}</h2>
       {record.data.encounters.map((item:any)=>{const status=appointmentStatus(item,true);return <article className="care-encounter" key={item.id}>
         <header><div><time>{date(item.start,item.timezone)}</time><h3>{item.service}</h3></div><StatusBadge tone={status.tone}>{w(status.label)}</StatusBadge></header>
         {status.detail&&<p className="supporting">{w(status.detail)}</p>}

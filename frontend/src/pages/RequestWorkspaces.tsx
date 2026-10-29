@@ -1,3 +1,6 @@
+import {PendingPaymentReviews,DirectPaymentStatus} from '../components/DirectPayments';
+import {languageName} from '../components/CareLanguages';
+import CareLanguageSelect from '../components/CareLanguageSelect';
 import {RequestAvailabilityCard} from '../components/RequestPresence';
 import {appointmentStatus} from '../appointment-status';
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -49,6 +52,7 @@ import "./RequestWorkspace.css";
 
 type Service = { id: string; label: string };
 type Offer = {
+  photo_url?:string|null;
   id: string;
   clinician_name: string;
   clinician_id: string;
@@ -143,7 +147,7 @@ const loadServices = () => journeyApi.services();
 const loadPractice = () => api<any>("practice");
 
 export function PatientRequestsWorkspace() {
-  const { w, locale } = useLocale();
+  const { w } = useLocale();
   const [search, setSearch] = useSearchParams();
   const { requestId, offerId } = useParams();
   const navigate = useNavigate();
@@ -185,7 +189,7 @@ export function PatientRequestsWorkspace() {
     guestDraft()?.urgency || "immediate",
   );
   const [language, setLanguage] = useState(
-    () => requestDraft?.language || locale,
+    () => requestDraft?.language || session?.profile?.preferred_care_language || "en",
   );
   const [format, setFormat] = useState<"video" | "audio">(
     requestDraft?.format || "video",
@@ -605,15 +609,7 @@ export function PatientRequestsWorkspace() {
                           {w("Schedule for later")}
                         </option>
                       </Select>
-                      <Select
-                        label={w("Language")}
-                        value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
-                      >
-                        <option value="en">English</option>
-                        <option value="am">Amharic</option>
-                        <option value="om">Afaan Oromo</option>
-                      </Select>
+                      <CareLanguageSelect label={w("Consultation Language")} value={language} onChange={setLanguage} required/>
                       <Select
                         label={w("Session format")}
                         value={format}
@@ -809,12 +805,7 @@ function PatientRequestThread({
                 : "Schedule for later",
             )}{" "}
             · {w(request.consultation_format === "audio" ? "Audio" : "Video")} ·{" "}
-            {(
-              { en: "English", am: "አማርኛ", om: "Afaan Oromo" } as Record<
-                string,
-                string
-              >
-            )[request.language] || request.language}
+            {languageName(request.language)}
           </p>
         </div>
         <StatusBadge>
@@ -923,7 +914,7 @@ function PatientRequestThread({
                     data-offer-id={offer.id}
                   >
                     <header>
-                      <Avatar name={offer.clinician_name} />
+                      <Avatar url={offer.photo_url} name={offer.clinician_name} />
                       <div>
                         <h4>{offer.clinician_name}</h4>
                         <p>{offer.specialty}</p>
@@ -1304,7 +1295,7 @@ export function ClinicianRequestsWorkspace() {
           "Review eligible requests, send a private offer and follow its outcome here.",
         )}
       />
-      <RequestAvailabilityCard/>
+      <RequestAvailabilityCard/><PendingPaymentReviews/>
       <div className="request-workspace-layout">
         <aside
           className="request-workspace-index"
@@ -1573,12 +1564,7 @@ function ClinicianResponsePanel({
             <div>
               <dt>{w("Language")}</dt>
               <dd>
-                {(
-                  { en: "English", am: "አማርኛ", om: "Afaan Oromo" } as Record<
-                    string,
-                    string
-                  >
-                )[request.language] || request.language}
+                {languageName(request.language)}
               </dd>
             </div>
             <div>
@@ -1752,7 +1738,7 @@ function ClinicianResponsePanel({
                   </details>
                   <p className="supporting">
                     {w(
-                      "No appointment is confirmed until the patient accepts. Your quote is private.",
+                      "Your quote is private. The patient selects an offer and completes the applicable payment and booking approvals.",
                     )}
                   </p>
                   <Button
@@ -1894,4 +1880,5 @@ function ClinicianQuotePanel({
   );
 }
 
-function MatchedAppointmentCard({appointmentId,clinician}:{appointmentId:string;clinician:boolean}){const {w}=useLocale(),resource=usePolling(()=>journeyApi.appointmentDetail(appointmentId),15000);const status=resource.data?appointmentStatus(resource.data,clinician):null;return <section className="request-success-card"><h3>{w(status?.label==='Confirmed'?'Appointment confirmed':status?.label||'Offer accepted')}</h3><p>{w('Your offer was accepted. Appointment details show its current status and next steps.')}{status?.detail?' '+w(status.detail):''}</p>{resource.error&&<InlineNotice>{w('Appointment status could not be refreshed.')} <Button variant="quiet" onClick={()=>void resource.refresh()}>{w('Retry')}</Button></InlineNotice>}<Link className="button primary" to={(clinician?'/clinician':'/patient')+'/consultations/'+appointmentId}>{w(clinician?'Open consultation details':'View appointment')}</Link></section>;}
+function MatchedAppointmentCard({appointmentId,clinician}:{appointmentId:string;clinician:boolean}){const {w}=useLocale(),resource=usePolling(()=>journeyApi.appointmentDetail(appointmentId),15000);const status=resource.data?appointmentStatus(resource.data,clinician):null;return <section className="request-success-card"><h3>{w(status?.label==='Confirmed'?'Appointment confirmed':status?.label||'Offer accepted')}</h3><p>{w('Your offer was accepted. Appointment details show its current status and next steps.')}{status?.detail?' '+w(status.detail):''}</p>{resource.data&&(clinician||(resource.data as any).you_pay)&&<DirectPaymentStatus paymentId={(resource.data as any).direct_payment_id} state={(resource.data as any).direct_payment_state} clinician={clinician}/>}
+{resource.error&&<InlineNotice>{w('Appointment status could not be refreshed.')} <Button variant="quiet" onClick={()=>void resource.refresh()}>{w('Retry')}</Button></InlineNotice>}<Link className="button primary" to={(clinician?'/clinician':'/patient')+'/consultations/'+appointmentId}>{w(clinician?'Open consultation details':'View appointment')}</Link></section>;}

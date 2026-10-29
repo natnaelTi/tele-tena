@@ -9,6 +9,10 @@ parser.add_argument('--site-private', type=Path, help='Optional local private di
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[1] / 'tele_tena/public/review'
 release = json.loads((root / 'release.json').read_text())
+reviewed=json.loads((root.parents[2]/'localization/reviewed.json').read_text())
+expected=hashlib.sha256((json.dumps(reviewed,ensure_ascii=False,indent=2,sort_keys=True)+'\n').encode()).hexdigest()
+assert release.get('translation_dictionary_sha256')==expected,'Packaged translation version mismatch'
+assert release.get('translation_reviewed_counts')=={locale:sum(bool(e.get(locale)) for e in reviewed.values()) for locale in ('amharic','afaan_oromo')},'Packaged translation approval counts differ'
 for name, digest in release['files'].items():
     assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest, 'Artifact hash mismatch'
 assert '/assets/tele_tena/review/assets/' in (root / 'index.html').read_text()

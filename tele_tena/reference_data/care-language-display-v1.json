@@ -1,0 +1,3158 @@
+{
+  "source": "Unicode CLDR names, likely subtags and Ethiopia territory-language data via Babel2.16.0",
+  "source_url": "https://cldr.unicode.org/",
+  "license_url": "https://www.unicode.org/license.txt",
+  "note": "Regions are visual associations, not exclusive language countries or authorization. English and existing Ethiopia territory languages are grouped first; not an exhaustive Ethiopian language inventory.",
+  "records": {
+    "aa": {
+      "english": "Afar",
+      "region": "ET",
+      "priority": true
+    },
+    "ab": {
+      "english": "Abkhazian",
+      "region": "GE",
+      "priority": false
+    },
+    "ace": {
+      "english": "Acehnese",
+      "region": "ID",
+      "priority": false
+    },
+    "ach": {
+      "english": "Acoli",
+      "region": "UG",
+      "priority": false
+    },
+    "ada": {
+      "english": "Adangme",
+      "region": "GH",
+      "priority": false
+    },
+    "ady": {
+      "english": "Adyghe",
+      "region": "RU",
+      "priority": false
+    },
+    "ae": {
+      "english": "Avestan",
+      "region": "IR",
+      "priority": false
+    },
+    "aeb": {
+      "english": "Tunisian Arabic",
+      "region": "TN",
+      "priority": false
+    },
+    "af": {
+      "english": "Afrikaans",
+      "region": "ZA",
+      "priority": false
+    },
+    "afh": {
+      "english": "Afrihili",
+      "region": "GH",
+      "priority": false
+    },
+    "agq": {
+      "english": "Aghem",
+      "region": "CM",
+      "priority": false
+    },
+    "ain": {
+      "english": "Ainu",
+      "region": "JP",
+      "priority": false
+    },
+    "ak": {
+      "english": "Akan",
+      "region": "GH",
+      "priority": false
+    },
+    "akk": {
+      "english": "Akkadian",
+      "region": "IQ",
+      "priority": false
+    },
+    "akz": {
+      "english": "Alabama",
+      "region": "US",
+      "priority": false
+    },
+    "ale": {
+      "english": "Aleut",
+      "region": "US",
+      "priority": false
+    },
+    "aln": {
+      "english": "Gheg Albanian",
+      "region": "XK",
+      "priority": false
+    },
+    "alt": {
+      "english": "Southern Altai",
+      "region": "RU",
+      "priority": false
+    },
+    "am": {
+      "english": "Amharic",
+      "region": "ET",
+      "priority": true
+    },
+    "an": {
+      "english": "Aragonese",
+      "region": "ES",
+      "priority": false
+    },
+    "ang": {
+      "english": "Old English",
+      "region": "GB",
+      "priority": false
+    },
+    "ann": {
+      "english": "Obolo",
+      "region": "NG",
+      "priority": false
+    },
+    "anp": {
+      "english": "Angika",
+      "region": "IN",
+      "priority": false
+    },
+    "ar": {
+      "english": "Arabic",
+      "region": "EG",
+      "priority": false
+    },
+    "arc": {
+      "english": "Aramaic",
+      "region": "IR",
+      "priority": false
+    },
+    "arn": {
+      "english": "Mapuche",
+      "region": "CL",
+      "priority": false
+    },
+    "aro": {
+      "english": "Araona",
+      "region": "BO",
+      "priority": false
+    },
+    "arp": {
+      "english": "Arapaho",
+      "region": "US",
+      "priority": false
+    },
+    "arq": {
+      "english": "Algerian Arabic",
+      "region": "DZ",
+      "priority": false
+    },
+    "ars": {
+      "english": "Najdi Arabic",
+      "region": "SA",
+      "priority": false
+    },
+    "arw": {
+      "english": "Arawak",
+      "region": "SR",
+      "priority": false
+    },
+    "ary": {
+      "english": "Moroccan Arabic",
+      "region": "MA",
+      "priority": false
+    },
+    "arz": {
+      "english": "Egyptian Arabic",
+      "region": "EG",
+      "priority": false
+    },
+    "as": {
+      "english": "Assamese",
+      "region": "IN",
+      "priority": false
+    },
+    "asa": {
+      "english": "Asu",
+      "region": "TZ",
+      "priority": false
+    },
+    "ase": {
+      "english": "American Sign Language",
+      "region": "US",
+      "priority": false
+    },
+    "ast": {
+      "english": "Asturian",
+      "region": "ES",
+      "priority": false
+    },
+    "atj": {
+      "english": "Atikamekw",
+      "region": "CA",
+      "priority": false
+    },
+    "av": {
+      "english": "Avaric",
+      "region": "RU",
+      "priority": false
+    },
+    "avk": {
+      "english": "Kotava",
+      "region": null,
+      "priority": false
+    },
+    "awa": {
+      "english": "Awadhi",
+      "region": "IN",
+      "priority": false
+    },
+    "ay": {
+      "english": "Aymara",
+      "region": "BO",
+      "priority": false
+    },
+    "az": {
+      "english": "Azerbaijani",
+      "region": "AZ",
+      "priority": false
+    },
+    "ba": {
+      "english": "Bashkir",
+      "region": "RU",
+      "priority": false
+    },
+    "bal": {
+      "english": "Baluchi",
+      "region": "PK",
+      "priority": false
+    },
+    "ban": {
+      "english": "Balinese",
+      "region": "ID",
+      "priority": false
+    },
+    "bar": {
+      "english": "Bavarian",
+      "region": "AT",
+      "priority": false
+    },
+    "bas": {
+      "english": "Basaa",
+      "region": "CM",
+      "priority": false
+    },
+    "bax": {
+      "english": "Bamun",
+      "region": "CM",
+      "priority": false
+    },
+    "bbc": {
+      "english": "Batak Toba",
+      "region": "ID",
+      "priority": false
+    },
+    "bbj": {
+      "english": "Ghomala",
+      "region": "CM",
+      "priority": false
+    },
+    "be": {
+      "english": "Belarusian",
+      "region": "BY",
+      "priority": false
+    },
+    "bej": {
+      "english": "Beja",
+      "region": "SD",
+      "priority": false
+    },
+    "bem": {
+      "english": "Bemba",
+      "region": "ZM",
+      "priority": false
+    },
+    "bew": {
+      "english": "Betawi",
+      "region": "ID",
+      "priority": false
+    },
+    "bez": {
+      "english": "Bena",
+      "region": "TZ",
+      "priority": false
+    },
+    "bfd": {
+      "english": "Bafut",
+      "region": "CM",
+      "priority": false
+    },
+    "bfq": {
+      "english": "Badaga",
+      "region": "IN",
+      "priority": false
+    },
+    "bg": {
+      "english": "Bulgarian",
+      "region": "BG",
+      "priority": false
+    },
+    "bgc": {
+      "english": "Haryanvi",
+      "region": "IN",
+      "priority": false
+    },
+    "bgn": {
+      "english": "Western Balochi",
+      "region": "PK",
+      "priority": false
+    },
+    "bho": {
+      "english": "Bhojpuri",
+      "region": "IN",
+      "priority": false
+    },
+    "bi": {
+      "english": "Bislama",
+      "region": "VU",
+      "priority": false
+    },
+    "bik": {
+      "english": "Bikol",
+      "region": "PH",
+      "priority": false
+    },
+    "bin": {
+      "english": "Bini",
+      "region": "NG",
+      "priority": false
+    },
+    "bjn": {
+      "english": "Banjar",
+      "region": "ID",
+      "priority": false
+    },
+    "bkm": {
+      "english": "Kom",
+      "region": "CM",
+      "priority": false
+    },
+    "bla": {
+      "english": "Siksiká",
+      "region": "CA",
+      "priority": false
+    },
+    "blo": {
+      "english": "Anii",
+      "region": "BJ",
+      "priority": false
+    },
+    "blt": {
+      "english": "Tai Dam",
+      "region": "VN",
+      "priority": false
+    },
+    "bm": {
+      "english": "Bambara",
+      "region": "ML",
+      "priority": false
+    },
+    "bn": {
+      "english": "Bangla",
+      "region": "BD",
+      "priority": false
+    },
+    "bo": {
+      "english": "Tibetan",
+      "region": "CN",
+      "priority": false
+    },
+    "bpy": {
+      "english": "Bishnupriya",
+      "region": "IN",
+      "priority": false
+    },
+    "bqi": {
+      "english": "Bakhtiari",
+      "region": "IR",
+      "priority": false
+    },
+    "br": {
+      "english": "Breton",
+      "region": "FR",
+      "priority": false
+    },
+    "bra": {
+      "english": "Braj",
+      "region": "IN",
+      "priority": false
+    },
+    "brh": {
+      "english": "Brahui",
+      "region": "PK",
+      "priority": false
+    },
+    "brx": {
+      "english": "Bodo",
+      "region": "IN",
+      "priority": false
+    },
+    "bs": {
+      "english": "Bosnian",
+      "region": "BA",
+      "priority": false
+    },
+    "bss": {
+      "english": "Akoose",
+      "region": "CM",
+      "priority": false
+    },
+    "bua": {
+      "english": "Buriat",
+      "region": "RU",
+      "priority": false
+    },
+    "bug": {
+      "english": "Buginese",
+      "region": "ID",
+      "priority": false
+    },
+    "bum": {
+      "english": "Bulu",
+      "region": "CM",
+      "priority": false
+    },
+    "byn": {
+      "english": "Blin",
+      "region": "ER",
+      "priority": false
+    },
+    "byv": {
+      "english": "Medumba",
+      "region": "CM",
+      "priority": false
+    },
+    "ca": {
+      "english": "Catalan",
+      "region": "ES",
+      "priority": false
+    },
+    "cad": {
+      "english": "Caddo",
+      "region": "US",
+      "priority": false
+    },
+    "car": {
+      "english": "Carib",
+      "region": "VE",
+      "priority": false
+    },
+    "cay": {
+      "english": "Cayuga",
+      "region": "CA",
+      "priority": false
+    },
+    "cch": {
+      "english": "Atsam",
+      "region": "NG",
+      "priority": false
+    },
+    "ccp": {
+      "english": "Chakma",
+      "region": "BD",
+      "priority": false
+    },
+    "ce": {
+      "english": "Chechen",
+      "region": "RU",
+      "priority": false
+    },
+    "ceb": {
+      "english": "Cebuano",
+      "region": "PH",
+      "priority": false
+    },
+    "cgg": {
+      "english": "Chiga",
+      "region": "UG",
+      "priority": false
+    },
+    "ch": {
+      "english": "Chamorro",
+      "region": "GU",
+      "priority": false
+    },
+    "chb": {
+      "english": "Chibcha",
+      "region": "CO",
+      "priority": false
+    },
+    "chg": {
+      "english": "Chagatai",
+      "region": "TM",
+      "priority": false
+    },
+    "chk": {
+      "english": "Chuukese",
+      "region": "FM",
+      "priority": false
+    },
+    "chm": {
+      "english": "Mari",
+      "region": "RU",
+      "priority": false
+    },
+    "chn": {
+      "english": "Chinook Jargon",
+      "region": "US",
+      "priority": false
+    },
+    "cho": {
+      "english": "Choctaw",
+      "region": "US",
+      "priority": false
+    },
+    "chp": {
+      "english": "Chipewyan",
+      "region": "CA",
+      "priority": false
+    },
+    "chr": {
+      "english": "Cherokee",
+      "region": "US",
+      "priority": false
+    },
+    "chy": {
+      "english": "Cheyenne",
+      "region": "US",
+      "priority": false
+    },
+    "cic": {
+      "english": "Chickasaw",
+      "region": "US",
+      "priority": false
+    },
+    "ckb": {
+      "english": "Central Kurdish",
+      "region": "IQ",
+      "priority": false
+    },
+    "clc": {
+      "english": "Chilcotin",
+      "region": "CA",
+      "priority": false
+    },
+    "co": {
+      "english": "Corsican",
+      "region": "FR",
+      "priority": false
+    },
+    "cop": {
+      "english": "Coptic",
+      "region": "EG",
+      "priority": false
+    },
+    "cps": {
+      "english": "Capiznon",
+      "region": "PH",
+      "priority": false
+    },
+    "cr": {
+      "english": "Cree",
+      "region": "CA",
+      "priority": false
+    },
+    "crg": {
+      "english": "Michif",
+      "region": "CA",
+      "priority": false
+    },
+    "crh": {
+      "english": "Crimean Tatar",
+      "region": "UA",
+      "priority": false
+    },
+    "crj": {
+      "english": "Southern East Cree",
+      "region": "CA",
+      "priority": false
+    },
+    "crk": {
+      "english": "Plains Cree",
+      "region": "CA",
+      "priority": false
+    },
+    "crl": {
+      "english": "Northern East Cree",
+      "region": "CA",
+      "priority": false
+    },
+    "crm": {
+      "english": "Moose Cree",
+      "region": "CA",
+      "priority": false
+    },
+    "crr": {
+      "english": "Carolina Algonquian",
+      "region": null,
+      "priority": false
+    },
+    "crs": {
+      "english": "Seselwa Creole French",
+      "region": "SC",
+      "priority": false
+    },
+    "cs": {
+      "english": "Czech",
+      "region": "CZ",
+      "priority": false
+    },
+    "csb": {
+      "english": "Kashubian",
+      "region": "PL",
+      "priority": false
+    },
+    "csw": {
+      "english": "Swampy Cree",
+      "region": "CA",
+      "priority": false
+    },
+    "cu": {
+      "english": "Church Slavic",
+      "region": "RU",
+      "priority": false
+    },
+    "cv": {
+      "english": "Chuvash",
+      "region": "RU",
+      "priority": false
+    },
+    "cy": {
+      "english": "Welsh",
+      "region": "GB",
+      "priority": false
+    },
+    "da": {
+      "english": "Danish",
+      "region": "DK",
+      "priority": false
+    },
+    "dak": {
+      "english": "Dakota",
+      "region": "US",
+      "priority": false
+    },
+    "dar": {
+      "english": "Dargwa",
+      "region": "RU",
+      "priority": false
+    },
+    "dav": {
+      "english": "Taita",
+      "region": "KE",
+      "priority": false
+    },
+    "de": {
+      "english": "German",
+      "region": "DE",
+      "priority": false
+    },
+    "del": {
+      "english": "Delaware",
+      "region": "US",
+      "priority": false
+    },
+    "den": {
+      "english": "Slave",
+      "region": "CA",
+      "priority": false
+    },
+    "dgr": {
+      "english": "Dogrib",
+      "region": "CA",
+      "priority": false
+    },
+    "din": {
+      "english": "Dinka",
+      "region": "SS",
+      "priority": false
+    },
+    "dje": {
+      "english": "Zarma",
+      "region": "NE",
+      "priority": false
+    },
+    "doi": {
+      "english": "Dogri",
+      "region": "IN",
+      "priority": false
+    },
+    "dsb": {
+      "english": "Lower Sorbian",
+      "region": "DE",
+      "priority": false
+    },
+    "dtp": {
+      "english": "Central Dusun",
+      "region": "MY",
+      "priority": false
+    },
+    "dua": {
+      "english": "Duala",
+      "region": "CM",
+      "priority": false
+    },
+    "dum": {
+      "english": "Middle Dutch",
+      "region": "NL",
+      "priority": false
+    },
+    "dv": {
+      "english": "Divehi",
+      "region": "MV",
+      "priority": false
+    },
+    "dyo": {
+      "english": "Jola-Fonyi",
+      "region": "SN",
+      "priority": false
+    },
+    "dyu": {
+      "english": "Dyula",
+      "region": "BF",
+      "priority": false
+    },
+    "dz": {
+      "english": "Dzongkha",
+      "region": "BT",
+      "priority": false
+    },
+    "dzg": {
+      "english": "Dazaga",
+      "region": "TD",
+      "priority": false
+    },
+    "ebu": {
+      "english": "Embu",
+      "region": "KE",
+      "priority": false
+    },
+    "ee": {
+      "english": "Ewe",
+      "region": "GH",
+      "priority": false
+    },
+    "efi": {
+      "english": "Efik",
+      "region": "NG",
+      "priority": false
+    },
+    "egl": {
+      "english": "Emilian",
+      "region": "IT",
+      "priority": false
+    },
+    "egy": {
+      "english": "Ancient Egyptian",
+      "region": "EG",
+      "priority": false
+    },
+    "eka": {
+      "english": "Ekajuk",
+      "region": "NG",
+      "priority": false
+    },
+    "el": {
+      "english": "Greek",
+      "region": "GR",
+      "priority": false
+    },
+    "elx": {
+      "english": "Elamite",
+      "region": null,
+      "priority": false
+    },
+    "en": {
+      "english": "English",
+      "region": "US",
+      "priority": true
+    },
+    "enm": {
+      "english": "Middle English",
+      "region": "GB",
+      "priority": false
+    },
+    "eo": {
+      "english": "Esperanto",
+      "region": null,
+      "priority": false
+    },
+    "es": {
+      "english": "Spanish",
+      "region": "ES",
+      "priority": false
+    },
+    "esu": {
+      "english": "Central Yupik",
+      "region": "US",
+      "priority": false
+    },
+    "et": {
+      "english": "Estonian",
+      "region": "EE",
+      "priority": false
+    },
+    "eu": {
+      "english": "Basque",
+      "region": "ES",
+      "priority": false
+    },
+    "ewo": {
+      "english": "Ewondo",
+      "region": "CM",
+      "priority": false
+    },
+    "ext": {
+      "english": "Extremaduran",
+      "region": "ES",
+      "priority": false
+    },
+    "fa": {
+      "english": "Persian",
+      "region": "IR",
+      "priority": false
+    },
+    "fan": {
+      "english": "Fang",
+      "region": "GQ",
+      "priority": false
+    },
+    "ff": {
+      "english": "Fula",
+      "region": "SN",
+      "priority": false
+    },
+    "fi": {
+      "english": "Finnish",
+      "region": "FI",
+      "priority": false
+    },
+    "fil": {
+      "english": "Filipino",
+      "region": "PH",
+      "priority": false
+    },
+    "fit": {
+      "english": "Tornedalen Finnish",
+      "region": "SE",
+      "priority": false
+    },
+    "fj": {
+      "english": "Fijian",
+      "region": "FJ",
+      "priority": false
+    },
+    "fo": {
+      "english": "Faroese",
+      "region": "FO",
+      "priority": false
+    },
+    "fon": {
+      "english": "Fon",
+      "region": "BJ",
+      "priority": false
+    },
+    "fr": {
+      "english": "French",
+      "region": "FR",
+      "priority": false
+    },
+    "frc": {
+      "english": "Cajun French",
+      "region": "US",
+      "priority": false
+    },
+    "frm": {
+      "english": "Middle French",
+      "region": "FR",
+      "priority": false
+    },
+    "fro": {
+      "english": "Old French",
+      "region": "FR",
+      "priority": false
+    },
+    "frp": {
+      "english": "Arpitan",
+      "region": "FR",
+      "priority": false
+    },
+    "frr": {
+      "english": "Northern Frisian",
+      "region": "DE",
+      "priority": false
+    },
+    "frs": {
+      "english": "Eastern Frisian",
+      "region": "DE",
+      "priority": false
+    },
+    "fur": {
+      "english": "Friulian",
+      "region": "IT",
+      "priority": false
+    },
+    "fy": {
+      "english": "Western Frisian",
+      "region": "NL",
+      "priority": false
+    },
+    "ga": {
+      "english": "Irish",
+      "region": "IE",
+      "priority": false
+    },
+    "gaa": {
+      "english": "Ga",
+      "region": "GH",
+      "priority": false
+    },
+    "gag": {
+      "english": "Gagauz",
+      "region": "MD",
+      "priority": false
+    },
+    "gan": {
+      "english": "Gan Chinese",
+      "region": "CN",
+      "priority": false
+    },
+    "gay": {
+      "english": "Gayo",
+      "region": "ID",
+      "priority": false
+    },
+    "gba": {
+      "english": "Gbaya",
+      "region": "CF",
+      "priority": false
+    },
+    "gbz": {
+      "english": "Zoroastrian Dari",
+      "region": "IR",
+      "priority": false
+    },
+    "gd": {
+      "english": "Scottish Gaelic",
+      "region": "GB",
+      "priority": false
+    },
+    "gez": {
+      "english": "Geez",
+      "region": "ET",
+      "priority": true
+    },
+    "gil": {
+      "english": "Gilbertese",
+      "region": "KI",
+      "priority": false
+    },
+    "gl": {
+      "english": "Galician",
+      "region": "ES",
+      "priority": false
+    },
+    "glk": {
+      "english": "Gilaki",
+      "region": "IR",
+      "priority": false
+    },
+    "gmh": {
+      "english": "Middle High German",
+      "region": "DE",
+      "priority": false
+    },
+    "gn": {
+      "english": "Guarani",
+      "region": "PY",
+      "priority": false
+    },
+    "goh": {
+      "english": "Old High German",
+      "region": "DE",
+      "priority": false
+    },
+    "gom": {
+      "english": "Goan Konkani",
+      "region": "IN",
+      "priority": false
+    },
+    "gon": {
+      "english": "Gondi",
+      "region": "IN",
+      "priority": false
+    },
+    "gor": {
+      "english": "Gorontalo",
+      "region": "ID",
+      "priority": false
+    },
+    "got": {
+      "english": "Gothic",
+      "region": "UA",
+      "priority": false
+    },
+    "grb": {
+      "english": "Grebo",
+      "region": "LR",
+      "priority": false
+    },
+    "grc": {
+      "english": "Ancient Greek",
+      "region": "CY",
+      "priority": false
+    },
+    "gsw": {
+      "english": "Swiss German",
+      "region": "CH",
+      "priority": false
+    },
+    "gu": {
+      "english": "Gujarati",
+      "region": "IN",
+      "priority": false
+    },
+    "guc": {
+      "english": "Wayuu",
+      "region": "CO",
+      "priority": false
+    },
+    "gur": {
+      "english": "Frafra",
+      "region": "GH",
+      "priority": false
+    },
+    "guz": {
+      "english": "Gusii",
+      "region": "KE",
+      "priority": false
+    },
+    "gv": {
+      "english": "Manx",
+      "region": "IM",
+      "priority": false
+    },
+    "gwi": {
+      "english": "Gwichʼin",
+      "region": "CA",
+      "priority": false
+    },
+    "ha": {
+      "english": "Hausa",
+      "region": "NG",
+      "priority": false
+    },
+    "hai": {
+      "english": "Haida",
+      "region": "CA",
+      "priority": false
+    },
+    "hak": {
+      "english": "Hakka Chinese",
+      "region": "CN",
+      "priority": false
+    },
+    "haw": {
+      "english": "Hawaiian",
+      "region": "US",
+      "priority": false
+    },
+    "hax": {
+      "english": "Southern Haida",
+      "region": "CA",
+      "priority": false
+    },
+    "he": {
+      "english": "Hebrew",
+      "region": "IL",
+      "priority": false
+    },
+    "hi": {
+      "english": "Hindi",
+      "region": "IN",
+      "priority": false
+    },
+    "hif": {
+      "english": "Fiji Hindi",
+      "region": "FJ",
+      "priority": false
+    },
+    "hil": {
+      "english": "Hiligaynon",
+      "region": "PH",
+      "priority": false
+    },
+    "hit": {
+      "english": "Hittite",
+      "region": "TR",
+      "priority": false
+    },
+    "hmn": {
+      "english": "Hmong",
+      "region": "CN",
+      "priority": false
+    },
+    "hnj": {
+      "english": "Hmong Njua",
+      "region": "US",
+      "priority": false
+    },
+    "ho": {
+      "english": "Hiri Motu",
+      "region": "PG",
+      "priority": false
+    },
+    "hr": {
+      "english": "Croatian",
+      "region": "HR",
+      "priority": false
+    },
+    "hsb": {
+      "english": "Upper Sorbian",
+      "region": "DE",
+      "priority": false
+    },
+    "hsn": {
+      "english": "Xiang Chinese",
+      "region": "CN",
+      "priority": false
+    },
+    "ht": {
+      "english": "Haitian Creole",
+      "region": "HT",
+      "priority": false
+    },
+    "hu": {
+      "english": "Hungarian",
+      "region": "HU",
+      "priority": false
+    },
+    "hup": {
+      "english": "Hupa",
+      "region": "US",
+      "priority": false
+    },
+    "hur": {
+      "english": "Halkomelem",
+      "region": "CA",
+      "priority": false
+    },
+    "hy": {
+      "english": "Armenian",
+      "region": "AM",
+      "priority": false
+    },
+    "hz": {
+      "english": "Herero",
+      "region": "NA",
+      "priority": false
+    },
+    "ia": {
+      "english": "Interlingua",
+      "region": null,
+      "priority": false
+    },
+    "iba": {
+      "english": "Iban",
+      "region": "MY",
+      "priority": false
+    },
+    "ibb": {
+      "english": "Ibibio",
+      "region": "NG",
+      "priority": false
+    },
+    "id": {
+      "english": "Indonesian",
+      "region": "ID",
+      "priority": false
+    },
+    "ie": {
+      "english": "Interlingue",
+      "region": "EE",
+      "priority": false
+    },
+    "ig": {
+      "english": "Igbo",
+      "region": "NG",
+      "priority": false
+    },
+    "ii": {
+      "english": "Sichuan Yi",
+      "region": "CN",
+      "priority": false
+    },
+    "ik": {
+      "english": "Inupiaq",
+      "region": "US",
+      "priority": false
+    },
+    "ikt": {
+      "english": "Western Canadian Inuktitut",
+      "region": "CA",
+      "priority": false
+    },
+    "ilo": {
+      "english": "Iloko",
+      "region": "PH",
+      "priority": false
+    },
+    "inh": {
+      "english": "Ingush",
+      "region": "RU",
+      "priority": false
+    },
+    "io": {
+      "english": "Ido",
+      "region": null,
+      "priority": false
+    },
+    "is": {
+      "english": "Icelandic",
+      "region": "IS",
+      "priority": false
+    },
+    "it": {
+      "english": "Italian",
+      "region": "IT",
+      "priority": false
+    },
+    "iu": {
+      "english": "Inuktitut",
+      "region": "CA",
+      "priority": false
+    },
+    "izh": {
+      "english": "Ingrian",
+      "region": "RU",
+      "priority": false
+    },
+    "ja": {
+      "english": "Japanese",
+      "region": "JP",
+      "priority": false
+    },
+    "jam": {
+      "english": "Jamaican Creole English",
+      "region": "JM",
+      "priority": false
+    },
+    "jbo": {
+      "english": "Lojban",
+      "region": null,
+      "priority": false
+    },
+    "jgo": {
+      "english": "Ngomba",
+      "region": "CM",
+      "priority": false
+    },
+    "jmc": {
+      "english": "Machame",
+      "region": "TZ",
+      "priority": false
+    },
+    "jpr": {
+      "english": "Judeo-Persian",
+      "region": "IL",
+      "priority": false
+    },
+    "jrb": {
+      "english": "Judeo-Arabic",
+      "region": "IL",
+      "priority": false
+    },
+    "jut": {
+      "english": "Jutish",
+      "region": "DK",
+      "priority": false
+    },
+    "jv": {
+      "english": "Javanese",
+      "region": "ID",
+      "priority": false
+    },
+    "ka": {
+      "english": "Georgian",
+      "region": "GE",
+      "priority": false
+    },
+    "kaa": {
+      "english": "Kara-Kalpak",
+      "region": "UZ",
+      "priority": false
+    },
+    "kab": {
+      "english": "Kabyle",
+      "region": "DZ",
+      "priority": false
+    },
+    "kac": {
+      "english": "Kachin",
+      "region": "MM",
+      "priority": false
+    },
+    "kaj": {
+      "english": "Jju",
+      "region": "NG",
+      "priority": false
+    },
+    "kam": {
+      "english": "Kamba",
+      "region": "KE",
+      "priority": false
+    },
+    "kaw": {
+      "english": "Kawi",
+      "region": "ID",
+      "priority": false
+    },
+    "kbd": {
+      "english": "Kabardian",
+      "region": "RU",
+      "priority": false
+    },
+    "kbl": {
+      "english": "Kanembu",
+      "region": "TD",
+      "priority": false
+    },
+    "kcg": {
+      "english": "Tyap",
+      "region": "NG",
+      "priority": false
+    },
+    "kde": {
+      "english": "Makonde",
+      "region": "TZ",
+      "priority": false
+    },
+    "kea": {
+      "english": "Kabuverdianu",
+      "region": "CV",
+      "priority": false
+    },
+    "ken": {
+      "english": "Kenyang",
+      "region": "CM",
+      "priority": false
+    },
+    "kfo": {
+      "english": "Koro",
+      "region": "CI",
+      "priority": false
+    },
+    "kg": {
+      "english": "Kongo",
+      "region": "CD",
+      "priority": false
+    },
+    "kgp": {
+      "english": "Kaingang",
+      "region": "BR",
+      "priority": false
+    },
+    "kha": {
+      "english": "Khasi",
+      "region": "IN",
+      "priority": false
+    },
+    "kho": {
+      "english": "Khotanese",
+      "region": null,
+      "priority": false
+    },
+    "khq": {
+      "english": "Koyra Chiini",
+      "region": "ML",
+      "priority": false
+    },
+    "khw": {
+      "english": "Khowar",
+      "region": "PK",
+      "priority": false
+    },
+    "ki": {
+      "english": "Kikuyu",
+      "region": "KE",
+      "priority": false
+    },
+    "kiu": {
+      "english": "Kirmanjki",
+      "region": "TR",
+      "priority": false
+    },
+    "kj": {
+      "english": "Kuanyama",
+      "region": "NA",
+      "priority": false
+    },
+    "kk": {
+      "english": "Kazakh",
+      "region": "KZ",
+      "priority": false
+    },
+    "kkj": {
+      "english": "Kako",
+      "region": "CM",
+      "priority": false
+    },
+    "kl": {
+      "english": "Kalaallisut",
+      "region": "GL",
+      "priority": false
+    },
+    "kln": {
+      "english": "Kalenjin",
+      "region": "KE",
+      "priority": false
+    },
+    "km": {
+      "english": "Khmer",
+      "region": "KH",
+      "priority": false
+    },
+    "kmb": {
+      "english": "Kimbundu",
+      "region": "AO",
+      "priority": false
+    },
+    "kn": {
+      "english": "Kannada",
+      "region": "IN",
+      "priority": false
+    },
+    "ko": {
+      "english": "Korean",
+      "region": "KR",
+      "priority": false
+    },
+    "koi": {
+      "english": "Komi-Permyak",
+      "region": "RU",
+      "priority": false
+    },
+    "kok": {
+      "english": "Konkani",
+      "region": "IN",
+      "priority": false
+    },
+    "kos": {
+      "english": "Kosraean",
+      "region": "FM",
+      "priority": false
+    },
+    "kpe": {
+      "english": "Kpelle",
+      "region": "LR",
+      "priority": false
+    },
+    "kr": {
+      "english": "Kanuri",
+      "region": "NG",
+      "priority": false
+    },
+    "krc": {
+      "english": "Karachay-Balkar",
+      "region": "RU",
+      "priority": false
+    },
+    "kri": {
+      "english": "Krio",
+      "region": "SL",
+      "priority": false
+    },
+    "krj": {
+      "english": "Kinaray-a",
+      "region": "PH",
+      "priority": false
+    },
+    "krl": {
+      "english": "Karelian",
+      "region": "RU",
+      "priority": false
+    },
+    "kru": {
+      "english": "Kurukh",
+      "region": "IN",
+      "priority": false
+    },
+    "ks": {
+      "english": "Kashmiri",
+      "region": "IN",
+      "priority": false
+    },
+    "ksb": {
+      "english": "Shambala",
+      "region": "TZ",
+      "priority": false
+    },
+    "ksf": {
+      "english": "Bafia",
+      "region": "CM",
+      "priority": false
+    },
+    "ksh": {
+      "english": "Colognian",
+      "region": "DE",
+      "priority": false
+    },
+    "ku": {
+      "english": "Kurdish",
+      "region": "TR",
+      "priority": false
+    },
+    "kum": {
+      "english": "Kumyk",
+      "region": "RU",
+      "priority": false
+    },
+    "kut": {
+      "english": "Kutenai",
+      "region": "CA",
+      "priority": false
+    },
+    "kv": {
+      "english": "Komi",
+      "region": "RU",
+      "priority": false
+    },
+    "kw": {
+      "english": "Cornish",
+      "region": "GB",
+      "priority": false
+    },
+    "kwk": {
+      "english": "Kwakʼwala",
+      "region": "CA",
+      "priority": false
+    },
+    "kxv": {
+      "english": "Kuvi",
+      "region": "IN",
+      "priority": false
+    },
+    "ky": {
+      "english": "Kyrgyz",
+      "region": "KG",
+      "priority": false
+    },
+    "la": {
+      "english": "Latin",
+      "region": "VA",
+      "priority": false
+    },
+    "lad": {
+      "english": "Ladino",
+      "region": "IL",
+      "priority": false
+    },
+    "lag": {
+      "english": "Langi",
+      "region": "TZ",
+      "priority": false
+    },
+    "lah": {
+      "english": "Western Panjabi",
+      "region": "PK",
+      "priority": false
+    },
+    "lam": {
+      "english": "Lamba",
+      "region": "ZM",
+      "priority": false
+    },
+    "lb": {
+      "english": "Luxembourgish",
+      "region": "LU",
+      "priority": false
+    },
+    "lez": {
+      "english": "Lezghian",
+      "region": "RU",
+      "priority": false
+    },
+    "lfn": {
+      "english": "Lingua Franca Nova",
+      "region": null,
+      "priority": false
+    },
+    "lg": {
+      "english": "Ganda",
+      "region": "UG",
+      "priority": false
+    },
+    "li": {
+      "english": "Limburgish",
+      "region": "NL",
+      "priority": false
+    },
+    "lij": {
+      "english": "Ligurian",
+      "region": "IT",
+      "priority": false
+    },
+    "lil": {
+      "english": "Lillooet",
+      "region": "CA",
+      "priority": false
+    },
+    "liv": {
+      "english": "Livonian",
+      "region": "LV",
+      "priority": false
+    },
+    "lkt": {
+      "english": "Lakota",
+      "region": "US",
+      "priority": false
+    },
+    "lmo": {
+      "english": "Lombard",
+      "region": "IT",
+      "priority": false
+    },
+    "ln": {
+      "english": "Lingala",
+      "region": "CD",
+      "priority": false
+    },
+    "lo": {
+      "english": "Lao",
+      "region": "LA",
+      "priority": false
+    },
+    "lol": {
+      "english": "Mongo",
+      "region": "CD",
+      "priority": false
+    },
+    "lou": {
+      "english": "Louisiana Creole",
+      "region": "US",
+      "priority": false
+    },
+    "loz": {
+      "english": "Lozi",
+      "region": "ZM",
+      "priority": false
+    },
+    "lrc": {
+      "english": "Northern Luri",
+      "region": "IR",
+      "priority": false
+    },
+    "lsm": {
+      "english": "Saamia",
+      "region": "UG",
+      "priority": false
+    },
+    "lt": {
+      "english": "Lithuanian",
+      "region": "LT",
+      "priority": false
+    },
+    "ltg": {
+      "english": "Latgalian",
+      "region": "LV",
+      "priority": false
+    },
+    "lu": {
+      "english": "Luba-Katanga",
+      "region": "CD",
+      "priority": false
+    },
+    "lua": {
+      "english": "Luba-Lulua",
+      "region": "CD",
+      "priority": false
+    },
+    "lui": {
+      "english": "Luiseno",
+      "region": "US",
+      "priority": false
+    },
+    "lun": {
+      "english": "Lunda",
+      "region": "ZM",
+      "priority": false
+    },
+    "luo": {
+      "english": "Luo",
+      "region": "KE",
+      "priority": false
+    },
+    "lus": {
+      "english": "Mizo",
+      "region": "IN",
+      "priority": false
+    },
+    "luy": {
+      "english": "Luyia",
+      "region": "KE",
+      "priority": false
+    },
+    "lv": {
+      "english": "Latvian",
+      "region": "LV",
+      "priority": false
+    },
+    "lzh": {
+      "english": "Literary Chinese",
+      "region": "CN",
+      "priority": false
+    },
+    "lzz": {
+      "english": "Laz",
+      "region": "TR",
+      "priority": false
+    },
+    "mad": {
+      "english": "Madurese",
+      "region": "ID",
+      "priority": false
+    },
+    "maf": {
+      "english": "Mafa",
+      "region": "CM",
+      "priority": false
+    },
+    "mag": {
+      "english": "Magahi",
+      "region": "IN",
+      "priority": false
+    },
+    "mai": {
+      "english": "Maithili",
+      "region": "IN",
+      "priority": false
+    },
+    "mak": {
+      "english": "Makasar",
+      "region": "ID",
+      "priority": false
+    },
+    "man": {
+      "english": "Mandingo",
+      "region": "GM",
+      "priority": false
+    },
+    "mas": {
+      "english": "Masai",
+      "region": "KE",
+      "priority": false
+    },
+    "mde": {
+      "english": "Maba",
+      "region": "TD",
+      "priority": false
+    },
+    "mdf": {
+      "english": "Moksha",
+      "region": "RU",
+      "priority": false
+    },
+    "mdr": {
+      "english": "Mandar",
+      "region": "ID",
+      "priority": false
+    },
+    "men": {
+      "english": "Mende",
+      "region": "SL",
+      "priority": false
+    },
+    "mer": {
+      "english": "Meru",
+      "region": "KE",
+      "priority": false
+    },
+    "mfe": {
+      "english": "Morisyen",
+      "region": "MU",
+      "priority": false
+    },
+    "mg": {
+      "english": "Malagasy",
+      "region": "MG",
+      "priority": false
+    },
+    "mga": {
+      "english": "Middle Irish",
+      "region": null,
+      "priority": false
+    },
+    "mgh": {
+      "english": "Makhuwa-Meetto",
+      "region": "MZ",
+      "priority": false
+    },
+    "mgo": {
+      "english": "Metaʼ",
+      "region": "CM",
+      "priority": false
+    },
+    "mh": {
+      "english": "Marshallese",
+      "region": "MH",
+      "priority": false
+    },
+    "mi": {
+      "english": "Māori",
+      "region": "NZ",
+      "priority": false
+    },
+    "mic": {
+      "english": "Mi'kmaw",
+      "region": "CA",
+      "priority": false
+    },
+    "min": {
+      "english": "Minangkabau",
+      "region": "ID",
+      "priority": false
+    },
+    "mk": {
+      "english": "Macedonian",
+      "region": "MK",
+      "priority": false
+    },
+    "ml": {
+      "english": "Malayalam",
+      "region": "IN",
+      "priority": false
+    },
+    "mn": {
+      "english": "Mongolian",
+      "region": "MN",
+      "priority": false
+    },
+    "mnc": {
+      "english": "Manchu",
+      "region": null,
+      "priority": false
+    },
+    "mni": {
+      "english": "Manipuri",
+      "region": "IN",
+      "priority": false
+    },
+    "moe": {
+      "english": "Innu-aimun",
+      "region": "CA",
+      "priority": false
+    },
+    "moh": {
+      "english": "Mohawk",
+      "region": "CA",
+      "priority": false
+    },
+    "mos": {
+      "english": "Mossi",
+      "region": "BF",
+      "priority": false
+    },
+    "mr": {
+      "english": "Marathi",
+      "region": "IN",
+      "priority": false
+    },
+    "mrj": {
+      "english": "Western Mari",
+      "region": "RU",
+      "priority": false
+    },
+    "ms": {
+      "english": "Malay",
+      "region": "MY",
+      "priority": false
+    },
+    "mt": {
+      "english": "Maltese",
+      "region": "MT",
+      "priority": false
+    },
+    "mua": {
+      "english": "Mundang",
+      "region": "CM",
+      "priority": false
+    },
+    "mus": {
+      "english": "Muscogee",
+      "region": "US",
+      "priority": false
+    },
+    "mwl": {
+      "english": "Mirandese",
+      "region": "PT",
+      "priority": false
+    },
+    "mwr": {
+      "english": "Marwari",
+      "region": "IN",
+      "priority": false
+    },
+    "mwv": {
+      "english": "Mentawai",
+      "region": "ID",
+      "priority": false
+    },
+    "my": {
+      "english": "Burmese",
+      "region": "MM",
+      "priority": false
+    },
+    "mye": {
+      "english": "Myene",
+      "region": "GA",
+      "priority": false
+    },
+    "myv": {
+      "english": "Erzya",
+      "region": "RU",
+      "priority": false
+    },
+    "mzn": {
+      "english": "Mazanderani",
+      "region": "IR",
+      "priority": false
+    },
+    "na": {
+      "english": "Nauru",
+      "region": "NR",
+      "priority": false
+    },
+    "nan": {
+      "english": "Min Nan Chinese",
+      "region": "CN",
+      "priority": false
+    },
+    "nap": {
+      "english": "Neapolitan",
+      "region": "IT",
+      "priority": false
+    },
+    "naq": {
+      "english": "Nama",
+      "region": "NA",
+      "priority": false
+    },
+    "nb": {
+      "english": "Norwegian Bokmål",
+      "region": "NO",
+      "priority": false
+    },
+    "nd": {
+      "english": "North Ndebele",
+      "region": "ZW",
+      "priority": false
+    },
+    "nds": {
+      "english": "Low German",
+      "region": "DE",
+      "priority": false
+    },
+    "ne": {
+      "english": "Nepali",
+      "region": "NP",
+      "priority": false
+    },
+    "new": {
+      "english": "Newari",
+      "region": "NP",
+      "priority": false
+    },
+    "ng": {
+      "english": "Ndonga",
+      "region": "NA",
+      "priority": false
+    },
+    "nia": {
+      "english": "Nias",
+      "region": "ID",
+      "priority": false
+    },
+    "niu": {
+      "english": "Niuean",
+      "region": "NU",
+      "priority": false
+    },
+    "njo": {
+      "english": "Ao Naga",
+      "region": "IN",
+      "priority": false
+    },
+    "nl": {
+      "english": "Dutch",
+      "region": "NL",
+      "priority": false
+    },
+    "nmg": {
+      "english": "Kwasio",
+      "region": "CM",
+      "priority": false
+    },
+    "nn": {
+      "english": "Norwegian Nynorsk",
+      "region": "NO",
+      "priority": false
+    },
+    "nnh": {
+      "english": "Ngiemboon",
+      "region": "CM",
+      "priority": false
+    },
+    "no": {
+      "english": "Norwegian",
+      "region": "NO",
+      "priority": false
+    },
+    "nog": {
+      "english": "Nogai",
+      "region": "RU",
+      "priority": false
+    },
+    "non": {
+      "english": "Old Norse",
+      "region": "SE",
+      "priority": false
+    },
+    "nov": {
+      "english": "Novial",
+      "region": null,
+      "priority": false
+    },
+    "nqo": {
+      "english": "N’Ko",
+      "region": "GN",
+      "priority": false
+    },
+    "nr": {
+      "english": "South Ndebele",
+      "region": "ZA",
+      "priority": false
+    },
+    "nso": {
+      "english": "Northern Sotho",
+      "region": "ZA",
+      "priority": false
+    },
+    "nus": {
+      "english": "Nuer",
+      "region": "SS",
+      "priority": false
+    },
+    "nv": {
+      "english": "Navajo",
+      "region": "US",
+      "priority": false
+    },
+    "nwc": {
+      "english": "Classical Newari",
+      "region": "NP",
+      "priority": false
+    },
+    "ny": {
+      "english": "Nyanja",
+      "region": "MW",
+      "priority": false
+    },
+    "nym": {
+      "english": "Nyamwezi",
+      "region": "TZ",
+      "priority": false
+    },
+    "nyn": {
+      "english": "Nyankole",
+      "region": "UG",
+      "priority": false
+    },
+    "nyo": {
+      "english": "Nyoro",
+      "region": "UG",
+      "priority": false
+    },
+    "nzi": {
+      "english": "Nzima",
+      "region": "GH",
+      "priority": false
+    },
+    "oc": {
+      "english": "Occitan",
+      "region": "FR",
+      "priority": false
+    },
+    "oj": {
+      "english": "Ojibwa",
+      "region": "CA",
+      "priority": false
+    },
+    "ojb": {
+      "english": "Northwestern Ojibwa",
+      "region": "CA",
+      "priority": false
+    },
+    "ojc": {
+      "english": "Central Ojibwa",
+      "region": "CA",
+      "priority": false
+    },
+    "ojs": {
+      "english": "Oji-Cree",
+      "region": "CA",
+      "priority": false
+    },
+    "ojw": {
+      "english": "Western Ojibwa",
+      "region": "CA",
+      "priority": false
+    },
+    "oka": {
+      "english": "Okanagan",
+      "region": "CA",
+      "priority": false
+    },
+    "om": {
+      "english": "Oromo",
+      "region": "ET",
+      "priority": true
+    },
+    "or": {
+      "english": "Odia",
+      "region": "IN",
+      "priority": false
+    },
+    "os": {
+      "english": "Ossetic",
+      "region": "GE",
+      "priority": false
+    },
+    "osa": {
+      "english": "Osage",
+      "region": "US",
+      "priority": false
+    },
+    "ota": {
+      "english": "Ottoman Turkish",
+      "region": "TR",
+      "priority": false
+    },
+    "pa": {
+      "english": "Punjabi",
+      "region": "IN",
+      "priority": false
+    },
+    "pag": {
+      "english": "Pangasinan",
+      "region": "PH",
+      "priority": false
+    },
+    "pal": {
+      "english": "Pahlavi",
+      "region": "IR",
+      "priority": false
+    },
+    "pam": {
+      "english": "Pampanga",
+      "region": "PH",
+      "priority": false
+    },
+    "pap": {
+      "english": "Papiamento",
+      "region": "CW",
+      "priority": false
+    },
+    "pau": {
+      "english": "Palauan",
+      "region": "PW",
+      "priority": false
+    },
+    "pcd": {
+      "english": "Picard",
+      "region": "FR",
+      "priority": false
+    },
+    "pcm": {
+      "english": "Nigerian Pidgin",
+      "region": "NG",
+      "priority": false
+    },
+    "pdc": {
+      "english": "Pennsylvania German",
+      "region": "US",
+      "priority": false
+    },
+    "pdt": {
+      "english": "Plautdietsch",
+      "region": "CA",
+      "priority": false
+    },
+    "peo": {
+      "english": "Old Persian",
+      "region": "IR",
+      "priority": false
+    },
+    "pfl": {
+      "english": "Palatine German",
+      "region": "DE",
+      "priority": false
+    },
+    "phn": {
+      "english": "Phoenician",
+      "region": "LB",
+      "priority": false
+    },
+    "pi": {
+      "english": "Pali",
+      "region": "IN",
+      "priority": false
+    },
+    "pis": {
+      "english": "Pijin",
+      "region": "SB",
+      "priority": false
+    },
+    "pl": {
+      "english": "Polish",
+      "region": "PL",
+      "priority": false
+    },
+    "pms": {
+      "english": "Piedmontese",
+      "region": "IT",
+      "priority": false
+    },
+    "pnt": {
+      "english": "Pontic",
+      "region": "GR",
+      "priority": false
+    },
+    "pon": {
+      "english": "Pohnpeian",
+      "region": "FM",
+      "priority": false
+    },
+    "pqm": {
+      "english": "Maliseet-Passamaquoddy",
+      "region": "CA",
+      "priority": false
+    },
+    "prg": {
+      "english": "Prussian",
+      "region": "PL",
+      "priority": false
+    },
+    "pro": {
+      "english": "Old Provençal",
+      "region": "FR",
+      "priority": false
+    },
+    "ps": {
+      "english": "Pashto",
+      "region": "AF",
+      "priority": false
+    },
+    "pt": {
+      "english": "Portuguese",
+      "region": "BR",
+      "priority": false
+    },
+    "qu": {
+      "english": "Quechua",
+      "region": "PE",
+      "priority": false
+    },
+    "quc": {
+      "english": "Kʼicheʼ",
+      "region": "GT",
+      "priority": false
+    },
+    "qug": {
+      "english": "Chimborazo Highland Quichua",
+      "region": "EC",
+      "priority": false
+    },
+    "raj": {
+      "english": "Rajasthani",
+      "region": "IN",
+      "priority": false
+    },
+    "rap": {
+      "english": "Rapanui",
+      "region": "CL",
+      "priority": false
+    },
+    "rar": {
+      "english": "Rarotongan",
+      "region": "CK",
+      "priority": false
+    },
+    "rgn": {
+      "english": "Romagnol",
+      "region": "IT",
+      "priority": false
+    },
+    "rhg": {
+      "english": "Rohingya",
+      "region": "MM",
+      "priority": false
+    },
+    "rif": {
+      "english": "Riffian",
+      "region": "MA",
+      "priority": false
+    },
+    "rm": {
+      "english": "Romansh",
+      "region": "CH",
+      "priority": false
+    },
+    "rn": {
+      "english": "Rundi",
+      "region": "BI",
+      "priority": false
+    },
+    "ro": {
+      "english": "Romanian",
+      "region": "RO",
+      "priority": false
+    },
+    "rof": {
+      "english": "Rombo",
+      "region": "TZ",
+      "priority": false
+    },
+    "rom": {
+      "english": "Romany",
+      "region": "RO",
+      "priority": false
+    },
+    "rtm": {
+      "english": "Rotuman",
+      "region": "FJ",
+      "priority": false
+    },
+    "ru": {
+      "english": "Russian",
+      "region": "RU",
+      "priority": false
+    },
+    "rue": {
+      "english": "Rusyn",
+      "region": "UA",
+      "priority": false
+    },
+    "rug": {
+      "english": "Roviana",
+      "region": "SB",
+      "priority": false
+    },
+    "rup": {
+      "english": "Aromanian",
+      "region": "RO",
+      "priority": false
+    },
+    "rw": {
+      "english": "Kinyarwanda",
+      "region": "RW",
+      "priority": false
+    },
+    "rwk": {
+      "english": "Rwa",
+      "region": "TZ",
+      "priority": false
+    },
+    "sa": {
+      "english": "Sanskrit",
+      "region": "IN",
+      "priority": false
+    },
+    "sad": {
+      "english": "Sandawe",
+      "region": "TZ",
+      "priority": false
+    },
+    "sah": {
+      "english": "Yakut",
+      "region": "RU",
+      "priority": false
+    },
+    "sam": {
+      "english": "Samaritan Aramaic",
+      "region": "PS",
+      "priority": false
+    },
+    "saq": {
+      "english": "Samburu",
+      "region": "KE",
+      "priority": false
+    },
+    "sas": {
+      "english": "Sasak",
+      "region": "ID",
+      "priority": false
+    },
+    "sat": {
+      "english": "Santali",
+      "region": "IN",
+      "priority": false
+    },
+    "saz": {
+      "english": "Saurashtra",
+      "region": "IN",
+      "priority": false
+    },
+    "sba": {
+      "english": "Ngambay",
+      "region": "TD",
+      "priority": false
+    },
+    "sbp": {
+      "english": "Sangu",
+      "region": "TZ",
+      "priority": false
+    },
+    "sc": {
+      "english": "Sardinian",
+      "region": "IT",
+      "priority": false
+    },
+    "scn": {
+      "english": "Sicilian",
+      "region": "IT",
+      "priority": false
+    },
+    "sco": {
+      "english": "Scots",
+      "region": "GB",
+      "priority": false
+    },
+    "sd": {
+      "english": "Sindhi",
+      "region": "PK",
+      "priority": false
+    },
+    "sdc": {
+      "english": "Sassarese Sardinian",
+      "region": "IT",
+      "priority": false
+    },
+    "sdh": {
+      "english": "Southern Kurdish",
+      "region": "IR",
+      "priority": false
+    },
+    "se": {
+      "english": "Northern Sami",
+      "region": "NO",
+      "priority": false
+    },
+    "see": {
+      "english": "Seneca",
+      "region": "US",
+      "priority": false
+    },
+    "seh": {
+      "english": "Sena",
+      "region": "MZ",
+      "priority": false
+    },
+    "sei": {
+      "english": "Seri",
+      "region": "MX",
+      "priority": false
+    },
+    "sel": {
+      "english": "Selkup",
+      "region": "RU",
+      "priority": false
+    },
+    "ses": {
+      "english": "Koyraboro Senni",
+      "region": "ML",
+      "priority": false
+    },
+    "sg": {
+      "english": "Sango",
+      "region": "CF",
+      "priority": false
+    },
+    "sga": {
+      "english": "Old Irish",
+      "region": "IE",
+      "priority": false
+    },
+    "sgs": {
+      "english": "Samogitian",
+      "region": "LT",
+      "priority": false
+    },
+    "shi": {
+      "english": "Tachelhit",
+      "region": "MA",
+      "priority": false
+    },
+    "shn": {
+      "english": "Shan",
+      "region": "MM",
+      "priority": false
+    },
+    "shu": {
+      "english": "Chadian Arabic",
+      "region": "TD",
+      "priority": false
+    },
+    "si": {
+      "english": "Sinhala",
+      "region": "LK",
+      "priority": false
+    },
+    "sid": {
+      "english": "Sidamo",
+      "region": "ET",
+      "priority": true
+    },
+    "sk": {
+      "english": "Slovak",
+      "region": "SK",
+      "priority": false
+    },
+    "sl": {
+      "english": "Slovenian",
+      "region": "SI",
+      "priority": false
+    },
+    "slh": {
+      "english": "Southern Lushootseed",
+      "region": "US",
+      "priority": false
+    },
+    "sli": {
+      "english": "Lower Silesian",
+      "region": "PL",
+      "priority": false
+    },
+    "sly": {
+      "english": "Selayar",
+      "region": "ID",
+      "priority": false
+    },
+    "sm": {
+      "english": "Samoan",
+      "region": "WS",
+      "priority": false
+    },
+    "sma": {
+      "english": "Southern Sami",
+      "region": "SE",
+      "priority": false
+    },
+    "smj": {
+      "english": "Lule Sami",
+      "region": "SE",
+      "priority": false
+    },
+    "smn": {
+      "english": "Inari Sami",
+      "region": "FI",
+      "priority": false
+    },
+    "sms": {
+      "english": "Skolt Sami",
+      "region": "FI",
+      "priority": false
+    },
+    "sn": {
+      "english": "Shona",
+      "region": "ZW",
+      "priority": false
+    },
+    "snk": {
+      "english": "Soninke",
+      "region": "ML",
+      "priority": false
+    },
+    "so": {
+      "english": "Somali",
+      "region": "ET",
+      "priority": true
+    },
+    "sog": {
+      "english": "Sogdien",
+      "region": "UZ",
+      "priority": false
+    },
+    "sq": {
+      "english": "Albanian",
+      "region": "AL",
+      "priority": false
+    },
+    "sr": {
+      "english": "Serbian",
+      "region": "RS",
+      "priority": false
+    },
+    "srn": {
+      "english": "Sranan Tongo",
+      "region": "SR",
+      "priority": false
+    },
+    "srr": {
+      "english": "Serer",
+      "region": "SN",
+      "priority": false
+    },
+    "ss": {
+      "english": "Swati",
+      "region": "ZA",
+      "priority": false
+    },
+    "ssy": {
+      "english": "Saho",
+      "region": "ER",
+      "priority": false
+    },
+    "st": {
+      "english": "Southern Sotho",
+      "region": "ZA",
+      "priority": false
+    },
+    "stq": {
+      "english": "Saterland Frisian",
+      "region": "DE",
+      "priority": false
+    },
+    "str": {
+      "english": "Straits Salish",
+      "region": "CA",
+      "priority": false
+    },
+    "su": {
+      "english": "Sundanese",
+      "region": "ID",
+      "priority": false
+    },
+    "suk": {
+      "english": "Sukuma",
+      "region": "TZ",
+      "priority": false
+    },
+    "sus": {
+      "english": "Susu",
+      "region": "GN",
+      "priority": false
+    },
+    "sux": {
+      "english": "Sumerian",
+      "region": null,
+      "priority": false
+    },
+    "sv": {
+      "english": "Swedish",
+      "region": "SE",
+      "priority": false
+    },
+    "sw": {
+      "english": "Swahili",
+      "region": "TZ",
+      "priority": false
+    },
+    "swb": {
+      "english": "Comorian",
+      "region": "YT",
+      "priority": false
+    },
+    "syc": {
+      "english": "Classical Syriac",
+      "region": "TR",
+      "priority": false
+    },
+    "syr": {
+      "english": "Syriac",
+      "region": "IQ",
+      "priority": false
+    },
+    "szl": {
+      "english": "Silesian",
+      "region": "PL",
+      "priority": false
+    },
+    "ta": {
+      "english": "Tamil",
+      "region": "IN",
+      "priority": false
+    },
+    "tce": {
+      "english": "Southern Tutchone",
+      "region": "CA",
+      "priority": false
+    },
+    "tcy": {
+      "english": "Tulu",
+      "region": "IN",
+      "priority": false
+    },
+    "te": {
+      "english": "Telugu",
+      "region": "IN",
+      "priority": false
+    },
+    "tem": {
+      "english": "Timne",
+      "region": "SL",
+      "priority": false
+    },
+    "teo": {
+      "english": "Teso",
+      "region": "UG",
+      "priority": false
+    },
+    "ter": {
+      "english": "Tereno",
+      "region": "BR",
+      "priority": false
+    },
+    "tet": {
+      "english": "Tetum",
+      "region": "TL",
+      "priority": false
+    },
+    "tg": {
+      "english": "Tajik",
+      "region": "TJ",
+      "priority": false
+    },
+    "tgx": {
+      "english": "Tagish",
+      "region": "CA",
+      "priority": false
+    },
+    "th": {
+      "english": "Thai",
+      "region": "TH",
+      "priority": false
+    },
+    "tht": {
+      "english": "Tahltan",
+      "region": "CA",
+      "priority": false
+    },
+    "ti": {
+      "english": "Tigrinya",
+      "region": "ET",
+      "priority": true
+    },
+    "tig": {
+      "english": "Tigre",
+      "region": "ER",
+      "priority": false
+    },
+    "tiv": {
+      "english": "Tiv",
+      "region": "NG",
+      "priority": false
+    },
+    "tk": {
+      "english": "Turkmen",
+      "region": "TM",
+      "priority": false
+    },
+    "tkl": {
+      "english": "Tokelau",
+      "region": "TK",
+      "priority": false
+    },
+    "tkr": {
+      "english": "Tsakhur",
+      "region": "AZ",
+      "priority": false
+    },
+    "tlh": {
+      "english": "Klingon",
+      "region": null,
+      "priority": false
+    },
+    "tli": {
+      "english": "Tlingit",
+      "region": "US",
+      "priority": false
+    },
+    "tly": {
+      "english": "Talysh",
+      "region": "AZ",
+      "priority": false
+    },
+    "tmh": {
+      "english": "Tamashek",
+      "region": "NE",
+      "priority": false
+    },
+    "tn": {
+      "english": "Tswana",
+      "region": "ZA",
+      "priority": false
+    },
+    "to": {
+      "english": "Tongan",
+      "region": "TO",
+      "priority": false
+    },
+    "tog": {
+      "english": "Nyasa Tonga",
+      "region": "MW",
+      "priority": false
+    },
+    "tok": {
+      "english": "Toki Pona",
+      "region": null,
+      "priority": false
+    },
+    "tpi": {
+      "english": "Tok Pisin",
+      "region": "PG",
+      "priority": false
+    },
+    "tr": {
+      "english": "Turkish",
+      "region": "TR",
+      "priority": false
+    },
+    "tru": {
+      "english": "Turoyo",
+      "region": "TR",
+      "priority": false
+    },
+    "trv": {
+      "english": "Taroko",
+      "region": "TW",
+      "priority": false
+    },
+    "trw": {
+      "english": "Torwali",
+      "region": "PK",
+      "priority": false
+    },
+    "ts": {
+      "english": "Tsonga",
+      "region": "ZA",
+      "priority": false
+    },
+    "tsd": {
+      "english": "Tsakonian",
+      "region": "GR",
+      "priority": false
+    },
+    "tsi": {
+      "english": "Tsimshian",
+      "region": "CA",
+      "priority": false
+    },
+    "tt": {
+      "english": "Tatar",
+      "region": "RU",
+      "priority": false
+    },
+    "ttm": {
+      "english": "Northern Tutchone",
+      "region": "CA",
+      "priority": false
+    },
+    "ttt": {
+      "english": "Muslim Tat",
+      "region": "AZ",
+      "priority": false
+    },
+    "tum": {
+      "english": "Tumbuka",
+      "region": "MW",
+      "priority": false
+    },
+    "tvl": {
+      "english": "Tuvalu",
+      "region": "TV",
+      "priority": false
+    },
+    "twq": {
+      "english": "Tasawaq",
+      "region": "NE",
+      "priority": false
+    },
+    "ty": {
+      "english": "Tahitian",
+      "region": "PF",
+      "priority": false
+    },
+    "tyv": {
+      "english": "Tuvinian",
+      "region": "RU",
+      "priority": false
+    },
+    "tzm": {
+      "english": "Central Atlas Tamazight",
+      "region": "MA",
+      "priority": false
+    },
+    "udm": {
+      "english": "Udmurt",
+      "region": "RU",
+      "priority": false
+    },
+    "ug": {
+      "english": "Uyghur",
+      "region": "CN",
+      "priority": false
+    },
+    "uga": {
+      "english": "Ugaritic",
+      "region": "SY",
+      "priority": false
+    },
+    "uk": {
+      "english": "Ukrainian",
+      "region": "UA",
+      "priority": false
+    },
+    "umb": {
+      "english": "Umbundu",
+      "region": "AO",
+      "priority": false
+    },
+    "ur": {
+      "english": "Urdu",
+      "region": "PK",
+      "priority": false
+    },
+    "uz": {
+      "english": "Uzbek",
+      "region": "UZ",
+      "priority": false
+    },
+    "vai": {
+      "english": "Vai",
+      "region": "LR",
+      "priority": false
+    },
+    "ve": {
+      "english": "Venda",
+      "region": "ZA",
+      "priority": false
+    },
+    "vec": {
+      "english": "Venetian",
+      "region": "IT",
+      "priority": false
+    },
+    "vep": {
+      "english": "Veps",
+      "region": "RU",
+      "priority": false
+    },
+    "vi": {
+      "english": "Vietnamese",
+      "region": "VN",
+      "priority": false
+    },
+    "vls": {
+      "english": "West Flemish",
+      "region": "BE",
+      "priority": false
+    },
+    "vmf": {
+      "english": "Main-Franconian",
+      "region": "DE",
+      "priority": false
+    },
+    "vmw": {
+      "english": "Makhuwa",
+      "region": "MZ",
+      "priority": false
+    },
+    "vo": {
+      "english": "Volapük",
+      "region": null,
+      "priority": false
+    },
+    "vot": {
+      "english": "Votic",
+      "region": "RU",
+      "priority": false
+    },
+    "vro": {
+      "english": "Võro",
+      "region": "EE",
+      "priority": false
+    },
+    "vun": {
+      "english": "Vunjo",
+      "region": "TZ",
+      "priority": false
+    },
+    "wa": {
+      "english": "Walloon",
+      "region": "BE",
+      "priority": false
+    },
+    "wae": {
+      "english": "Walser",
+      "region": "CH",
+      "priority": false
+    },
+    "wal": {
+      "english": "Wolaytta",
+      "region": "ET",
+      "priority": true
+    },
+    "war": {
+      "english": "Waray",
+      "region": "PH",
+      "priority": false
+    },
+    "was": {
+      "english": "Washo",
+      "region": "US",
+      "priority": false
+    },
+    "wbp": {
+      "english": "Warlpiri",
+      "region": "AU",
+      "priority": false
+    },
+    "wo": {
+      "english": "Wolof",
+      "region": "SN",
+      "priority": false
+    },
+    "wuu": {
+      "english": "Wu Chinese",
+      "region": "CN",
+      "priority": false
+    },
+    "xal": {
+      "english": "Kalmyk",
+      "region": "RU",
+      "priority": false
+    },
+    "xh": {
+      "english": "Xhosa",
+      "region": "ZA",
+      "priority": false
+    },
+    "xmf": {
+      "english": "Mingrelian",
+      "region": "GE",
+      "priority": false
+    },
+    "xnr": {
+      "english": "Kangri",
+      "region": "IN",
+      "priority": false
+    },
+    "xog": {
+      "english": "Soga",
+      "region": "UG",
+      "priority": false
+    },
+    "yao": {
+      "english": "Yao",
+      "region": "MZ",
+      "priority": false
+    },
+    "yap": {
+      "english": "Yapese",
+      "region": "FM",
+      "priority": false
+    },
+    "yav": {
+      "english": "Yangben",
+      "region": "CM",
+      "priority": false
+    },
+    "ybb": {
+      "english": "Yemba",
+      "region": "CM",
+      "priority": false
+    },
+    "yi": {
+      "english": "Yiddish",
+      "region": "UA",
+      "priority": false
+    },
+    "yo": {
+      "english": "Yoruba",
+      "region": "NG",
+      "priority": false
+    },
+    "yrl": {
+      "english": "Nheengatu",
+      "region": "BR",
+      "priority": false
+    },
+    "yue": {
+      "english": "Cantonese",
+      "region": "HK",
+      "priority": false
+    },
+    "za": {
+      "english": "Zhuang",
+      "region": "CN",
+      "priority": false
+    },
+    "zap": {
+      "english": "Zapotec",
+      "region": "MX",
+      "priority": false
+    },
+    "zbl": {
+      "english": "Blissymbols",
+      "region": null,
+      "priority": false
+    },
+    "zea": {
+      "english": "Zeelandic",
+      "region": "NL",
+      "priority": false
+    },
+    "zen": {
+      "english": "Zenaga",
+      "region": "MR",
+      "priority": false
+    },
+    "zgh": {
+      "english": "Standard Moroccan Tamazight",
+      "region": "MA",
+      "priority": false
+    },
+    "zh": {
+      "english": "Chinese",
+      "region": "CN",
+      "priority": false
+    },
+    "zu": {
+      "english": "Zulu",
+      "region": "ZA",
+      "priority": false
+    },
+    "zun": {
+      "english": "Zuni",
+      "region": "US",
+      "priority": false
+    },
+    "zza": {
+      "english": "Zaza",
+      "region": "TR",
+      "priority": false
+    }
+  }
+}

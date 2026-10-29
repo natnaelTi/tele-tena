@@ -1,0 +1,9 @@
+{
+  "source_commit": "569537640665d9dcbb07738523fd49e4c5c5354a",
+  "frontend_lock_sha256": "28e44d5940f166a82b6f096cfd8dee39f36f0ecd7b315b655eb05b56325a2ca6",
+  "translation_dictionary_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+  "translation_reviewed_counts": {
+    "amharic": 0,
+    "afaan_oromo": 0
+  }
+}

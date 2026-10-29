@@ -64,7 +64,7 @@ export function PublicLayout() {
   const [signingOut,setSigningOut]=useState(false),[signoutError,setSignoutError]=useState(false);
   const home=destination(session);
   const isReviewer=!!session?.roles.some(role=>['Tele Tena Approver','Tele Tena Medical Lead'].includes(role));
-  const links=!session?[]:isReviewer?[[home,'Home'],...(session.roles.includes('Tele Tena Approver')?[['/admin/applications','Applications'],['/admin/vetting','Service scopes'],['/admin/services','Services']]:[])]:session.profile?.kind==='patient'?[[home,'Home'],['/care','Find care'],['/patient/appointments','Appointments'],['/patient/requests','My requests']]:session.profile?.kind==='clinician'?[[home,'Home'],...(session.roles.includes('Tele Tena Clinician')?[['/clinician/appointments','Appointments'],['/clinician/requests','Requests']]:[['/clinician/vetting','Professional review']])]:[[home,'Continue']];
+  const links=!session?[]:isReviewer?[[home,'Home'],...(session.roles.includes('Tele Tena Approver')?[['/admin/applications','Applications'],['/admin/vetting','Service scopes'],['/admin/services','Services']]:[])]:session.profile?.kind==='patient'?[[home,'Home'],['/care','Find care'],['/patient/appointments','Appointments'],['/patient/requests','My requests'],['/patient/couples','Shared care']]:session.profile?.kind==='clinician'?[[home,'Home'],...(session.roles.includes('Tele Tena Clinician')?[['/clinician/appointments','Appointments'],['/clinician/requests','Requests']]:[['/clinician/vetting','Professional review']])]:[[home,'Continue']];
   const accountPath=isReviewer?(session?.roles.includes('Tele Tena Approver')?'/admin/account':'/admin/rubrics/account'):session?.profile?'/'+session.profile.kind+'/account':home;
   const signout=async()=>{setSigningOut(true);setSignoutError(false);try{await journeyApi.logout();await refresh();navigate('/sign-in');}catch{setSignoutError(true);}finally{setSigningOut(false);}};
   const location=useLocation();
@@ -142,7 +142,7 @@ export function RequireSession() {
         </InlineNotice>
       </main>
     );
-  return session ? <Outlet /> : <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname)}`} state={location.state} replace />;
+  return session ? <Outlet key={session.user}/> : <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname)}`} state={location.state} replace />;
 }
 const patientNav = [
   ["/patient", "Home", Home],
@@ -150,6 +150,7 @@ const patientNav = [
   ["/patient/appointments", "Appointments", CalendarDays],
   ["/patient/requests", "My requests", ClipboardCheck],
   ["/patient/account", "Account", Settings2],
+  ["/patient/payments", "Balance", Wallet],
   ["/patient/clinic-access", "Clinic access", Building2],
   ["/patient/couples", "Shared care", HeartHandshake],
 ] as const;
@@ -219,7 +220,7 @@ export function WorkspaceLayout({
       ? ["/clinician", "/clinician/requests", "/clinician/availability"]
       : ["/clinician", "/clinician/vetting", "/clinician/account"]
     : kind === "patient"
-      ? ["/patient", "/patient/discovery", "/patient/appointments"]
+      ? ["/patient", "/patient/discovery", "/patient/appointments", "/patient/requests", "/patient/couples"]
       : kind === "admin"
         ? ["/admin", "/admin/applications"]
         : ["/clinic"];
@@ -236,7 +237,7 @@ export function WorkspaceLayout({
   const renderNavLink = (item: (typeof items)[number], closeMore = false) => {
     const [to, label, Icon] = item;
     return <NavLink key={to} to={to} end={to === "/"+kind} data-tour={tourTargets[to]} onClick={closeMore ? () => setMoreOpen(false) : undefined}>
-      <Icon size={20} /><span>{w(label)}</span>
+      <Icon size={20} /><span>{w(session?.payment_mode==='Offline'?(to==='/patient/payments'?'Expenses Ledger':to==='/clinician/earnings'?'Revenue Ledger':label):label)}</span>
     </NavLink>;
   };
   const groups = [

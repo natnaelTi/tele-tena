@@ -6,25 +6,25 @@ import { Button, InlineNotice, Skeleton } from "./ui";
 import "./BookingReview.css";
 
 /** A price review, not a reservation. The server revalidates at confirmation. */
-export function BookingReview({offer,start,zone,format,disclosure,balance,balanceError,onRetry,onConfirm,busy}: {
+export function BookingReview({offer,start,zone,format,disclosure,balance,balanceError,onRetry,onConfirm,busy,offline=false}: {
   offer:Offer; start:string; zone:string; format:string; disclosure:Disclosure;
   balance?:{available:number;reserved:number}|null; balanceError:boolean;
-  onRetry:()=>void; onConfirm:()=>void; busy:boolean;
+  onRetry:()=>void; onConfirm:()=>void; busy:boolean;offline?:boolean;
 }) {
   const {w}=useLocale();
-  const shortfall=balance ? Math.max(0,offer.price-balance.available) : 0;
+  const shortfall=!offline&&balance ? Math.max(0,offer.price-balance.available) : 0;
   return <div className="booking-review-panels">
     <section className="booking-review-panel"><h2>{w("Your Consultation")}</h2>
       <div className="booking-review-clinician"><span className="avatar" aria-hidden="true">{offer.display_name.slice(0,1)}</span><div><h3>{offer.display_name}</h3><p>{offer.label}</p></div></div>
-      <dl className="summary-list"><dt>{w("When")}</dt><dd>{date(start,zone)}</dd><dt>{w("Timezone")}</dt><dd>{zone}</dd><dt>{w("Duration")}</dt><dd>{offer.minutes} {w("minutes")}</dd><dt>{w("Format")}</dt><dd>{w(format==='audio'?'Audio':'Video')}</dd><dt>{w("Cancellation")}</dt><dd>{w("Cancel before the session starts to release the full reservation.")}</dd></dl>
+      <dl className="summary-list"><dt>{w("When")}</dt><dd>{date(start,zone)}</dd><dt>{w("Timezone")}</dt><dd>{zone}</dd><dt>{w("Duration")}</dt><dd>{offer.minutes} {w("minutes")}</dd><dt>{w("Format")}</dt><dd>{w(format==='audio'?'Audio':'Video')}</dd><dt>{w("Cancellation")}</dt><dd>{w(offline?'Cancellation may require an external refund from the clinician. TeleTena does not automatically transfer refunds.':'Cancel before the session starts to release the full reservation.')}</dd></dl>
       <details className="booking-review-disclosure"><summary>{w("What You’ll Share")}</summary><DisclosurePreview disclosure={disclosure}/></details>
     </section>
     <section className="booking-review-panel"><h2>{w("Payment Summary")}</h2>
-      {balanceError ? <InlineNotice tone="danger">{w("Your balance could not be loaded.")} <Button variant="secondary" onClick={onRetry}>{w("Retry")}</Button></InlineNotice> : !balance ? <Skeleton/> : <>
+      {offline?<InlineNotice>{w('Continue to private Telebirr instructions. The server rechecks the price, receiving account and time, then creates a temporary payment hold. No wallet balance is required. Booking is confirmed only after the required payment and appointment approvals.')}</InlineNotice>:balanceError ? <InlineNotice tone="danger">{w("Your balance could not be loaded.")} <Button variant="secondary" onClick={onRetry}>{w("Retry")}</Button></InlineNotice> : !balance ? <Skeleton/> : <>
         <dl className="summary-list"><dt>{w("Session price")}</dt><dd>ETB {money(offer.price)}</dd><dt>{w("Available balance")}</dt><dd>ETB {money(balance.available)}</dd><dt>{w("Amount to reserve")}</dt><dd>ETB {money(offer.price)}</dd><dt>{w(shortfall?'Amount to add':'Available after reservation')}</dt><dd>ETB {money(shortfall||balance.available-offer.price)}</dd></dl>
         {shortfall>0 ? <InlineNotice>{w("Add funds before confirming. This time is not held yet.")} <Link to="/patient/payments" target="_blank" rel="noopener">{w("Add funds in a new tab")}</Link><Button variant="secondary" onClick={onRetry}>{w("Check balance again")}</Button></InlineNotice> : <InlineNotice>{w("Funds are reserved when you confirm. Ending the call alone does not release earnings.")}</InlineNotice>}
       </>}
-      <Button disabled={busy||!balance||balanceError||shortfall>0} loading={busy} onClick={onConfirm}>{w("Confirm session")} · ETB {money(offer.price)}</Button>
+      <Button disabled={busy||(!offline&&(!balance||balanceError||shortfall>0))} loading={busy} onClick={onConfirm}>{w(offline?'Continue to Direct Payment':'Confirm session')} · ETB {money(offer.price)}</Button>
     </section>
   </div>;
 }

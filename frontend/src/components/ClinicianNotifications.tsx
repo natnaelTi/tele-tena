@@ -1,25 +1,17 @@
-import {useCallback,useEffect,useRef,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {Link,useLocation} from 'react-router-dom';
 import {Bell} from 'lucide-react';
-import {api} from '../api';
-import {useResource} from '../hooks/useResource';
+import {useNotifications} from '../hooks/useNotifications';
+import type {Notice} from '../hooks/useNotifications';
 import {useLocale} from '../hooks/useLocale';
-import {Button,Dialog,EmptyState,InlineNotice,Skeleton} from './ui';
+import {UserNotifications} from './UserNotifications';
+import {Button} from './ui';
 import './ClinicianNotifications.css';
-type Notification={id:string;appointment:string|null;accepted_at:string|null;read:boolean;kind?:'booking'|'user';label?:string;href?:string};
 export function ClinicianNotifications(){
- const {w}=useLocale(),location=useLocation();const load=useCallback(async():Promise<{bookingUnavailable:boolean;items:Notification[]}>=>{const [offers,updates,general]=await Promise.all([api<{items:Notification[]}>('tele_tena.api.open_requests.clinician_notifications'),api<any[]>('tele_tena.booking_notifications.notices').catch(()=>null),api<any[]>('tele_tena.notifications.feed').catch(()=>null)]);const offered=new Set(offers.items.map(item=>item.appointment));return{bookingUnavailable:updates===null||general===null,items:[...offers.items,...(general||[]).filter(item=>item.source==='user').map(item=>({id:item.id,appointment:item.appointment,accepted_at:item.created,read:item.read,kind:'user' as const,label:item.title,href:item.appointment?'/clinician/consultations/'+item.appointment:'/clinician/account'})),...(updates||[]).filter(item=>item.channel==='in_app'&&item.state==='Available'&&!offered.has(item.appointment)).map(item=>({id:item.id,appointment:item.appointment,accepted_at:item.created,read:!!item.read_at,kind:'booking' as const,label:item.appointment_state==='Booked'?'Appointment confirmed':item.appointment_state==='PendingConfirmation'?'Awaiting clinician approval':'View appointment update'}))]};},[]);
- const data=useResource(load),[open,setOpen]=useState(false),[failure,setFailure]=useState(false),[popup,setPopup]=useState<Notification|null>(null);
- const announced=useRef(new Set<string>()),trigger=useRef<HTMLButtonElement|null>(null);
+ const{w}=useLocale(),location=useLocation(),feed=useNotifications(),[open,setOpen]=useState(false),[failure,setFailure]=useState(false),[popup,setPopup]=useState<Notice|null>(null),announced=useRef(new Set<string>());
  const call=location.pathname.includes('/consultation/')||location.pathname.endsWith('/room');
- useEffect(()=>{const timer=window.setInterval(()=>{if(navigator.onLine)void data.refresh();},5000);return()=>window.clearInterval(timer);},[data.refresh]);
- useEffect(()=>{if(call||popup)return;const next=data.data?.items.find(item=>!item.kind&&!item.read&&!announced.current.has(item.id)&&item.accepted_at&&Date.now()-Date.parse(item.accepted_at)<15*60*1000);if(next){announced.current.add(next.id);setPopup(next);}},[data.data,call,popup]);
- const mark=async(item:Notification)=>{setFailure(false);try{await api(item.kind==='user'?'tele_tena.notifications.mark_read':item.kind==='booking'?'tele_tena.booking_notifications.mark_read':'tele_tena.api.open_requests.read_clinician_notification',item.kind==='user'?{id:item.id,source:'user'}:item.kind==='booking'?{id:item.id}:{offer_id:item.id},true);if(popup?.id===item.id)setPopup(null);await data.refresh();}catch{setFailure(true);}};
- const unread=data.data?.items.filter(item=>!item.read).length||0;
- return <><Button variant="quiet" aria-label={w('Notifications')} title={w('Notifications')} onClick={event=>{trigger.current=event.currentTarget;setOpen(true);}}><Bell size={20}/>{unread>0&&<span className="notification-count">{unread}</span>}</Button>
- <Dialog open={open} onOpenChange={value=>{setOpen(value);if(!value)requestAnimationFrame(()=>trigger.current?.focus());}} title={w('Notifications')} description={w('Accepted offers and your consultation links.')}>
- {data.error?<InlineNotice tone="danger">{w('Notifications could not be loaded.')} <Button onClick={()=>void data.refresh()}>{w('Retry')}</Button></InlineNotice>:!data.data?<Skeleton/>:data.data.items.length?data.data.items.map(item=><article className="clinician-notification" key={item.id}><strong>{w(item.label||'Your offer was accepted')}</strong>{item.accepted_at&&<time>{new Date(item.accepted_at).toLocaleString()}</time>}<Link className="text-link" to={item.href||'/clinician/consultations/'+item.appointment} onClick={()=>{void mark(item);setOpen(false);}}>{w(item.appointment?'View consultation':'View Account')}</Link>{!item.read&&<Button variant="quiet" onClick={()=>void mark(item)}>{w('Mark as read')}</Button>}</article>):<EmptyState title={w('No Notifications Yet')}/>}
- {data.data?.bookingUnavailable&&<InlineNotice>{w('Appointment updates could not be refreshed. Accepted offers remain available.')}</InlineNotice>}
- {failure&&<InlineNotice tone="danger">{w('We could not mark this notification as read. Try again.')}</InlineNotice>}</Dialog>
- {popup&&!call&&!open&&<aside className="clinician-notification-popup" role="status"><Bell size={22}/><div><strong>{w('Your offer was accepted')}</strong><p>{w('The appointment is confirmed. Open its details to prepare or join.')}</p><Link className="text-link" to={'/clinician/consultations/'+popup.appointment} onClick={()=>void mark(popup)}>{w('View consultation')}</Link></div><Button variant="quiet" aria-label={w('Dismiss notification')} onClick={()=>void mark(popup)}>×</Button>{failure&&<p>{w('We could not mark this notification as read. Try again.')}</p>}</aside>}</>;
+ useEffect(()=>{if(call||popup)return;const next=feed.items?.find(item=>item.source==='offer'&&!item.read&&!announced.current.has(item.id)&&item.created&&Date.now()-Date.parse(item.created)<15*60*1000);if(next){announced.current.add(next.id);setPopup(next);}},[feed.items,call,popup]);
+ useEffect(()=>{if(popup&&feed.items?.find(n=>n.source==='offer'&&n.id===popup.id)?.read)setPopup(null);},[feed.items,popup]);
+ const mark=async(item:Notice)=>{try{await feed.mark(item);setPopup(null);setFailure(false);}catch{setFailure(true);}};
+ return <><UserNotifications onOpenChange={setOpen}/>{popup&&!call&&!open&&!popup.read&&<aside className="clinician-notification-popup" role="status"><Bell size={22}/><div><strong>{w('Your offer was accepted')}</strong><p>{w(popup.appointment_state==='Booked'?'The appointment is confirmed. Open its details to prepare or join.':popup.payment_mode==='Offline'?'Your offer was selected. Open the appointment for direct-payment verification and acceptance.':'Your offer was selected. Open the appointment to review its current status.')}</p><Link className="text-link" to={popup.href!} onClick={()=>void mark(popup)}>{w('View consultation')}</Link></div><Button variant="quiet" aria-label={w('Dismiss notification')} onClick={()=>void mark(popup)}>×</Button>{failure&&<p>{w('We could not mark this notification as read. Try again.')}</p>}</aside>}</>;
 }

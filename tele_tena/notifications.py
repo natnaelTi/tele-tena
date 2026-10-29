@@ -1,10 +1,17 @@
 """Owner-only neutral notification inbox. No health text or arbitrary destinations."""
+from tele_tena.localization import localized_throw
 import uuid
 from datetime import datetime,timezone
 import frappe
 from tele_tena.api.journey import actor,rows,query,command
 
 KINDS={
+ 'PaymentReminder':('Direct Payment Reminder','reminders'),
+ 'PaymentVerificationReminder':('Payment Verification Reminder','reminders'),
+ 'PaymentSubmitted':('Payment Submitted for Verification','appointments'),
+ 'PaymentVerified':('Payment Receipt Verified','appointments'),
+ 'PaymentCorrection':('Payment Correction Requested','appointments'),
+ 'PaymentReconciliation':('Payment Reconciliation Update','appointments'),
  'Confirmed':('Appointment Confirmed','appointments'),
  'Pending':('Awaiting Clinician Confirmation','appointments'),
  'ConfirmationReminder':('Booking Confirmation Reminder','appointments'),
@@ -70,7 +77,7 @@ def lifecycle(appointment,event,event_key=None):
 def confirmation_presented(appointment):
     from tele_tena.api.presentation import _authorized
     app,user,role=_authorized(appointment)
-    if role!='clinician':frappe.throw('Confirmation prompt unavailable',frappe.PermissionError)
+    if role!='clinician':localized_throw('Confirmation prompt unavailable',frappe.PermissionError)
     if app.state=='PendingConfirmation':
         frappe.db.sql('UPDATE tt_confirmation_observation SET first_presented_at=COALESCE(first_presented_at,UTC_TIMESTAMP(6)) WHERE appointment=%s AND clinician=%s AND response IS NULL',(appointment,user))
     return {'recorded':True}
@@ -80,15 +87,25 @@ def confirmation_presented(appointment):
 def feed():
     user=actor();result=[]
     # No body, notes, identities, phone numbers or emails in inbox projections.
-    notices=rows('''SELECT id,kind,appointment,created,read_at FROM tt_user_notification
+    notices=rows('''SELECT id,kind,appointment,event_key,created,read_at FROM tt_user_notification
         WHERE user=%s ORDER BY created DESC LIMIT 100''',(user,))
-    bookings=rows("""SELECT id,event kind,appointment,created,read_at FROM tt_booking_notice
+    bookings=rows("""SELECT id,event kind,appointment,context_key,created,read_at FROM tt_booking_notice
         WHERE user=%s AND channel='in_app' AND state='Available' ORDER BY created DESC LIMIT 100""",(user,))
+    payment_events=set()
     for source,items in (('user',notices),('booking',bookings)):
         for item in items:
             if item.kind not in KINDS:continue
             if item.appointment and user not in participants(item.appointment):continue
-            result.append({'id':item.id,'source':source,'kind':item.kind,'title':KINDS[item.kind][0],
+            href=None
+            if item.kind.startswith('Payment'):
+                from tele_tena.api.direct_payments import notice_path
+                event_id=item.event_key[7:] if source=='user' and item.event_key.startswith('direct:') else item.get('context_key') or None
+                href=notice_path(item.appointment,user,event_id)
+                if not href:continue
+                identity=(event_id,item.kind,href)
+                if identity in payment_events:continue
+                payment_events.add(identity)
+            result.append({'id':item.id,'source':source,'kind':item.kind,'title':KINDS[item.kind][0],'href':href,
                            'category':KINDS[item.kind][1],'appointment':item.appointment,
                            'created':item.created.isoformat()+'Z','read':bool(item.read_at)})
     return sorted(result,key=lambda item:item['created'],reverse=True)[:100]
@@ -97,13 +114,13 @@ def feed():
 @command
 def mark_read(id,source):
     user=actor()
-    if source not in ('user','booking'):frappe.throw('Notification unavailable',frappe.PermissionError)
+    if source not in ('user','booking'):localized_throw('Notification unavailable',frappe.PermissionError)
     table='tt_user_notification' if source=='user' else 'tt_booking_notice'
-    found=rows(f'SELECT appointment FROM {table} WHERE id=%s AND user=%s',(id,user))
+    found=rows(f"SELECT appointment,{'kind' if source=='user' else 'event'} notice_kind FROM {table} WHERE id=%s AND user=%s",(id,user))
     if not found or (found[0].appointment and user not in participants(found[0].appointment)):
-        frappe.throw('Notification unavailable',frappe.PermissionError)
+        localized_throw('Notification unavailable',frappe.PermissionError)
     frappe.db.sql(f'UPDATE {table} SET read_at=COALESCE(read_at,UTC_TIMESTAMP(6)) WHERE id=%s AND user=%s',(id,user))
-    if found[0].appointment and user==rows('SELECT clinician FROM tt_appointment WHERE id=%s',(found[0].appointment,))[0].clinician:
+    if found[0].notice_kind in ('Pending','ConfirmationReminder') and found[0].appointment and user==rows('SELECT clinician FROM tt_appointment WHERE id=%s',(found[0].appointment,))[0].clinician:
         confirmation_presented(found[0].appointment)
     return {'read':True}
 

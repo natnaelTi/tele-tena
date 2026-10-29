@@ -2,13 +2,13 @@ import { api } from './api'
 import { clearCareQuery } from './care-intent'
 
 type Sharing = { name: boolean; history: boolean }
-export type Profile = {care_alias?:string; kind: 'patient' | 'clinician'; display_name: string; history: string; share_name: boolean; share_history: boolean; languages?: string; introduction?: string }
-export type Session = {display_name?:string; photo?: {url:string|null;published:boolean}; user: string; roles: string[]; profile: Profile | null; csrf_token: string; simulation: boolean; clinic_workspace?: boolean; clinic_schedule_workspace?: boolean }
+export type Profile = {preferred_care_language?:string|null; care_alias?:string; kind: 'patient' | 'clinician'; display_name: string; history: string; share_name: boolean; share_history: boolean; languages?: string; introduction?: string }
+export type Session = {payment_mode?:'Wallet'|'Offline';display_name?:string; photo?: {url:string|null;published:boolean}; user: string; roles: string[]; profile: Profile | null; csrf_token: string; simulation: boolean; clinic_workspace?: boolean; clinic_schedule_workspace?: boolean }
 export type Service = { id: string; label: string; description?:string; synonyms?:string; service_label_am?:string; service_label_om?:string }
-export type Offer = { availability?:import('./pages/PublicDirectory').Availability; photo_url?:string|null; participant_structure?: 'individual'|'couple'; id: string; clinician_id:string; display_name: string; label: string; description?: string; service_category?: string; price: number; minutes: number; care_languages?: ('en'|'am'|'om')[]; schedule_id?: string | null; schedule_timezone?: string | null; consultation_format?: 'video' | 'audio' }
+export type Offer = { availability?:import('./pages/PublicDirectory').Availability; photo_url?:string|null; participant_structure?: 'individual'|'couple'; id: string; clinician_id:string; display_name: string; label: string; description?: string; service_category?: string; price: number; minutes: number; care_languages?: string[]; schedule_id?: string | null; schedule_timezone?: string | null; consultation_format?: 'video' | 'audio' }
 export type Application = { application_id?:string; user: string; display_name: string; statement: string; application_profile?: Record<string,string|number|null>; status: 'Pending' | 'Approved' | 'Rejected'; requested_services?: string[]; requested_service_labels?:string[]; resume_uploaded?: boolean; resume_size?: number; submission_date_available?: boolean; submitted_at?: string | null; evidence_complete?: boolean; verified_contacts?: {channel: string; contact: string; verified_at: string}[] }
 export type Disclosure = { request: string; name?: string; alias?:string; history?: string; history_sha256?:string;disclosure_version?:string;files?:{id:string;filename:string;content_sha256:string}[] }
-export type Appointment = { id: string; start: string; end: string; state: string; price: number; minutes: number; service_label: string; disclosure: Disclosure; timezone?: string | null; consultation_format?: string; confirmation_mode?: string; expires_at?: string | null; confirmed_at?: string | null; cancelled_by?: string | null; cancelled_at?: string | null; cancel_reason?: string | null; call_state?: string; call_ended?: string | null; documentation_state?: string | null; display_identity?:string }
+export type Appointment = {photo_url?:string|null;direct_payment_state?:string;payment_mode?:string; id: string; start: string; end: string; state: string; price: number; minutes: number; service_label: string; disclosure: Disclosure; timezone?: string | null; consultation_format?: string; confirmation_mode?: string; expires_at?: string | null; confirmed_at?: string | null; cancelled_by?: string | null; cancelled_at?: string | null; cancel_reason?: string | null; call_state?: string; call_ended?: string | null; documentation_state?: string | null; display_identity?:string }
 export type Window = { start: string; end: string }
 export type TimeSlot = {start: string; end: string; local_time: string; timezone: string; schedule_timezone: string | null}
 export type ScheduleInterval = {weekday: number; start_local: string; end_local: string}
@@ -23,7 +23,7 @@ export const journeyApi = {
   coupleConsent: (data:Record<string,unknown>) => api<any>('tele_tena.api.couples.consent',data,true),
   couplePlan: (plan:string) => api<any>('tele_tena.api.couples.get_plan',{plan_id:plan}),
   couplePlans: () => api<any[]>('tele_tena.api.couples.my_plans'),
-  coupleConfirm: (plan_id:string) => api<{id:string}>('tele_tena.api.couples.confirm',{plan_id},true),
+  coupleConfirm: (plan_id:string,payment?:{mode:string;revision:number}) => api<{id:string;payment?:string}>('tele_tena.api.couples.confirm',{plan_id,expected_payment_mode:payment?.mode,payment_mode_revision:payment?.revision},true),
   coupleWithdraw: (plan_id:string) => api('tele_tena.api.couples.withdraw',{plan_id},true),
   session: () => api<Session>('session'),
   services: () => api<Service[]>('services'),
@@ -58,7 +58,7 @@ export const journeyApi = {
   submitSessionFeedback: (appointment:string,rating:number) => api('tele_tena.api.trust.submit_session_feedback',{appointment,rating},true),
   careDirectory: (data: Record<string, unknown>) => api<{rows:any[];total:number;page:number;page_size:number;pages:number}>('tele_tena.api.presentation.care_directory', data),
   careDetail: (appointment: string) => api<any>('tele_tena.api.presentation.care_detail', { appointment }),
-  carePatientRecord: (appointment: string) => api<{patient_label:string;encounters:any[]}>('tele_tena.api.presentation.care_patient_record', { appointment }),
+  carePatientRecord: (appointment: string) => api<{photo_url?:string|null;patient_label:string;encounters:any[]}>('tele_tena.api.presentation.care_patient_record', { appointment }),
   preferences: () => api<{locale:string;timezone:string|null;notification_preferences?:string|null}>('tele_tena.api.presentation.preferences'),
   savePreferences: (locale:string, timezone_name:string) => api('tele_tena.api.presentation.save_preferences', {locale,timezone_name}, true),
   tourState: (tour_id:string) => api<{role:string;state:string|null;version:number}>('tele_tena.api.presentation.tour_state', {tour_id}),
@@ -82,13 +82,13 @@ export const journeyApi = {
   simulatedDeposit: (retryKey: string) => api('simulated_deposit', { amount: 10000, retry_key: retryKey }, true),
   preview: (requestText: string, sharing: Sharing) =>
     api<{ disclosure: Disclosure }>('preview', { request_text: requestText, sharing }, true),
-  book: (data: Record<string, unknown>) => api<{id:string}>('book', data, true),
+  book: (data: Record<string, unknown>) => api<{id:string;payment?:string}>('book', data, true),
   publishRequest: (data: Record<string, unknown>) => api<any>('tele_tena.api.open_requests.publish_request', data, true),
   myRequests: () => api<any[]>('tele_tena.api.open_requests.my_requests'),
   myRequestDetail: (request_id: string) => api<any>('tele_tena.api.open_requests.my_request_detail', {request_id}),
   findMoreOptions: (request_id: string) => api<any>('tele_tena.api.open_requests.find_more_options', {request_id}, true),
   cancelRequest: (request_id: string) => api<any>('tele_tena.api.open_requests.close_request', {request_id}, true),
-  respondOffer: (request_id: string, offer_id: string, decision: 'accept'|'decline', sharing?:Sharing, expected_disclosure?:Disclosure) => api<any>('tele_tena.api.open_requests.respond_offer', {request_id,offer_id,decision,sharing,expected_disclosure}, true),
+  respondOffer: (request_id: string, offer_id: string, decision: 'accept'|'decline', sharing?:Sharing, expected_disclosure?:Disclosure,payment?:{mode:string;revision:number}) => api<any>('tele_tena.api.open_requests.respond_offer', {request_id,offer_id,decision,sharing,expected_disclosure,expected_payment_mode:payment?.mode,payment_mode_revision:payment?.revision}, true),
   heartbeatRequestPresence: (resume_automatic=false) => api<any>('tele_tena.api.open_requests.heartbeat_request_presence',{resume_automatic},true),
   requestPresence: () => api<any>('tele_tena.api.open_requests.request_presence'),
   setRequestPresence: (ready: boolean) => api<any>('tele_tena.api.open_requests.set_request_presence', {ready}, true),

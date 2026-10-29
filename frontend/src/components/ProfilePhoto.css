@@ -12,3 +12,6 @@
 .photo-crop-sliders{display:grid;gap:12px}.photo-crop-sliders label{display:grid;grid-template-columns:145px minmax(0,1fr);gap:12px;align-items:center;font-size:14px;color:var(--ink)}
 .photo-crop-sliders input{width:100%;min-height:32px;accent-color:var(--brand-primary);padding:0}
 @media(max-width:450px){.photo-crop-preview{max-width:210px}.photo-crop-sliders label{grid-template-columns:minmax(0,1fr);gap:2px}}
+.care-directory-table .identity-with-avatar>.profile-avatar{width:32px;height:32px}
+
+.identity-with-avatar{display:inline-flex;align-items:center;gap:12px;max-width:100%;vertical-align:middle}.identity-with-avatar .identity-name{min-width:0;overflow-wrap:anywhere}.identity-with-avatar>.profile-avatar{flex:none;width:40px;height:40px}.consultation-record-identity{margin:12px 0 20px;font-size:20px;font-weight:600}.room-session-details .identity-with-avatar>.profile-avatar{width:32px;height:32px}

@@ -1,4 +1,5 @@
 """Private, bounded open-request delivery and patient-only offer acceptance."""
+from tele_tena.localization import localized_throw
 import hashlib
 import json
 import re
@@ -9,7 +10,6 @@ import frappe
 from tele_tena.api import journey
 from tele_tena.api.journey import actor, approved, approved_service, fail, integer, one, profile, query, rows, text
 
-LANGUAGES = {'en', 'am', 'om'}
 FORMATS = {'audio', 'video'}
 DEFAULT_PRESENCE_SECONDS = 90
 DEFAULT_REQUEST_MINUTES = 15
@@ -65,12 +65,8 @@ def wave_policy():
 
 
 def clinician_languages(user):
-    row = one('SELECT languages FROM tt_profile WHERE user=%s', (user,))
-    try:
-        values = json.loads(row.languages or '[]')
-    except (TypeError, ValueError):
-        values = []
-    return set(values) if isinstance(values, list) else set()
+    from tele_tena.api.care_languages import approved_for
+    return set(approved_for(user))
 
 
 def immediate_service_enabled(service):
@@ -116,11 +112,14 @@ def _eligible(request, exclude_delivered=True, limit=None):
          1 if exclude_delivered else 0, request.id))
     result = []
     for item in candidates:
+        from tele_tena.api.direct_payments import config
+        if config().mode=='Offline' and not rows('SELECT clinician FROM tt_telebirr_payee WHERE clinician=%s',(item.clinician,)):continue
         try:
             languages = json.loads(item.languages or '[]')
         except (TypeError, ValueError):
             languages = []
-        if request.language not in languages:
+        from tele_tena.api.care_languages import offering_languages
+        if request.language not in offering_languages(item.offering):
             continue
         if not journey.service_scope_is_current(item.clinician, request.service):
             continue
@@ -236,8 +235,10 @@ def _set_request_presence(ready, manual=True):
     approved(clinician, lock=True)
     p = profile('clinician', lock=True)
     if ready:
+        from tele_tena.api.direct_payments import config,require_payee
+        if config().mode=='Offline':require_payee(clinician)
         languages = clinician_languages(clinician)
-        if not languages.intersection(LANGUAGES):
+        if not languages:
             fail('Choose at least one language you can provide care in before becoming available for requests',
                  'request_languages_required')
         offerings = rows('''SELECT o.id,o.service,s.id schedule_id,svc.immediate_care_enabled,svc.catalog_status
@@ -251,7 +252,9 @@ def _set_request_presence(ready, manual=True):
         if not scoped:
             fail('An active service scope must be approved before you can receive requests.',
                  'scope_approval_required')
-        scheduled = [item for item in scoped if item.schedule_id]
+        from tele_tena.api.care_languages import offering_languages
+        if not any(offering_languages(item.id) for item in scoped):fail('Obtain care-language approval for a published offering before receiving requests.','request_languages_required')
+        scheduled = [item for item in scoped if item.schedule_id and offering_languages(item.id)]
         if not scheduled:
             fail('Publish recurring availability for an approved service before receiving requests.',
                  'request_schedule_required')
@@ -324,7 +327,8 @@ def publish_request(service, request_text, urgency, language, consultation_forma
                     earliest_start=None, latest_start=None, max_price_minor=None, navigation_timing=None):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     patient = profile('patient', lock=True)
-    if urgency not in ('immediate', 'scheduled') or language not in LANGUAGES or consultation_format not in FORMATS:
+    from tele_tena.api.care_languages import valid
+    if urgency not in ('immediate', 'scheduled') or not valid(language) or consultation_format not in FORMATS:
         fail('Choose when you need care, a language and a session format')
     service_row = one('SELECT name,catalog_status,participant_structure FROM `tabTele Tena Service` WHERE name=%s AND active=1', (service,))
     if service_row.participant_structure not in ('individual',None,''):
@@ -454,13 +458,15 @@ def _serialize_patient_request(req):
         WHERE request_id=%s AND event='Published' ORDER BY occurred_at LIMIT 1''', (req.id,))
     req.eligible_supply = int(supply[0].eligible_supply or 0) if supply else None
     offers = rows('''SELECT o.id,o.start,o.duration_minutes,o.consultation_format,o.price_minor,o.timezone,
-        o.price_source,o.state,o.valid_until,p.display_name clinician_name,p.public_id clinician_id,
+        o.price_source,o.state,o.valid_until,p.display_name clinician_name,p.public_id clinician_id,p.user photo_clinician,
         s.service_label specialty
         FROM tt_request_offer o JOIN tt_profile p ON p.user=o.clinician
         JOIN tt_offering off ON off.id=o.offering
         JOIN `tabTele Tena Service` s ON s.name=off.service WHERE o.request_id=%s
         ORDER BY o.created_at DESC''', (req.id,))
     for offer in offers:
+        from tele_tena.api.profile_photos import public_photo
+        offer.photo_url=public_photo(offer.pop('photo_clinician'))
         offer.start = offer.start.isoformat() + 'Z'
         offer.valid_until = offer.valid_until.isoformat() + 'Z'
     req.offers = offers
@@ -725,7 +731,7 @@ def request_presence():
     if not app or app[0].status != 'Approved':
         reasons.append('approval_required')
     language_set = clinician_languages(clinician)
-    if not language_set.intersection(LANGUAGES):
+    if not language_set:
         reasons.append('language_required')
     all_offerings = rows('''SELECT o.id,o.service,s.id schedule_id,svc.immediate_care_enabled,svc.catalog_status
         FROM tt_offering o JOIN `tabTele Tena Service` svc ON svc.name=o.service AND svc.active=1
@@ -736,7 +742,11 @@ def request_presence():
     scoped = [item for item in all_offerings if journey.service_scope_is_current(clinician, item.service)]
     if all_offerings and not scoped:
         reasons.append('scope_approval_required')
-    scheduled = [item for item in scoped if item.schedule_id]
+    from tele_tena.api.care_languages import offering_languages
+    if scoped and not any(offering_languages(item.id) for item in scoped) and 'language_required' not in reasons:reasons.append('language_required')
+    from tele_tena.api.direct_payments import config
+    if config().mode=='Offline' and not rows('SELECT clinician FROM tt_telebirr_payee WHERE clinician=%s',(clinician,)):reasons.append('telebirr_payee_required')
+    scheduled = [item for item in scoped if item.schedule_id and offering_languages(item.id)]
     if scoped and not scheduled:
         reasons.append('published_schedule_required')
     immediate_services = [item for item in scheduled if immediate_service_enabled(item)]
@@ -773,7 +783,7 @@ def submit_offer(request_id, offering, start, price_minor=None):
     recipient = rows('SELECT clinician FROM tt_request_recipient WHERE request_id=%s AND clinician=%s FOR UPDATE',
                      (request_id, clinician))
     if not recipient:
-        frappe.throw('Request unavailable', frappe.PermissionError)
+        localized_throw('Request unavailable', frappe.PermissionError)
     start_at = timestamp(start)
     requested_price = None if price_minor in (None, '') else integer(price_minor, 1, 100000000)
     existing = rows("""SELECT * FROM tt_request_offer WHERE request_id=%s AND clinician=%s
@@ -839,7 +849,7 @@ def submit_offer(request_id, offering, start, price_minor=None):
 
 
 @journey.command
-def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclosure=None):
+def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclosure=None,expected_payment_mode=None,payment_mode_revision=None):
     patient = actor('Tele Tena Patient')
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     req = one('SELECT * FROM tt_open_request WHERE id=%s AND patient=%s FOR UPDATE', (request_id, patient))
@@ -848,6 +858,10 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
         result = {'state': item.state, 'idempotent': True}
         if item.appointment:
             result['appointment'] = item.appointment
+            app=one('SELECT payment_mode FROM tt_appointment WHERE id=%s',(item.appointment,))
+            result['payment_mode']=app.payment_mode
+            payment=rows("SELECT id FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment'",(item.appointment,))
+            if payment:result['payment']=payment[0].id
         return result
     if decision == 'decline':
         frappe.db.sql("UPDATE tt_request_offer SET state='Declined' WHERE id=%s", (offer_id,))
@@ -902,7 +916,7 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
         booking = journey.book(item.offering, item.start.isoformat(timespec='seconds') + 'Z', req.request_text,
                                json.dumps(selected), key, int(item.price_minor),
                                int(item.duration_minutes), json.dumps(expected), req.timezone,
-                               custom_offer_id=item.id,care_language=req.language,expected_format=item.consultation_format)
+                               custom_offer_id=item.id,care_language=req.language,expected_format=item.consultation_format,expected_payment_mode=expected_payment_mode,payment_mode_revision=payment_mode_revision)
     finally:
         frappe.local.tele_tena_accepting_offer = None
         frappe.local.tele_tena_offer_disclosure = None
@@ -915,7 +929,7 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
     metric(request_id, 'PatientAccepted')
     metric(request_id, 'AppointmentCreated')
     route_event(request_id, item.clinician, int(req.current_wave or 1), 'OfferAccepted')
-    return {'state': 'Matched', 'appointment': appt, 'simulated': True}
+    return {'state':'Matched','appointment':appt,'payment':booking.get('payment'),'payment_mode':booking.get('payment_mode','Wallet'),'simulated':booking.get('simulated',True)}
 
 
 @query()
@@ -926,7 +940,7 @@ def clinician_notifications():
     pref = rows('SELECT notification_preferences FROM tt_preferences WHERE user=%s', (clinician,))
     settings = json.loads(pref[0].notification_preferences or '{}') if pref else {}
     seen = set(settings.get('accepted_offer_seen', []))
-    found = rows("""SELECT o.id,a.id appointment,r.matched_at accepted_at
+    found = rows("""SELECT o.id,a.id appointment,a.state appointment_state,a.payment_mode,r.matched_at accepted_at
         FROM tt_request_offer o JOIN tt_open_request r ON r.id=o.request_id
         JOIN tt_appointment a ON a.id=o.appointment AND a.clinician=o.clinician
         WHERE o.clinician=%s AND o.state='Accepted' AND r.state='Matched'
@@ -979,7 +993,7 @@ def withdraw_offer(offer_id):
     item = rows('SELECT * FROM tt_request_offer WHERE id=%s AND clinician=%s FOR UPDATE',
                 (offer_id, clinician))
     if not item:
-        frappe.throw('Offer unavailable', frappe.PermissionError)
+        localized_throw('Offer unavailable', frappe.PermissionError)
     offer = item[0]
     if offer.state == 'Withdrawn':
         return {'state': 'Withdrawn', 'idempotent': True}
@@ -1043,8 +1057,9 @@ def expire_requests():
 def request_metrics():
     actor('Tele Tena Approver')
     from statistics import median
-    requests = rows('''SELECT id,state,urgency,published_at,matched_at FROM tt_open_request
-        WHERE published_at>=UTC_TIMESTAMP(6)-INTERVAL 90 DAY ORDER BY published_at''')
+    requests = rows('''SELECT r.id,r.state,r.urgency,r.published_at,r.matched_at,a.confirmed_at,a.state appointment_state
+        FROM tt_open_request r LEFT JOIN tt_appointment a ON a.id=r.appointment
+        WHERE r.published_at>=UTC_TIMESTAMP(6)-INTERVAL 90 DAY ORDER BY r.published_at''')
     def percentile(values, p):
         if not values:
             return None
@@ -1053,7 +1068,7 @@ def request_metrics():
     immediate = [req for req in requests if req.urgency == 'immediate']
     first_offer, confirmed, both_joined, booked_to_joined, guest_navigation, auth_navigation = [], [], [], [], [], []
     counts = {'matched': 0, 'unmatched': 0, 'expired': 0, 'cancelled': 0, 'open': 0,
-              'failed_acceptance': 0, 'matched_under_3_minutes': 0,'matched_under_5_minutes':0, 'eligible_supply_total': 0, 'no_eligible_supply': 0}
+              'selected_awaiting_confirmation':0,'selected_without_confirmation_closed':0,'cancelled_after_confirmation':0,'failed_acceptance': 0, 'matched_under_3_minutes': 0,'matched_under_5_minutes':0, 'eligible_supply_total': 0, 'no_eligible_supply': 0}
     for req in immediate:
         supply = rows("SELECT eligible_supply FROM tt_request_metric WHERE request_id=%s AND event='Published' LIMIT 1", (req.id,))
         if supply and supply[0].eligible_supply is not None and int(supply[0].eligible_supply) == 0:
@@ -1065,13 +1080,16 @@ def request_metrics():
             if event in events:values.append(max(0,int((req.published_at-events[event]).total_seconds())))
         if 'FirstOffer' in events:
             first_offer.append(int((events['FirstOffer'] - req.published_at).total_seconds()))
-        if req.state == 'Matched' and req.matched_at:
+        if req.state == 'Matched' and req.confirmed_at:
             counts['matched'] += 1
-            delay = int((req.matched_at - req.published_at).total_seconds())
+            if req.appointment_state=='Cancelled':counts['cancelled_after_confirmation']+=1
+            delay = int((req.confirmed_at - req.published_at).total_seconds())
             confirmed.append(delay)
             if delay<=300:counts['matched_under_5_minutes']+=1
             if delay <= 180:
                 counts['matched_under_3_minutes'] += 1
+        elif req.state=='Matched':
+            counts['selected_without_confirmation_closed' if req.appointment_state in ('Cancelled','Expired') else 'selected_awaiting_confirmation']+=1
         elif req.state == 'Expired':
             counts['expired'] += 1
         elif req.state == 'Cancelled':
@@ -1083,9 +1101,9 @@ def request_metrics():
         if 'ParticipantJoinedPatient' in events and 'ParticipantJoinedClinician' in events:
             joined=max(events['ParticipantJoinedPatient'],events['ParticipantJoinedClinician'])
             both_joined.append(int((joined-req.published_at).total_seconds()))
-            if req.matched_at:booked_to_joined.append(int((joined-req.matched_at).total_seconds()))
+            if req.confirmed_at:booked_to_joined.append(int((joined-req.confirmed_at).total_seconds()))
     denominator = len(immediate)
-    counts['unmatched'] = counts['expired'] + counts['cancelled'] + counts['open']
+    counts['unmatched'] = len(immediate)-counts['matched']
     counts['immediate_total'] = denominator
     counts['average_eligible_supply'] = counts['eligible_supply_total'] / denominator if denominator else None
     counts['matched_within_3_minutes_percent'] = round(counts['matched_under_3_minutes'] * 100 / denominator, 2) if denominator else None
@@ -1112,7 +1130,7 @@ def record_accept_failure(request_id, offer_id, attempt_key, reason):
                (request_id, patient.user))
     offer = rows("SELECT id FROM tt_request_offer WHERE id=%s AND request_id=%s", (offer_id, request_id))
     if not req or not offer:
-        frappe.throw('Request unavailable', frappe.PermissionError)
+        localized_throw('Request unavailable', frappe.PermissionError)
     metric(request_id, 'AcceptFailed',
            external_event_id='accept-failure:' + request_id + ':' + key)
     return {'recorded': True}

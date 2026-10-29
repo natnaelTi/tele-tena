@@ -20,7 +20,9 @@ jobs:
         working-directory: frontend
       - run: node tests/service_worker.mjs
   python-syntax:
-    runs-on: ubuntu-latest
+    # Python3.12/3.14.2 artifacts exist for24.04; ubuntu-latest moved to26.04.
+    # Keep the target runtime pins instead of silently testing another Python.
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         python: ['3.12', '3.14.2']

@@ -1,4 +1,5 @@
 """Human-led professional and per-service scope vetting."""
+from tele_tena.localization import localized_throw
 import base64
 import hashlib
 import json
@@ -29,11 +30,11 @@ APPLICANT_FIELDS = {
 def _applicant(user=None):
     user = user or actor()
     if user == 'Guest' or not set(frappe.get_roles(user)).intersection({'Tele Tena Applicant', 'Tele Tena Clinician'}):
-        frappe.throw('Clinician application access required', frappe.PermissionError)
+        localized_throw('Clinician application access required', frappe.PermissionError)
     if not frappe.db.get_value('User', user, 'enabled'):
-        frappe.throw('Account unavailable', frappe.PermissionError)
+        localized_throw('Account unavailable', frappe.PermissionError)
     if not rows("SELECT user FROM tt_profile WHERE user=%s AND kind='clinician'", (user,)):
-        frappe.throw('Clinician profile required', frappe.PermissionError)
+        localized_throw('Clinician profile required', frappe.PermissionError)
     return user
 
 
@@ -41,7 +42,7 @@ def _rubric_manager():
     user = actor()
     roles = set(frappe.get_roles(user))
     if not roles.intersection({'Tele Tena Approver', 'Tele Tena Medical Lead'}):
-        frappe.throw('Rubric review access required', frappe.PermissionError)
+        localized_throw('Rubric review access required', frappe.PermissionError)
     return user, roles
 
 
@@ -119,7 +120,7 @@ def approve_rubric_version(version, reason):
     rubric = rows('''SELECT version,status,definition_json,definition_sha256
         FROM tt_vetting_rubric_version WHERE version=%s FOR UPDATE''', (version,))
     if not rubric:
-        frappe.throw('Rubric version unavailable', frappe.PermissionError)
+        localized_throw('Rubric version unavailable', frappe.PermissionError)
     _load_rubric(version, lock=True)
     if rubric[0].status == 'Approved':
         return {'version': version, 'status': 'Approved', 'idempotent': True}
@@ -353,7 +354,7 @@ def submit_scope_appeal(application, statement):
     item = rows('''SELECT name,clinician,status FROM `tabTele Tena Vetting Scope Application`
         WHERE name=%s FOR UPDATE''', (application,))
     if not item or item[0].clinician != user:
-        frappe.throw('Scope application unavailable', frappe.PermissionError)
+        localized_throw('Scope application unavailable', frappe.PermissionError)
     current = item[0]
     decisions = rows('''SELECT name,decision FROM `tabTele Tena Vetting Assessment`
         WHERE scope_application=%s ORDER BY decided_at DESC,creation DESC LIMIT 1 FOR UPDATE''',
@@ -400,7 +401,7 @@ def review_scope_appeal(appeal, decision, reason):
     locked = rows('''SELECT name,scope_application,clinician,basis_assessment,status
         FROM `tabTele Tena Vetting Appeal` WHERE name=%s FOR UPDATE''', (appeal,))
     if not locked:
-        frappe.throw('Appeal unavailable', frappe.PermissionError)
+        localized_throw('Appeal unavailable', frappe.PermissionError)
     item = locked[0]
     if item.status != 'Submitted':
         final_status = 'Reopened' if decision == 'Reopen' else decision
@@ -448,7 +449,7 @@ def _authorized_scope_application(application, user=None):
     result = rows('''SELECT name,clinician,status,service FROM `tabTele Tena Vetting Scope Application`
         WHERE name=%s''', (application,))
     if not result or (not reviewer and result[0].clinician != user):
-        frappe.throw('Scope evidence unavailable', frappe.PermissionError)
+        localized_throw('Scope evidence unavailable', frappe.PermissionError)
     item = result[0]
     return item
 
@@ -462,7 +463,7 @@ def upload_scope_evidence(application, evidence_type, filename, content_base64):
     locked = rows('''SELECT name,status FROM `tabTele Tena Vetting Scope Application`
         WHERE name=%s AND clinician=%s FOR UPDATE''', (scope.name, user))
     if not locked:
-        frappe.throw('Scope evidence unavailable', frappe.PermissionError)
+        localized_throw('Scope evidence unavailable', frappe.PermissionError)
     if locked[0].status not in ('Draft', 'Clarification'):
         fail('Evidence can be changed only by the applicant while the application is a draft or requests clarification.',
              'scope_evidence_locked')
@@ -507,15 +508,15 @@ def download_scope_evidence(evidence):
     item = rows('''SELECT name,scope_application,clinician,filename FROM `tabTele Tena Scope Evidence`
         WHERE name=%s''', (evidence,))
     if not item:
-        frappe.throw('Scope evidence unavailable', frappe.PermissionError)
+        localized_throw('Scope evidence unavailable', frappe.PermissionError)
     record = item[0]
     reviewer = user != 'Guest' and 'Tele Tena Approver' in frappe.get_roles(user)
     if not reviewer and (record.clinician != user or not set(frappe.get_roles(user)).intersection(
             {'Tele Tena Applicant', 'Tele Tena Clinician'})):
-        frappe.throw('Scope evidence unavailable', frappe.PermissionError)
+        localized_throw('Scope evidence unavailable', frappe.PermissionError)
     content = rows('SELECT content FROM tt_scope_evidence_content WHERE evidence=%s', (record.name,))
     if not content:
-        frappe.throw('Scope evidence unavailable', frappe.DoesNotExistError)
+        localized_throw('Scope evidence unavailable', frappe.DoesNotExistError)
     frappe.local.response.filename = record.filename
     frappe.local.response.filecontent = bytes(content[0].content)
     frappe.local.response.type = 'download'
@@ -546,7 +547,7 @@ def application_context():
 def vetting_services():
     user = actor()
     if not set(frappe.get_roles(user)).intersection({'Tele Tena Applicant', 'Tele Tena Clinician'}):
-        frappe.throw('Clinician application access required', frappe.PermissionError)
+        localized_throw('Clinician application access required', frappe.PermissionError)
     return rows("""SELECT name AS id,service_label AS label,category,description,definition_version,
         professional_categories,credential_requirements,clinical_review_status,catalog_status
         FROM `tabTele Tena Service` WHERE catalog_status IN ('Draft','Active') AND vetting_required=1
@@ -567,7 +568,7 @@ def save_scope_application(service, values, submit=False, reverification_of=None
             WHERE name=%s FOR UPDATE''', (reverification_of,))
         if (not base or base[0].clinician != user or base[0].service != service
                 or base[0].status not in ('Approved','Expired')):
-            frappe.throw('Only your approved or formally expired application for this service can be re-verified.',
+            localized_throw('Only your approved or formally expired application for this service can be re-verified.',
                          frappe.PermissionError)
         scopes = rows('''SELECT name FROM `tabTele Tena Service Scope`
             WHERE clinician=%s AND service=%s AND status=%s FOR UPDATE''',
@@ -671,7 +672,7 @@ def review_scope_application(application, decision, identity_reviewed=False,
     locked = rows('''SELECT name,clinician,service,status,rubric_version FROM `tabTele Tena Vetting Scope Application`
         WHERE name=%s FOR UPDATE''', (application,))
     if not locked:
-        frappe.throw('Scope application unavailable', frappe.PermissionError)
+        localized_throw('Scope application unavailable', frappe.PermissionError)
     doc = locked[0]
     if doc.status not in ('Submitted', 'Resubmitted', 'Clarification', 'Approved'):
         fail('Only submitted scope applications can be reviewed.')
@@ -878,7 +879,7 @@ def resolve_scope_appointment_review(review, outcome, rationale):
         FROM `tabTele Tena Scope Appointment Review` r
         JOIN tt_appointment a ON a.id=r.appointment WHERE r.name=%s FOR UPDATE''', (review,))
     if not item:
-        frappe.throw('Operational review unavailable', frappe.PermissionError)
+        localized_throw('Operational review unavailable', frappe.PermissionError)
     current = item[0]
     if current.status == 'Cleared':
         if outcome == 'Clear' and rows('''SELECT name FROM `tabTele Tena Scope Appointment Review`
@@ -908,7 +909,7 @@ def assign_scope_reviewer(application, reviewer):
     current = rows('''SELECT name,status FROM `tabTele Tena Vetting Scope Application`
         WHERE name=%s FOR UPDATE''', (application,))
     if not current:
-        frappe.throw('Scope application unavailable', frappe.PermissionError)
+        localized_throw('Scope application unavailable', frappe.PermissionError)
     if current[0].status not in ('Submitted', 'Resubmitted', 'Clarification'):
         fail('Assign a reviewer only to an application in review.')
     frappe.db.sql('''UPDATE `tabTele Tena Vetting Scope Application`

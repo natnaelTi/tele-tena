@@ -1,3 +1,37 @@
+## Payment Navigation and Reviewer Defaults — 28 October 2026
+
+Owner-approved refinement: payment submission/review is a standalone page, with the form/status on the left and a payment-only timeline/appointment next-step link on the right. Appointment details retain a compact status/link; incoming receipts are actionable from clinician Appointments, Requests and notifications. No booking/receipt/appointment acceptance facts are merged.
+
+Reviewer accounts (Tele Tena Approver) now receive Tele Tena Financial Configuration by default through a versioned audited backfill and authorized new-reviewer assignment. This explicitly supersedes the earlier no-default-reviewer policy. It grants no receipt/clinical access beyond existing party/reviewer permissions, changes no payment mode and activates no providers. A later explicit removal is respected. See [verification](payment-navigation-verification-2026-10-28.md).
+
+## Direct Telebirr Revision — 27 October 2026
+
+The requested MVP payment model is Offline Direct Payment, subject to explicit
+financial-administrator selection after deployment. Installation/upgrade keeps
+Wallet and never changes the remote mode automatically. Each appointment keeps
+its original mode, quote and policy. Existing wallet balances, holds, postings,
+disputes, release/payout history and credentials are preserved.
+
+Offline intents reserve appointment capacity, not money. The authorized payer
+transfers externally to the snapshotted clinician receiving number, then submits
+a private receipt and transaction reference. The receiving clinician records a
+human verification, independently of appointment acceptance. A submitted image
+is not verified receipt. No platform custody, fee collection, automated refund,
+settlement or payout follows. Late/mismatched/disputed claims stay auditable in
+reconciliation/refund states. An extension needs its own consent and payment.
+
+Care-language claims, explicit self-assessment, individual reviewer decisions,
+offering languages and patient preference are separate. Prior declarations are
+preserved as pending claims without invented ratings/verification; existing
+appointments remain intact and authorization changes flag future care for human
+review. New booking/publication/matching requires approved offering languages.
+The expanded competency/navigation vocabulary and language scale are proposed
+for clinical-owner review. Directory priority conveys no accreditation.
+
+Local implementation/verification is recorded in `offline-telebirr-verification-2026-10-28.md`; owner acceptance and external activation remain pending. Implementation and acceptance remain tracked in `offline-telebirr-sprint.md` and
+the existing screen matrix; this section records requested behavior, not a claim
+that all browser/scheduler/visual acceptance has passed.
+
 ## Clinician Onboarding and Contextual Access — 22 October 2026
 
 The five professional groups are Profile, Qualifications/Certifications, License,
@@ -520,3 +554,68 @@ Profile photo selection/drop opens an in-memory crop/zoom/position preview with 
 Patient Requests contains composition, preferences, immutable disclosure preview, publication, live progress, clinician inspection, private offer comparison, funding and acceptance. Clinician Requests contains the eligible inbox, authorized disclosure, approved-offering response editor and private active/history outcomes. Existing deep links select the corresponding record in these workspaces; only opaque references belong in URLs. Draft clinical text stays in React memory and survives local view/step changes, not a page reload. Hidden drafts still protect against tour navigation; published/sent drafts clear only after durable success.
 
 Acceptance uses the existing atomic appointment/reservation command; this presentation change introduces no parallel booking or accounting workflow. The patient remains on the matched request until opening the authorized appointment. Offer acceptance is a historical event, distinct from the appointment's current status: cancelled/ended/completed appointments are not relabeled confirmed by their old matched request. Schedule-for-later prepares a new draft without silently cancelling or rewriting the original request.
+
+### Direct Payment Live Activity — 28 October 2026
+
+After proof submission, the payer sees the immutable submitted details and private
+receipt rather than an editable replacement form. A correction/rejection explicitly
+reopens submission; identical retries return the same result. The server also
+rejects replacement while review is pending. Authorized payment pages and workspace
+alerts refresh within a bounded five-second polling cycle while reachable.
+Alerts are neutral, do not navigate automatically, and retain durable inbox/read
+state; historical unread items remain in the bell rather than flooding new popups.
+Submission and receipt verification are separate durable activity facts: fast
+verification must not supersede the queued submission email/SMS. Each respects
+recipient preferences, verified contact, site/provider availability and SMS caps.
+Provider acceptance is not delivery. Reminders remain conditional on current state.
+No mode, payment verification, appointment acceptance or money rules change here.
+
+### Shared Notifications Recovery — 28 October 2026
+
+Patient and clinician bells share the same pane and actor-scoped live feed. New
+payment popups use unseen server event IDs, never the browser wall clock; historical
+unread events remain in the bell. A five-second poll and visibility/focus/reconnect
+recovery refresh open payment queues and pages. A stalled request times out after
+eight seconds; one failed source does not suppress the other successful source.
+Accepted-offer popups and server-authorized deep links/read handling are preserved.
+This supersedes independent client pollers, not notification permissions or delivery
+semantics. Closed/unreachable browsers do not imply notification presentation.
+
+
+## Translation Workbook Revision — 28 October 2026
+
+Current technical candidate569537640665d9dcbb07738523fd49e4c5c5354a preserves
+completed MVP scope and all existing financial modes/permissions. No schema,
+dependency, provider, access or payment-mode change is introduced. Workbook
+reconciliation and approved-only locale/template/policy plumbing are verified;
+no workbook draft was imported. Both Amharic and Afaan Oromo have zero human
+approvals. Native review, independent locale approval, new-template/conflict
+resolution and subsequent built-language/owner review remain release gates.
+Existing policy draft/publication status and consent versions remain unchanged.
+See [localization-release-readiness.md](localization-release-readiness.md), the
+existing screen matrix revision and [selfmade-translation-update.md](selfmade-translation-update.md).
+Historical evidence is retained; no separate roadmap website was changed.
+
+
+## Navigation, Private Previews and Encounter Photos — 29 October 2026
+
+Owner-approved v1.49 adds an independent patient preference to share the current
+profile photo only with an otherwise authorized treating clinician. Missing new
+and legacy preferences default enabled; explicit opt-outs remain intact. This
+supersedes the earlier blanket owner-only patient-photo presentation, while name,
+history, file choices and immutable encounter consent remain unchanged. Withdrawal
+denies subsequent image requests and avatars revalidate on active-tab refresh.
+Couples participants never grant photo access for one another.
+
+Patient Requests and Shared Care are primary navigation. Private receipt and
+professional attachment previews retain underlying access/PDF restrictions. Final
+application review groups selected filenames by purpose. Encounter avatars are
+LEFT of the authorized person's name; page headings stay separate.
+
+Demo deployment is authorized with existing permitted translations and truthful
+fallbacks. Final localization remains blocked by independent human approvals; no
+Draft import or approval bypass was added. See the existing matrix revision and
+[attachment-photo-release-readiness.md](attachment-photo-release-readiness.md),
+[selfmade-translation-update.md](selfmade-translation-update.md). No remote
+deployment, merge, reseed, password/provider/access/mode change or public-roadmap
+website update is claimed.
