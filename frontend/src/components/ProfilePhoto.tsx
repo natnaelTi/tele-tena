@@ -19,7 +19,7 @@ export function Avatar({url,name,className=''}:{url?:string|null;name:string;cla
 }
 /** An encounter-authorized name and its current permitted photo form one identity. */
 export function IdentityName({url,name,children}:{url?:string|null;name:string;children?:ReactNode}){
- return <span className="identity-with-avatar"><span className="identity-name">{children||name}</span><Avatar url={url} name={name}/></span>;
+ return <span className="identity-with-avatar"><Avatar url={url} name={name}/><span className="identity-name">{children||name}</span></span>;
 }
 export default function ProfilePhoto() {
   const {session,refresh}=useSession(); const {w}=useLocale();
