@@ -1,7 +1,7 @@
 """Real Frappe16 transactional event coverage; all outbound transports mocked."""
 from direct_payments import *
 from unittest.mock import patch
-from datetime import timedelta
+from datetime import datetime,timezone,timedelta
 from tele_tena import communications as comm,booking_notifications as notices,notifications,email_delivery
 from tele_tena.api import contact_auth,care_languages,vetting
 
@@ -42,6 +42,19 @@ class Communications(DirectPayment):
   status={n.channel:n.state for n in self.deliveries('notification-transport-test')};self.assertEqual(status,{'in_app':'Available','email':'ProviderAccepted','sms':'Unknown'})
   unknown=next(n for n in self.deliveries('notification-transport-test') if n.channel=='sms')
   with self.assertRaises(frappe.PermissionError):notices.retry(unknown.id)
+ def test_utc_send_gate_ignores_site_clock_offset(self):
+  result,_=self.book();id=result['payment'];self.receipt(id);frappe.set_user(users['counselor']);pay.review(id,'confirm','utc-send-gate')
+  app=result['id']
+  for who in (users['patient'],users['counselor']):
+   frappe.set_user(who);notices.save_preferences(True,True)
+   frappe.db.sql('DELETE FROM tt_contact_identity WHERE user=%s',(who,));self.contacts(who)
+  frappe.db.sql('UPDATE tt_appointment SET start=UTC_TIMESTAMP(6)+INTERVAL 4 MINUTE,end=UTC_TIMESTAMP(6)+INTERVAL 34 MINUTE WHERE id=%s',(app,));notices.process_reminders()
+  ids={n.id for n in j.rows("SELECT id FROM tt_booking_notice WHERE appointment=%s AND event='FiveMinuteReminder'",(app,))};original=notices.rows
+  def scoped(query,args=()):
+   value=original(query,args);return [n for n in value if n.id in ids] if query.startswith('SELECT id FROM tt_booking_notice WHERE state=') else value
+  with patch.object(notices,'rows',side_effect=scoped),patch.object(frappe.db,'commit'),patch('frappe.utils.now_datetime',return_value=datetime.now(timezone.utc).replace(tzinfo=None)+timedelta(hours=9)),patch('tele_tena.email_delivery.send_notice') as email,patch('tele_tena.sms.send_notice'),patch('tele_tena.review.phone_enabled',return_value=True),patch('tele_tena.api.phone_auth.reserve_sms_budget',return_value=True):
+   notices.dispatch();self.assertEqual(email.call_count,2)
+  self.assertEqual(len(j.rows("SELECT id FROM tt_booking_notice WHERE appointment=%s AND event='FiveMinuteReminder' AND state='ProviderAccepted'",(app,))),4)
  def test_five_minute_reminder_occurrence_and_retry_safety(self):
   result,_=self.book();id=result['payment'];self.receipt(id);frappe.set_user(users['counselor']);pay.review(id,'confirm','five-minute-test')
   app=result['id'];frappe.db.sql('UPDATE tt_appointment SET start=UTC_TIMESTAMP(6)+INTERVAL 10 MINUTE,end=UTC_TIMESTAMP(6)+INTERVAL 40 MINUTE WHERE id=%s',(app,));notices.process_reminders()

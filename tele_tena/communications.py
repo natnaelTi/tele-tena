@@ -1,6 +1,6 @@
 """Neutral transactional communication, sharing the appointment delivery outbox."""
 import uuid
-from datetime import timedelta
+from datetime import datetime,timezone,timedelta
 import frappe
 from tele_tena.api.journey import rows,query
 
@@ -87,7 +87,7 @@ def describe(notice, dispatch=False):
         if event=='ApplicationSubmitted':
             body='We have received your application. It is under review, and you will receive an update within the next 24 hours.'
             if app[0].status!='Pending':body='We have received your application. A review update is available in your account.'
-            elif app[0].submitted_at and app[0].submitted_at<=frappe.utils.now_datetime()-timedelta(hours=24):
+            elif app[0].submitted_at and app[0].submitted_at<=datetime.now(timezone.utc).replace(tzinfo=None)-timedelta(hours=24):
                 body='Your application is still under review. Open your account for the current status.'
         elif event=='ApplicationReviewUpdate':
             if dispatch and app[0].status!='Pending':return None
@@ -109,7 +109,7 @@ def describe(notice, dispatch=False):
             if not rows('SELECT clinician FROM tt_request_recipient WHERE request_id=%s AND clinician=%s',(ref,user)):return None
             from tele_tena.api.journey import service_scope_is_current
             if not service_scope_is_current(user,request.service):return None
-            if dispatch and (request.state!='Open' or request.expires_at<=frappe.utils.now_datetime()):return None
+            if dispatch and (request.state!='Open' or request.expires_at<=datetime.now(timezone.utc).replace(tzinfo=None)):return None
             href='/clinician/requests';body='A new consultation request is available. Sign in to review your eligible request inbox.'
         else:
             if request.patient!=user:return None

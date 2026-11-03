@@ -118,7 +118,7 @@ def dispatch():
             app=rows('SELECT * FROM tt_appointment WHERE id=%s',(notice.appointment,))
             if not app or app[0].state not in EVENT_STATES.get(notice.event,()):
                 frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
-            if notice.event=='FiveMinuteReminder' and (app[0].start<=frappe.utils.now_datetime() or app[0].start.isoformat()!=notice.context_key or rows("SELECT appointment FROM tt_consultation WHERE appointment=%s AND state='Ended'",(notice.appointment,))):
+            if notice.event=='FiveMinuteReminder' and (app[0].start<=datetime.now(timezone.utc).replace(tzinfo=None) or app[0].start.isoformat()!=notice.context_key or rows("SELECT appointment FROM tt_consultation WHERE appointment=%s AND state='Ended'",(notice.appointment,))):
                 frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded' WHERE id=%s",(item.id,));frappe.db.commit();continue
             if notice.event.startswith('Payment'):
                 payments=rows('SELECT p.state,e.event FROM tt_direct_payment p JOIN tt_direct_payment_event e ON e.payment=p.id WHERE e.id=%s',(notice.context_key,))
