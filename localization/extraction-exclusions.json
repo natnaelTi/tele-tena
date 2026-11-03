@@ -226,22 +226,22 @@
   },
   {
     "english": "Available",
-    "source_location": "frontend/src/components/BookingNotices.tsx:6",
+    "source_location": "frontend/src/components/BookingNotices.tsx:7",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Available",
-    "source_location": "frontend/src/components/BookingNotices.tsx:6",
+    "source_location": "frontend/src/components/BookingNotices.tsx:7",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Unavailable",
-    "source_location": "frontend/src/components/BookingNotices.tsx:6",
+    "source_location": "frontend/src/components/BookingNotices.tsx:7",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Rejected",
-    "source_location": "frontend/src/components/BookingNotices.tsx:6",
+    "source_location": "frontend/src/components/BookingNotices.tsx:7",
     "reason": "Keyboard or state matching set"
   },
   {
@@ -365,6 +365,46 @@
     "reason": "Technical JSX attribute transform"
   },
   {
+    "english": "NewRequest",
+    "source_location": "frontend/src/components/ClinicianNotifications.tsx:12",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "PaymentSubmitted",
+    "source_location": "frontend/src/components/ClinicianNotifications.tsx:12",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "ApplicationApproved",
+    "source_location": "frontend/src/components/ClinicianNotifications.tsx:12",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "ApplicationRejected",
+    "source_location": "frontend/src/components/ClinicianNotifications.tsx:12",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "ScopeApproved",
+    "source_location": "frontend/src/components/ClinicianNotifications.tsx:12",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "ScopeRejected",
+    "source_location": "frontend/src/components/ClinicianNotifications.tsx:12",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "ScopeClarification",
+    "source_location": "frontend/src/components/ClinicianNotifications.tsx:12",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "LanguageReviewUpdated",
+    "source_location": "frontend/src/components/ClinicianNotifications.tsx:12",
+    "reason": "Keyboard or state matching set"
+  },
+  {
     "english": "Booked",
     "source_location": "frontend/src/components/ClinicianNotifications.tsx:15",
     "reason": "Keyboard or machine-code comparison"
@@ -398,6 +438,16 @@
     "english": "Unavailable",
     "source_location": "frontend/src/components/ConsultationDetails.tsx:13",
     "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Unavailable",
+    "source_location": "frontend/src/components/DeliverySettings.tsx:11",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "Rejected",
+    "source_location": "frontend/src/components/DeliverySettings.tsx:11",
+    "reason": "Keyboard or state matching set"
   },
   {
     "english": "Wallet",
@@ -991,12 +1041,12 @@
   },
   {
     "english": "PaymentSubmitted",
-    "source_location": "frontend/src/components/UserNotifications.tsx:22",
+    "source_location": "frontend/src/components/UserNotifications.tsx:23",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "PaymentVerificationReminder",
-    "source_location": "frontend/src/components/UserNotifications.tsx:22",
+    "source_location": "frontend/src/components/UserNotifications.tsx:23",
     "reason": "Keyboard or state matching set"
   },
   {
@@ -3216,27 +3266,27 @@
   },
   {
     "english": "%d %b %Y %H:%M",
-    "source_location": "tele_tena/booking_notifications.py:141",
+    "source_location": "tele_tena/booking_notifications.py:166",
     "reason": "SQL fragment, date format or authentication protocol literal"
   },
   {
     "english": "%d %b %Y %H:%M",
-    "source_location": "tele_tena/booking_notifications.py:164",
+    "source_location": "tele_tena/booking_notifications.py:189",
     "reason": "SQL fragment, date format or authentication protocol literal"
   },
   {
     "english": " notice_kind FROM ",
-    "source_location": "tele_tena/notifications.py:119",
+    "source_location": "tele_tena/notifications.py:129",
     "reason": "SQL fragment, date format or authentication protocol literal"
   },
   {
     "english": " WHERE id=%s AND user=%s",
-    "source_location": "tele_tena/notifications.py:119",
+    "source_location": "tele_tena/notifications.py:129",
     "reason": "SQL fragment, date format or authentication protocol literal"
   },
   {
     "english": " SET read_at=COALESCE(read_at,UTC_TIMESTAMP(6)) WHERE id=%s AND user=%s",
-    "source_location": "tele_tena/notifications.py:122",
+    "source_location": "tele_tena/notifications.py:136",
     "reason": "SQL fragment, date format or authentication protocol literal"
   },
   {

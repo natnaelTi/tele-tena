@@ -177,3 +177,6 @@ def install():
 
     from tele_tena.patches.v1_50_onboarding_scope_intake import execute as scope_intake
     scope_intake()
+
+    from tele_tena.patches.v1_51_communications import execute as communications
+    communications()

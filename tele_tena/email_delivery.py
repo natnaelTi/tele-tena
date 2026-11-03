@@ -34,12 +34,16 @@ def send_code(destination, code):
     message['To'] = destination
     message['Subject'] = 'Your TeleTena verification code'
     message.set_content(f'Your TeleTena code is {code}. It expires in 5 minutes. Never share it. If you did not request this code, ignore this email.')
+    from tele_tena.email_templates import render
+    message.add_alternative(render('Your verification code expires in 5 minutes. Never share it. If you did not request this code, ignore this email.',title='Your TeleTena Verification Code',code=code),subtype='html')
     _send(message,settings)
 
 def send_notice(destination,body):
     settings=configuration()
     message=EmailMessage();message['From']=settings['sender'];message['To']=destination
-    message['Subject']='TeleTena appointment update';message.set_content(body)
+    message['Subject']=getattr(body,'title','TeleTena Update');message.set_content(str(body))
+    from tele_tena.email_templates import render
+    message.add_alternative(render(body),subtype='html')
     _send(message,settings)
 
 def _send(message,settings):

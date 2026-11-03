@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 import uuid
 import frappe
 from tele_tena.api.journey import actor,rows,query,command
+from tele_tena.communications import external_state,wake_dispatch
 
 
 def create(appointment,state,plan_id=None):
@@ -38,7 +39,9 @@ def create(appointment,state,plan_id=None):
             frappe.db.sql('''INSERT IGNORE INTO tt_booking_notice
               (id,appointment,user,event,channel,state,created,modified)
               VALUES (%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))''',
-              (str(uuid.uuid4()),appointment,user,event,channel,'Available' if channel=='in_app' else 'Pending'))
+              (str(uuid.uuid4()),appointment,user,event,channel,'Available' if channel=='in_app' else external_state(user,channel)))
+
+    wake_dispatch()
 
 
 @query()
@@ -91,7 +94,7 @@ def retry(id):
 
 
 EVENT_STATES={**{k:('PendingConfirmation','Booked','Expired','Cancelled','Completed') for k in ('PaymentSubmitted','PaymentVerified','PaymentCorrection','PaymentReconciliation','PaymentReminder','PaymentVerificationReminder')},'Confirmed':('Booked',),'Pending':('PendingConfirmation',),'ConfirmationReminder':('PendingConfirmation',),
-              'AppointmentReminder':('Booked',),'Cancelled':('Cancelled',),'Declined':('Cancelled',),'Expired':('Expired',)}
+              'AppointmentReminder':('Booked',),'FiveMinuteReminder':('Booked',),'BookingCreated':('PendingConfirmation','Booked','Expired','Cancelled','Completed'),'Cancelled':('Cancelled',),'Declined':('Cancelled',),'Expired':('Expired',)}
 
 def dispatch():
     # A crashed/uncertain send is not retried automatically:SMTP/SMS lack a verified
@@ -104,65 +107,90 @@ def dispatch():
         notice=rows("SELECT * FROM tt_booking_notice WHERE id=%s AND state='Pending'",(item.id,))
         if not notice:frappe.db.commit();continue
         notice=notice[0]
-        app=rows('SELECT * FROM tt_appointment WHERE id=%s',(notice.appointment,))
-        if not app or app[0].state not in EVENT_STATES.get(notice.event,()):
-            frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
-        if notice.event.startswith('Payment'):
-            payments=rows('SELECT p.state,e.event FROM tt_direct_payment p JOIN tt_direct_payment_event e ON e.payment=p.id WHERE e.id=%s',(notice.context_key,))
-            valid={'PaymentReminder':('AwaitingPayment','CorrectionRequired'),'PaymentVerificationReminder':('Submitted',),'PaymentSubmitted':('Submitted','ReconciliationRequired'),'PaymentVerified':('Verified',),'PaymentCorrection':('CorrectionRequired','Rejected'),'PaymentReconciliation':('ReconciliationRequired','RefundRequired','RefundReported','RefundConfirmed')}
-            # These are durable activity receipts, even when verification happens
-            # before the submission email/SMS worker runs. Reminders remain state-bound.
-            fact={'PaymentSubmitted':'PaymentSubmitted','PaymentVerified':'ReceiptVerified'}.get(notice.event)
-            eligible=bool(payments and (payments[0].event==fact if fact else payments[0].state in valid.get(notice.event,())))
-            if not eligible:
-                frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded' WHERE id=%s",(item.id,));frappe.db.commit();continue
-        if not frappe.db.get_value('User',notice.user,'enabled'):
-            frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
-        if notice.user not in (app[0].patient,app[0].clinician):
-            consent=rows("""SELECT 1 FROM tt_couple_participant p JOIN tt_couple_plan cp ON cp.id=p.plan
-              WHERE cp.appointment=%s AND p.user=%s AND p.state='Consented'""",(notice.appointment,notice.user))
-            if not consent:
+        description=None
+        if notice.context_kind!='appointment':
+            from tele_tena.communications import describe
+            description=describe(notice,dispatch=True)
+            if not description:
                 frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
+        else:
+            app=rows('SELECT * FROM tt_appointment WHERE id=%s',(notice.appointment,))
+            if not app or app[0].state not in EVENT_STATES.get(notice.event,()):
+                frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
+            if notice.event=='FiveMinuteReminder' and (app[0].start<=frappe.utils.now_datetime() or app[0].start.isoformat()!=notice.context_key or rows("SELECT appointment FROM tt_consultation WHERE appointment=%s AND state='Ended'",(notice.appointment,))):
+                frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded' WHERE id=%s",(item.id,));frappe.db.commit();continue
+            if notice.event.startswith('Payment'):
+                payments=rows('SELECT p.state,e.event FROM tt_direct_payment p JOIN tt_direct_payment_event e ON e.payment=p.id WHERE e.id=%s',(notice.context_key,))
+                valid={'PaymentReminder':('AwaitingPayment','CorrectionRequired'),'PaymentVerificationReminder':('Submitted',),'PaymentSubmitted':('Submitted','ReconciliationRequired'),'PaymentVerified':('Verified',),'PaymentCorrection':('CorrectionRequired','Rejected'),'PaymentReconciliation':('ReconciliationRequired','RefundRequired','RefundReported','RefundConfirmed')}
+                # These are durable activity receipts, even when verification happens
+                # before the submission email/SMS worker runs. Reminders remain state-bound.
+                fact={'PaymentSubmitted':'PaymentSubmitted','PaymentVerified':'ReceiptVerified'}.get(notice.event)
+                eligible=bool(payments and (payments[0].event==fact if fact else payments[0].state in valid.get(notice.event,())))
+                if not eligible:
+                    frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded' WHERE id=%s",(item.id,));frappe.db.commit();continue
+            if not frappe.db.get_value('User',notice.user,'enabled'):
+                frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
+            if notice.user not in (app[0].patient,app[0].clinician):
+                consent=rows("""SELECT 1 FROM tt_couple_participant p JOIN tt_couple_plan cp ON cp.id=p.plan
+                  WHERE cp.appointment=%s AND p.user=%s AND p.state='Consented'""",(notice.appointment,notice.user))
+                if not consent:
+                    frappe.db.sql("UPDATE tt_booking_notice SET state='Superseded',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
         prefs=rows('SELECT * FROM tt_notice_preference WHERE user=%s',(notice.user,))
         identities=rows('SELECT contact FROM tt_contact_identity WHERE user=%s AND channel=%s AND verified_at IS NOT NULL LIMIT 1',(notice.user,'phone' if notice.channel=='sms' else 'email'))
         if (prefs and not prefs[0][notice.channel+'_enabled']) or not identities:
             frappe.db.sql("UPDATE tt_booking_notice SET state='Unavailable',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
         if notice.channel=='sms':
+            import re
+            if not re.fullmatch(r'\+251[79][0-9]{8}',identities[0].contact):
+                frappe.db.sql("UPDATE tt_booking_notice SET state='Unavailable',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
             from tele_tena.review import phone_enabled
             from tele_tena.api.phone_auth import reserve_sms_budget,_now
             frappe.db.sql('SELECT id FROM tt_otp_gate WHERE id=1 FOR UPDATE')
             if not phone_enabled() or not reserve_sms_budget(_now()):
                 frappe.db.sql("UPDATE tt_booking_notice SET state='Unavailable',modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit();continue
         frappe.db.sql("UPDATE tt_booking_notice SET state='Sending',attempts=attempts+1,modified=UTC_TIMESTAMP(6) WHERE id=%s",(item.id,));frappe.db.commit()
-        app=app[0];state='Unknown'
-        label={'PaymentReminder':'direct payment awaiting submission','PaymentVerificationReminder':'payment receipt awaiting your verification','PaymentSubmitted':'payment submitted for verification','PaymentVerified':'payment receipt verified','PaymentCorrection':'payment correction requested','PaymentReconciliation':'payment reconciliation updated','Confirmed':'confirmed','Pending':'awaiting your confirmation' if notice.user==app.clinician else 'awaiting clinician confirmation',
-               'ConfirmationReminder':'still awaiting your confirmation; please confirm or decline before the deadline',
-               'AppointmentReminder':'coming up soon','Cancelled':'cancelled','Declined':'declined','Expired':'expired without confirmation'}.get(notice.event,'updated')
-        when=app.start.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(app.timezone or 'Africa/Addis_Ababa')).strftime('%d %b %Y %H:%M')
-        # Site-bound relative authenticated link;no permanent token or health text.
-        destination='/'+('clinician' if notice.user==app.clinician else 'patient')+'/consultations/'+app.id
-        if notice.event.startswith('Payment'):
-            from tele_tena.api.direct_payments import notice_path
-            destination=notice_path(app.id,notice.user,notice.context_key or None) or destination
-        link=frappe.utils.get_url('/teletena'+destination)
-        from urllib.parse import urlsplit,urlunsplit
-        parsed=urlsplit(link)
-        if parsed.hostname and not parsed.hostname.endswith('.localhost') and parsed.hostname not in ('localhost','127.0.0.1'):
-            link=urlunsplit(('https',parsed.netloc,parsed.path,'',''))
-        from tele_tena.localization import translate
-        locale=rows('SELECT locale FROM tt_preferences WHERE user=%s',(notice.user,))
-        locale=locale[0].locale if locale else 'en'
-        template=translate('TeleTena appointment {status}. {time} ({timezone}). Reference {reference}. Sign in: {link}',locale)
-        message=template.format(status=translate(label,locale),time=when,timezone=app.timezone,reference=app.id[:8],link=link)
-        if notice.event in ('PaymentSubmitted','PaymentVerified'):
-            message+=' '+translate('This records a payment activity. Open the link for the current payment and appointment status.',locale)
-        if notice.user==app.patient and notice.event in ('Confirmed','Pending') and rows('SELECT id FROM tt_journal WHERE event_ref=%s',('booking:'+app.id,)):
-            minor=int(app.price);message+=f' Demonstration balance: ETB {minor//100}.{minor%100:02d} reserved. No external payment collected.'
-        if notice.user==app.patient and notice.event in ('Cancelled','Declined','Expired') and rows('SELECT id FROM tt_journal WHERE event_ref=%s',('release:'+app.id,)):
-            message+=' Demonstration balance reservation released. No external refund was processed.'
-        if notice.event in ('Pending','ConfirmationReminder') and app.expires_at:
-            deadline=app.expires_at.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(app.timezone or 'Africa/Addis_Ababa')).strftime('%d %b %Y %H:%M')
-            message+=f' Response deadline: {deadline} ({app.timezone}).'
+        state='Unknown'
+        if description:
+            from tele_tena.email_templates import NoticeText,secure_link
+            from tele_tena.localization import translate
+            pref=rows('SELECT locale FROM tt_preferences WHERE user=%s',(notice.user,))
+            locale=pref[0].locale if pref else 'en'
+            link=secure_link(description['href'])
+            message=NoticeText(translate(description['body'],locale)+' '+translate('Sign in:',locale)+' '+link,
+                               title=translate(description['title'],locale),link=link,locale=locale)
+        else:
+            app=app[0]
+            label={'PaymentReminder':'direct payment awaiting submission','PaymentVerificationReminder':'payment receipt awaiting your verification','PaymentSubmitted':'payment submitted for verification','PaymentVerified':'payment receipt verified','PaymentCorrection':'payment correction requested','PaymentReconciliation':'payment reconciliation updated','Confirmed':'confirmed','Pending':'awaiting your confirmation' if notice.user==app.clinician else 'awaiting clinician confirmation',
+                   'ConfirmationReminder':'still awaiting your confirmation; please confirm or decline before the deadline',
+                   'AppointmentReminder':'coming up soon','FiveMinuteReminder':'starting in about five minutes','BookingCreated':'created; direct payment and any clinician confirmation are still required','Cancelled':'cancelled','Declined':'declined','Expired':'expired without confirmation'}.get(notice.event,'updated')
+            when=app.start.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(app.timezone or 'Africa/Addis_Ababa')).strftime('%d %b %Y %H:%M')
+            # Site-bound relative authenticated link;no permanent token or health text.
+            destination='/'+('clinician' if notice.user==app.clinician else 'patient')+'/consultations/'+app.id
+            if notice.event.startswith('Payment') or notice.event=='BookingCreated':
+                from tele_tena.api.direct_payments import notice_path
+                destination=notice_path(app.id,notice.user,notice.context_key or None) or destination
+            link=frappe.utils.get_url('/teletena'+destination)
+            from urllib.parse import urlsplit,urlunsplit
+            parsed=urlsplit(link)
+            if parsed.hostname and not parsed.hostname.endswith('.localhost') and parsed.hostname not in ('localhost','127.0.0.1'):
+                link=urlunsplit(('https',parsed.netloc,parsed.path,'',''))
+            from tele_tena.localization import translate
+            locale=rows('SELECT locale FROM tt_preferences WHERE user=%s',(notice.user,))
+            locale=locale[0].locale if locale else 'en'
+            template=translate('TeleTena appointment {status}. {time} ({timezone}). Reference {reference}. Sign in: {link}',locale)
+            message=template.format(status=translate(label,locale),time=when,timezone=app.timezone,reference=app.id[:8],link=link)
+            if notice.event in ('PaymentSubmitted','PaymentVerified'):
+                message+=' '+translate('This records a payment activity. Open the link for the current payment and appointment status.',locale)
+            if notice.user==app.patient and notice.event in ('Confirmed','Pending') and rows('SELECT id FROM tt_journal WHERE event_ref=%s',('booking:'+app.id,)):
+                minor=int(app.price);message+=f' Demonstration balance: ETB {minor//100}.{minor%100:02d} reserved. No external payment collected.'
+            if notice.user==app.patient and notice.event in ('Cancelled','Declined','Expired') and rows('SELECT id FROM tt_journal WHERE event_ref=%s',('release:'+app.id,)):
+                message+=' Demonstration balance reservation released. No external refund was processed.'
+            if notice.event in ('Pending','ConfirmationReminder') and app.expires_at:
+                deadline=app.expires_at.replace(tzinfo=timezone.utc).astimezone(ZoneInfo(app.timezone or 'Africa/Addis_Ababa')).strftime('%d %b %Y %H:%M')
+                message+=f' Response deadline: {deadline} ({app.timezone}).'
+            from tele_tena.email_templates import NoticeText
+            from tele_tena.notifications import KINDS
+            message=NoticeText(message,title=translate(KINDS[notice.event][0],locale),link=link,locale=locale)
         try:
             if notice.channel=='email':
                 from tele_tena.email_delivery import send_notice
@@ -176,7 +204,7 @@ def dispatch():
             # outcomes remain terminal and visible;never claim delivery.
             from tele_tena.sms import SMSRejected
             from tele_tena.email_delivery import DeliveryUnavailable
-            state='Rejected' if isinstance(error,SMSRejected) and error.args==('provider_rejected',) else 'Unavailable' if (isinstance(error,SMSRejected) and error.args==('not_configured',)) or (isinstance(error,DeliveryUnavailable) and error.args==('email_not_configured',)) else 'Unknown'
+            state='Rejected' if isinstance(error,SMSRejected) and error.args in (('provider_rejected',),('invalid_request',)) else 'Unavailable' if (isinstance(error,SMSRejected) and error.args==('not_configured',)) or (isinstance(error,DeliveryUnavailable) and error.args==('email_not_configured',)) else 'Unknown'
         frappe.db.sql('UPDATE tt_booking_notice SET state=%s,modified=UTC_TIMESTAMP(6) WHERE id=%s',(state,item.id));frappe.db.commit()
 
 
@@ -185,11 +213,13 @@ def queue_external(appointment,event,recipients,channels=('email','sms'),context
     for user in recipients:
         prefs=rows('SELECT * FROM tt_notice_preference WHERE user=%s',(user,))
         for channel in channels:
-            state='Suppressed' if prefs and not prefs[0][channel+'_enabled'] else 'Pending'
+            state=external_state(user,channel)
             frappe.db.sql("""INSERT IGNORE INTO tt_booking_notice
               (id,appointment,user,event,channel,state,context_key,created,modified)
               VALUES (%s,%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))""",
               (str(uuid.uuid4()),appointment,user,event,channel,state,context_key))
+
+    wake_dispatch()
 
 
 def process_reminders():
@@ -209,17 +239,20 @@ def process_reminders():
         queue_external(candidate.id,'ConfirmationReminder',[app[0].clinician],('email',))
         emit(app[0].clinician,'confirmation-reminder:'+candidate.id,'ConfirmationReminder',candidate.id)
         frappe.db.sql('UPDATE tt_confirmation_observation SET reminded_at=UTC_TIMESTAMP(6) WHERE appointment=%s',(candidate.id,))
-    # Only bookings explicitly accepting the new policy get automatic reminders.
-    upcoming=rows("SELECT a.* FROM tt_appointment a WHERE a.state='Booked' AND a.start>UTC_TIMESTAMP(6) AND a.start<=UTC_TIMESTAMP(6)+INTERVAL 1 HOUR AND JSON_UNQUOTE(JSON_EXTRACT(IF(JSON_VALID(a.policy_snapshot),a.policy_snapshot,'{}'),'$.notifications.version'))='booking-notices-v2' AND NOT EXISTS (SELECT 1 FROM tt_user_notification n WHERE n.appointment=a.id AND n.kind='AppointmentReminder') ORDER BY a.start,a.id LIMIT 100")
+    from tele_tena.communications import application_updates
+    application_updates()
+    upcoming=rows("""SELECT a.* FROM tt_appointment a WHERE a.state='Booked'
+        AND a.start>UTC_TIMESTAMP(6) AND a.start<=UTC_TIMESTAMP(6)+INTERVAL 5 MINUTE
+        AND NOT EXISTS (SELECT 1 FROM tt_consultation c WHERE c.appointment=a.id AND c.state='Ended')
+        ORDER BY a.start,a.id LIMIT 100""")
     import json
     for app in upcoming:
         one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
-        current=rows("SELECT * FROM tt_appointment WHERE id=%s AND state='Booked' AND start>UTC_TIMESTAMP(6) FOR UPDATE",(app.id,))
+        current=rows("SELECT * FROM tt_appointment WHERE id=%s AND state='Booked' AND start>UTC_TIMESTAMP(6) AND start<=UTC_TIMESTAMP(6)+INTERVAL 5 MINUTE FOR UPDATE",(app.id,))
         if not current:continue
-        app=current[0]
-        if json.loads(app.policy_snapshot or '{}').get('notifications',{}).get('version')!='booking-notices-v2':continue
-        for user in participants(app.id):emit(user,'appointment-reminder:'+app.id,'AppointmentReminder',app.id)
-        queue_external(app.id,'AppointmentReminder',participants(app.id))
+        app=current[0];occurrence=app.start.isoformat()
+        for user in participants(app.id):emit(user,'five-minute:'+app.id+':'+occurrence,'FiveMinuteReminder',app.id)
+        queue_external(app.id,'FiveMinuteReminder',participants(app.id),context_key=occurrence)
 
     # Reconcile neutral ended-call inbox events independently of the token/room
     # closure transaction; notification storage can never undo authoritative End.

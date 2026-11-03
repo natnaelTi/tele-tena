@@ -435,6 +435,8 @@ def review_scope_appeal(appeal, decision, reason):
             ('Reconsideration reopened: ' + reason, reviewer, now, reviewer, item.scope_application))
     journey.audit(reviewer, 'ScopeAppealReviewed', {'application':item.scope_application,
         'appeal':item.name,'decision':decision,'basis_assessment':item.basis_assessment})
+    from tele_tena.communications import queue
+    queue(item.clinician,'ScopeAppealDecision','scope',item.scope_application,'appeal-decision:'+item.name)
     return {'status':'Upheld' if decision == 'Upheld' else 'Reopened','idempotent':False}
 
 
@@ -770,6 +772,12 @@ def review_scope_application(application, decision, identity_reviewed=False,
         WHERE name=%s''', (decision, reviewer, findings,
         findings if decision == 'Clarification' else '', restrictions, reviewer,
         assessment.decided_at, assessment.decided_at, reviewer, doc.name))
+    from tele_tena.communications import queue
+    submitted=frappe.db.get_value('Tele Tena Vetting Scope Application',doc.name,'submitted_at')
+    key=hashlib.sha256(json.dumps([doc.name,str(submitted),reviewer,decision,findings,restrictions,flags,
+        scored_criteria,credential_source,credential_checked_on,credential_evidence,credential_source_reference],
+        sort_keys=True,default=str).encode()).hexdigest()
+    queue(doc.clinician,'Scope'+decision,'scope',doc.name,'scope-decision:'+key)
     if decision == 'Approved':
         from tele_tena.api import journey as api
         api.review_service_scope(doc.clinician, doc.service, 'Approved', vetting_action=True)

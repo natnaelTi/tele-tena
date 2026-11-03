@@ -71,7 +71,7 @@ def event(p,user,kind,key,values,evidence=None,reason='',create=True):
 def notify(p,kind,event_id):
     from tele_tena.notifications import emit
     from tele_tena.booking_notifications import queue_external
-    recipients={p.clinician} if kind in ('PaymentSubmitted','PaymentVerificationReminder') else {p.patient}
+    recipients={p.patient,p.clinician} if kind in ('PaymentSubmitted','PaymentVerified') else {p.clinician} if kind=='PaymentVerificationReminder' else {p.patient}
     for user in recipients:emit(user,'direct:'+str(event_id),kind,p.appointment)
     queue_external(p.appointment,kind,recipients,context_key=str(event_id))
 
@@ -81,6 +81,11 @@ def begin(appointment,payee,c):
     frappe.db.sql("INSERT INTO tt_direct_payment (id,appointment,patient,clinician,amount,payee,payee_revision,mode_revision,reference_id,state,hold_until,verify_until,created) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,'AwaitingPayment',%s,%s,UTC_TIMESTAMP(6))",(id,a.id,a.patient,a.clinician,a.price,payee.phone,payee.revision,c.revision,a.id,hold,verify))
     frappe.db.sql("UPDATE tt_appointment SET payment_mode='Offline',state='PendingConfirmation',confirmed_at=NULL,expires_at=%s WHERE id=%s",(hold,a.id))
     event(one('SELECT * FROM tt_direct_payment WHERE id=%s',(id,)),a.patient,'IntentCreated','intent',{'appointment':a.id,'amount':int(a.price),'mode_revision':c.revision})
+    from tele_tena.notifications import emit,participants
+    from tele_tena.booking_notifications import queue_external
+    recipients=participants(a.id)
+    for user in recipients:emit(user,'booking-created:'+a.id,'BookingCreated',a.id)
+    queue_external(a.id,'BookingCreated',recipients)
     return id
 @query()
 def detail(id):

@@ -297,6 +297,8 @@ def apply(statement, requested_services='[]'):
         submitted_at=VALUES(submitted_at)''',
         (p.user, statement, json.dumps(requested), now))
     audit(p.user, 'Application', {'status': 'Pending', 'requested_services': requested})
+    from tele_tena.communications import application_submitted
+    application_submitted(p.user)
     return {'status': 'Pending'}
 
 
@@ -367,7 +369,9 @@ def review(clinician, decision):
     if clinician == reviewer or decision not in ('Approved', 'Rejected'):
         fail('Invalid approval decision')
     one('SELECT user FROM tt_profile WHERE user=%s AND kind=%s FOR UPDATE', (clinician, 'clinician'))
-    one('SELECT user FROM tt_application WHERE user=%s FOR UPDATE', (clinician,))
+    prior=one('SELECT user,status,reviewed_at FROM tt_application WHERE user=%s FOR UPDATE', (clinician,))
+    if prior.status==decision and prior.reviewed_at:
+        return {'status':decision,'idempotent':True}
     frappe.db.sql('UPDATE tt_application SET status=%s,reviewed_by=%s,reviewed_at=UTC_TIMESTAMP(6) WHERE user=%s',
                   (decision, reviewer, clinician))
     # This one role transition is part of the approver-guarded command. Public
@@ -382,6 +386,10 @@ def review(clinician, decision):
             user_doc.remove_roles('Tele Tena Clinician')
             user_doc.add_roles('Tele Tena Applicant')
     audit(clinician, 'Review', {'status': decision})
+    from tele_tena.communications import queue
+    public=one('SELECT public_id FROM tt_profile WHERE user=%s',(clinician,)).public_id
+    stamp=one('SELECT reviewed_at FROM tt_application WHERE user=%s',(clinician,)).reviewed_at
+    queue(clinician,'Application'+decision,'application',public,'application-review:'+public+':'+str(stamp))
     return {'status': decision}
 
 
@@ -423,6 +431,7 @@ def review_service_scope(clinician, service, decision, vetting_action=False):
     try:
         if frappe.db.exists('Tele Tena Service Scope', name):
             doc = frappe.get_doc('Tele Tena Service Scope', name)
+            if not vetting_action and doc.status==decision:return {'status':decision,'idempotent':True}
             doc.status = decision
             doc.save()
         else:
@@ -430,6 +439,11 @@ def review_service_scope(clinician, service, decision, vetting_action=False):
                                 service=service, status=decision)).insert()
     finally:
         frappe.local.tele_tena_vetting_decision = False
+    if not vetting_action:
+        from tele_tena.communications import queue
+        public=one('SELECT public_id FROM tt_profile WHERE user=%s',(clinician,)).public_id
+        queue(clinician,'ScopeApproved' if decision=='Approved' else 'ScopeSuspended','application',public,
+              'manual-scope:'+name+':'+str(doc.reviewed_at))
     return {'status': decision}
 
 
@@ -909,7 +923,7 @@ def book(offering, start, request_text, sharing, retry_key, expected_price, expe
               'financial': {'version': 'demo-earnings-v1', 'fee_bps': fee_bps,
                             'dispute_window_minutes': dispute_minutes,
                             'external_settlement': False}}
-    policy['notifications']={'version':'booking-notices-v2','confirmation_reminder_seconds':180,
+    policy['notifications']={'version':'booking-notices-v2','confirmation_reminder_seconds':180,'appointment_reminder_seconds':300,
                              'confirmation_deadline':iso(expires) if expires and not offline else None,
                              'confirmation_expiry_hours':hours,'confirmation_start':'receipt_verified' if offline else 'booking_created',
                              'expiry_effect':'full_reservation_release'}

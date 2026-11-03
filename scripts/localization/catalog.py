@@ -22,10 +22,15 @@ def extract():
         if '/localization/' in str(file):continue
         tree=ast.parse(file.read_text())
         parents={child:parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)}
-        if file.name in ('notifications.py','booking_notifications.py','public_content_defaults.py','email_delivery.py','sms.py'):
+        if file.name in ('notifications.py','booking_notifications.py','public_content_defaults.py','email_delivery.py','sms.py','communications.py','email_templates.py'):
             for node in ast.walk(tree):
                 if isinstance(node,ast.Constant) and isinstance(node.value,str) and re.search('[A-Za-z]',node.value) and (' ' in node.value or re.fullmatch('[A-Z][a-z]+',node.value)) and not re.match(r'(?i)^(https?://|SELECT |INSERT |UPDATE |DELETE |CREATE |ALTER |\s*SELECT |\s*INSERT |\s*UPDATE )',node.value) and len(node.value)<50000:
                     parent=parents.get(node);sql_fragment=False
+                    if file.name in ('communications.py','email_templates.py'):
+                        if isinstance(parent,ast.Expr):continue  # module/function documentation
+                        if file.name=='email_templates.py' and not (isinstance(parent,ast.Call) and ast.unparse(parent.func)=='translate'):
+                            continue  # HTML/CSS composition and wire syntax, not copy
+                    sql_fragment=False
                     if isinstance(parent,ast.JoinedStr):
                         full=''.join(v.value if isinstance(v,ast.Constant) and isinstance(v.value,str) else '{}' for v in parent.values)
                         sql_fragment=bool(re.match(r'(?is)^\s*(SELECT|INSERT|UPDATE|DELETE|ALTER|CREATE)\b',full))

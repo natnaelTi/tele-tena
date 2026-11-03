@@ -71,10 +71,18 @@ def decide(clinician,language,decision,reason,evidence_ids=None):
     for id in evidence_ids:
         if not rows("SELECT id FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose<>'Identification'",(id,clinician)):fail('Professional evidence is unavailable to this review.')
     claim=one('SELECT * FROM tt_care_language_claim WHERE clinician=%s AND language=%s AND active=1 FOR UPDATE',(clinician,language))
+    latest=rows("SELECT details FROM tt_care_language_event WHERE clinician=%s AND language=%s AND event='LanguageDecision' ORDER BY created DESC,id DESC LIMIT 1",(clinician,language))
+    if claim.state==decision and claim.reviewer==user and claim.reason==reason and latest:
+        previous=json.loads(latest[0].details)
+        if previous.get('evidence')==evidence_ids and previous.get('self_assessment')==claim.proficiency:return claims(clinician)
     if decision=='Approved' and not claim.proficiency:fail('Request an explicit proficiency self-assessment before approval.','language_assessment_required')
     frappe.db.sql('UPDATE tt_care_language_claim SET state=%s,reviewer=%s,reason=%s,modified=UTC_TIMESTAMP(6) WHERE clinician=%s AND language=%s',(decision,user,reason,clinician,language))
     record(clinician,language,user,'LanguageDecision',{'decision':decision,'reason':reason,'evidence':evidence_ids,'self_assessment':claim.proficiency});audit(clinician,'CareLanguageDecision',{'language':language,'decision':decision,'reason':reason})
     if decision!='Approved':flag_existing(clinician,language)
+    from tele_tena.communications import queue
+    import hashlib
+    key=hashlib.sha256(json.dumps([clinician,language,user,decision,reason,evidence_ids,str(claim.modified)],sort_keys=True).encode()).hexdigest()
+    queue(clinician,'LanguageReviewUpdated','language',language,'language-decision:'+key)
     return claims(clinician)
 @command
 def preference(language=''):

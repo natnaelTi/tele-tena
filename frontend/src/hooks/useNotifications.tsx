@@ -2,10 +2,10 @@ import {createContext,useCallback,useContext,useEffect,useRef,useState} from 're
 import type {ReactNode} from 'react';
 import {api} from '../api';
 import {useSession} from './useSession';
-export type Notice={href?:string;id:string;source:'user'|'booking'|'offer';kind:string;title:string;category:string;appointment:string|null;created:string;read:boolean;appointment_state?:string;payment_mode?:string};
+export type Notice={description?:string;href?:string;id:string;source:'user'|'booking'|'offer';kind:string;title:string;category:string;appointment:string|null;created:string;read:boolean;appointment_state?:string;payment_mode?:string};
 type Feed={items:Notice[]|null;error:boolean;partial:boolean;refresh:()=>Promise<void>;mark:(item:Notice)=>Promise<void>};
 const Context=createContext<Feed|null>(null);
-export function NotificationsProvider({children}:{children:ReactNode}){const{session}=useSession();return <FeedForUser key={session?.user||'guest'} clinician={session?.profile?.kind==='clinician'} enabled={!!session}>{children}</FeedForUser>;}
+export function NotificationsProvider({children}:{children:ReactNode}){const{session}=useSession();return <FeedForUser key={session?.user||'guest'} clinician={session?.profile?.kind==='clinician'&&session.roles.includes('Tele Tena Clinician')} enabled={!!session}>{children}</FeedForUser>;}
 function FeedForUser({children,enabled,clinician}:{children:ReactNode;enabled:boolean;clinician:boolean}){
  const[items,setItems]=useState<Notice[]|null>(null),[error,setError]=useState(false),[partial,setPartial]=useState(false);
  const active=useRef(true),flight=useRef<Promise<void>|null>(null),abort=useRef<AbortController|null>(null),known=useRef(new Set<string>()),last=useRef<{general:Notice[];offers:Notice[]}>({general:[],offers:[]});

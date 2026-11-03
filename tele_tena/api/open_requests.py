@@ -214,6 +214,8 @@ def _deliver(request, candidates=None, wave=None):
             (request.id, item.clinician, wave, wave))
         added += 1
         route_event(request.id, item.clinician, wave, 'NotificationEnqueued')
+        from tele_tena.communications import queue
+        queue(item.clinician,'NewRequest','request',request.id,'new-request:'+request.id)
     if added:
         metric(request.id, 'NoticesEnqueued', delivered + added)
         if not request.first_notice_at:
@@ -839,6 +841,8 @@ def submit_offer(request_id, offering, start, price_minor=None):
         (offer_id, request_id, clinician, offering, start_at, offer.minutes, offer.consultation_format,
          price, source, valid_until, offer.timezone))
     route_event(request_id, clinician, int(req.current_wave or 1), 'OfferSubmitted')
+    from tele_tena.communications import queue
+    queue(req.patient,'OfferReceived','request',req.id,'offer-received:'+offer_id)
     # submit_offer holds the request row lock, so only the first accepted
     # offer submission records this milestone even under concurrent offers.
     if not req.first_offer_at:
@@ -865,6 +869,8 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
         return result
     if decision == 'decline':
         frappe.db.sql("UPDATE tt_request_offer SET state='Declined' WHERE id=%s", (offer_id,))
+        from tele_tena.communications import queue
+        queue(item.clinician,'OfferDeclined','offer',item.id,'offer-declined:'+item.id)
         return {'state': 'Declined'}
     if decision != 'accept' or req.state != 'Open' or req.expires_at <= now() or item.valid_until <= now():
         fail('This offer is no longer available. Choose another or browse clinicians.', 'request_offer_expired')
@@ -922,6 +928,7 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
         frappe.local.tele_tena_offer_disclosure = None
     appt = booking['id']
     frappe.db.sql("UPDATE tt_request_offer SET state='Accepted',appointment=%s WHERE id=%s", (appt, offer_id))
+    other_offers=rows("SELECT id,clinician FROM tt_request_offer WHERE request_id=%s AND id<>%s AND state='Active'",(request_id,offer_id))
     frappe.db.sql("UPDATE tt_request_offer SET state='Superseded' WHERE request_id=%s AND id<>%s AND state='Active'",
                   (request_id, offer_id))
     frappe.db.sql("UPDATE tt_open_request SET state='Matched',appointment=%s,matched_at=UTC_TIMESTAMP(6) WHERE id=%s",
@@ -929,6 +936,9 @@ def respond_offer(request_id, offer_id, decision, sharing=None, expected_disclos
     metric(request_id, 'PatientAccepted')
     metric(request_id, 'AppointmentCreated')
     route_event(request_id, item.clinician, int(req.current_wave or 1), 'OfferAccepted')
+    from tele_tena.communications import queue
+    queue(item.clinician,'OfferAccepted','offer',item.id,'offer-accepted:'+item.id,in_app=False)
+    for other in other_offers:queue(other.clinician,'OfferDeclined','offer',other.id,'offer-declined:'+other.id)
     return {'state':'Matched','appointment':appt,'payment':booking.get('payment'),'payment_mode':booking.get('payment_mode','Wallet'),'simulated':booking.get('simulated',True)}
 
 

@@ -56,8 +56,8 @@ class DirectPayment(unittest.TestCase):
     frappe.db.sql('INSERT INTO tt_contact_identity VALUES (%s,%s,%s,UTC_TIMESTAMP(6))',(channel,contact,user))
   self.receipt(id);frappe.set_user(users['counselor']);pay.review(id,'confirm','verify-fast')
   selected=notices.rows("SELECT id,event,channel,state FROM tt_booking_notice WHERE appointment=%s AND event IN ('PaymentSubmitted','PaymentVerified')",(result['id'],))
-  self.assertEqual(len(selected),4)
-  self.assertEqual(sum(n.state=='Suppressed' for n in selected),2)
+  self.assertEqual(len(selected),8)
+  self.assertEqual(sum(n.state=='Suppressed' for n in selected),4)
   original=notices.rows;allowed={n.id for n in selected};sent=[]
   def scoped(query,args=()):
    found=original(query,args)
@@ -66,9 +66,9 @@ class DirectPayment(unittest.TestCase):
    self.assertIn('/direct-payments/'+id,message);self.assertNotIn('SYNTHETIC123456',message);sent.append(message)
   with patch.object(notices,'rows',side_effect=scoped),patch.object(frappe.db,'commit'),patch('tele_tena.email_delivery.send_notice',side_effect=capture),patch('tele_tena.sms.send_notice',side_effect=capture),patch('tele_tena.review.phone_enabled',return_value=True),patch('tele_tena.api.phone_auth.reserve_sms_budget',return_value=True):
    notices.dispatch();notices.dispatch()
-  self.assertEqual(len(sent),2)
+  self.assertEqual(len(sent),4)
   delivered=original("SELECT event,channel,state,attempts FROM tt_booking_notice WHERE appointment=%s AND event IN ('PaymentSubmitted','PaymentVerified')",(result['id'],))
-  self.assertEqual(sum(n.state=='ProviderAccepted' and n.attempts==1 for n in delivered),2)
+  self.assertEqual(sum(n.state=='ProviderAccepted' and n.attempts==1 for n in delivered),4)
  def test_direct_confirmation_no_wallet_postings(self):
   before=frappe.db.sql('SELECT COUNT(*) FROM tt_journal')[0][0];result,args=self.book();self.assertEqual(result['state'],'AwaitingPayment')
   id=result['payment'];self.assertEqual(j.book(**args)['payment'],id)

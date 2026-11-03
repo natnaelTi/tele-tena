@@ -14,5 +14,7 @@ def code(contact,value):
 email_delivery.configuration=lambda:{'test_transport':True}
 email_delivery.send_code=code;sms.send_otp=code;sms._config=lambda:{'test_transport':True}
 email_delivery.send_notice=lambda *a,**k:None;sms.send_notice=lambda *a,**k:None
-frappe.app._site=SITE;frappe.app._sites_path=str(BENCH/'sites')
+test_sites=Path(os.environ.get('TELE_TENA_TEST_SITES_PATH',str(BENCH/'sites')))
+assert test_sites in (BENCH/'sites',Path('/home/frappe/teletena-communications-release/jobs/sites'))
+frappe.app._site=SITE;frappe.app._sites_path=str(test_sites)
 application=SharedDataMiddleware(frappe.app.application,{'/assets/tele_tena':str(ROOT/'tele_tena/public')})
