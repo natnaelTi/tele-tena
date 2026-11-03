@@ -90,6 +90,7 @@ def retry(id):
     if not found or found[0].state not in ('Unavailable','Rejected') or found[0].attempts>=3:
         localized_throw('This delivery cannot safely be retried.',frappe.PermissionError)
     frappe.db.sql("UPDATE tt_booking_notice SET state='Pending',modified=UTC_TIMESTAMP(6) WHERE id=%s",(id,))
+    wake_dispatch()
     return {'state':'Pending'}
 
 
