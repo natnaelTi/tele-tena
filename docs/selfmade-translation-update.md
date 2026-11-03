@@ -6,14 +6,18 @@ English fallbacks. It imports no workbook drafts and does not claim clinical,
 legal-policy, native-language or real-payment readiness. Final localization still
 requires genuine independent approvals, validated import and a new verified pin.
 
-Candidate `d400cb5d9e68d35a2b602f11497f76ce3441a58e`, branch `feat/offline-telebirr-mvp`, draft
+Candidate `02ed9209589732e9d4e3e3750c07c49592c2a327`, branch `feat/offline-telebirr-mvp`, draft
 [PR50](https://github.com/natnaelTi/tele-tena/pull/50) dependent on draft PR49.
-This includes current MVP work plus primary patient navigation, private previews,
-sectioned onboarding attachments and encounter-authorized current photos with an
-independent revocable patient preference. v1.49 adds one preference table/default; v1.50 recovers omitted selected scope requests and their selected private license snapshots, leaving original rows/decisions intact;
-no dependency, provider, payment-mode or historic disclosure change. Reviewed
-translation hash remains `ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356`,
-with zero human-approved workbook imports. See scope-intake-fix-2026-11-03.md and the retained attachment/photo report. The first preservation check uses the narrow v1.50 recovery gate; repeat migration remains strict.
+This includes the existing navigation/attachment/photo and scope-intake fixes plus
+transactional application, request/offer and appointment/payment communications,
+OTP-verified missing delivery contacts and branded multipart email. v1.51 adds
+nullable outbox context and OTP account binding; no package dependency, provider,
+payment-mode, credential or historic disclosure change. v1.50 still recovers only
+omitted selected scope requests. Reviewed translation hash remains
+`ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356`, with zero human-approved
+workbook imports. See [current evidence](communications-demo-readiness-2026-11-04.md).
+The first preservation gate allows only the narrow v1.50 recovery; v1.51 changes
+no original values and repeat migration remains strict.
 
 Nothing has been remotely deployed or merged. Do not run the separate historical
 Offline mode-cutover section: this update preserves the current payment mode.
@@ -33,7 +37,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=d400cb5d9e68d35a2b602f11497f76ce3441a58e
+RELEASE_SHA=02ed9209589732e9d4e3e3750c07c49592c2a327
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
@@ -134,7 +138,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=d400cb5d9e68d35a2b602f11497f76ce3441a58e
+RELEASE_SHA=02ed9209589732e9d4e3e3750c07c49592c2a327
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 UPDATE_BACKUP=/home/smcs/teletena-before-translations.RETAINED_PATH
 TOOLS="$UPDATE_BACKUP/tools"
@@ -292,6 +296,37 @@ The repository build uses locked `npm ci`, not Vite dev.755/644 applies only to
 this public output. Never recursively chmod sites/private, configuration, backups
 or the home directory. An inaccessible ancestor requires a narrow ownership/group
 fix, not a blanket chmod. Draft workbooks/approval artifacts must not be copied here.
+
+## 7b. Explicit Fictional Catalog Readiness (Optional, Owner-Requested Demo Only)
+
+Do this only after checkpoint7's preservation/reconciliation passes and while
+writers remain stopped. It is **not** the full seed or a scenario refresh. It
+requires the site's matching existing `tt-demo-mvp-v2` marker/account manifest and
+refuses unrelated clinicians or conflicting reviews. If absent/mismatched, stop
+this optional operation; never create a marker to bypass ownership guards.
+
+```bash
+"$BENCH_CLI" --site "$SITE" execute tele_tena.demo_readiness.setup \
+  --kwargs '{"dry_run":true}' > "$UPDATE_BACKUP/demo-readiness-preflight.json"
+# Inspect: exactly the ten existing adult MVP definitions; no change in preflight.
+"$BENCH_CLI" --site "$SITE" execute tele_tena.demo_readiness.setup \
+  --kwargs '{"dry_run":false}' > "$UPDATE_BACKUP/demo-readiness-result.json"
+"$BENCH_CLI" --site "$SITE" execute tele_tena.demo_readiness.setup \
+  --kwargs '{"dry_run":false}' > "$UPDATE_BACKUP/demo-readiness-repeat.json"
+cmp "$UPDATE_BACKUP/demo-readiness-result.json" "$UPDATE_BACKUP/demo-readiness-repeat.json"
+env/bin/python "$TOOLS/check_financial_owners.py" --bench /home/smcs/frappe-bench \
+  --site "$SITE" > "$UPDATE_BACKUP/financial.after-readiness.json"
+```
+
+Expected: ten ready services, fictional=true, external_verification=false,
+credentials_unchanged=true, real_money=false. Private fake evidence, individual
+scope/language decisions, missing offerings/schedules/payee readiness are added
+only for the three recognized operational fictional clinicians. Real applicants,
+existing reviewer decisions, balances, passwords and provider settings are not
+modified. Fixture notifications are suppressed. Do not compare this intentional
+additive demo change with the strict pre-migration snapshot; its own internal
+protected identity/configuration/finance hash guard remains mandatory. Retain all
+pre-update snapshots for rollback. No change to payment mode is required.
 
 ## 8. Target-Only Migration, Repeat and Preservation
 
@@ -479,3 +514,20 @@ credentials/files. Never overwrite shared configuration/Amazon/packages. Start t
 same scoped services, exit maintenance and check the saved old build and original
 accounts. A preservation/reconciliation mismatch remains a stop, not permission to
 edit balances/delete records. Keep diagnostics and the retained backup bundle.
+
+## Communication Smoke Test
+
+With consenting test recipients only: Account → Notifications → verify a missing
+email/mobile and check preferences. Submission creates an acknowledgement; reviewer
+general/scope/language decisions create independent updates. Request publication,
+offer submission/selection/decline and direct-payment submission/verification notify
+the relevant parties. Check the exact secure links and owner-only delivery status.
+Five-minute reminders apply to Booked appointments with the current start time and
+running workers/scheduler. The three-minute clinician acceptance reminder and
+snapshotted expiry policy remain separate. A pending payment is never confirmed care.
+
+Check automatically advancing job-execution metadata and outbox outcomes; RUNNING
+processes alone do not establish delivery. SMS needs a verified Ethiopian mobile,
+site capability and provider capacity; email needs a verified email and configured
+SMTP. Preserve explicit opt-outs. Provider Accepted is not handset/inbox receipt.
+Unknown outcomes are not automatically resent. Never bulk-send the demo population.

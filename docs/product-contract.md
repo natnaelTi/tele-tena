@@ -632,3 +632,25 @@ requires an audited reason and preserves all existing human-assessment gates;
 legacy services without vetting retain explicit audited manual grants. Incomplete
 legacy selections are shown honestly for follow-up. See
 [verification and walkthrough](scope-intake-fix-2026-11-03.md).
+
+
+## Communications and Fictional Readiness — 4 November 2026
+
+Application submission/resubmission acknowledges under review with an update within
+24hours; an honest once-only status update follows if still pending. General,
+individual scope/language/appeal decisions, eligible Requests and private offer
+outcomes use durable neutral system/email/SMS events. Booking/payment activity
+notifies both authorized parties; five-minute reminders use current UTC occurrence
+keys, distinct from the existing3minute acceptance reminder/expiry policy. Saved
+preferences, verified contacts, Ethiopian SMS support/caps and unknown-send safety
+remain enforced. Missing delivery contacts require account-bound OTP proof. Branded
+email retains plain text, private links and accurate provider-acceptance states.
+
+The explicit owner-authorized `demo_readiness.setup` operation readies the ten
+existing adult fictional services through normal catalog/scope/language APIs,
+without real credential verification, full reseed, password reset, balance changes
+or bulk messages. New/real applicants retain human review. This is not automatic
+clinical approval on installation. See
+[verification and limits](communications-demo-readiness-2026-11-04.md) and the existing
+screen matrix revision. No remote deployment, provider/mode/access change,
+translation approval or separate roadmap-site update is claimed.

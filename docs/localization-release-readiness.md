@@ -187,3 +187,12 @@ Review this separately through the existing CSV workflow, one locale at a time
 with the other blank and genuine attribution in translator_notes. Only change
 provisional to reviewed after human review; preview/import separately. Do not
 append new keys to the old-baseline workbook or fabricate source hashes.
+
+## 4 November Communications Delta
+
+Full exchange now contains8,535 source entries; `localization/communications-delta.csv`
+contains116 current source rows for the notification/contact/email revision. New
+copy uses the same runtime lookup pipeline and truthful English fallback. Five
+exchange/two extraction checks pass. Reviewed dictionary hash and independent
+locale approval states are unchanged; no workbook draft was activated. Native
+approval remains a final-localization gate, separate from the demo candidate.
