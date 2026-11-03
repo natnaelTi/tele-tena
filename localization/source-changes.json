@@ -1,7 +1,6 @@
 {
   "added": [
-    "copy.backend_validation_scope_intake.this_service_application_is_still_a_draft_ask_the_clinician_to_submit_",
-    "copy.useaction.this_service_application_is_still_a_draft_ask_the_clinician_to_submit_"
+    "copy.admin.no_submitted_scope_review_is_recorded_check_existing_grants_in_service"
   ],
   "stale": []
 }

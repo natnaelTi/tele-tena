@@ -1401,77 +1401,77 @@
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/journey-api.ts:75",
+    "source_location": "frontend/src/journey-api.ts:76",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Revoked",
-    "source_location": "frontend/src/journey-api.ts:75",
+    "source_location": "frontend/src/journey-api.ts:76",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Active",
-    "source_location": "frontend/src/journey-api.ts:97",
+    "source_location": "frontend/src/journey-api.ts:98",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "History",
-    "source_location": "frontend/src/journey-api.ts:97",
+    "source_location": "frontend/src/journey-api.ts:98",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Acknowledge",
-    "source_location": "frontend/src/journey-api.ts:111",
+    "source_location": "frontend/src/journey-api.ts:112",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Clear",
-    "source_location": "frontend/src/journey-api.ts:111",
+    "source_location": "frontend/src/journey-api.ts:112",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Upheld",
-    "source_location": "frontend/src/journey-api.ts:112",
+    "source_location": "frontend/src/journey-api.ts:113",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Reopen",
-    "source_location": "frontend/src/journey-api.ts:112",
+    "source_location": "frontend/src/journey-api.ts:113",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Verified",
-    "source_location": "frontend/src/journey-api.ts:127",
+    "source_location": "frontend/src/journey-api.ts:128",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Rejected",
-    "source_location": "frontend/src/journey-api.ts:127",
+    "source_location": "frontend/src/journey-api.ts:128",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Suspended",
-    "source_location": "frontend/src/journey-api.ts:127",
+    "source_location": "frontend/src/journey-api.ts:128",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Verified",
-    "source_location": "frontend/src/journey-api.ts:128",
+    "source_location": "frontend/src/journey-api.ts:129",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/journey-api.ts:128",
+    "source_location": "frontend/src/journey-api.ts:129",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Rejected",
-    "source_location": "frontend/src/journey-api.ts:128",
+    "source_location": "frontend/src/journey-api.ts:129",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Revoked",
-    "source_location": "frontend/src/journey-api.ts:128",
+    "source_location": "frontend/src/journey-api.ts:129",
     "reason": "Type-only identifier; not rendered copy"
   },
   {

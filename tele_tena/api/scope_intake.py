@@ -75,6 +75,8 @@ def submit_selected_scopes(user, services, recovery=False):
             if recovery:
                 continue  # Remains visible as a missing intake; no invented claims.
             fail('Complete your professional qualification and institution before requesting scope review.', 'scope_qualification_required')
+        if recovery and not professional.cv_available(user) and not rows('SELECT clinician FROM tt_resume_evidence WHERE clinician=%s',(user,)):
+            continue  # Reviewer sees the selection, but no complete intake is invented.
         values = {k:v for k,v in claims.items() if k in vetting.APPLICANT_FIELDS}
         values.update(population_adults=True, applicant_statement=application.statement or '')
         # Reuse validation/storage without changing the authenticated actor/roles.
@@ -113,3 +115,15 @@ def prepare_review(clinician, service, reason):
     journey.audit(reviewer,'ReviewerScopeReviewInitiated',{'clinician':clinician,'service':service,
         'application':results[0]['name'],'reason':reason})
     return {'application':results[0]['name'],'status':'Review required'}
+
+
+@journey.query()
+def reviewable_services():
+    actor('Tele Tena Approver')
+    # Draft definitions may receive applications, but never an approval until
+    # their independent medical-lead catalog review has passed.
+    from tele_tena.review import enabled
+    return rows('''SELECT name AS id,service_label AS label FROM `tabTele Tena Service`
+        WHERE (vetting_required=1 AND catalog_status IN ('Draft','Active'))
+        OR (active=1 AND (catalog_status='Active' OR (catalog_status='Legacy test' AND %s=1)))
+        ORDER BY service_label,name''', (int(enabled() or frappe.local.site=='erp.localhost'),))

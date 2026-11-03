@@ -72,6 +72,7 @@ export const journeyApi = {
   saveService: (service: string, label: string) => api('save_service', { service, label }, true),
   reviewApplication: (clinician: string, decision: 'Approved' | 'Rejected') =>
     api('review', { clinician, decision }, true),
+  reviewableScopeServices: () => api<{id:string;label:string}[]>("tele_tena.api.scope_intake.reviewable_services"),
   prepareScopeReview: (clinician:string,service:string,reason:string) => api<{application?:string;status:string}>('tele_tena.api.scope_intake.prepare_review',{clinician,service,reason},true),
   reviewServiceScope: (clinician: string, service: string, decision: 'Approved' | 'Revoked') =>
     api('review_service_scope', { clinician, service, decision }, true),
