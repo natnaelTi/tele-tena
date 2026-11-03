@@ -299,4 +299,7 @@ def save_onboarding(kind, step, answers, complete=0):
         (kind, int(step), json.dumps(clean), finish, user))
     if finish and kind=='clinician' and draft:
         persist(user,structured,submit=True)
+    if finish and kind=='clinician':
+        from tele_tena.api.scope_intake import submit_selected_scopes
+        submit_selected_scopes(user, requested_services)
     return {'saved': True, 'completed': finish}

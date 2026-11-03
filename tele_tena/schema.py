@@ -174,3 +174,6 @@ def install():
     reviewer_defaults()
     from tele_tena.patches.v1_49_patient_photo_sharing import execute as patient_photo_sharing
     patient_photo_sharing()
+
+    from tele_tena.patches.v1_50_onboarding_scope_intake import execute as scope_intake
+    scope_intake()

@@ -70,8 +70,55 @@ def verify_snapshot(saved,actual,allow_reviewer_default=False):
     return len(parents)
 
 
+def verify_scope_intake(saved, actual, frappe):
+    """v1.50: only missing selected applications, their license copies and audit.
+
+    Original rows (including every decision/credential/file) must be identical.
+    This gate is deliberately separate from the old reviewer-role backfill.
+    """
+    from collections import Counter
+    assert saved['site']==actual['site'] and saved['files']==actual['files'], 'Site/private/configuration changed'
+    assert saved['tables'].keys()==actual['tables'].keys(), 'Protected table set changed'
+    allowed={'tabTele Tena Vetting Scope Application','tabTele Tena Scope Evidence','tt_scope_evidence_content','tt_audit'}
+    additions={}
+    for name,before in saved['tables'].items():
+        after=actual['tables'][name]
+        assert before['columns']==after['columns'], 'Protected columns changed'
+        old,new=Counter(before['rows']),Counter(after['rows'])
+        assert not old-new, 'An original record changed or was removed: '+name
+        extra=new-old
+        assert not extra or name in allowed, 'Unexpected added records: '+name
+        additions[name]=extra
+    def added(name):
+        fields=saved['tables'][name]['columns']
+        return [dict(zip(fields,row)) for row in frappe.db.sql('SELECT '+','.join('`'+c+'`' for c in fields)+' FROM `'+name+'`')
+                if row_hash(row) in additions[name]]
+    apps=added('tabTele Tena Vetting Scope Application');ids={a['name'] for a in apps}
+    for app in apps:
+        selected=frappe.db.sql('SELECT requested_services FROM tt_application WHERE user=%s',(app['clinician'],))
+        assert selected and app['service'] in json.loads(selected[0][0] or '[]'), 'Unselected recovered service'
+        assert app['status']=='Submitted' and not app.get('decided_by'), 'Recovery created a decision'
+        assert frappe.db.sql('SELECT COUNT(*) FROM `tabTele Tena Vetting Scope Application` WHERE clinician=%s AND service=%s',(app['clinician'],app['service']))[0][0]==1, 'Recovery duplicated an existing application'
+    evidence=added('tabTele Tena Scope Evidence');eids={e['name'] for e in evidence}
+    for item in evidence:
+        assert item['scope_application'] in ids and item['evidence_type']=='License or registration', 'Unexpected copied evidence'
+        content=frappe.db.sql('SELECT content FROM tt_scope_evidence_content WHERE evidence=%s',(item['name'],))[0][0]
+        assert hashlib.sha256(bytes(content)).hexdigest()==item['content_sha256'], 'Copied evidence hash differs'
+    assert {r['evidence'] for r in added('tt_scope_evidence_content')}==eids, 'Unexpected private content copy'
+    audits=added('tt_audit')
+    assert len(audits)==2*len(apps)+len(evidence), 'Unexpected recovery audit count'
+    assert all(a['action'] in ('ScopeApplication','ScopeLicenseSnapshotLinked','ScopeIntakeRecovered') for a in audits), 'Unexpected audit action'
+    for audit in audits:
+        detail=json.loads(audit['evidence'])
+        if audit['action']=='ScopeApplication':
+            assert any(a['clinician']==audit['subject'] and a['service']==detail.get('service') for a in apps) and detail.get('status')=='Submitted', 'Unexpected recovered application audit'
+        else:
+            assert detail.get('application') in ids, 'Audit is unrelated to recovered intake'
+    return len(apps)
+
+
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('action',choices=('snapshot','verify'));p.add_argument('--bench',type=Path,required=True);p.add_argument('--site',required=True);p.add_argument('--snapshot',type=Path,required=True);p.add_argument('--expect-reviewer-default-v148',action='store_true',help='Verify only the previously owner-approved reviewer financial-role backfill; every other record/credential/file remains strict');a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('action',choices=('snapshot','verify'));p.add_argument('--bench',type=Path,required=True);p.add_argument('--site',required=True);p.add_argument('--snapshot',type=Path,required=True);p.add_argument('--expect-reviewer-default-v148',action='store_true',help='Verify only the previously owner-approved reviewer financial-role backfill; every other record/credential/file remains strict');p.add_argument('--expect-scope-intake-v150',action='store_true',help='Verify only new explicitly selected scope intakes and immutable license copies; every original row remains exact');a=p.parse_args();assert not (a.expect_reviewer_default_v148 and a.expect_scope_intake_v150),'Use the verified baseline-specific migration gate'
     bench=a.bench.resolve();site=(bench/'sites'/a.site).resolve();assert site.parent==bench/'sites' and site.is_dir()
     assert os.geteuid()!=0,'Use the normal Bench user';os.chdir(bench/'sites')
     import frappe
@@ -85,8 +132,9 @@ def main():
             assert not a.snapshot.is_symlink() and a.snapshot.stat().st_uid==os.getuid() and not a.snapshot.stat().st_mode&0o077,'Private owned checkpoint required'
             saved=json.loads(a.snapshot.read_text());assert saved['site']==a.site
             actual=capture(frappe,site,{n:v['columns'] for n,v in saved['tables'].items()})
-            expected=verify_snapshot(saved,actual,a.expect_reviewer_default_v148)
-            if expected:print('PASS: audited owner-approved v1.48 reviewer defaults:',expected,'all other protected values unchanged')
+            expected=verify_scope_intake(saved,actual,frappe) if a.expect_scope_intake_v150 else verify_snapshot(saved,actual,a.expect_reviewer_default_v148)
+            if a.expect_scope_intake_v150:print('PASS: missing explicit scope requests recovered:',expected,'all original protected records unchanged')
+            elif expected:print('PASS: audited owner-approved v1.48 reviewer defaults:',expected,'all other protected values unchanged')
         print('PASS:',a.action,'protected tables',len(saved['tables']),'rows',sum(len(t['rows']) for t in saved['tables'].values()),'private/config files',len(saved['files']))
     finally:frappe.db.rollback();frappe.destroy()
 

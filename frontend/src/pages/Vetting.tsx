@@ -1,3 +1,4 @@
+import {useLocation} from 'react-router-dom';
 import {ProfessionalEditor,ProfessionalReview} from '../components/ProfessionalReview';
 import {FileUpload} from "../components/FileUpload";
 import { useEffect, useRef, useState } from 'react';
@@ -246,7 +247,8 @@ export function VettingQueue() {
   const [findings,setFindings]=useState<Record<string,string>>({});
   const [restrictions,setRestrictions]=useState<Record<string,string>>({});
   const [decision,setDecision]=useState<Record<string,string>>({});
-  const [selectedReview,setSelectedReview]=useState<string|null>(null);
+  const reviewLocation=useLocation();
+  const [selectedReview,setSelectedReview]=useState<string|null>((reviewLocation.state as {scopeApplication?:string}|null)?.scopeApplication||null);
   const [reviewStep,setReviewStep]=useState(0);
   const reviewSteps=["Application & documents","Verify credentials","Assess this scope","Decision & next steps"];
   const reviewHeading=useRef<HTMLHeadingElement>(null);

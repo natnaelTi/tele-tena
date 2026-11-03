@@ -333,6 +333,9 @@ def applications():
                 item.requested_services = json.loads(item.requested_services or '[]')
             except ValueError:
                 item.requested_services = []
+            item.scope_applications = rows('''SELECT a.name,a.service,a.status,s.service_label
+                FROM `tabTele Tena Vetting Scope Application` a JOIN `tabTele Tena Service` s ON s.name=a.service
+                WHERE a.clinician=%s ORDER BY a.creation,a.name''', (item.user,))
             item.requested_service_labels = []
             for service in item.requested_services:
                 label = rows('SELECT service_label FROM `tabTele Tena Service` WHERE name=%s', (service,))

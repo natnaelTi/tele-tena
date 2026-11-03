@@ -296,7 +296,8 @@ def my_scope_applications():
             JOIN tt_profile p ON p.user=a.clinician JOIN `tabTele Tena Service` s ON s.name=a.service
             ORDER BY FIELD(a.status,'Submitted','Resubmitted','Clarification','Draft'),a.submitted_at''')
         for item in result:
-            item.resume_uploaded = bool(rows('SELECT 1 FROM tt_resume_evidence WHERE clinician=%s', (item.clinician,)))
+            from tele_tena.api.professional import cv_available
+            item.resume_uploaded = bool(rows('SELECT 1 FROM tt_resume_evidence WHERE clinician=%s', (item.clinician,))) or cv_available(item.clinician)
             item.rubric_definition = _load_rubric(item.rubric_version or current_rubric_version())
             item.scope_evidence = _scope_evidence_rows(item.name)
             item.appeals = _appeal_history(item.name)
@@ -556,7 +557,12 @@ def vetting_services():
 
 @journey.command
 def save_scope_application(service, values, submit=False, reverification_of=None):
-    user = _applicant()
+    return _save_scope_application(_applicant(), service, values, submit, reverification_of)
+
+
+def _save_scope_application(user, service, values, submit=False, reverification_of=None):
+    # Internal intake also supports audited recovery/reviewer initiation. Public
+    # callers always pass through _applicant; no caller-supplied identity is trusted.
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     definition = one('''SELECT name,active,catalog_status,vetting_required FROM `tabTele Tena Service`
         WHERE name=%s''', (service,))

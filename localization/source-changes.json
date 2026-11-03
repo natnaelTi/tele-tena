@@ -1,4 +1,7 @@
 {
-  "added": [],
+  "added": [
+    "copy.backend_validation_scope_intake.this_service_application_is_still_a_draft_ask_the_clinician_to_submit_",
+    "copy.useaction.this_service_application_is_still_a_draft_ask_the_clinician_to_submit_"
+  ],
   "stale": []
 }
