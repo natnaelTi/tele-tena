@@ -16906,5 +16906,27 @@
       "Policy approval"
     ],
     "data_preservation": "Native v1.49 default-only table; restored populated strict/repeat preservation; no balances/credentials/disclosures reset"
+  },
+  "scope_intake_correction_2026_11_03": {
+    "runtime_commit": "d400cb5d9e68d35a2b602f11497f76ce3441a58e",
+    "requirements": [
+      "Separate submitted scope applications from onboarding selections",
+      "Reviewer application status and exact scope handoff",
+      "Audited manual initiation retaining assessment requirements",
+      "Recover missing selected requests without changing original decisions"
+    ],
+    "routes": [
+      "/onboarding?intent=clinician",
+      "/admin/applications/:applicationId",
+      "/admin/scopes",
+      "/admin/vetting",
+      "/clinician/vetting"
+    ],
+    "functional_evidence": "scope-intake-fix-2026-11-03.md",
+    "visual_status": "Codex inspected at390/768/1440 and actual200%; owner acceptance pending",
+    "reference": "Existing grouped professional review and individual scope vetting compositions; no redesign",
+    "localization": "Source delta only; genuine locale approvals remain outstanding",
+    "screenshots": "screenshots/scope-intake/README.md",
+    "functional_status": "Verified: new clinician two-scope submission, independent reviewer clarification, general approval, reviewer-initiated third assessment; five real-database authorization/approval/rollback/preservation tests"
   }
 }

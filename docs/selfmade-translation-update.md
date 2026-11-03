@@ -6,14 +6,14 @@ English fallbacks. It imports no workbook drafts and does not claim clinical,
 legal-policy, native-language or real-payment readiness. Final localization still
 requires genuine independent approvals, validated import and a new verified pin.
 
-Candidate `553a6190b4c4a0431dc5126fc6d2d095e50f5faa`, branch `feat/offline-telebirr-mvp`, draft
+Candidate `d400cb5d9e68d35a2b602f11497f76ce3441a58e`, branch `feat/offline-telebirr-mvp`, draft
 [PR50](https://github.com/natnaelTi/tele-tena/pull/50) dependent on draft PR49.
 This includes current MVP work plus primary patient navigation, private previews,
 sectioned onboarding attachments and encounter-authorized current photos with an
-independent revocable patient preference. v1.49 adds one preference table/default;
+independent revocable patient preference. v1.49 adds one preference table/default; v1.50 recovers omitted selected scope requests and their selected private license snapshots, leaving original rows/decisions intact;
 no dependency, provider, payment-mode or historic disclosure change. Reviewed
 translation hash remains `ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356`,
-with zero human-approved workbook imports. See attachment-photo-release-readiness.md.
+with zero human-approved workbook imports. See scope-intake-fix-2026-11-03.md and the retained attachment/photo report. The first preservation check uses the narrow v1.50 recovery gate; repeat migration remains strict.
 
 Nothing has been remotely deployed or merged. Do not run the separate historical
 Offline mode-cutover section: this update preserves the current payment mode.
@@ -33,7 +33,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=553a6190b4c4a0431dc5126fc6d2d095e50f5faa
+RELEASE_SHA=d400cb5d9e68d35a2b602f11497f76ce3441a58e
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
@@ -78,7 +78,7 @@ git -C apps/tele_tena diff --stat "$OLD_SHA" "$RELEASE_SHA"
 git -C apps/tele_tena diff "$OLD_SHA" "$RELEASE_SHA" -- pyproject.toml frontend/package.json frontend/package-lock.json tele_tena/patches.txt
 git -C apps/tele_tena merge-base --is-ancestor "$OLD_SHA" "$RELEASE_SHA"
 git -C apps/tele_tena merge-base --is-ancestor \
-  45e1600a35a9450bb26b50397749c01491b2d4a7 "$OLD_SHA"
+  553a6190b4c4a0431dc5126fc6d2d095e50f5faa "$OLD_SHA"
 env/bin/python - "$RELEASE_SHA" "$RELEASE_PURPOSE" <<'PY'
 import json,subprocess,sys
 sha,purpose=sys.argv[1:];assert purpose in ('demo','localized')
@@ -93,12 +93,12 @@ print('Purpose:',purpose,'; no draft dictionary import or provider/payment activ
 PY
 ```
 
-The second ancestry guard defines the verified v1.48-or-later update baseline. If the
-installed release predates45e1600 or is on unrelated ancestry, stop: collect the
+The second ancestry guard defines the verified v1.49-or-later update baseline. If the
+installed release predates553a619 or is on unrelated ancestry, stop: collect the
 installed SHA and `git diff "$OLD_SHA" "$RELEASE_SHA" -- tele_tena/patches.txt
 pyproject.toml frontend/package-lock.json` for a baseline-specific functional/schema
 upgrade plan. The candidate includes older features, but unknown older migrations
-must not be silently treated as this verified v1.49 incremental delta.
+must not be silently treated as this verified v1.50 incremental delta.
 
 ## 3. Initialize Once, or Resume the Retained Bundle
 
@@ -134,7 +134,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=553a6190b4c4a0431dc5126fc6d2d095e50f5faa
+RELEASE_SHA=d400cb5d9e68d35a2b602f11497f76ce3441a58e
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 UPDATE_BACKUP=/home/smcs/teletena-before-translations.RETAINED_PATH
 TOOLS="$UPDATE_BACKUP/tools"
@@ -298,17 +298,19 @@ fix, not a blanket chmod. Draft workbooks/approval artifacts must not be copied 
 ```bash
 "$BENCH_CLI" --site "$SITE" migrate > "$UPDATE_BACKUP/migrate.first.log" 2>&1
 env/bin/python "$TOOLS/release_preservation.py" verify --bench /home/smcs/frappe-bench \
-  --site "$SITE" --snapshot "$UPDATE_BACKUP/preserved-state.json"
+  --site "$SITE" --snapshot "$UPDATE_BACKUP/preserved-state.json" --expect-scope-intake-v150
+env/bin/python "$TOOLS/release_preservation.py" snapshot --bench /home/smcs/frappe-bench \
+  --site "$SITE" --snapshot "$UPDATE_BACKUP/preserved-state.after-first.json"
 "$BENCH_CLI" --site "$SITE" migrate > "$UPDATE_BACKUP/migrate.repeat.log" 2>&1
 env/bin/python "$TOOLS/release_preservation.py" verify --bench /home/smcs/frappe-bench \
-  --site "$SITE" --snapshot "$UPDATE_BACKUP/preserved-state.json"
+  --site "$SITE" --snapshot "$UPDATE_BACKUP/preserved-state.after-first.json"
 env/bin/python "$TOOLS/check_financial_owners.py" --bench /home/smcs/frappe-bench \
   --site "$SITE" > "$UPDATE_BACKUP/financial.after.json"
 "$BENCH_CLI" --site "$SITE" clear-cache
 "$BENCH_CLI" --site "$SITE" clear-website-cache
 ```
 
-This incremental release adds v1.49: tt_patient_photo_preference, defaulting only
+The retained v1.49 migration adds tt_patient_photo_preference, defaulting only
 missing patient preferences to enabled using INSERT IGNORE. Existing explicit
 opt-outs remain unchanged; no historical consent is invented and no disclosure
 snapshot is rewritten. No requirement/provider change or new payment mode occurs. All protected native TeleTena/command records, users/auth, files,
@@ -319,7 +321,14 @@ it verifies only missing Financial Configuration grants to existing reviewers,
 matching audited events and associated modification/index metadata; all credentials,
 settings, other roles/records/files remain strict. It is not a general ignore flag.
 Use it only in that separately reviewed older-baseline plan, never to hide an
-unexplained mismatch in this v1.49 procedure.
+unexplained mismatch in this v1.50 procedure.
+
+v1.50 adds only missing explicitly selected scope review rows, selected safe license
+copies and recovery audits. `--expect-scope-intake-v150` validates those additions
+against the preserved general requests and permits no original-row changes. The
+second migration is compared strictly against the after-first snapshot, so duplicate
+intakes, evidence or audit events fail verification. Retain both snapshots; when
+resuming, never overwrite either with a later baseline.
 
 ## 9. Shared-State Checks and Scoped Recovery
 

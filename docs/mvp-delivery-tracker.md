@@ -1034,3 +1034,16 @@ Draft import or approval bypass was added. See the existing matrix revision and
 [selfmade-translation-update.md](selfmade-translation-update.md). No remote
 deployment, merge, reseed, password/provider/access/mode change or public-roadmap
 website update is claimed.
+
+
+## Onboarding Scope Intake Correction — 3 November 2026
+
+Final clinician onboarding submits each explicitly selected structured service for
+independent review in the same transaction as the professional application. The
+exact professional version and selected safe license PDFs are linked; general
+approval never grants scopes. v1.50 idempotently recovers missing selected intakes
+without rewriting original evidence/decisions. Reviewer-initiated service review
+requires an audited reason and preserves all existing human-assessment gates;
+legacy services without vetting retain explicit audited manual grants. Incomplete
+legacy selections are shown honestly for follow-up. See
+[verification and walkthrough](scope-intake-fix-2026-11-03.md).
