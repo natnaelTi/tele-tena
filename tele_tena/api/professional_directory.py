@@ -30,7 +30,10 @@ def search(kind,search='',country='',offset=0,limit=20,prefer_country='',profess
 @command
 def add_facility(label,country,region,entity_type,identifier='',website=''):
     from tele_tena.api.professional import owner
-    user=owner();label=text(label,160);country=text(country,2);region=text(region,140);entity_type=text(entity_type,80);identifier=text(identifier,120,False);website=text(website,300,False)
+    return _add_facility(owner(),label,country,region,entity_type,identifier,website)
+
+def _add_facility(user,label,country,region,entity_type,identifier='',website=''):
+    label=text(label,160);country=text(country,2);region=text(region,140);entity_type=text(entity_type,80);identifier=text(identifier,120,False);website=text(website,300,False)
     if len(country)!=2 or not country.isalpha():fail('Choose a country.','country_invalid')
     if website and not website.startswith('https://'):fail('Use an HTTPS website.','website_invalid')
     frappe.db.sql('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')

@@ -22,6 +22,14 @@ class ApplicationFlow(ScopeInformation):
   frappe.set_user(users['patient'])
   with self.assertRaises(frappe.ValidationError):flow.respond(app.name,req.id,files={'license_document':[self.license]})
   self.assertEqual(j.one('SELECT state FROM tt_scope_information_request WHERE id=%s',(req.id,)).state,'Open');self.assertFalse(j.rows('SELECT id FROM tt_scope_information_response WHERE request_id=%s',(req.id,)))
+ def test_legacy_free_text_request_uses_a_targeted_response_and_explicit_document_type(self):
+  app=self.without_license();frappe.set_user(users['reviewer']);vetting.review_scope_application(app.name,'Clarification',findings='Supply license evidence.')
+  frappe.db.sql('DELETE FROM tt_scope_information_request WHERE application=%s',(app.name,));frappe.set_user(self.user)
+  result=flow.respond(app.name,None,fields={'applicant_response':'Here is the requested license.'},files={'license_document':[self.license]});self.assertTrue(result['submitted']);self.assertEqual(j.one('SELECT origin FROM tt_scope_information_request WHERE application=%s',(app.name,)).origin,'LegacyResponseCategorization')
+ def test_existing_misclassified_document_is_linked_without_rewriting_its_original(self):
+  app,req=self.request();frappe.set_user(self.user);uploaded=vetting.upload_scope_evidence(app.name,'Qualification','existing-document.pdf',base64.b64encode(professional.download(self.license).data).decode())
+  flow.respond(app.name,req.id,files={'license_document':['scope:'+uploaded['id']]})
+  self.assertEqual(frappe.db.get_value('Tele Tena Scope Evidence',uploaded['id'],'evidence_type'),'Qualification');self.assertEqual(len(j.rows("SELECT name FROM `tabTele Tena Scope Evidence` WHERE scope_application=%s AND evidence_type='License or registration'",(app.name,))),1)
  def test_email_assistance_requires_explicit_authorization_and_separate_approvals(self):
   frappe.set_user(self.user)
   with self.assertRaises(frappe.ValidationError):flow.request_assistance(self.services[:2],False)

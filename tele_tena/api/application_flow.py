@@ -111,12 +111,20 @@ def respond(application,request_id,fields=None,files=None):
  for k in file_keys:
   ids=files.get(k,[])
   if not isinstance(ids,list) or not 1<=len(ids)<=12 or len(set(ids))!=len(ids):fail('Attach the requested PDF document.','information_required')
+  normalized=[]
   for id in ids:
+   if not isinstance(id,str):fail('Choose an available private document.','scope_evidence_invalid')
+   if id.startswith('scope:'):
+    source=rows('''SELECT e.filename,c.content FROM `tabTele Tena Scope Evidence` e JOIN tt_scope_evidence_content c ON c.evidence=e.name WHERE e.name=%s AND e.scope_application=%s AND e.clinician=%s''',(id[6:],application,user))
+    if not source:fail('This document is unavailable for your response.','scope_evidence_invalid')
+    copied=professional._upload(user,ITEMS[k]['purpose'],source[0].filename,base64.b64encode(bytes(source[0].content)).decode())
+    audit(application,'ExistingDocumentCategorized',{'source':id[6:],'purpose':ITEMS[k]['purpose'],'new_source':copied['id']});id=copied['id']
+   normalized.append(id)
    e=rows('SELECT id,mime FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose=%s',(id,user,ITEMS[k]['purpose']))
    if not e or e[0].mime!='application/pdf':fail('Choose your own private PDF for the requested document.','scope_evidence_invalid')
    if ITEMS[k].get('evidence_type'):links.append(copy_scope_document(app,id,ITEMS[k]['evidence_type']))
   if profile is not None and k in ('license_document','cv'):
-   field='license_files' if k=='license_document' else 'cv_files';profile[field]=list(dict.fromkeys(profile.get(field,[])+ids))
+   field='license_files' if k=='license_document' else 'cv_files';profile[field]=list(dict.fromkeys(profile.get(field,[])+normalized))
  if profile is not None:professional.persist(user,profile,draft[0].revision,submit=False)
  vetting._save_scope_application(user,app.service,values,submit=True)
  id=str(uuid.uuid4());payload['linked_scope_evidence']=links
@@ -156,7 +164,7 @@ def assistance_detail(case):
  c=case_for(case)
  from tele_tena.api import professional,policies
  data=professional.application(c.clinician)
- return {'case':c,'professional':data,'policies':policies.current(),'services':json.loads(c.services)}
+ return {'case':c,'professional':data,'policies':policies.current(),'services':json.loads(c.services),'service_labels':rows('SELECT name,service_label FROM `tabTele Tena Service` WHERE name IN %s',(tuple(json.loads(c.services)),))}
 
 @command
 def assisted_upload(case,purpose,filename,content_base64):
@@ -195,6 +203,7 @@ def assisted_submit(case,authorization_file,source_reference,received_on,terms_v
  if not isinstance(attestations,dict) or set(attestations)!={'authorization','accuracy','adult','terms','privacy','registration_consent','care_languages'} or not all(type(v) is bool and v for v in attestations.values()):fail('Record each explicit statement supplied by the clinician.','assistance_attestation_required')
  evidence=rows("SELECT id,mime FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose='Authorization'",(authorization_file,c.clinician))
  if not evidence or evidence[0].mime!='application/pdf':fail('Attach the private PDF of the clinician’s email authorization and declarations.','assistance_authorization_required')
+ if not rows("SELECT id FROM tt_audit WHERE subject=%s AND action='AssistedEvidenceUploaded' AND JSON_UNQUOTE(JSON_EXTRACT(evidence,'$.case'))=%s AND JSON_UNQUOTE(JSON_EXTRACT(evidence,'$.evidence'))=%s",(c.clinician,case,authorization_file)):fail('Upload the authorization for this specific assistance case.','assistance_authorization_required')
  from tele_tena.api import professional,policies,scope_intake
  current=policies.current()
  if terms_version!=current['terms_version'] or privacy_version!=current['privacy_version']:fail('The supplied policy versions changed. Obtain current acknowledgements.','policy_changed')
@@ -245,3 +254,17 @@ def assisted_save_languages(case,values,draft=True):
  if c.state!='Open':fail('This assistance case is already submitted.','assistance_closed')
  from tele_tena.api.care_languages import _save_claims
  result=_save_claims(c.clinician,values,draft);audit(c.clinician,'AssistedLanguagesRecorded',{'case':case});return result
+
+@command
+def assisted_add_facility(case,label,country,region,entity_type,identifier='',website=''):
+ c=case_for(case)
+ if c.state!='Open':fail('This assistance case is already submitted.','assistance_closed')
+ from tele_tena.api.professional_directory import _add_facility
+ result=_add_facility(c.clinician,label,country,region,entity_type,identifier,website)
+ audit(c.clinician,'AssistedFacilityClaim',{'case':case,'facility':result['id'],'verified':False});return result
+
+@query()
+def assisted_resolve(case,ids):
+ c=case_for(case)
+ if not isinstance(ids,list) or len(ids)>100:fail('Select a bounded number of directory entries.','reference_invalid')
+ return rows("SELECT id,label,country,status,merged_into FROM tt_reference WHERE id IN %s AND (status IN ('Listed','Reviewed','Merged') OR submitted_by=%s)",(tuple(ids) or ('',),c.clinician))
