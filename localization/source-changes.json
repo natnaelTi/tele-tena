@@ -1,15 +1,13 @@
 {
   "added": [
-    "copy.notification_or_default_public_copy_communications.professional_application_not_approved",
-    "copy.notification_or_default_public_copy_communications.service_scope_approval_expired",
-    "copy.notification_or_default_public_copy_communications.service_scope_not_approved",
-    "copy.notification_or_default_public_copy_communications.service_scope_suspended",
-    "copy.notification_or_default_public_copy_notifications.five_minute_appointment_reminder"
+    "copy.clinician.a_reviewer_needs_additional_information_before_deciding_on_these_servi",
+    "copy.clinician.more_information_requested",
+    "copy.clinician.provide_requested_information",
+    "copy.clinician.service_application_updates_could_not_be_loaded",
+    "copy.vetting.approval_requires_completed_evidence_credential_verification_and_asses",
+    "copy.vetting.more_information_requested",
+    "copy.vetting.this_application_is_no_longer_awaiting_information_or_is_unavailable_c",
+    "copy.vetting.update_this_service_application_and_resubmit_it_for_review_your_other_"
   ],
-  "stale": [
-    "copy.notification_or_default_public_copy_communications.professional_application_update",
-    "copy.notification_or_default_public_copy_communications.service_scope_decision",
-    "copy.notification_or_default_public_copy_communications.service_scope_update",
-    "copy.notification_or_default_public_copy_notifications.your_appointment_starts_in_five_minutes"
-  ]
+  "stale": []
 }

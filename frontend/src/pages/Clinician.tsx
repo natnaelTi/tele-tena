@@ -48,7 +48,10 @@ export function ClinicianToday() {
   useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),60000);return()=>clearInterval(timer);},[]);
   const appointments=useResource(useCallback(()=>approved?journeyApi.appointments():Promise.resolve([]),[approved]));
   const current=useResource(practice);
-  const scopeApplications=useResource(useCallback(()=>!approved?journeyApi.myScopeApplications():Promise.resolve([]),[approved]));
+  const scopeApplications=useResource(journeyApi.myScopeApplications);
+  useEffect(()=>{const update=()=>{if(document.visibilityState==='visible')void scopeApplications.refresh();};const timer=setInterval(update,15000);window.addEventListener('focus',update);return()=>{clearInterval(timer);window.removeEventListener('focus',update);};},[scopeApplications.refresh]);
+  const informationRequests=scopeApplications.data?.filter((item:any)=>item.status==='Clarification'&&(!item.clinician||item.clinician===session?.user))||[];
+  const followUp=scopeApplications.error?<InlineNotice tone="danger">{w('Service-application updates could not be loaded.')} <Button variant="quiet" onClick={()=>void scopeApplications.refresh()}>{w('Retry')}</Button></InlineNotice>:informationRequests.length>0?<section className="practice-panel scope-information-follow-up" aria-labelledby="scope-information-title"><h2 id="scope-information-title"><ShieldCheck size={22} aria-hidden="true"/>{w('More Information Requested')}</h2><p>{w('A reviewer needs additional information before deciding on these services.')}</p>{informationRequests.map((item:any)=><article key={item.name}><div><h3>{item.service_label}</h3><p>{item.clarification_request||item.decision_reason}</p></div><Link className="button secondary" to={'/clinician/vetting?application='+encodeURIComponent(item.name)}>{w('Provide Requested Information')}</Link></article>)}</section>:null;
   const earnings=useResource(useCallback(()=>approved?api<EarningsView>("tele_tena.accounting.clinician_earnings"):Promise.resolve(null),[approved]));
   const inbox=useResource(useCallback(()=>approved?journeyApi.clinicianRequests():Promise.resolve(null),[approved]));
   const groups=appointmentGroups(appointments.data||[],true,now).filter(([label])=>label!=="Past");
@@ -56,6 +59,7 @@ export function ClinicianToday() {
   const today=appointments.data?.filter(item=>new Date(item.start).toLocaleDateString(undefined,{timeZone:timezone})===day);
   if (!approved) return <>
     <PageTitle title={w("Application Progress")} description={w("Track each part of your application.")}/>
+    {followUp}
     <div className="clinician-today-layout application-progress-layout"><section className="practice-panel"><h2>{w("Review Progress")}</h2>
       {current.error?<InlineNotice tone="danger">{w("Practice details unavailable.")} <Button variant="secondary" onClick={()=>void current.refresh()}>{w("Retry")}</Button></InlineNotice>:!current.data?<Skeleton/>:<>
         <ol className="application-progress-timeline"><li><strong>{w(current.data.application?"Application received":"Complete your application")}</strong><p>{w(current.data.application?"Your application is saved for manual review.":"Complete your professional profile and upload evidence for review. Approval is manual.")}</p></li><li><strong>{w("Current status")}</strong><StatusBadge tone={current.data.application?.status === "Rejected" ? "danger" : "warning"}>{w(current.data.application?.status || "Not submitted")}</StatusBadge><p>{w("Approval and each service scope are reviewed by an administrator. Resume files are private application evidence; upload does not verify credentials.")}</p></li></ol>
@@ -68,6 +72,7 @@ export function ClinicianToday() {
   </>;
   return <>
     <PageTitle title={w("Your Day at a Glance")} description={`${new Date(now).toLocaleDateString(undefined,{dateStyle:"full"})} · ${timezone}`} action={<Link className="button secondary" to="/clinician/availability">{w("Manage availability")}</Link>}/>
+    {followUp}
     <RequestAvailabilityCard/>
     <div className="practice-metrics">
       <section><span>{w("Today’s sessions")}</span><strong>{appointments.error?w("Unavailable"):today?.length??"—"}</strong><p>{w("Appointments on your calendar")}</p></section>

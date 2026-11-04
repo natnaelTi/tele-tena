@@ -435,8 +435,9 @@ def review_service_scope(clinician, service, decision, vetting_action=False):
             doc.status = decision
             doc.save()
         else:
-            frappe.get_doc(dict(doctype='Tele Tena Service Scope', clinician=clinician,
-                                service=service, status=decision)).insert()
+            doc = frappe.get_doc(dict(doctype='Tele Tena Service Scope', clinician=clinician,
+                                      service=service, status=decision))
+            doc.insert()
     finally:
         frappe.local.tele_tena_vetting_decision = False
     if not vetting_action:

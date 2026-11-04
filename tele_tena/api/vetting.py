@@ -688,6 +688,15 @@ def review_scope_application(application, decision, identity_reviewed=False,
         fail('Record a decision reason of up to 2000 characters.', 'vetting_findings_required')
     findings = text(findings, 2000)
     restrictions = text(restrictions or '', 1000, required=False)
+    # Non-approval outcomes record the reason and current evidence inventory,
+    # not a credential verification or a completed scored assessment. Reviewers
+    # must be able to request missing evidence even with unfinished UI entries.
+    if decision != 'Approved':
+        identity_reviewed = credential_verified = qualification_relevant = False
+        experience_adequate = approach_evidence_reviewed = False
+        adult_scope_appropriate = interview_completed = False
+        credential_source = credential_checked_on = credential_evidence = credential_source_reference = ''
+        scored_criteria = None
     flags = {key: int(journey.boolean(value)) for key, value in {
         'identity_reviewed': identity_reviewed, 'credential_verified': credential_verified,
         'qualification_relevant': qualification_relevant, 'experience_adequate': experience_adequate,
@@ -728,8 +737,8 @@ def review_scope_application(application, decision, identity_reviewed=False,
         fail('Mark the credential verified before recording its source details.',
              'credential_verification_flag_required')
     rubric_version = doc.rubric_version or RUBRIC_VERSION
-    scoring_snapshot = _scored_criteria_snapshot(
-        scored_criteria, doc.name, rubric_version, require_all=(decision == 'Approved'))
+    scoring_snapshot = (_scored_criteria_snapshot(scored_criteria, doc.name, rubric_version, require_all=True)
+                        if decision == 'Approved' else '')
     if decision == 'Approved':
         required = ('identity_reviewed', 'credential_verified', 'qualification_relevant',
                     'adult_scope_appropriate', 'interview_completed')

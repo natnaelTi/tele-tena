@@ -82,3 +82,5 @@
 .application-scope-decisions h3{font-size:16px;margin:0 0 8px}.application-scope-decisions p{font-size:14px;line-height:1.6;color:var(--muted);margin:0;overflow-wrap:anywhere}
 .application-progress-layout aside>.button{margin-top:24px}
 @media(max-width:600px){.application-scope-decisions>section{grid-template-columns:44px minmax(0,1fr)}.application-scope-decisions .badge{grid-column:2;justify-self:start}}
+
+.scope-information-follow-up{border-inline-start:4px solid var(--brand-primary);margin-block:20px}.scope-information-follow-up h2{display:flex;align-items:center;gap:10px}.scope-information-follow-up article{display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid var(--border-default);padding-block:16px}.scope-information-follow-up article>div{min-width:0;overflow-wrap:anywhere}.scope-information-follow-up article .button{flex-shrink:0}@media(max-width:768px){.scope-information-follow-up article{align-items:stretch;flex-direction:column}.scope-information-follow-up article .button{align-self:flex-start}}
