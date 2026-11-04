@@ -1,10 +1,6 @@
 {
-  "added": [
-    "copy.helptools.8_email_assisted_entry",
-    "copy.helptools.a_clinician_can_request_assistance_from_onboarding_or_service_applicat",
-    "copy.helptools.open_service_applications_select_one_application_and_choose_review_and"
-  ],
+  "added": [],
   "stale": [
-    "copy.helptools.approve_only_when_the_evidence_and_requirements_pass_request_informati"
+    "copy.layouts.scope_vetting"
   ]
 }

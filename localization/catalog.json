@@ -43901,7 +43901,7 @@
     "english": "Service Applications",
     "amharic": "",
     "afaan_oromo": "",
-    "source_location": "frontend/src/layouts/Layouts.tsx:163; frontend/src/layouts/Layouts.tsx:173; frontend/src/layouts/Layouts.tsx:53; frontend/src/layouts/Layouts.tsx:55",
+    "source_location": "frontend/src/layouts/Layouts.tsx:163; frontend/src/layouts/Layouts.tsx:173; frontend/src/layouts/Layouts.tsx:181; frontend/src/layouts/Layouts.tsx:53; frontend/src/layouts/Layouts.tsx:55",
     "placeholders": "[]",
     "source_hash": "de1718b3e4b720d94a7a83fb94e0548b87130334470be9ef2bbe482296c28b70",
     "review_status": "missing",
@@ -44001,18 +44001,6 @@
     "placeholders": "[]",
     "source_hash": "4d47ca74cc658c52e53d83b64e6bbcf889f026d872d4e865f5aa21507bcc9b51",
     "review_status": "provisional",
-    "translator_notes": ""
-  },
-  "copy.layouts.scope_vetting": {
-    "key": "copy.layouts.scope_vetting",
-    "context": "Layouts",
-    "english": "Scope vetting",
-    "amharic": "",
-    "afaan_oromo": "",
-    "source_location": "frontend/src/layouts/Layouts.tsx:181",
-    "placeholders": "[]",
-    "source_hash": "0b50449366774429dcb30585b25866471ae72d29cfde1990b0b573dd3dd4dffa",
-    "review_status": "missing",
     "translator_notes": ""
   },
   "copy.layouts.clinics": {

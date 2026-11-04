@@ -179,7 +179,7 @@ const adminNav = [
   ["/admin/applications", "Applications", ClipboardCheck],
   ["/admin/scopes", "Service Authorizations", Stethoscope],
   ["/admin/services", "Service catalog", Stethoscope],
-  ["/admin/vetting", "Scope vetting", ClipboardCheck],
+  ["/admin/vetting", "Service Applications", ClipboardCheck],
   ["/admin/clinics", "Clinics", Building2],
   ["/admin/financial-disputes", "Financial disputes", Wallet],
   ["/admin/matching", "Matching operations", Settings2],
