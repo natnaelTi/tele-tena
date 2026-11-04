@@ -40,7 +40,8 @@ class ScopeInformation(ScopeIntake):
   app=self.without_license();frappe.set_user(users['reviewer']);vetting.review_scope_application(app.name,'Clarification',findings='Upload your license and resubmit.')
   frappe.set_user(self.user);evidence=vetting.upload_scope_evidence(app.name,'License or registration','fictional-correction.pdf',base64.b64encode(professional.download(self.license).data).decode());self.assertTrue(evidence['id'])
   item=next(r for r in vetting.my_scope_applications() if r.name==app.name);values={k:item.get(k) for k in vetting.APPLICANT_FIELDS if k not in ('service','clinician') and item.get(k) is not None}
-  result=vetting.save_scope_application(app.service,values,submit=True);self.assertEqual(result['status'],'Resubmitted');self.assertFalse(j.service_scope_is_current(self.user,app.service))
+  values['applicant_response']='Uploaded the requested license.'
+  result=vetting.save_scope_application(app.service,values,submit=True);self.assertEqual(result['status'],'Resubmitted');self.assertEqual(frappe.db.get_value('Tele Tena Vetting Scope Application',app.name,'applicant_response'),'Uploaded the requested license.');self.assertFalse(j.service_scope_is_current(self.user,app.service))
 
 if __name__=='__main__':
  try:unittest.main(defaultTest='ScopeInformation')
