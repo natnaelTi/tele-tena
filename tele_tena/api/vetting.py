@@ -672,7 +672,7 @@ def review_scope_application(application, decision, identity_reviewed=False,
                              adult_scope_appropriate=False, interview_completed=False,
                              findings='', restrictions='', scored_criteria=None,
                              credential_source='', credential_checked_on='',
-                             credential_evidence='', credential_source_reference=''):
+                             credential_evidence='', credential_source_reference='', requested_items=None):
     reviewer = actor('Tele Tena Approver')
     if decision not in ('Clarification', 'Approved', 'Rejected', 'Suspended', 'Expired'):
         fail('Choose a supported review decision.')
@@ -781,10 +781,15 @@ def review_scope_application(application, decision, identity_reviewed=False,
         WHERE name=%s''', (decision, reviewer, findings,
         findings if decision == 'Clarification' else '', restrictions, reviewer,
         assessment.decided_at, assessment.decided_at, reviewer, doc.name))
+    from tele_tena.api import application_flow
+    if decision=='Clarification':
+        information_items=application_flow.requested_items(requested_items)
+        application_flow.record_request(doc.name,assessment.name,findings,information_items)
+    else:information_items=None
     from tele_tena.communications import queue
     submitted=frappe.db.get_value('Tele Tena Vetting Scope Application',doc.name,'submitted_at')
     key=hashlib.sha256(json.dumps([doc.name,str(submitted),reviewer,decision,findings,restrictions,flags,
-        scored_criteria,credential_source,credential_checked_on,credential_evidence,credential_source_reference],
+        scored_criteria,credential_source,credential_checked_on,credential_evidence,credential_source_reference,information_items],
         sort_keys=True,default=str).encode()).hexdigest()
     queue(doc.clinician,'Scope'+decision,'scope',doc.name,'scope-decision:'+key)
     if decision == 'Approved':

@@ -37,7 +37,9 @@ def claims(clinician=None):
 @command
 def save_claims(values,draft=False):
     from tele_tena.api.professional import owner
-    user=owner()
+    return _save_claims(owner(),values,draft)
+
+def _save_claims(user,values,draft=False):
     if isinstance(values,str):values=json.loads(values)
     if not isinstance(values,list) or len(values)>80:fail('Choose up to 80 care languages.')
     one('SELECT name FROM tabUser WHERE name=%s FOR UPDATE',(user,));seen=set()
@@ -48,13 +50,13 @@ def save_claims(values,draft=False):
         if old and old[0].proficiency==rating and (old[0].explanation or '')==explanation and old[0].active:continue
         frappe.db.sql("INSERT INTO tt_care_language_claim (clinician,language,proficiency,explanation,state,modified) VALUES (%s,%s,%s,%s,'Pending',UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE proficiency=VALUES(proficiency),explanation=VALUES(explanation),active=1,state='Pending',modified=UTC_TIMESTAMP(6)",(user,code,rating,explanation))
         if old and old[0].state=='Approved':flag_existing(user,code)
-        record(user,code,user,'ClaimSubmitted',{'proficiency':rating,'explanation':explanation})
+        record(user,code,actor(),'ClaimSubmitted',{'proficiency':rating,'explanation':explanation})
     removed=rows('SELECT language FROM tt_care_language_claim WHERE clinician=%s AND active=1',(user,))
     for r in removed:
         if r.language not in seen:
-            frappe.db.sql('UPDATE tt_care_language_claim SET active=0,modified=UTC_TIMESTAMP(6) WHERE clinician=%s AND language=%s',(user,r.language));record(user,r.language,user,'ClaimWithdrawn',{});flag_existing(user,r.language)
+            frappe.db.sql('UPDATE tt_care_language_claim SET active=0,modified=UTC_TIMESTAMP(6) WHERE clinician=%s AND language=%s',(user,r.language));record(user,r.language,actor(),'ClaimWithdrawn',{});flag_existing(user,r.language)
     frappe.db.sql("UPDATE tt_profile SET languages=%s WHERE user=%s AND kind='clinician'",(json.dumps(sorted(seen)),user))
-    return claims()
+    return claims(user)
 def record(clinician,language,user,event,details):frappe.db.sql('INSERT INTO tt_care_language_event VALUES (%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))',(str(uuid.uuid4()),clinician,language,user,event,json.dumps(details)))
 def flag_existing(clinician,language):
     for a in rows("SELECT id,policy_snapshot FROM tt_appointment WHERE clinician=%s AND state IN ('Booked','PendingConfirmation') AND start>UTC_TIMESTAMP(6)",(clinician,)):

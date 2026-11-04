@@ -1626,92 +1626,92 @@
   },
   {
     "english": "Pending",
-    "source_location": "frontend/src/pages/Admin.tsx:25",
+    "source_location": "frontend/src/pages/Admin.tsx:26",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Admin.tsx:79",
+    "source_location": "frontend/src/pages/Admin.tsx:80",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "button secondary",
-    "source_location": "frontend/src/pages/Admin.tsx:83",
+    "source_location": "frontend/src/pages/Admin.tsx:84",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "table-scroll review-queue-table",
-    "source_location": "frontend/src/pages/Admin.tsx:91",
+    "source_location": "frontend/src/pages/Admin.tsx:92",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Admin.tsx:140",
+    "source_location": "frontend/src/pages/Admin.tsx:141",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Revoked",
-    "source_location": "frontend/src/pages/Admin.tsx:197",
+    "source_location": "frontend/src/pages/Admin.tsx:198",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "audio\nvideo",
-    "source_location": "frontend/src/pages/Admin.tsx:229",
-    "reason": "Controlled schema-key example; must retain wire values"
-  },
-  {
-    "english": "direct-booking\nscheduled",
     "source_location": "frontend/src/pages/Admin.tsx:230",
     "reason": "Controlled schema-key example; must retain wire values"
   },
   {
+    "english": "direct-booking\nscheduled",
+    "source_location": "frontend/src/pages/Admin.tsx:231",
+    "reason": "Controlled schema-key example; must retain wire values"
+  },
+  {
     "english": "Draft",
-    "source_location": "frontend/src/pages/Admin.tsx:259",
+    "source_location": "frontend/src/pages/Admin.tsx:260",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Not reviewed",
-    "source_location": "frontend/src/pages/Admin.tsx:259",
+    "source_location": "frontend/src/pages/Admin.tsx:260",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "button quiet",
-    "source_location": "frontend/src/pages/Admin.tsx:301",
+    "source_location": "frontend/src/pages/Admin.tsx:302",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "In review",
-    "source_location": "frontend/src/pages/Admin.tsx:311",
+    "source_location": "frontend/src/pages/Admin.tsx:312",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "form-grid two-column",
-    "source_location": "frontend/src/pages/Admin.tsx:314",
+    "source_location": "frontend/src/pages/Admin.tsx:315",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "In review",
-    "source_location": "frontend/src/pages/Admin.tsx:349",
+    "source_location": "frontend/src/pages/Admin.tsx:350",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "form-grid two-column",
-    "source_location": "frontend/src/pages/Admin.tsx:357",
+    "source_location": "frontend/src/pages/Admin.tsx:358",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "form-grid two-column",
-    "source_location": "frontend/src/pages/Admin.tsx:367",
+    "source_location": "frontend/src/pages/Admin.tsx:368",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "ReviewRequired",
-    "source_location": "frontend/src/pages/Admin.tsx:393",
+    "source_location": "frontend/src/pages/Admin.tsx:394",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "form-grid two-column reconciliation-balances",
-    "source_location": "frontend/src/pages/Admin.tsx:411",
+    "source_location": "frontend/src/pages/Admin.tsx:412",
     "reason": "Technical JSX attribute className"
   },
   {
@@ -2811,12 +2811,12 @@
   },
   {
     "english": "guided-panel onboarding-guided {!clinician&&step===3?\"onboarding-ready-page\":\"\"}",
-    "source_location": "frontend/src/pages/Onboarding.tsx:188",
+    "source_location": "frontend/src/pages/Onboarding.tsx:189",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "scope-picker onboarding-scope-picker",
-    "source_location": "frontend/src/pages/Onboarding.tsx:292",
+    "source_location": "frontend/src/pages/Onboarding.tsx:293",
     "reason": "Technical JSX attribute className"
   },
   {
@@ -3015,6 +3015,36 @@
     "reason": "Technical JSX attribute className"
   },
   {
+    "english": "application-state application-state-",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:19",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Clarification",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:27",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Open",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:41",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Legacy",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:41",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Open",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:58",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Submitted",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:65",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "button full",
     "source_location": "frontend/src/pages/ServiceDetails.tsx:17",
     "reason": "Technical JSX attribute className"
@@ -3046,242 +3076,242 @@
   },
   {
     "english": "status-pill status-{String(item.status).toLowerCase()}",
-    "source_location": "frontend/src/pages/Vetting.tsx:55",
+    "source_location": "frontend/src/pages/Vetting.tsx:56",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Proposed",
-    "source_location": "frontend/src/pages/Vetting.tsx:58",
+    "source_location": "frontend/src/pages/Vetting.tsx:59",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "License",
-    "source_location": "frontend/src/pages/Vetting.tsx:81",
+    "source_location": "frontend/src/pages/Vetting.tsx:82",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Draft",
-    "source_location": "frontend/src/pages/Vetting.tsx:139",
+    "source_location": "frontend/src/pages/Vetting.tsx:140",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/pages/Vetting.tsx:139",
+    "source_location": "frontend/src/pages/Vetting.tsx:140",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Draft",
-    "source_location": "frontend/src/pages/Vetting.tsx:147",
+    "source_location": "frontend/src/pages/Vetting.tsx:148",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/pages/Vetting.tsx:147",
+    "source_location": "frontend/src/pages/Vetting.tsx:148",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Draft",
-    "source_location": "frontend/src/pages/Vetting.tsx:147",
+    "source_location": "frontend/src/pages/Vetting.tsx:148",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/pages/Vetting.tsx:147",
+    "source_location": "frontend/src/pages/Vetting.tsx:148",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/pages/Vetting.tsx:191",
+    "source_location": "frontend/src/pages/Vetting.tsx:192",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Draft",
-    "source_location": "frontend/src/pages/Vetting.tsx:198",
+    "source_location": "frontend/src/pages/Vetting.tsx:199",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/pages/Vetting.tsx:198",
+    "source_location": "frontend/src/pages/Vetting.tsx:199",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Vetting.tsx:198",
+    "source_location": "frontend/src/pages/Vetting.tsx:199",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Draft",
-    "source_location": "frontend/src/pages/Vetting.tsx:223",
+    "source_location": "frontend/src/pages/Vetting.tsx:224",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/pages/Vetting.tsx:223",
+    "source_location": "frontend/src/pages/Vetting.tsx:224",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Expired",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Expired",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Rejected",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Suspended",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Expired",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Draft",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Expired",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Revoked",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Draft",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Vetting.tsx:237",
+    "source_location": "frontend/src/pages/Vetting.tsx:238",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Cleared",
-    "source_location": "frontend/src/pages/Vetting.tsx:273",
+    "source_location": "frontend/src/pages/Vetting.tsx:277",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Cleared",
-    "source_location": "frontend/src/pages/Vetting.tsx:273",
+    "source_location": "frontend/src/pages/Vetting.tsx:277",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/Vetting.tsx:273",
+    "source_location": "frontend/src/pages/Vetting.tsx:277",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Upheld",
-    "source_location": "frontend/src/pages/Vetting.tsx:274",
+    "source_location": "frontend/src/pages/Vetting.tsx:278",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Reopen",
-    "source_location": "frontend/src/pages/Vetting.tsx:274",
+    "source_location": "frontend/src/pages/Vetting.tsx:278",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Upheld",
-    "source_location": "frontend/src/pages/Vetting.tsx:274",
+    "source_location": "frontend/src/pages/Vetting.tsx:278",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Reopen",
-    "source_location": "frontend/src/pages/Vetting.tsx:274",
+    "source_location": "frontend/src/pages/Vetting.tsx:278",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Submitted",
-    "source_location": "frontend/src/pages/Vetting.tsx:276",
+    "source_location": "frontend/src/pages/Vetting.tsx:280",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Resubmitted",
-    "source_location": "frontend/src/pages/Vetting.tsx:276",
+    "source_location": "frontend/src/pages/Vetting.tsx:280",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/pages/Vetting.tsx:276",
+    "source_location": "frontend/src/pages/Vetting.tsx:280",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Vetting.tsx:276",
+    "source_location": "frontend/src/pages/Vetting.tsx:280",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "scope-review-card guided-review",
-    "source_location": "frontend/src/pages/Vetting.tsx:278",
+    "source_location": "frontend/src/pages/Vetting.tsx:282",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Vetting.tsx:318",
+    "source_location": "frontend/src/pages/Vetting.tsx:323",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/pages/Vetting.tsx:323",
+    "source_location": "frontend/src/pages/Vetting.tsx:329",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Vetting.tsx:323",
+    "source_location": "frontend/src/pages/Vetting.tsx:329",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Rejected",
-    "source_location": "frontend/src/pages/Vetting.tsx:323",
+    "source_location": "frontend/src/pages/Vetting.tsx:329",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Suspended",
-    "source_location": "frontend/src/pages/Vetting.tsx:323",
+    "source_location": "frontend/src/pages/Vetting.tsx:329",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Expired",
-    "source_location": "frontend/src/pages/Vetting.tsx:323",
+    "source_location": "frontend/src/pages/Vetting.tsx:329",
     "reason": "Technical JSX attribute value"
   },
   {

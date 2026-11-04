@@ -9,6 +9,7 @@ EVENTS = {
     'ApplicationReviewUpdate': ('Application Review Update', 'account'),
     'ApplicationApproved': ('Professional Application Approved', 'account'),
     'ApplicationRejected': ('Professional Application Not Approved', 'account'),
+    'ScopeResubmitted': ('Additional Information Received — In Review', 'account'),
     'ScopeApproved': ('Service Scope Approved', 'account'),
     'ScopeRejected': ('Service Scope Not Approved', 'account'),
     'ScopeClarification': ('More Information Requested', 'account'),
@@ -97,7 +98,8 @@ def describe(notice, dispatch=False):
         else:body='A reviewer has recorded an update to your professional application. Sign in to read the decision and next steps.'
     elif notice.context_kind=='scope':
         if not rows('SELECT name FROM `tabTele Tena Vetting Scope Application` WHERE name=%s AND clinician=%s',(ref,user)):return None
-        href='/clinician/vetting';body='A reviewer has recorded a decision on a service application. Sign in to read the outcome, feedback and next steps.'
+        href='/clinician/vetting/'+ref;body='A reviewer has recorded a decision on a service application. Sign in to read the outcome, feedback and next steps.'
+        if event=='ScopeResubmitted':body='Your additional information has been received. This service application is back in review. We will notify you when a reviewer records an update.'
     elif notice.context_kind=='language':
         if not rows('SELECT language FROM tt_care_language_claim WHERE clinician=%s AND language=%s',(user,ref)):return None
         href='/clinician/account';body='A reviewer has updated a care-language application. Sign in to read the decision and feedback.'

@@ -1,3 +1,4 @@
+import {ScopeApplicationList,ScopeApplicationDetail,NewScopeApplication,AssistedApplication,ScopeReviewDecision} from './pages/ScopeApplications';
 import {NotificationsProvider} from './hooks/useNotifications';
 import PaymentActivityAlerts from './components/PaymentActivityAlerts';
 import {DirectPaymentPage,PaymentConfiguration,DirectLedger} from './components/DirectPayments';
@@ -47,7 +48,7 @@ import { AdminOverview, Applications, FinancialDisputes, Scopes, ServiceCatalog 
 import ConsultationPage, { ConsultationRoomPage } from "./pages/ConsultationPage";
 import Showcase from "./pages/Showcase";
 import { ClinicianRequestInbox, PatientOpenRequests, PatientRequestDetail, PatientRequestOfferDetail, PublicClinicianProfile } from "./pages/OpenRequests";
-import { ClinicianScopeApplications, VettingQueue, VettingRubricManagementPage } from "./pages/Vetting";
+import { VettingRubricManagementPage } from "./pages/Vetting";
 import { ClinicianAffiliations, ClinicMembershipPortal, ClinicReview } from "./pages/Clinics";
 import ClinicCalendar from "./pages/ClinicCalendar";
 import Couples, { CoupleInvitation } from './pages/Couples';
@@ -155,7 +156,7 @@ export default function App() {
                 <Route path="care/:id" element={<CareRecordDetail />} />
                 <Route path="earnings" element={<ClinicianEarnings />} /><Route path="direct-payment-history" element={<DirectLedger role="clinician"/>}/><Route path="direct-payments/:id" element={<DirectPaymentPage/>}/>
                 <Route path="earnings/transactions/:activityId" element={<FinancialActivityDetail />} />
-                <Route path="vetting" element={<ClinicianScopeApplications />} />
+                <Route path="vetting" element={<ScopeApplicationList />} /><Route path="vetting/new" element={<NewScopeApplication/>}/><Route path="vetting/:applicationId" element={<ScopeApplicationDetail/>}/>
                 <Route path="affiliations" element={<ClinicianAffiliations />} />
               </Route>
               <Route path="/admin" element={<WorkspaceLayout kind="admin" />}>
@@ -169,7 +170,7 @@ export default function App() {
                 <Route path="services/new" element={<ServiceCatalog />} />
                 <Route path="services/:serviceId/edit" element={<ServiceCatalog />} />
                 <Route path="matching" element={<MatchingOperations />} />
-                <Route path="vetting" element={<VettingQueue />} />
+                <Route path="vetting" element={<ScopeApplicationList reviewer />} /><Route path="vetting/:applicationId" element={<ScopeApplicationDetail reviewer/>}/><Route path="vetting/:applicationId/review" element={<ScopeReviewDecision/>}/><Route path="assisted/:caseId" element={<AssistedApplication/>}/>
                 <Route path="clinics" element={<ClinicReview />} />
                 <Route path="financial-disputes" element={<FinancialDisputes />} />
                 <Route

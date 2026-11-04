@@ -2,8 +2,8 @@ import {useEffect,useRef,useState} from 'react';
 import {Button,Dialog,InlineNotice} from './ui';
 import {useLocale} from '../hooks/useLocale';
 import './AttachmentPreview.css';
-type Source='receipt'|'professional'|'legacycv';
-const methods={receipt:'tele_tena.api.direct_payments.receipt',professional:'tele_tena.api.professional.download',legacycv:'tele_tena.api.professional.legacy_cv'};
+type Source='receipt'|'professional'|'legacycv'|'scope';
+const methods={scope:'tele_tena.api.application_flow.document',receipt:'tele_tena.api.direct_payments.receipt',professional:'tele_tena.api.professional.download',legacycv:'tele_tena.api.professional.legacy_cv'};
 export function AttachmentPreview({source,id,filename,purpose,action='Open Attachment'}:{source:Source;id:string;filename?:string;purpose:string;action?:string}){
  const {w}=useLocale();const [open,setOpen]=useState(false),[file,setFile]=useState<{url:string;type:string;name:string}|null>(null),[error,setError]=useState(false),[zoom,setZoom]=useState(1),[attempt,setAttempt]=useState(0);const trigger=useRef<HTMLButtonElement>(null);
  useEffect(()=>{if(!open)return;const controller=new AbortController();let url:string|undefined,active=true;setFile(null);setError(false);setZoom(1);

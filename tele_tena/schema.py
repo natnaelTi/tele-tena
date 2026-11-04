@@ -180,3 +180,5 @@ def install():
 
     from tele_tena.patches.v1_51_communications import execute as communications
     communications()
+    from tele_tena.patches.v1_52_application_flow import execute as application_flow
+    application_flow()

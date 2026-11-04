@@ -35,7 +35,7 @@ def owner():
 
 def may_review(user,clinician):
     if user==clinician:return True
-    return 'Tele Tena Approver' in frappe.get_roles(user) and bool(rows('SELECT user FROM tt_application WHERE user=%s',(clinician,)))
+    return 'Tele Tena Approver' in frappe.get_roles(user) and (bool(rows('SELECT user FROM tt_application WHERE user=%s',(clinician,))) or bool(rows("SELECT id FROM tt_assistance_case WHERE clinician=%s AND state IN ('Open','Submitted')",(clinician,))))
 
 
 def reference(id,kind,user):
@@ -162,7 +162,7 @@ def application(clinician=None):
     return {'legacy_cv':dict(legacy_cv[0]) if legacy_cv else None,'reference_countries':{r.id:r.country for r in reference_rows},'reference_labels':reference_labels,'legacy':{'name':saved[0].legacy_name if saved and saved[0].legacy_name is not None else legacy.get('name') or (public[0].display_name if public else ''),'professional':legacy.get('professional',{}),'statement':legacy.get('statement','')},'payload':payload,'revision':saved[0].revision if saved else 0,'evidence':evidence,'identity_access':identity_access,'submissions':submissions,'rating_definitions':RATING_DEFINITIONS,'declaration_version':DECLARATION}
 
 
-def persist(user,payload,revision=None,submit=False):
+def persist(user,payload,revision=None,submit=False,declaration_version=DECLARATION):
     old=rows('SELECT revision FROM tt_professional_draft WHERE user=%s FOR UPDATE',(user,))
     if revision is not None and int(revision)!=(old[0].revision if old else 0):fail('This application changed in another tab. Reload before saving; your entries remain here.','professional_conflict')
     clean=validate(payload,user,submit)
@@ -176,12 +176,12 @@ def persist(user,payload,revision=None,submit=False):
         selected={clean.get(k) for k in ('profession','issuer','authority')}|set(clean.get('specialties',[]))|set(clean.get('clinics',[]))|{c.get('domain') for c in clean.get('competencies',[])}|{c.get('issuer') for c in clean.get('certifications',[])}
         selected.discard(None);selected.discard('');selected.discard('Other')
         snapshot=rows('SELECT id,label,country,region,entity_type,source_id,source_url,accessed,permitted_use,status FROM tt_reference WHERE id IN ('+','.join(['%s']*len(selected))+')',tuple(selected)) if selected else []
-        frappe.db.sql('INSERT IGNORE INTO tt_professional_submission (id,user,payload,digest,created,declaration_version,reference_snapshot) VALUES (%s,%s,%s,%s,UTC_TIMESTAMP(6),%s,%s)',(str(uuid.uuid4()),user,encoded,digest,DECLARATION,json.dumps(snapshot,default=str,ensure_ascii=False)))
+        frappe.db.sql('INSERT IGNORE INTO tt_professional_submission (id,user,payload,digest,created,declaration_version,reference_snapshot) VALUES (%s,%s,%s,%s,UTC_TIMESTAMP(6),%s,%s)',(str(uuid.uuid4()),user,encoded,digest,declaration_version,json.dumps(snapshot,default=str,ensure_ascii=False)))
         # Only structured name + explicitly public bio. Never copies qualifications or ID into public fields.
         name=' '.join(filter(None,[clean.get('prefix_other') if clean.get('prefix')=='Other' else clean.get('prefix'),clean['first_name'],clean['last_name']]))
         name=text(name,120)
         frappe.db.sql('UPDATE tt_profile SET display_name=%s,introduction=%s WHERE user=%s',(name,clean.get('bio',''),user))
-        if not already_submitted:audit(user,'ProfessionalDeclaration',{'version':DECLARATION,'digest':digest})
+        if not already_submitted:audit(user,'ProfessionalDeclaration',{'version':declaration_version,'digest':digest})
     return clean
 
 
@@ -196,8 +196,12 @@ def save(payload,revision,submit=False):
 
 @command
 def upload(purpose,filename,content_base64):
-    user=owner()
-    if purpose not in ('Identification','Certification','License','Competency','CV'):fail('Choose the evidence category.','evidence_invalid')
+    if purpose=='Authorization':fail('Use the recorded assistance workflow.','evidence_invalid')
+    return _upload(owner(),purpose,filename,content_base64)
+
+
+def _upload(user,purpose,filename,content_base64):
+    if purpose not in ('Identification','Certification','License','Competency','CV','Authorization'):fail('Choose the evidence category.','evidence_invalid')
     from tele_tena.api.history_documents import validated
     filename,mime,content=validated(filename,content_base64)
     if purpose=='CV' and mime!='application/pdf':fail('Upload your CV as a PDF.','evidence_invalid')

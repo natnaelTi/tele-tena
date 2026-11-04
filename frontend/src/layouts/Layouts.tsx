@@ -161,7 +161,7 @@ const clinicianNav = [
   ["/clinician/offers", "Your offers", ClipboardCheck],
   ["/clinician/availability", "Availability", Clock3],
   ["/clinician/services", "Services & pricing", Stethoscope],
-  ["/clinician/vetting", "Professional review", ClipboardCheck],
+  ["/clinician/vetting", "Service Applications", ClipboardCheck],
   ["/clinician/affiliations", "Clinics & affiliations", Building2],
   ["/clinician/clinic-access", "Clinic access", Building2],
   ["/clinician/care", "Care records", FileHeart],
@@ -171,13 +171,13 @@ const clinicianNav = [
 // Applicants can continue profile/review work, without approved-only workspace links.
 const applicantNav = [
   ["/clinician", "Your application", Home],
-  ["/clinician/vetting", "Professional review", ClipboardCheck],
+  ["/clinician/vetting", "Service Applications", ClipboardCheck],
   ["/clinician/account", "Account", Settings2],
 ] as const;
 const adminNav = [
   ["/admin", "Overview", Home],
   ["/admin/applications", "Applications", ClipboardCheck],
-  ["/admin/scopes", "Service scopes", Stethoscope],
+  ["/admin/scopes", "Service Authorizations", Stethoscope],
   ["/admin/services", "Service catalog", Stethoscope],
   ["/admin/vetting", "Scope vetting", ClipboardCheck],
   ["/admin/clinics", "Clinics", Building2],
@@ -222,7 +222,7 @@ export function WorkspaceLayout({
     : kind === "patient"
       ? ["/patient", "/patient/discovery", "/patient/appointments", "/patient/requests", "/patient/couples"]
       : kind === "admin"
-        ? ["/admin", "/admin/applications"]
+        ? ["/admin", "/admin/applications", "/admin/vetting"]
         : ["/clinic"];
   const mobilePrimary = items.filter(([to]) => mobilePrimaryRoutes.includes(to));
   const mobileMore = items.filter(([to]) => !mobilePrimaryRoutes.includes(to) && !to.endsWith("/account"));

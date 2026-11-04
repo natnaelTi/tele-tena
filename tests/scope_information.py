@@ -35,7 +35,7 @@ class ScopeInformation(ScopeIntake):
   vetting.review_scope_application(app.name,'Clarification',findings=reason,**self.incomplete());vetting.review_scope_application(app.name,'Clarification',findings=reason)
   self.assertEqual(len(j.rows("SELECT id FROM tt_booking_notice WHERE context_ref=%s AND event='ScopeClarification'",(app.name,))),3)
   frappe.set_user(self.user);mine=next(r for r in vetting.my_scope_applications() if r.name==app.name);self.assertEqual(mine.clarification_request,reason)
-  notice=next(r for r in notifications.feed() if r['kind']=='ScopeClarification');self.assertNotIn(reason,json.dumps(notice));self.assertEqual(notice['href'],'/clinician/vetting')
+  notice=next(r for r in notifications.feed() if r['kind']=='ScopeClarification');self.assertNotIn(reason,json.dumps(notice));self.assertEqual(notice['href'],'/clinician/vetting/'+app.name)
  def test_owner_upload_and_resubmit_does_not_approve_scope(self):
   app=self.without_license();frappe.set_user(users['reviewer']);vetting.review_scope_application(app.name,'Clarification',findings='Upload your license and resubmit.')
   frappe.set_user(self.user);evidence=vetting.upload_scope_evidence(app.name,'License or registration','fictional-correction.pdf',base64.b64encode(professional.download(self.license).data).decode());self.assertTrue(evidence['id'])
