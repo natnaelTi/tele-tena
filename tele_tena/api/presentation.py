@@ -1,4 +1,5 @@
 """State transitions and privacy-scoped presentation release APIs."""
+from tele_tena.localization import localized_throw
 import base64
 import hashlib
 import json
@@ -31,18 +32,18 @@ def _authorized(appointment, lock=False):
     item = rows('''SELECT * FROM tt_appointment WHERE id=%s AND (patient=%s OR clinician=%s OR EXISTS (SELECT 1 FROM tt_couple_plan cp JOIN tt_couple_participant p ON p.plan=cp.id WHERE cp.appointment=tt_appointment.id AND p.user=%s AND p.state='Consented'))''',
                 (appointment, user, user, user))
     if not item:
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
+        localized_throw('Appointment unavailable', frappe.PermissionError)
     item = item[0]
     if user != item.clinician:
         from tele_tena.api.couples import plan_for, participant
         if plan_for(item.id):
             participant(item.id,user)
         if 'Tele Tena Patient' not in frappe.get_roles(user):
-            frappe.throw('Appointment unavailable', frappe.PermissionError)
+            localized_throw('Appointment unavailable', frappe.PermissionError)
         role = 'patient'
     else:
         if 'Tele Tena Clinician' not in frappe.get_roles(user):
-            frappe.throw('Appointment unavailable', frappe.PermissionError)
+            localized_throw('Appointment unavailable', frappe.PermissionError)
         role = 'clinician'
     if lock:
         item = one('SELECT * FROM tt_appointment WHERE id=%s FOR UPDATE', (appointment,))
@@ -53,6 +54,9 @@ def _authorized(appointment, lock=False):
 
 
 def _wallet_release(item, reference_suffix):
+    if item.get('payment_mode')=='Offline':
+        from tele_tena.api.direct_payments import cancel
+        return cancel(item.id,reference_suffix)
     wallet = one('SELECT available,reserved FROM tt_wallet WHERE patient=%s FOR UPDATE', (item.patient,))
     reference = 'release:' + item.id
     if rows('SELECT id FROM tt_ledger WHERE reference=%s', (reference,)):
@@ -80,7 +84,7 @@ def respond_to_request(appointment, decision):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role != 'clinician' or item.clinician != clinician:
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
+        localized_throw('Appointment unavailable', frappe.PermissionError)
     if item.state != 'PendingConfirmation':
         if decision == 'confirm' and item.state == 'Booked':
             return {'state': item.state, 'idempotent': True}
@@ -92,7 +96,15 @@ def respond_to_request(appointment, decision):
         frappe.db.sql("UPDATE tt_appointment SET state='Expired' WHERE id=%s", (item.id,))
         _event(item.id, 'Expired', 'System')
         return {'state': 'Expired'}
+    if decision=='confirm' and item.get('payment_mode')=='Offline':
+        payment=rows("SELECT id FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment' AND state='Verified'",(item.id,))
+        if not payment:fail('Verify the direct payment receipt before accepting the appointment.','payment_verification_required')
     if decision == 'confirm':
+        from tele_tena.api.journey import approved,approved_service
+        approved(item.clinician,True);approved_service(item.clinician,one('SELECT service FROM tt_offering WHERE id=%s',(item.offering,)).service,True)
+        from tele_tena.api.care_languages import offering_languages
+        language=json.loads(item.policy_snapshot or '{}').get('care_language')
+        if language and language not in offering_languages(item.offering):fail('This consultation language needs authorization review before confirmation.','care_language_changed')
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         frappe.db.sql("UPDATE tt_appointment SET state='Booked',confirmed_at=%s WHERE id=%s", (now, item.id))
         _event(item.id, 'Confirmed', clinician)
@@ -114,7 +126,7 @@ def cancel_appointment(appointment, reason):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role == 'clinician' and item.clinician != user:
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
+        localized_throw('Appointment unavailable', frappe.PermissionError)
     if item.state == 'Cancelled' and item.cancelled_by == user and item.cancel_reason == reason:
         return {'state': 'Cancelled', 'idempotent': True}
     if item.state not in ('Booked', 'PendingConfirmation'):
@@ -126,7 +138,7 @@ def cancel_appointment(appointment, reason):
     if active_call:
         fail('End the active consultation before cancelling the appointment', 'cancellation_call_active')
     snapshot = json.loads(item.policy_snapshot) if item.policy_snapshot else {}
-    if snapshot.get('version') != DEMO_CANCELLATION_POLICY:
+    if snapshot.get('version') not in (DEMO_CANCELLATION_POLICY,'offline-prestart-refund-v1'):
         fail('The accepted cancellation policy is unavailable', 'policy_unavailable')
     _wallet_release(item, 'cancel')
     frappe.db.sql("UPDATE tt_reschedule_proposal SET state='Superseded',responded_at=UTC_TIMESTAMP(6) WHERE appointment=%s AND state='Pending'",
@@ -134,7 +146,7 @@ def cancel_appointment(appointment, reason):
     frappe.db.sql("UPDATE tt_appointment SET state='Cancelled',cancelled_by=%s,cancelled_at=%s,cancel_reason=%s WHERE id=%s",
                   (user, now, reason, item.id))
     _event(item.id, 'Cancelled', user, reason)
-    return {'state': 'Cancelled', 'released': True}
+    return {'state': 'Cancelled', 'released':item.get('payment_mode')!='Offline'}
 
 
 def _reschedule_expiry():
@@ -224,7 +236,7 @@ def respond_to_reschedule(appointment, proposal, decision):
     record = rows('''SELECT * FROM tt_reschedule_proposal WHERE id=%s AND appointment=%s FOR UPDATE''',
                   (proposal, item.id))
     if not record:
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
+        localized_throw('Appointment unavailable', frappe.PermissionError)
     record = record[0]
     if record.state in ('Accepted', 'Declined'):
         if decision == 'accept' and record.state == 'Accepted':
@@ -233,7 +245,7 @@ def respond_to_reschedule(appointment, proposal, decision):
             return {'state': 'Declined', 'idempotent': True}
         fail('This time-change request is already resolved', 'reschedule_resolved')
     if record.proposer == user and not shared:
-        frappe.throw('Only the other appointment participant may respond', frappe.PermissionError)
+        localized_throw('Only the other appointment participant may respond', frappe.PermissionError)
     if record.state != 'Pending':
         fail('This time-change request is no longer available', 'reschedule_resolved')
     now = datetime.now(timezone.utc).replace(tzinfo=None)
@@ -317,9 +329,9 @@ def withdraw_reschedule(appointment, proposal):
     record = rows('''SELECT id,proposer,state FROM tt_reschedule_proposal
         WHERE id=%s AND appointment=%s FOR UPDATE''', (proposal, item.id))
     if not record:
-        frappe.throw('Appointment unavailable', frappe.PermissionError)
+        localized_throw('Appointment unavailable', frappe.PermissionError)
     if record[0].proposer != user:
-        frappe.throw('Only the proposer may withdraw this request', frappe.PermissionError)
+        localized_throw('Only the proposer may withdraw this request', frappe.PermissionError)
     if record[0].state == 'Withdrawn':
         return {'state': 'Withdrawn', 'idempotent': True}
     if record[0].state != 'Pending':
@@ -409,6 +421,7 @@ def appointment_detail(appointment):
     selected = {
         'id': item.id,
         'status': item.state,
+        'payment_mode':item.get('payment_mode','Wallet'),
         'service': item.service_label,
         'start': iso(item.start),
         'end': iso(item.end),
@@ -449,11 +462,18 @@ def appointment_detail(appointment):
                         'expires_at': iso(reschedule[0].expires_at)} if reschedule else None),
         'can_propose_reschedule': _can_change_time(item) and not bool(reschedule),
     }
+    if item.get('payment_mode')=='Offline':
+        direct=rows("SELECT id,state FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment'",(item.id,))
+        selected['direct_payment_state']=direct[0].state if direct else 'Unavailable'
+        if direct and (user==item.patient or role=='clinician'):selected['direct_payment_id']=direct[0].id
+        selected['can_respond']=selected['can_respond'] and bool(direct and direct[0].state=='Verified')
+    from tele_tena.api.profile_photos import encounter_url
+    selected['photo_url']=encounter_url(item,user,role)
     selected['is_couple'] = bool(shared_plan)
     selected['you_pay'] = user == item.patient
     selected['supports_clinic_sharing'] = not bool(shared_plan)
     if shared_plan and role == 'clinician':
-        selected['couple_participants'] = [{'id':p.id,'label':json.loads(p.disclosure).get('name') or 'Participant '+str(index),'disclosure':json.loads(p.disclosure),'state':p.state} for index,p in enumerate(participants(shared_plan[0].id),1)]
+        selected['couple_participants'] = [{'id':p.id,'label':json.loads(p.disclosure).get('name') or 'Participant '+str(index),'disclosure':json.loads(p.disclosure),'state':p.state,'photo_url':encounter_url(item,user,role,p.id) if p.state=='Consented' else None} for index,p in enumerate(participants(shared_plan[0].id),1)]
     if shared_plan:
         from tele_tena.api.couples import ready
         selected['can_join'] = selected['can_join'] and ready(item.id)
@@ -568,7 +588,7 @@ def save_note_draft(appointment, private_note, patient_summary, share_note=0, su
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role != 'clinician' or item.clinician != clinician:
-        frappe.throw('Consultation record unavailable', frappe.PermissionError)
+        localized_throw('Consultation record unavailable', frappe.PermissionError)
     call = rows("SELECT state FROM tt_consultation WHERE appointment=%s", (item.id,))
     if not call or call[0].state != 'Ended' or item.state not in ('Booked', 'Completed'):
         fail('End the consultation before documenting it', 'documentation_not_ready')
@@ -621,7 +641,7 @@ def preview_patient_summary(appointment, summary=None):
     clinician = actor('Tele Tena Clinician')
     item, _, role = _authorized(appointment)
     if role != 'clinician' or item.clinician != clinician:
-        frappe.throw('Consultation record unavailable', frappe.PermissionError)
+        localized_throw('Consultation record unavailable', frappe.PermissionError)
     call = rows('SELECT state FROM tt_consultation WHERE appointment=%s', (item.id,))
     if not call or call[0].state != 'Ended' or item.state not in ('Booked', 'Completed'):
         fail('End the consultation before documenting it', 'documentation_not_ready')
@@ -652,13 +672,13 @@ def finalize_consultation(appointment, publish_summary=0, publish_note=0):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     item, _, role = _authorized(appointment, True)
     if role != 'clinician' or item.clinician != clinician:
-        frappe.throw('Consultation record unavailable', frappe.PermissionError)
+        localized_throw('Consultation record unavailable', frappe.PermissionError)
     call = rows("SELECT state,room_closed FROM tt_consultation WHERE appointment=%s", (item.id,))
     note = one('SELECT current_revision,status FROM tt_consultation_note WHERE appointment=%s FOR UPDATE', (item.id,))
     if item.state == 'Completed' and note.status == 'Finalized':
         earnings = rows('SELECT state,net_minor,release_at FROM tt_earning WHERE appointment=%s', (item.id,))
         return {'status': 'Finalized', 'revision': note.current_revision,
-                'idempotent': True, 'earning_state': earnings[0].state if earnings else 'LegacyHold'}
+                'idempotent': True, 'earning_state': earnings[0].state if earnings else 'DirectReceiptRecorded' if item.payment_mode=='Offline' else 'LegacyHold'}
     from tele_tena.api.couples import ready
     if not ready(item.id):
         fail('A participant withdrew consent. Financial resolution requires review.', 'couple_consent_required')
@@ -695,51 +715,55 @@ def finalize_consultation(appointment, publish_summary=0, publish_note=0):
     frappe.db.sql("UPDATE tt_consultation_note SET status='Finalized',current_revision=%s,modified=%s WHERE appointment=%s",
                   (finalized_revision, now, item.id))
     if item.state != 'Completed':
-        from tele_tena.accounting import account_id, check_wallet_projection, post
-        extensions = rows('''SELECT id,duration_minutes,amount_minor,price_snapshot,policy_snapshot
-            FROM tt_consultation_extension WHERE appointment=%s AND state='Started'
-            ORDER BY started_at FOR UPDATE''', (item.id,))
-        extension_total = sum(int(extension.amount_minor) for extension in extensions)
-        gross = int(item.price) + extension_total
-        wallet = one('SELECT available,reserved FROM tt_wallet WHERE patient=%s FOR UPDATE', (item.patient,))
-        snapshot = json.loads(item.policy_snapshot) if item.policy_snapshot else {}
-        finance = snapshot.get('financial', {})
-        if finance.get('version') != 'demo-earnings-v1' or finance.get('external_settlement') is not False:
-            fail('Accepted earnings policy is unavailable for this appointment', 'financial_policy_missing')
-        fee = (gross * int(finance.get('fee_bps', 0))) // 10000
-        net = gross - fee
-        if int(wallet.reserved) < gross:
-            fail('Reservation is inconsistent; consultation remains unfinalized', 'reservation_inconsistent')
-        check_wallet_projection(item.patient, wallet)
-        earning_id = str(uuid.uuid4())
-        release_at = now + timedelta(minutes=int(finance.get('dispute_window_minutes', 60)))
-        frappe.db.sql('''UPDATE tt_wallet SET reserved=reserved-%s WHERE patient=%s''', (gross, item.patient))
-        entries = [(account_id('patient', item.patient, 'reserved'), gross, 0),
-                   (account_id('clinician', clinician, 'pending'), 0, net)]
-        if fee:
-            entries.append((account_id('', '', 'platform_fee_revenue'), 0, fee))
-        reference = 'completion:' + item.id
-        policy_snapshot = {**finance, 'extension_blocks': [
-            {'id': extension.id, 'duration_minutes': int(extension.duration_minutes),
-             'amount_minor': int(extension.amount_minor), 'price_snapshot': json.loads(extension.price_snapshot),
-             'policy_snapshot': json.loads(extension.policy_snapshot)} for extension in extensions]}
-        post(reference, 'ConsultationFinalized', reference, entries,
-             {'appointment': item.id, 'simulated': True,
-              'extension_ids': [extension.id for extension in extensions]})
-        # This activity row is not a second accounting posting. The balanced
-        # journal above remains authoritative and uses the same reference.
-        from tele_tena.api.journey import simulation_log
-        simulation_log(item.patient, 'Consumption', gross, reference)
-        frappe.db.sql('''INSERT INTO tt_earning
-            (id,appointment,patient,clinician,gross_minor,fee_minor,net_minor,policy_snapshot,
-             state,completed_at,release_at,created,modified)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Pending',%s,%s,%s,%s)''',
-            (earning_id, item.id, item.patient, clinician, gross, fee, net,
-             json.dumps(policy_snapshot, separators=(',', ':'), sort_keys=True), now, release_at, now, now))
-        for extension in extensions:
-            frappe.db.sql("UPDATE tt_consultation_extension SET state='Settled',closed_at=%s WHERE id=%s AND state='Started'",
-                          (now, extension.id))
-            _event(item.id, 'ExtensionSettled', clinician)
+        if item.get('payment_mode')=='Offline':
+            if not rows("SELECT id FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment' AND verified_at IS NOT NULL",(item.id,)):fail('Payment reconciliation is required before finalizing this consultation.','payment_verification_required')
+            frappe.db.sql("UPDATE tt_consultation_extension SET state='Completed',closed_at=UTC_TIMESTAMP(6) WHERE appointment=%s AND state='Started'",(item.id,))
+        else:
+            from tele_tena.accounting import account_id, check_wallet_projection, post
+            extensions = rows('''SELECT id,duration_minutes,amount_minor,price_snapshot,policy_snapshot
+                FROM tt_consultation_extension WHERE appointment=%s AND state='Started'
+                ORDER BY started_at FOR UPDATE''', (item.id,))
+            extension_total = sum(int(extension.amount_minor) for extension in extensions)
+            gross = int(item.price) + extension_total
+            wallet = one('SELECT available,reserved FROM tt_wallet WHERE patient=%s FOR UPDATE', (item.patient,))
+            snapshot = json.loads(item.policy_snapshot) if item.policy_snapshot else {}
+            finance = snapshot.get('financial', {})
+            if finance.get('version') != 'demo-earnings-v1' or finance.get('external_settlement') is not False:
+                fail('Accepted earnings policy is unavailable for this appointment', 'financial_policy_missing')
+            fee = (gross * int(finance.get('fee_bps', 0))) // 10000
+            net = gross - fee
+            if int(wallet.reserved) < gross:
+                fail('Reservation is inconsistent; consultation remains unfinalized', 'reservation_inconsistent')
+            check_wallet_projection(item.patient, wallet)
+            earning_id = str(uuid.uuid4())
+            release_at = now + timedelta(minutes=int(finance.get('dispute_window_minutes', 60)))
+            frappe.db.sql('''UPDATE tt_wallet SET reserved=reserved-%s WHERE patient=%s''', (gross, item.patient))
+            entries = [(account_id('patient', item.patient, 'reserved'), gross, 0),
+                       (account_id('clinician', clinician, 'pending'), 0, net)]
+            if fee:
+                entries.append((account_id('', '', 'platform_fee_revenue'), 0, fee))
+            reference = 'completion:' + item.id
+            policy_snapshot = {**finance, 'extension_blocks': [
+                {'id': extension.id, 'duration_minutes': int(extension.duration_minutes),
+                 'amount_minor': int(extension.amount_minor), 'price_snapshot': json.loads(extension.price_snapshot),
+                 'policy_snapshot': json.loads(extension.policy_snapshot)} for extension in extensions]}
+            post(reference, 'ConsultationFinalized', reference, entries,
+                 {'appointment': item.id, 'simulated': True,
+                  'extension_ids': [extension.id for extension in extensions]})
+            # This activity row is not a second accounting posting. The balanced
+            # journal above remains authoritative and uses the same reference.
+            from tele_tena.api.journey import simulation_log
+            simulation_log(item.patient, 'Consumption', gross, reference)
+            frappe.db.sql('''INSERT INTO tt_earning
+                (id,appointment,patient,clinician,gross_minor,fee_minor,net_minor,policy_snapshot,
+                 state,completed_at,release_at,created,modified)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'Pending',%s,%s,%s,%s)''',
+                (earning_id, item.id, item.patient, clinician, gross, fee, net,
+                 json.dumps(policy_snapshot, separators=(',', ':'), sort_keys=True), now, release_at, now, now))
+            for extension in extensions:
+                frappe.db.sql("UPDATE tt_consultation_extension SET state='Settled',closed_at=%s WHERE id=%s AND state='Started'",
+                              (now, extension.id))
+                _event(item.id, 'ExtensionSettled', clinician)
         frappe.db.sql("UPDATE tt_appointment SET state='Completed' WHERE id=%s", (item.id,))
         _event(item.id, 'Completed', clinician)
     _event(item.id, 'DocumentationFinalized', clinician)
@@ -801,6 +825,8 @@ def care_directory(search='', service='', status='', from_date='', to_date='', p
                                         'state': item.state, 'disclosure': disclosure,
                                         'start': item.start, 'end': item.end, 'timezone': item.timezone,
                                         'call_state': item.call_state, 'documentation_state': item.documentation_state})
+        from tele_tena.api.profile_photos import encounter_url
+        group['photo_url']=encounter_url(frappe._dict(id=item.id,patient=item.patient,clinician=clinician),clinician,'clinician')
         group['encounters'].append(item.id)
         if item.start < now and (
                 item.state == 'Completed' or item.call_state == 'Ended'):
@@ -830,7 +856,7 @@ def care_directory(search='', service='', status='', from_date='', to_date='', p
 def care_patient_record(appointment):
     item, clinician, role = _authorized(appointment)
     if role != 'clinician':
-        frappe.throw('Care record unavailable', frappe.PermissionError)
+        localized_throw('Care record unavailable', frappe.PermissionError)
     disclosure = json.loads(item.disclosure)
     shared_name = disclosure.get('name')
     if shared_name:
@@ -839,7 +865,8 @@ def care_patient_record(appointment):
             (clinician, item.patient, shared_name))
     else:
         matches = [{'id': item.id}]
-    return {'patient_label': shared_name or disclosure.get('alias') or 'Private patient',
+    from tele_tena.api.profile_photos import encounter_url
+    return {'photo_url':encounter_url(item,clinician,role),'patient_label': shared_name or disclosure.get('alias') or 'Private patient',
             'encounters': [appointment_detail(row['id']) for row in matches]}
 
 
@@ -847,7 +874,7 @@ def care_patient_record(appointment):
 def care_detail(appointment):
     item, _, role = _authorized(appointment)
     if role != 'clinician':
-        frappe.throw('Care record unavailable', frappe.PermissionError)
+        localized_throw('Care record unavailable', frappe.PermissionError)
     return appointment_detail(appointment)
 
 
@@ -938,7 +965,7 @@ def tour_state(tour_id):
     user = actor()
     role = _tour_role(user)
     if not role or tour_id not in TOURS[role]:
-        frappe.throw('Tour unavailable', frappe.PermissionError)
+        localized_throw('Tour unavailable', frappe.PermissionError)
     saved = rows('''SELECT state FROM tt_tour_progress
         WHERE user=%s AND role=%s AND tour_id=%s AND version=%s''',
         (user, role, tour_id, TOUR_VERSION))
@@ -951,7 +978,7 @@ def save_tour_state(tour_id, state):
     user = actor()
     role = _tour_role(user)
     if not role or tour_id not in TOURS[role] or state not in ('Dismissed', 'Completed'):
-        frappe.throw('Tour unavailable', frappe.PermissionError)
+        localized_throw('Tour unavailable', frappe.PermissionError)
     frappe.db.sql('''INSERT INTO tt_tour_progress (user,role,tour_id,version,state,modified)
         VALUES (%s,%s,%s,%s,%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE
         state=VALUES(state),modified=VALUES(modified)''',
@@ -965,7 +992,7 @@ def _resume_owner():
     draft = rows('SELECT kind,completed FROM tt_onboarding WHERE user=%s', (user,))
     if not ((p and p[0].kind == 'clinician') or
             (draft and draft[0].kind == 'clinician' and not draft[0].completed)):
-        frappe.throw('CV unavailable', frappe.PermissionError)
+        localized_throw('CV unavailable', frappe.PermissionError)
     return user
 
 
@@ -1020,17 +1047,17 @@ def remove_resume():
 def download_resume(clinician):
     user = actor()
     if user != clinician and 'Tele Tena Approver' not in frappe.get_roles(user):
-        frappe.throw('CV unavailable', frappe.PermissionError)
+        localized_throw('CV unavailable', frappe.PermissionError)
     if user == clinician:
         _resume_owner()
     elif not rows('SELECT user FROM tt_application WHERE user=%s', (clinician,)):
-        frappe.throw('CV unavailable', frappe.PermissionError)
+        localized_throw('CV unavailable', frappe.PermissionError)
     found = rows('SELECT filename,content FROM tt_resume_evidence WHERE clinician=%s', (clinician,))
     if not found:
         from tele_tena.api.professional import cv_available, retained_cv_ids, download
         if cv_available(clinician):
             return download(retained_cv_ids(clinician)[0])
-        frappe.throw('CV unavailable', frappe.DoesNotExistError)
+        localized_throw('CV unavailable', frappe.DoesNotExistError)
     frappe.local.response.filename = found[0].filename
     frappe.local.response.filecontent = bytes(found[0].content)
     frappe.local.response.type = 'download'

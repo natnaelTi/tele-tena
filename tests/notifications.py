@@ -6,6 +6,15 @@ from datetime import timedelta
 from tele_tena.sms import SMSUncertain
 
 class Notifications(GuestFirst):
+ def setUp(self):
+  super().setUp()
+  # Current language approval is an independent publication gate. Explicitly
+  # prepare the retained fictional provider inside this rollback-only fixture.
+  from tele_tena.api import care_languages
+  frappe.set_user(users['counselor'])
+  care_languages.save_claims([{'code':'en','proficiency':3,'explanation':'Fictional notification regression self-assessment only.'}])
+  frappe.set_user(users['reviewer']);care_languages.decide(users['counselor'],'en','Approved','Fictional notification regression review only.')
+  frappe.set_user(users['patient'])
  def manual(self):
   offer=self.offer();clinician=frappe.db.sql('SELECT clinician FROM tt_offering WHERE id=%s',(offer.id,))[0][0]
   frappe.set_user(clinician);schedule=next(s for s in scheduling.schedules() if s.offering==offer.id)
@@ -48,7 +57,7 @@ class Notifications(GuestFirst):
  def test_owner_read_privacy_and_system_deduplication(self):
   app=self.manual();notifications.emit(app.patient,'private-system-test','SystemUpdate');notifications.emit(app.patient,'private-system-test','SystemUpdate')
   feed=notifications.feed();notice=next(n for n in feed if n['kind']=='SystemUpdate');self.assertEqual(len([n for n in feed if n['kind']=='SystemUpdate']),1)
-  self.assertEqual(set(notice),{'id','source','kind','title','category','appointment','created','read'})
+  self.assertEqual(set(notice),{'id','source','kind','title','category','appointment','created','read','href'})
   notifications.mark_read(notice['id'],notice['source']);self.assertTrue(next(n for n in notifications.feed() if n['id']==notice['id'])['read'])
   frappe.set_user(users['reviewer']);self.assertFalse(any(n['id']==notice['id'] for n in notifications.feed()))
   with self.assertRaises(frappe.PermissionError):notifications.mark_read(notice['id'],notice['source'])

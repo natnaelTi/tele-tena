@@ -63,3 +63,6 @@
 .reference-clinician-card .clinician-description { margin:14px 0 0; color:var(--muted); display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
 
 @media(max-width:800px) { .product-header .product-user { margin-left:auto; } }
+
+/* Five patient destinations remain primary; small screens use a deliberate scroll rail. */
+@media(max-width:1200px){.workspace-role-patient .product-desktop-nav{display:none}.workspace-role-patient .product-mobile-nav{display:flex;position:fixed;bottom:0;inset-inline:0;background:var(--surface,#fff);border-top:1px solid var(--border);padding:8px 8px max(8px,env(safe-area-inset-bottom));z-index:40;overflow-x:auto;justify-content:flex-start;gap:4px}.workspace-role-patient .product-mobile-nav>a,.workspace-role-patient .product-mobile-nav>button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px 8px;font-size:14px;text-decoration:none}.workspace-role-patient .product-mobile-nav>a,.workspace-role-patient .product-mobile-nav>button{flex:1 0 88px;min-height:56px}.workspace-role-patient .reference-workspace-main{padding-bottom:96px}}

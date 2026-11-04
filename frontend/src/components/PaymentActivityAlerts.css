@@ -1,0 +1,4 @@
+.payment-activity-alert{position:fixed;z-index:65;left:24px;bottom:24px;width:min(420px,calc(100vw - 48px));display:flex;align-items:start;gap:12px;background:var(--surface-card,#fff);color:var(--ink);padding:20px;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px #102a3320}
+.payment-activity-alert>svg{flex-shrink:0;color:var(--brand)}
+.payment-activity-alert>div{min-width:0}.payment-activity-alert p{font-size:14px;line-height:1.55;margin:8px 0}.payment-activity-alert .text-link{display:inline-block;padding-block:6px}
+@media(max-width:768px){.payment-activity-alert{bottom:88px;left:16px;width:calc(100vw - 32px);max-height:50vh;overflow:auto;padding:16px}}

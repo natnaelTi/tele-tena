@@ -4,6 +4,7 @@ An accepted link exposes only the other participant's chosen profile name. It
 does not grant access to appointments, clinical records, disclosures, balances,
 or consultation rooms.
 """
+from tele_tena.localization import localized_throw
 import hashlib
 import base64
 import hmac
@@ -182,7 +183,7 @@ def revoke_relationship(relationship_id):
     link = rows('''SELECT id,state FROM tt_relationship_link
         WHERE id=%s AND %s IN (participant_a,participant_b) FOR UPDATE''', (relationship_id, participant))
     if not link:
-        frappe.throw('Relationship link unavailable', frappe.PermissionError)
+        localized_throw('Relationship link unavailable', frappe.PermissionError)
     if link[0].state == 'Revoked':
         return {'revoked': True, 'idempotent': True}
     frappe.db.sql("UPDATE tt_relationship_link SET state='Revoked',ended_at=UTC_TIMESTAMP(6),ended_by=%s WHERE id=%s",
@@ -199,7 +200,7 @@ def revoke_relationship_invitation(invitation_id):
     invitation = rows('''SELECT id,state FROM tt_relationship_invitation
         WHERE id=%s AND inviter=%s FOR UPDATE''', (invitation_id, inviter))
     if not invitation:
-        frappe.throw('Invitation unavailable', frappe.PermissionError)
+        localized_throw('Invitation unavailable', frappe.PermissionError)
     if invitation[0].state == 'Revoked':
         return {'revoked': True, 'idempotent': True}
     if invitation[0].state != 'Pending':

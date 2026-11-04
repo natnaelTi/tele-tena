@@ -1,4 +1,5 @@
 """Timezone-aware recurring clinician schedules and server-generated slots."""
+from tele_tena.localization import localized_throw
 import json
 import hashlib
 import hmac
@@ -457,7 +458,7 @@ def calendar(offering, from_date=None, days=35, display_timezone=None):
     offer = one('SELECT * FROM tt_offering WHERE id=%s AND active=1', (offering,))
     roles = set(frappe.get_roles(user))
     if 'Tele Tena Patient' not in roles and not ('Tele Tena Clinician' in roles and offer.clinician == user):
-        frappe.throw('Schedule unavailable', frappe.PermissionError)
+        localized_throw('Schedule unavailable', frappe.PermissionError)
     approved(offer.clinician)
     approved_service(offer.clinician, offer.service)
     display_zone = _zone(display_timezone) if display_timezone else None

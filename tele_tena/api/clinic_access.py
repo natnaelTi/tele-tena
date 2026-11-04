@@ -1,4 +1,5 @@
 """Patient-controlled, encounter-specific clinic scheduling disclosure."""
+from tele_tena.localization import localized_throw
 import json
 from datetime import date, datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -12,7 +13,7 @@ from tele_tena.api.journey import actor, command, fail, one, query, rows
 def _patient():
     user = actor('Tele Tena Patient')
     if not frappe.db.get_value('User', user, 'enabled'):
-        frappe.throw('Account unavailable.', frappe.PermissionError)
+        localized_throw('Account unavailable.', frappe.PermissionError)
     return user
 
 
@@ -20,10 +21,10 @@ def _appointment_for_patient(appointment, patient, lock=False):
     found = rows('''SELECT * FROM tt_appointment WHERE id=%s AND patient=%s''' +
                  (' FOR UPDATE' if lock else ''), (appointment, patient))
     if not found:
-        frappe.throw('Appointment unavailable.', frappe.PermissionError)
+        localized_throw('Appointment unavailable.', frappe.PermissionError)
     from tele_tena.api.couples import plan_for
     if plan_for(appointment):
-        frappe.throw('Shared sessions require each recipient’s permission; clinic sharing is unavailable.', frappe.PermissionError)
+        localized_throw('Shared sessions require each recipient’s permission; clinic sharing is unavailable.', frappe.PermissionError)
     return found[0]
 
 
@@ -176,7 +177,7 @@ def revoke_schedule_access(grant, reason=''):
     found = rows('''SELECT name FROM `tabTele Tena Clinic Encounter Access`
         WHERE name=%s AND patient=%s FOR UPDATE''', (grant, patient))
     if not found:
-        frappe.throw('Clinic access unavailable.', frappe.PermissionError)
+        localized_throw('Clinic access unavailable.', frappe.PermissionError)
     doc = frappe.get_doc('Tele Tena Clinic Encounter Access', found[0].name)
     if doc.status == 'Revoked':
         return {'status': 'Revoked', 'idempotent': True}
@@ -259,7 +260,7 @@ def clinic_schedule_week(week_start=None, display_timezone='Africa/Addis_Ababa')
     user = actor()
     allowed_clinics = _staff_clinic_ids(user)
     if not allowed_clinics:
-        frappe.throw('Clinic calendar access required.', frappe.PermissionError)
+        localized_throw('Clinic calendar access required.', frappe.PermissionError)
     if not isinstance(display_timezone, str) or len(display_timezone) > 80:
         fail('Choose a valid calendar timezone.', 'invalid_timezone')
     try:

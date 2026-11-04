@@ -38,7 +38,8 @@ let checkpoint='launch';
   checkpoint='activation message';
   assert.equal(await page.evaluate(()=>sessionStorage.getItem('teletena-test-update-message')),'SKIP_WAITING');
   checkpoint='post update home';
-  assert.equal(await page.getByRole('heading',{name:'Find support. Make time for care.'}).count(),1);
+  await page.getByRole('heading',{name:'Find Care That Fits You.',exact:true}).waitFor();
+  assert.equal(await page.getByRole('heading',{name:'Find Care That Fits You.',exact:true}).count(),1);
   console.log('PASS: built app detects a waiting worker, waits for explicit refresh, and reloads after activation');
  }finally{await browser.close()}
 })().catch(error=>{console.error('FAIL: PWA update interaction at '+checkpoint+' ('+(error?.name||'Error')+'); details withheld');process.exitCode=1});

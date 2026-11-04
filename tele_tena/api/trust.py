@@ -1,4 +1,5 @@
 """Encounter-authorized, structured patient session-experience feedback."""
+from tele_tena.localization import localized_throw
 import uuid
 
 import frappe
@@ -17,7 +18,7 @@ def submit_session_feedback(appointment, rating):
     item = rows('''SELECT id,state,patient,clinician FROM tt_appointment
         WHERE id=%s AND patient=%s FOR UPDATE''', (appointment, patient))
     if not item:
-        frappe.throw('Feedback unavailable for this consultation', frappe.PermissionError)
+        localized_throw('Feedback unavailable for this consultation', frappe.PermissionError)
     item = item[0]
 
     previous = rows('''SELECT rating,created_at FROM tt_session_feedback

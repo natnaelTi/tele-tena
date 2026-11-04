@@ -1,3 +1,15 @@
+## Payment Routing and Reviewer Defaults — 28 October 2026
+
+Payment-specific notifications resolve their exact immutable payment event to an allowlisted party-authorized route, including extensions; duplicate in-app outbox projections are deduplicated. A bounded clinician review query exposes only owned pending claims and encounter-authorized identity/time, without payee or clinical text. Standalone payment pages keep timeline and appointment navigation separate from clinical details.
+
+Owner-approvedv1.48 backfills financial configuration for existing reviewers, with audit; privileged User role assignment supplies the same default to new reviewers. Client intent does not grant reviewer roles. Explicit later financial-role removal is respected. No new tables or payment-mode/balance change is part of this migration.
+
+## Direct-Payment and Language Revision — 28 October 2026
+
+Additivev1.45–v1.47 command tables store site mode/revision, immutable payable quote/payee/policy snapshots, private receipt bytes and append-only decisions. Existing appointment capacity gate serializes booking/acceptance/verification; no Offline Wallet posting occurs. Mode changes use the same lock and an audited legacy-obligation plan. Existing durable notification outbox and native scheduler/workers handle reminders/expiry. Language claims, decisions and offering selections are separate; legacy claims migrate Pending. Source-only CSV dictionaries import reviewed values with hash/placeholder validation and rollback. No shared Python dependency or framework/Amazon change.
+
+See [verification](offline-telebirr-verification-2026-10-28.md), [operator walkthrough](offline-telebirr-operator-walkthrough.md) and [update guide](selfmade-offline-telebirr-update.md).
+
 ## Professional application v1.44 —22October2026
 
 App-owned private draft/version/evidence/identity-reviewer tables are additive.
@@ -305,3 +317,25 @@ headless heartbeat; notifications and appointment authorization are unchanged.
 Empty additive `tt_user_notification` and `tt_confirmation_observation` tables preserve durable owner/read state and actual booking-prompt observations. They are not publicly exposed DocTypes. Custom endpoints authorize the owner and current encounter membership; recipient-specific publication resolves participant row IDs only within the consented encounter. Stable lifecycle/event keys and existing booking-outbox unique keys make retries idempotent.
 
 Minute cron queues reminders through the existing provider outbox; booking gate and row locks serialize reminders against decisions. Durable Sending claims precede network I/O; uncertain outcomes are not automatically retried. SQL batching excludes legacy policy rows before limiting so they cannot starve current reminders. Existing LiveKit End/revocation implementation is unchanged; ended-call notices reconcile without mutating room security transactions.
+
+
+## Communications and Fictional Readiness — 4 November 2026
+
+Application submission/resubmission acknowledges under review with an update within
+24hours; an honest once-only status update follows if still pending. General,
+individual scope/language/appeal decisions, eligible Requests and private offer
+outcomes use durable neutral system/email/SMS events. Booking/payment activity
+notifies both authorized parties; five-minute reminders use current UTC occurrence
+keys, distinct from the existing3minute acceptance reminder/expiry policy. Saved
+preferences, verified contacts, Ethiopian SMS support/caps and unknown-send safety
+remain enforced. Missing delivery contacts require account-bound OTP proof. Branded
+email retains plain text, private links and accurate provider-acceptance states.
+
+The explicit owner-authorized `demo_readiness.setup` operation readies the ten
+existing adult fictional services through normal catalog/scope/language APIs,
+without real credential verification, full reseed, password reset, balance changes
+or bulk messages. New/real applicants retain human review. This is not automatic
+clinical approval on installation. See
+[verification and limits](communications-demo-readiness-2026-11-04.md) and the existing
+screen matrix revision. No remote deployment, provider/mode/access change,
+translation approval or separate roadmap-site update is claimed.

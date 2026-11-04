@@ -1,0 +1,53 @@
+{
+  "workbook_sha256": "fdf8991a953408ea28f7734e63385c8f1b3b88ec3248a6c9ab8feda7c5ba3495",
+  "baseline_commit": "05299379183efa0e8f1b599c46c60bd9531d6296",
+  "current_commit": "569537640665d9dcbb07738523fd49e4c5c5354a",
+  "baseline_rows": 8690,
+  "workbook_rows": 8690,
+  "current_catalog_rows": 8384,
+  "source_delta": {
+    "technical_extraction_excluded": 351,
+    "new_source": 45
+  },
+  "locale_states": {
+    "amharic": {
+      "Draft": 8472,
+      "Needs Clarification": 218
+    },
+    "afaan_oromo": {
+      "Draft": 8472,
+      "Needs Clarification": 218
+    }
+  },
+  "approved_rows": {
+    "amharic": 0,
+    "afaan_oromo": 0
+  },
+  "eligible_exports": {
+    "amharic": 0,
+    "afaan_oromo": 0
+  },
+  "issues_by_locale": {
+    "amharic": {
+      "product_name_review:Telebirr": 1,
+      "locale_script_review": 93,
+      "supplied_locale_wording_review": 100,
+      "clinical_financial_terminology_review": 34,
+      "policy_translation_review": 21,
+      "product_name_review:TeleTena": 2,
+      "same_english_fallback_conflict": 19
+    },
+    "afaan_oromo": {
+      "clinical_financial_terminology_review": 34,
+      "locale_script_review": 1,
+      "policy_translation_review": 21,
+      "same_english_fallback_conflict": 24
+    }
+  },
+  "fatal_source_errors": [],
+  "mechanical_corrections": 328,
+  "human_linguistic_corrections": 0,
+  "draft_preview_available": false,
+  "import_performed": false,
+  "approval_gate": "Blocked: no independently approved rows"
+}

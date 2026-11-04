@@ -64,8 +64,8 @@ export function Applications() {
       <nav className="guided-step-nav" aria-label={w("Application review progress")}>{applicationSteps.map((label,index)=><button key={label} type="button" aria-current={applicationStep===index?"step":undefined} onClick={()=>setApplicationStep(index)}><span>{index+1}</span>{w(label)}</button>)}</nav>
       <div className="application-review-layout"><div>
         <div hidden={applicationStep!==0}>
-        <section className="application-review-panel"><h2>{w("Professional Profile")}</h2>{selected.application_profile&&Object.keys(selected.application_profile).length>0&&<><p className="supporting">{w("Self-reported application details — verification is recorded separately.")}</p><dl>{([["professional_category","Profession"],["qualification","Primary Qualification"],["issuing_institution","Issuing Institution"],["experience_years","Years of Practice"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl><details className="application-credential-details"><summary>{w("Credential Details")}</summary><dl>{([["issuing_authority","Licensing Authority"],["registration_number","License Number"],["jurisdiction","Credential Jurisdiction"],["credential_valid_from","Valid From"],["credential_expiry","Valid Until"],["competencies","Earlier Competency Narrative"],["certifications","Certifications"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl></details></>}<h3>{w("Professional Statement")}</h3><p className="prewrap">{selected.statement||w("Not provided")}</p>
-          <h3>{w("Requested Service Scopes")}</h3><ul>{(selected.requested_service_labels||[]).map(label=><li key={label}>{label}</li>)}</ul>{!selected.requested_service_labels?.length&&<p>{w("No requested scopes recorded")}</p>}
+        <section className="application-review-panel"><h2>{w("Professional Profile")}</h2>{selected.application_profile&&Object.keys(selected.application_profile).length>0&&<><p className="supporting">{w("Self-reported application details — verification is recorded separately.")}</p><dl>{([["professional_category","Profession"],["qualification","Primary Qualification"],["issuing_institution","Issuing Institution"],["experience_years","Years of Practice"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl><details className="application-credential-details"><summary>{w("Credential Details")}</summary><dl>{([["issuing_authority","Licensing Authority"],["registration_number","License Number"],["jurisdiction","Credential Jurisdiction"],["credential_valid_from","Valid From"],["credential_expiry","Valid Until"],["competencies","Earlier Competency Narrative"],["certifications","Credentials"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl></details></>}<h3>{w("Professional Statement")}</h3><p className="prewrap">{selected.statement||w("Not provided")}</p>
+          <h3>{w("Requested Service Scopes")}</h3><ul>{(selected.requested_services||[]).map((service,index)=><li key={service}><strong>{selected.requested_service_labels?.[index]}</strong>{!selected.scope_applications?.some(item=>item.service===service)&&<p className="supporting">{w("No submitted scope review is recorded. Check existing grants in Service Scopes, or request the missing application details before starting a review.")}</p>}{selected.scope_applications?.filter((item:any)=>item.service===service).map((item:any)=><div key={item.name}><StatusBadge>{w(item.status)}</StatusBadge> <Link className="text-link" to="/admin/vetting" state={{scopeApplication:item.name}}>{w("Review This Scope")}</Link></div>)}</li>)}</ul>{!selected.requested_service_labels?.length&&<p>{w("No requested scopes recorded")}</p>}
           <details><summary>{w("Contact / Account Reference")}</summary><p className="supporting">{selected.user}</p></details>
         </section>
         </div><div hidden={applicationStep!==1}><ProfessionalReview clinician={selected.user}/><section className="application-review-panel"><h2>{w("Private Documents")}</h2><div className="application-document-row"><FileText size={24} aria-hidden="true"/><div><strong>{w("CV")}</strong><p>{w(selected.resume_uploaded?"Uploaded":"Not uploaded")}</p></div></div>
@@ -97,8 +97,10 @@ export function Applications() {
   </>;
 }
 export function Scopes() {
+  const navigate=useNavigate();
+  const [grantReason,setGrantReason]=useState("");
   const applications = useResource(journeyApi.applications);
-  const services = useResource(journeyApi.services);
+  const services = useResource(journeyApi.reviewableScopeServices);
   const scopes = useResource(journeyApi.serviceScopes);
   const immediateServices = useResource(journeyApi.immediateServices);
   const [clinician, setClinician] = useState("");
@@ -122,11 +124,8 @@ export function Scopes() {
           onSubmit={(e) => {
             e.preventDefault();
             void action.run(async () => {
-              await journeyApi.reviewServiceScope(
-                clinician,
-                service,
-                "Approved",
-              );
+              const result=await journeyApi.prepareScopeReview(clinician,service,grantReason);
+              if(result.application){navigate("/admin/vetting",{state:{scopeApplication:result.application}});return;}
               await scopes.refresh();
             });
           }}
@@ -157,9 +156,9 @@ export function Scopes() {
               </option>
             ))}
           </Select>
-          <Button type="submit" loading={action.busy}>
-            Approve service scope
-          </Button>
+          <TextField label={w("Reason for Manual Review")} required value={grantReason} onChange={e=>setGrantReason(e.target.value)} maxLength={1000} hint={w("Record why this service is being reviewed. This action is audited and does not bypass evidence or approval requirements.")}/>
+          <InlineNotice>{w("Services requiring vetting open their individual assessment. Only legacy services that do not require vetting can be granted here directly.")}</InlineNotice>
+          <Button type="submit" loading={action.busy}>{w("Continue to Service-Scope Review")}</Button>
         </form>
       </div>
       {action.error && (

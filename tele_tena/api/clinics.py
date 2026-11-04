@@ -3,6 +3,7 @@
 Clinic affiliation is operational evidence only. It never grants patient-record
 access or establishes competence for a clinical service scope.
 """
+from tele_tena.localization import localized_throw
 import frappe
 from frappe.utils import now_datetime
 
@@ -13,10 +14,10 @@ from tele_tena.tele_tena.doctype.tele_tena_clinic_membership.tele_tena_clinic_me
 def clinic_applicant():
     user = actor()
     if not set(frappe.get_roles(user)).intersection({'Tele Tena Clinician', 'Tele Tena Applicant'}):
-        frappe.throw('Clinician application access required.', frappe.PermissionError)
+        localized_throw('Clinician application access required.', frappe.PermissionError)
     if not frappe.db.get_value('User', user, 'enabled') or not frappe.db.sql(
             'SELECT user FROM tt_profile WHERE user=%s AND kind=%s', (user, 'clinician')):
-        frappe.throw('Complete the clinician profile first.', frappe.PermissionError)
+        localized_throw('Complete the clinician profile first.', frappe.PermissionError)
     return user
 
 
@@ -35,7 +36,7 @@ def submit_clinic_application(clinic_name, legal_name, registration_reference,
                               jurisdiction, public_description=''):
     clinician = clinic_applicant()
     if not frappe.db.get_value('User', clinician, 'enabled'):
-        frappe.throw('Account unavailable', frappe.PermissionError)
+        localized_throw('Account unavailable', frappe.PermissionError)
     clinic_name = text(clinic_name, 160)
     legal_name = text(legal_name, 180)
     registration_reference = text(registration_reference, 120)
@@ -94,7 +95,7 @@ def review_clinic(application, decision, reason):
     if not allowed:
         fail('This clinic verification decision is not valid from its current status.')
     if doc.submitted_by == reviewer:
-        frappe.throw('A reviewer cannot decide their own clinic application.', frappe.PermissionError)
+        localized_throw('A reviewer cannot decide their own clinic application.', frappe.PermissionError)
     frappe.local.tele_tena_clinic_review = True
     try:
         doc.status = decision
@@ -135,7 +136,7 @@ def submit_affiliation(clinic, professional_role, evidence_summary, application=
     clinician = clinic_applicant()
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     if not frappe.db.get_value('User', clinician, 'enabled'):
-        frappe.throw('Account unavailable', frappe.PermissionError)
+        localized_throw('Account unavailable', frappe.PermissionError)
     if frappe.db.get_value('Tele Tena Clinic', clinic, 'status') != 'Verified':
         fail('Choose a clinic whose registration has been verified.', 'clinic_not_verified')
     role = text(professional_role, 120)
@@ -143,7 +144,7 @@ def submit_affiliation(clinic, professional_role, evidence_summary, application=
     if application:
         doc = frappe.get_doc('Tele Tena Clinic Affiliation', application)
         if doc.clinician != clinician or doc.status != 'Clarification':
-            frappe.throw('This affiliation cannot be resubmitted.', frappe.PermissionError)
+            localized_throw('This affiliation cannot be resubmitted.', frappe.PermissionError)
         if doc.clinic != clinic:
             fail('The clinic for this application cannot change.')
         # The previous reviewer decision remains in Frappe Version history and
@@ -181,7 +182,7 @@ def review_affiliation(application, decision, reason):
     reason = text(reason, 1000)
     doc = frappe.get_doc('Tele Tena Clinic Affiliation', application)
     if doc.clinician == reviewer:
-        frappe.throw('A reviewer cannot decide their own clinic affiliation.', frappe.PermissionError)
+        localized_throw('A reviewer cannot decide their own clinic affiliation.', frappe.PermissionError)
     if decision == 'Verified' and frappe.db.get_value('Tele Tena Clinic', doc.clinic, 'status') != 'Verified':
         fail('The associated clinic is no longer verified.')
     if decision == 'Revoked':
@@ -245,9 +246,9 @@ def managed_clinics():
 def clinic_team(clinic):
     user = actor()
     if not _clinic_manager(user, clinic):
-        frappe.throw('Clinic manager access required.', frappe.PermissionError)
+        localized_throw('Clinic manager access required.', frappe.PermissionError)
     if not frappe.db.exists('Tele Tena Clinic', clinic):
-        frappe.throw('Clinic unavailable.', frappe.PermissionError)
+        localized_throw('Clinic unavailable.', frappe.PermissionError)
     return frappe.get_list('Tele Tena Clinic Membership',
         fields=['name', 'invite_email', 'membership_role', 'status',
                 'invited_at', 'accepted_at', 'revoked_at', 'revocation_reason'],
@@ -258,7 +259,7 @@ def clinic_team(clinic):
 def invite_clinic_member(clinic, invite_email, membership_role):
     user = actor()
     if not _clinic_manager(user, clinic):
-        frappe.throw('Clinic manager access required.', frappe.PermissionError)
+        localized_throw('Clinic manager access required.', frappe.PermissionError)
     if frappe.db.get_value('Tele Tena Clinic', clinic, 'status') != 'Verified':
         fail('Only a verified clinic may invite team members.', 'clinic_unavailable')
     if membership_role not in ('Clinic Manager', 'Scheduling', 'Billing', 'Care Coordination'):
@@ -323,7 +324,7 @@ def _invitation_for_verified_contact(invitation, user):
     contacts = frappe.db.sql('''SELECT contact FROM tt_contact_identity
         WHERE user=%s AND channel='email' ''', (user,), pluck=True)
     if not contacts or invitation.invite_email not in contacts:
-        frappe.throw('This invitation is unavailable for the signed-in account.',
+        localized_throw('This invitation is unavailable for the signed-in account.',
                      frappe.PermissionError)
 
 
@@ -336,7 +337,7 @@ def respond_to_clinic_invitation(membership, decision):
     try:
         doc = frappe.get_doc('Tele Tena Clinic Membership', membership)
     except frappe.DoesNotExistError:
-        frappe.throw('Invitation unavailable.', frappe.PermissionError)
+        localized_throw('Invitation unavailable.', frappe.PermissionError)
     _invitation_for_verified_contact(doc, user)
     if doc.status == 'Active' and doc.member_user == user and decision == 'accept':
         return {'membership': doc.name, 'status': doc.status, 'idempotent': True}
@@ -371,9 +372,9 @@ def revoke_clinic_membership(membership, reason):
     try:
         doc = frappe.get_doc('Tele Tena Clinic Membership', membership)
     except frappe.DoesNotExistError:
-        frappe.throw('Membership unavailable.', frappe.PermissionError)
+        localized_throw('Membership unavailable.', frappe.PermissionError)
     if not _clinic_manager(user, doc.clinic):
-        frappe.throw('Clinic manager access required.', frappe.PermissionError)
+        localized_throw('Clinic manager access required.', frappe.PermissionError)
     if (doc.status == 'Revoked' and doc.revoked_by == user
             and doc.revocation_reason == reason):
         return {'membership': doc.name, 'status': doc.status, 'idempotent': True}

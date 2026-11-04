@@ -1,4 +1,5 @@
 """Structured applicant claims. Never grants scopes, clinical access or verification."""
+from tele_tena.localization import localized_throw
 import base64
 import hashlib
 import json
@@ -29,7 +30,7 @@ def owner():
     draft=rows('SELECT kind,completed FROM tt_onboarding WHERE user=%s',(user,))
     from tele_tena.review import registration_enabled
     if (p and p[0].kind=='clinician') or (draft and not draft[0].completed and not p and registration_enabled('clinician')):return user
-    frappe.throw('Professional application access required',frappe.PermissionError)
+    localized_throw('Professional application access required',frappe.PermissionError)
 
 
 def may_review(user,clinician):
@@ -85,21 +86,21 @@ def validate(value,user,submit=False):
         return values
     for key,purpose in [('identity_files','Identification'),('license_files','License'),('cv_files','CV')]:result[key]=files(value.get(key,[]),purpose)
     certs=value.get('certifications',[])
-    if not isinstance(certs,list) or len(certs)>200:fail('Up to 200 certifications may be saved per application.','certifications_limit')
+    if not isinstance(certs,list) or len(certs)>200:fail('Up to 200 credentials may be saved per application.','certifications_limit')
     result['certifications']=[];seen=set()
     for item in certs:
-        if not isinstance(item,dict) or set(item)-{'id','title','description','issuer','issuer_other','country','issued','expires','files'}:fail('Review certification fields.','certification_invalid')
+        if not isinstance(item,dict) or set(item)-{'id','title','description','issuer','issuer_other','country','issued','expires','files'}:fail('Review credential fields.','certification_invalid')
         cert={k:text(str(v),1000 if k=='description' else 240,False) for k,v in item.items() if k!='files'}
-        if not re.fullmatch(r'[a-f0-9-]{36}',cert.get('id','')) or cert['id'] in seen:fail('Certification row is invalid.','certification_invalid')
+        if not re.fullmatch(r'[a-f0-9-]{36}',cert.get('id','')) or cert['id'] in seen:fail('Credential row is invalid.','certification_invalid')
         seen.add(cert['id']);cert['files']=files(item.get('files',[]),'Certification')
-        if submit and not cert.get('title'):fail('Enter a title for every certification, or remove its empty row.','certification_title_required')
+        if submit and not cert.get('title'):fail('Enter a title for every credential, or remove its empty row.','certification_title_required')
         if cert.get('issuer') and cert['issuer']!='Other':reference(cert['issuer'],'issuer',user)
-        if submit and cert.get('issuer')=='Other' and not (cert.get('issuer_other') and cert.get('country')):fail('Enter the certification issuer and country.','issuer_country_required')
+        if submit and cert.get('issuer')=='Other' and not (cert.get('issuer_other') and cert.get('country')):fail('Enter the credential issuer and country.','issuer_country_required')
         for k in ('issued','expires'):
             if cert.get(k):
                 try:cert[k]=frappe.utils.getdate(cert[k]).isoformat()
-                except Exception:fail('Enter valid certification dates.','credential_date_invalid')
-        if cert.get('issued') and cert.get('expires') and cert['expires']<cert['issued']:fail('Certification expiry must follow its issue date.','credential_date_range')
+                except Exception:fail('Enter valid credential dates.','credential_date_invalid')
+        if cert.get('issued') and cert.get('expires') and cert['expires']<cert['issued']:fail('Credential expiry must follow its issue date.','credential_date_range')
         result['certifications'].append(cert)
     domains=value.get('competencies',[])
     if not isinstance(domains,list) or len(domains)>100:fail('Review selected competency domains.','competency_invalid')
@@ -123,7 +124,7 @@ def validate(value,user,submit=False):
 @query()
 def application(clinician=None):
     user=actor();clinician=clinician or owner()
-    if not may_review(user,clinician):frappe.throw('Application unavailable',frappe.PermissionError)
+    if not may_review(user,clinician):localized_throw('Application unavailable',frappe.PermissionError)
     saved=rows('SELECT payload,revision,legacy_name FROM tt_professional_draft WHERE user=%s',(clinician,))
     evidence=rows('SELECT id,purpose,filename,mime,content_size,content_sha256,created FROM tt_professional_evidence WHERE user=%s ORDER BY created',(clinician,))
     identity_access=user==clinician or bool(rows('SELECT clinician FROM tt_identity_reviewer WHERE clinician=%s AND reviewer=%s',(clinician,user)))
@@ -212,11 +213,11 @@ def upload(purpose,filename,content_base64):
 @query()
 def download(id):
     user=actor();found=rows('SELECT user,purpose,filename,mime,content FROM tt_professional_evidence WHERE id=%s',(id,))
-    if not found:frappe.throw('Evidence unavailable',frappe.PermissionError)
+    if not found:localized_throw('Evidence unavailable',frappe.PermissionError)
     d=found[0]
     allowed=may_review(user,d.user)
     if d.purpose=='Identification' and user!=d.user:allowed=bool(rows('SELECT clinician FROM tt_identity_reviewer WHERE clinician=%s AND reviewer=%s',(d.user,user))) and 'Tele Tena Approver' in frappe.get_roles(user)
-    if not allowed:frappe.throw('Evidence unavailable',frappe.PermissionError)
+    if not allowed:localized_throw('Evidence unavailable',frappe.PermissionError)
     from werkzeug.wrappers import Response
     return Response(bytes(d.content),mimetype=d.mime,headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Disposition':"attachment; filename*=UTF-8''"+quote(d.filename,safe=''),'Content-Security-Policy':"sandbox; default-src 'none'"})
 
@@ -268,7 +269,7 @@ def revoke_identity_reviewer(clinician,reviewer,reason):
 @query()
 def submission(id):
     user=actor();found=rows('SELECT id,user,payload,digest,created,declaration_version,reference_snapshot FROM tt_professional_submission WHERE id=%s',(id,))
-    if not found or not may_review(user,found[0].user):frappe.throw('Submitted application unavailable',frappe.PermissionError)
+    if not found or not may_review(user,found[0].user):localized_throw('Submitted application unavailable',frappe.PermissionError)
     row=found[0];payload=json.loads(row.payload)
     identity=user==row.user or ('Tele Tena Approver' in frappe.get_roles(user) and bool(rows('SELECT clinician FROM tt_identity_reviewer WHERE clinician=%s AND reviewer=%s',(row.user,user))))
     if not identity:payload.pop('identity_files',None);payload.pop('identification_type',None)
@@ -285,7 +286,7 @@ def attach_scope_license(application,id):
     user=owner()
     from tele_tena.api.vetting import _authorized_scope_application,upload_scope_evidence
     scope=_authorized_scope_application(application,user)
-    if scope.clinician!=user:frappe.throw('Scope evidence unavailable',frappe.PermissionError)
+    if scope.clinician!=user:localized_throw('Scope evidence unavailable',frappe.PermissionError)
     document=rows("SELECT filename,mime,content,content_sha256 FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose='License'",(id,user))
     if not document or document[0].mime!='application/pdf':fail('Choose a private license PDF from your professional profile. Identification files cannot be attached to scope applications.','scope_license_pdf_required')
     rows('SELECT name FROM `tabTele Tena Vetting Scope Application` WHERE name=%s AND clinician=%s FOR UPDATE',(application,user))
@@ -294,3 +295,20 @@ def attach_scope_license(application,id):
     result=upload_scope_evidence(application,'License or registration',document[0].filename,base64.b64encode(bytes(document[0].content)).decode())
     audit(user,'ProfessionalLicenseAttached',{'application':application,'source_evidence':id,'sha256':document[0].content_sha256})
     return result
+
+
+@query()
+def legacy_cv(id=None):
+    """Owner-only adapter; never accepts another clinician's account in the URL."""
+    user=owner()
+    found=rows('SELECT filename,content FROM tt_resume_evidence WHERE clinician=%s',(user,))
+    if not found:
+        ids=retained_cv_ids(user)
+        if not ids:localized_throw('CV unavailable',frappe.DoesNotExistError)
+        return download(ids[0])
+    # Earlier CV uploads used a weaker header-only check. Revalidate on this
+    # preview-specific route, without rewriting or broadening legacy downloads.
+    from tele_tena.api.history_documents import validated
+    filename,mime,content=validated(found[0].filename,base64.b64encode(bytes(found[0].content)).decode())
+    from werkzeug.wrappers import Response
+    return Response(content,mimetype=mime,headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Disposition':"attachment; filename*=UTF-8''"+quote(filename,safe=''),'Content-Security-Policy':"sandbox; default-src 'none'"})

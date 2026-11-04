@@ -1,4 +1,5 @@
 """Owner-only history files, separate from the text sharing/disclosure snapshot."""
+from tele_tena.localization import localized_throw
 import base64
 import hashlib
 import io
@@ -24,7 +25,7 @@ def owner():
     if registration_enabled('patient') and onboarding and onboarding[0].kind=='patient' and not onboarding[0].completed and frappe.db.sql('SELECT user FROM tt_contact_identity WHERE user=%s',(user,)):
         answers=json.loads(onboarding[0].answers)
         if answers.get('adult') is True and answers.get('consent') is True:return user
-    frappe.throw('Patient access required',frappe.PermissionError)
+    localized_throw('Patient access required',frappe.PermissionError)
 
 
 def validated(filename,encoded):
@@ -90,7 +91,7 @@ def upload(filename,content_base64):
 @query()
 def download(id):
     patient=owner();found=rows('SELECT filename,mime,content FROM tt_history_document WHERE id=%s AND patient=%s',(id,patient))
-    if not found:frappe.throw('Document unavailable',frappe.PermissionError)
+    if not found:localized_throw('Document unavailable',frappe.PermissionError)
     from werkzeug.wrappers import Response
     document=found[0]
     return Response(bytes(document.content),mimetype=document.mime,headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Content-Disposition':"attachment; filename*=UTF-8''"+quote(document.filename,safe=''),'Content-Security-Policy':"sandbox; default-src 'none'"})

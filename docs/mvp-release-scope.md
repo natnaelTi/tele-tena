@@ -1,3 +1,15 @@
+## Payment Navigation and Reviewer Defaults — 28 October 2026
+
+Owner-approved refinement: payment submission/review is a standalone page, with the form/status on the left and a payment-only timeline/appointment next-step link on the right. Appointment details retain a compact status/link; incoming receipts are actionable from clinician Appointments, Requests and notifications. No booking/receipt/appointment acceptance facts are merged.
+
+Reviewer accounts (Tele Tena Approver) now receive Tele Tena Financial Configuration by default through a versioned audited backfill and authorized new-reviewer assignment. This explicitly supersedes the earlier no-default-reviewer policy. It grants no receipt/clinical access beyond existing party/reviewer permissions, changes no payment mode and activates no providers. A later explicit removal is respected. See [verification](payment-navigation-verification-2026-10-28.md).
+
+## Offline Payment and Care-Language Amendment — 28 October 2026
+
+New payable bookings can use administrator-selected Offline Direct Payment. Existing Wallet transactions retain their original rules. This supersedes mandatory Wallet funding for new Offline bookings, not historical finance. Individual care-language claims/reviewer decisions gate offering publication/discovery/matching/booking. No new real-money provider is activated.
+
+See [verification](offline-telebirr-verification-2026-10-28.md), [operator walkthrough](offline-telebirr-operator-walkthrough.md) and [update guide](selfmade-offline-telebirr-update.md).
+
 ## Guest-first direction —17October2026
 
 Public directory,structured reactive filters,intent-aware authentication,volatile
@@ -207,3 +219,78 @@ other adult, unrelated clinicians and vetting reviewers receive no message.
 An amendment retains previously published content. This does not create another
 charge or earning. Existing summaries, clinical notes and historical records are
 not rewritten. New Amharic/Afaan Oromo copy is provisional pending human review.
+
+
+## Translation Workbook Revision — 28 October 2026
+
+Current technical candidate569537640665d9dcbb07738523fd49e4c5c5354a preserves
+completed MVP scope and all existing financial modes/permissions. No schema,
+dependency, provider, access or payment-mode change is introduced. Workbook
+reconciliation and approved-only locale/template/policy plumbing are verified;
+no workbook draft was imported. Both Amharic and Afaan Oromo have zero human
+approvals. Native review, independent locale approval, new-template/conflict
+resolution and subsequent built-language/owner review remain release gates.
+Existing policy draft/publication status and consent versions remain unchanged.
+See [localization-release-readiness.md](localization-release-readiness.md), the
+existing screen matrix revision and [selfmade-translation-update.md](selfmade-translation-update.md).
+Historical evidence is retained; no separate roadmap website was changed.
+
+
+## Navigation, Private Previews and Encounter Photos — 29 October 2026
+
+Owner-approved v1.49 adds an independent patient preference to share the current
+profile photo only with an otherwise authorized treating clinician. Missing new
+and legacy preferences default enabled; explicit opt-outs remain intact. This
+supersedes the earlier blanket owner-only patient-photo presentation, while name,
+history, file choices and immutable encounter consent remain unchanged. Withdrawal
+denies subsequent image requests and avatars revalidate on active-tab refresh.
+Couples participants never grant photo access for one another.
+
+Patient Requests and Shared Care are primary navigation. Private receipt and
+professional attachment previews retain underlying access/PDF restrictions. Final
+application review groups selected filenames by purpose. Encounter avatars are
+LEFT of the authorized person's name; page headings stay separate.
+
+Demo deployment is authorized with existing permitted translations and truthful
+fallbacks. Final localization remains blocked by independent human approvals; no
+Draft import or approval bypass was added. See the existing matrix revision and
+[attachment-photo-release-readiness.md](attachment-photo-release-readiness.md),
+[selfmade-translation-update.md](selfmade-translation-update.md). No remote
+deployment, merge, reseed, password/provider/access/mode change or public-roadmap
+website update is claimed.
+
+
+## Communications and Fictional Readiness — 4 November 2026
+
+Application submission/resubmission acknowledges under review with an update within
+24hours; an honest once-only status update follows if still pending. General,
+individual scope/language/appeal decisions, eligible Requests and private offer
+outcomes use durable neutral system/email/SMS events. Booking/payment activity
+notifies both authorized parties; five-minute reminders use current UTC occurrence
+keys, distinct from the existing3minute acceptance reminder/expiry policy. Saved
+preferences, verified contacts, Ethiopian SMS support/caps and unknown-send safety
+remain enforced. Missing delivery contacts require account-bound OTP proof. Branded
+email retains plain text, private links and accurate provider-acceptance states.
+
+The explicit owner-authorized `demo_readiness.setup` operation readies the ten
+existing adult fictional services through normal catalog/scope/language APIs,
+without real credential verification, full reseed, password reset, balance changes
+or bulk messages. New/real applicants retain human review. This is not automatic
+clinical approval on installation. See
+[verification and limits](communications-demo-readiness-2026-11-04.md) and the existing
+screen matrix revision. No remote deployment, provider/mode/access change,
+translation approval or separate roadmap-site update is claimed.
+
+
+## Missing-Information Scope Decisions — 4 November 2026
+
+Only approval requires complete credential verification and scored assessment.
+Authorized non-approval outcomes record a required reason and optional restrictions
+without asserting verification from unfinished controls. Request Information uses
+the existing Clarification state and durable neutral system/email/SMS channels.
+Both applicant and approved clinician homepages show exact service follow-ups,
+private reasons and a link to the correct reply/evidence/resubmission form. Existing
+approvals/history remain intact; resubmission grants no service scope. See
+[focused verification](scope-information-fix-2026-11-04.md) and the existing matrix.
+No remote deployment, provider/mode change, real delivery or language approval is
+claimed.

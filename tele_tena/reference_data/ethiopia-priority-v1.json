@@ -1,0 +1,41 @@
+{
+  "version": "proposed-et-navigation-v1",
+  "status": "Clinical-owner review pending; curated convenience, no usage/popularity evidence or accreditation claim",
+  "entries": [
+    {
+      "id": "authority:et-moh",
+      "label": "Ethiopian Ministry of Health",
+      "source_url": "https://www.moh.gov.et/"
+    },
+    {
+      "id": "facility:ror:04ye60n79",
+      "label": "Tikur Anbessa Hospital",
+      "source_url": "https://ror.org/04ye60n79"
+    },
+    {
+      "id": "facility:ror:01jww0g06",
+      "label": "Amanuel Mental Specialized Hospital",
+      "source_url": "https://ror.org/01jww0g06"
+    },
+    {
+      "id": "issuer:ror:0595gz585",
+      "label": "University of Gondar",
+      "source_url": "https://ror.org/0595gz585"
+    },
+    {
+      "id": "issuer:ror:038b8e254",
+      "label": "Addis Ababa University",
+      "source_url": "https://ror.org/038b8e254"
+    },
+    {
+      "id": "issuer:ror:05eer8g02",
+      "label": "Jimma University",
+      "source_url": "https://ror.org/05eer8g02"
+    },
+    {
+      "id": "facility:ror:04ax47y98",
+      "label": "St. Paul's Hospital Millennium Medical College",
+      "source_url": "https://ror.org/04ax47y98"
+    }
+  ]
+}

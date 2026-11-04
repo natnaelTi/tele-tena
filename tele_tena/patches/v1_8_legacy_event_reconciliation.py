@@ -4,6 +4,7 @@ The wallet and append-only simulation log remain unchanged. This patch only
 adds balanced, traceable journals for known events that landed after a wallet's
 v1.7 opening snapshot. Unknown event kinds fail the migration closed.
 """
+from tele_tena.localization import localized_throw
 import frappe
 
 
@@ -36,7 +37,7 @@ def reconcile_wallet_events(patient):
         elif event.kind == 'Release':
             lines = [(reserved, amount, 0), (available, 0, amount)]
         else:
-            frappe.throw('Unknown legacy financial event; migration requires review',
+            localized_throw('Unknown legacy financial event; migration requires review',
                          frappe.ValidationError)
         post(event.reference, 'LegacyEventImported', 'legacy-import:' + event.id,
              lines, {'source': 'tt_ledger', 'legacy_event_id': event.id,

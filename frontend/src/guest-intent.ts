@@ -1,10 +1,10 @@
 /** Durable allowlisted navigation only. Health text/files never enter Web Storage. */
 import {discoveryFilters} from './care-intent';
-type Language='en'|'am'|'om';type Format='audio'|'video';
+type Language=string;type Format='audio'|'video';
 export type ReturnIntent={kind:'offering';ref:string;language?:Language;format?:Format}|{kind:'request';ref?:string}|{kind:'booking-link';ref:string};
 const key='teletena-return-v1',uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 let memory:ReturnIntent|null=null;
-function clean(value:any):ReturnIntent|null{if(value?.kind==='booking-link'&&/^[a-f0-9]{64}$/.test(value.ref||''))return{kind:'booking-link',ref:value.ref};if(value?.kind==='request')return{kind:'request',...(uuid.test(value.ref||'')?{ref:value.ref}:{})};if(value?.kind==='offering'&&uuid.test(value.ref))return{kind:'offering',ref:value.ref,...(['en','am','om'].includes(value.language)?{language:value.language}:{}),...(['audio','video'].includes(value.format)?{format:value.format}:{})};return null;}
+function clean(value:any):ReturnIntent|null{if(value?.kind==='booking-link'&&/^[a-f0-9]{64}$/.test(value.ref||''))return{kind:'booking-link',ref:value.ref};if(value?.kind==='request')return{kind:'request',...(uuid.test(value.ref||'')?{ref:value.ref}:{})};if(value?.kind==='offering'&&uuid.test(value.ref))return{kind:'offering',ref:value.ref,...(typeof value.language==='string'&&/^[a-z]{2,3}$/.test(value.language)?{language:value.language}:{}),...(['audio','video'].includes(value.format)?{format:value.format}:{})};return null;}
 export function returnIntent():ReturnIntent|null{try{return clean(JSON.parse(sessionStorage.getItem(key)||'null'))||memory;}catch{return memory;}}
 export function rememberReturn(value:ReturnIntent){const filters=discoveryFilters(),prior=returnIntent();memory=clean(value.kind==='offering'?{...value,language:value.language||filters.language||(prior?.kind==='offering'&&prior.ref===value.ref?prior.language:''),format:value.format||filters.format||(prior?.kind==='offering'&&prior.ref===value.ref?prior.format:'')}:value);try{if(memory)sessionStorage.setItem(key,JSON.stringify(memory));}catch{/* Memory-only fallback;no clinical data is persisted. */}}
 export function clearReturn(){memory=null;try{sessionStorage.removeItem(key);}catch{}}

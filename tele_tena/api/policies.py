@@ -5,9 +5,21 @@ from tele_tena.api.journey import fail
 TERMS='terms-draft-2026-10-20-v1';PRIVACY='privacy-draft-2026-10-20-v1'
 
 @frappe.whitelist(allow_guest=True,methods=['GET'])
-def current():
+def current(locale='en'):
     from tele_tena.api.public_content import public
-    content=public();versions={item['key']:item['version'] for item in content['documents']}
+    if locale not in ('en','am','om'):fail('Choose an available language')
+    from tele_tena.localization import translate
+    from tele_tena.public_content_defaults import DOCUMENTS
+    content=public()
+    localized=[]
+    for document in content['documents']:
+        item=dict(document);default=DOCUMENTS.get(item['key'])
+        # Translate only exact application-owned defaults, never edited records.
+        if default and item.get('title')==default[0]:item['title']=translate(default[0],locale)
+        if default and item.get('body')==default[2]:item['body']=translate(default[2],locale)
+        localized.append(item)
+    content={**content,'documents':localized}
+    versions={item['key']:item['version'] for item in content['documents']}
     return {'review_only':True,'terms_version':versions.get('terms',TERMS),'privacy_version':versions.get('privacy',PRIVACY),'documents':content['documents'],
       'notice':'Policy content is under review. This demonstration is not real clinical care or real payments. Approved production Terms and Privacy content is not yet available.',
       'sharing_notice':'Only the identity, text and individual files you affirmatively approve for this encounter are shared with its treating clinician. Previously viewed material cannot be recalled.'}

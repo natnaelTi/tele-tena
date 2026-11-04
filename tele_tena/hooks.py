@@ -19,6 +19,7 @@ scheduler_events = {
 
 # A dedicated namespace only; no catch-all routing or changes to other sites.
 page_renderer = ["tele_tena.review_web.ReviewPage"]
+doc_events = {"User": {"before_validate": "tele_tena.reviewer_roles.set_defaults"}}
 
 # Generic Frappe list and document APIs must enforce the same ownership
 # boundary as TeleTena's purpose-built clinic workflows.

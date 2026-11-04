@@ -1,4 +1,5 @@
 """Two adults consent separately; payer funds one existing appointment ledger."""
+from tele_tena.localization import localized_throw
 import hashlib
 import json
 import secrets
@@ -26,7 +27,7 @@ def participant(appointment, user, require_active=True):
         return None
     found = [p for p in participants(plans[0].id) if p.user == user]
     if not found or (require_active and found[0].state != 'Consented'):
-        frappe.throw('This consultation is unavailable.', frappe.PermissionError)
+        localized_throw('This consultation is unavailable.', frappe.PermissionError)
     return found[0]
 
 
@@ -83,12 +84,14 @@ def _consent(plan, user, request_text, sharing, expected_disclosure, adult_confi
 
 @j.command
 def invite(offering, start, request_text, sharing, expected_disclosure,
-           adult_confirmed, retry_key, booked_timezone='UTC'):
+           adult_confirmed, retry_key, booked_timezone='UTC',care_language=None):
     payer = j.actor('Tele Tena Patient')
     j.one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     key = j.text(retry_key, 80)
     start = j.instant(start)
-    payload = json.dumps([offering,j.iso(start),request_text,sharing,expected_disclosure,booked_timezone], sort_keys=True)
+    payload_values=[offering,j.iso(start),request_text,sharing,expected_disclosure,booked_timezone]
+    if care_language is not None:payload_values.append({'care_language':care_language})
+    payload = json.dumps(payload_values, sort_keys=True)
     digest = hashlib.sha256(payload.encode()).hexdigest()
     token = _retry_token(payer, 'couple-' + key)
     existing = j.rows('SELECT * FROM tt_couple_plan WHERE payer=%s AND retry_key=%s FOR UPDATE', (payer,key))
@@ -99,6 +102,12 @@ def invite(offering, start, request_text, sharing, expected_disclosure,
             j.fail('This invitation is no longer available.', 'couple_invitation_unavailable')
         return {'id':existing[0].id,'token':token,'idempotent':True}
     offer = _offering(offering)
+    from tele_tena.api.care_languages import offering_languages
+    allowed=offering_languages(offering)
+    if not allowed:j.fail('This offering has no approved consultation language.','care_language_unavailable')
+    preferred=j.profile('patient').get('preferred_care_language')
+    selected_language=care_language if care_language is not None else preferred if preferred in allowed else allowed[0]
+    if selected_language not in allowed:j.fail('The selected care language is no longer approved.','care_language_changed')
     from tele_tena.api.scheduling import validate_slot, _zone
     _zone(booked_timezone)
     validate_slot(offer,start,payer)
@@ -108,6 +117,7 @@ def invite(offering, start, request_text, sharing, expected_disclosure,
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Invited',UTC_TIMESTAMP(6),
         LEAST(%s,DATE_ADD(UTC_TIMESTAMP(6),INTERVAL 24 HOUR)))''',
         (plan,payer,offering,start,booked_timezone,offer.price,offer.minutes,key,digest,_token_digest(token),start))
+    frappe.db.sql('UPDATE tt_couple_plan SET care_language=%s WHERE id=%s',(selected_language,plan))
     _consent(plan,payer,request_text,sharing,expected_disclosure,adult_confirmed)
     return {'id':plan,'token':token,'idempotent':False}
 
@@ -118,12 +128,12 @@ def _visible(plan, user):
     clinician = j.one('''SELECT p.display_name,o.title,s.service_label FROM tt_offering o
         JOIN tt_profile p ON p.user=o.clinician JOIN `tabTele Tena Service` s ON s.name=o.service
         WHERE o.id=%s''', (plan.offering,))
-    lifecycle = j.rows('''SELECT a.state appointment_state,c.state call_state
+    lifecycle = j.rows('''SELECT a.state appointment_state,a.payment_mode,c.state call_state
         FROM tt_appointment a LEFT JOIN tt_consultation c ON c.appointment=a.id
         WHERE a.id=%s''', (plan.appointment,)) if plan.appointment and own and own.state=='Consented' else []
     status = lifecycle[0] if lifecycle else {}
     return {'id':plan.id,'state':plan.state,'appointment':plan.appointment,
-        'appointment_state':status.get('appointment_state'), 'call_state':status.get('call_state'),
+        'care_language':plan.get('care_language'),'payment_mode':status.get('payment_mode'),'appointment_state':status.get('appointment_state'), 'call_state':status.get('call_state'),
         'service':clinician.title or clinician.service_label,'clinician':clinician.display_name,
         'start':j.iso(plan.start),'timezone':plan.timezone,'price':plan.price,'minutes':plan.minutes,
         'expires_at':j.iso(plan.expires_at),'consent_version':CONSENT_VERSION,
@@ -156,7 +166,7 @@ def consent(token, request_text, sharing, expected_disclosure, adult_confirmed):
             j.fail('Consent details changed. Start a new invitation.', 'retry_changed')
         return _visible(plan,user)
     if plan.state!='Invited' or len(participants(plan.id))!=1:
-        frappe.throw('Invitation unavailable.',frappe.PermissionError)
+        localized_throw('Invitation unavailable.',frappe.PermissionError)
     _consent(plan.id,user,request_text,sharing,expected_disclosure,adult_confirmed)
     frappe.db.sql("UPDATE tt_couple_plan SET state='Consented' WHERE id=%s", (plan.id,))
     plan.state='Consented'
@@ -177,23 +187,26 @@ def get_plan(plan_id):
     plan = j.rows('''SELECT cp.* FROM tt_couple_plan cp
         JOIN tt_couple_participant p ON p.plan=cp.id WHERE cp.id=%s AND p.user=%s''', (plan_id,user))
     if not plan:
-        frappe.throw('This invitation is unavailable.', frappe.PermissionError)
+        localized_throw('This invitation is unavailable.', frappe.PermissionError)
     return _visible(plan[0],user)
 
 
 @j.command
-def confirm(plan_id):
+def confirm(plan_id,expected_payment_mode=None,payment_mode_revision=None):
     payer = j.actor('Tele Tena Patient')
     j.one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
     plan = j.one('SELECT * FROM tt_couple_plan WHERE id=%s AND payer=%s FOR UPDATE', (plan_id,payer))
     if plan.state=='Booked':
-        return {'id':plan.appointment,'idempotent':True}
+        prior=j.one('SELECT state,payment_mode FROM tt_appointment WHERE id=%s',(plan.appointment,))
+        direct=j.rows("SELECT id FROM tt_direct_payment WHERE appointment=%s AND reference_type='Appointment'",(plan.appointment,))
+        return {'id':plan.appointment,'state':prior.state,'payment_mode':prior.payment_mode,'payment':direct[0].id if direct else None,'idempotent':True}
     if plan.state!='Consented' or plan.expires_at<=datetime.now(timezone.utc).replace(tzinfo=None):
         j.fail('Both adults must consent before booking.', 'couple_consent_required')
     people = participants(plan.id)
     if len(people)!=2 or not all(p.state=='Consented' and frappe.db.get_value('User',p.user,'enabled')
                                 and 'Tele Tena Patient' in frappe.get_roles(p.user) for p in people):
         j.fail('Both adults must have active consent.', 'couple_consent_required')
+    if not plan.get('care_language'):j.fail('This earlier invitation has no recorded consultation language. Create a new invitation so both adults can agree to the same language.','couple_language_required')
     offer = _offering(plan.offering)
     conflicts([p.user for p in people], plan.start, plan.start+timedelta(minutes=plan.minutes))
     own = next(p for p in people if p.user==payer)
@@ -201,7 +214,7 @@ def confirm(plan_id):
     try:
         result = j.book(plan.offering,j.iso(plan.start),json.loads(own.disclosure)['request'],
                         json.loads(own.choices),'couple-'+plan.id,plan.price,plan.minutes,
-                        json.loads(own.disclosure),plan.timezone,couple_plan_id=plan.id)
+                        json.loads(own.disclosure),plan.timezone,couple_plan_id=plan.id,care_language=plan.get('care_language'),expected_payment_mode=expected_payment_mode,payment_mode_revision=payment_mode_revision)
         frappe.db.sql("UPDATE tt_couple_plan SET state='Booked',appointment=%s WHERE id=%s", (result['id'],plan.id))
         return result
     finally:
@@ -232,7 +245,7 @@ def withdraw(plan_id):
     people = participants(plan.id)
     own = next((p for p in people if p.user == user), None)
     if not own:
-        frappe.throw('Shared session unavailable.', frappe.PermissionError)
+        localized_throw('Shared session unavailable.', frappe.PermissionError)
     if own.state == 'Withdrawn':
         _close_withdrawn_room(plan, people)
         return {'withdrawn':True,'idempotent':True}
@@ -302,7 +315,7 @@ def change_people(item, require_ready=True):
 def change_vote(item, kind, change_id, user, decision):
     required = change_people(item)
     if user not in required:
-        frappe.throw('Consultation unavailable', frappe.PermissionError)
+        localized_throw('Consultation unavailable', frappe.PermissionError)
     prior = j.rows('SELECT decision FROM tt_shared_change_consent WHERE kind=%s AND change_id=%s AND participant=%s',
                    (kind, change_id, user))
     if prior and prior[0].decision != decision:
@@ -343,7 +356,7 @@ def decline_invitation(token):
                                          ('invitation', plan.id, user, 'decline')):
         return {'state': 'Declined', 'idempotent': True}
     if user == plan.payer or plan.state != 'Invited' or plan.expires_at <= datetime.now(timezone.utc).replace(tzinfo=None):
-        frappe.throw('Invitation unavailable.', frappe.PermissionError)
+        localized_throw('Invitation unavailable.', frappe.PermissionError)
     frappe.db.sql('''INSERT INTO tt_shared_change_consent
         (kind,change_id,participant,decision,created) VALUES ('invitation',%s,%s,'decline',UTC_TIMESTAMP(6))''',
         (plan.id, user))

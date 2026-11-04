@@ -1,4 +1,5 @@
 """Bounded server-side directory search; pending facilities remain owner-only."""
+from tele_tena.localization import localized_throw
 import json
 import uuid
 import frappe
@@ -12,14 +13,17 @@ def search(kind,search='',country='',offset=0,limit=20,prefer_country='',profess
     offset=integer(offset,0,1000000);limit=integer(limit,1,50);search=text(search,120,False);country=text(country,2,False)
     # Escape wildcard characters rather than allow unbounded wildcard queries.
     term='%'+search.replace('!','!!').replace('%','!%').replace('_','!_')+'%'
-    where="kind=%s AND merged_into IS NULL AND (status IN ('Listed','Reviewed') OR submitted_by=%s) AND (label LIKE %s ESCAPE '!' OR aliases LIKE %s ESCAPE '!')"
-    values=[kind,user,term,term]
+    where="kind=%s AND merged_into IS NULL AND (status IN ('Listed','Reviewed') OR submitted_by=%s) AND (label LIKE %s ESCAPE '!' OR aliases LIKE %s ESCAPE '!' OR group_label LIKE %s ESCAPE '!' OR description LIKE %s ESCAPE '!')"
+    values=[kind,user,term,term,term,term]
+    if kind=='facility':
+        # Only explicit shared clinic identities are deduplicated. Never merge
+        # organizations by a guessed similar name or infer affiliations.
+        where+=" AND (clinic IS NULL OR NOT EXISTS (SELECT 1 FROM tt_reference peer WHERE peer.kind='facility' AND peer.clinic=tt_reference.clinic AND peer.merged_into IS NULL AND (peer.status IN ('Listed','Reviewed') OR peer.submitted_by=%s) AND (CASE WHEN peer.id LIKE 'clinic:%%' THEN 1 ELSE 0 END,peer.id)<(CASE WHEN tt_reference.id LIKE 'clinic:%%' THEN 1 ELSE 0 END,tt_reference.id)))";values.append(user)
     if country:where+=' AND country=%s';values.append(country)
     prefer_country=text(prefer_country,2,False)
     profession=text(profession,100,False)
-    profession_label=rows("SELECT label FROM tt_reference WHERE id=%s AND kind='profession'",(profession,))
-    professional_term='%'+(profession_label[0].label if profession_label else '__no_profession__')+'%'
-    found=rows('SELECT id,label,country,region,entity_type,status FROM tt_reference WHERE '+where+' ORDER BY (country=%s AND country!=\'\') DESC,(aliases LIKE %s) DESC,label,id LIMIT %s OFFSET %s',tuple(values+[prefer_country,professional_term,limit+1,offset]))
+    order="COALESCE(group_label,''),label,id" if kind=='domain' else "CASE WHEN country='ET' AND priority_et=1 THEN 0 ELSE 1 END,label,id"
+    found=rows('SELECT id,label,country,region,entity_type,status,priority_et,priority_review_status,group_label,description FROM tt_reference WHERE '+where+' ORDER BY '+order+' LIMIT %s OFFSET %s',tuple(values+[limit+1,offset]))
     return {'items':found[:limit],'has_more':len(found)>limit,'offset':offset,'limit':limit}
 
 
@@ -80,3 +84,17 @@ def resolve(ids):
         found=rows("SELECT id,label,country,status,merged_into FROM tt_reference WHERE id=%s AND (status IN ('Listed','Reviewed','Merged') OR submitted_by=%s)",(text(id,100),user))
         if found:result.append(found[0])
     return result
+
+
+@command
+def set_priority(id,enabled,source,reason):
+    user=actor('Tele Tena Approver')
+    if 'Tele Tena Medical Lead' not in frappe.get_roles(user):localized_throw('Medical Lead permission required',frappe.PermissionError)
+    from tele_tena.api.journey import boolean
+    source=text(source,500);reason=text(reason,1000)
+    if not source.startswith('https://'):fail('Provide an HTTPS source for this curated selection.')
+    found=rows("SELECT id FROM tt_reference WHERE id=%s AND country='ET' AND kind IN ('issuer','facility','authority') AND merged_into IS NULL FOR UPDATE",(id,))
+    if not found:fail('Choose an eligible Ethiopian reference.')
+    frappe.db.sql("UPDATE tt_reference SET priority_et=%s,priority_source=%s,priority_review_status='Reviewed' WHERE id=%s",(boolean(enabled),source,id))
+    audit(user,'ReferencePriorityDecision',{'reference':id,'enabled':boolean(enabled),'source':source,'reason':reason})
+    return {'saved':True}

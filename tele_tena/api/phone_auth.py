@@ -1,4 +1,5 @@
 """Phone OTP request, verification and narrowly scoped signup endpoints."""
+from tele_tena.localization import localized_throw
 import hashlib
 import hmac
 import re
@@ -56,7 +57,7 @@ def _otp_digest(challenge, phone_digest, purpose, code):
 
 def _json_error(message, code):
     frappe.local.response['tele_tena_error'] = code
-    frappe.throw(message, frappe.ValidationError)
+    localized_throw(message, frappe.ValidationError)
 
 
 def _generic_result(challenge_id=''):

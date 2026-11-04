@@ -1,4 +1,5 @@
 """Owner-scoped, read-only financial activity details."""
+from tele_tena.localization import localized_throw
 import json
 import re
 
@@ -10,7 +11,7 @@ UUID_RE = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]
 
 def _unavailable():
     frappe.local.response['tele_tena_error'] = 'transaction_unavailable'
-    frappe.throw('Transaction unavailable', frappe.PermissionError)
+    localized_throw('Transaction unavailable', frappe.PermissionError)
 
 
 def _actor_accounts(user, role):

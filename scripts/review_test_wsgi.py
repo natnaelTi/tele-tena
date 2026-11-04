@@ -10,4 +10,7 @@ assert frappe.app._site and frappe.app._site.startswith(('tele-tena-', 'teletena
 frappe.app._sites_path = str(BENCH / 'sites')
 application = SharedDataMiddleware(frappe.app.application, {
     '/assets/tele_tena': str(BENCH / 'apps/tele_tena/tele_tena/public'),
+    # The Administrator login and Desk use the Bench's existing public bundles.
+    # Never expose sites/, public files or private files through this middleware.
+    '/assets': str(BENCH / 'sites/assets'),
 })

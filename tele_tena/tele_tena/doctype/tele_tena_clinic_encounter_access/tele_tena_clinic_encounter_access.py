@@ -1,3 +1,4 @@
+from tele_tena.localization import localized_throw
 import frappe
 from frappe.model.document import Document
 
@@ -6,29 +7,29 @@ class TeleTenaClinicEncounterAccess(Document):
     def validate(self):
         action = getattr(frappe.local, 'tele_tena_clinic_access_action', None)
         if action not in ('grant', 'revoke'):
-            frappe.throw('Use the patient clinic-access action.', frappe.PermissionError)
+            localized_throw('Use the patient clinic-access action.', frappe.PermissionError)
         old = self.get_doc_before_save()
         if old:
             immutable = ('clinic', 'appointment', 'patient', 'clinician', 'purpose',
                          'granted_by', 'granted_at', 'expires_at')
             if any(old.get(field) != self.get(field) for field in immutable):
-                frappe.throw('A clinic-access grant cannot be rewritten.', frappe.PermissionError)
+                localized_throw('A clinic-access grant cannot be rewritten.', frappe.PermissionError)
             if action != 'revoke' or old.status != 'Active' or self.status != 'Revoked':
-                frappe.throw('This clinic-access transition is not allowed.', frappe.PermissionError)
+                localized_throw('This clinic-access transition is not allowed.', frappe.PermissionError)
             if self.revoked_by != frappe.session.user or not self.revoked_at:
-                frappe.throw('The revocation must record the acting patient.', frappe.PermissionError)
+                localized_throw('The revocation must record the acting patient.', frappe.PermissionError)
         else:
             if action != 'grant' or self.status != 'Active':
-                frappe.throw('Only a patient-approved scheduling grant may be created.', frappe.PermissionError)
+                localized_throw('Only a patient-approved scheduling grant may be created.', frappe.PermissionError)
             if self.granted_by != self.patient or self.granted_at is None:
-                frappe.throw('The patient grant is incomplete.', frappe.PermissionError)
+                localized_throw('The patient grant is incomplete.', frappe.PermissionError)
             if self.purpose == 'Scheduling coordination' and self.expires_at is None:
-                frappe.throw('Scheduling access must expire after the appointment.', frappe.PermissionError)
+                localized_throw('Scheduling access must expire after the appointment.', frappe.PermissionError)
             if self.purpose not in ('Scheduling coordination', 'Patient-shared summary'):
-                frappe.throw('Unsupported clinic-access purpose.')
+                localized_throw('Unsupported clinic-access purpose.')
 
     def on_trash(self):
-        frappe.throw('Clinic-access history is retained for audit.', frappe.PermissionError)
+        localized_throw('Clinic-access history is retained for audit.', frappe.PermissionError)
 
 
 def get_permission_query_conditions(user=None):

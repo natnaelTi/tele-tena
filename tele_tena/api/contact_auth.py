@@ -31,18 +31,22 @@ def _result(challenge_id):
 
 @frappe.whitelist(allow_guest=True, methods=['POST'])
 def request_code(channel, contact, request_id):
+    return _request_code(channel,contact,request_id)
+
+
+def _request_code(channel,contact,request_id,link_user=None):
     from tele_tena.review import guard_contact_access
     guard_contact_access(channel)
     contact = normalize(channel, contact)
     if not isinstance(request_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{20,100}', request_id):
         fail('Invalid request', 'invalid_request')
     digest = otp._keyed('contact:' + channel, contact)
-    purpose = 'contact_' + channel
+    purpose = ('link_' if link_user else 'contact_') + channel
     request_digest = hashlib.sha256(request_id.encode()).hexdigest()
     now = otp._now()
     frappe.db.sql('SELECT id FROM tt_otp_gate WHERE id=1 FOR UPDATE')
     prior = frappe.db.sql('''SELECT id FROM tt_otp_challenge WHERE phone_digest=%s
-        AND purpose=%s AND request_digest=%s''', (digest, purpose, request_digest))
+        AND purpose=%s AND request_digest=%s AND link_user<=>%s''', (digest, purpose, request_digest,link_user))
     if prior:
         frappe.db.commit()
         return _result(prior[0][0])
@@ -61,10 +65,10 @@ def request_code(channel, contact, request_id):
     challenge = str(uuid.uuid4())
     code = f'{secrets.randbelow(1000000):06d}'
     frappe.db.sql('''INSERT INTO tt_otp_challenge
-        (id,phone_digest,purpose,otp_digest,request_digest,created,expires,attempts,dispatch_state)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,0,'Sending')''',
+        (id,phone_digest,purpose,otp_digest,request_digest,created,expires,attempts,dispatch_state,link_user)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,0,'Sending',%s)''',
         (challenge, digest, purpose, otp._otp_digest(challenge, digest, purpose, code),
-         request_digest, now, now + timedelta(seconds=300)))
+         request_digest, now, now + timedelta(seconds=300),link_user))
     frappe.db.commit()  # Durable send-once claim before provider interaction.
     try:
         (sms.send_otp if channel == 'phone' else email_delivery.send_code)(contact, code)
@@ -121,11 +125,15 @@ def _identity(channel, contact):
 
 @frappe.whitelist(allow_guest=True, methods=['POST'])
 def verify_code(channel, contact, challenge_id, code):
+    return _verify_code(channel,contact,challenge_id,code)
+
+
+def _verify_code(channel,contact,challenge_id,code,link_user=None):
     from tele_tena.review import guard_contact_access
     guard_contact_access(channel)
     contact = normalize(channel, contact)
     digest = otp._keyed('contact:' + channel, contact)
-    purpose = 'contact_' + channel
+    purpose = ('link_' if link_user else 'contact_') + channel
     if not isinstance(challenge_id, str) or not re.fullmatch(r'[0-9a-f-]{36}', challenge_id):
         fail('Code invalid or expired', 'otp_invalid')
     # Same lock order for request and verification, including first identity creation.
@@ -136,6 +144,7 @@ def verify_code(channel, contact, challenge_id, code):
     rows = frappe.db.sql('SELECT * FROM tt_otp_challenge WHERE id=%s FOR UPDATE', (challenge_id,), as_dict=True)
     valid = bool(rows and allowed)
     row = rows[0] if rows else None
+    valid = valid and row.link_user==link_user
     valid = valid and row.phone_digest == digest and row.purpose == purpose and not row.consumed and row.expires > now and row.attempts < 5 and row.dispatch_state in ('Accepted', 'Uncertain')
     valid = valid and isinstance(code, str) and bool(re.fullmatch(r'[0-9]{6}', code)) and hmac.compare_digest(row.otp_digest, otp._otp_digest(challenge_id, digest, purpose, code))
     if not valid:
@@ -143,9 +152,13 @@ def verify_code(channel, contact, challenge_id, code):
             frappe.db.sql('UPDATE tt_otp_challenge SET attempts=attempts+1 WHERE id=%s', (challenge_id,))
         frappe.db.commit()
         fail('Code invalid or expired', 'otp_invalid')
-    user = _identity(channel, contact)
+    if link_user:
+        _link_contact(link_user,channel,contact)
+        user=link_user
+    else:user = _identity(channel, contact)
     frappe.db.sql('UPDATE tt_otp_challenge SET consumed=UTC_TIMESTAMP(6),attempts=attempts+1 WHERE id=%s', (challenge_id,))
     frappe.db.commit()
+    if link_user:return {'linked':True}
     otp._establish_login(user)
     return {'authenticated': True}
 
@@ -241,13 +254,15 @@ def save_onboarding(kind, step, answers, complete=0):
         clean['professional'] = _validated_form(values)
     if 'care_languages' in answers:
         languages = answers['care_languages']
-        if not isinstance(languages, list) or any(not isinstance(value, str) for value in languages) or len(languages) != len(set(languages)) or not set(languages).issubset({'en', 'am', 'om'}):
+        if not isinstance(languages, list) or any(not isinstance(value, str) for value in languages) or len(languages) != len(set(languages)) or any(not __import__('tele_tena.api.care_languages',fromlist=['valid']).valid(code) for code in languages):
             fail('Choose supported care languages')
         clean['care_languages'] = sorted(languages)
     if 'introduction' in answers:
         clean['introduction'] = text(answers['introduction'], 2000, False)
     finish = boolean(complete)
     if finish and kind == 'clinician':
+        languages_review=frappe.db.sql('SELECT language,proficiency FROM tt_care_language_claim WHERE clinician=%s AND active=1',(user,),as_dict=True)
+        if not languages_review or any(not item.proficiency for item in languages_review):fail('Select and self-assess your care languages before submission.','care_language_assessment_required')
         from tele_tena.api.professional import validate, persist, validate_bio
         draft = frappe.db.sql('SELECT payload FROM tt_professional_draft WHERE user=%s', (user,))
         if draft:
@@ -272,7 +287,7 @@ def save_onboarding(kind, step, answers, complete=0):
             if not requested_services:
                 fail('Choose at least one service for review')
             if not frappe.db.sql('SELECT clinician FROM tt_resume_evidence WHERE clinician=%s', (user,)) and not (draft and structured.get('cv_files')):
-                fail('Upload a PDF resume before submitting your application', 'resume_required')
+                fail('Upload a PDF CV before submitting your application', 'resume_required')
         if kind == 'clinician' and clean.get('professional'):
             if any(not clean['professional'].get(key) for key in ('professional_category', 'qualification', 'issuing_institution')) or not clean.get('care_languages'):
                 fail('Complete your profession, qualification, institution and care languages before submission', 'professional_required')
@@ -297,4 +312,43 @@ def save_onboarding(kind, step, answers, complete=0):
         (kind, int(step), json.dumps(clean), finish, user))
     if finish and kind=='clinician' and draft:
         persist(user,structured,submit=True)
+    if finish and kind=='clinician':
+        from tele_tena.api.scope_intake import submit_selected_scopes
+        submit_selected_scopes(user, requested_services)
+        from tele_tena.communications import application_submitted
+        application_submitted(user)
     return {'saved': True, 'completed': finish}
+
+
+@query()
+def delivery_contacts():
+    user=actor()
+    return frappe.db.sql('SELECT channel,contact FROM tt_contact_identity WHERE user=%s AND verified_at IS NOT NULL ORDER BY channel',(user,),as_dict=True)
+
+
+@frappe.whitelist(methods=['POST'])
+def request_delivery_contact(channel,contact,request_id):
+    user=actor()
+    return _request_code(channel,contact,request_id,link_user=user)
+
+
+@frappe.whitelist(methods=['POST'])
+def verify_delivery_contact(channel,contact,challenge_id,code):
+    return _verify_code(channel,contact,challenge_id,code,link_user=actor())
+
+
+def _link_contact(user,channel,contact):
+    # Authenticated session + account-bound, single-use proof. No account merging,
+    # contact replacement, privilege assignment, or session/account switching.
+    from tele_tena.api.journey import audit
+    frappe.db.sql('SELECT name FROM tabUser WHERE name=%s FOR UPDATE',(user,))
+    existing=frappe.db.sql('SELECT user FROM tt_contact_identity WHERE channel=%s AND contact=%s FOR UPDATE',(channel,contact))
+    own=frappe.db.sql('SELECT contact FROM tt_contact_identity WHERE user=%s AND channel=%s FOR UPDATE',(user,channel))
+    legacy=frappe.db.sql('SELECT user FROM tt_phone_identity WHERE phone=%s FOR UPDATE',(contact,)) if channel=='phone' else []
+    email_user=frappe.db.get_value('User',{'email':contact},'name') if channel=='email' else None
+    if ((existing and existing[0][0]!=user) or (legacy and legacy[0][0]!=user) or
+        (email_user and email_user!=user) or (own and any(item[0]!=contact for item in own))):
+        fail('This contact cannot be added. Keep your existing sign-in method or contact support.','contact_link_unavailable')
+    if not existing:
+        frappe.db.sql('INSERT INTO tt_contact_identity (channel,contact,user,verified_at) VALUES (%s,%s,%s,UTC_TIMESTAMP(6))',(channel,contact,user))
+        audit(user,'VerifiedDeliveryContactAdded',{'channel':channel})

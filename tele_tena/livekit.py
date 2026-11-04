@@ -1,4 +1,5 @@
 """Backend-only LiveKit configuration, participant tokens and room closure."""
+from tele_tena.localization import localized_throw
 import asyncio
 import json
 import os
@@ -15,7 +16,7 @@ import frappe
 def _configuration_error(message):
     # Return a safe actionable category, never the credential values or path.
     frappe.local.response['tele_tena_error'] = 'consultation_service_unconfigured'
-    frappe.throw(message, frappe.ValidationError)
+    localized_throw(message, frappe.ValidationError)
 
 
 def _credentials():

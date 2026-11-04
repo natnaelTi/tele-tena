@@ -1,0 +1,5966 @@
+{
+  "source": "Unicode CLDR via Babel 2.16.0",
+  "source_url": "https://cldr.unicode.org/",
+  "license_url": "https://www.unicode.org/license.txt",
+  "coverage": "Base language identifiers in installed Babel English locale; no global-completeness or spoken-proficiency claim",
+  "records": [
+    {
+      "code": "aa",
+      "english": "Afar",
+      "amharic": "አፋርኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "aar",
+        "Afar"
+      ]
+    },
+    {
+      "code": "ab",
+      "english": "Abkhazian",
+      "amharic": "አብሐዚኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "abk",
+        "Abkhazian"
+      ]
+    },
+    {
+      "code": "ace",
+      "english": "Acehnese",
+      "amharic": "አቻይንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Acehnese"
+      ]
+    },
+    {
+      "code": "ach",
+      "english": "Acoli",
+      "amharic": "አኮሊኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Acoli"
+      ]
+    },
+    {
+      "code": "ada",
+      "english": "Adangme",
+      "amharic": "አዳንግሜ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Adangme"
+      ]
+    },
+    {
+      "code": "ady",
+      "english": "Adyghe",
+      "amharic": "አድይግሄ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Adyghe"
+      ]
+    },
+    {
+      "code": "ae",
+      "english": "Avestan",
+      "amharic": "አቬስታን",
+      "afaan_oromo": "",
+      "aliases": [
+        "ave",
+        "Avestan"
+      ]
+    },
+    {
+      "code": "aeb",
+      "english": "Tunisian Arabic",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "ajt",
+        "Tunisian Arabic"
+      ]
+    },
+    {
+      "code": "af",
+      "english": "Afrikaans",
+      "amharic": "አፍሪካንኛ",
+      "afaan_oromo": "Afrikoota",
+      "aliases": [
+        "afr",
+        "Afrikaans"
+      ]
+    },
+    {
+      "code": "afh",
+      "english": "Afrihili",
+      "amharic": "አፍሪሂሊ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Afrihili"
+      ]
+    },
+    {
+      "code": "agq",
+      "english": "Aghem",
+      "amharic": "አገም",
+      "afaan_oromo": "",
+      "aliases": [
+        "Aghem"
+      ]
+    },
+    {
+      "code": "ain",
+      "english": "Ainu",
+      "amharic": "አይኑ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ainu"
+      ]
+    },
+    {
+      "code": "ak",
+      "english": "Akan",
+      "amharic": "አካንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "fat",
+        "tw",
+        "aka",
+        "twi",
+        "Akan"
+      ]
+    },
+    {
+      "code": "akk",
+      "english": "Akkadian",
+      "amharic": "አካዲያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Akkadian"
+      ]
+    },
+    {
+      "code": "akz",
+      "english": "Alabama",
+      "amharic": "አላባማ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Alabama"
+      ]
+    },
+    {
+      "code": "ale",
+      "english": "Aleut",
+      "amharic": "አልዩት",
+      "afaan_oromo": "",
+      "aliases": [
+        "Aleut"
+      ]
+    },
+    {
+      "code": "aln",
+      "english": "Gheg Albanian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Gheg Albanian"
+      ]
+    },
+    {
+      "code": "alt",
+      "english": "Southern Altai",
+      "amharic": "ደቡባዊ አልታይ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Southern Altai"
+      ]
+    },
+    {
+      "code": "am",
+      "english": "Amharic",
+      "amharic": "አማርኛ",
+      "afaan_oromo": "Afaan Sidaamaa",
+      "aliases": [
+        "amh",
+        "Amharic"
+      ]
+    },
+    {
+      "code": "an",
+      "english": "Aragonese",
+      "amharic": "አራጎንስ",
+      "afaan_oromo": "",
+      "aliases": [
+        "arg",
+        "Aragonese"
+      ]
+    },
+    {
+      "code": "ang",
+      "english": "Old English",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Old English"
+      ]
+    },
+    {
+      "code": "ann",
+      "english": "Obolo",
+      "amharic": "ኦቦሎ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Obolo"
+      ]
+    },
+    {
+      "code": "anp",
+      "english": "Angika",
+      "amharic": "አንጊካ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Angika"
+      ]
+    },
+    {
+      "code": "ar",
+      "english": "Arabic",
+      "amharic": "ዓረብኛ",
+      "afaan_oromo": "Arabiffaa",
+      "aliases": [
+        "arb",
+        "ara",
+        "Arabic"
+      ]
+    },
+    {
+      "code": "arc",
+      "english": "Aramaic",
+      "amharic": "አራማይክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Aramaic"
+      ]
+    },
+    {
+      "code": "arn",
+      "english": "Mapuche",
+      "amharic": "ማፑቼ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mapuche"
+      ]
+    },
+    {
+      "code": "aro",
+      "english": "Araona",
+      "amharic": "አራኦና",
+      "afaan_oromo": "",
+      "aliases": [
+        "Araona"
+      ]
+    },
+    {
+      "code": "arp",
+      "english": "Arapaho",
+      "amharic": "አራፓሆ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Arapaho"
+      ]
+    },
+    {
+      "code": "arq",
+      "english": "Algerian Arabic",
+      "amharic": "የአልጄሪያ ዓረብኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Algerian Arabic"
+      ]
+    },
+    {
+      "code": "ars",
+      "english": "Najdi Arabic",
+      "amharic": "ናጅዲ አረብኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Najdi Arabic"
+      ]
+    },
+    {
+      "code": "arw",
+      "english": "Arawak",
+      "amharic": "አራዋክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Arawak"
+      ]
+    },
+    {
+      "code": "ary",
+      "english": "Moroccan Arabic",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Moroccan Arabic"
+      ]
+    },
+    {
+      "code": "arz",
+      "english": "Egyptian Arabic",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Egyptian Arabic"
+      ]
+    },
+    {
+      "code": "as",
+      "english": "Assamese",
+      "amharic": "አሳሜዛዊ",
+      "afaan_oromo": "",
+      "aliases": [
+        "asm",
+        "Assamese"
+      ]
+    },
+    {
+      "code": "asa",
+      "english": "Asu",
+      "amharic": "አሱ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Asu"
+      ]
+    },
+    {
+      "code": "ase",
+      "english": "American Sign Language",
+      "amharic": "የአሜሪካ የምልክት ቋንቋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "American Sign Language"
+      ]
+    },
+    {
+      "code": "ast",
+      "english": "Asturian",
+      "amharic": "አስቱሪያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Asturian"
+      ]
+    },
+    {
+      "code": "atj",
+      "english": "Atikamekw",
+      "amharic": "አቲካምከው",
+      "afaan_oromo": "",
+      "aliases": [
+        "Atikamekw"
+      ]
+    },
+    {
+      "code": "av",
+      "english": "Avaric",
+      "amharic": "አቫሪክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ava",
+        "Avaric"
+      ]
+    },
+    {
+      "code": "avk",
+      "english": "Kotava",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kotava"
+      ]
+    },
+    {
+      "code": "awa",
+      "english": "Awadhi",
+      "amharic": "አዋድሂ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Awadhi"
+      ]
+    },
+    {
+      "code": "ay",
+      "english": "Aymara",
+      "amharic": "አያማርኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ayr",
+        "aym",
+        "Aymara"
+      ]
+    },
+    {
+      "code": "az",
+      "english": "Azerbaijani",
+      "amharic": "አዘርባጃንኛ",
+      "afaan_oromo": "Afaan Azerbaijani",
+      "aliases": [
+        "azj",
+        "aze",
+        "Azerbaijani"
+      ]
+    },
+    {
+      "code": "ba",
+      "english": "Bashkir",
+      "amharic": "ባስኪርኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "bak",
+        "Bashkir"
+      ]
+    },
+    {
+      "code": "bal",
+      "english": "Baluchi",
+      "amharic": "ባሉቺ",
+      "afaan_oromo": "",
+      "aliases": [
+        "bcc",
+        "Baluchi"
+      ]
+    },
+    {
+      "code": "ban",
+      "english": "Balinese",
+      "amharic": "ባሊኔስ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Balinese"
+      ]
+    },
+    {
+      "code": "bar",
+      "english": "Bavarian",
+      "amharic": "ባቫሪያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Bavarian"
+      ]
+    },
+    {
+      "code": "bas",
+      "english": "Basaa",
+      "amharic": "ባሳ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Basaa"
+      ]
+    },
+    {
+      "code": "bax",
+      "english": "Bamun",
+      "amharic": "ባሙን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Bamun"
+      ]
+    },
+    {
+      "code": "bbc",
+      "english": "Batak Toba",
+      "amharic": "ባታካ ቶባ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Batak Toba"
+      ]
+    },
+    {
+      "code": "bbj",
+      "english": "Ghomala",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ghomala"
+      ]
+    },
+    {
+      "code": "be",
+      "english": "Belarusian",
+      "amharic": "ቤላራሻኛ",
+      "afaan_oromo": "Afaan Belarusia",
+      "aliases": [
+        "bel",
+        "Belarusian"
+      ]
+    },
+    {
+      "code": "bej",
+      "english": "Beja",
+      "amharic": "ቤጃ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Beja"
+      ]
+    },
+    {
+      "code": "bem",
+      "english": "Bemba",
+      "amharic": "ቤምባ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Bemba"
+      ]
+    },
+    {
+      "code": "bew",
+      "english": "Betawi",
+      "amharic": "ቤታዊ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Betawi"
+      ]
+    },
+    {
+      "code": "bez",
+      "english": "Bena",
+      "amharic": "ቤና",
+      "afaan_oromo": "",
+      "aliases": [
+        "Bena"
+      ]
+    },
+    {
+      "code": "bfd",
+      "english": "Bafut",
+      "amharic": "ባፉት",
+      "afaan_oromo": "",
+      "aliases": [
+        "Bafut"
+      ]
+    },
+    {
+      "code": "bfq",
+      "english": "Badaga",
+      "amharic": "ባዳጋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Badaga"
+      ]
+    },
+    {
+      "code": "bg",
+      "english": "Bulgarian",
+      "amharic": "ቡልጋሪኛ",
+      "afaan_oromo": "Afaan Bulgariya",
+      "aliases": [
+        "bul",
+        "Bulgarian"
+      ]
+    },
+    {
+      "code": "bgc",
+      "english": "Haryanvi",
+      "amharic": "ሃርያንቪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Haryanvi"
+      ]
+    },
+    {
+      "code": "bgn",
+      "english": "Western Balochi",
+      "amharic": "የምዕራብ ባሎቺ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Western Balochi"
+      ]
+    },
+    {
+      "code": "bho",
+      "english": "Bhojpuri",
+      "amharic": "ቦጁሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "bh",
+        "bih",
+        "Bhojpuri"
+      ]
+    },
+    {
+      "code": "bi",
+      "english": "Bislama",
+      "amharic": "ቢስላምኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "bis",
+        "Bislama"
+      ]
+    },
+    {
+      "code": "bik",
+      "english": "Bikol",
+      "amharic": "ቢኮል",
+      "afaan_oromo": "",
+      "aliases": [
+        "bcl",
+        "Bikol"
+      ]
+    },
+    {
+      "code": "bin",
+      "english": "Bini",
+      "amharic": "ቢኒ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Bini"
+      ]
+    },
+    {
+      "code": "bjn",
+      "english": "Banjar",
+      "amharic": "ባንጃር",
+      "afaan_oromo": "",
+      "aliases": [
+        "Banjar"
+      ]
+    },
+    {
+      "code": "bkm",
+      "english": "Kom",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kom"
+      ]
+    },
+    {
+      "code": "bla",
+      "english": "Siksiká",
+      "amharic": "ሲክሲካ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Siksiká"
+      ]
+    },
+    {
+      "code": "blo",
+      "english": "Anii",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Anii"
+      ]
+    },
+    {
+      "code": "blt",
+      "english": "Tai Dam",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tai Dam"
+      ]
+    },
+    {
+      "code": "bm",
+      "english": "Bambara",
+      "amharic": "ባምባርኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "bam",
+        "Bambara"
+      ]
+    },
+    {
+      "code": "bn",
+      "english": "Bangla",
+      "amharic": "ቤንጋሊኛ",
+      "afaan_oromo": "Afaan Baangladeshi",
+      "aliases": [
+        "ben",
+        "Bangla"
+      ]
+    },
+    {
+      "code": "bo",
+      "english": "Tibetan",
+      "amharic": "ቲቤታንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "bod",
+        "tib",
+        "Tibetan"
+      ]
+    },
+    {
+      "code": "bpy",
+      "english": "Bishnupriya",
+      "amharic": "ቢሹንፑሪያ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Bishnupriya"
+      ]
+    },
+    {
+      "code": "bqi",
+      "english": "Bakhtiari",
+      "amharic": "ባክህቲያሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Bakhtiari"
+      ]
+    },
+    {
+      "code": "br",
+      "english": "Breton",
+      "amharic": "ብሬቶንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "bre",
+        "Breton"
+      ]
+    },
+    {
+      "code": "bra",
+      "english": "Braj",
+      "amharic": "ብራጅ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Braj"
+      ]
+    },
+    {
+      "code": "brh",
+      "english": "Brahui",
+      "amharic": "ብራሁዪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Brahui"
+      ]
+    },
+    {
+      "code": "brx",
+      "english": "Bodo",
+      "amharic": "ቦዶ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Bodo"
+      ]
+    },
+    {
+      "code": "bs",
+      "english": "Bosnian",
+      "amharic": "ቦስኒያንኛ",
+      "afaan_oromo": "Afaan Bosniyaa",
+      "aliases": [
+        "bos",
+        "Bosnian"
+      ]
+    },
+    {
+      "code": "bss",
+      "english": "Akoose",
+      "amharic": "አኮስ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Akoose"
+      ]
+    },
+    {
+      "code": "bua",
+      "english": "Buriat",
+      "amharic": "ቡሪያት",
+      "afaan_oromo": "",
+      "aliases": [
+        "bxr",
+        "Buriat"
+      ]
+    },
+    {
+      "code": "bug",
+      "english": "Buginese",
+      "amharic": "ቡጊኔዝ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Buginese"
+      ]
+    },
+    {
+      "code": "bum",
+      "english": "Bulu",
+      "amharic": "ቡሉ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Bulu"
+      ]
+    },
+    {
+      "code": "byn",
+      "english": "Blin",
+      "amharic": "ብሊን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Blin"
+      ]
+    },
+    {
+      "code": "byv",
+      "english": "Medumba",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Medumba"
+      ]
+    },
+    {
+      "code": "ca",
+      "english": "Catalan",
+      "amharic": "ካታላንኛ",
+      "afaan_oromo": "Afaan Katalaa",
+      "aliases": [
+        "cat",
+        "Catalan"
+      ]
+    },
+    {
+      "code": "cad",
+      "english": "Caddo",
+      "amharic": "ካዶ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Caddo"
+      ]
+    },
+    {
+      "code": "car",
+      "english": "Carib",
+      "amharic": "ካሪብ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Carib"
+      ]
+    },
+    {
+      "code": "cay",
+      "english": "Cayuga",
+      "amharic": "ካዩጋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Cayuga"
+      ]
+    },
+    {
+      "code": "cch",
+      "english": "Atsam",
+      "amharic": "አትሳም",
+      "afaan_oromo": "",
+      "aliases": [
+        "Atsam"
+      ]
+    },
+    {
+      "code": "ccp",
+      "english": "Chakma",
+      "amharic": "ቻክማ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Chakma"
+      ]
+    },
+    {
+      "code": "ce",
+      "english": "Chechen",
+      "amharic": "ችችን",
+      "afaan_oromo": "",
+      "aliases": [
+        "che",
+        "Chechen"
+      ]
+    },
+    {
+      "code": "ceb",
+      "english": "Cebuano",
+      "amharic": "ካቡዋኖ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Cebuano"
+      ]
+    },
+    {
+      "code": "cgg",
+      "english": "Chiga",
+      "amharic": "ቺጋኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Chiga"
+      ]
+    },
+    {
+      "code": "ch",
+      "english": "Chamorro",
+      "amharic": "ቻሞሮ",
+      "afaan_oromo": "",
+      "aliases": [
+        "cha",
+        "Chamorro"
+      ]
+    },
+    {
+      "code": "chb",
+      "english": "Chibcha",
+      "amharic": "ቺብቻ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Chibcha"
+      ]
+    },
+    {
+      "code": "chg",
+      "english": "Chagatai",
+      "amharic": "ቻጋታይ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Chagatai"
+      ]
+    },
+    {
+      "code": "chk",
+      "english": "Chuukese",
+      "amharic": "ቹክስ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Chuukese"
+      ]
+    },
+    {
+      "code": "chm",
+      "english": "Mari",
+      "amharic": "ማሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "mhr",
+        "Mari"
+      ]
+    },
+    {
+      "code": "chn",
+      "english": "Chinook Jargon",
+      "amharic": "ቺኑክ ጃርጎን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Chinook Jargon"
+      ]
+    },
+    {
+      "code": "cho",
+      "english": "Choctaw",
+      "amharic": "ቾክታዋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Choctaw"
+      ]
+    },
+    {
+      "code": "chp",
+      "english": "Chipewyan",
+      "amharic": "ቺፔውያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Chipewyan"
+      ]
+    },
+    {
+      "code": "chr",
+      "english": "Cherokee",
+      "amharic": "ቼሮኬኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Cherokee"
+      ]
+    },
+    {
+      "code": "chy",
+      "english": "Cheyenne",
+      "amharic": "ችዬኔ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Cheyenne"
+      ]
+    },
+    {
+      "code": "cic",
+      "english": "Chickasaw",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Chickasaw"
+      ]
+    },
+    {
+      "code": "ckb",
+      "english": "Central Kurdish",
+      "amharic": "የሶራኒ ኩርድኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Central Kurdish"
+      ]
+    },
+    {
+      "code": "clc",
+      "english": "Chilcotin",
+      "amharic": "ቺልኮቲን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Chilcotin"
+      ]
+    },
+    {
+      "code": "co",
+      "english": "Corsican",
+      "amharic": "ኮርሲካኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "cos",
+        "Corsican"
+      ]
+    },
+    {
+      "code": "cop",
+      "english": "Coptic",
+      "amharic": "ኮፕቲክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Coptic"
+      ]
+    },
+    {
+      "code": "cps",
+      "english": "Capiznon",
+      "amharic": "ካፒዝኖን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Capiznon"
+      ]
+    },
+    {
+      "code": "cr",
+      "english": "Cree",
+      "amharic": "ክሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "cwd",
+        "cre",
+        "Cree"
+      ]
+    },
+    {
+      "code": "crg",
+      "english": "Michif",
+      "amharic": "ሚቺፍ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Michif"
+      ]
+    },
+    {
+      "code": "crh",
+      "english": "Crimean Tatar",
+      "amharic": "ክሪሚያን ተርኪሽ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Crimean Tatar"
+      ]
+    },
+    {
+      "code": "crj",
+      "english": "Southern East Cree",
+      "amharic": "ደቡብ ምዕራባዊ ክሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Southern East Cree"
+      ]
+    },
+    {
+      "code": "crk",
+      "english": "Plains Cree",
+      "amharic": "ፕላይንስ ክሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Plains Cree"
+      ]
+    },
+    {
+      "code": "crl",
+      "english": "Northern East Cree",
+      "amharic": "ሰሜን ምስራቃዊ ክሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Northern East Cree"
+      ]
+    },
+    {
+      "code": "crm",
+      "english": "Moose Cree",
+      "amharic": "ሙዝ ክሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Moose Cree"
+      ]
+    },
+    {
+      "code": "crr",
+      "english": "Carolina Algonquian",
+      "amharic": "ካሮሊና አልጎንክዊያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "pmk",
+        "Carolina Algonquian"
+      ]
+    },
+    {
+      "code": "crs",
+      "english": "Seselwa Creole French",
+      "amharic": "ሰሰላዊ ክሬኦሊ ፈረንሳይኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Seselwa Creole French"
+      ]
+    },
+    {
+      "code": "cs",
+      "english": "Czech",
+      "amharic": "ቼክኛ",
+      "afaan_oromo": "Afaan Czech",
+      "aliases": [
+        "ces",
+        "cze",
+        "Czech"
+      ]
+    },
+    {
+      "code": "csb",
+      "english": "Kashubian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kashubian"
+      ]
+    },
+    {
+      "code": "csw",
+      "english": "Swampy Cree",
+      "amharic": "ስዋምፒ ክሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Swampy Cree"
+      ]
+    },
+    {
+      "code": "cu",
+      "english": "Church Slavic",
+      "amharic": "ቸርች ስላቪክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "chu",
+        "Church Slavic"
+      ]
+    },
+    {
+      "code": "cv",
+      "english": "Chuvash",
+      "amharic": "ቹቫሽ",
+      "afaan_oromo": "",
+      "aliases": [
+        "chv",
+        "Chuvash"
+      ]
+    },
+    {
+      "code": "cy",
+      "english": "Welsh",
+      "amharic": "ወልሽ",
+      "afaan_oromo": "Welishiffaa",
+      "aliases": [
+        "cym",
+        "wel",
+        "Welsh"
+      ]
+    },
+    {
+      "code": "da",
+      "english": "Danish",
+      "amharic": "ዴኒሽ",
+      "afaan_oromo": "Afaan Deenmaark",
+      "aliases": [
+        "dan",
+        "Danish"
+      ]
+    },
+    {
+      "code": "dak",
+      "english": "Dakota",
+      "amharic": "ዳኮታ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Dakota"
+      ]
+    },
+    {
+      "code": "dar",
+      "english": "Dargwa",
+      "amharic": "ዳርግዋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Dargwa"
+      ]
+    },
+    {
+      "code": "dav",
+      "english": "Taita",
+      "amharic": "ታይታ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Taita"
+      ]
+    },
+    {
+      "code": "de",
+      "english": "German",
+      "amharic": "ጀርመንኛ",
+      "afaan_oromo": "Afaan Jarmanii",
+      "aliases": [
+        "deu",
+        "ger",
+        "German"
+      ]
+    },
+    {
+      "code": "del",
+      "english": "Delaware",
+      "amharic": "ዳላዌር",
+      "afaan_oromo": "",
+      "aliases": [
+        "umu",
+        "Delaware"
+      ]
+    },
+    {
+      "code": "den",
+      "english": "Slave",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "xsl",
+        "Slave"
+      ]
+    },
+    {
+      "code": "dgr",
+      "english": "Dogrib",
+      "amharic": "ዶግሪብ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Dogrib"
+      ]
+    },
+    {
+      "code": "din",
+      "english": "Dinka",
+      "amharic": "ዲንካ",
+      "afaan_oromo": "",
+      "aliases": [
+        "dik",
+        "Dinka"
+      ]
+    },
+    {
+      "code": "dje",
+      "english": "Zarma",
+      "amharic": "ዛርማኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Zarma"
+      ]
+    },
+    {
+      "code": "doi",
+      "english": "Dogri",
+      "amharic": "ዶግሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "dgo",
+        "Dogri"
+      ]
+    },
+    {
+      "code": "dsb",
+      "english": "Lower Sorbian",
+      "amharic": "የታችኛው ሰርቢያኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lower Sorbian"
+      ]
+    },
+    {
+      "code": "dtp",
+      "english": "Central Dusun",
+      "amharic": "ሴንተራል ዱሰን",
+      "afaan_oromo": "",
+      "aliases": [
+        "ktr",
+        "kzj",
+        "kzt",
+        "tdu",
+        "Central Dusun"
+      ]
+    },
+    {
+      "code": "dua",
+      "english": "Duala",
+      "amharic": "ዱዋላኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Duala"
+      ]
+    },
+    {
+      "code": "dum",
+      "english": "Middle Dutch",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Middle Dutch"
+      ]
+    },
+    {
+      "code": "dv",
+      "english": "Divehi",
+      "amharic": "ዲቬሂ",
+      "afaan_oromo": "",
+      "aliases": [
+        "div",
+        "Divehi"
+      ]
+    },
+    {
+      "code": "dyo",
+      "english": "Jola-Fonyi",
+      "amharic": "ጆላ-ፎንዪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Jola-Fonyi"
+      ]
+    },
+    {
+      "code": "dyu",
+      "english": "Dyula",
+      "amharic": "ድዩላ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Dyula"
+      ]
+    },
+    {
+      "code": "dz",
+      "english": "Dzongkha",
+      "amharic": "ድዞንግኻኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "adp",
+        "dzo",
+        "Dzongkha"
+      ]
+    },
+    {
+      "code": "dzg",
+      "english": "Dazaga",
+      "amharic": "ዳዛጋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Dazaga"
+      ]
+    },
+    {
+      "code": "ebu",
+      "english": "Embu",
+      "amharic": "ኢምቡ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Embu"
+      ]
+    },
+    {
+      "code": "ee",
+      "english": "Ewe",
+      "amharic": "ኢዊ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ewe",
+        "Ewe"
+      ]
+    },
+    {
+      "code": "efi",
+      "english": "Efik",
+      "amharic": "ኤፊክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Efik"
+      ]
+    },
+    {
+      "code": "egl",
+      "english": "Emilian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Emilian"
+      ]
+    },
+    {
+      "code": "egy",
+      "english": "Ancient Egyptian",
+      "amharic": "የጥንታዊ ግብጽኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ancient Egyptian"
+      ]
+    },
+    {
+      "code": "eka",
+      "english": "Ekajuk",
+      "amharic": "ኤካጁክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ekajuk"
+      ]
+    },
+    {
+      "code": "el",
+      "english": "Greek",
+      "amharic": "ግሪክኛ",
+      "afaan_oromo": "Afaan Giriiki",
+      "aliases": [
+        "ell",
+        "gre",
+        "Greek"
+      ]
+    },
+    {
+      "code": "elx",
+      "english": "Elamite",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Elamite"
+      ]
+    },
+    {
+      "code": "en",
+      "english": "English",
+      "amharic": "እንግሊዝኛ",
+      "afaan_oromo": "Ingliffa",
+      "aliases": [
+        "eng",
+        "English"
+      ]
+    },
+    {
+      "code": "enm",
+      "english": "Middle English",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Middle English"
+      ]
+    },
+    {
+      "code": "eo",
+      "english": "Esperanto",
+      "amharic": "ኤስፐራንቶ",
+      "afaan_oromo": "Afaan Esperantoo",
+      "aliases": [
+        "epo",
+        "Esperanto"
+      ]
+    },
+    {
+      "code": "es",
+      "english": "Spanish",
+      "amharic": "ስፓኒሽ",
+      "afaan_oromo": "Afaan Ispeen",
+      "aliases": [
+        "spa",
+        "Spanish"
+      ]
+    },
+    {
+      "code": "esu",
+      "english": "Central Yupik",
+      "amharic": "ሴንተራል ዩፒክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Central Yupik"
+      ]
+    },
+    {
+      "code": "et",
+      "english": "Estonian",
+      "amharic": "ኢስቶኒያንኛ",
+      "afaan_oromo": "Afaan Istooniya",
+      "aliases": [
+        "ekk",
+        "est",
+        "Estonian"
+      ]
+    },
+    {
+      "code": "eu",
+      "english": "Basque",
+      "amharic": "ባስክኛ",
+      "afaan_oromo": "Afaan Baskuu",
+      "aliases": [
+        "eus",
+        "baq",
+        "Basque"
+      ]
+    },
+    {
+      "code": "ewo",
+      "english": "Ewondo",
+      "amharic": "ኤዎንዶ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ewondo"
+      ]
+    },
+    {
+      "code": "ext",
+      "english": "Extremaduran",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Extremaduran"
+      ]
+    },
+    {
+      "code": "fa",
+      "english": "Persian",
+      "amharic": "ፐርሺያኛ",
+      "afaan_oromo": "Afaan Persia",
+      "aliases": [
+        "pes",
+        "fas",
+        "per",
+        "Persian"
+      ]
+    },
+    {
+      "code": "fan",
+      "english": "Fang",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Fang"
+      ]
+    },
+    {
+      "code": "ff",
+      "english": "Fula",
+      "amharic": "ፉላ",
+      "afaan_oromo": "",
+      "aliases": [
+        "fuc",
+        "ful",
+        "Fula"
+      ]
+    },
+    {
+      "code": "fi",
+      "english": "Finnish",
+      "amharic": "ፊኒሽ",
+      "afaan_oromo": "Afaan Fiilaandi",
+      "aliases": [
+        "fin",
+        "Finnish"
+      ]
+    },
+    {
+      "code": "fil",
+      "english": "Filipino",
+      "amharic": "ፊሊፒንኛ",
+      "afaan_oromo": "Afaan Filippinii",
+      "aliases": [
+        "tl",
+        "tgl",
+        "Filipino"
+      ]
+    },
+    {
+      "code": "fit",
+      "english": "Tornedalen Finnish",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tornedalen Finnish"
+      ]
+    },
+    {
+      "code": "fj",
+      "english": "Fijian",
+      "amharic": "ፊጂኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "fij",
+        "Fijian"
+      ]
+    },
+    {
+      "code": "fo",
+      "english": "Faroese",
+      "amharic": "ፋሮኛ",
+      "afaan_oromo": "Afaan Faroese",
+      "aliases": [
+        "fao",
+        "Faroese"
+      ]
+    },
+    {
+      "code": "fon",
+      "english": "Fon",
+      "amharic": "ፎን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Fon"
+      ]
+    },
+    {
+      "code": "fr",
+      "english": "French",
+      "amharic": "ፈረንሳይኛ",
+      "afaan_oromo": "Afaan Faransaayii",
+      "aliases": [
+        "fra",
+        "fre",
+        "French"
+      ]
+    },
+    {
+      "code": "frc",
+      "english": "Cajun French",
+      "amharic": "ካጁን ፍሬንች",
+      "afaan_oromo": "",
+      "aliases": [
+        "Cajun French"
+      ]
+    },
+    {
+      "code": "frm",
+      "english": "Middle French",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Middle French"
+      ]
+    },
+    {
+      "code": "fro",
+      "english": "Old French",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Old French"
+      ]
+    },
+    {
+      "code": "frp",
+      "english": "Arpitan",
+      "amharic": "አርፒታን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Arpitan"
+      ]
+    },
+    {
+      "code": "frr",
+      "english": "Northern Frisian",
+      "amharic": "ሰሜናዊ ፍሪስያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Northern Frisian"
+      ]
+    },
+    {
+      "code": "frs",
+      "english": "Eastern Frisian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Eastern Frisian"
+      ]
+    },
+    {
+      "code": "fur",
+      "english": "Friulian",
+      "amharic": "ፍሩሊያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Friulian"
+      ]
+    },
+    {
+      "code": "fy",
+      "english": "Western Frisian",
+      "amharic": "ምዕራባዊ ፍሪሲኛ",
+      "afaan_oromo": "Afaan Firisiyaani",
+      "aliases": [
+        "fry",
+        "Western Frisian"
+      ]
+    },
+    {
+      "code": "ga",
+      "english": "Irish",
+      "amharic": "አይሪሽ",
+      "afaan_oromo": "Afaan Ayirishii",
+      "aliases": [
+        "gle",
+        "Irish"
+      ]
+    },
+    {
+      "code": "gaa",
+      "english": "Ga",
+      "amharic": "ጋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ga"
+      ]
+    },
+    {
+      "code": "gag",
+      "english": "Gagauz",
+      "amharic": "ጋጉዝኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Gagauz"
+      ]
+    },
+    {
+      "code": "gan",
+      "english": "Gan Chinese",
+      "amharic": "ጋን ቻይንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Gan Chinese"
+      ]
+    },
+    {
+      "code": "gay",
+      "english": "Gayo",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Gayo"
+      ]
+    },
+    {
+      "code": "gba",
+      "english": "Gbaya",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "gya",
+        "Gbaya"
+      ]
+    },
+    {
+      "code": "gbz",
+      "english": "Zoroastrian Dari",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Zoroastrian Dari"
+      ]
+    },
+    {
+      "code": "gd",
+      "english": "Scottish Gaelic",
+      "amharic": "ስኮቲሽ ጋይሊክ",
+      "afaan_oromo": "Scots Gaelic",
+      "aliases": [
+        "gla",
+        "Scottish Gaelic"
+      ]
+    },
+    {
+      "code": "gez",
+      "english": "Geez",
+      "amharic": "ግዕዝኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Geez"
+      ]
+    },
+    {
+      "code": "gil",
+      "english": "Gilbertese",
+      "amharic": "ጅልበርትስ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Gilbertese"
+      ]
+    },
+    {
+      "code": "gl",
+      "english": "Galician",
+      "amharic": "ጋሊሽያዊ",
+      "afaan_oromo": "Afaan Galishii",
+      "aliases": [
+        "glg",
+        "Galician"
+      ]
+    },
+    {
+      "code": "glk",
+      "english": "Gilaki",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Gilaki"
+      ]
+    },
+    {
+      "code": "gmh",
+      "english": "Middle High German",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Middle High German"
+      ]
+    },
+    {
+      "code": "gn",
+      "english": "Guarani",
+      "amharic": "ጓራኒኛ",
+      "afaan_oromo": "Afaan Guarani",
+      "aliases": [
+        "gug",
+        "grn",
+        "Guarani"
+      ]
+    },
+    {
+      "code": "goh",
+      "english": "Old High German",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Old High German"
+      ]
+    },
+    {
+      "code": "gom",
+      "english": "Goan Konkani",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Goan Konkani"
+      ]
+    },
+    {
+      "code": "gon",
+      "english": "Gondi",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "gno",
+        "Gondi"
+      ]
+    },
+    {
+      "code": "gor",
+      "english": "Gorontalo",
+      "amharic": "ጎሮንታሎ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Gorontalo"
+      ]
+    },
+    {
+      "code": "got",
+      "english": "Gothic",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Gothic"
+      ]
+    },
+    {
+      "code": "grb",
+      "english": "Grebo",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "gbo",
+        "Grebo"
+      ]
+    },
+    {
+      "code": "grc",
+      "english": "Ancient Greek",
+      "amharic": "የጥንታዊ ግሪክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ancient Greek"
+      ]
+    },
+    {
+      "code": "gsw",
+      "english": "Swiss German",
+      "amharic": "ስዊዝ ጀርመንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Swiss German"
+      ]
+    },
+    {
+      "code": "gu",
+      "english": "Gujarati",
+      "amharic": "ጉጃርቲኛ",
+      "afaan_oromo": "Afaan Gujarati",
+      "aliases": [
+        "guj",
+        "prp",
+        "Gujarati"
+      ]
+    },
+    {
+      "code": "guc",
+      "english": "Wayuu",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Wayuu"
+      ]
+    },
+    {
+      "code": "gur",
+      "english": "Frafra",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Frafra"
+      ]
+    },
+    {
+      "code": "guz",
+      "english": "Gusii",
+      "amharic": "ጉስሊኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Gusii"
+      ]
+    },
+    {
+      "code": "gv",
+      "english": "Manx",
+      "amharic": "ማንክስ",
+      "afaan_oromo": "",
+      "aliases": [
+        "glv",
+        "Manx"
+      ]
+    },
+    {
+      "code": "gwi",
+      "english": "Gwichʼin",
+      "amharic": "ግዊቺን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Gwichʼin"
+      ]
+    },
+    {
+      "code": "ha",
+      "english": "Hausa",
+      "amharic": "ሃውሳኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "hau",
+        "Hausa"
+      ]
+    },
+    {
+      "code": "hai",
+      "english": "Haida",
+      "amharic": "ሃይዳ",
+      "afaan_oromo": "",
+      "aliases": [
+        "hdn",
+        "Haida"
+      ]
+    },
+    {
+      "code": "hak",
+      "english": "Hakka Chinese",
+      "amharic": "ሃካ ቻይንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Hakka Chinese"
+      ]
+    },
+    {
+      "code": "haw",
+      "english": "Hawaiian",
+      "amharic": "ሃዊያኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Hawaiian"
+      ]
+    },
+    {
+      "code": "hax",
+      "english": "Southern Haida",
+      "amharic": "ደቡባዊ ሃይዳ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Southern Haida"
+      ]
+    },
+    {
+      "code": "he",
+      "english": "Hebrew",
+      "amharic": "ዕብራይስጥ",
+      "afaan_oromo": "Afaan Hebrew",
+      "aliases": [
+        "iw",
+        "heb",
+        "Hebrew"
+      ]
+    },
+    {
+      "code": "hi",
+      "english": "Hindi",
+      "amharic": "ሒንዱኛ",
+      "afaan_oromo": "Afaan Hindii",
+      "aliases": [
+        "hin",
+        "Hindi"
+      ]
+    },
+    {
+      "code": "hif",
+      "english": "Fiji Hindi",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Fiji Hindi"
+      ]
+    },
+    {
+      "code": "hil",
+      "english": "Hiligaynon",
+      "amharic": "ሂሊጋይኖን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Hiligaynon"
+      ]
+    },
+    {
+      "code": "hit",
+      "english": "Hittite",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Hittite"
+      ]
+    },
+    {
+      "code": "hmn",
+      "english": "Hmong",
+      "amharic": "ህሞንግ",
+      "afaan_oromo": "",
+      "aliases": [
+        "hea",
+        "Hmong"
+      ]
+    },
+    {
+      "code": "hnj",
+      "english": "Hmong Njua",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Hmong Njua"
+      ]
+    },
+    {
+      "code": "ho",
+      "english": "Hiri Motu",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "hmo",
+        "Hiri Motu"
+      ]
+    },
+    {
+      "code": "hr",
+      "english": "Croatian",
+      "amharic": "ክሮሽያንኛ",
+      "afaan_oromo": "Afaan Croatian",
+      "aliases": [
+        "scr",
+        "hrv",
+        "Croatian"
+      ]
+    },
+    {
+      "code": "hsb",
+      "english": "Upper Sorbian",
+      "amharic": "የላይኛው ሶርቢያንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Upper Sorbian"
+      ]
+    },
+    {
+      "code": "hsn",
+      "english": "Xiang Chinese",
+      "amharic": "ዢያንግ ቻይንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Xiang Chinese"
+      ]
+    },
+    {
+      "code": "ht",
+      "english": "Haitian Creole",
+      "amharic": "ሃይትኛ ክሮሌ",
+      "afaan_oromo": "",
+      "aliases": [
+        "hat",
+        "Haitian Creole"
+      ]
+    },
+    {
+      "code": "hu",
+      "english": "Hungarian",
+      "amharic": "ሀንጋሪኛ",
+      "afaan_oromo": "Afaan Hangaari",
+      "aliases": [
+        "hun",
+        "Hungarian"
+      ]
+    },
+    {
+      "code": "hup",
+      "english": "Hupa",
+      "amharic": "ሁፓ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Hupa"
+      ]
+    },
+    {
+      "code": "hur",
+      "english": "Halkomelem",
+      "amharic": "ሃልኮመልም",
+      "afaan_oromo": "",
+      "aliases": [
+        "Halkomelem"
+      ]
+    },
+    {
+      "code": "hy",
+      "english": "Armenian",
+      "amharic": "አርመናዊ",
+      "afaan_oromo": "",
+      "aliases": [
+        "hye",
+        "arm",
+        "Armenian"
+      ]
+    },
+    {
+      "code": "hz",
+      "english": "Herero",
+      "amharic": "ሄሬሮ",
+      "afaan_oromo": "",
+      "aliases": [
+        "her",
+        "Herero"
+      ]
+    },
+    {
+      "code": "ia",
+      "english": "Interlingua",
+      "amharic": "ኢንቴርሊንጓ",
+      "afaan_oromo": "Interlingua",
+      "aliases": [
+        "ina",
+        "Interlingua"
+      ]
+    },
+    {
+      "code": "iba",
+      "english": "Iban",
+      "amharic": "ኢባን",
+      "afaan_oromo": "",
+      "aliases": [
+        "blg",
+        "snb",
+        "Iban"
+      ]
+    },
+    {
+      "code": "ibb",
+      "english": "Ibibio",
+      "amharic": "ኢቢብዮ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ibibio"
+      ]
+    },
+    {
+      "code": "id",
+      "english": "Indonesian",
+      "amharic": "ኢንዶኔዥያኛ",
+      "afaan_oromo": "Afaan Indoneziya",
+      "aliases": [
+        "in",
+        "ind",
+        "Indonesian"
+      ]
+    },
+    {
+      "code": "ie",
+      "english": "Interlingue",
+      "amharic": "እንተርሊንግወ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ile",
+        "Interlingue"
+      ]
+    },
+    {
+      "code": "ig",
+      "english": "Igbo",
+      "amharic": "ኢግቦኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ibo",
+        "Igbo"
+      ]
+    },
+    {
+      "code": "ii",
+      "english": "Sichuan Yi",
+      "amharic": "ሲቹዋን ዪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "iii",
+        "Sichuan Yi"
+      ]
+    },
+    {
+      "code": "ik",
+      "english": "Inupiaq",
+      "amharic": "እኑፒያቅኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "esk",
+        "ipk",
+        "Inupiaq"
+      ]
+    },
+    {
+      "code": "ikt",
+      "english": "Western Canadian Inuktitut",
+      "amharic": "የምዕራባዊ ካናዳ ኢኑክቲቱት",
+      "afaan_oromo": "",
+      "aliases": [
+        "Western Canadian Inuktitut"
+      ]
+    },
+    {
+      "code": "ilo",
+      "english": "Iloko",
+      "amharic": "ኢሎኮ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Iloko"
+      ]
+    },
+    {
+      "code": "inh",
+      "english": "Ingush",
+      "amharic": "ኢንጉሽ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ingush"
+      ]
+    },
+    {
+      "code": "io",
+      "english": "Ido",
+      "amharic": "ኢዶ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ido",
+        "Ido"
+      ]
+    },
+    {
+      "code": "is",
+      "english": "Icelandic",
+      "amharic": "አይስላንድኛ",
+      "afaan_oromo": "Ayiislandiffaa",
+      "aliases": [
+        "isl",
+        "ice",
+        "Icelandic"
+      ]
+    },
+    {
+      "code": "it",
+      "english": "Italian",
+      "amharic": "ጣሊያንኛ",
+      "afaan_oromo": "Afaan Xaaliyaani",
+      "aliases": [
+        "ita",
+        "Italian"
+      ]
+    },
+    {
+      "code": "iu",
+      "english": "Inuktitut",
+      "amharic": "እኑክቲቱትኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ike",
+        "iku",
+        "Inuktitut"
+      ]
+    },
+    {
+      "code": "izh",
+      "english": "Ingrian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ingrian"
+      ]
+    },
+    {
+      "code": "ja",
+      "english": "Japanese",
+      "amharic": "ጃፓንኛ",
+      "afaan_oromo": "Afaan Japanii",
+      "aliases": [
+        "jpn",
+        "Japanese"
+      ]
+    },
+    {
+      "code": "jam",
+      "english": "Jamaican Creole English",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Jamaican Creole English"
+      ]
+    },
+    {
+      "code": "jbo",
+      "english": "Lojban",
+      "amharic": "ሎጅባን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lojban"
+      ]
+    },
+    {
+      "code": "jgo",
+      "english": "Ngomba",
+      "amharic": "ንጎምባ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ngomba"
+      ]
+    },
+    {
+      "code": "jmc",
+      "english": "Machame",
+      "amharic": "ማቻሜኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Machame"
+      ]
+    },
+    {
+      "code": "jpr",
+      "english": "Judeo-Persian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Judeo-Persian"
+      ]
+    },
+    {
+      "code": "jrb",
+      "english": "Judeo-Arabic",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "aju",
+        "Judeo-Arabic"
+      ]
+    },
+    {
+      "code": "jut",
+      "english": "Jutish",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Jutish"
+      ]
+    },
+    {
+      "code": "jv",
+      "english": "Javanese",
+      "amharic": "ጃቫኒዝ",
+      "afaan_oromo": "Afaan Java",
+      "aliases": [
+        "jw",
+        "jav",
+        "Javanese"
+      ]
+    },
+    {
+      "code": "ka",
+      "english": "Georgian",
+      "amharic": "ጆርጂያዊ",
+      "afaan_oromo": "Afaan Georgian",
+      "aliases": [
+        "kat",
+        "geo",
+        "Georgian"
+      ]
+    },
+    {
+      "code": "kaa",
+      "english": "Kara-Kalpak",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kara-Kalpak"
+      ]
+    },
+    {
+      "code": "kab",
+      "english": "Kabyle",
+      "amharic": "ካብይል",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kabyle"
+      ]
+    },
+    {
+      "code": "kac",
+      "english": "Kachin",
+      "amharic": "ካቺን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kachin"
+      ]
+    },
+    {
+      "code": "kaj",
+      "english": "Jju",
+      "amharic": "ጅጁ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Jju"
+      ]
+    },
+    {
+      "code": "kam",
+      "english": "Kamba",
+      "amharic": "ካምባ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kamba"
+      ]
+    },
+    {
+      "code": "kaw",
+      "english": "Kawi",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kawi"
+      ]
+    },
+    {
+      "code": "kbd",
+      "english": "Kabardian",
+      "amharic": "ካባርዲያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kabardian"
+      ]
+    },
+    {
+      "code": "kbl",
+      "english": "Kanembu",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kanembu"
+      ]
+    },
+    {
+      "code": "kcg",
+      "english": "Tyap",
+      "amharic": "ታያፕ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tyap"
+      ]
+    },
+    {
+      "code": "kde",
+      "english": "Makonde",
+      "amharic": "ማኮንዴ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Makonde"
+      ]
+    },
+    {
+      "code": "kea",
+      "english": "Kabuverdianu",
+      "amharic": "ካቡቨርዲያኑ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kabuverdianu"
+      ]
+    },
+    {
+      "code": "ken",
+      "english": "Kenyang",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kenyang"
+      ]
+    },
+    {
+      "code": "kfo",
+      "english": "Koro",
+      "amharic": "ኮሮ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Koro"
+      ]
+    },
+    {
+      "code": "kg",
+      "english": "Kongo",
+      "amharic": "ኮንጎኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "kng",
+        "kon",
+        "Kongo"
+      ]
+    },
+    {
+      "code": "kgp",
+      "english": "Kaingang",
+      "amharic": "ካይንጋንግ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kaingang"
+      ]
+    },
+    {
+      "code": "kha",
+      "english": "Khasi",
+      "amharic": "ካሲ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Khasi"
+      ]
+    },
+    {
+      "code": "kho",
+      "english": "Khotanese",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Khotanese"
+      ]
+    },
+    {
+      "code": "khq",
+      "english": "Koyra Chiini",
+      "amharic": "ኮይራ ቺኒ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Koyra Chiini"
+      ]
+    },
+    {
+      "code": "khw",
+      "english": "Khowar",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Khowar"
+      ]
+    },
+    {
+      "code": "ki",
+      "english": "Kikuyu",
+      "amharic": "ኪኩዩ",
+      "afaan_oromo": "",
+      "aliases": [
+        "kik",
+        "Kikuyu"
+      ]
+    },
+    {
+      "code": "kiu",
+      "english": "Kirmanjki",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kirmanjki"
+      ]
+    },
+    {
+      "code": "kj",
+      "english": "Kuanyama",
+      "amharic": "ኩዋንያማ",
+      "afaan_oromo": "",
+      "aliases": [
+        "kua",
+        "Kuanyama"
+      ]
+    },
+    {
+      "code": "kk",
+      "english": "Kazakh",
+      "amharic": "ካዛክኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "kaz",
+        "Kazakh"
+      ]
+    },
+    {
+      "code": "kkj",
+      "english": "Kako",
+      "amharic": "ካኮ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kako"
+      ]
+    },
+    {
+      "code": "kl",
+      "english": "Kalaallisut",
+      "amharic": "ካላሊሱት",
+      "afaan_oromo": "",
+      "aliases": [
+        "kal",
+        "Kalaallisut"
+      ]
+    },
+    {
+      "code": "kln",
+      "english": "Kalenjin",
+      "amharic": "ካለንጂን",
+      "afaan_oromo": "",
+      "aliases": [
+        "spy",
+        "Kalenjin"
+      ]
+    },
+    {
+      "code": "km",
+      "english": "Khmer",
+      "amharic": "ክመር",
+      "afaan_oromo": "",
+      "aliases": [
+        "khm",
+        "Khmer"
+      ]
+    },
+    {
+      "code": "kmb",
+      "english": "Kimbundu",
+      "amharic": "ኪምቡንዱ",
+      "afaan_oromo": "",
+      "aliases": [
+        "smd",
+        "Kimbundu"
+      ]
+    },
+    {
+      "code": "kn",
+      "english": "Kannada",
+      "amharic": "ካናዳ",
+      "afaan_oromo": "Afaan Kannada",
+      "aliases": [
+        "kan",
+        "Kannada"
+      ]
+    },
+    {
+      "code": "ko",
+      "english": "Korean",
+      "amharic": "ኮሪያኛ",
+      "afaan_oromo": "Afaan Korea",
+      "aliases": [
+        "kor",
+        "Korean"
+      ]
+    },
+    {
+      "code": "koi",
+      "english": "Komi-Permyak",
+      "amharic": "ኮሚ ፔርምያክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Komi-Permyak"
+      ]
+    },
+    {
+      "code": "kok",
+      "english": "Konkani",
+      "amharic": "ኮንካኒ",
+      "afaan_oromo": "",
+      "aliases": [
+        "knn",
+        "Konkani"
+      ]
+    },
+    {
+      "code": "kos",
+      "english": "Kosraean",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kosraean"
+      ]
+    },
+    {
+      "code": "kpe",
+      "english": "Kpelle",
+      "amharic": "ክፔሌ",
+      "afaan_oromo": "",
+      "aliases": [
+        "xpe",
+        "Kpelle"
+      ]
+    },
+    {
+      "code": "kr",
+      "english": "Kanuri",
+      "amharic": "ካኑሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "knc",
+        "kau",
+        "Kanuri"
+      ]
+    },
+    {
+      "code": "krc",
+      "english": "Karachay-Balkar",
+      "amharic": "ካራቻይ-ባልካር",
+      "afaan_oromo": "",
+      "aliases": [
+        "Karachay-Balkar"
+      ]
+    },
+    {
+      "code": "kri",
+      "english": "Krio",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Krio"
+      ]
+    },
+    {
+      "code": "krj",
+      "english": "Kinaray-a",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kinaray-a"
+      ]
+    },
+    {
+      "code": "krl",
+      "english": "Karelian",
+      "amharic": "ካረሊያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Karelian"
+      ]
+    },
+    {
+      "code": "kru",
+      "english": "Kurukh",
+      "amharic": "ኩሩክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "kxl",
+        "Kurukh"
+      ]
+    },
+    {
+      "code": "ks",
+      "english": "Kashmiri",
+      "amharic": "ካሽሚርኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "kas",
+        "Kashmiri"
+      ]
+    },
+    {
+      "code": "ksb",
+      "english": "Shambala",
+      "amharic": "ሻምባላ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Shambala"
+      ]
+    },
+    {
+      "code": "ksf",
+      "english": "Bafia",
+      "amharic": "ባፊያ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Bafia"
+      ]
+    },
+    {
+      "code": "ksh",
+      "english": "Colognian",
+      "amharic": "ኮሎኝኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Colognian"
+      ]
+    },
+    {
+      "code": "ku",
+      "english": "Kurdish",
+      "amharic": "ኩርድሽ",
+      "afaan_oromo": "",
+      "aliases": [
+        "kmr",
+        "kur",
+        "Kurdish"
+      ]
+    },
+    {
+      "code": "kum",
+      "english": "Kumyk",
+      "amharic": "ኩማይክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kumyk"
+      ]
+    },
+    {
+      "code": "kut",
+      "english": "Kutenai",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kutenai"
+      ]
+    },
+    {
+      "code": "kv",
+      "english": "Komi",
+      "amharic": "ኮሚ",
+      "afaan_oromo": "",
+      "aliases": [
+        "kpv",
+        "kom",
+        "Komi"
+      ]
+    },
+    {
+      "code": "kw",
+      "english": "Cornish",
+      "amharic": "ኮርኒሽ",
+      "afaan_oromo": "",
+      "aliases": [
+        "cor",
+        "Cornish"
+      ]
+    },
+    {
+      "code": "kwk",
+      "english": "Kwakʼwala",
+      "amharic": "ክዋክዋላ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kwakʼwala"
+      ]
+    },
+    {
+      "code": "kxv",
+      "english": "Kuvi",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kuvi"
+      ]
+    },
+    {
+      "code": "ky",
+      "english": "Kyrgyz",
+      "amharic": "ክይርግይዝ",
+      "afaan_oromo": "",
+      "aliases": [
+        "kir",
+        "Kyrgyz"
+      ]
+    },
+    {
+      "code": "la",
+      "english": "Latin",
+      "amharic": "ላቲንኛ",
+      "afaan_oromo": "Afaan Laatini",
+      "aliases": [
+        "lat",
+        "Latin"
+      ]
+    },
+    {
+      "code": "lad",
+      "english": "Ladino",
+      "amharic": "ላዲኖ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ladino"
+      ]
+    },
+    {
+      "code": "lag",
+      "english": "Langi",
+      "amharic": "ላንጊ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Langi"
+      ]
+    },
+    {
+      "code": "lah",
+      "english": "Western Panjabi",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "pnb",
+        "Western Panjabi"
+      ]
+    },
+    {
+      "code": "lam",
+      "english": "Lamba",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lamba"
+      ]
+    },
+    {
+      "code": "lb",
+      "english": "Luxembourgish",
+      "amharic": "ሉክሰምበርግኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ltz",
+        "Luxembourgish"
+      ]
+    },
+    {
+      "code": "lez",
+      "english": "Lezghian",
+      "amharic": "ሌዝጊያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lezghian"
+      ]
+    },
+    {
+      "code": "lfn",
+      "english": "Lingua Franca Nova",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lingua Franca Nova"
+      ]
+    },
+    {
+      "code": "lg",
+      "english": "Ganda",
+      "amharic": "ጋንዳኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "lug",
+        "Ganda"
+      ]
+    },
+    {
+      "code": "li",
+      "english": "Limburgish",
+      "amharic": "ሊምቡርጊሽ",
+      "afaan_oromo": "",
+      "aliases": [
+        "lim",
+        "Limburgish"
+      ]
+    },
+    {
+      "code": "lij",
+      "english": "Ligurian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ligurian"
+      ]
+    },
+    {
+      "code": "lil",
+      "english": "Lillooet",
+      "amharic": "ሊሎኤት",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lillooet"
+      ]
+    },
+    {
+      "code": "liv",
+      "english": "Livonian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Livonian"
+      ]
+    },
+    {
+      "code": "lkt",
+      "english": "Lakota",
+      "amharic": "ላኮታ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lakota"
+      ]
+    },
+    {
+      "code": "lmo",
+      "english": "Lombard",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lombard"
+      ]
+    },
+    {
+      "code": "ln",
+      "english": "Lingala",
+      "amharic": "ሊንጋላ",
+      "afaan_oromo": "",
+      "aliases": [
+        "lin",
+        "Lingala"
+      ]
+    },
+    {
+      "code": "lo",
+      "english": "Lao",
+      "amharic": "ላኦኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "lao",
+        "Lao"
+      ]
+    },
+    {
+      "code": "lol",
+      "english": "Mongo",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mongo"
+      ]
+    },
+    {
+      "code": "lou",
+      "english": "Louisiana Creole",
+      "amharic": "ሉዊዚያና ክሬኦል",
+      "afaan_oromo": "",
+      "aliases": [
+        "Louisiana Creole"
+      ]
+    },
+    {
+      "code": "loz",
+      "english": "Lozi",
+      "amharic": "ሎዚ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lozi"
+      ]
+    },
+    {
+      "code": "lrc",
+      "english": "Northern Luri",
+      "amharic": "ሰሜናዊ ሉሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Northern Luri"
+      ]
+    },
+    {
+      "code": "lsm",
+      "english": "Saamia",
+      "amharic": "ሳሚያ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Saamia"
+      ]
+    },
+    {
+      "code": "lt",
+      "english": "Lithuanian",
+      "amharic": "ሉቴንያንኛ",
+      "afaan_oromo": "Afaan Liituniyaa",
+      "aliases": [
+        "lit",
+        "Lithuanian"
+      ]
+    },
+    {
+      "code": "ltg",
+      "english": "Latgalian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Latgalian"
+      ]
+    },
+    {
+      "code": "lu",
+      "english": "Luba-Katanga",
+      "amharic": "ሉባ-ካታንጋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "lub",
+        "Luba-Katanga"
+      ]
+    },
+    {
+      "code": "lua",
+      "english": "Luba-Lulua",
+      "amharic": "ሉባ-ሉሏ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Luba-Lulua"
+      ]
+    },
+    {
+      "code": "lui",
+      "english": "Luiseno",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Luiseno"
+      ]
+    },
+    {
+      "code": "lun",
+      "english": "Lunda",
+      "amharic": "ሉንዳ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lunda"
+      ]
+    },
+    {
+      "code": "luo",
+      "english": "Luo",
+      "amharic": "ሉኦ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Luo"
+      ]
+    },
+    {
+      "code": "lus",
+      "english": "Mizo",
+      "amharic": "ሚዞ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mizo"
+      ]
+    },
+    {
+      "code": "luy",
+      "english": "Luyia",
+      "amharic": "ሉያ",
+      "afaan_oromo": "",
+      "aliases": [
+        "bxk",
+        "Luyia"
+      ]
+    },
+    {
+      "code": "lv",
+      "english": "Latvian",
+      "amharic": "ላትቪያን",
+      "afaan_oromo": "Afaan Lativiyaa",
+      "aliases": [
+        "lvs",
+        "lav",
+        "Latvian"
+      ]
+    },
+    {
+      "code": "lzh",
+      "english": "Literary Chinese",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Literary Chinese"
+      ]
+    },
+    {
+      "code": "lzz",
+      "english": "Laz",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Laz"
+      ]
+    },
+    {
+      "code": "mad",
+      "english": "Madurese",
+      "amharic": "ማዱረስ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Madurese"
+      ]
+    },
+    {
+      "code": "maf",
+      "english": "Mafa",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mafa"
+      ]
+    },
+    {
+      "code": "mag",
+      "english": "Magahi",
+      "amharic": "ማጋሂ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Magahi"
+      ]
+    },
+    {
+      "code": "mai",
+      "english": "Maithili",
+      "amharic": "ማይቲሊ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Maithili"
+      ]
+    },
+    {
+      "code": "mak",
+      "english": "Makasar",
+      "amharic": "ማካሳር",
+      "afaan_oromo": "",
+      "aliases": [
+        "Makasar"
+      ]
+    },
+    {
+      "code": "man",
+      "english": "Mandingo",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "emk",
+        "mnk",
+        "Mandingo"
+      ]
+    },
+    {
+      "code": "mas",
+      "english": "Masai",
+      "amharic": "ማሳይ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Masai"
+      ]
+    },
+    {
+      "code": "mde",
+      "english": "Maba",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Maba"
+      ]
+    },
+    {
+      "code": "mdf",
+      "english": "Moksha",
+      "amharic": "ሞክሻ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Moksha"
+      ]
+    },
+    {
+      "code": "mdr",
+      "english": "Mandar",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mandar"
+      ]
+    },
+    {
+      "code": "men",
+      "english": "Mende",
+      "amharic": "ሜንዴ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mende"
+      ]
+    },
+    {
+      "code": "mer",
+      "english": "Meru",
+      "amharic": "ሜሩ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Meru"
+      ]
+    },
+    {
+      "code": "mfe",
+      "english": "Morisyen",
+      "amharic": "ሞሪስየን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Morisyen"
+      ]
+    },
+    {
+      "code": "mg",
+      "english": "Malagasy",
+      "amharic": "ማላጋስይ",
+      "afaan_oromo": "",
+      "aliases": [
+        "plt",
+        "mlg",
+        "Malagasy"
+      ]
+    },
+    {
+      "code": "mga",
+      "english": "Middle Irish",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Middle Irish"
+      ]
+    },
+    {
+      "code": "mgh",
+      "english": "Makhuwa-Meetto",
+      "amharic": "ማኩዋ-ሜቶ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Makhuwa-Meetto"
+      ]
+    },
+    {
+      "code": "mgo",
+      "english": "Metaʼ",
+      "amharic": "ሜታ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Metaʼ"
+      ]
+    },
+    {
+      "code": "mh",
+      "english": "Marshallese",
+      "amharic": "ማርሻሊዝ",
+      "afaan_oromo": "",
+      "aliases": [
+        "mah",
+        "Marshallese"
+      ]
+    },
+    {
+      "code": "mi",
+      "english": "Māori",
+      "amharic": "ማኦሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "mri",
+        "mao",
+        "Māori"
+      ]
+    },
+    {
+      "code": "mic",
+      "english": "Mi'kmaw",
+      "amharic": "ሚክማው",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mi'kmaw"
+      ]
+    },
+    {
+      "code": "min",
+      "english": "Minangkabau",
+      "amharic": "ሚናንግካባኡ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Minangkabau"
+      ]
+    },
+    {
+      "code": "mk",
+      "english": "Macedonian",
+      "amharic": "ሜቄዶንኛ",
+      "afaan_oromo": "Afaan Macedooniyaa",
+      "aliases": [
+        "mkd",
+        "mac",
+        "Macedonian"
+      ]
+    },
+    {
+      "code": "ml",
+      "english": "Malayalam",
+      "amharic": "ማላያላም",
+      "afaan_oromo": "Malayaalamiffaa",
+      "aliases": [
+        "mal",
+        "Malayalam"
+      ]
+    },
+    {
+      "code": "mn",
+      "english": "Mongolian",
+      "amharic": "ሞንጎሊያኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "drh",
+        "khk",
+        "mon",
+        "Mongolian"
+      ]
+    },
+    {
+      "code": "mnc",
+      "english": "Manchu",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Manchu"
+      ]
+    },
+    {
+      "code": "mni",
+      "english": "Manipuri",
+      "amharic": "ማኒፑሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Manipuri"
+      ]
+    },
+    {
+      "code": "moe",
+      "english": "Innu-aimun",
+      "amharic": "ኢኑ-አይመን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Innu-aimun"
+      ]
+    },
+    {
+      "code": "moh",
+      "english": "Mohawk",
+      "amharic": "ሞሃውክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mohawk"
+      ]
+    },
+    {
+      "code": "mos",
+      "english": "Mossi",
+      "amharic": "ሞሲ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mossi"
+      ]
+    },
+    {
+      "code": "mr",
+      "english": "Marathi",
+      "amharic": "ማራቲ",
+      "afaan_oromo": "Afaan Maratii",
+      "aliases": [
+        "mar",
+        "Marathi"
+      ]
+    },
+    {
+      "code": "mrj",
+      "english": "Western Mari",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Western Mari"
+      ]
+    },
+    {
+      "code": "ms",
+      "english": "Malay",
+      "amharic": "ማላይ",
+      "afaan_oromo": "Malaayiffaa",
+      "aliases": [
+        "zsm",
+        "msa",
+        "may",
+        "Malay"
+      ]
+    },
+    {
+      "code": "mt",
+      "english": "Maltese",
+      "amharic": "ማልቲስ",
+      "afaan_oromo": "Afaan Maltesii",
+      "aliases": [
+        "mlt",
+        "Maltese"
+      ]
+    },
+    {
+      "code": "mua",
+      "english": "Mundang",
+      "amharic": "ሙንዳንግ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mundang"
+      ]
+    },
+    {
+      "code": "mus",
+      "english": "Muscogee",
+      "amharic": "ሙስኮኪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Muscogee"
+      ]
+    },
+    {
+      "code": "mwl",
+      "english": "Mirandese",
+      "amharic": "ሚራንዴዝ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mirandese"
+      ]
+    },
+    {
+      "code": "mwr",
+      "english": "Marwari",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "dhd",
+        "Marwari"
+      ]
+    },
+    {
+      "code": "mwv",
+      "english": "Mentawai",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mentawai"
+      ]
+    },
+    {
+      "code": "my",
+      "english": "Burmese",
+      "amharic": "ቡርማኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "mya",
+        "bur",
+        "Burmese"
+      ]
+    },
+    {
+      "code": "mye",
+      "english": "Myene",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Myene"
+      ]
+    },
+    {
+      "code": "myv",
+      "english": "Erzya",
+      "amharic": "ኤርዝያ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Erzya"
+      ]
+    },
+    {
+      "code": "mzn",
+      "english": "Mazanderani",
+      "amharic": "ማዛንደራኒ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mazanderani"
+      ]
+    },
+    {
+      "code": "na",
+      "english": "Nauru",
+      "amharic": "ናኡሩ",
+      "afaan_oromo": "",
+      "aliases": [
+        "nau",
+        "Nauru"
+      ]
+    },
+    {
+      "code": "nan",
+      "english": "Min Nan Chinese",
+      "amharic": "ሚን ኛን ቻይንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Min Nan Chinese"
+      ]
+    },
+    {
+      "code": "nap",
+      "english": "Neapolitan",
+      "amharic": "ኒአፖሊታን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Neapolitan"
+      ]
+    },
+    {
+      "code": "naq",
+      "english": "Nama",
+      "amharic": "ናማ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Nama"
+      ]
+    },
+    {
+      "code": "nb",
+      "english": "Norwegian Bokmål",
+      "amharic": "የኖርዌይ ቦክማል",
+      "afaan_oromo": "",
+      "aliases": [
+        "nob",
+        "Norwegian Bokmål"
+      ]
+    },
+    {
+      "code": "nd",
+      "english": "North Ndebele",
+      "amharic": "ሰሜን ንዴብሌ",
+      "afaan_oromo": "",
+      "aliases": [
+        "nde",
+        "North Ndebele"
+      ]
+    },
+    {
+      "code": "nds",
+      "english": "Low German",
+      "amharic": "የታችኛው ጀርመንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Low German"
+      ]
+    },
+    {
+      "code": "ne",
+      "english": "Nepali",
+      "amharic": "ኔፓሊኛ",
+      "afaan_oromo": "Afaan Nepalii",
+      "aliases": [
+        "npi",
+        "nep",
+        "Nepali"
+      ]
+    },
+    {
+      "code": "new",
+      "english": "Newari",
+      "amharic": "ኒዋሪ(ኔፓል)",
+      "afaan_oromo": "",
+      "aliases": [
+        "Newari"
+      ]
+    },
+    {
+      "code": "ng",
+      "english": "Ndonga",
+      "amharic": "ንዶንጋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ndo",
+        "Ndonga"
+      ]
+    },
+    {
+      "code": "nia",
+      "english": "Nias",
+      "amharic": "ኒአስ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Nias"
+      ]
+    },
+    {
+      "code": "niu",
+      "english": "Niuean",
+      "amharic": "ኒዩአንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Niuean"
+      ]
+    },
+    {
+      "code": "njo",
+      "english": "Ao Naga",
+      "amharic": "ኦ ናጋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ao Naga"
+      ]
+    },
+    {
+      "code": "nl",
+      "english": "Dutch",
+      "amharic": "ደች",
+      "afaan_oromo": "Afaan Dachii",
+      "aliases": [
+        "nld",
+        "dut",
+        "Dutch"
+      ]
+    },
+    {
+      "code": "nmg",
+      "english": "Kwasio",
+      "amharic": "ክዋሲዮ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kwasio"
+      ]
+    },
+    {
+      "code": "nn",
+      "english": "Norwegian Nynorsk",
+      "amharic": "የኖርዌይ ናይኖርስክ",
+      "afaan_oromo": "Afaan Norwegian",
+      "aliases": [
+        "nno",
+        "Norwegian Nynorsk"
+      ]
+    },
+    {
+      "code": "nnh",
+      "english": "Ngiemboon",
+      "amharic": "ኒጊምቡን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ngiemboon"
+      ]
+    },
+    {
+      "code": "no",
+      "english": "Norwegian",
+      "amharic": "ኖርዌጂያን",
+      "afaan_oromo": "Afaan Norweyii",
+      "aliases": [
+        "nor",
+        "Norwegian"
+      ]
+    },
+    {
+      "code": "nog",
+      "english": "Nogai",
+      "amharic": "ኖጋይ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Nogai"
+      ]
+    },
+    {
+      "code": "non",
+      "english": "Old Norse",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Old Norse"
+      ]
+    },
+    {
+      "code": "nov",
+      "english": "Novial",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Novial"
+      ]
+    },
+    {
+      "code": "nqo",
+      "english": "N’Ko",
+      "amharic": "ንኮ",
+      "afaan_oromo": "",
+      "aliases": [
+        "N’Ko"
+      ]
+    },
+    {
+      "code": "nr",
+      "english": "South Ndebele",
+      "amharic": "ደቡብ ንደቤሌ",
+      "afaan_oromo": "",
+      "aliases": [
+        "nbl",
+        "South Ndebele"
+      ]
+    },
+    {
+      "code": "nso",
+      "english": "Northern Sotho",
+      "amharic": "ሰሜናዊ ሶቶ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Northern Sotho"
+      ]
+    },
+    {
+      "code": "nus",
+      "english": "Nuer",
+      "amharic": "ኑዌር",
+      "afaan_oromo": "",
+      "aliases": [
+        "Nuer"
+      ]
+    },
+    {
+      "code": "nv",
+      "english": "Navajo",
+      "amharic": "ናቫጆ",
+      "afaan_oromo": "",
+      "aliases": [
+        "nav",
+        "Navajo"
+      ]
+    },
+    {
+      "code": "nwc",
+      "english": "Classical Newari",
+      "amharic": "ክላሲክ ኔዋሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Classical Newari"
+      ]
+    },
+    {
+      "code": "ny",
+      "english": "Nyanja",
+      "amharic": "ንያንጃ",
+      "afaan_oromo": "",
+      "aliases": [
+        "nya",
+        "Nyanja"
+      ]
+    },
+    {
+      "code": "nym",
+      "english": "Nyamwezi",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Nyamwezi"
+      ]
+    },
+    {
+      "code": "nyn",
+      "english": "Nyankole",
+      "amharic": "ኒያንኮል",
+      "afaan_oromo": "",
+      "aliases": [
+        "Nyankole"
+      ]
+    },
+    {
+      "code": "nyo",
+      "english": "Nyoro",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Nyoro"
+      ]
+    },
+    {
+      "code": "nzi",
+      "english": "Nzima",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Nzima"
+      ]
+    },
+    {
+      "code": "oc",
+      "english": "Occitan",
+      "amharic": "ኦሲታን",
+      "afaan_oromo": "Afaan Occit",
+      "aliases": [
+        "oci",
+        "Occitan"
+      ]
+    },
+    {
+      "code": "oj",
+      "english": "Ojibwa",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "ojg",
+        "oji",
+        "Ojibwa"
+      ]
+    },
+    {
+      "code": "ojb",
+      "english": "Northwestern Ojibwa",
+      "amharic": "ሰሜን ምዕራባዊ ኦጂብዋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Northwestern Ojibwa"
+      ]
+    },
+    {
+      "code": "ojc",
+      "english": "Central Ojibwa",
+      "amharic": "ማዕከላዊ ኦጂብዋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Central Ojibwa"
+      ]
+    },
+    {
+      "code": "ojs",
+      "english": "Oji-Cree",
+      "amharic": "ኦጂ-ክሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Oji-Cree"
+      ]
+    },
+    {
+      "code": "ojw",
+      "english": "Western Ojibwa",
+      "amharic": "ምዕራባዊ ኦጂቡዋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Western Ojibwa"
+      ]
+    },
+    {
+      "code": "oka",
+      "english": "Okanagan",
+      "amharic": "ኦካናጋን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Okanagan"
+      ]
+    },
+    {
+      "code": "om",
+      "english": "Oromo",
+      "amharic": "ኦሮሚኛ",
+      "afaan_oromo": "Oromoo",
+      "aliases": [
+        "gaz",
+        "orm",
+        "Oromo"
+      ]
+    },
+    {
+      "code": "or",
+      "english": "Odia",
+      "amharic": "ኦዲያ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ory",
+        "ori",
+        "Odia"
+      ]
+    },
+    {
+      "code": "os",
+      "english": "Ossetic",
+      "amharic": "ኦሴቲክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "oss",
+        "Ossetic"
+      ]
+    },
+    {
+      "code": "osa",
+      "english": "Osage",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Osage"
+      ]
+    },
+    {
+      "code": "ota",
+      "english": "Ottoman Turkish",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ottoman Turkish"
+      ]
+    },
+    {
+      "code": "pa",
+      "english": "Punjabi",
+      "amharic": "ፑንጃብኛ",
+      "afaan_oromo": "Afaan Punjabii",
+      "aliases": [
+        "pan",
+        "Punjabi"
+      ]
+    },
+    {
+      "code": "pag",
+      "english": "Pangasinan",
+      "amharic": "ፓንጋሲናን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Pangasinan"
+      ]
+    },
+    {
+      "code": "pal",
+      "english": "Pahlavi",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Pahlavi"
+      ]
+    },
+    {
+      "code": "pam",
+      "english": "Pampanga",
+      "amharic": "ፓምፓንጋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Pampanga"
+      ]
+    },
+    {
+      "code": "pap",
+      "english": "Papiamento",
+      "amharic": "ፓፒያሜንቶ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Papiamento"
+      ]
+    },
+    {
+      "code": "pau",
+      "english": "Palauan",
+      "amharic": "ፓሉዋን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Palauan"
+      ]
+    },
+    {
+      "code": "pcd",
+      "english": "Picard",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Picard"
+      ]
+    },
+    {
+      "code": "pcm",
+      "english": "Nigerian Pidgin",
+      "amharic": "የናይጄሪያ ፒጂን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Nigerian Pidgin"
+      ]
+    },
+    {
+      "code": "pdc",
+      "english": "Pennsylvania German",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Pennsylvania German"
+      ]
+    },
+    {
+      "code": "pdt",
+      "english": "Plautdietsch",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Plautdietsch"
+      ]
+    },
+    {
+      "code": "peo",
+      "english": "Old Persian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Old Persian"
+      ]
+    },
+    {
+      "code": "pfl",
+      "english": "Palatine German",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Palatine German"
+      ]
+    },
+    {
+      "code": "phn",
+      "english": "Phoenician",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Phoenician"
+      ]
+    },
+    {
+      "code": "pi",
+      "english": "Pali",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "pli",
+        "Pali"
+      ]
+    },
+    {
+      "code": "pis",
+      "english": "Pijin",
+      "amharic": "ፒጂን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Pijin"
+      ]
+    },
+    {
+      "code": "pl",
+      "english": "Polish",
+      "amharic": "ፖሊሽ",
+      "afaan_oromo": "Afaan Polandii",
+      "aliases": [
+        "pol",
+        "Polish"
+      ]
+    },
+    {
+      "code": "pms",
+      "english": "Piedmontese",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Piedmontese"
+      ]
+    },
+    {
+      "code": "pnt",
+      "english": "Pontic",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Pontic"
+      ]
+    },
+    {
+      "code": "pon",
+      "english": "Pohnpeian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Pohnpeian"
+      ]
+    },
+    {
+      "code": "pqm",
+      "english": "Maliseet-Passamaquoddy",
+      "amharic": "ማሊሴት-ፓሳማኩዎድይ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Maliseet-Passamaquoddy"
+      ]
+    },
+    {
+      "code": "prg",
+      "english": "Prussian",
+      "amharic": "ፐሩሳንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Prussian"
+      ]
+    },
+    {
+      "code": "pro",
+      "english": "Old Provençal",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Old Provençal"
+      ]
+    },
+    {
+      "code": "ps",
+      "english": "Pashto",
+      "amharic": "ፓሽቶ",
+      "afaan_oromo": "",
+      "aliases": [
+        "pbu",
+        "pus",
+        "Pashto"
+      ]
+    },
+    {
+      "code": "pt",
+      "english": "Portuguese",
+      "amharic": "ፖርቹጋልኛ",
+      "afaan_oromo": "Afaan Porchugaal",
+      "aliases": [
+        "por",
+        "Portuguese"
+      ]
+    },
+    {
+      "code": "qu",
+      "english": "Quechua",
+      "amharic": "ኩዌቹዋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "quz",
+        "que",
+        "Quechua"
+      ]
+    },
+    {
+      "code": "quc",
+      "english": "Kʼicheʼ",
+      "amharic": "ኪቼ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kʼicheʼ"
+      ]
+    },
+    {
+      "code": "qug",
+      "english": "Chimborazo Highland Quichua",
+      "amharic": "ቺምቦራዞ ሃይላንድ ኩቹዋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Chimborazo Highland Quichua"
+      ]
+    },
+    {
+      "code": "raj",
+      "english": "Rajasthani",
+      "amharic": "ራጃስታኒ",
+      "afaan_oromo": "",
+      "aliases": [
+        "mup",
+        "Rajasthani"
+      ]
+    },
+    {
+      "code": "rap",
+      "english": "Rapanui",
+      "amharic": "ራፓኑኢ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Rapanui"
+      ]
+    },
+    {
+      "code": "rar",
+      "english": "Rarotongan",
+      "amharic": "ራሮቶንጋን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Rarotongan"
+      ]
+    },
+    {
+      "code": "rgn",
+      "english": "Romagnol",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Romagnol"
+      ]
+    },
+    {
+      "code": "rhg",
+      "english": "Rohingya",
+      "amharic": "ሮሂንግያ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Rohingya"
+      ]
+    },
+    {
+      "code": "rif",
+      "english": "Riffian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Riffian"
+      ]
+    },
+    {
+      "code": "rm",
+      "english": "Romansh",
+      "amharic": "ሮማንሽ",
+      "afaan_oromo": "",
+      "aliases": [
+        "roh",
+        "Romansh"
+      ]
+    },
+    {
+      "code": "rn",
+      "english": "Rundi",
+      "amharic": "ሩንዲ",
+      "afaan_oromo": "",
+      "aliases": [
+        "run",
+        "Rundi"
+      ]
+    },
+    {
+      "code": "ro",
+      "english": "Romanian",
+      "amharic": "ሮማኒያኛ",
+      "afaan_oromo": "Afaan Romaniyaa",
+      "aliases": [
+        "mo",
+        "mol",
+        "ron",
+        "rum",
+        "Romanian"
+      ]
+    },
+    {
+      "code": "rof",
+      "english": "Rombo",
+      "amharic": "ሮምቦ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Rombo"
+      ]
+    },
+    {
+      "code": "rom",
+      "english": "Romany",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "rmy",
+        "Romany"
+      ]
+    },
+    {
+      "code": "rtm",
+      "english": "Rotuman",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Rotuman"
+      ]
+    },
+    {
+      "code": "ru",
+      "english": "Russian",
+      "amharic": "ራሽያኛ",
+      "afaan_oromo": "Afaan Rushiyaa",
+      "aliases": [
+        "rus",
+        "Russian"
+      ]
+    },
+    {
+      "code": "rue",
+      "english": "Rusyn",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Rusyn"
+      ]
+    },
+    {
+      "code": "rug",
+      "english": "Roviana",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Roviana"
+      ]
+    },
+    {
+      "code": "rup",
+      "english": "Aromanian",
+      "amharic": "አሮማንያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Aromanian"
+      ]
+    },
+    {
+      "code": "rw",
+      "english": "Kinyarwanda",
+      "amharic": "ኪንያርዋንዳ",
+      "afaan_oromo": "",
+      "aliases": [
+        "kin",
+        "Kinyarwanda"
+      ]
+    },
+    {
+      "code": "rwk",
+      "english": "Rwa",
+      "amharic": "ርዋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Rwa"
+      ]
+    },
+    {
+      "code": "sa",
+      "english": "Sanskrit",
+      "amharic": "ሳንስክሪት",
+      "afaan_oromo": "",
+      "aliases": [
+        "san",
+        "Sanskrit"
+      ]
+    },
+    {
+      "code": "sad",
+      "english": "Sandawe",
+      "amharic": "ሳንዳዌ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Sandawe"
+      ]
+    },
+    {
+      "code": "sah",
+      "english": "Yakut",
+      "amharic": "ሳክሃ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Yakut"
+      ]
+    },
+    {
+      "code": "sam",
+      "english": "Samaritan Aramaic",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Samaritan Aramaic"
+      ]
+    },
+    {
+      "code": "saq",
+      "english": "Samburu",
+      "amharic": "ሳምቡሩ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Samburu"
+      ]
+    },
+    {
+      "code": "sas",
+      "english": "Sasak",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Sasak"
+      ]
+    },
+    {
+      "code": "sat",
+      "english": "Santali",
+      "amharic": "ሳንታሊ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Santali"
+      ]
+    },
+    {
+      "code": "saz",
+      "english": "Saurashtra",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Saurashtra"
+      ]
+    },
+    {
+      "code": "sba",
+      "english": "Ngambay",
+      "amharic": "ንጋምባይ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ngambay"
+      ]
+    },
+    {
+      "code": "sbp",
+      "english": "Sangu",
+      "amharic": "ሳንጉ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Sangu"
+      ]
+    },
+    {
+      "code": "sc",
+      "english": "Sardinian",
+      "amharic": "ሳርዲንያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "src",
+        "srd",
+        "Sardinian"
+      ]
+    },
+    {
+      "code": "scn",
+      "english": "Sicilian",
+      "amharic": "ሲሲሊያንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Sicilian"
+      ]
+    },
+    {
+      "code": "sco",
+      "english": "Scots",
+      "amharic": "ስኮትስ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Scots"
+      ]
+    },
+    {
+      "code": "sd",
+      "english": "Sindhi",
+      "amharic": "ሲንዲ",
+      "afaan_oromo": "",
+      "aliases": [
+        "snd",
+        "Sindhi"
+      ]
+    },
+    {
+      "code": "sdc",
+      "english": "Sassarese Sardinian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Sassarese Sardinian"
+      ]
+    },
+    {
+      "code": "sdh",
+      "english": "Southern Kurdish",
+      "amharic": "ደቡባዊ ኩርዲሽ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Southern Kurdish"
+      ]
+    },
+    {
+      "code": "se",
+      "english": "Northern Sami",
+      "amharic": "ሰሜናዊ ሳሚ",
+      "afaan_oromo": "",
+      "aliases": [
+        "sme",
+        "Northern Sami"
+      ]
+    },
+    {
+      "code": "see",
+      "english": "Seneca",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Seneca"
+      ]
+    },
+    {
+      "code": "seh",
+      "english": "Sena",
+      "amharic": "ሴና",
+      "afaan_oromo": "",
+      "aliases": [
+        "Sena"
+      ]
+    },
+    {
+      "code": "sei",
+      "english": "Seri",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Seri"
+      ]
+    },
+    {
+      "code": "sel",
+      "english": "Selkup",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Selkup"
+      ]
+    },
+    {
+      "code": "ses",
+      "english": "Koyraboro Senni",
+      "amharic": "ኮይራቦሮ ሴኒ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Koyraboro Senni"
+      ]
+    },
+    {
+      "code": "sg",
+      "english": "Sango",
+      "amharic": "ሳንጎ",
+      "afaan_oromo": "",
+      "aliases": [
+        "sag",
+        "Sango"
+      ]
+    },
+    {
+      "code": "sga",
+      "english": "Old Irish",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Old Irish"
+      ]
+    },
+    {
+      "code": "sgs",
+      "english": "Samogitian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Samogitian"
+      ]
+    },
+    {
+      "code": "shi",
+      "english": "Tachelhit",
+      "amharic": "ታቼልሂት",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tachelhit"
+      ]
+    },
+    {
+      "code": "shn",
+      "english": "Shan",
+      "amharic": "ሻን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Shan"
+      ]
+    },
+    {
+      "code": "shu",
+      "english": "Chadian Arabic",
+      "amharic": "ቻዲያን ዓረብኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Chadian Arabic"
+      ]
+    },
+    {
+      "code": "si",
+      "english": "Sinhala",
+      "amharic": "ሲንሃላ",
+      "afaan_oromo": "Afaan Sinhalese",
+      "aliases": [
+        "sin",
+        "Sinhala"
+      ]
+    },
+    {
+      "code": "sid",
+      "english": "Sidamo",
+      "amharic": "ሲዳምኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Sidamo"
+      ]
+    },
+    {
+      "code": "sk",
+      "english": "Slovak",
+      "amharic": "ስሎቫክኛ",
+      "afaan_oromo": "Afaan Slovak",
+      "aliases": [
+        "slk",
+        "slo",
+        "Slovak"
+      ]
+    },
+    {
+      "code": "sl",
+      "english": "Slovenian",
+      "amharic": "ስሎቬንኛ",
+      "afaan_oromo": "Afaan Islovaniyaa",
+      "aliases": [
+        "slv",
+        "Slovenian"
+      ]
+    },
+    {
+      "code": "slh",
+      "english": "Southern Lushootseed",
+      "amharic": "ደቡባዊ ሉሹትሲድ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Southern Lushootseed"
+      ]
+    },
+    {
+      "code": "sli",
+      "english": "Lower Silesian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lower Silesian"
+      ]
+    },
+    {
+      "code": "sly",
+      "english": "Selayar",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Selayar"
+      ]
+    },
+    {
+      "code": "sm",
+      "english": "Samoan",
+      "amharic": "ሳሞኣን",
+      "afaan_oromo": "",
+      "aliases": [
+        "smo",
+        "Samoan"
+      ]
+    },
+    {
+      "code": "sma",
+      "english": "Southern Sami",
+      "amharic": "ደቡባዊ ሳሚ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Southern Sami"
+      ]
+    },
+    {
+      "code": "smj",
+      "english": "Lule Sami",
+      "amharic": "ሉሌ ሳሚ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Lule Sami"
+      ]
+    },
+    {
+      "code": "smn",
+      "english": "Inari Sami",
+      "amharic": "ኢናሪ ሳሚ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Inari Sami"
+      ]
+    },
+    {
+      "code": "sms",
+      "english": "Skolt Sami",
+      "amharic": "ስኮልት ሳሚ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Skolt Sami"
+      ]
+    },
+    {
+      "code": "sn",
+      "english": "Shona",
+      "amharic": "ሾና",
+      "afaan_oromo": "",
+      "aliases": [
+        "sna",
+        "Shona"
+      ]
+    },
+    {
+      "code": "snk",
+      "english": "Soninke",
+      "amharic": "ሶኒንኬ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Soninke"
+      ]
+    },
+    {
+      "code": "so",
+      "english": "Somali",
+      "amharic": "ሱማልኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "som",
+        "Somali"
+      ]
+    },
+    {
+      "code": "sog",
+      "english": "Sogdien",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Sogdien"
+      ]
+    },
+    {
+      "code": "sq",
+      "english": "Albanian",
+      "amharic": "አልባንያንኛ",
+      "afaan_oromo": "Afaan Albaniyaa",
+      "aliases": [
+        "als",
+        "sqi",
+        "alb",
+        "Albanian"
+      ]
+    },
+    {
+      "code": "sr",
+      "english": "Serbian",
+      "amharic": "ሰርብያኛ",
+      "afaan_oromo": "Afaan Serbiya",
+      "aliases": [
+        "scc",
+        "srp",
+        "Serbian"
+      ]
+    },
+    {
+      "code": "srn",
+      "english": "Sranan Tongo",
+      "amharic": "ስራናን ቶንጎ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Sranan Tongo"
+      ]
+    },
+    {
+      "code": "srr",
+      "english": "Serer",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Serer"
+      ]
+    },
+    {
+      "code": "ss",
+      "english": "Swati",
+      "amharic": "ስዋቲ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ssw",
+        "Swati"
+      ]
+    },
+    {
+      "code": "ssy",
+      "english": "Saho",
+      "amharic": "ሳሆኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Saho"
+      ]
+    },
+    {
+      "code": "st",
+      "english": "Southern Sotho",
+      "amharic": "ደቡባዊ ሶቶ",
+      "afaan_oromo": "",
+      "aliases": [
+        "sot",
+        "Southern Sotho"
+      ]
+    },
+    {
+      "code": "stq",
+      "english": "Saterland Frisian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Saterland Frisian"
+      ]
+    },
+    {
+      "code": "str",
+      "english": "Straits Salish",
+      "amharic": "ስትሬይትስ ስታሊሽ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Straits Salish"
+      ]
+    },
+    {
+      "code": "su",
+      "english": "Sundanese",
+      "amharic": "ሱዳንኛ",
+      "afaan_oromo": "Afaan Sudaanii",
+      "aliases": [
+        "sun",
+        "Sundanese"
+      ]
+    },
+    {
+      "code": "suk",
+      "english": "Sukuma",
+      "amharic": "ሱኩማ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Sukuma"
+      ]
+    },
+    {
+      "code": "sus",
+      "english": "Susu",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Susu"
+      ]
+    },
+    {
+      "code": "sux",
+      "english": "Sumerian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Sumerian"
+      ]
+    },
+    {
+      "code": "sv",
+      "english": "Swedish",
+      "amharic": "ስዊድንኛ",
+      "afaan_oromo": "Afaan Suwidiin",
+      "aliases": [
+        "swe",
+        "Swedish"
+      ]
+    },
+    {
+      "code": "sw",
+      "english": "Swahili",
+      "amharic": "ስዋሂሊኛ",
+      "afaan_oromo": "Suwahilii",
+      "aliases": [
+        "swh",
+        "swa",
+        "Swahili"
+      ]
+    },
+    {
+      "code": "swb",
+      "english": "Comorian",
+      "amharic": "ኮሞሪያን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Comorian"
+      ]
+    },
+    {
+      "code": "syc",
+      "english": "Classical Syriac",
+      "amharic": "ክላሲክ ኔይራ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Classical Syriac"
+      ]
+    },
+    {
+      "code": "syr",
+      "english": "Syriac",
+      "amharic": "ሲሪያክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "cld",
+        "Syriac"
+      ]
+    },
+    {
+      "code": "szl",
+      "english": "Silesian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Silesian"
+      ]
+    },
+    {
+      "code": "ta",
+      "english": "Tamil",
+      "amharic": "ታሚል",
+      "afaan_oromo": "Afaan Tamilii",
+      "aliases": [
+        "tam",
+        "Tamil"
+      ]
+    },
+    {
+      "code": "tce",
+      "english": "Southern Tutchone",
+      "amharic": "ደቡባዊ ቱትቾን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Southern Tutchone"
+      ]
+    },
+    {
+      "code": "tcy",
+      "english": "Tulu",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tulu"
+      ]
+    },
+    {
+      "code": "te",
+      "english": "Telugu",
+      "amharic": "ተሉጉ",
+      "afaan_oromo": "Afaan Telugu",
+      "aliases": [
+        "tel",
+        "Telugu"
+      ]
+    },
+    {
+      "code": "tem",
+      "english": "Timne",
+      "amharic": "ቲምኔ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Timne"
+      ]
+    },
+    {
+      "code": "teo",
+      "english": "Teso",
+      "amharic": "ቴሶ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Teso"
+      ]
+    },
+    {
+      "code": "ter",
+      "english": "Tereno",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tereno"
+      ]
+    },
+    {
+      "code": "tet",
+      "english": "Tetum",
+      "amharic": "ቴተም",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tetum"
+      ]
+    },
+    {
+      "code": "tg",
+      "english": "Tajik",
+      "amharic": "ታጂክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "tgk",
+        "Tajik"
+      ]
+    },
+    {
+      "code": "tgx",
+      "english": "Tagish",
+      "amharic": "ታጊሽ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tagish"
+      ]
+    },
+    {
+      "code": "th",
+      "english": "Thai",
+      "amharic": "ታይ",
+      "afaan_oromo": "Afaan Tayii",
+      "aliases": [
+        "tha",
+        "Thai"
+      ]
+    },
+    {
+      "code": "tht",
+      "english": "Tahltan",
+      "amharic": "ታህልታን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tahltan"
+      ]
+    },
+    {
+      "code": "ti",
+      "english": "Tigrinya",
+      "amharic": "ትግርኛ",
+      "afaan_oromo": "Afaan Tigiree",
+      "aliases": [
+        "tir",
+        "Tigrinya"
+      ]
+    },
+    {
+      "code": "tig",
+      "english": "Tigre",
+      "amharic": "ትግረ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tigre"
+      ]
+    },
+    {
+      "code": "tiv",
+      "english": "Tiv",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tiv"
+      ]
+    },
+    {
+      "code": "tk",
+      "english": "Turkmen",
+      "amharic": "ቱርክሜን",
+      "afaan_oromo": "Lammii Turkii",
+      "aliases": [
+        "tuk",
+        "Turkmen"
+      ]
+    },
+    {
+      "code": "tkl",
+      "english": "Tokelau",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tokelau"
+      ]
+    },
+    {
+      "code": "tkr",
+      "english": "Tsakhur",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tsakhur"
+      ]
+    },
+    {
+      "code": "tlh",
+      "english": "Klingon",
+      "amharic": "ክሊንጎን",
+      "afaan_oromo": "Afaan Kilingon",
+      "aliases": [
+        "Klingon"
+      ]
+    },
+    {
+      "code": "tli",
+      "english": "Tlingit",
+      "amharic": "ትሊንጊት",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tlingit"
+      ]
+    },
+    {
+      "code": "tly",
+      "english": "Talysh",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Talysh"
+      ]
+    },
+    {
+      "code": "tmh",
+      "english": "Tamashek",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "ttq",
+        "Tamashek"
+      ]
+    },
+    {
+      "code": "tn",
+      "english": "Tswana",
+      "amharic": "ጽዋና",
+      "afaan_oromo": "",
+      "aliases": [
+        "tsn",
+        "Tswana"
+      ]
+    },
+    {
+      "code": "to",
+      "english": "Tongan",
+      "amharic": "ቶንጋን",
+      "afaan_oromo": "",
+      "aliases": [
+        "ton",
+        "Tongan"
+      ]
+    },
+    {
+      "code": "tog",
+      "english": "Nyasa Tonga",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Nyasa Tonga"
+      ]
+    },
+    {
+      "code": "tok",
+      "english": "Toki Pona",
+      "amharic": "ቶኪ ፖና",
+      "afaan_oromo": "",
+      "aliases": [
+        "Toki Pona"
+      ]
+    },
+    {
+      "code": "tpi",
+      "english": "Tok Pisin",
+      "amharic": "ቶክ ፒሲን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tok Pisin"
+      ]
+    },
+    {
+      "code": "tr",
+      "english": "Turkish",
+      "amharic": "ቱርክኛ",
+      "afaan_oromo": "Afaan Turkii",
+      "aliases": [
+        "tur",
+        "Turkish"
+      ]
+    },
+    {
+      "code": "tru",
+      "english": "Turoyo",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Turoyo"
+      ]
+    },
+    {
+      "code": "trv",
+      "english": "Taroko",
+      "amharic": "ታሮኮ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Taroko"
+      ]
+    },
+    {
+      "code": "trw",
+      "english": "Torwali",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Torwali"
+      ]
+    },
+    {
+      "code": "ts",
+      "english": "Tsonga",
+      "amharic": "ጾንጋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "tso",
+        "Tsonga"
+      ]
+    },
+    {
+      "code": "tsd",
+      "english": "Tsakonian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tsakonian"
+      ]
+    },
+    {
+      "code": "tsi",
+      "english": "Tsimshian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tsimshian"
+      ]
+    },
+    {
+      "code": "tt",
+      "english": "Tatar",
+      "amharic": "ታታር",
+      "afaan_oromo": "",
+      "aliases": [
+        "tat",
+        "Tatar"
+      ]
+    },
+    {
+      "code": "ttm",
+      "english": "Northern Tutchone",
+      "amharic": "ሰሜናዊ ቱትቾን",
+      "afaan_oromo": "",
+      "aliases": [
+        "Northern Tutchone"
+      ]
+    },
+    {
+      "code": "ttt",
+      "english": "Muslim Tat",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Muslim Tat"
+      ]
+    },
+    {
+      "code": "tum",
+      "english": "Tumbuka",
+      "amharic": "ቱምቡካ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tumbuka"
+      ]
+    },
+    {
+      "code": "tvl",
+      "english": "Tuvalu",
+      "amharic": "ቱቫሉ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tuvalu"
+      ]
+    },
+    {
+      "code": "twq",
+      "english": "Tasawaq",
+      "amharic": "ታሳዋክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tasawaq"
+      ]
+    },
+    {
+      "code": "ty",
+      "english": "Tahitian",
+      "amharic": "ታሂታንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "tah",
+        "Tahitian"
+      ]
+    },
+    {
+      "code": "tyv",
+      "english": "Tuvinian",
+      "amharic": "ቱቪንያንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Tuvinian"
+      ]
+    },
+    {
+      "code": "tzm",
+      "english": "Central Atlas Tamazight",
+      "amharic": "መካከለኛው አትላስ ታማዚኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Central Atlas Tamazight"
+      ]
+    },
+    {
+      "code": "udm",
+      "english": "Udmurt",
+      "amharic": "ኡድሙርት",
+      "afaan_oromo": "",
+      "aliases": [
+        "Udmurt"
+      ]
+    },
+    {
+      "code": "ug",
+      "english": "Uyghur",
+      "amharic": "ኡይግሁር",
+      "afaan_oromo": "",
+      "aliases": [
+        "uig",
+        "Uyghur"
+      ]
+    },
+    {
+      "code": "uga",
+      "english": "Ugaritic",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Ugaritic"
+      ]
+    },
+    {
+      "code": "uk",
+      "english": "Ukrainian",
+      "amharic": "ዩክሬንኛ",
+      "afaan_oromo": "Afaan Ukreenii",
+      "aliases": [
+        "ukr",
+        "Ukrainian"
+      ]
+    },
+    {
+      "code": "umb",
+      "english": "Umbundu",
+      "amharic": "ኡምቡንዱ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Umbundu"
+      ]
+    },
+    {
+      "code": "ur",
+      "english": "Urdu",
+      "amharic": "ኡርዱኛ",
+      "afaan_oromo": "Afaan Urdu",
+      "aliases": [
+        "urd",
+        "Urdu"
+      ]
+    },
+    {
+      "code": "uz",
+      "english": "Uzbek",
+      "amharic": "ኡዝቤክኛ",
+      "afaan_oromo": "Afaan Uzbek",
+      "aliases": [
+        "uzn",
+        "uzb",
+        "Uzbek"
+      ]
+    },
+    {
+      "code": "vai",
+      "english": "Vai",
+      "amharic": "ቫይ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Vai"
+      ]
+    },
+    {
+      "code": "ve",
+      "english": "Venda",
+      "amharic": "ቬንዳ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ven",
+        "Venda"
+      ]
+    },
+    {
+      "code": "vec",
+      "english": "Venetian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Venetian"
+      ]
+    },
+    {
+      "code": "vep",
+      "english": "Veps",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Veps"
+      ]
+    },
+    {
+      "code": "vi",
+      "english": "Vietnamese",
+      "amharic": "ቪየትናምኛ",
+      "afaan_oromo": "Afaan Veetinam",
+      "aliases": [
+        "vie",
+        "Vietnamese"
+      ]
+    },
+    {
+      "code": "vls",
+      "english": "West Flemish",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "West Flemish"
+      ]
+    },
+    {
+      "code": "vmf",
+      "english": "Main-Franconian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Main-Franconian"
+      ]
+    },
+    {
+      "code": "vmw",
+      "english": "Makhuwa",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Makhuwa"
+      ]
+    },
+    {
+      "code": "vo",
+      "english": "Volapük",
+      "amharic": "ቮላፑክኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "vol",
+        "Volapük"
+      ]
+    },
+    {
+      "code": "vot",
+      "english": "Votic",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Votic"
+      ]
+    },
+    {
+      "code": "vro",
+      "english": "Võro",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Võro"
+      ]
+    },
+    {
+      "code": "vun",
+      "english": "Vunjo",
+      "amharic": "ቩንጆ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Vunjo"
+      ]
+    },
+    {
+      "code": "wa",
+      "english": "Walloon",
+      "amharic": "ዋሎን",
+      "afaan_oromo": "",
+      "aliases": [
+        "wln",
+        "Walloon"
+      ]
+    },
+    {
+      "code": "wae",
+      "english": "Walser",
+      "amharic": "ዋልሰር",
+      "afaan_oromo": "",
+      "aliases": [
+        "Walser"
+      ]
+    },
+    {
+      "code": "wal",
+      "english": "Wolaytta",
+      "amharic": "ወላይትኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Wolaytta"
+      ]
+    },
+    {
+      "code": "war",
+      "english": "Waray",
+      "amharic": "ዋራይ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Waray"
+      ]
+    },
+    {
+      "code": "was",
+      "english": "Washo",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Washo"
+      ]
+    },
+    {
+      "code": "wbp",
+      "english": "Warlpiri",
+      "amharic": "ዋርልፒሪ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Warlpiri"
+      ]
+    },
+    {
+      "code": "wo",
+      "english": "Wolof",
+      "amharic": "ዎሎፍኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "wol",
+        "Wolof"
+      ]
+    },
+    {
+      "code": "wuu",
+      "english": "Wu Chinese",
+      "amharic": "ዉ ቻይንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Wu Chinese"
+      ]
+    },
+    {
+      "code": "xal",
+      "english": "Kalmyk",
+      "amharic": "ካልማይክ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kalmyk"
+      ]
+    },
+    {
+      "code": "xh",
+      "english": "Xhosa",
+      "amharic": "ዞሳኛ",
+      "afaan_oromo": "Afaan Xhosa",
+      "aliases": [
+        "xho",
+        "Xhosa"
+      ]
+    },
+    {
+      "code": "xmf",
+      "english": "Mingrelian",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Mingrelian"
+      ]
+    },
+    {
+      "code": "xnr",
+      "english": "Kangri",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Kangri"
+      ]
+    },
+    {
+      "code": "xog",
+      "english": "Soga",
+      "amharic": "ሶጋ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Soga"
+      ]
+    },
+    {
+      "code": "yao",
+      "english": "Yao",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Yao"
+      ]
+    },
+    {
+      "code": "yap",
+      "english": "Yapese",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Yapese"
+      ]
+    },
+    {
+      "code": "yav",
+      "english": "Yangben",
+      "amharic": "ያንግቤንኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Yangben"
+      ]
+    },
+    {
+      "code": "ybb",
+      "english": "Yemba",
+      "amharic": "የምባ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Yemba"
+      ]
+    },
+    {
+      "code": "yi",
+      "english": "Yiddish",
+      "amharic": "ይዲሽኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "ji",
+        "ydd",
+        "yid",
+        "Yiddish"
+      ]
+    },
+    {
+      "code": "yo",
+      "english": "Yoruba",
+      "amharic": "ዮሩባዊኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "yor",
+        "Yoruba"
+      ]
+    },
+    {
+      "code": "yrl",
+      "english": "Nheengatu",
+      "amharic": "ንሄንጋቱ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Nheengatu"
+      ]
+    },
+    {
+      "code": "yue",
+      "english": "Cantonese",
+      "amharic": "ካንቶኒዝ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Cantonese"
+      ]
+    },
+    {
+      "code": "za",
+      "english": "Zhuang",
+      "amharic": "ዡዋንግኛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "zyb",
+        "zha",
+        "Zhuang"
+      ]
+    },
+    {
+      "code": "zap",
+      "english": "Zapotec",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "zai",
+        "Zapotec"
+      ]
+    },
+    {
+      "code": "zbl",
+      "english": "Blissymbols",
+      "amharic": "ብሊስይምቦልስ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Blissymbols"
+      ]
+    },
+    {
+      "code": "zea",
+      "english": "Zeelandic",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Zeelandic"
+      ]
+    },
+    {
+      "code": "zen",
+      "english": "Zenaga",
+      "amharic": "",
+      "afaan_oromo": "",
+      "aliases": [
+        "Zenaga"
+      ]
+    },
+    {
+      "code": "zgh",
+      "english": "Standard Moroccan Tamazight",
+      "amharic": "መደበኛ የሞሮኮ ታማዚግት",
+      "afaan_oromo": "",
+      "aliases": [
+        "Standard Moroccan Tamazight"
+      ]
+    },
+    {
+      "code": "zh",
+      "english": "Chinese",
+      "amharic": "ቻይንኛ",
+      "afaan_oromo": "Chinese",
+      "aliases": [
+        "cmn",
+        "zho",
+        "chi",
+        "Chinese"
+      ]
+    },
+    {
+      "code": "zu",
+      "english": "Zulu",
+      "amharic": "ዙሉኛ",
+      "afaan_oromo": "Afaan Zuulu",
+      "aliases": [
+        "zul",
+        "Zulu"
+      ]
+    },
+    {
+      "code": "zun",
+      "english": "Zuni",
+      "amharic": "ዙኒ",
+      "afaan_oromo": "",
+      "aliases": [
+        "Zuni"
+      ]
+    },
+    {
+      "code": "zza",
+      "english": "Zaza",
+      "amharic": "ዛዛ",
+      "afaan_oromo": "",
+      "aliases": [
+        "diq",
+        "Zaza"
+      ]
+    }
+  ]
+}

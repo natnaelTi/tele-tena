@@ -114,6 +114,9 @@ def setup(dry_run=True):
             seed=Builder(state,marker,passwords)
             seed.run()
             state['reconciliation']=reconcile(state)
+            frappe.set_user('Administrator')
+            from tele_tena.demo_readiness import setup as ready_catalog
+            state['ready_catalog_version']=ready_catalog(False)['version']
             state['complete']=True
             state['content_revision']=CONTENT_REVISION
             write_private(marker,state)
@@ -137,6 +140,8 @@ class Builder:
         self.state['steps'][key]={'started':True}
         write_private(self.marker,self.state)
         frappe.set_user(self.users.get(role,role))
+        before_notices=getattr(frappe.flags,'tele_tena_fixture_notifications',False)
+        frappe.flags.tele_tena_fixture_notifications=True
         try:
             result=fn()
             frappe.db.commit()
@@ -146,6 +151,8 @@ class Builder:
         except Exception:
             frappe.db.rollback()
             raise
+        finally:
+            frappe.flags.tele_tena_fixture_notifications=before_notices
 
     def result(self,key):
         return self.state['steps'][key]['result']
@@ -164,7 +171,7 @@ class Builder:
         doc=frappe.get_doc({'doctype':'User','email':user,'first_name':NAMES[key],
             'send_welcome_email':0,'user_type':'Website User'})
         doc.insert()
-        if key=='reviewer':doc.add_roles('Tele Tena Approver','Tele Tena Medical Lead')
+        if key=='reviewer':doc.add_roles('Tele Tena Approver','Tele Tena Medical Lead','Tele Tena Financial Configuration')
         elif key in ('counselor','therapist','psychiatrist','applicant'):doc.add_roles('Tele Tena Clinician')
         else:doc.add_roles('Tele Tena Patient')
         update_password(user,self.passwords[user])

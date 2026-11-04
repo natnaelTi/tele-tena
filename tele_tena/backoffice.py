@@ -1,11 +1,12 @@
 """Native configuration authorization shared by command and generic document APIs."""
+from tele_tena.localization import localized_throw
 import hashlib
 import frappe
 
 
 def approver():
     if frappe.session.user != 'Administrator' and 'Tele Tena Approver' not in frappe.get_roles():
-        frappe.throw('Approver required', frappe.PermissionError)
+        localized_throw('Approver required', frappe.PermissionError)
 
 
 def scope_name(clinician, service):

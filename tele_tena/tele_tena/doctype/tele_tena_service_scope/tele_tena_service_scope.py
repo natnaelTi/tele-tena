@@ -1,3 +1,4 @@
+from tele_tena.localization import localized_throw
 import frappe
 from frappe.model.document import Document
 from frappe.utils import now_datetime
@@ -11,14 +12,14 @@ class TeleTenaServiceScope(Document):
     def validate(self):
         approver()
         if self.clinician == frappe.session.user:
-            frappe.throw('Self approval is prohibited', frappe.PermissionError)
+            localized_throw('Self approval is prohibited', frappe.PermissionError)
         previous = self.get_doc_before_save()
         if previous and (previous.clinician != self.clinician or previous.service != self.service):
-            frappe.throw('Scope identity is immutable')
+            localized_throw('Scope identity is immutable')
         if self.name != scope_name(self.clinician, self.service):
-            frappe.throw('Invalid scope identity')
+            localized_throw('Invalid scope identity')
         if self.status not in ('Approved', 'Revoked'):
-            frappe.throw('Invalid scope status')
+            localized_throw('Invalid scope status')
         # Same lock order as offering publication and new booking. Generic writes
         # cannot race past approval revocation or approve an ineligible clinician.
         from tele_tena.api.journey import one, approved
@@ -26,18 +27,18 @@ class TeleTenaServiceScope(Document):
         if self.status == 'Approved':
             approved(self.clinician, True)
             if not frappe.db.get_value('Tele Tena Service', self.service, 'active'):
-                frappe.throw('Service is inactive')
+                localized_throw('Service is inactive')
             definition = frappe.db.get_value('Tele Tena Service', self.service,
                 ['vetting_required', 'catalog_status', 'clinical_review_status'], as_dict=True)
             if definition.vetting_required:
                 if not getattr(frappe.local, 'tele_tena_vetting_decision', False):
-                    frappe.throw('This scope must be approved through its structured assessment', frappe.PermissionError)
+                    localized_throw('This scope must be approved through its structured assessment', frappe.PermissionError)
                 vetted = frappe.db.sql("""SELECT a.name FROM `tabTele Tena Vetting Scope Application` a
                     JOIN `tabTele Tena Vetting Assessment` v ON v.scope_application=a.name
                     WHERE a.clinician=%s AND a.service=%s AND a.status='Approved' AND v.decision='Approved'
                     ORDER BY v.creation DESC LIMIT 1""", (self.clinician, self.service))
                 if definition.catalog_status != 'Active' or definition.clinical_review_status != 'Approved' or not vetted:
-                    frappe.throw('Required clinical catalog and individual scope review is incomplete')
+                    localized_throw('Required clinical catalog and individual scope review is incomplete')
         self.reviewed_by = frappe.session.user
         self.reviewed_at = now_datetime()
 
@@ -46,4 +47,4 @@ class TeleTenaServiceScope(Document):
         audit(self.clinician, 'ServiceScope', {'service': self.service, 'status': self.status})
 
     def on_trash(self):
-        frappe.throw('Revoke service scopes instead of deleting records', frappe.PermissionError)
+        localized_throw('Revoke service scopes instead of deleting records', frappe.PermissionError)

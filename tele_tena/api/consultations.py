@@ -1,4 +1,5 @@
 """Appointment-bound LiveKit call authorization and lifecycle commands."""
+from tele_tena.localization import localized_throw
 import secrets
 from datetime import datetime, timedelta, timezone
 
@@ -102,7 +103,7 @@ def join(appointment, audio_only=0):
     except Exception:
         frappe.db.rollback(save_point=savepoint)
         frappe.local.response['tele_tena_error'] = 'consultation_unavailable'
-        frappe.throw('Unable to prepare the consultation; check local LiveKit configuration')
+        localized_throw('Unable to prepare the consultation; check local LiveKit configuration')
 
 
 @frappe.whitelist(methods=['POST'])
@@ -110,7 +111,7 @@ def end(appointment):
     """Serialize against Join, persist Ended, revoke both Cloud identities, close the room."""
     item, user, role = _authorized_appointment(appointment)
     if role != 'clinician':
-        frappe.throw('Only the appointment clinician can end the consultation', frappe.PermissionError)
+        localized_throw('Only the appointment clinician can end the consultation', frappe.PermissionError)
     # Join takes this same lock first, so no token can be minted concurrently
     # after the End transition has committed.
     item = one('''SELECT id,patient,clinician,state FROM tt_appointment
@@ -139,7 +140,7 @@ def end(appointment):
     try:
         close_room(room_name, identities)
     except Exception:
-        frappe.throw('Consultation ended; room closure is pending. Retry ending to confirm closure',
+        localized_throw('Consultation ended; room closure is pending. Retry ending to confirm closure',
                      frappe.ValidationError)
     frappe.db.sql('UPDATE tt_consultation SET room_closed=1 WHERE appointment=%s', (item.id,))
     return {'state': 'Ended'}

@@ -42,6 +42,10 @@ def main():
             with patch('frappe.database.get_command',secure_command):
                 backup=BackupGenerator(db_name=frappe.conf.db_name,user=frappe.conf.db_user or frappe.conf.db_name,password=frappe.conf.db_password,backup_path_db=str(dest/'database.sql.gz'),backup_path_files=str(dest/'public-files.tar'),backup_path_private_files=str(dest/'private-files.tar'),backup_path_conf=str(dest/'site-config.json'),ignore_conf=True,compress_files=False,db_type="mariadb",db_socket=frappe.conf.db_socket,db_host=frappe.conf.db_host,db_port=frappe.conf.db_port)
                 backup.get_backup(force=True,ignore_files=False)
+        for name in ('database.sql.gz','public-files.tar','private-files.tar','site-config.json'):
+            archive=dest/name
+            assert archive.is_file() and not archive.is_symlink(),'Required native backup artifact missing or unsafe'
+            archive.chmod(0o600)
         from verify_release_backup import verify
         result=verify(dest)
         import json
