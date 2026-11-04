@@ -196,3 +196,9 @@ copy uses the same runtime lookup pipeline and truthful English fallback. Five
 exchange/two extraction checks pass. Reviewed dictionary hash and independent
 locale approval states are unchanged; no workbook draft was activated. Native
 approval remains a final-localization gate, separate from the demo candidate.
+
+
+Scope-information follow-up source exchange now has8,545 entries and a10-row
+`scope-information-delta.csv`. New labels/reply guidance use normal localization
+lookup and English fallback. No independent human-review state or reviewed
+dictionary changed; final localization approval remains outstanding.

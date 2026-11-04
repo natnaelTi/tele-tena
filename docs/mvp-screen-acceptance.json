@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/offline-telebirr-mvp",
-  "source_checkpoint": "02ed9209589732e9d4e3e3750c07c49592c2a327",
+  "source_checkpoint": "83b88149121448c5555735a594460e34916c02ec",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Single authoritative MVP matrix. Current bounded polish/portable dataset evidence is in final-mvp-polish-verification.md. Historical per-screen evidence is retained. Owner visual acceptance and external device/provider/native-language checks remain separate.",
   "screens": [
@@ -16955,5 +16955,20 @@
       "Physical device calling and owner acceptance remain separate"
     ],
     "localization": "116-row source delta; full8535-row exchange; no human approval invented"
+  },
+  "scope_information_correction_2026_11_04": {
+    "runtime_pin": "83b88149121448c5555735a594460e34916c02ec",
+    "routes": [
+      "/admin/vetting",
+      "/clinician",
+      "/clinician/vetting?application=:opaqueReference"
+    ],
+    "reference": "Existing guided scope review and clinician practice panels; owner-approved follow-up card extends shared components",
+    "functional_status": "Verified real Frappe16 backend:9 tests; built missing-license review, automatic homepage card, exact target/reply reload/private upload/resubmit; native private-transport channel processing",
+    "visual_status": "Codex inspected390/768/1440 and actual200%; owner acceptance pending",
+    "evidence": "scope-information-fix-2026-11-04.md",
+    "screenshots": "screenshots/scope-information/README.md",
+    "preservation": "No schema, configuration, credential, file, approval-history or financial change on primary site; isolated synthetic browser fixtures only",
+    "external": "SMTP connectivity remains unresolved; private transport acceptance is not live email/SMS receipt; translation human approval remains pending"
   }
 }

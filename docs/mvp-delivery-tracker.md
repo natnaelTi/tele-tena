@@ -1069,3 +1069,17 @@ clinical approval on installation. See
 [verification and limits](communications-demo-readiness-2026-11-04.md) and the existing
 screen matrix revision. No remote deployment, provider/mode/access change,
 translation approval or separate roadmap-site update is claimed.
+
+
+## Missing-Information Scope Decisions — 4 November 2026
+
+Only approval requires complete credential verification and scored assessment.
+Authorized non-approval outcomes record a required reason and optional restrictions
+without asserting verification from unfinished controls. Request Information uses
+the existing Clarification state and durable neutral system/email/SMS channels.
+Both applicant and approved clinician homepages show exact service follow-ups,
+private reasons and a link to the correct reply/evidence/resubmission form. Existing
+approvals/history remain intact; resubmission grants no service scope. See
+[focused verification](scope-information-fix-2026-11-04.md) and the existing matrix.
+No remote deployment, provider/mode change, real delivery or language approval is
+claimed.

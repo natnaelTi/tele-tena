@@ -6,7 +6,7 @@ English fallbacks. It imports no workbook drafts and does not claim clinical,
 legal-policy, native-language or real-payment readiness. Final localization still
 requires genuine independent approvals, validated import and a new verified pin.
 
-Candidate `02ed9209589732e9d4e3e3750c07c49592c2a327`, branch `feat/offline-telebirr-mvp`, draft
+Candidate `83b88149121448c5555735a594460e34916c02ec`, branch `feat/offline-telebirr-mvp`, draft
 [PR50](https://github.com/natnaelTi/tele-tena/pull/50) dependent on draft PR49.
 This includes the existing navigation/attachment/photo and scope-intake fixes plus
 transactional application, request/offer and appointment/payment communications,
@@ -37,7 +37,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=02ed9209589732e9d4e3e3750c07c49592c2a327
+RELEASE_SHA=83b88149121448c5555735a594460e34916c02ec
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
@@ -138,7 +138,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=02ed9209589732e9d4e3e3750c07c49592c2a327
+RELEASE_SHA=83b88149121448c5555735a594460e34916c02ec
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 UPDATE_BACKUP=/home/smcs/teletena-before-translations.RETAINED_PATH
 TOOLS="$UPDATE_BACKUP/tools"
@@ -531,3 +531,17 @@ processes alone do not establish delivery. SMS needs a verified Ethiopian mobile
 site capability and provider capacity; email needs a verified email and configured
 SMTP. Preserve explicit opt-outs. Provider Accepted is not handset/inbox receipt.
 Unknown outcomes are not automatically resent. Never bulk-send the demo population.
+
+## Scope Information Follow-Up Correction — 4 November
+
+This candidate also separates non-approval decisions from approval evidence checks.
+Request Information, Reject, Suspend and Expire record reasons/restrictions without
+asserting credential verification or incomplete scores. All approval guards remain.
+Clinician homepages show owner-specific follow-up cards and exact application links;
+replies, private uploads and resubmissions persist. The legacy manual grant insertion
+notification path is repaired. No new schema/dependency migration beyond the already
+listedv1.51, provider/access/payment-mode change or fixture refresh is required.
+After the normal guarded incremental update, smoke-test a missing-license request
+for information and clinician reply/upload/resubmission. Do not edit an unrelated
+application or approve fake evidence on a clinical site. See
+[scope-information-fix-2026-11-04.md](scope-information-fix-2026-11-04.md).
