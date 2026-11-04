@@ -7,7 +7,7 @@ legal-policy, native-language or real-payment readiness. Final localization stil
 requires genuine independent approvals, validated import and a new verified pin.
 
 Candidate `c30d4cdff475a91f864af5bab9aafa329040e33a`, branch `feat/application-tracker-assisted-entry`, draft
-new draft application-workflow PR dependent on [PR50](https://github.com/natnaelTi/tele-tena/pull/50), which retains PR49 ancestry.
+[draft PR51](https://github.com/natnaelTi/tele-tena/pull/51) dependent on [PR50](https://github.com/natnaelTi/tele-tena/pull/50), which retains PR49 ancestry.
 This includes the existing navigation/attachment/photo and scope-intake fixes plus
 transactional application, request/offer and appointment/payment communications,
 OTP-verified missing delivery contacts and branded multipart email. v1.51 adds

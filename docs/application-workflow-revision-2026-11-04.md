@@ -1,7 +1,7 @@
 # Application Workflow Revision — Verified Local Candidate
 
 Runtime/install pin `c30d4cdff475a91f864af5bab9aafa329040e33a`, branch
-`feat/application-tracker-assisted-entry`, dependent on draft PR50. Later evidence
+`feat/application-tracker-assisted-entry`, [draft PR51](https://github.com/natnaelTi/tele-tena/pull/51), dependent on draft PR50. Later evidence
 and documentation commits do not change runtime. Preview:
 http://127.0.0.1:8017/teletena/ ; site
 `teletena-mvp-presentation.localhost` (Frappe15.121.2/ERPNext15.121.6).
