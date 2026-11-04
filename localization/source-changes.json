@@ -1,13 +1,7 @@
 {
   "added": [
-    "copy.clinician.a_reviewer_needs_additional_information_before_deciding_on_these_servi",
-    "copy.clinician.more_information_requested",
-    "copy.clinician.provide_requested_information",
-    "copy.clinician.service_application_updates_could_not_be_loaded",
-    "copy.vetting.approval_requires_completed_evidence_credential_verification_and_asses",
-    "copy.vetting.more_information_requested",
-    "copy.vetting.this_application_is_no_longer_awaiting_information_or_is_unavailable_c",
-    "copy.vetting.update_this_service_application_and_resubmit_it_for_review_your_other_"
+    "copy.vetting.explain_what_you_updated_add_requested_files_under_documents_for_each_",
+    "copy.vetting.response_to_reviewer_optional"
   ],
   "stale": []
 }

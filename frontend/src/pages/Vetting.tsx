@@ -125,6 +125,7 @@ export function ClinicianScopeApplications() {
   const [approaches, setApproaches] = useState('');
   const [training, setTraining] = useState('');
   const [statement, setStatement] = useState('');
+  const [applicantResponse,setApplicantResponse]=useState('');
   const [adults, setAdults] = useState(false);
   const [independent, setIndependent] = useState(false);
   const [appealStatements,setAppealStatements]=useState<Record<string,string>>({});
@@ -148,7 +149,7 @@ export function ClinicianScopeApplications() {
     if(resumable){
       setReverificationOf(resumable.reverification_of||null);setStep(1);
       setApproaches(resumable.approach_keys||'');setTraining(resumable.relevant_training||'');
-      setStatement(resumable.applicant_statement||'');setAdults(!!resumable.population_adults);
+      setStatement(resumable.applicant_statement||'');setApplicantResponse(resumable.applicant_response||'');setAdults(!!resumable.population_adults);
       setIndependent(!!resumable.independent_practice);
     }
     setInitialized(true);
@@ -163,7 +164,7 @@ export function ClinicianScopeApplications() {
       registration_number:license,issuing_authority:authority,jurisdiction,credential_expiry:expiry,
       experience_years:experience||'0',approach_keys:approaches,population_adults:adults,
       independent_practice:independent,clinic_affiliations:'',relevant_training:training,
-      applicant_statement:statement};
+      applicant_statement:statement,applicant_response:applicantResponse};
     if(!reverificationOf&&selectedServices.length>1)await journeyApi.saveScopeApplications(selectedServices,values,submit);
     else await journeyApi.saveScopeApplication(service,values,submit,reverificationOf);
     await applications.refresh();
@@ -177,7 +178,7 @@ export function ClinicianScopeApplications() {
     setLicense(item.registration_number||'');setAuthority(item.issuing_authority||'');
     setJurisdiction(item.jurisdiction||'');setExpiry(item.credential_expiry||'');
     setExperience(String(item.experience_years??''));setApproaches(item.approach_keys||'');
-    setTraining(item.relevant_training||'');setStatement(item.applicant_statement||'');
+    setTraining(item.relevant_training||'');setStatement(item.applicant_statement||'');setApplicantResponse(item.applicant_response||'');
     setAdults(!!item.population_adults);setIndependent(!!item.independent_practice);
     document.querySelector('.scope-application-form')?.scrollIntoView({behavior:'smooth',block:'start'});
   };
@@ -188,7 +189,7 @@ export function ClinicianScopeApplications() {
 
     <section className="scope-application-workspace">
       <div className="scope-application-form" data-tour-unsaved={dirty ? 'true' : 'false'} onChange={()=>{contextApplied.current=true;setDirty(true)}}>
-    {requestedApplication&&applications.data&&(()=>{const selected=applications.data.find((item:any)=>item.name===requestedApplication);return selected?.status==='Clarification'?<InlineNotice tone="info"><strong>{w('More Information Requested')} · {selected.service_label}</strong><p>{selected.clarification_request||selected.decision_reason}</p><p>{w('Update this service application and resubmit it for review. Your other applications are unchanged.')}</p></InlineNotice>:<InlineNotice>{w('This application is no longer awaiting information or is unavailable. Check your current applications below.')}</InlineNotice>;})()}
+    {requestedApplication&&applications.data&&(()=>{const selected=applications.data.find((item:any)=>item.name===requestedApplication);return selected?.status==='Clarification'?<InlineNotice tone="info"><strong>{w('More Information Requested')} · {selected.service_label}</strong><p>{selected.clarification_request||selected.decision_reason}</p><p>{w('Update this service application and resubmit it for review. Your other applications are unchanged.')}</p><label className="field">{w('Response to Reviewer (Optional)')}<textarea rows={3} maxLength={2000} value={applicantResponse} onChange={event=>setApplicantResponse(event.target.value)}/></label><p>{w('Explain what you updated. Add requested files under Documents for Each Requested Service.')}</p></InlineNotice>:<InlineNotice>{w('This application is no longer awaiting information or is unavailable. Check your current applications below.')}</InlineNotice>;})()}
         <p className="eyebrow">{w("STEP")} {step+1} {w("OF")} 4</p>
         <div className="step-progress" aria-hidden="true">{[0,1,2,3].map(index=><span key={index} data-complete={index<=step}/>)}</div>
         <h2 ref={headingRef} tabIndex={-1}>{w(step===0?"Choose Your Service Scopes":step===1?"Scope Qualifications":step===2?"Relevant Experience":"Review Your Application")}</h2>
