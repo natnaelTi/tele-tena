@@ -211,7 +211,7 @@ export function WorkspaceLayout({
         ? session?.roles.includes("Tele Tena Clinician") ? clinicianNav : applicantNav
         : kind === "clinic"
           ? session?.clinic_schedule_workspace ? clinicNav : clinicHomeNav
-          : adminNav;
+          : adminNav.filter(([to])=>session?.payment_mode!=="Offline"||to!=="/admin/financial-disputes");
   const items = kind !== "clinic" && session?.clinic_workspace
     ? [...roleItems, ["/clinic", "Clinic workspace", Building2] as const]
     : roleItems;

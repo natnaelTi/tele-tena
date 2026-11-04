@@ -311,6 +311,10 @@ def open_earning_dispute(appointment, reason):
     profile('patient')
     reason = text(reason, 500)
     frappe.db.sql('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE')
+    payment = frappe.db.sql('SELECT payment_mode FROM tt_appointment WHERE id=%s AND patient=%s FOR UPDATE',(appointment,patient),as_dict=True)
+    if not payment or payment[0].payment_mode!='Wallet':
+        frappe.local.response['tele_tena_error']='wallet_dispute_unavailable'
+        localized_throw('Wallet disputes are unavailable for direct payments. Use the payment page to follow up with the receiving clinician.',frappe.ValidationError)
     earning = frappe.db.sql('''SELECT * FROM tt_earning WHERE appointment=%s AND patient=%s FOR UPDATE''',
                             (appointment, patient), as_dict=True)
     if not earning:

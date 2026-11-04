@@ -18,6 +18,7 @@ import {
 } from "../components/ui";
 import { useAction } from "../hooks/useAction";
 import { useResource } from "../hooks/useResource";
+import { useSession } from "../hooks/useSession";
 import { useLocale } from "../hooks/useLocale";
 import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ClipboardCheck, Layers, ShieldCheck, Building2, ArrowRight, FileText } from "lucide-react";
@@ -387,6 +388,7 @@ type ReconciliationCase = {
 };
 export function FinancialDisputes() {
   const { w } = useLocale();
+  const {session}=useSession();
   const resource = useResource(() => api<OpenDispute[]>("tele_tena.accounting.open_disputes"));
   const reconciliation = useResource(() => api<ReconciliationCase[]>("tele_tena.accounting.financial_reconciliation_queue"));
   const action = useAction();
@@ -394,7 +396,8 @@ export function FinancialDisputes() {
   const [snapshotReasons, setSnapshotReasons] = useState<Record<string, string>>({});
   const reviewCases = reconciliation.data?.filter((item) => item.status === "ReviewRequired") || [];
   return <>
-    <PageTitle title={w("Financial Disputes")} description={w("Financial disputes review only payment concerns. No clinical note access is included.")} />
+    <PageTitle title={w(session?.payment_mode==="Offline"?"Historical Wallet Review":"Financial Disputes")} description={w("Financial disputes review only payment concerns. No clinical note access is included.")} />
+    {session?.payment_mode==="Offline"&&<InlineNotice>{w("Wallet disputes are disabled for Offline Direct Payment. This page retains earlier wallet cases and reconciliation only. Direct-payment follow-ups stay between the payer and receiving clinician.")}</InlineNotice>}
     {action.error && <InlineNotice tone="danger">{action.error}</InlineNotice>}
     {resource.error ? <InlineNotice tone="danger">Disputes could not be loaded. <Button onClick={() => void resource.refresh()}>Try again</Button></InlineNotice> : !resource.data ? <Skeleton /> : resource.data.length ? <div className="stack">{resource.data.map(item => <Card key={item.earning_id}>
       <div className="row-between"><h2>ETB {money(item.net_minor)} {w("On hold")}</h2><StatusBadge tone="warning">{w("Disputed")}</StatusBadge></div>

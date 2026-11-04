@@ -470,6 +470,11 @@
     "reason": "Technical JSX attribute value"
   },
   {
+    "english": "Offline",
+    "source_location": "frontend/src/components/DirectPayments.tsx:35",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "AwaitingPayment",
     "source_location": "frontend/src/components/DirectPayments.tsx:42",
     "reason": "Keyboard or state matching set"
@@ -1571,6 +1576,11 @@
   },
   {
     "english": "Offline",
+    "source_location": "frontend/src/layouts/Layouts.tsx:213",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Offline",
     "source_location": "frontend/src/layouts/Layouts.tsx:239",
     "reason": "Keyboard or machine-code comparison"
   },
@@ -1626,92 +1636,102 @@
   },
   {
     "english": "Pending",
-    "source_location": "frontend/src/pages/Admin.tsx:26",
+    "source_location": "frontend/src/pages/Admin.tsx:27",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Admin.tsx:80",
+    "source_location": "frontend/src/pages/Admin.tsx:81",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "button secondary",
-    "source_location": "frontend/src/pages/Admin.tsx:84",
+    "source_location": "frontend/src/pages/Admin.tsx:85",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "table-scroll review-queue-table",
-    "source_location": "frontend/src/pages/Admin.tsx:92",
+    "source_location": "frontend/src/pages/Admin.tsx:93",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Approved",
-    "source_location": "frontend/src/pages/Admin.tsx:141",
+    "source_location": "frontend/src/pages/Admin.tsx:142",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Revoked",
-    "source_location": "frontend/src/pages/Admin.tsx:198",
+    "source_location": "frontend/src/pages/Admin.tsx:199",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "audio\nvideo",
-    "source_location": "frontend/src/pages/Admin.tsx:230",
-    "reason": "Controlled schema-key example; must retain wire values"
-  },
-  {
-    "english": "direct-booking\nscheduled",
     "source_location": "frontend/src/pages/Admin.tsx:231",
     "reason": "Controlled schema-key example; must retain wire values"
   },
   {
+    "english": "direct-booking\nscheduled",
+    "source_location": "frontend/src/pages/Admin.tsx:232",
+    "reason": "Controlled schema-key example; must retain wire values"
+  },
+  {
     "english": "Draft",
-    "source_location": "frontend/src/pages/Admin.tsx:260",
+    "source_location": "frontend/src/pages/Admin.tsx:261",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Not reviewed",
-    "source_location": "frontend/src/pages/Admin.tsx:260",
+    "source_location": "frontend/src/pages/Admin.tsx:261",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "button quiet",
-    "source_location": "frontend/src/pages/Admin.tsx:302",
+    "source_location": "frontend/src/pages/Admin.tsx:303",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "In review",
-    "source_location": "frontend/src/pages/Admin.tsx:312",
+    "source_location": "frontend/src/pages/Admin.tsx:313",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "form-grid two-column",
-    "source_location": "frontend/src/pages/Admin.tsx:315",
+    "source_location": "frontend/src/pages/Admin.tsx:316",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "In review",
-    "source_location": "frontend/src/pages/Admin.tsx:350",
+    "source_location": "frontend/src/pages/Admin.tsx:351",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "form-grid two-column",
-    "source_location": "frontend/src/pages/Admin.tsx:358",
+    "source_location": "frontend/src/pages/Admin.tsx:359",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "form-grid two-column",
-    "source_location": "frontend/src/pages/Admin.tsx:368",
+    "source_location": "frontend/src/pages/Admin.tsx:369",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "ReviewRequired",
-    "source_location": "frontend/src/pages/Admin.tsx:394",
+    "source_location": "frontend/src/pages/Admin.tsx:396",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/pages/Admin.tsx:398",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Offline",
+    "source_location": "frontend/src/pages/Admin.tsx:399",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "form-grid two-column reconciliation-balances",
-    "source_location": "frontend/src/pages/Admin.tsx:412",
+    "source_location": "frontend/src/pages/Admin.tsx:415",
     "reason": "Technical JSX attribute className"
   },
   {
@@ -3040,9 +3060,19 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "(prefers-reduced-motion: reduce)",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:61",
+    "reason": "DOM selector or media query"
+  },
+  {
     "english": "Submitted",
-    "source_location": "frontend/src/pages/ScopeApplications.tsx:65",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:67",
     "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "application-step-tabs assisted-entry-nav",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:67",
+    "reason": "Technical JSX attribute className"
   },
   {
     "english": "button full",
