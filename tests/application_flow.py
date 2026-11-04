@@ -47,6 +47,14 @@ class ApplicationFlow(ScopeInformation):
   flow.assisted_save(c['id'],self.payload,state['professional']['revision']);policy=policies.current();args=dict(case=c['id'],authorization_file=auth['id'],source_reference='FICTIONAL-EMAIL-MESSAGE-REFERENCE',received_on=frappe.utils.today(),terms_version=policy['terms_version'],privacy_version=policy['privacy_version'],attestations={k:True for k in ('authorization','accuracy','adult','terms','privacy','registration_consent','care_languages')})
   result=flow.assisted_submit(**args);self.assertTrue(result['submitted']);self.assertTrue(flow.assisted_submit(**args)['idempotent']);self.assertEqual(j.one('SELECT status FROM tt_application WHERE user=%s',(self.user,)).status,'Pending');self.assertNotIn('Tele Tena Clinician',frappe.get_roles(self.user));self.assertEqual(len(j.rows('SELECT name FROM `tabTele Tena Vetting Scope Application` WHERE clinician=%s',(self.user,))),2)
   self.assertFalse(j.rows('SELECT name FROM `tabTele Tena Service Scope` WHERE clinician=%s',(self.user,)));self.assertEqual(j.one('SELECT reviewer FROM tt_assisted_submission WHERE case_id=%s',(c['id'],)).reviewer,users['reviewer']);self.assertEqual(j.one('SELECT declaration_version FROM tt_professional_submission WHERE user=%s',(self.user,)).declaration_version,'professional-accuracy-email-v1')
+ def test_assisted_evidence_selections_are_independent_and_wrong_purpose_is_rejected(self):
+  c=flow.request_assistance(self.services[:2],True);frappe.set_user(users['reviewer'])
+  state=flow.assistance_detail(c['id']);payload=state['professional']['payload'];self.assertEqual(payload['cv_files'],[self.cv]);self.assertEqual(payload['license_files'],[self.license])
+  payload['license_files']=[];flow.assisted_save(c['id'],payload,state['professional']['revision'])
+  state=flow.assistance_detail(c['id']);self.assertEqual(state['professional']['payload']['cv_files'],[self.cv]);self.assertEqual(state['professional']['payload']['license_files'],[])
+  payload=state['professional']['payload'];payload['license_files']=[self.cv]
+  with self.assertRaises(frappe.ValidationError):flow.assisted_save(c['id'],payload,state['professional']['revision'])
+  state=flow.assistance_detail(c['id']);self.assertEqual(state['professional']['payload']['cv_files'],[self.cv]);self.assertEqual(state['professional']['payload']['license_files'],[])
  def test_assisted_submit_missing_proof_or_other_actor_denied(self):
   c=flow.request_assistance(self.services[:2],True)
   for user in (self.user,users['patient'],'Guest'):
