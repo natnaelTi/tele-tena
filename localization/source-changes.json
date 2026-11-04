@@ -1,17 +1,22 @@
 {
   "added": [
-    "copy.backend_validation_application_flow.choose_an_available_private_document",
-    "copy.backend_validation_application_flow.select_a_bounded_number_of_directory_entries",
-    "copy.backend_validation_application_flow.this_document_is_unavailable_for_your_response",
-    "copy.backend_validation_application_flow.upload_the_authorization_for_this_specific_assistance_case",
-    "copy.professionalapplication.the_clinician_works_independently",
-    "copy.scopeapplications.requested_service_scopes",
-    "copy.scopeapplications.saved_progress_is_retained_unsaved_entries_stay_on_this_page_until_you",
-    "copy.scopeapplications.these_choices_do_not_grant_service_approval",
-    "copy.scopeapplications.upload_a_new_document",
-    "copy.scopeapplications.use_a_document_already_supplied"
+    "copy.backend_validation_application_flow.choose_your_own_supported_private_file_for_the_requested_document",
+    "copy.backend_validation_professional.choose_a_private_pdf_jpeg_or_png_license_document_from_your_profession",
+    "copy.backend_validation_vetting.choose_a_supported_private_document_for_this_evidence_type",
+    "copy.scopeapplications.email",
+    "copy.scopeapplications.match_the_email_correspondence_to_this_clinician_before_entering_their",
+    "copy.scopeapplications.mobile_number",
+    "copy.scopeapplications.pdf_jpeg_or_png_up_to_5_mb_per_file_the_original_file_is_linked_to_you",
+    "copy.scopeapplications.select_requested_document",
+    "copy.scopeapplications.verified_sign_in_contacts",
+    "copy.vetting.pdf_jpeg_or_png_up_to_5_mb_choose_the_evidence_type_before_uploading"
   ],
   "stale": [
-    "copy.scopeapplications.your_saved_progress_is_retained_choose_the_services_you_want_reviewed"
+    "copy.backend_validation_application_flow.choose_your_own_private_pdf_for_the_requested_document",
+    "copy.backend_validation_professional.choose_a_private_license_pdf_from_your_professional_profile_identifica",
+    "copy.backend_validation_vetting.the_uploaded_file_is_not_a_valid_pdf_within_the_5_mib_limit",
+    "copy.layouts.service_scope_vetting",
+    "copy.scopeapplications.select_requested_pdf",
+    "copy.scopeapplications.the_draft_could_not_be_saved_check_the_current_fields_your_entries_rem"
   ]
 }

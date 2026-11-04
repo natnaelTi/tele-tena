@@ -61,7 +61,7 @@ def detail(application):
 def copy_scope_document(app,evidence_id,evidence_type):
  from tele_tena.api.history_documents import validated
  evidence=one('SELECT * FROM tt_professional_evidence WHERE id=%s AND user=%s',(evidence_id,app.clinician))
- if evidence.purpose=='Identification' or evidence.mime!='application/pdf':fail('Use a private PDF for this service document.','scope_evidence_invalid')
+ if evidence.purpose=='Identification' or evidence.mime not in (('application/pdf','image/jpeg','image/png') if evidence_type=='License or registration' else ('application/pdf',)):fail('Use a private PDF for this service document.','scope_evidence_invalid')
  filename,mime,data=validated(evidence.filename,base64.b64encode(bytes(evidence.content)).decode())
  digest=hashlib.sha256(data).hexdigest()
  prior=rows('SELECT name FROM `tabTele Tena Scope Evidence` WHERE scope_application=%s AND evidence_type=%s AND content_sha256=%s',(app.name,evidence_type,digest))
@@ -121,7 +121,7 @@ def respond(application,request_id,fields=None,files=None):
     audit(application,'ExistingDocumentCategorized',{'source':id[6:],'purpose':ITEMS[k]['purpose'],'new_source':copied['id']});id=copied['id']
    normalized.append(id)
    e=rows('SELECT id,mime FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose=%s',(id,user,ITEMS[k]['purpose']))
-   if not e or e[0].mime!='application/pdf':fail('Choose your own private PDF for the requested document.','scope_evidence_invalid')
+   if not e or e[0].mime not in (('application/pdf','image/jpeg','image/png') if k=='license_document' else ('application/pdf',)):fail('Choose your own supported private file for the requested document.','scope_evidence_invalid')
    if ITEMS[k].get('evidence_type'):links.append(copy_scope_document(app,id,ITEMS[k]['evidence_type']))
   if profile is not None and k in ('license_document','cv'):
    field='license_files' if k=='license_document' else 'cv_files';profile[field]=list(dict.fromkeys(profile.get(field,[])+normalized))
@@ -164,7 +164,7 @@ def assistance_detail(case):
  c=case_for(case)
  from tele_tena.api import professional,policies
  data=professional.application(c.clinician)
- return {'case':c,'professional':data,'policies':policies.current(),'services':json.loads(c.services),'service_labels':rows('SELECT name,service_label FROM `tabTele Tena Service` WHERE name IN %s',(tuple(json.loads(c.services)),))}
+ return {'case':c,'professional':data,'policies':policies.current(),'services':json.loads(c.services),'verified_contacts':rows('SELECT channel,contact FROM tt_contact_identity WHERE user=%s AND verified_at IS NOT NULL',(c.clinician,)),'service_labels':rows('SELECT name,service_label FROM `tabTele Tena Service` WHERE name IN %s',(tuple(json.loads(c.services)),))}
 
 @command
 def assisted_upload(case,purpose,filename,content_base64):
@@ -224,7 +224,7 @@ def assisted_submit(case,authorization_file,source_reference,received_on,terms_v
  frappe.db.sql("INSERT INTO tt_application (user,statement,status,requested_services,submitted_at) VALUES (%s,%s,'Pending',%s,UTC_TIMESTAMP(6)) ON DUPLICATE KEY UPDATE status='Pending',requested_services=VALUES(requested_services),submitted_at=UTC_TIMESTAMP(6)",(c.clinician,'Clinician-supplied application entered with recorded email authorization.',json.dumps(services)))
  claims={'professional_category':label('profession'),'qualification':clean['qualification_title'],'issuing_institution':label('issuer'),'registration_number':clean.get('license_number',''),'issuing_authority':label('authority'),'jurisdiction':clean.get('jurisdiction',''),'credential_valid_from':clean.get('valid_from',''),'credential_expiry':clean.get('valid_until',''),'experience_years':clean.get('experience_years') or '0'}
  frappe.db.sql("UPDATE tt_onboarding SET completed=UTC_TIMESTAMP(6),answers=%s WHERE user=%s",(json.dumps({'name':name,'adult':True,'consent':True,'professional':claims,'requested_services':services,'assistance_case':case}),c.clinician))
- scope_intake.submit_selected_scopes(c.clinician,services)
+ scope_intake.submit_selected_scopes(c.clinician,services,assisted_actor=actor())
  id=str(uuid.uuid4());digest=hashlib.sha256(json.dumps(clean,sort_keys=True).encode()).hexdigest()
  frappe.db.sql('INSERT INTO tt_assisted_submission VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6))',(id,case,c.clinician,actor(),authorization_file,source_reference,received,terms_version,privacy_version,json.dumps(attestations),digest))
  frappe.db.sql("UPDATE tt_assistance_case SET state='Submitted',modified=UTC_TIMESTAMP(6) WHERE id=%s",(case,))

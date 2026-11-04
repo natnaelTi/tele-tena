@@ -15,6 +15,13 @@ class ApplicationFlow(ScopeInformation):
   for who in ('Guest',users['patient'],users['therapist']):
    frappe.set_user(who)
    with self.assertRaises((frappe.PermissionError,frappe.ValidationError)):flow.document(license[0].id)
+ def test_validated_license_image_keeps_bytes_and_hash_in_the_correct_field(self):
+  app,req=self.request();frappe.set_user(self.user)
+  from PIL import Image
+  image=io.BytesIO();Image.new('RGB',(8,8),(30,100,120)).save(image,format='PNG');content=image.getvalue()
+  upload=professional.upload('License','fictional-license.png',base64.b64encode(content).decode())
+  flow.respond(app.name,req.id,files={'license_document':[upload['id']]})
+  doc=j.one("SELECT name,content_sha256 FROM `tabTele Tena Scope Evidence` WHERE scope_application=%s AND evidence_type='License or registration'",(app.name,));self.assertEqual(doc.content_sha256,__import__('hashlib').sha256(content).hexdigest());response=flow.document(doc.name);self.assertEqual(response.mimetype,'image/png');self.assertEqual(response.data,content)
  def test_response_validates_requested_fields_owner_type_and_required_document(self):
   app,req=self.request();frappe.set_user(self.user)
   for fields,files in [({},{}),({'jurisdiction':'Not requested'},{}),({}, {'license_document':[self.cv]}),({}, {'qualification_document':[self.license]})]:

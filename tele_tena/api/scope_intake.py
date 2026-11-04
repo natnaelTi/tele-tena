@@ -9,8 +9,8 @@ from tele_tena.api import journey, vetting, professional
 from tele_tena.api.journey import actor, rows, fail, text
 
 
-def _copy_license(application, submission, user):
-    """Copy only selected, safe license PDFs from the exact submitted version.
+def _copy_license(application, submission, user, copied_by=None):
+    """Copy only selected, safe license documents from the exact submitted version.
 
     This is an internal snapshot operation, not a reviewer upload or owner
     impersonation. Identification documents are never eligible for this copy.
@@ -20,7 +20,7 @@ def _copy_license(application, submission, user):
         found = rows('''SELECT filename,mime,content,content_sha256,created
             FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose='License' ''',
             (evidence_id, user))
-        if not found or found[0].mime != 'application/pdf':
+        if not found or found[0].mime not in ('application/pdf','image/jpeg','image/png'):
             continue
         evidence = found[0]
         content = bytes(evidence.content)
@@ -42,13 +42,13 @@ def _copy_license(application, submission, user):
              clinician,evidence_type,filename,revision,content_size,content_sha256,uploaded_by,uploaded_at)
             VALUES (%s,%s,%s,%s,%s,0,0,%s,%s,'License or registration',%s,%s,%s,%s,%s,%s)''',
             (name,user,now,now,actor(),application,user,filename,revision,len(content),
-             evidence.content_sha256,user,evidence.created))
+             evidence.content_sha256,copied_by or user,evidence.created))
         frappe.db.sql('INSERT INTO tt_scope_evidence_content (evidence,content) VALUES (%s,FROM_BASE64(%s))', (name,base64.b64encode(content).decode()))
         journey.audit(actor(), 'ScopeLicenseSnapshotLinked', {'application':application,
             'submission':submission.id,'source_evidence':evidence_id,'evidence':name})
 
 
-def submit_selected_scopes(user, services, recovery=False):
+def submit_selected_scopes(user, services, recovery=False, assisted_actor=None):
     """Internal only. Caller authorizes owner completion or a versioned patch.
 
     Existing applications/decisions/scopes are left intact. A recovered selection
@@ -82,7 +82,8 @@ def submit_selected_scopes(user, services, recovery=False):
         # Reuse validation/storage without changing the authenticated actor/roles.
         result = vetting._save_scope_application(user,service,values,submit=True)
         if submitted:
-            _copy_license(result['name'],submitted[0],user)
+            if assisted_actor:_copy_license(result['name'],submitted[0],user,copied_by=assisted_actor)
+            else:_copy_license(result['name'],submitted[0],user)
         if recovery and application.submitted_at:
             frappe.db.sql('UPDATE `tabTele Tena Vetting Scope Application` SET submitted_at=%s WHERE name=%s',
                           (application.submitted_at,result['name']))

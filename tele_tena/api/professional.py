@@ -292,7 +292,7 @@ def attach_scope_license(application,id):
     scope=_authorized_scope_application(application,user)
     if scope.clinician!=user:localized_throw('Scope evidence unavailable',frappe.PermissionError)
     document=rows("SELECT filename,mime,content,content_sha256 FROM tt_professional_evidence WHERE id=%s AND user=%s AND purpose='License'",(id,user))
-    if not document or document[0].mime!='application/pdf':fail('Choose a private license PDF from your professional profile. Identification files cannot be attached to scope applications.','scope_license_pdf_required')
+    if not document or document[0].mime not in ('application/pdf','image/jpeg','image/png'):fail('Choose a private PDF, JPEG or PNG license document from your professional profile. Identification files cannot be attached to scope applications.','scope_license_pdf_required')
     rows('SELECT name FROM `tabTele Tena Vetting Scope Application` WHERE name=%s AND clinician=%s FOR UPDATE',(application,user))
     prior=rows("SELECT name FROM `tabTele Tena Scope Evidence` WHERE scope_application=%s AND evidence_type='License or registration' AND content_sha256=%s FOR UPDATE",(scope.name,document[0].content_sha256))
     if prior:return {'id':prior[0].name,'already_attached':True}

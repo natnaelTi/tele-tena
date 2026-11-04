@@ -472,7 +472,8 @@ def upload_scope_evidence(application, evidence_type, filename, content_base64):
              'scope_evidence_locked')
     if evidence_type not in SCOPE_EVIDENCE_TYPES:
         fail('Choose a supported evidence type.')
-    if not isinstance(filename, str) or len(filename) > 255 or not filename.lower().endswith('.pdf'):
+    endings=('.pdf','.jpg','.jpeg','.png') if evidence_type=='License or registration' else ('.pdf',)
+    if not isinstance(filename, str) or len(filename) > 255 or not filename.lower().endswith(endings):
         fail('Upload a PDF document.')
     filename = re.sub(r'[^A-Za-z0-9 ._()-]', '_', filename.split('/')[-1].split('\\')[-1])[:180]
     if not isinstance(content_base64, str) or len(content_base64) > ((MAX_SCOPE_EVIDENCE_BYTES + 2) // 3) * 4 + 8:
@@ -481,9 +482,10 @@ def upload_scope_evidence(application, evidence_type, filename, content_base64):
         content = base64.b64decode(content_base64, validate=True)
     except (ValueError, TypeError):
         fail('The PDF data could not be read.')
-    if (not content or len(content) > MAX_SCOPE_EVIDENCE_BYTES or not content.startswith(b'%PDF-')
-            or b'%%EOF' not in content[-1024:]):
-        fail('The uploaded file is not a valid PDF within the 5 MiB limit.')
+    from tele_tena.api.history_documents import validated
+    filename,mime,content=validated(filename,base64.b64encode(content).decode())
+    allowed_mimes=('application/pdf','image/jpeg','image/png') if evidence_type=='License or registration' else ('application/pdf',)
+    if mime not in allowed_mimes:fail('Choose a supported private document for this evidence type.','scope_evidence_invalid')
     prior = rows('''SELECT MAX(revision) revision FROM `tabTele Tena Scope Evidence`
         WHERE scope_application=%s AND evidence_type=%s''', (scope.name, evidence_type))
     revision = int(prior[0].revision or 0) + 1
