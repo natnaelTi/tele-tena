@@ -6,8 +6,8 @@ English fallbacks. It imports no workbook drafts and does not claim clinical,
 legal-policy, native-language or real-payment readiness. Final localization still
 requires genuine independent approvals, validated import and a new verified pin.
 
-Candidate `83b88149121448c5555735a594460e34916c02ec`, branch `feat/offline-telebirr-mvp`, draft
-[PR50](https://github.com/natnaelTi/tele-tena/pull/50) dependent on draft PR49.
+Candidate `c30d4cdff475a91f864af5bab9aafa329040e33a`, branch `feat/application-tracker-assisted-entry`, draft
+new draft application-workflow PR dependent on [PR50](https://github.com/natnaelTi/tele-tena/pull/50), which retains PR49 ancestry.
 This includes the existing navigation/attachment/photo and scope-intake fixes plus
 transactional application, request/offer and appointment/payment communications,
 OTP-verified missing delivery contacts and branded multipart email. v1.51 adds
@@ -16,8 +16,7 @@ payment-mode, credential or historic disclosure change. v1.50 still recovers onl
 omitted selected scope requests. Reviewed translation hash remains
 `ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356`, with zero human-approved
 workbook imports. See [current evidence](communications-demo-readiness-2026-11-04.md).
-The first preservation gate allows only the narrow v1.50 recovery; v1.51 changes
-no original values and repeat migration remains strict.
+v1.52 adds four command tables for typed requests/responses and recorded email-assisted submission. No existing rows are rewritten. The first preservation gate allows only the retained narrow v1.50 recovery; v1.51/v1.52 change no original values and repeat migration remains strict. See [application-flow evidence](application-workflow-revision-2026-11-04.md).
 
 Nothing has been remotely deployed or merged. Do not run the separate historical
 Offline mode-cutover section: this update preserves the current payment mode.
@@ -37,7 +36,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=83b88149121448c5555735a594460e34916c02ec
+RELEASE_SHA=c30d4cdff475a91f864af5bab9aafa329040e33a
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
@@ -76,7 +75,7 @@ Fetching Git objects changes no running application. This stages reviewed tools
 before backup; runtime checkout/install happens only in checkpoint6.
 
 ```bash
-git -C apps/tele_tena fetch origin feat/offline-telebirr-mvp
+git -C apps/tele_tena fetch origin feat/application-tracker-assisted-entry
 git -C apps/tele_tena cat-file -e "$RELEASE_SHA^{commit}"
 git -C apps/tele_tena diff --stat "$OLD_SHA" "$RELEASE_SHA"
 git -C apps/tele_tena diff "$OLD_SHA" "$RELEASE_SHA" -- pyproject.toml frontend/package.json frontend/package-lock.json tele_tena/patches.txt
@@ -102,7 +101,7 @@ installed release predates553a619 or is on unrelated ancestry, stop: collect the
 installed SHA and `git diff "$OLD_SHA" "$RELEASE_SHA" -- tele_tena/patches.txt
 pyproject.toml frontend/package-lock.json` for a baseline-specific functional/schema
 upgrade plan. The candidate includes older features, but unknown older migrations
-must not be silently treated as this verified v1.50 incremental delta.
+must not be silently treated as this verified v1.50–v1.52 incremental delta.
 
 ## 3. Initialize Once, or Resume the Retained Bundle
 
@@ -138,7 +137,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=83b88149121448c5555735a594460e34916c02ec
+RELEASE_SHA=c30d4cdff475a91f864af5bab9aafa329040e33a
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 UPDATE_BACKUP=/home/smcs/teletena-before-translations.RETAINED_PATH
 TOOLS="$UPDATE_BACKUP/tools"
@@ -356,7 +355,7 @@ it verifies only missing Financial Configuration grants to existing reviewers,
 matching audited events and associated modification/index metadata; all credentials,
 settings, other roles/records/files remain strict. It is not a general ignore flag.
 Use it only in that separately reviewed older-baseline plan, never to hide an
-unexplained mismatch in this v1.50 procedure.
+unexplained mismatch in this v1.52 procedure.
 
 v1.50 adds only missing explicitly selected scope review rows, selected safe license
 copies and recovery audits. `--expect-scope-intake-v150` validates those additions
@@ -540,7 +539,7 @@ asserting credential verification or incomplete scores. All approval guards rema
 Clinician homepages show owner-specific follow-up cards and exact application links;
 replies, private uploads and resubmissions persist. The legacy manual grant insertion
 notification path is repaired. No new schema/dependency migration beyond the already
-listedv1.51, provider/access/payment-mode change or fixture refresh is required.
+listed v1.51/v1.52, provider/access/payment-mode change or fixture refresh is required.
 After the normal guarded incremental update, smoke-test a missing-license request
 for information and clinician reply/upload/resubmission. Do not edit an unrelated
 application or approve fake evidence on a clinical site. See

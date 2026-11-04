@@ -1,3 +1,7 @@
+## Application Tracking and Email-Assisted Entry — 4 November 2026
+
+Scope applications use a tracker, individual details and typed requests for additional information. Responses collect only requested items and link evidence into its proper license/qualification/training field; original submissions and decisions remain immutable. General, scope and language approvals stay separate. The owner authorizes reviewers to submit clinician-supplied information using recorded email authorization, not impersonation. The reviewer records a private authorization PDF, correspondence reference/date, accuracy/adult/registration statements, separate current Terms/Privacy acknowledgements and declared care-language proficiency. IDs still require specifically assigned identity reviewers. This is manual correspondence recording, not automatic email ingestion. No consent/UI clicks, external verification or approval is fabricated.
+
 ## Payment Navigation and Reviewer Defaults — 28 October 2026
 
 Owner-approved refinement: payment submission/review is a standalone page, with the form/status on the left and a payment-only timeline/appointment next-step link on the right. Appointment details retain a compact status/link; incoming receipts are actionable from clinician Appointments, Requests and notifications. No booking/receipt/appointment acceptance facts are merged.

@@ -1,3 +1,7 @@
+## Application Workflow v1.52
+
+Four additive command tables store typed information requests/responses, assistance cases and email-authorized submission provenance. Existing transaction gate plus request/case locks serialize submissions; response digests and unique request/case IDs make identical retries safe. License PDF/JPEG/PNG evidence keeps validated original bytes/hash and is linked by type; historical submissions/evidence stay intact. Cross-table assistance joins normalize comparison collation without altering framework tables. Case-scoped reviewer commands preserve actual authorship and existing ID-reviewer restrictions. Existing outbox handles neutral acknowledgement channels; no shared package or provider configuration change.
+
 ## Payment Routing and Reviewer Defaults — 28 October 2026
 
 Payment-specific notifications resolve their exact immutable payment event to an allowlisted party-authorized route, including extensions; duplicate in-app outbox projections are deduplicated. A bounded clinician review query exposes only owned pending claims and encounter-authorized identity/time, without payee or clinical text. Standalone payment pages keep timeline and appointment navigation separate from clinical details.
