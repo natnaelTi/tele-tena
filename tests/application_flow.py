@@ -41,7 +41,7 @@ class ApplicationFlow(ScopeInformation):
   frappe.set_user(self.user)
   with self.assertRaises(frappe.ValidationError):flow.request_assistance(self.services[:2],False)
   c=flow.request_assistance(self.services[:2],True);self.assertEqual(flow.request_assistance(self.services[:2],True)['id'],c['id']);frappe.set_user(users['reviewer'])
-  state=flow.assistance_detail(c['id']);self.assertFalse(state['professional']['identity_access'])
+  self.assertIn(c['id'],[row.id for row in flow.assistance_cases()]);state=flow.assistance_detail(c['id']);self.assertFalse(state['professional']['identity_access'])
   with self.assertRaises(frappe.ValidationError):flow.assisted_upload(c['id'],'Identification','id.pdf',base64.b64encode(professional.download(self.cv).data).decode())
   auth=flow.assisted_upload(c['id'],'Authorization','fictional-authorization.pdf',base64.b64encode(professional.download(self.cv).data).decode())
   flow.assisted_save(c['id'],self.payload,state['professional']['revision']);policy=policies.current();args=dict(case=c['id'],authorization_file=auth['id'],source_reference='FICTIONAL-EMAIL-MESSAGE-REFERENCE',received_on=frappe.utils.today(),terms_version=policy['terms_version'],privacy_version=policy['privacy_version'],attestations={k:True for k in ('authorization','accuracy','adult','terms','privacy','registration_consent','care_languages')})

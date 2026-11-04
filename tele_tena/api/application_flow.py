@@ -152,7 +152,7 @@ def request_assistance(services,authorization):
 @query()
 def assistance_cases():
  user=actor();reviewer='Tele Tena Approver' in frappe.get_roles(user)
- return rows('SELECT c.*,COALESCE(p.display_name,u.full_name) display_name FROM tt_assistance_case c JOIN tabUser u ON u.name=c.clinician LEFT JOIN tt_profile p ON p.user=c.clinician '+('' if reviewer else 'WHERE c.clinician=%s ')+'ORDER BY c.modified DESC',() if reviewer else (user,))
+ return rows('SELECT c.*,COALESCE(p.display_name,u.full_name) display_name FROM tt_assistance_case c JOIN tabUser u ON u.name COLLATE utf8mb4_unicode_ci=c.clinician COLLATE utf8mb4_unicode_ci LEFT JOIN tt_profile p ON p.user COLLATE utf8mb4_unicode_ci=c.clinician COLLATE utf8mb4_unicode_ci '+('' if reviewer else 'WHERE c.clinician=%s ')+'ORDER BY c.modified DESC',() if reviewer else (user,))
 
 def case_for(id):
  reviewer=actor('Tele Tena Approver');case=one('SELECT * FROM tt_assistance_case WHERE id=%s',(id,))
