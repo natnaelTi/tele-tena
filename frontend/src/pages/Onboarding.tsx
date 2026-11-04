@@ -1,3 +1,4 @@
+import {AssistanceEntry} from './ScopeApplications';
 import ApplicationAttachments from '../components/ApplicationAttachments';
 import {CareLanguageEditor,languageName} from '../components/CareLanguages';
 import type {CareLanguageHandle} from '../components/CareLanguages';
@@ -369,6 +370,7 @@ export default function Onboarding() {
           >
             {w("Save for later")}
           </Button>
+          {clinician&&<AssistanceEntry services={answers.requested_services||[]}/>}
           {saved && (
             <p role="status">{w("Progress saved. You can return to this step.")}</p>
           )}

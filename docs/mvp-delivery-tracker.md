@@ -1,3 +1,11 @@
+## Assisted Entry / Offline Follow-Up Patch — 4 November 2026
+
+Independent upload slots and guided reviewer entry verified against production-built real backend; direct follow-up notifies both parties and Offline navigation/API separates wallet disputes while preserving historical obligations.17 application +2 focused boundary +21 retained direct-payment tests pass. See assisted-payment-polish-2026-11-04.md; owner Selfmade retest and live delivery remain separate.
+
+## Application Workflow Checkpoint — 4 November 2026
+
+Implemented typed evidence requests/responses, service-application trackers/details, focused reviewer decisions and recorded email-assisted submission. Current evidence is application-workflow-revision-2026-11-04.md; existing MVP screen matrix remains authoritative. Frappe16 backend16 tests, real two-role browser flows, additive/repeat preservation and read-only financial reconciliation pass. Live delivery, native-language approval and owner visual acceptance are not claimed.
+
 ## Payment Navigation and Reviewer Defaults — 28 October 2026
 
 Owner-approved refinement: payment submission/review is a standalone page, with the form/status on the left and a payment-only timeline/appointment next-step link on the right. Appointment details retain a compact status/link; incoming receipts are actionable from clinician Appointments, Requests and notifications. No booking/receipt/appointment acceptance facts are merged.

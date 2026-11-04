@@ -1,7 +1,7 @@
 {
   "version": 3,
-  "release_branch": "feat/offline-telebirr-mvp",
-  "source_checkpoint": "83b88149121448c5555735a594460e34916c02ec",
+  "release_branch": "feat/application-tracker-assisted-entry",
+  "source_checkpoint": "0d1a3c37e68f4154f96bb809f6a3b60c11acd567",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Single authoritative MVP matrix. Current bounded polish/portable dataset evidence is in final-mvp-polish-verification.md. Historical per-screen evidence is retained. Owner visual acceptance and external device/provider/native-language checks remain separate.",
   "screens": [
@@ -16970,5 +16970,48 @@
     "screenshots": "screenshots/scope-information/README.md",
     "preservation": "No schema, configuration, credential, file, approval-history or financial change on primary site; isolated synthetic browser fixtures only",
     "external": "SMTP connectivity remains unresolved; private transport acceptance is not live email/SMS receipt; translation human approval remains pending"
+  },
+  "application_workflow_2026_11_04": {
+    "runtime_pin": "c30d4cdff475a91f864af5bab9aafa329040e33a",
+    "routes": [
+      "/clinician/vetting",
+      "/clinician/vetting/new",
+      "/clinician/vetting/:id",
+      "/admin/vetting",
+      "/admin/vetting/:id",
+      "/admin/vetting/:id/review",
+      "/onboarding?intent=clinician",
+      "/admin/applications",
+      "/admin/assisted/:case"
+    ],
+    "reference": "B10/B11 and I02/I03, owner-requested typed-response and recorded-email assistance extensions using existing components",
+    "functional_status": "Functionally verified:16 Frappe16 tests; real two-role built browser resubmission and new OTP/email-assisted entry; native worker; additive/repeat preservation",
+    "visual_status": "Codex inspected390/768/1440 and actual200%; owner acceptance pending",
+    "evidence": "application-workflow-revision-2026-11-04.md",
+    "screenshots": "screenshots/application-workflow/README.md",
+    "preservation": "Four additive tables; original102tables/19301rows/26private/config protected on main; zero reconciliation errors; no dependency or provider/payment switch",
+    "localization": "200-row source delta;8739-row exchange; no workbook human approval invented",
+    "external": [
+      "Owner visual acceptance",
+      "Native-language approval",
+      "Live consenting-recipient SMS/email receipt; local SMTP connectivity still unresolved",
+      "ID/evidence retention governance remains unchanged"
+    ]
+  },
+  "assisted_payment_polish_2026_11_04": {
+    "runtime_pin": "0d1a3c37e68f4154f96bb809f6a3b60c11acd567",
+    "routes": [
+      "/admin/assisted/:case",
+      "/patient/direct-payments/:id",
+      "/clinician/requests",
+      "/admin/financial-disputes"
+    ],
+    "reference": "Existing B10/I02/I03 patterns; owner-requested guided assisted entry, existing payment and historical wallet components",
+    "functional_status": "17 application tests,2 payment-boundary tests,21 retained direct-payment tests; real browser independent CV/license/two credentials, complete assisted submission and expired-receipt follow-up; actual native worker",
+    "visual_status": "Codex inspected390/768/1440 and actual200%; owner acceptance pending",
+    "evidence": "assisted-payment-polish-2026-11-04.md",
+    "screenshots": "screenshots/assisted-polish/README.md",
+    "scope": "Offline payments have no platform wallet disputes; direct follow-up only payer/clinician, earlier wallet obligations remain authorized under original rules",
+    "external": "Owner Selfmade retest; no direct remote reproduction or live delivery; locale approvals pending"
   }
 }

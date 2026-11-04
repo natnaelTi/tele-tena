@@ -15,7 +15,7 @@ def administrator():
 @query()
 def capabilities():
     c=config();user=actor();allowed=user=='Administrator' or 'Tele Tena Financial Configuration' in frappe.get_roles(user)
-    out={'mode':c.mode,'revision':c.revision,'hold_minutes':c.hold_minutes,'verification_hours':c.verification_hours,'can_configure':allowed,'wallet_funding':c.mode=='Wallet','platform_payouts':c.mode=='Wallet'}
+    out={'mode':c.mode,'revision':c.revision,'hold_minutes':c.hold_minutes,'verification_hours':c.verification_hours,'can_configure':allowed,'wallet_funding':c.mode=='Wallet','wallet_disputes':c.mode=='Wallet','platform_payouts':c.mode=='Wallet'}
     if allowed:out.update(transition_obligations())
     return out
 def transition_obligations():
@@ -71,7 +71,7 @@ def event(p,user,kind,key,values,evidence=None,reason='',create=True):
 def notify(p,kind,event_id):
     from tele_tena.notifications import emit
     from tele_tena.booking_notifications import queue_external
-    recipients={p.patient,p.clinician} if kind in ('PaymentSubmitted','PaymentVerified') else {p.clinician} if kind=='PaymentVerificationReminder' else {p.patient}
+    recipients={p.patient,p.clinician} if kind in ('PaymentSubmitted','PaymentVerified','PaymentReconciliation') else {p.clinician} if kind=='PaymentVerificationReminder' else {p.patient}
     for user in recipients:emit(user,'direct:'+str(event_id),kind,p.appointment)
     queue_external(p.appointment,kind,recipients,context_key=str(event_id))
 
@@ -159,14 +159,15 @@ def submit(id,transaction_ref,amount,filename,content_base64,retry_key):
 def review(id,decision,retry_key,reason=''):
     one('SELECT id FROM tt_gate WHERE id=1 FOR UPDATE');p,user=authorize(id,True)
     if user!=p.clinician:localized_throw('Only the receiving clinician may verify receipt',frappe.PermissionError)
-    if decision not in ('confirm','correct','reject','dispute'):fail('Choose a payment decision.')
+    if decision=='dispute':fail('Wallet disputes do not apply to direct payments. Use the direct-payment follow-up instead.','direct_dispute_unavailable')
+    if decision not in ('confirm','correct','reject','reconcile'):fail('Choose a payment decision.')
     if decision in ('correct','reject') and not p.transaction_ref:fail('Review submitted payment evidence first.','receipt_required')
     reason=text(reason,1000,decision!='confirm')
     if decision=='confirm' and p.verified_at:
         event(p,user,'ReceiptVerified',retry_key,{'decision':decision,'reason':reason},create=False);return detail(id)
-    eid=event(p,user,{'confirm':'ReceiptVerified','correct':'CorrectionRequested','reject':'ReceiptRejected','dispute':'PaymentDisputed'}[decision],retry_key,{'decision':decision,'reason':reason},reason=reason)
+    eid=event(p,user,{'confirm':'ReceiptVerified','correct':'CorrectionRequested','reject':'ReceiptRejected','reconcile':'PaymentIssueReported'}[decision],retry_key,{'decision':decision,'reason':reason},reason=reason)
     if not eid:return detail(id)
-    if decision=='dispute':
+    if decision=='reconcile':
         state='ReconciliationRequired'
     elif decision in ('correct','reject'):
         if p.verified_at:fail('Use payment reconciliation for an already verified receipt.','payment_resolved')

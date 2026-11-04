@@ -1,3 +1,7 @@
+## Application Workflow Refinement — 4 November 2026
+
+This bounded MVP revision adds clinician service-application tracking, focused requested-information dialogs, reviewer queue/detail/decision routes and recorded email-authorized reviewer entry. It preserves individual scope/language/general decisions, identity-file access restrictions and all financial/clinical workflows. See application-workflow-revision-2026-11-04.md for actual checks, screenshot comparisons, current candidate and external limits. Owner acceptance and native-language approval remain separate.
+
 ## Payment Navigation and Reviewer Defaults — 28 October 2026
 
 Owner-approved refinement: payment submission/review is a standalone page, with the form/status on the left and a payment-only timeline/appointment next-step link on the right. Appointment details retain a compact status/link; incoming receipts are actionable from clinician Appointments, Requests and notifications. No booking/receipt/appointment acceptance facts are merged.

@@ -487,7 +487,7 @@ def appointment_detail(appointment):
     if earning:
         selected['financial_state'] = earning[0].state
         selected['dispute_release_at'] = iso(earning[0].release_at) if earning[0].release_at else None
-        selected['can_open_financial_dispute'] = (role == 'patient' and user == item.patient and earning[0].state == 'Pending' and
+        selected['can_open_financial_dispute'] = (item.payment_mode == 'Wallet' and role == 'patient' and user == item.patient and earning[0].state == 'Pending' and
             earning[0].release_at and earning[0].release_at > datetime.now(timezone.utc).replace(tzinfo=None))
     # Appointment status is not proof of consumption. Legacy completed records
     # may still hold funds; only immutable postings establish this display state.

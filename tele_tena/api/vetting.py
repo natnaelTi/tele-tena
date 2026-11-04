@@ -472,7 +472,8 @@ def upload_scope_evidence(application, evidence_type, filename, content_base64):
              'scope_evidence_locked')
     if evidence_type not in SCOPE_EVIDENCE_TYPES:
         fail('Choose a supported evidence type.')
-    if not isinstance(filename, str) or len(filename) > 255 or not filename.lower().endswith('.pdf'):
+    endings=('.pdf','.jpg','.jpeg','.png') if evidence_type=='License or registration' else ('.pdf',)
+    if not isinstance(filename, str) or len(filename) > 255 or not filename.lower().endswith(endings):
         fail('Upload a PDF document.')
     filename = re.sub(r'[^A-Za-z0-9 ._()-]', '_', filename.split('/')[-1].split('\\')[-1])[:180]
     if not isinstance(content_base64, str) or len(content_base64) > ((MAX_SCOPE_EVIDENCE_BYTES + 2) // 3) * 4 + 8:
@@ -481,9 +482,10 @@ def upload_scope_evidence(application, evidence_type, filename, content_base64):
         content = base64.b64decode(content_base64, validate=True)
     except (ValueError, TypeError):
         fail('The PDF data could not be read.')
-    if (not content or len(content) > MAX_SCOPE_EVIDENCE_BYTES or not content.startswith(b'%PDF-')
-            or b'%%EOF' not in content[-1024:]):
-        fail('The uploaded file is not a valid PDF within the 5 MiB limit.')
+    from tele_tena.api.history_documents import validated
+    filename,mime,content=validated(filename,base64.b64encode(content).decode())
+    allowed_mimes=('application/pdf','image/jpeg','image/png') if evidence_type=='License or registration' else ('application/pdf',)
+    if mime not in allowed_mimes:fail('Choose a supported private document for this evidence type.','scope_evidence_invalid')
     prior = rows('''SELECT MAX(revision) revision FROM `tabTele Tena Scope Evidence`
         WHERE scope_application=%s AND evidence_type=%s''', (scope.name, evidence_type))
     revision = int(prior[0].revision or 0) + 1
@@ -672,7 +674,7 @@ def review_scope_application(application, decision, identity_reviewed=False,
                              adult_scope_appropriate=False, interview_completed=False,
                              findings='', restrictions='', scored_criteria=None,
                              credential_source='', credential_checked_on='',
-                             credential_evidence='', credential_source_reference=''):
+                             credential_evidence='', credential_source_reference='', requested_items=None):
     reviewer = actor('Tele Tena Approver')
     if decision not in ('Clarification', 'Approved', 'Rejected', 'Suspended', 'Expired'):
         fail('Choose a supported review decision.')
@@ -781,10 +783,15 @@ def review_scope_application(application, decision, identity_reviewed=False,
         WHERE name=%s''', (decision, reviewer, findings,
         findings if decision == 'Clarification' else '', restrictions, reviewer,
         assessment.decided_at, assessment.decided_at, reviewer, doc.name))
+    from tele_tena.api import application_flow
+    if decision=='Clarification':
+        information_items=application_flow.requested_items(requested_items)
+        application_flow.record_request(doc.name,assessment.name,findings,information_items)
+    else:information_items=None
     from tele_tena.communications import queue
     submitted=frappe.db.get_value('Tele Tena Vetting Scope Application',doc.name,'submitted_at')
     key=hashlib.sha256(json.dumps([doc.name,str(submitted),reviewer,decision,findings,restrictions,flags,
-        scored_criteria,credential_source,credential_checked_on,credential_evidence,credential_source_reference],
+        scored_criteria,credential_source,credential_checked_on,credential_evidence,credential_source_reference,information_items],
         sort_keys=True,default=str).encode()).hexdigest()
     queue(doc.clinician,'Scope'+decision,'scope',doc.name,'scope-decision:'+key)
     if decision == 'Approved':

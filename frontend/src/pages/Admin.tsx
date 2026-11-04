@@ -1,3 +1,4 @@
+import {AssistedApplicationQueue,ApplicationStatus} from './ScopeApplications';
 import {ProfessionalReview} from '../components/ProfessionalReview';
 import "./AdminWorkspace.css";
 import { useCallback, useEffect, useState } from "react";
@@ -17,6 +18,7 @@ import {
 } from "../components/ui";
 import { useAction } from "../hooks/useAction";
 import { useResource } from "../hooks/useResource";
+import { useSession } from "../hooks/useSession";
 import { useLocale } from "../hooks/useLocale";
 import { Link, Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ClipboardCheck, Layers, ShieldCheck, Building2, ArrowRight, FileText } from "lucide-react";
@@ -65,7 +67,7 @@ export function Applications() {
       <div className="application-review-layout"><div>
         <div hidden={applicationStep!==0}>
         <section className="application-review-panel"><h2>{w("Professional Profile")}</h2>{selected.application_profile&&Object.keys(selected.application_profile).length>0&&<><p className="supporting">{w("Self-reported application details — verification is recorded separately.")}</p><dl>{([["professional_category","Profession"],["qualification","Primary Qualification"],["issuing_institution","Issuing Institution"],["experience_years","Years of Practice"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl><details className="application-credential-details"><summary>{w("Credential Details")}</summary><dl>{([["issuing_authority","Licensing Authority"],["registration_number","License Number"],["jurisdiction","Credential Jurisdiction"],["credential_valid_from","Valid From"],["credential_expiry","Valid Until"],["competencies","Earlier Competency Narrative"],["certifications","Credentials"]] as const).map(([key,label])=>selected.application_profile?.[key]!=null&&selected.application_profile[key]!==""?<div key={key}><dt>{w(label)}</dt><dd>{String(selected.application_profile[key])}</dd></div>:null)}</dl></details></>}<h3>{w("Professional Statement")}</h3><p className="prewrap">{selected.statement||w("Not provided")}</p>
-          <h3>{w("Requested Service Scopes")}</h3><ul>{(selected.requested_services||[]).map((service,index)=><li key={service}><strong>{selected.requested_service_labels?.[index]}</strong>{!selected.scope_applications?.some(item=>item.service===service)&&<p className="supporting">{w("No submitted scope review is recorded. Check existing grants in Service Scopes, or request the missing application details before starting a review.")}</p>}{selected.scope_applications?.filter((item:any)=>item.service===service).map((item:any)=><div key={item.name}><StatusBadge>{w(item.status)}</StatusBadge> <Link className="text-link" to="/admin/vetting" state={{scopeApplication:item.name}}>{w("Review This Scope")}</Link></div>)}</li>)}</ul>{!selected.requested_service_labels?.length&&<p>{w("No requested scopes recorded")}</p>}
+          <h3>{w("Requested Service Scopes")}</h3><ul>{(selected.requested_services||[]).map((service,index)=><li key={service}><strong>{selected.requested_service_labels?.[index]}</strong>{!selected.scope_applications?.some(item=>item.service===service)&&<p className="supporting">{w("No submitted scope review is recorded. Check existing grants in Service Scopes, or request the missing application details before starting a review.")}</p>}{selected.scope_applications?.filter((item:any)=>item.service===service).map((item:any)=><div key={item.name}><ApplicationStatus state={item.status}/> <Link className="text-link" to={"/admin/vetting/"+item.name}>{w("Review This Scope")}</Link></div>)}</li>)}</ul>{!selected.requested_service_labels?.length&&<p>{w("No requested scopes recorded")}</p>}
           <details><summary>{w("Contact / Account Reference")}</summary><p className="supporting">{selected.user}</p></details>
         </section>
         </div><div hidden={applicationStep!==1}><ProfessionalReview clinician={selected.user}/><section className="application-review-panel"><h2>{w("Private Documents")}</h2><div className="application-document-row"><FileText size={24} aria-hidden="true"/><div><strong>{w("CV")}</strong><p>{w(selected.resume_uploaded?"Uploaded":"Not uploaded")}</p></div></div>
@@ -86,7 +88,7 @@ export function Applications() {
   </section>;
   if(selectedUser&&selected)return <Navigate replace to={selected.application_id?`/admin/applications/${encodeURIComponent(selected.application_id)}`:"/admin/application-review"} state={{applicationUser:selectedUser}}/>;
   return <>
-    <PageTitle title={w("Clinician Applications")} description={w("Review people by name, with their requested scopes visible.")}/>
+    <PageTitle title={w("Clinician Applications")} description={w("Review people by name, with their requested scopes visible.")}/><AssistedApplicationQueue/>
     <div className="review-queue-filters"><TextField label={w("Search clinician name")} placeholder={w("Search clinician name")} value={query} onChange={event=>setQuery(event.target.value)}/><Select label={w("Application status")} value={status} onChange={event=>setStatus(event.target.value)}><option value="">{w("All statuses")}</option>{["Pending","Approved","Rejected"].map(value=><option key={value} value={value}>{w(value)}</option>)}</Select></div>
     {resource.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void resource.refresh()}>{w("Retry")}</Button></InlineNotice>:!resource.data?<Skeleton/>:shown?.length?<>
       <div className="table-scroll review-queue-table"><table><thead><tr>{["Clinician","Application status","Requested services","Submitted","Evidence","Action"].map(label=><th key={label}>{w(label)}</th>)}</tr></thead><tbody>{shown.map(item=><tr key={item.user}><td><strong>{item.display_name||w("Clinician application")}</strong></td><td><StatusBadge>{w(item.status)}</StatusBadge></td><td>{item.requested_service_labels?.join(", ")||w("Not recorded")}</td><td>{item.submitted_at?new Date(item.submitted_at).toLocaleDateString():w("Date unavailable")}</td><td>{w(item.evidence_complete?"Complete":"Incomplete")}</td><td><Button variant="quiet" onClick={()=>review(item.user)}>{w("Review")}</Button></td></tr>)}</tbody></table></div>
@@ -386,6 +388,7 @@ type ReconciliationCase = {
 };
 export function FinancialDisputes() {
   const { w } = useLocale();
+  const {session}=useSession();
   const resource = useResource(() => api<OpenDispute[]>("tele_tena.accounting.open_disputes"));
   const reconciliation = useResource(() => api<ReconciliationCase[]>("tele_tena.accounting.financial_reconciliation_queue"));
   const action = useAction();
@@ -393,7 +396,8 @@ export function FinancialDisputes() {
   const [snapshotReasons, setSnapshotReasons] = useState<Record<string, string>>({});
   const reviewCases = reconciliation.data?.filter((item) => item.status === "ReviewRequired") || [];
   return <>
-    <PageTitle title={w("Financial Disputes")} description={w("Financial disputes review only payment concerns. No clinical note access is included.")} />
+    <PageTitle title={w(session?.payment_mode==="Offline"?"Historical Wallet Review":"Financial Disputes")} description={w("Financial disputes review only payment concerns. No clinical note access is included.")} />
+    {session?.payment_mode==="Offline"&&<InlineNotice>{w("Wallet disputes are disabled for Offline Direct Payment. This page retains earlier wallet cases and reconciliation only. Direct-payment follow-ups stay between the payer and receiving clinician.")}</InlineNotice>}
     {action.error && <InlineNotice tone="danger">{action.error}</InlineNotice>}
     {resource.error ? <InlineNotice tone="danger">Disputes could not be loaded. <Button onClick={() => void resource.refresh()}>Try again</Button></InlineNotice> : !resource.data ? <Skeleton /> : resource.data.length ? <div className="stack">{resource.data.map(item => <Card key={item.earning_id}>
       <div className="row-between"><h2>ETB {money(item.net_minor)} {w("On hold")}</h2><StatusBadge tone="warning">{w("Disputed")}</StatusBadge></div>

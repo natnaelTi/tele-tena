@@ -1,4 +1,29 @@
 {
-  "added": [],
-  "stale": []
+  "added": [
+    "copy.admin.historical_wallet_review",
+    "copy.admin.wallet_disputes_are_disabled_for_offline_direct_payment_this_page_reta",
+    "copy.backend_validation_accounting.wallet_disputes_are_unavailable_for_direct_payments_use_the_payment_pa",
+    "copy.backend_validation_direct_payments.wallet_disputes_do_not_apply_to_direct_payments_use_the_direct_payment",
+    "copy.directpayments.follow_up_with_the_clinician_about_payment",
+    "copy.directpayments.payment_follow_up_requested",
+    "copy.directpayments.review_historical_wallet_obligations",
+    "copy.directpayments.this_sends_a_payment_follow_up_to_you_and_the_receiving_clinician_it_d",
+    "copy.scopeapplications.6",
+    "copy.scopeapplications.applicant_and_requested_services",
+    "copy.scopeapplications.back",
+    "copy.scopeapplications.enter_the_clinician_s_identity_profession_and_declared_care_languages",
+    "copy.scopeapplications.enter_the_clinician_s_information_one_section_at_a_time_save_your_work",
+    "copy.scopeapplications.keep_the_cv_and_each_credential_with_its_own_supporting_documents",
+    "copy.scopeapplications.message_cdb4ee2a",
+    "copy.scopeapplications.record_independent_practice_or_declared_clinic_affiliations_without_gr",
+    "copy.scopeapplications.record_only_competency_ratings_declared_by_the_clinician",
+    "copy.scopeapplications.record_practice_authorization_and_attach_only_the_professional_license",
+    "copy.scopeapplications.record_the_email_source_and_each_separate_declaration_before_submittin",
+    "copy.scopeapplications.save_and_continue",
+    "copy.scopeapplications.section"
+  ],
+  "stale": [
+    "copy.directpayments.report_a_payment_issue",
+    "copy.scopeapplications.enter_only_information_supplied_by_the_clinician_submission_and_approv"
+  ]
 }

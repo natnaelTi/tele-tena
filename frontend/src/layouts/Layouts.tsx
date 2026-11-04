@@ -51,9 +51,9 @@ export function MedicalLeadLayout(){
   const signout=async()=>{setBusy(true);setError(false);try{await journeyApi.logout();await refresh();}catch{setError(true);}finally{setBusy(false);}};
   if(!session?.roles.includes('Tele Tena Medical Lead'))return <main className="container"><InlineNotice tone="danger">{w('You do not have access to clinical rubric governance.')}</InlineNotice></main>;
   return <div className="reference-workspace workspace-role-medical-lead"><DemoBar/>
-    <header className="product-header site-masthead"><Brand bilingual/><nav className="product-desktop-nav" aria-label={w('Clinical standards')}><NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>{session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}</nav><div className="product-user"><LanguageSelect/><AccountMenu accountPath={session.roles.includes('Tele Tena Approver')?'/admin/account':'/admin/rubrics/account'} onSignout={()=>void signout()} busy={busy}/></div></header>
+    <header className="product-header site-masthead"><Brand bilingual/><nav className="product-desktop-nav" aria-label={w('Clinical standards')}><NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>{session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service Applications')}</span></NavLink>}</nav><div className="product-user"><LanguageSelect/><AccountMenu accountPath={session.roles.includes('Tele Tena Approver')?'/admin/account':'/admin/rubrics/account'} onSignout={()=>void signout()} busy={busy}/></div></header>
     {error&&<InlineNotice tone="danger">{w('We could not sign you out. Try again.')}</InlineNotice>}
-    <nav className="product-mobile-nav" aria-label={w('Clinical standards')}><NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>{session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service-scope vetting')}</span></NavLink>}</nav>
+    <nav className="product-mobile-nav" aria-label={w('Clinical standards')}><NavLink to="/admin/rubrics"><ClipboardCheck size={20}/><span>{w('Rubric versions')}</span></NavLink>{session.roles.includes('Tele Tena Approver')&&<NavLink to="/admin/vetting"><Stethoscope size={20}/><span>{w('Service Applications')}</span></NavLink>}</nav>
     <main className="reference-workspace-main" id="main-content"><Outlet/></main>
   </div>;
 }
@@ -161,7 +161,7 @@ const clinicianNav = [
   ["/clinician/offers", "Your offers", ClipboardCheck],
   ["/clinician/availability", "Availability", Clock3],
   ["/clinician/services", "Services & pricing", Stethoscope],
-  ["/clinician/vetting", "Professional review", ClipboardCheck],
+  ["/clinician/vetting", "Service Applications", ClipboardCheck],
   ["/clinician/affiliations", "Clinics & affiliations", Building2],
   ["/clinician/clinic-access", "Clinic access", Building2],
   ["/clinician/care", "Care records", FileHeart],
@@ -171,15 +171,15 @@ const clinicianNav = [
 // Applicants can continue profile/review work, without approved-only workspace links.
 const applicantNav = [
   ["/clinician", "Your application", Home],
-  ["/clinician/vetting", "Professional review", ClipboardCheck],
+  ["/clinician/vetting", "Service Applications", ClipboardCheck],
   ["/clinician/account", "Account", Settings2],
 ] as const;
 const adminNav = [
   ["/admin", "Overview", Home],
   ["/admin/applications", "Applications", ClipboardCheck],
-  ["/admin/scopes", "Service scopes", Stethoscope],
+  ["/admin/scopes", "Service Authorizations", Stethoscope],
   ["/admin/services", "Service catalog", Stethoscope],
-  ["/admin/vetting", "Scope vetting", ClipboardCheck],
+  ["/admin/vetting", "Service Applications", ClipboardCheck],
   ["/admin/clinics", "Clinics", Building2],
   ["/admin/financial-disputes", "Financial disputes", Wallet],
   ["/admin/matching", "Matching operations", Settings2],
@@ -211,7 +211,7 @@ export function WorkspaceLayout({
         ? session?.roles.includes("Tele Tena Clinician") ? clinicianNav : applicantNav
         : kind === "clinic"
           ? session?.clinic_schedule_workspace ? clinicNav : clinicHomeNav
-          : adminNav;
+          : adminNav.filter(([to])=>session?.payment_mode!=="Offline"||to!=="/admin/financial-disputes");
   const items = kind !== "clinic" && session?.clinic_workspace
     ? [...roleItems, ["/clinic", "Clinic workspace", Building2] as const]
     : roleItems;
@@ -222,7 +222,7 @@ export function WorkspaceLayout({
     : kind === "patient"
       ? ["/patient", "/patient/discovery", "/patient/appointments", "/patient/requests", "/patient/couples"]
       : kind === "admin"
-        ? ["/admin", "/admin/applications"]
+        ? ["/admin", "/admin/applications", "/admin/vetting"]
         : ["/clinic"];
   const mobilePrimary = items.filter(([to]) => mobilePrimaryRoutes.includes(to));
   const mobileMore = items.filter(([to]) => !mobilePrimaryRoutes.includes(to) && !to.endsWith("/account"));
