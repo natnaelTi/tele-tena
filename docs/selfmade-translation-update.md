@@ -6,7 +6,7 @@ English fallbacks. It imports no workbook drafts and does not claim clinical,
 legal-policy, native-language or real-payment readiness. Final localization still
 requires genuine independent approvals, validated import and a new verified pin.
 
-Candidate `c30d4cdff475a91f864af5bab9aafa329040e33a`, branch `feat/application-tracker-assisted-entry`, draft
+Candidate `0d1a3c37e68f4154f96bb809f6a3b60c11acd567`, branch `feat/application-tracker-assisted-entry`, draft
 [draft PR51](https://github.com/natnaelTi/tele-tena/pull/51) dependent on [PR50](https://github.com/natnaelTi/tele-tena/pull/50), which retains PR49 ancestry.
 This includes the existing navigation/attachment/photo and scope-intake fixes plus
 transactional application, request/offer and appointment/payment communications,
@@ -16,7 +16,7 @@ payment-mode, credential or historic disclosure change. v1.50 still recovers onl
 omitted selected scope requests. Reviewed translation hash remains
 `ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356`, with zero human-approved
 workbook imports. See [current evidence](communications-demo-readiness-2026-11-04.md).
-v1.52 adds four command tables for typed requests/responses and recorded email-assisted submission. No existing rows are rewritten. The first preservation gate allows only the retained narrow v1.50 recovery; v1.51/v1.52 change no original values and repeat migration remains strict. See [application-flow evidence](application-workflow-revision-2026-11-04.md).
+v1.52 adds four command tables for typed requests/responses and recorded email-assisted submission. No existing rows are rewritten. The first preservation gate allows only the retained narrow v1.50 recovery; v1.51/v1.52 change no original values and repeat migration remains strict. See [application-flow evidence](application-workflow-revision-2026-11-04.md) and [attachment/payment polish](assisted-payment-polish-2026-11-04.md). The latter has no schema/dependency changes: independently keyed uploads and guided assisted entry, direct-payment participant follow-up notices, and Offline-mode wallet-dispute separation. Existing wallet cases retain their original rules.
 
 Nothing has been remotely deployed or merged. Do not run the separate historical
 Offline mode-cutover section: this update preserves the current payment mode.
@@ -36,7 +36,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=c30d4cdff475a91f864af5bab9aafa329040e33a
+RELEASE_SHA=0d1a3c37e68f4154f96bb809f6a3b60c11acd567
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
@@ -137,7 +137,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=c30d4cdff475a91f864af5bab9aafa329040e33a
+RELEASE_SHA=0d1a3c37e68f4154f96bb809f6a3b60c11acd567
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 UPDATE_BACKUP=/home/smcs/teletena-before-translations.RETAINED_PATH
 TOOLS="$UPDATE_BACKUP/tools"
