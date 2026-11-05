@@ -1,3 +1,8 @@
+> Current provider proof and remaining implementation boundaries:
+> [Plan V1 results](live-verification-results-v1.md). Owner Telegram/email receipts
+> are confirmed. The settled replay checkpoint is pending; application-wide capture
+> remains quarantined. Do not infer production activation from successful fixtures.
+
 # Operations Walkthrough and Sprint 2 Handoff
 
 All Tele Tena Approver users have server-enforced operational super-admin access;

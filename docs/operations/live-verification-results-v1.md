@@ -169,3 +169,14 @@ statements that all projects are absent or that no provider calls have occurred.
   provider binding, balances or business-data mutation.
 
 [Masked synthetic playback screenshot](../screenshots/operations-provider-proof/README.md).
+
+## Packaged Continuation
+
+Immutable built/install source: `e3e31ae8cd70a55db61a52c035c507823ad1b52c`.
+Later documentation/evidence commits do not change the runtime. The locked build,
+lint and private-asset/hash scan pass. The local preview uses this production build
+at http://127.0.0.1:8017/teletena/. The shared Selfmade environment was not changed.
+
+The [incremental update guide](../selfmade-operations-update.md) pins this native
+review candidate and preserves existing site/provider switches. This is not an
+instruction to deploy or activate capture before owner review.

@@ -12,7 +12,7 @@ English fallbacks. It imports no workbook drafts and does not claim clinical,
 legal-policy, native-language or real-payment readiness. Final localization still
 requires genuine independent approvals, validated import and a new verified pin.
 
-Installation pin: `15a051c271ddbe1a5e73b62d1f8d9c1afbd0fa74`, branch `feat/operations-journey-insights`,
+Installation pin: `e3e31ae8cd70a55db61a52c035c507823ad1b52c`, branch `feat/operations-journey-insights`,
 draft PR dependent on PR51/50. The native v1.53 migration adds private operations
 command tables only. Existing clinical, financial, evidence and preference values
 remain unchanged. No Python requirements change; frontend adds locked PostHog JS
@@ -21,8 +21,10 @@ Frappe Sentry SDK through an isolated, sanitized client. No provider is enabled.
 
 See [Sprint1 evidence](operations/verification.md), [configuration](operations/configuration.md),
 [collection contract](operations/collection-retention.md) and [operator walkthrough](operations/operator-and-sprint2.md).
-Actual ingestion, replay export/independent playback, measured replay capacity,
-external monitor setup and live receipt remain external gates. This package is a
+Synthetic event/error ingestion, original-line mapping, provisional single-window
+export/playback and owner alert receipt passed. Settled completeness/deletion,
+application-wide capture integration, representative production capacity and
+external monitor setup remain gates. This package is a
 native operations review candidate, not a claim that those gates or launch acceptance passed.
 The alert recipient stays privately configured and unlinked to demo accounts.
 
@@ -44,7 +46,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=15a051c271ddbe1a5e73b62d1f8d9c1afbd0fa74
+RELEASE_SHA=e3e31ae8cd70a55db61a52c035c507823ad1b52c
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
@@ -145,7 +147,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=15a051c271ddbe1a5e73b62d1f8d9c1afbd0fa74
+RELEASE_SHA=e3e31ae8cd70a55db61a52c035c507823ad1b52c
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 UPDATE_BACKUP=/home/smcs/teletena-before-operations.RETAINED_PATH
 TOOLS="$UPDATE_BACKUP/tools"

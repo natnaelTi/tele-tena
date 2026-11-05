@@ -128,16 +128,18 @@ browser-tools NODE_PATH; loopback8021 only, existing isolated synthetic users. N
 point tests at Selfmade/presentation data. New operations files/rows are separate
 from immutable clinical and financial history.
 
-## Handover Identity
+## Current Handover Identity
 
-Immutable installation/packaged source: `15a051c271ddbe1a5e73b62d1f8d9c1afbd0fa74`.
-Branch `feat/operations-journey-insights`, dependent draft PR52 → PR51 → PR50.
-Subsequent source commits contain documentation, screenshot evidence and browser-test
-reproduction only; no runtime difference requires another build. See
+Immutable installation/packaged source: `e3e31ae8cd70a55db61a52c035c507823ad1b52c`.
+Branch `feat/operations-journey-insights`, draft PR52 → PR51 → PR50 ancestry retained.
+Later source commits contain evidence/guide updates only. The latest continuation
+adds gated adapters and trusted browser frames, without schema/dependency changes.
+
+See [actual provider results and exact pending checkpoint](live-verification-results-v1.md),
 [release metadata/checksums](release-evidence.json) and
 [copyable incremental update/recovery procedure](../selfmade-operations-update.md).
 
 Preview: http://127.0.0.1:8017/teletena/ — reviewer More → Operations Overview /
-User Support; all authenticated roles can open Help → Report a Problem.
-Private provider template: `/home/frappe/teletena-operations-config/providers.template.json`.
-No secrets or account manifest is bundled in Git or public assets.
+User Support. Provider bindings and site replay/analytics/alert settings stay unchanged.
+This is a native review candidate; unfinished capture integration and settled
+proof gates prevent claiming Sprint1 fully complete or90-day archive availability.

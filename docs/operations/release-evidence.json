@@ -1,11 +1,11 @@
 {
   "baseline": "de27a6fbd6e2ed8c23d74471d98b8c357178890a",
   "schema": "v1.53",
-  "packaged_source": "15a051c271ddbe1a5e73b62d1f8d9c1afbd0fa74",
+  "packaged_source": "e3e31ae8cd70a55db61a52c035c507823ad1b52c",
   "frontend_lock_sha256": "efe3613bc3acba82e24a2a0d581a1c991e87babfd7b81522d542bae5b749051a",
   "translation_dictionary_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
   "human_approved_workbook_imports": 0,
-  "catalog_new_keys": 211,
+  "catalog_new_keys": 232,
   "screenshots": {
     "operations-health-1440.png": "55e7e99286c1a6edf4dd01c651e9cbf978f386ac831b18322508fadebe598243",
     "operations-overview-1440.png": "b52e049441b7413468a32a115920b6fc7a49d34a786563c5e55349d8ef21d4d5",
@@ -15,7 +15,8 @@
     "quarter-report-1440.png": "1b869d9ba7db3f0dca58712950d26d2f376284f0507775a1729da8f11db2bd15",
     "support-preview-1440.png": "7fc0fa19c2e8810a34fec6f0bf7a824e5939c16e685ac44712fbb155db384e60",
     "support-resolved-1440.png": "f7a35d31c8cb7c7aca126f8872f22ea32d87db9cc719d38034cedb161a313be2",
-    "support-review-390.png": "fc84b46fb7232b66c2ae76d63bee71df38fb53af90334e5b6c6e6690bf09ed2c"
+    "support-review-390.png": "fc84b46fb7232b66c2ae76d63bee71df38fb53af90334e5b6c6e6690bf09ed2c",
+    "provider-proof/independent-playback.png": "388f59b171c5c96e10cd7823d8386c2c5974724f977cb7f8bee8faaa6a9778d0"
   },
   "provider_ingestion_verified": true,
   "replay_archive_available": false,
@@ -39,5 +40,36 @@
     "application_runtime_changed": true
   },
   "live_results": "docs/operations/live-verification-results-v1.md",
-  "replay_settled_checkpoint_due_utc": "2026-11-06T19:50:28.731000+00:00"
+  "replay_settled_checkpoint_due_utc": "2026-11-06T19:50:28.731000+00:00",
+  "installation_commit": "e3e31ae8cd70a55db61a52c035c507823ad1b52c",
+  "packaged_source_commit": "e3e31ae8cd70a55db61a52c035c507823ad1b52c",
+  "packaged_release_json_sha256": "44bc401d0cfaf04c64769a22051e6d9dc80d2f6a45731fc374857ff290fd4bf5",
+  "latest_local_tests": {
+    "frappe16_operations": 19,
+    "communications": 30,
+    "preflight": 7,
+    "budget": 6,
+    "replay_format": 3,
+    "export": 2,
+    "error_frames": 2,
+    "email_composition": 2,
+    "localization_exchange": 5,
+    "localization_extraction": 2,
+    "hostile_player": "Passed",
+    "actual_export_playback": "72 events, seek ends, zero network"
+  },
+  "receipt_confirmation": {
+    "telegram_alert": true,
+    "telegram_recovery": true,
+    "amended_email_alert": true,
+    "amended_email_recovery": true
+  },
+  "production_capture_enabled": false,
+  "previous_packaged_source": "15a051c271ddbe1a5e73b62d1f8d9c1afbd0fa74",
+  "local_restart_financial_reconciliation": {
+    "patient_owners": 11,
+    "clinician_owners": 2,
+    "accounts": 22,
+    "mismatches": 0
+  }
 }
