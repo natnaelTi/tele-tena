@@ -17,7 +17,7 @@ def process():
  beat('worker_started');reports.aggregate(500)
  for file in list(storage.root().glob('error-*'))[:25]:
   try:
-   data=json.loads(file.read_text());safe=providers.sanitized_error(data);fingerprint=hashlib.sha256(json.dumps(safe,sort_keys=True).encode()).hexdigest()
+   data=json.loads(file.read_text());safe=providers.sanitized_error(data);group={**safe,'tags':{k:v for k,v in safe.get('tags',{}).items() if k!='attempt'}};group.pop('event_id',None);fingerprint=hashlib.sha256(json.dumps(group,sort_keys=True).encode()).hexdigest()
    if rt.count('errors',rt.config()['errors_per_day']):
     frappe.db.sql('INSERT INTO tt_ops_error VALUES (%s,%s,%s,%s,\'Pending\',0)',(str(uuid.uuid4()),fingerprint,json.dumps(safe),rt.now()));rt.incident('error_'+fingerprint[:12]);rt.safe_record('operations.error_observed',file.name,{'error_code':'unexpected'},context={'route':safe.get('tags',{}).get('route','/unknown'),'locale':'en','device':'unknown'})
    file.unlink()

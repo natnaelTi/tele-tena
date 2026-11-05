@@ -38,6 +38,7 @@ def configure(values,revision):
  if values.get('archive'):fail('Archive export is unavailable until the selected project passes complete export and independent playback verification.','archive_unverified')
  data={**old,**values};data.pop('revision',None)
  frappe.db.sql('SELECT id FROM tt_ops_config WHERE id=1 FOR UPDATE')
+ if rt.config()['revision']!=old['revision']:fail('Settings changed. Reload before saving.','operations_conflict')
  frappe.db.sql('UPDATE tt_ops_config SET payload=%s,revision=revision+1,modified=%s WHERE id=1',(json.dumps(data),rt.now()))
  audit(user,'OperationsConfigured',{'changed':sorted(values),'prior_revision':old['revision']});return configuration()
 @frappe.whitelist(allow_guest=True,methods=['GET'])
