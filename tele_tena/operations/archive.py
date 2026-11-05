@@ -77,7 +77,7 @@ def player_response(locale=None):
  from tele_tena.localization import translate,request_locale
  locale=locale if locale in ('en','am','om') else request_locale()
  labels={'play':translate('Play',locale),'pause':translate('Pause',locale),'timeline':translate('Replay Timeline',locale),'blocked':translate('Private Element Blocked',locale),'unavailable':translate('Replay interaction unavailable',locale),'unsupported':translate('Unsupported or incomplete recording',locale)}
- safe_labels=json.dumps(labels).replace('<',r'<')
+ safe_labels=json.dumps(labels).replace('<',chr(92)+'u003c')
  nonce=secrets.token_hex(24);code='window.__teletenaPlayerLabels='+safe_labels+';'+(Path(__file__).parent/'player.js').read_text()
  policy="default-src 'none'; script-src 'nonce-"+nonce+"'; style-src 'unsafe-inline'; img-src 'none'; media-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'self'; sandbox allow-scripts"
  html='<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Private Replay</title><body><script nonce="'+nonce+'">'+code+'</script></body></html>'

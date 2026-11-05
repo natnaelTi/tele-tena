@@ -124,6 +124,11 @@ class Operations(unittest.TestCase):
   row=j.one('SELECT * FROM tt_ops_archive WHERE id=%s',(id,));self.assertEqual(row.state,'Verified');self.assertEqual(row.captured,captured);self.assertEqual(row.expires,captured+timedelta(days=90));self.assertEqual(row.player_version,'teletena-sandbox-web-v1')
   frappe.set_user(users['reviewer'])
   with patch('tele_tena.operations.providers.archive_capability',return_value=True):self.assertTrue(archive.playback_payload(id)['available'])
+ def test_player_translation_cannot_close_trusted_script(self):
+  frappe.set_user(users['reviewer'])
+  with patch('tele_tena.localization.translate',return_value='</script><script>PRIVATE-CANARY</script>'):
+   response=archive.player_response('am')
+  body=response.get_data(as_text=True);self.assertNotIn('</script><script>',body);self.assertIn(chr(92)+'u003c/script>',body)
  def test_archive_adapter_does_not_promote_partial_or_metadata_to_verified(self):
   with self.assertRaises(providers.ArchiveUnverified):providers.archive_export({'metadata_only':True})
   self.assertFalse(archive.status()['available']);self.assertIsNone(archive.status()['capacity_estimate'])

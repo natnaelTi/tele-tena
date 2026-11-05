@@ -154,7 +154,7 @@ statements that all projects are absent or that no provider calls have occurred.
 
 ## Local Regression Evidence for This Continuation
 
--18/18 isolated real Frappe16 operations tests;30/30 communications tests.
+-19/19 isolated real Frappe16 operations tests;30/30 communications tests.
 -7 private-preflight,6 durable-budget/amendment/phase tests,3 strict replay-format,
   2 complete-export,2 trusted-frame and2 email-composition tests.
 -5 localization exchange and2 extraction tests. Source-only export now8,990 rows;
@@ -162,7 +162,7 @@ statements that all projects are absent or that no provider calls have occurred.
   dialog/player labels use the same reviewed-only fallback mechanism.
 -Independent playback applies all72 actual exported events, seeks to both ends,
   and makes zero network requests. Separate hostile synthetic markup test denies
-  captured scripts, private URLs, media and active account controls.
+  captured scripts, private URLs, media and active account controls. A translated label cannot close the trusted player script.
 -Frontend production compilation passes. Lint retains existing warnings with zero
   errors. Fresh/upgrade/repeat-migration and financial preservation evidence from
   the unchangedv1.53 schema is reused; this continuation adds no schema migration,
