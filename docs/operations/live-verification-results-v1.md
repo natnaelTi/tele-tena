@@ -155,7 +155,7 @@ statements that all projects are absent or that no provider calls have occurred.
 ## Local Regression Evidence for This Continuation
 
 -19/19 isolated real Frappe16 operations tests;30/30 communications tests.
--7 private-preflight,6 durable-budget/amendment/phase tests,3 strict replay-format,
+-7 private-preflight,7 durable-budget/amendment/phase tests,3 strict replay-format,
   2 complete-export,2 trusted-frame and2 email-composition tests.
 -5 localization exchange and2 extraction tests. Source-only export now8,990 rows;
   approved reviewed dictionary is unchanged, with zero invented approvals. Archive
@@ -172,7 +172,7 @@ statements that all projects are absent or that no provider calls have occurred.
 
 ## Packaged Continuation
 
-Immutable built/install source: `e3e31ae8cd70a55db61a52c035c507823ad1b52c`.
+Immutable built/install source: `79fcebde6a940d3c12e9b5df7be2eb03ab788ac7`.
 Later documentation/evidence commits do not change the runtime. The locked build,
 lint and private-asset/hash scan pass. The local preview uses this production build
 at http://127.0.0.1:8017/teletena/. The shared Selfmade environment was not changed.

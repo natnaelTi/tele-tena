@@ -130,7 +130,7 @@ from immutable clinical and financial history.
 
 ## Current Handover Identity
 
-Immutable installation/packaged source: `e3e31ae8cd70a55db61a52c035c507823ad1b52c`.
+Immutable installation/packaged source: `79fcebde6a940d3c12e9b5df7be2eb03ab788ac7`.
 Branch `feat/operations-journey-insights`, draft PR52 → PR51 → PR50 ancestry retained.
 Later source commits contain evidence/guide updates only. The latest continuation
 adds gated adapters and trusted browser frames, without schema/dependency changes.
