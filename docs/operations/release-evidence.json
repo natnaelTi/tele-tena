@@ -17,9 +17,9 @@
     "support-resolved-1440.png": "f7a35d31c8cb7c7aca126f8872f22ea32d87db9cc719d38034cedb161a313be2",
     "support-review-390.png": "fc84b46fb7232b66c2ae76d63bee71df38fb53af90334e5b6c6e6690bf09ed2c"
   },
-  "provider_ingestion_verified": false,
+  "provider_ingestion_verified": true,
   "replay_archive_available": false,
-  "live_alert_receipt_verified": false,
+  "live_alert_receipt_verified": true,
   "provider_configuration_followup": {
     "source_with_preflight": "b91aa8a2a6729daa4012c290d70a61f2f84e92e7",
     "working_file_validated": true,
@@ -28,16 +28,16 @@
     "posthog_project_id": "335848",
     "missing_or_invalid_fields": [],
     "optional_missing_fields": [],
-    "telegram_setup_missing_fields": [
-      "telegram_chat"
-    ],
-    "telegram_discovery": "One authorized getUpdates request; zero matching private chats; no changes or sends",
+    "telegram_setup_missing_fields": [],
+    "telegram_discovery": "Unique matching private chat saved; two approved messages received",
     "owner_account_unlinked": true,
     "live_test_authorized": false,
     "new_network_free_tests_passed": 7,
     "live_plan": "docs/operations/live-verification-plan-v1.md",
     "live_plan_sha256": "6c34edd9b9d8708b03cc3e0fc9f0af90369bfe050bec7fd9061628a2df92f6a3",
-    "provider_ingestion_verified": false,
-    "application_runtime_changed": false
-  }
+    "provider_ingestion_verified": true,
+    "application_runtime_changed": true
+  },
+  "live_results": "docs/operations/live-verification-results-v1.md",
+  "replay_settled_checkpoint_due_utc": "2026-11-06T19:50:28.731000+00:00"
 }

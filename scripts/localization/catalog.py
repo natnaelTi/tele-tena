@@ -41,7 +41,7 @@ def extract():
         for node in ast.walk(tree):
             if not isinstance(node,ast.Call) or not node.args:continue
             name=ast.unparse(node.func)
-            if name not in ('fail','journey.fail','localized_throw','frappe.throw','ValueError','frappe._','text'):continue
+            if name not in ('fail','journey.fail','localized_throw','frappe.throw','ValueError','frappe._','text','translate'):continue
             arg=node.args[0];english=arg.value if isinstance(arg,ast.Constant) and isinstance(arg.value,str) else ''.join(p.value if isinstance(p,ast.Constant) else '{'+ast.unparse(p.value)+'}' for p in arg.values) if isinstance(arg,ast.JoinedStr) else None
             if english and not (name=='ValueError' and re.fullmatch('[a-z0-9_]+',english)):entries.append({'english':english,'context':'Backend validation / '+file.stem,'source_location':str(file.relative_to(ROOT))+':'+str(node.lineno)})
     # Shipped metadata only. Never query a database or export user submissions.

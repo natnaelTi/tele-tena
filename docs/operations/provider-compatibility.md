@@ -1,3 +1,7 @@
+> Current Plan V1 results supersede the historical provider status below: see
+> [actual live results, receipt confirmation and pending 25-hour checkpoint](live-verification-results-v1.md).
+> Production collection remains disabled; no 90-day archive claim is made.
+
 # Provider Inspection — 5 November 2026
 
 Official sources inspected locally before integration:

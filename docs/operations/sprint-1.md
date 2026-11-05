@@ -73,3 +73,11 @@ Working-file follow-up: see [actual readiness](configuration-readiness.md). EU33
 and Bugsink credential fields are populated; no successful connectivity is inferred.
 Telegram chat discovery found no matching setup message. The single consolidated
 [live plan](live-verification-plan-v1.md) awaits approval; no site flags changed.
+
+## Plan V1 Continuation
+
+Selected-provider error/event ingestion, owner alert receipts and the provisional
+single-window export/player proof are recorded in
+[live results](live-verification-results-v1.md). Application-wide replay remains
+quarantined; settled export/deletion is due6November2026 at19:50:28.731UTC. This is
+not production activation or completed90-day retention acceptance.

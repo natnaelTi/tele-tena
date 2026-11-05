@@ -1,13 +1,29 @@
 {
   "added": [
-    "copy.operations.bugsink",
-    "copy.operations.mobile_alerts",
-    "copy.operations.no_operational_alert_attempts_recorded",
-    "copy.operations.planned_raw_replay_retention",
-    "copy.operations.posthog",
-    "copy.operations.private_source_maps"
+    "copy.archivereplay.masked_archived_interactions_playback_cannot_perform_live_account_acti",
+    "copy.archivereplay.play_private_replay",
+    "copy.archivereplay.private_replay",
+    "copy.archivereplay.private_replay_player",
+    "copy.archivereplay.the_private_replay_could_not_be_loaded",
+    "copy.archivereplay.the_private_replay_player_did_not_become_ready",
+    "copy.archivereplay.this_recording_format_could_not_be_played_safely",
+    "copy.archivereplay.this_recording_is_unavailable_or_awaiting_verification",
+    "copy.backend_validation_archive.pause",
+    "copy.backend_validation_archive.play",
+    "copy.backend_validation_archive.private_element_blocked",
+    "copy.backend_validation_archive.replay_interaction_unavailable",
+    "copy.backend_validation_archive.replay_timeline",
+    "copy.backend_validation_archive.unsupported_or_incomplete_recording",
+    "copy.backend_validation_booking_notifications.sign_in",
+    "copy.backend_validation_booking_notifications.teletena_appointment_status_time_timezone_reference_reference_sign_in_",
+    "copy.backend_validation_booking_notifications.this_records_a_payment_activity_open_the_link_for_the_current_payment_",
+    "copy.backend_validation_email_templates.demonstration_environment_no_real_payments_or_clinical_care",
+    "copy.backend_validation_email_templates.for_your_privacy_detailed_decisions_documents_and_consultation_informa",
+    "copy.backend_validation_email_templates.open_teletena",
+    "copy.operations.archive_playback_requires_complete_export_and_independent_playback_ver",
+    "copy.operations.replay_is_unavailable_until_its_verification_gates_pass"
   ],
   "stale": [
-    "copy.operations.raw_replay_retention"
+    "copy.operations.archive_playback_remains_unavailable_a_provider_link_or_metadata_row_i"
   ]
 }

@@ -215,6 +215,11 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Failed",
+    "source_location": "frontend/src/components/ArchiveReplay.tsx:1",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "button secondary",
     "source_location": "frontend/src/components/AttachmentPreview.tsx:12",
     "reason": "Technical JSX attribute className"
@@ -2906,32 +2911,37 @@
   },
   {
     "english": "operations-page ph-no-capture",
-    "source_location": "frontend/src/pages/Operations.tsx:3",
+    "source_location": "frontend/src/pages/Operations.tsx:4",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/Operations.tsx:4",
+    "source_location": "frontend/src/pages/Operations.tsx:5",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "ops-state ",
-    "source_location": "frontend/src/pages/Operations.tsx:5",
+    "source_location": "frontend/src/pages/Operations.tsx:6",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Current",
-    "source_location": "frontend/src/pages/Operations.tsx:5",
+    "source_location": "frontend/src/pages/Operations.tsx:6",
     "reason": "Technical JSX attribute className"
   },
   {
+    "english": "Verified",
+    "source_location": "frontend/src/pages/Operations.tsx:7",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "Disabled",
-    "source_location": "frontend/src/pages/Operations.tsx:9",
+    "source_location": "frontend/src/pages/Operations.tsx:10",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Telegram",
-    "source_location": "frontend/src/pages/Operations.tsx:9",
+    "source_location": "frontend/src/pages/Operations.tsx:10",
     "reason": "Technical JSX attribute value"
   },
   {
@@ -3026,87 +3036,87 @@
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:124",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:125",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Active",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:126",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:127",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:376",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:377",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:471",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:472",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "open-request-composer request-guided-composer",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:521",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:522",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:816",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:817",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:828",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:829",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:840",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:841",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Active",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:944",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:945",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Superseded",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1395",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1396",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "text-link request-index-help",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1436",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1437",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "prewrap request-authorized-narrative",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1560",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1561",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Superseded",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1801",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1802",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "request-inline-facts quote-summary",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1806",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1807",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Accepted",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1834",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1835",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Active",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1837",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1838",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "button primary",
-    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1883",
+    "source_location": "frontend/src/pages/RequestWorkspaces.tsx:1884",
     "reason": "Technical JSX attribute className"
   },
   {
@@ -3116,42 +3126,42 @@
   },
   {
     "english": "application-state application-state-",
-    "source_location": "frontend/src/pages/ScopeApplications.tsx:19",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:20",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Clarification",
-    "source_location": "frontend/src/pages/ScopeApplications.tsx:27",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:28",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/ScopeApplications.tsx:41",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:42",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Legacy",
-    "source_location": "frontend/src/pages/ScopeApplications.tsx:41",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:42",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/ScopeApplications.tsx:58",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:59",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "(prefers-reduced-motion: reduce)",
-    "source_location": "frontend/src/pages/ScopeApplications.tsx:61",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:62",
     "reason": "DOM selector or media query"
   },
   {
     "english": "Submitted",
-    "source_location": "frontend/src/pages/ScopeApplications.tsx:67",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:68",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "application-step-tabs assisted-entry-nav",
-    "source_location": "frontend/src/pages/ScopeApplications.tsx:67",
+    "source_location": "frontend/src/pages/ScopeApplications.tsx:68",
     "reason": "Technical JSX attribute className"
   },
   {

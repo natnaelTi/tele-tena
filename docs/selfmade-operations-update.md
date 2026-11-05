@@ -1,3 +1,9 @@
+> Provider follow-up: [Plan V1 actual results](operations/live-verification-results-v1.md).
+> Do not bind the proof configuration or enable replay/archive while following this
+> update. The native demo release is separate from provider activation. Owner
+> receipts are confirmed; settled replay completeness/deletion and application-wide
+> capture integration remain pending. Preserve all existing provider settings.
+
 # Selfmade Operations Sprint 1 — Incremental Update
 
 This procedure distinguishes **Demo** from **Final Localized Release**. The owner
