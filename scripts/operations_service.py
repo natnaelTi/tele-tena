@@ -35,8 +35,8 @@ with (root/'control.lock').open('a') as lock:
     import tele_tena,frappe
     frappe.init(site=a.site,sites_path=str(bench/'sites'));frappe.connect()
     try:
-     from frappe.utils.background_jobs import get_workers
-     assert not get_workers('teletena_ops'),'Operations queue already has a worker; inspect it rather than creating a duplicate'
+     from frappe.utils.background_jobs import get_workers,get_queue
+     assert not get_workers(get_queue('teletena_ops')),'Operations queue already has a worker; inspect it rather than creating a duplicate'
     finally:frappe.destroy()
    file=root/(name+'.log');fd=os.open(file,os.O_WRONLY|os.O_CREAT|os.O_APPEND,0o600)
    with os.fdopen(fd,'ab') as log:

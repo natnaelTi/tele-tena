@@ -18,8 +18,21 @@ def reviewer():
  if user!='Administrator' and 'Tele Tena Approver' not in frappe.get_roles(user):raise frappe.PermissionError('Operational reviewer access required')
  return user
 def pseudonym(value):
- key=frappe.conf.get('encryption_key')
- if not key:raise ValueError('site_key_unavailable')
+ # Fresh sites may not yet have a framework encryption key. Keep a separate
+ # private stable HMAC key rather than modifying framework/provider credentials.
+ from .storage import root,locked
+ import os,secrets
+ file=root()/'actor-hmac.key'
+ with locked():
+  if file.exists():
+   if file.is_symlink() or file.stat().st_uid!=os.geteuid() or file.stat().st_mode&0o077 or file.stat().st_size!=64:raise ValueError('site_key_unavailable')
+   key=file.read_text()
+  else:
+   key=frappe.conf.get('encryption_key')
+   if not key:
+    fd=os.open(file,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600)
+    with os.fdopen(fd,'w') as stream:stream.write(secrets.token_hex(32))
+    key=file.read_text()
  return hmac.new(str(key).encode(),('teletena-ops-v1:'+str(value)).encode(),hashlib.sha256).hexdigest()
 def role(user=None):
  user=user or frappe.session.user

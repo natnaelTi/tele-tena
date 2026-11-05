@@ -14,6 +14,12 @@ class Operations(unittest.TestCase):
  def tearDown(self):
   frappe.db.rollback(save_point='operations');self.storage.stop();self.wake.stop();self.tmp.cleanup();frappe.set_user('Administrator')
  def submit(self,key='support-test',attachment=None):return ops.support_submit('Technical','PRIVATE SUPPORT CANARY: please help with layout.',False,key,{'route':'/patient/consultations/private-id?secret=CANARY'},attachment)
+ def test_fresh_site_private_pseudonym_key_without_framework_mutation(self):
+  before=frappe.conf.get('encryption_key')
+  with patch.dict(frappe.conf,{'encryption_key':None}):
+   first=rt.pseudonym('synthetic-owner');self.assertEqual(first,rt.pseudonym('synthetic-owner'));self.assertNotEqual(first,rt.pseudonym('other-owner'))
+   key=Path(self.tmp.name)/'actor-hmac.key';self.assertEqual(key.stat().st_mode&0o777,0o600);self.assertEqual(len(key.read_text()),64);self.assertIsNone(frappe.conf.get('encryption_key'))
+  self.assertEqual(frappe.conf.get('encryption_key'),before)
  def test_reviewer_super_admin_and_other_role_denial(self):
   for u in ('Guest',users['patient'],users['counselor']):
    frappe.set_user(u)

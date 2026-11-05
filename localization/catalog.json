@@ -64097,7 +64097,7 @@
     "english": "Replay Archive",
     "amharic": "",
     "afaan_oromo": "",
-    "source_location": "frontend/src/pages/Operations.tsx:1; frontend/src/pages/Operations.tsx:6",
+    "source_location": "frontend/src/pages/Operations.tsx:1; frontend/src/pages/Operations.tsx:5; frontend/src/pages/Operations.tsx:6",
     "placeholders": "[]",
     "source_hash": "da0346a3b0c46cb2bdcf6f5bb4d94655c3b4090ded4541bd7d57f7fa787a24e6",
     "review_status": "missing",
@@ -64367,6 +64367,18 @@
     "review_status": "missing",
     "translator_notes": ""
   },
+  "copy.operations.bugsink": {
+    "key": "copy.operations.bugsink",
+    "context": "Operations",
+    "english": "Bugsink",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "frontend/src/pages/Operations.tsx:5",
+    "placeholders": "[]",
+    "source_hash": "9ed63088f7708a3fc8fa4f37b342d1f49cd54c6ce39df71a40adba20c23583eb",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
   "copy.operations.built_release": {
     "key": "copy.operations.built_release",
     "context": "Operations",
@@ -64427,6 +64439,18 @@
     "review_status": "missing",
     "translator_notes": ""
   },
+  "copy.operations.mobile_alerts": {
+    "key": "copy.operations.mobile_alerts",
+    "context": "Operations",
+    "english": "Mobile Alerts",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "frontend/src/pages/Operations.tsx:5",
+    "placeholders": "[]",
+    "source_hash": "f8d99f0bff10cb3ee1e03084c104d22bb58f95e008bd415ed7b472185f1279f8",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
   "copy.operations.no_job_execution_has_been_observed_yet_a_running_process_alone_does_no": {
     "key": "copy.operations.no_job_execution_has_been_observed_yet_a_running_process_alone_does_no",
     "context": "Operations",
@@ -64436,6 +64460,18 @@
     "source_location": "frontend/src/pages/Operations.tsx:5",
     "placeholders": "[]",
     "source_hash": "8eef510803e6f9a81c4c32f97f21a6a31bae5d7ca06c7b6caa2ca44026b1176f",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
+  "copy.operations.no_operational_alert_attempts_recorded": {
+    "key": "copy.operations.no_operational_alert_attempts_recorded",
+    "context": "Operations",
+    "english": "No Operational Alert Attempts Recorded",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "frontend/src/pages/Operations.tsx:5",
+    "placeholders": "[]",
+    "source_hash": "591198bc5096e78235387f6180dafddf7681eaaeaf9ebaacd39b879754f67f7b",
     "review_status": "missing",
     "translator_notes": ""
   },
@@ -64496,6 +64532,30 @@
     "source_location": "frontend/src/pages/Operations.tsx:5",
     "placeholders": "[]",
     "source_hash": "31d3ce0f86eb13b232a3b615b47d8d85feb3f81f800edab2d271e305091437e9",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
+  "copy.operations.posthog": {
+    "key": "copy.operations.posthog",
+    "context": "Operations",
+    "english": "PostHog",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "frontend/src/pages/Operations.tsx:5",
+    "placeholders": "[]",
+    "source_hash": "20f873ce6068f2e142012c5cc84ff33bc12be83f34f100429fbef752be7b210f",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
+  "copy.operations.private_source_maps": {
+    "key": "copy.operations.private_source_maps",
+    "context": "Operations",
+    "english": "Private Source Maps",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "frontend/src/pages/Operations.tsx:5",
+    "placeholders": "[]",
+    "source_hash": "249ff323240780f9fa0b68a865bf47fce9a1f50ee612b431ff96e1475aec4bab",
     "review_status": "missing",
     "translator_notes": ""
   },
@@ -64571,6 +64631,18 @@
     "review_status": "missing",
     "translator_notes": ""
   },
+  "copy.operations.planned_raw_replay_retention": {
+    "key": "copy.operations.planned_raw_replay_retention",
+    "context": "Operations",
+    "english": "Planned Raw Replay Retention",
+    "amharic": "",
+    "afaan_oromo": "",
+    "source_location": "frontend/src/pages/Operations.tsx:6",
+    "placeholders": "[]",
+    "source_hash": "5846ff7beccf51e5e0dab616932e5548d15f8b4943938dcb18779f58d2dc3056",
+    "review_status": "missing",
+    "translator_notes": ""
+  },
   "copy.operations.private_storage_used": {
     "key": "copy.operations.private_storage_used",
     "context": "Operations",
@@ -64580,18 +64652,6 @@
     "source_location": "frontend/src/pages/Operations.tsx:6",
     "placeholders": "[]",
     "source_hash": "2430dca5ebb398fc6a19dcd1eac6d051641926ddfc8d6c66404d436b2592bcfb",
-    "review_status": "missing",
-    "translator_notes": ""
-  },
-  "copy.operations.raw_replay_retention": {
-    "key": "copy.operations.raw_replay_retention",
-    "context": "Operations",
-    "english": "Raw Replay Retention",
-    "amharic": "",
-    "afaan_oromo": "",
-    "source_location": "frontend/src/pages/Operations.tsx:6",
-    "placeholders": "[]",
-    "source_hash": "6da9050c5f716a7f2e9d740aa475aacaadec652e5097656c4a0665bde014a824",
     "review_status": "missing",
     "translator_notes": ""
   },

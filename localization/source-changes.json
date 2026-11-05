@@ -1,6 +1,13 @@
 {
   "added": [
-    "copy.operations.reviewer_annotations"
+    "copy.operations.bugsink",
+    "copy.operations.mobile_alerts",
+    "copy.operations.no_operational_alert_attempts_recorded",
+    "copy.operations.planned_raw_replay_retention",
+    "copy.operations.posthog",
+    "copy.operations.private_source_maps"
   ],
-  "stale": []
+  "stale": [
+    "copy.operations.raw_replay_retention"
+  ]
 }
