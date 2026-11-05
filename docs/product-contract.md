@@ -1,3 +1,14 @@
+## Operations Contract — 5 November 2026
+
+Native private support, reviewer operations/health, allowlisted outcome metrics, bounded
+errors/alerts and quarterly reports are additive v1.53. Every reviewer has operational
+authority without an additional role; this grants no new clinical/evidence access.
+Provider integrations remain disabled until explicitly configured. Replay capture,
+complete export and independent playback remain unavailable pending selected-project
+proof; this is not a claim of usable90-day archive retention. Public heatmaps and the
+full operations-portal redesign remain Sprint2. See [scope and collection contract](operations/sprint-1.md),
+[verification](operations/verification.md) and [update guide](selfmade-operations-update.md).
+
 ## Offline Follow-Up and Assisted-Entry Refinement — 4 November 2026
 
 Offline Direct Payment has no platform wallet-dispute workflow. Payment follow-up is between the authorized payer and receiving clinician, acknowledged through existing system/email/SMS channels subject to delivery preferences/availability. Existing wallet transactions retain their original dispute/hold rules and authorized historical review after a mode change. Current Offline transactions cannot open wallet disputes. Assisted entry uses separate CV/license/credential selections and guided sections; no evidence/approval history is rewritten. See assisted-payment-polish-2026-11-04.md.

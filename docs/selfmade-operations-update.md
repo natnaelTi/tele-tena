@@ -6,7 +6,7 @@ English fallbacks. It imports no workbook drafts and does not claim clinical,
 legal-policy, native-language or real-payment readiness. Final localization still
 requires genuine independent approvals, validated import and a new verified pin.
 
-Installation pin: `OPERATIONS_INSTALLATION_PIN`, branch `feat/operations-journey-insights`,
+Installation pin: `82895bd2d1adb73f581e4fce0f59be0343d246d4`, branch `feat/operations-journey-insights`,
 draft PR dependent on PR51/50. The native v1.53 migration adds private operations
 command tables only. Existing clinical, financial, evidence and preference values
 remain unchanged. No Python requirements change; frontend adds locked PostHog JS
@@ -38,7 +38,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=OPERATIONS_INSTALLATION_PIN
+RELEASE_SHA=82895bd2d1adb73f581e4fce0f59be0343d246d4
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
@@ -139,7 +139,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=OPERATIONS_INSTALLATION_PIN
+RELEASE_SHA=82895bd2d1adb73f581e4fce0f59be0343d246d4
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 UPDATE_BACKUP=/home/smcs/teletena-before-operations.RETAINED_PATH
 TOOLS="$UPDATE_BACKUP/tools"

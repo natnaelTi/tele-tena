@@ -1,7 +1,7 @@
 {
   "version": 3,
-  "release_branch": "feat/application-tracker-assisted-entry",
-  "source_checkpoint": "0d1a3c37e68f4154f96bb809f6a3b60c11acd567",
+  "release_branch": "feat/operations-journey-insights",
+  "source_checkpoint": "82895bd2d1adb73f581e4fce0f59be0343d246d4",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Single authoritative MVP matrix. Current bounded polish/portable dataset evidence is in final-mvp-polish-verification.md. Historical per-screen evidence is retained. Owner visual acceptance and external device/provider/native-language checks remain separate.",
   "screens": [
@@ -17013,5 +17013,29 @@
     "screenshots": "screenshots/assisted-polish/README.md",
     "scope": "Offline payments have no platform wallet disputes; direct follow-up only payer/clinician, earlier wallet obligations remain authorized under original rules",
     "external": "Owner Selfmade retest; no direct remote reproduction or live delivery; locale approvals pending"
+  },
+  "operations_sprint_1": {
+    "requirements": "docs/operations/sprint-1.md",
+    "routes": [
+      "/admin/operations",
+      "/admin/operations/insights",
+      "/admin/operations/health",
+      "/admin/operations/archive",
+      "/admin/operations/reports",
+      "/admin/operations/settings",
+      "/admin/support",
+      "/support"
+    ],
+    "functional": "Native backend/browser verified; provider export, playback and ingestion gated",
+    "visual": "Codex inspected 390/768/1440 and actual200% screenshots; owner acceptance pending",
+    "evidence": "docs/operations/verification.md",
+    "external": [
+      "PostHog project and complete export/independent playback proof",
+      "Bugsink ingestion and private source-map verification",
+      "Telegram/email owner opt-in live receipt",
+      "UptimeRobot monitor/account setup",
+      "Native-language/policy and owner acceptance"
+    ],
+    "existing_mvp": "Prior requirements/evidence retained unchanged; no broad reacceptance claim"
   }
 }

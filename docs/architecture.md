@@ -1,3 +1,14 @@
+## Operations Architecture — 5 November 2026
+
+Native private support, reviewer operations/health, allowlisted outcome metrics, bounded
+errors/alerts and quarterly reports are additive v1.53. Every reviewer has operational
+authority without an additional role; this grants no new clinical/evidence access.
+Provider integrations remain disabled until explicitly configured. Replay capture,
+complete export and independent playback remain unavailable pending selected-project
+proof; this is not a claim of usable90-day archive retention. Public heatmaps and the
+full operations-portal redesign remain Sprint2. See [scope and collection contract](operations/sprint-1.md),
+[verification](operations/verification.md) and [update guide](selfmade-operations-update.md).
+
 ## Application Workflow v1.52
 
 Four additive command tables store typed information requests/responses, assistance cases and email-authorized submission provenance. Existing transaction gate plus request/case locks serialize submissions; response digests and unique request/case IDs make identical retries safe. License PDF/JPEG/PNG evidence keeps validated original bytes/hash and is linked by type; historical submissions/evidence stay intact. Cross-table assistance joins normalize comparison collation without altering framework tables. Case-scoped reviewer commands preserve actual authorship and existing ID-reviewer restrictions. Existing outbox handles neutral acknowledgement channels; no shared package or provider configuration change.
