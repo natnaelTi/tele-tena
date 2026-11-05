@@ -5,6 +5,9 @@ import frappe
 from tele_tena.api.journey import rows,query
 
 EVENTS = {
+    'SupportReceived': ('Problem Report Received', 'account'),
+    'SupportUpdated': ('Problem Report Updated', 'account'),
+    'OperationsDigest': ('TeleTena Daily Operations Summary', 'account'),
     'ApplicationSubmitted': ('Application Received — Under Review', 'account'),
     'ApplicationReviewUpdate': ('Application Review Update', 'account'),
     'ApplicationApproved': ('Professional Application Approved', 'account'),
@@ -47,13 +50,16 @@ def _enqueue():
         pass
 
 
-def queue(user, event, context_kind, context_ref, event_key, in_app=True):
+def queue(user, event, context_kind, context_ref, event_key, in_app=True, external=True):
     """Internal call only, from an already-authorized durable transition."""
-    if event not in EVENTS or context_kind not in ('application','scope','language','request','offer'):
+    from tele_tena.operations.runtime import safe_record
+    mapped={'ScopeApproved':'application.scope_decision','ScopeRejected':'application.scope_decision','ScopeClarification':'application.scope_decision','ApplicationApproved':'application.professional_decision','ApplicationRejected':'application.professional_decision','LanguageReviewUpdated':'application.language_decision','OfferReceived':'request.offer_received'}
+    if event in mapped:safe_record(mapped[event],event_key,user=user)
+    if event not in EVENTS or context_kind not in ('application','scope','language','request','offer','support','operations'):
         raise ValueError('Unsupported communication context')
     if not isinstance(event_key,str) or not 0<len(event_key)<=180:
         raise ValueError('Invalid durable communication key')
-    for channel in (('in_app','email','sms') if in_app else ('email','sms')):
+    for channel in (('in_app',) if not external else ('in_app','email','sms') if in_app else ('email','sms')):
         frappe.db.sql('''INSERT IGNORE INTO tt_booking_notice
             (id,appointment,user,event,channel,state,event_key,context_kind,context_ref,created,modified)
             VALUES (%s,NULL,%s,%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(6),UTC_TIMESTAMP(6))''',
@@ -80,7 +86,15 @@ def describe(notice, dispatch=False):
     if event not in EVENTS or not frappe.db.get_value('User',user,'enabled'):
         return None
     title=EVENTS[event][0]
-    if notice.context_kind=='application':
+    if notice.context_kind=='support':
+        records=rows('SELECT owner FROM tt_ops_support WHERE id=%s',(ref,))
+        if not records or (records[0].owner!=user and 'Tele Tena Approver' not in frappe.get_roles(user)):return None
+        href='/admin/support/'+ref if 'Tele Tena Approver' in frappe.get_roles(user) else '/support/'+ref
+        body='Your problem report has an update. Sign in to read the current status and replies.' if event=='SupportUpdated' else 'Your problem report was received. Sign in to track its status.'
+    elif notice.context_kind=='operations':
+        if 'Tele Tena Approver' not in frappe.get_roles(user):return None
+        href='/admin/operations';body='Your daily operational summary is available. Sign in to review queues, health and support.'
+    elif notice.context_kind=='application':
         app=rows('''SELECT a.status,a.submitted_at FROM tt_application a JOIN tt_profile p ON p.user=a.user
             WHERE a.user=%s AND p.public_id=%s AND p.kind='clinician' ''',(user,ref))
         if not app:return None

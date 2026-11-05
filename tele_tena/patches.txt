@@ -71,3 +71,5 @@ tele_tena.patches.v1_50_onboarding_scope_intake
 tele_tena.patches.v1_51_communications
 
 tele_tena.patches.v1_52_application_flow
+
+tele_tena.patches.v1_53_operations

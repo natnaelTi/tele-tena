@@ -37,7 +37,7 @@ def owned_pid(name):
     elif name == 'queue-redis':
         valid = 'redis-server 127.0.0.1:13917' in command and cwd == RUNTIME / 'redis'
     else:
-        valid = 'frappe.utils.bench_helper' in command and cwd == RUNTIME / 'sites' and (' worker ' if name == 'worker' else ' schedule') in command
+        valid = 'frappe.utils.bench_helper' in command and cwd == RUNTIME / 'sites' and (' worker ' if name in ('worker','operations-worker') else ' schedule') in command
     if not valid:
         raise RuntimeError(f'{name} PID is not owned by this preview; no signal sent')
     return pid
@@ -48,7 +48,7 @@ def status():
     print('Source:', subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=REPO, text=True).strip())
     manifest = json.loads((REPO / 'tele_tena/public/review/release.json').read_text())
     print('Packaged source:', manifest['source_commit'])
-    for name in ('web', 'queue-redis', 'worker', 'scheduler'):
+    for name in ('web', 'queue-redis', 'worker', 'operations-worker', 'scheduler'):
         print(name + ':', owned_pid(name) or 'stopped')
     try:
         with urllib.request.urlopen(URL, timeout=5) as response:
@@ -59,7 +59,7 @@ def status():
 
 def stop(keep_queue=False):
     # Scheduler first; worker drains its current job; queue remains until it exits.
-    names = ('scheduler', 'web', 'worker') if keep_queue else ('scheduler', 'web', 'worker', 'queue-redis')
+    names = ('scheduler', 'web', 'operations-worker', 'worker') if keep_queue else ('scheduler', 'web', 'operations-worker', 'worker', 'queue-redis')
     for name in names:
         pid = owned_pid(name)
         if not pid:

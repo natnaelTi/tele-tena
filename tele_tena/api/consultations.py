@@ -95,6 +95,8 @@ def join(appointment, audio_only=0):
         from tele_tena.livekit import _credentials, participant_token
         url, _, _ = _credentials()
         token = participant_token(current.room_name, identity, audio_only)
+        from tele_tena.operations.runtime import safe_record
+        safe_record('consultation.join_authorized',appointment+':'+user)
         return {'url': url, 'token': token, 'role': role, 'consultation_id': current.id,
                 'audio_only': audio_only, 'participants': room_labels(item.id,user,current.clinician_identity)}
     except (frappe.PermissionError, frappe.ValidationError):

@@ -6,12 +6,14 @@ app_email = ""
 required_apps = ["erpnext"]
 
 after_install = "tele_tena.schema.install"
-after_request = ["tele_tena.privacy.no_store"]
+after_request = ["tele_tena.privacy.no_store", "tele_tena.operations.jobs.after_request"]
+
+after_job = ["tele_tena.operations.jobs.after_job"]
 
 scheduler_events = {
     "all": ["tele_tena.api.presentation.expire_pending_appointments"],
     "cron": {"*/5 * * * *": ["tele_tena.accounting.release_eligible_earnings"],
-        "* * * * *": ["tele_tena.booking_notifications.process_reminders", "tele_tena.booking_notifications.dispatch", "tele_tena.api.couples.expire_invitations", "tele_tena.api.open_requests.expire_requests", "tele_tena.api.extensions.expire_extensions",
+        "* * * * *": ["tele_tena.operations.jobs.schedule", "tele_tena.booking_notifications.process_reminders", "tele_tena.booking_notifications.dispatch", "tele_tena.api.couples.expire_invitations", "tele_tena.api.open_requests.expire_requests", "tele_tena.api.extensions.expire_extensions",
                        "tele_tena.api.vetting.flag_scope_appointments_for_review"],
         "0 * * * *": ["tele_tena.api.presentation.expire_reschedule_proposals",
                        "tele_tena.api.relationships.expire_relationship_invitations"]},

@@ -91,6 +91,7 @@ def run():
     python=str(BENCH/'env/bin/python')
     base=[python,'-m','frappe.utils.bench_helper','frappe']
     daemon('worker',base+['worker','--queue','short,default,long'],env,RUNTIME/'sites')
+    daemon('operations-worker',base+['worker','--queue','teletena_ops'],env,RUNTIME/'sites')
     daemon('scheduler',base+['schedule'],env,RUNTIME/'sites')
     print('Native isolated scheduler/worker started for '+SITE+'; loopback queue '+str(PORT)+'. No other service restarted.')
 

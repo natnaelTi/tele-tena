@@ -221,7 +221,7 @@ def save_onboarding(kind, step, answers, complete=0):
         fail('This registration path is unavailable', 'registration_unavailable')
     if not frappe.db.sql('SELECT user FROM tt_contact_identity WHERE user=%s', (user,)):
         fail('Verify a contact before onboarding', 'contact_required')
-    rows = frappe.db.sql('SELECT completed FROM tt_onboarding WHERE user=%s FOR UPDATE', (user,))
+    rows = frappe.db.sql('SELECT completed,step FROM tt_onboarding WHERE user=%s FOR UPDATE', (user,))
     if not rows or rows[0][0]:
         fail('Onboarding already complete')
     if not isinstance(answers, dict) or set(answers) - {'name', 'adult', 'consent', 'language', 'share_name', 'share_history', 'statement', 'affiliations', 'requested_services', 'history', 'professional', 'care_languages', 'introduction','care_alias','terms_accepted','privacy_acknowledged','terms_version','privacy_version','marketing'}:
