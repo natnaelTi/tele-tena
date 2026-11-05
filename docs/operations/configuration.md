@@ -1,8 +1,9 @@
 # Provider, Storage and Alert Configuration
 
-Private local template (outside Git):
-`/home/frappe/teletena-operations-config/providers.template.json` (600, parent700).
-The owner's chosen email exists only in that file. Subscription is unlinked to any
+Actual populated local working file (outside Git):
+`/home/frappe/teletena-operations-config/providers.json` (600, parent700).
+The separate `providers.template.json` is a template only; never copy it over the
+working file. The owner's chosen email is read from the working file. Subscription is unlinked to any
 account; reviewer authorization is independent. Live testing is false. Do not copy
 this file into public assets or print its contents. Do not reuse demo identities.
 
@@ -80,3 +81,9 @@ If a fresh site has no framework encryption key, operations creates its own rand
 replaces framework/provider credentials. Keep that key in the private-state backup;
 changing it changes pseudonymous continuity. Existing sites with a framework key
 continue using it unless an existing operations key already establishes continuity.
+
+Current readiness and exact remaining implementation gaps are in
+[configuration-readiness.md](configuration-readiness.md). The working file has not
+been bound to the presentation site or activated. Follow only the owner-approved
+[bounded live plan](live-verification-plan-v1.md); credential presence is not consent
+to send, capture, upload, delete or change global flags.

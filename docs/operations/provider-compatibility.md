@@ -24,15 +24,18 @@ Official sources inspected locally before integration:
  50monitors/five-minute checks; HTTP/keyword available. Heartbeat and integration
   entitlement must be checked in the actual selected account, not assumed free.
 
-No Bugsink/PostHog/UptimeRobot connector or project credentials are present in the
-configured local review site. No real ingestion/export/monitor/alert was performed.
+Historical initial checkpoint: provider credentials were not bound to the local
+review site. The owner has since supplied the working private configuration; see
+[actual configuration readiness](configuration-readiness.md). It is structurally
+valid, including EU PostHog335848 and Bugsink credentials. The site remains unbound;
+authorized ingestion/export/monitor/alert verification has not yet occurred.
 Public docs do not prove selected-account capability or90-day archive availability.
 
 ## Owner Configuration
 
 The owner confirmed a personal alert email and Telegram preference, with no
 TeleTena account linkage. Those contact values are stored only in the private
-local template, not this repository. All reviewer-role users retain portal access;
+working private configuration, not this repository. All reviewer-role users retain portal access;
 that does not subscribe every reviewer to technical alerts. Live tests remain off.
 Private source-map token minimum: project-bound `debug-files:upload` where the
 selected Bugsink version exposes that capability. Ingestion itself uses only its

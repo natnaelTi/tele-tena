@@ -574,3 +574,21 @@ same scoped services, exit maintenance and check the saved old build and origina
 accounts. A preservation/reconciliation mismatch remains a stop, not permission to
 edit balances/delete records. Keep diagnostics and the retained backup bundle.
 
+
+## Provider Configuration Follow-Up — No Production Activation
+
+The owner has populated the **local** working file
+`/home/frappe/teletena-operations-config/providers.json`; it passes local structural
+checks, EU335848 consistency and600/700 permissions. Telegram chat remains unresolved.
+Do not copy the template over this file, transfer credentials to Selfmade implicitly,
+link the alert subscription to a demo reviewer or enable collection based on presence.
+No Selfmade provider state is inferred from this local file. Preserve remote settings.
+
+The native package pin above remains unchanged; new configuration/preflight tooling
+is on PR52 and is not part of the earlier packaged application runtime. See
+[actual capability/gap status](operations/configuration-readiness.md) and
+[one bounded live authorization plan](operations/live-verification-plan-v1.md).
+Only authorized isolated provider tests may advance connectivity/export/playback
+evidence. UptimeRobot stays separate. Source maps, useful masked capture, complete
+export/normalization and independent playback are not complete implementations yet.
+Do not deploy this checkpoint as a final provider-connected launch release.

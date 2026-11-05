@@ -17030,12 +17030,15 @@
     "visual": "Codex inspected 390/768/1440 and actual200% screenshots; owner acceptance pending",
     "evidence": "docs/operations/verification.md",
     "external": [
-      "PostHog project and complete export/independent playback proof",
-      "Bugsink ingestion and private source-map verification",
-      "Telegram/email owner opt-in live receipt",
-      "UptimeRobot monitor/account setup",
+      "Owner authorization of bounded live PlanV1; actual working credentials validated but connectivity unverified",
+      "Telegram exact setup message/private-chat discovery",
+      "PostHog replay capture/export/player implementations and actual project proof",
+      "Bugsink ingestion and private source-map implementation/verification",
+      "UptimeRobot separate account/monitor setup",
       "Native-language/policy and owner acceptance"
     ],
-    "existing_mvp": "Prior requirements/evidence retained unchanged; no broad reacceptance claim"
+    "existing_mvp": "Prior requirements/evidence retained unchanged; no broad reacceptance claim",
+    "provider_configuration_followup": "docs/operations/configuration-readiness.md",
+    "live_verification_plan": "docs/operations/live-verification-plan-v1.md"
   }
 }

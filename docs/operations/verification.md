@@ -1,3 +1,13 @@
+## Working Provider Configuration Follow-Up
+
+The owner supplied a populated `providers.json`; credentials and optional capability
+fields are present and local validation passes. Telegram chat is unresolved after
+one authorized exact-message lookup found zero matches. Owner subscription stays
+unlinked/live tests false, site binding unchanged. No ingestion or delivery claimed.
+See [current readiness/gaps](configuration-readiness.md) and
+[bounded approval plan](live-verification-plan-v1.md). The earlier evidence below
+remains historical; references to missing projects are superseded by this follow-up.
+
 # Operations Sprint 1 — Verification and Remaining Gates
 
 Verified5November2026. This is a **native operations review candidate**, not final
@@ -83,14 +93,14 @@ No new physical-device, live OTP/SMS/email receipt or real payment evidence.
 
 | Capability | Accurate state / Required resolution |
 | --- | --- |
-| Bugsink | Sanitized controlled SDK transport tested; actual project/DSN, ingestion readback and opt-in alerts unverified |
+| Bugsink | Sanitized controlled SDK transport tested; working project/DSN present; authorized ingestion readback and opt-in alerts unverified |
 | Private source maps | Not uploaded or verified; selected Bugsink endpoint/debug-ID compatibility and scoped token required |
-| PostHog analytics | Server adapter/control tests only; project ingestion not verified |
+| PostHog analytics | Server adapter/control tests only; EU335848 credentials present; project ingestion not verified |
 | Masked replay | Quarantined, disabled; actual canary/SPA/account-switch/document masking proof outstanding |
 | Replay archive/playback | **Unavailable**; complete raw export/all segments/player independence/missing segments must pass on selected project before implementation can be enabled |
 | Capacity | No actual compressed recording samples; no fabricated production estimate; measure once export/player proof exists |
 | Provider/user replay deletion | Native tombstone/local object lifecycle tested; provider deletion remains Pending, not connected |
-| Owner alerts | Recipient private/unlinked; Telegram and live email receipt unconfigured/unverified, no unsolicited tests |
+| Owner alerts | Recipient private/unlinked; Telegram token present/chat unresolved; live email receipt unverified, no unsolicited tests |
 | External uptime | Exact setup instructions prepared; no account/monitor created, entitlement/receipt needs operator validation |
 | Policies/localization | Draft notice and existing fallbacks; no human translation/policy approval invented |
 | Owner acceptance | New native screens await owner review; full launch still depends on these gates and Sprint2 |

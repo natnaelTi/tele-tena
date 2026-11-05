@@ -59,7 +59,7 @@ All statuses start Requested; they are updated with actual evidence, never assum
 | Overview, health, queue execution/scheduler freshness | Locally verified including dedicated-worker restart |
 | Safe errors, incidents, grouped alerts/daily digest/recovery | Controlled tests; no live receipt claimed |
 | Analytics/replay controls and pre-transmission canary tests | Safe event/error egress verified; recorder quarantined, actual replay masking awaiting project |
-| PostHog actual complete export + independent playback | Blocked: selected project/scoped credentials not yet configured |
+| PostHog actual complete export + independent playback | Credentials present; awaiting authorized project proof and export/player implementation |
 | Archive lifecycle/capacity/deletion and restoration safeguards | Synthetic native lifecycle verified; usable archive/provider deletion/capacity proof unavailable |
 | Continuous aggregates/quarter reports/test-clock boundaries | Locally verified; partial coverage shown |
 | Build/browser/mobile/200%/PWA/localization | Locally verified affected surfaces; human language/owner acceptance pending |
@@ -68,3 +68,8 @@ All statuses start Requested; they are updated with actual evidence, never assum
 | Sprint 2 API/component/operator/update handoff | Prepared; docs/operations/operator-and-sprint2.md |
 
 Provider sources and current limitations are recorded in provider-compatibility.md.
+
+Working-file follow-up: see [actual readiness](configuration-readiness.md). EU335848
+and Bugsink credential fields are populated; no successful connectivity is inferred.
+Telegram chat discovery found no matching setup message. The single consolidated
+[live plan](live-verification-plan-v1.md) awaits approval; no site flags changed.
