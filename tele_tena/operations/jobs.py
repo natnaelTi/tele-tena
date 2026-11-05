@@ -36,7 +36,7 @@ def process():
    except providers.Unconfigured:state='Unconfigured'
    except Exception:state='Unknown'
    frappe.db.sql('UPDATE tt_ops_error SET state=%s,tries=tries+1 WHERE id=%s',(state,event.id))
- archive.retention();archive.export_tick()
+ archive.retention();archive.process_provider_deletions();archive.export_tick()
  # Aggregate before raw structured-event expiry. Business/support/audit rows are never deleted here.
  frappe.db.sql('DELETE FROM tt_ops_event WHERE aggregated=1 AND created<%s LIMIT 1000',(rt.now()-timedelta(days=c['event_days']),))
  removed=frappe.db._cursor.rowcount

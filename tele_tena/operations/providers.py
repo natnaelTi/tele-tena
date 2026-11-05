@@ -36,16 +36,31 @@ def posthog_event(event):
   if response.status_code not in (200,201,202):raise ProviderUnavailable('provider_rejected')
  except requests.RequestException:raise ProviderUnavailable('provider_unavailable') from None
  return 'ProviderAccepted'
+def javascript_assets():
+ from pathlib import Path
+ try:
+  manifest=json.loads((Path(__file__).resolve().parents[1]/'public/review/release.json').read_text());ids=manifest.get('debug_ids',{})
+  return {'app:///'+name:ids.get(name) for name in manifest['files'] if name.startswith('assets/') and name.endswith('.js')}
+ except (OSError,ValueError,KeyError):return {}
 def sanitized_error(payload):
- # Mandatory final egress reconstruction, even if caller passed a crafted envelope.
- values=payload.get('exception',{}).get('values',[])[:1];out=[]
+ # Reconstruct from trusted release assets, never raw stack messages/URLs/locals.
+ origin=payload.get('tags',{}).get('origin');browser=origin=='browser';assets=javascript_assets() if browser else {};values=payload.get('exception',{}).get('values',[])[:1];out=[];images=[]
  for item in values:
   type_=item.get('type','UnexpectedError');type_=type_ if re.fullmatch('[A-Za-z0-9_]{1,80}',type_) else 'UnexpectedError';frames=[]
-  for frame in item.get('stacktrace',{}).get('frames',[])[:15]:
-   name=frame.get('filename','')
-   if re.fullmatch(r'tele_tena/[A-Za-z0-9_.-]{1,100}',name) and type(frame.get('lineno')) is int:frames.append({'filename':name,'lineno':max(0,min(100000,frame['lineno']))})
+  for frame in item.get('stacktrace',{}).get('frames',[])[:12]:
+   name=frame.get('filename','');line=frame.get('lineno')
+   if not isinstance(name,str):continue
+   if type(line) is not int or not 0<line<=1000000:continue
+   if browser and name in assets:
+    clean={'filename':name,'abs_path':name,'lineno':line};column=frame.get('colno')
+    if type(column) is int and 0<column<=10000000:clean['colno']=column
+    frames.append(clean);debug_id=assets[name]
+    if isinstance(debug_id,str) and re.fullmatch('[a-f0-9-]{36}',debug_id):images.append({'type':'sourcemap','code_file':name,'debug_id':debug_id})
+   elif not browser and re.fullmatch(r'tele_tena/[A-Za-z0-9_.-]{1,100}',name):frames.append({'filename':name,'lineno':line})
   out.append({'type':type_,'value':'Unexpected TeleTena failure','stacktrace':{'frames':frames}})
- return {**({'event_id':payload['event_id']} if re.fullmatch('[a-f0-9]{32}',str(payload.get('event_id',''))) else {}),'exception':{'values':out},'platform':'python','level':'error','tags':{**({'attempt':payload['tags']['attempt']} if re.fullmatch('[a-f0-9]{64}',str(payload.get('tags',{}).get('attempt',''))) else {}),'route':__import__('tele_tena.operations.contract',fromlist=['route_template']).route_template(payload.get('tags',{}).get('route','/unknown')),'release':__import__('tele_tena.operations.runtime',fromlist=['release']).release(),'origin':payload.get('tags',{}).get('origin') if payload.get('tags',{}).get('origin') in ('backend','browser','job') else 'backend'}}
+ result={**({'event_id':payload['event_id']} if re.fullmatch('[a-f0-9]{32}',str(payload.get('event_id',''))) else {}),'exception':{'values':out},'platform':'javascript' if browser else 'python','level':'error','tags':{**({'attempt':payload['tags']['attempt']} if re.fullmatch('[a-f0-9]{64}',str(payload.get('tags',{}).get('attempt',''))) else {}),'route':__import__('tele_tena.operations.contract',fromlist=['route_template']).route_template(payload.get('tags',{}).get('route','/unknown')),'release':__import__('tele_tena.operations.runtime',fromlist=['release']).release(),'origin':origin if origin in ('backend','browser','job') else 'backend'}}
+ if images:result['debug_meta']={'images':list({i['code_file']:i for i in images}.values())}
+ return result
 def bugsink_error(payload):
  c=settings();dsn=c.get('bugsink_dsn')
  if not dsn:raise Unconfigured('bugsink_unconfigured')
@@ -58,10 +73,56 @@ def bugsink_error(payload):
  client.capture_event(safe);client.flush(timeout=3)
  # SDK flush is not proof of provider ingestion. Do not label this Delivered/Accepted.
  return 'TransportAttempted'
+def archive_capability():
+ from pathlib import Path
+ import os
+ c=settings();value=c.get('archive_proof_file')
+ if not value:return False
+ try:
+  file=Path(value)
+  if not file.is_absolute() or file.is_symlink() or file.stat().st_uid!=os.geteuid() or file.stat().st_mode&0o077 or file.stat().st_size>16384:return False
+  proof=json.loads(file.read_text())
+  return proof.get('project_id')==str(c.get('posthog_project_id')) and proof.get('format')=='teletena-web-replay-v1' and proof.get('settled_export') is True and proof.get('independent_playback') is True and proof.get('provider_deletion_verified') is True and proof.get('player_sha256')==__import__('hashlib').sha256((Path(__file__).parent/'player.js').read_bytes()).hexdigest()
+ except (OSError,ValueError):return False
+
 def archive_export(recording):
- # Official snapshot API is mutable, provider/project-specific and not vanilla rrweb.
- # Do not invent completeness or import metadata as playable snapshots.
- raise ArchiveUnverified('selected_project_export_and_player_proof_required')
+ if not archive_capability():raise ArchiveUnverified('selected_project_export_and_player_proof_required')
+ c=settings();project=str(c.get('posthog_project_id'));host=c.get('posthog_api_host')
+ if host!='https://eu.posthog.com' or not c.get('posthog_read_key'):raise Unconfigured('archive_project_unconfigured')
+ import requests
+ from .posthog_export import export_recording
+ def fetch(path,maximum):
+  try:
+   response=requests.get(host+path,headers={'Authorization':'Bearer '+c['posthog_read_key']},timeout=(2,10),allow_redirects=False,stream=True)
+   raw=b''
+   for block in response.iter_content(65536):
+    raw+=block
+    if len(raw)>maximum:raise ProviderUnavailable('archive_response_limit')
+   return response.status_code,raw
+  except requests.RequestException:raise ProviderUnavailable('archive_provider_unavailable') from None
+ return export_recording(project,recording['provider_id'],fetch)
+
+def archive_delete_provider(recording_id):
+ if not archive_capability():raise ArchiveUnverified('archive_project_proof_required')
+ if not re.fullmatch('[a-f0-9-]{36}',recording_id):raise ProviderUnavailable('archive_identifier_invalid')
+ c=settings()
+ if c.get('posthog_api_host')!='https://eu.posthog.com' or not c.get('posthog_delete_key'):raise Unconfigured('archive_delete_unconfigured')
+ import requests
+ try:
+  response=requests.delete(c['posthog_api_host']+'/api/projects/'+str(c['posthog_project_id'])+'/session_recordings/'+recording_id+'/',headers={'Authorization':'Bearer '+c['posthog_delete_key']},timeout=(2,10),allow_redirects=False)
+  if response.status_code not in (200,202,204,404):raise ProviderUnavailable('archive_delete_unconfirmed')
+ except requests.RequestException:raise ProviderUnavailable('archive_delete_unknown') from None
+ return 'ProviderAccepted'
+def archive_provider_absent(recording_id):
+ if not archive_capability():raise ArchiveUnverified('archive_project_proof_required')
+ if not re.fullmatch('[a-f0-9-]{36}',recording_id):raise ProviderUnavailable('archive_identifier_invalid')
+ c=settings();import requests
+ try:
+  response=requests.get(c['posthog_api_host']+'/api/projects/'+str(c['posthog_project_id'])+'/session_recordings/'+recording_id+'/',headers={'Authorization':'Bearer '+c['posthog_read_key']},timeout=(2,10),allow_redirects=False)
+  if response.status_code==404:return True
+  if response.status_code==200:return False
+  raise ProviderUnavailable('archive_delete_confirmation_unavailable')
+ except requests.RequestException:raise ProviderUnavailable('archive_delete_confirmation_unknown') from None
 def telegram(message):
  c=settings()
  if not c.get('telegram_token') or not c.get('telegram_chat'):raise Unconfigured('mobile_unconfigured')

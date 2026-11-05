@@ -105,6 +105,25 @@ class Operations(unittest.TestCase):
   frappe.db.sql('DELETE FROM tt_ops_heartbeat');h=jobs.health();self.assertEqual(h['freshness'],'Stale');self.assertEqual(h['providers']['posthog'],'Unconfigured')
   jobs.beat('scheduler');jobs.beat('worker_completed');self.assertEqual(jobs.health()['freshness'],'Current')
   frappe.db.sql("UPDATE tt_ops_heartbeat SET at=DATE_SUB(UTC_TIMESTAMP(6),INTERVAL 1 HOUR) WHERE name='worker_completed'");self.assertEqual(jobs.health()['freshness'],'Stale')
+ def test_verified_archive_payload_private_player_headers_and_withdrawal(self):
+  import gzip,hashlib
+  from tele_tena.operations.replay_format import FORMAT
+  frappe.set_user(users['reviewer']);id='f'*64;now=rt.now();payload={'format':FORMAT,'events':[{'type':4,'timestamp':1,'data':{}},{'type':2,'timestamp':2,'data':{'node':{'type':0,'id':1,'childNodes':[]}}}]};raw=gzip.compress(json.dumps(payload).encode());key=storage.put(raw,1048576,10485760,'replay')
+  frappe.db.sql("INSERT INTO tt_ops_archive (id,provider_id,captured,expires,state,size_bytes,sha256,format_version,player_version,object_key,modified) VALUES (%s,%s,%s,%s,'Verified',%s,%s,%s,'teletena-sandbox-web-v1',%s,%s)",(id,str(uuid.uuid4()),now,now+timedelta(days=90),len(raw),hashlib.sha256(raw).hexdigest(),FORMAT,key,now))
+  with patch('tele_tena.operations.providers.archive_capability',return_value=True):
+   self.assertTrue(ops.archive_playback(id)['available'])
+   with patch.object(frappe.db,'commit') as commit:response=ops.archive_player();self.assertEqual(commit.call_count,1)
+   self.assertIn("connect-src 'none'",response.headers['Content-Security-Policy']);self.assertIn('sandbox allow-scripts',response.headers['Content-Security-Policy']);self.assertIn('no-store',response.headers['Cache-Control']);archive.tombstone(id);self.assertFalse(ops.archive_playback(id)['available'])
+  frappe.set_user(users['patient'])
+  for fn in (ops.archive_player,lambda:ops.archive_playback(id)):
+   with self.assertRaises(frappe.PermissionError):fn()
+ def test_export_preserves_original_capture_clock_and_private_integrity(self):
+  from tele_tena.operations.replay_format import FORMAT
+  id='e'*64;now=rt.now();captured=now-timedelta(days=2);result={'format':FORMAT,'captured_at':captured.isoformat()+'Z','events':[{'type':4,'timestamp':1,'data':{}},{'type':2,'timestamp':2,'data':{'node':{'type':0,'id':1,'childNodes':[]}}}]};frappe.db.sql("INSERT INTO tt_ops_archive (id,provider_id,captured,expires,state,size_bytes,modified) VALUES (%s,%s,%s,%s,'Pending',0,%s)",(id,str(uuid.uuid4()),captured,captured+timedelta(days=90),now));c=rt.config();c['archive']=True
+  with patch('tele_tena.operations.runtime.config',return_value=c),patch('tele_tena.operations.providers.archive_export',return_value=result):archive.export_tick()
+  row=j.one('SELECT * FROM tt_ops_archive WHERE id=%s',(id,));self.assertEqual(row.state,'Verified');self.assertEqual(row.captured,captured);self.assertEqual(row.expires,captured+timedelta(days=90));self.assertEqual(row.player_version,'teletena-sandbox-web-v1')
+  frappe.set_user(users['reviewer'])
+  with patch('tele_tena.operations.providers.archive_capability',return_value=True):self.assertTrue(archive.playback_payload(id)['available'])
  def test_archive_adapter_does_not_promote_partial_or_metadata_to_verified(self):
   with self.assertRaises(providers.ArchiveUnverified):providers.archive_export({'metadata_only':True})
   self.assertFalse(archive.status()['available']);self.assertIsNone(archive.status()['capacity_estimate'])

@@ -71,14 +71,16 @@ def events(items):
   except ValueError:fail('Event properties unavailable.','event_invalid')
  return {'accepted':accepted,'state':'Recorded Locally'}
 @frappe.whitelist(allow_guest=True,methods=['POST'])
-def browser_error(kind,route):
+def browser_error(kind,route,frames=None):
  # No raw message, stack, URL or arbitrary payload accepted.
  if kind not in ('Error','TypeError','ReferenceError','RangeError','UnhandledRejection','RenderError'):kind='Error'
  if not rt.config()['errors']:return {'recorded':False,'state':'Disabled'}
  key=rt.pseudonym(str(getattr(frappe.local,'request_ip','unknown')));cache=frappe.cache();n=cache.incr('teletena-ops-error:'+key);cache.expire('teletena-ops-error:'+key,60)
  if n>20:return {'recorded':False,'state':'Limited'}
  from tele_tena.operations.storage import write_spool
- write_spool({'exception':{'values':[{'type':kind,'value':'Unexpected TeleTena failure'}]},'tags':{'origin':'browser','route':rt.route_template(route)}})
+ if not isinstance(frames,list):frames=[]
+ payload={'exception':{'values':[{'type':kind,'value':'Unexpected TeleTena failure','stacktrace':{'frames':[f for f in frames[:12] if isinstance(f,dict)]}}]},'tags':{'origin':'browser','route':rt.route_template(route)}}
+ write_spool(providers.sanitized_error(payload))
  return {'recorded':True}
 @query()
 def overview():
@@ -108,7 +110,10 @@ def archive_delete(id):
 @command
 def archive_playback(id):
  rt.reviewer();audit(id,'ReplayAccessAttempted',{})
- return {'available':False,'reason':'No complete provider export and independent playback has been verified.'}
+ return archive.playback_payload(id)
+@frappe.whitelist(methods=['GET'])
+def archive_player(locale=None):
+ rt.reviewer();audit('archive-player','ReplayPlayerAccessed',{});result=archive.player_response(locale);frappe.db.commit();return result
 @query()
 def reports_list():rt.reviewer();return rows('SELECT id,period,version,created FROM tt_ops_report ORDER BY created DESC LIMIT 40')
 @command
