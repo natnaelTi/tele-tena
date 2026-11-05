@@ -43,7 +43,7 @@ def extract():
             name=ast.unparse(node.func)
             if name not in ('fail','journey.fail','localized_throw','frappe.throw','ValueError','frappe._','text'):continue
             arg=node.args[0];english=arg.value if isinstance(arg,ast.Constant) and isinstance(arg.value,str) else ''.join(p.value if isinstance(p,ast.Constant) else '{'+ast.unparse(p.value)+'}' for p in arg.values) if isinstance(arg,ast.JoinedStr) else None
-            if english:entries.append({'english':english,'context':'Backend validation / '+file.stem,'source_location':str(file.relative_to(ROOT))+':'+str(node.lineno)})
+            if english and not (name=='ValueError' and re.fullmatch('[a-z0-9_]+',english)):entries.append({'english':english,'context':'Backend validation / '+file.stem,'source_location':str(file.relative_to(ROOT))+':'+str(node.lineno)})
     # Shipped metadata only. Never query a database or export user submissions.
     for file in sorted((ROOT/'tele_tena/reference_data').glob('*.json.gz')):
         for r in json.loads(gzip.decompress(file.read_bytes())):

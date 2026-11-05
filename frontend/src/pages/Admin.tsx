@@ -27,7 +27,7 @@ export function AdminOverview() {
   const applications=useResource(journeyApi.applications);
   const pending=applications.data?.filter(item=>item.status==='Pending');
   return <>
-    <PageTitle title={w("Review Workspace")} description={w("Focus on the decisions that need a person.")}/>
+    <PageTitle title={w("Review Workspace")} description={w("Focus on the decisions that need a person.")} action={<Link className="button secondary" to="/admin/operations">{w("Operations Overview")}</Link>}/>
     {applications.error?<InlineNotice tone="danger">{w("The queue could not be loaded.")} <Button onClick={()=>void applications.refresh()}>{w("Retry")}</Button></InlineNotice>:!applications.data?<Skeleton/>:<>
       <div className="review-overview-metrics">{[
         [w("Applications"),applications.data.length,w("Submitted professional applications")],

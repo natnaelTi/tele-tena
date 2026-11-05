@@ -1045,6 +1045,21 @@
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "operations-page ph-no-capture",
+    "source_location": "frontend/src/components/SupportDesk.tsx:4",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "User",
+    "source_location": "frontend/src/components/SupportDesk.tsx:4",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Internal",
+    "source_location": "frontend/src/components/SupportDesk.tsx:4",
+    "reason": "Technical JSX attribute value"
+  },
+  {
     "english": "PaymentSubmitted",
     "source_location": "frontend/src/components/UserNotifications.tsx:23",
     "reason": "Keyboard or state matching set"
@@ -1151,23 +1166,18 @@
   },
   {
     "english": "Not started",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:19",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:20",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:19",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:20",
     "reason": "Type-only identifier; not rendered copy"
   },
   {
     "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:19",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:20",
     "reason": "Type-only identifier; not rendered copy"
-  },
-  {
-    "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:74",
-    "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Ended",
@@ -1176,52 +1186,52 @@
   },
   {
     "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:77",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:76",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:83",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:78",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Ended",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:84",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:89",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:90",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Escape",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:132",
-    "reason": "Keyboard or machine-code comparison"
-  },
-  {
-    "english": "Tab",
     "source_location": "frontend/src/features/consultations/Consultation.tsx:133",
     "reason": "Keyboard or machine-code comparison"
   },
   {
-    "english": "button:not([disabled]), a[href], input:not([disabled]), select:not([disabled])",
+    "english": "Tab",
     "source_location": "frontend/src/features/consultations/Consultation.tsx:134",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "button:not([disabled]), a[href], input:not([disabled]), select:not([disabled])",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:135",
     "reason": "DOM selector or media query"
   },
   {
     "english": "consultation {connected ? \"room-connected\" : \"room-preflight\"} {connected && audioOnly ? \"room-audio-layout\" : \"\"} {expanded ? \"room-expanded\" : \"\"} {sharedRoom?\"room-shared-layout\":\"\"} {sharedRoom&&info?.role===\"patient\"?\"shared-patient-view\":\"\"}",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:463",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:466",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:469",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:472",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:469",
-    "reason": "Keyboard or machine-code comparison"
-  },
-  {
-    "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:470",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:472",
     "reason": "Keyboard or machine-code comparison"
   },
   {
@@ -1231,67 +1241,72 @@
   },
   {
     "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:477",
-    "reason": "Keyboard or machine-code comparison"
-  },
-  {
-    "english": "Finalized",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:478",
-    "reason": "Keyboard or machine-code comparison"
-  },
-  {
-    "english": "Completed",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:478",
-    "reason": "Keyboard or machine-code comparison"
-  },
-  {
-    "english": "button primary",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:479",
-    "reason": "Technical JSX attribute className"
-  },
-  {
-    "english": "Finalized",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:479",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:476",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Ended",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:480",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Finalized",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:481",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Completed",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:481",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:482",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Finalized",
     "source_location": "frontend/src/features/consultations/Consultation.tsx:482",
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Ended",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:485",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "button secondary",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:523",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:526",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "media-stage {audioSurface?\"audio-only\":\"\"} {expanded?\"expanded\":\"\"}",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:528",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:531",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "audio-avatar {speaking?\"speaking\":\"\"}",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:530",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:533",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "room-session-details {audioOnly||sharedRoom?\"room-optional-details\":\"\"}",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:575",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:578",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:575",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:578",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:576",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:579",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:577",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:580",
     "reason": "Keyboard or machine-code comparison"
   },
   {
@@ -1576,28 +1591,58 @@
   },
   {
     "english": "Offline",
-    "source_location": "frontend/src/layouts/Layouts.tsx:213",
+    "source_location": "frontend/src/layouts/Layouts.tsx:215",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Offline",
-    "source_location": "frontend/src/layouts/Layouts.tsx:239",
+    "source_location": "frontend/src/layouts/Layouts.tsx:241",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "reference-workspace workspace-role-",
-    "source_location": "frontend/src/layouts/Layouts.tsx:266",
-    "reason": "Technical JSX attribute className"
-  },
-  {
-    "english": "product-header site-masthead",
     "source_location": "frontend/src/layouts/Layouts.tsx:268",
     "reason": "Technical JSX attribute className"
   },
   {
-    "english": "reference-workspace-main {location.pathname.includes('/discovery') || location.pathname.includes('/availability') || kind==='admin' ? 'workspace-wide' : ''}",
+    "english": "product-header site-masthead",
     "source_location": "frontend/src/layouts/Layouts.tsx:270",
     "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "reference-workspace-main {location.pathname.includes('/discovery') || location.pathname.includes('/availability') || kind==='admin' ? 'workspace-wide' : ''}",
+    "source_location": "frontend/src/layouts/Layouts.tsx:272",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Error",
+    "source_location": "frontend/src/operations-telemetry.ts:11",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "TypeError",
+    "source_location": "frontend/src/operations-telemetry.ts:11",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "ReferenceError",
+    "source_location": "frontend/src/operations-telemetry.ts:11",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "RangeError",
+    "source_location": "frontend/src/operations-telemetry.ts:11",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "UnhandledRejection",
+    "source_location": "frontend/src/operations-telemetry.ts:11",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "RenderError",
+    "source_location": "frontend/src/operations-telemetry.ts:11",
+    "reason": "Keyboard or state matching set"
   },
   {
     "english": "Offline",
@@ -1638,6 +1683,11 @@
     "english": "Pending",
     "source_location": "frontend/src/pages/Admin.tsx:27",
     "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "button secondary",
+    "source_location": "frontend/src/pages/Admin.tsx:29",
+    "reason": "Technical JSX attribute className"
   },
   {
     "english": "Approved",
@@ -2855,6 +2905,36 @@
     "reason": "Technical JSX attribute className"
   },
   {
+    "english": "operations-page ph-no-capture",
+    "source_location": "frontend/src/pages/Operations.tsx:3",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Open",
+    "source_location": "frontend/src/pages/Operations.tsx:4",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "ops-state ",
+    "source_location": "frontend/src/pages/Operations.tsx:5",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Current",
+    "source_location": "frontend/src/pages/Operations.tsx:5",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Disabled",
+    "source_location": "frontend/src/pages/Operations.tsx:9",
+    "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Telegram",
+    "source_location": "frontend/src/pages/Operations.tsx:9",
+    "reason": "Technical JSX attribute value"
+  },
+  {
     "english": "Booked",
     "source_location": "frontend/src/pages/Patient.tsx:52",
     "reason": "Keyboard or machine-code comparison"
@@ -3356,17 +3436,17 @@
   },
   {
     "english": " notice_kind FROM ",
-    "source_location": "tele_tena/notifications.py:129",
+    "source_location": "tele_tena/notifications.py:132",
     "reason": "SQL fragment, date format or authentication protocol literal"
   },
   {
     "english": " WHERE id=%s AND user=%s",
-    "source_location": "tele_tena/notifications.py:129",
+    "source_location": "tele_tena/notifications.py:132",
     "reason": "SQL fragment, date format or authentication protocol literal"
   },
   {
     "english": " SET read_at=COALESCE(read_at,UTC_TIMESTAMP(6)) WHERE id=%s AND user=%s",
-    "source_location": "tele_tena/notifications.py:136",
+    "source_location": "tele_tena/notifications.py:139",
     "reason": "SQL fragment, date format or authentication protocol literal"
   },
   {
