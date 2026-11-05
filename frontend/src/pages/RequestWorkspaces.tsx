@@ -1,3 +1,4 @@
+import{observe}from'../operations-telemetry';
 import {PendingPaymentReviews,DirectPaymentStatus} from '../components/DirectPayments';
 import {languageName} from '../components/CareLanguages';
 import CareLanguageSelect from '../components/CareLanguageSelect';
@@ -1881,4 +1882,4 @@ function ClinicianQuotePanel({
 }
 
 function MatchedAppointmentCard({appointmentId,clinician}:{appointmentId:string;clinician:boolean}){const {w}=useLocale(),resource=usePolling(()=>journeyApi.appointmentDetail(appointmentId),15000);const status=resource.data?appointmentStatus(resource.data,clinician):null;return <section className="request-success-card"><h3>{w(status?.label==='Confirmed'?'Appointment confirmed':status?.label||'Offer accepted')}</h3><p>{w('Your offer was accepted. Appointment details show its current status and next steps.')}{status?.detail?' '+w(status.detail):''}</p>{resource.data&&(clinician||(resource.data as any).you_pay)&&<DirectPaymentStatus paymentId={(resource.data as any).direct_payment_id} state={(resource.data as any).direct_payment_state} clinician={clinician}/>}
-{resource.error&&<InlineNotice>{w('Appointment status could not be refreshed.')} <Button variant="quiet" onClick={()=>void resource.refresh()}>{w('Retry')}</Button></InlineNotice>}<Link className="button primary" to={(clinician?'/clinician':'/patient')+'/consultations/'+appointmentId}>{w(clinician?'Open consultation details':'View appointment')}</Link></section>;}
+{resource.error&&<InlineNotice>{w('Appointment status could not be refreshed.')} <Button variant="quiet" onClick={()=>void resource.refresh()}>{w('Retry')}</Button></InlineNotice>}<Link className="button primary" onClick={()=>observe('request.consultation_handoff')} to={(clinician?'/clinician':'/patient')+'/consultations/'+appointmentId}>{w(clinician?'Open consultation details':'View appointment')}</Link></section>;}

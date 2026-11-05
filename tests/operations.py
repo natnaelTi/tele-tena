@@ -67,6 +67,19 @@ class Operations(unittest.TestCase):
   with patch('tele_tena.operations.providers.settings',return_value={'posthog_host':'https://us.i.posthog.com','posthog_token':'private-test'}),patch('requests.post',side_effect=__import__('requests').Timeout()):
    e=frappe._dict(properties='{}',source='server',role='patient',locale='en',device='desktop',environment='review',release_id='safe',payment_mode='Offline',route='/patient/book/:ref',actor='a'*64,id='b'*64,attempt='c'*64,name='booking.created',created=datetime(2026,11,5))
    with self.assertRaises(providers.ProviderUnavailable):providers.posthog_event(e)
+ def test_actual_bugsink_sdk_uses_only_sanitized_memory_transport(self):
+  from sentry_sdk import Client as ActualClient
+  from sentry_sdk.transport import Transport
+  captured=[]
+  class Memory(Transport):
+   def capture_event(self,event):captured.append(event)
+   def capture_envelope(self,envelope):
+    for item in envelope.items:
+     if item.headers.get('type')=='event':captured.append(item.payload.json)
+  def client(**options):return ActualClient(transport=Memory,**options)
+  with patch('tele_tena.operations.providers.settings',return_value={'bugsink_dsn':'https://synthetic-key@synthetic.bugsink.com/1'}),patch('sentry_sdk.Client',side_effect=client):
+   self.assertEqual(providers.bugsink_error({'request':{'password':'SDK-CANARY'},'exception':{'values':[{'type':'TypeError','value':'SDK-CANARY'}]},'tags':{'origin':'backend','route':'/patient/book/PRIVATE-CANARY?token=SDK-CANARY'}}),'TransportAttempted')
+  self.assertTrue(captured);self.assertNotIn('SDK-CANARY',json.dumps(captured));self.assertNotIn('PRIVATE-CANARY',json.dumps(captured));self.assertNotIn('request',captured[0])
  def test_storage_and_event_quota_preserve_business_operations(self):
   with self.assertRaises(ValueError):storage.put(b'x'*20,10,100)
   c=rt.config();frappe.db.sql('INSERT INTO tt_ops_counter VALUES (%s,%s,%s) ON DUPLICATE KEY UPDATE n=VALUES(n)',(rt.now().date(),'events',c['events_per_day']))
