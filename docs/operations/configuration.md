@@ -72,3 +72,11 @@ For supported heartbeat monitors, ping only after actual `worker_completed` prog
 not process startup. A stale worker must stop pings. Inspect account-generated ping
 URL privately and obtain explicit permission before a live failure/recovery test.
 No external monitors have been created or verified.
+
+## Private Native Identity Key
+
+If a fresh site has no framework encryption key, operations creates its own random
+`private/teletena-operations/actor-hmac.key` (600) under a lock. It never writes or
+replaces framework/provider credentials. Keep that key in the private-state backup;
+changing it changes pseudonymous continuity. Existing sites with a framework key
+continue using it unless an existing operations key already establishes continuity.

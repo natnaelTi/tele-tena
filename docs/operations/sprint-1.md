@@ -53,18 +53,18 @@ All statuses start Requested; they are updated with actual evidence, never assum
 
 | Area | Status / Gate |
 | --- | --- |
-| Allowlist, server-confirmed outcome dedupe, bounded browser attempts | Requested |
-| Reviewer authorization/audit; patient/clinician denial | Requested |
-| Support ownership, private screenshots, internal/user reply separation | Requested |
-| Overview, health, queue execution/scheduler freshness | Requested |
-| Safe errors, incidents, grouped alerts/daily digest/recovery | Requested |
-| Analytics/replay controls and pre-transmission canary tests | Requested |
-| PostHog actual complete export + independent playback | Awaiting selected project/scoped credentials |
-| Archive lifecycle/capacity/deletion and restoration safeguards | Requested; production enablement gated by preceding proof |
-| Continuous aggregates/quarter reports/test-clock boundaries | Requested |
-| Build/browser/mobile/200%/PWA/localization | Requested |
-| Fresh/repeat migration and existing state/financial preservation | Requested |
+| Allowlist, server-confirmed outcome dedupe, bounded browser attempts | Locally verified; optional browser collection only, guest collection disabled |
+| Reviewer authorization/audit; patient/clinician denial | Locally verified backend/browser |
+| Support ownership, private screenshots, internal/user reply separation | Locally verified backend/browser |
+| Overview, health, queue execution/scheduler freshness | Locally verified including dedicated-worker restart |
+| Safe errors, incidents, grouped alerts/daily digest/recovery | Controlled tests; no live receipt claimed |
+| Analytics/replay controls and pre-transmission canary tests | Safe event/error egress verified; recorder quarantined, actual replay masking awaiting project |
+| PostHog actual complete export + independent playback | Blocked: selected project/scoped credentials not yet configured |
+| Archive lifecycle/capacity/deletion and restoration safeguards | Synthetic native lifecycle verified; usable archive/provider deletion/capacity proof unavailable |
+| Continuous aggregates/quarter reports/test-clock boundaries | Locally verified; partial coverage shown |
+| Build/browser/mobile/200%/PWA/localization | Locally verified affected surfaces; human language/owner acceptance pending |
+| Fresh/repeat migration and existing state/financial preservation | Frappe16 fresh/populated upgrade + repeat and Frappe15 retained upgrade verified |
 | Provider ingestion/live alerts/UptimeRobot setup | Awaiting explicit account configuration/operator test |
-| Sprint 2 API/component/operator/update handoff | Requested |
+| Sprint 2 API/component/operator/update handoff | Prepared; docs/operations/operator-and-sprint2.md |
 
 Provider sources and current limitations are recorded in provider-compatibility.md.

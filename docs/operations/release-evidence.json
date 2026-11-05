@@ -1,0 +1,23 @@
+{
+  "baseline": "de27a6fbd6e2ed8c23d74471d98b8c357178890a",
+  "schema": "v1.53",
+  "packaged_source": "15a051c271ddbe1a5e73b62d1f8d9c1afbd0fa74",
+  "frontend_lock_sha256": "efe3613bc3acba82e24a2a0d581a1c991e87babfd7b81522d542bae5b749051a",
+  "translation_dictionary_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+  "human_approved_workbook_imports": 0,
+  "catalog_new_keys": 211,
+  "screenshots": {
+    "operations-health-1440.png": "55e7e99286c1a6edf4dd01c651e9cbf978f386ac831b18322508fadebe598243",
+    "operations-overview-1440.png": "b52e049441b7413468a32a115920b6fc7a49d34a786563c5e55349d8ef21d4d5",
+    "operations-overview-390.png": "3c1d223d46f8929500460220580416da6604082abfdbdae8872e27d1be60854e",
+    "operations-overview-768.png": "a764453b129cbe87de0cedb12183fe32472ce76fcf166e43c30834f4b1ce75f2",
+    "overview-200-percent.png": "ee42154c068d8c5ab3c49be13447a4bf903441a3cb4b5bb10f989afa9110173a",
+    "quarter-report-1440.png": "1b869d9ba7db3f0dca58712950d26d2f376284f0507775a1729da8f11db2bd15",
+    "support-preview-1440.png": "7fc0fa19c2e8810a34fec6f0bf7a824e5939c16e685ac44712fbb155db384e60",
+    "support-resolved-1440.png": "f7a35d31c8cb7c7aca126f8872f22ea32d87db9cc719d38034cedb161a313be2",
+    "support-review-390.png": "fc84b46fb7232b66c2ae76d63bee71df38fb53af90334e5b6c6e6690bf09ed2c"
+  },
+  "provider_ingestion_verified": false,
+  "replay_archive_available": false,
+  "live_alert_receipt_verified": false
+}

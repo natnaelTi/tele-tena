@@ -1,7 +1,7 @@
 {
   "version": 3,
   "release_branch": "feat/operations-journey-insights",
-  "source_checkpoint": "82895bd2d1adb73f581e4fce0f59be0343d246d4",
+  "source_checkpoint": "15a051c271ddbe1a5e73b62d1f8d9c1afbd0fa74",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Single authoritative MVP matrix. Current bounded polish/portable dataset evidence is in final-mvp-polish-verification.md. Historical per-screen evidence is retained. Owner visual acceptance and external device/provider/native-language checks remain separate.",
   "screens": [
