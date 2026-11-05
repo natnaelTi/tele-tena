@@ -41,7 +41,8 @@ def send_code(destination, code):
 def send_notice(destination,body):
     settings=configuration()
     message=EmailMessage();message['From']=settings['sender'];message['To']=destination
-    message['Subject']=getattr(body,'title','TeleTena Update');message.set_content(str(body))
+    title=getattr(body,'title',None)
+    message['Subject']=title if isinstance(title,str) else 'TeleTena Update';message.set_content(str(body))
     from tele_tena.email_templates import render
     message.add_alternative(render(body),subtype='html')
     _send(message,settings)
