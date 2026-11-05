@@ -32,6 +32,7 @@ class ProofRun:
   authorization=m['authorization']
   if authorization.get('status') in ('Completed','Revoked') or authorization.get('expires_at') and datetime.now(timezone.utc)>=datetime.fromisoformat(authorization['expires_at']):raise ProofBlocked('one_run_authorization_expired')
   d=urlsplit(c['bugsink_dsn']);expected={'posthog_ingest':c['posthog_host'],'posthog_api':c['posthog_api_host'],'posthog_project_id':str(c['posthog_project_id']),'bugsink_host':d.hostname,'bugsink_project_id':d.path.strip('/'),'email_recipient':c['owner_alert_email']}
+  if 'telegram_chat' in m['destinations'] and m['destinations']['telegram_chat']!=c.get('telegram_chat'):raise ProofBlocked('destination_changed')
   amendment=m.get('amendments',{}).get('email_recipient',{})
   if amendment.get('approved') and amendment.get('recipient')==c['owner_alert_email']:expected['email_recipient']=m['destinations']['email_recipient']
   if c.get('owner_account')!='' or any(m['destinations'].get(k)!=v for k,v in expected.items()):raise ProofBlocked('destination_changed')

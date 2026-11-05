@@ -21,6 +21,10 @@ class Budget(unittest.TestCase):
     self.assertTrue(json.loads(self.run.config.read_text())['live_test_authorized']);raise ValueError()
   self.assertFalse(json.loads(self.run.config.read_text())['live_test_authorized']);c=json.loads(self.run.config.read_text());c['owner_alert_email']='other@example.invalid';self.run._write(self.run.config,c)
   with self.assertRaises(ProofBlocked):self.run.reserve('no',{'errors':1})
+ def test_changed_telegram_destination_is_rejected(self):
+  m=json.loads(self.run.manifest.read_text());m['destinations']['telegram_chat']='synthetic-destination';self.run._write(self.run.manifest,m)
+  c=json.loads(self.run.config.read_text());c['telegram_chat']='different-destination';self.run._write(self.run.config,c)
+  with self.assertRaisesRegex(ProofBlocked,'destination_changed'):self.run.checked()
  def test_closed_immediate_phase_rejects_more_ingestion(self):
   m=json.loads(self.run.manifest.read_text());m['phase']='AwaitingSettledRecheck';self.run._write(self.run.manifest,m)
   with self.assertRaisesRegex(ProofBlocked,'immediate_phase_closed'):self.run.reserve('extra-error',{'errors':1})
