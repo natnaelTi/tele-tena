@@ -19,5 +19,25 @@
   },
   "provider_ingestion_verified": false,
   "replay_archive_available": false,
-  "live_alert_receipt_verified": false
+  "live_alert_receipt_verified": false,
+  "provider_configuration_followup": {
+    "source_with_preflight": "b91aa8a2a6729daa4012c290d70a61f2f84e92e7",
+    "working_file_validated": true,
+    "credential_values_committed": false,
+    "posthog_region": "EU",
+    "posthog_project_id": "335848",
+    "missing_or_invalid_fields": [],
+    "optional_missing_fields": [],
+    "telegram_setup_missing_fields": [
+      "telegram_chat"
+    ],
+    "telegram_discovery": "One authorized getUpdates request; zero matching private chats; no changes or sends",
+    "owner_account_unlinked": true,
+    "live_test_authorized": false,
+    "new_network_free_tests_passed": 7,
+    "live_plan": "docs/operations/live-verification-plan-v1.md",
+    "live_plan_sha256": "6c34edd9b9d8708b03cc3e0fc9f0af90369bfe050bec7fd9061628a2df92f6a3",
+    "provider_ingestion_verified": false,
+    "application_runtime_changed": false
+  }
 }
