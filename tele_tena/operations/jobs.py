@@ -90,6 +90,7 @@ def watch():
  rt.incident('widespread_booking_payment_failure','Critical',recovery=not(failures.n>=10 and failures.people>=3))
  a=__import__('tele_tena.operations.archive',fromlist=['status']).status()
  rt.incident('archive_capacity_near_limit','Warning',recovery=not(a['used_bytes'] is not None and a['used_bytes']*100>=a['limit_bytes']*80))
+ rt.incident('replay_index_near_limit','Warning',recovery=not(a['index_entries']*100>=a['index_limit']*80))
  rt.incident('archive_export_delayed','Warning',recovery=not a['export_warning'])
  pending=sum(x.n for x in a['chunks'] if x.state in ('Pending','Retry'))
  waiting=sum(x.n for x in a['states'] if x.state in ('Capturing','Pending','Failed','Incomplete'))

@@ -77,6 +77,16 @@ class Capture(Operations):
   r=self.recording();ops.replay_chunk(r['id'],str(uuid.uuid4()),self.frames(),'/patient');self.assertEqual(ops.replay_loss(r['id'],'projection')['state'],'Incomplete')
   with patch('tele_tena.operations.providers.replay_snapshot') as send:capture.tick();send.assert_not_called()
   self.assertEqual(j.one('SELECT state FROM tt_ops_archive WHERE id=%s',(r['id'],)).state,'Incomplete')
+ def test_index_capacity_threshold_is_visible_to_independent_watch(self):
+  facts={'used_bytes':0,'limit_bytes':1000,'index_entries':80,'index_limit':100,'export_warning':False,'chunks':[],'states':[]}
+  with patch.object(jobs,'health',return_value={'freshness':'Current'}),patch.object(archive,'status',return_value=facts),patch.object(rt,'incident') as incident,patch.object(jobs,'send_alerts'),patch.object(jobs,'send_digest'),patch.object(frappe.db,'commit'):
+   jobs.watch();incident.assert_any_call('replay_index_near_limit','Warning',recovery=False)
+   facts['index_entries']=79;jobs.watch();incident.assert_any_call('replay_index_near_limit','Warning',recovery=True)
+ def test_total_archive_index_limit_blocks_without_erasing_tombstones(self):
+  before=j.one('SELECT COUNT(*) n FROM tt_ops_archive').n
+  self.config['replay_index_limit']=before
+  self.assertEqual(self.recording()['state'],'Limited')
+  self.assertEqual(j.one('SELECT COUNT(*) n FROM tt_ops_archive').n,before)
  def test_chunk_count_limit_is_visible_and_does_not_admit_more_data(self):
   r=self.recording();self.config['replay_chunks_per_record']=0
   self.assertEqual(ops.replay_chunk(r['id'],str(uuid.uuid4()),self.frames(),'/patient')['state'],'Limited')

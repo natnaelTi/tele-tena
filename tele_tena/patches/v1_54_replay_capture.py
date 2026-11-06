@@ -1,6 +1,6 @@
 """Private replay admission/chunk indexes only; does not enable collection."""
 import frappe
-CAPTURE_DEFAULTS={'replay_chunks_per_day':5000,'replay_pending_chunks':500,'replay_chunks_per_record':1000}
+CAPTURE_DEFAULTS={'replay_index_limit':100000,'replay_chunks_per_day':5000,'replay_pending_chunks':500,'replay_chunks_per_record':1000}
 
 def execute():
     tables = {

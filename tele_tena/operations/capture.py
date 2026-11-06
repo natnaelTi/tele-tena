@@ -77,6 +77,7 @@ def admit(provider_id,window_id):
         if archive.deleted(id) or row.owner_actor!=owner or row.session_scope!=scope() or row.window_id!=window_id or row.state!='Active':raise frappe.PermissionError('Replay admission unavailable')
         data=json.loads(storage.read(row.style_key,'styles'))
         return {'state':'Active','id':id,'classes':data['classes'],'stop_at':str(row.stop_at),'max_bytes':c['recording_bytes'],'idempotent':True}
+    if frappe.db.sql('SELECT COUNT(*) FROM tt_ops_archive')[0][0]>=c['replay_index_limit']:dropped('index_limited');return {'state':'Limited'}
     if int(id[:8],16)%100>=c['sample_percent']:dropped('sampled');return {'state':'Sampled'}
     if frappe.db.sql("SELECT COUNT(*) FROM tt_ops_capture WHERE owner_actor=%s AND state='Active'",(owner,))[0][0]>=5:dropped('tabs_limited');return {'state':'Limited'}
     if frappe.db.sql("SELECT COUNT(*) FROM tt_ops_archive WHERE state IN ('Capturing','Pending','Failed','Incomplete')")[0][0]>=c['export_queue']:dropped('queue_limited');return {'state':'Limited'}
