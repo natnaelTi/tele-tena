@@ -5,7 +5,9 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 from tele_tena.operations.proof import ProofRun,ProofBlocked
 from tele_tena.operations.posthog_export import export_recording,ExportError
-p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--settled',action='store_true');args=p.parse_args();run=ProofRun(args.root);m,c=run.checked()
+p=argparse.ArgumentParser();p.add_argument('--root',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--settled',action='store_true');p.add_argument('--native-v2',action='store_true');args=p.parse_args();
+from scripts.operations_proof.native_v2 import NativeRun
+run=(NativeRun if args.native_v2 else ProofRun)(args.root);m,c=run.checked()
 for recording in m['recordings']:
  id=recording['id'];phase='settled' if args.settled else 'provisional';due=recording.get('recheck_due_at')
  if args.settled and (not due or datetime.now(timezone.utc)<datetime.fromisoformat(due)):

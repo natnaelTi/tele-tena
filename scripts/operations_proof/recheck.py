@@ -42,8 +42,10 @@ def main():
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--delete-verified-tests', action='store_true')
+    parser.add_argument('--native-v2', action='store_true')
     args = parser.parse_args()
-    run = ProofRun(args.root)
+    from scripts.operations_proof.native_v2 import NativeRun
+    run = (NativeRun if args.native_v2 else ProofRun)(args.root)
     manifest, config = run.checked()
     repo = Path(__file__).resolve().parents[2]
     if not manifest['recordings']:
@@ -55,7 +57,7 @@ def main():
             print('PENDING 25-hour checkpoint; due UTC:', due)
             return
     subprocess.run([sys.executable, str(repo / 'scripts/operations_proof/export.py'),
-                    '--root', str(args.root), '--output', str(args.output), '--settled'], check=True)
+                    '--root', str(args.root), '--output', str(args.output), '--settled'] + (['--native-v2'] if args.native_v2 else []), check=True)
     complete = True
     for recording in run.checked()[0]['recordings']:
         if recording.get('settled_export') != 'Complete':
@@ -128,7 +130,7 @@ def main():
              'settled_export': True, 'independent_playback': True, 'provider_deletion_verified': True,
              'player_sha256': hashlib.sha256((repo / 'tele_tena/operations/player.js').read_bytes()).hexdigest(),
              'verified_at': datetime.now(timezone.utc).isoformat(), 'production_activation': False}
-    run._write(args.root / 'archive-proof-v1.json', proof)
+    run._write(args.root / ('archive-proof-native-v2.json' if args.native_v2 else 'archive-proof-v1.json'), proof)
     # Only this run's synthetic raw proof artifacts. Keep ledger, checksums, result.
     for recording in run.checked()[0]['recordings']:
         digest = hashlib.sha256(recording['id'].encode()).hexdigest()
