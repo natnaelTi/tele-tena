@@ -1,17 +1,10 @@
 {
   "added": [
-    "copy.backend_validation_operations.enable_verified_archive_exports_before_enabling_replay_or_disable_repl",
-    "copy.backend_validation_operations.masked_replay_could_not_continue_other_care_features_are_unaffected",
-    "copy.operationstelemetry.allow_masked_interaction_replay",
-    "copy.operationstelemetry.optional_journey_analytics_uses_safe_action_categories_not_your_medica_d6855c31",
-    "copy.operationstelemetry.replay_masks_entered_text_and_blocks_documents_payment_evidence_and_co",
-    "copy.replay_projection.html_head_body_div_span_section_article_main_header_footer_nav_h1_h2_h",
-    "copy.replay_projection.none_auto_block_inline_inline_block_contents_flex_grid_absolute_relati",
-    "copy.replay_projection.width_height_min_width_max_width_min_height_max_height_padding_margin_",
-    "copy.replay_safety.disabled",
-    "copy.replay_safety.private_proof_operator_activation_site_flags_and_per_user_consent_requ"
+    "copy.backend_validation_archive.actual_project_settled_export_and_independent_playback_verification_re",
+    "copy.backend_validation_archive.measured_compressed_samples_inspect_collection_coverage_and_duration_b",
+    "copy.backend_validation_archive.no_verified_recording_samples_on_this_site",
+    "copy.backend_validation_archive.observed_compressed_archives_only_short_or_synthetic_sessions_are_not_",
+    "copy.backend_validation_archive.project_format_verified_site_collection_export_activation_remains_expl"
   ],
-  "stale": [
-    "copy.operationstelemetry.optional_journey_analytics_uses_safe_action_categories_not_your_medica"
-  ]
+  "stale": []
 }

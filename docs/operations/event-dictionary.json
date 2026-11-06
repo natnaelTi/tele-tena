@@ -37,6 +37,7 @@
     "request.consultation_handoff": "browser",
     "consultation.join_attempted": "browser",
     "consultation.join_authorized": "server",
+    "consultation.quality": "browser",
     "consultation.connected": "browser",
     "consultation.connection_failed": "browser",
     "consultation.left": "browser",
@@ -49,10 +50,16 @@
     "support.resolved": "server",
     "operations.error_observed": "server",
     "operations.failure": "server",
-    "operations.recovery": "server",
-    "consultation.quality": "browser"
+    "operations.recovery": "server"
   },
   "allowed_properties": {
+    "quality": [
+      "excellent",
+      "good",
+      "lost",
+      "poor",
+      "unknown"
+    ],
     "step": [
       "0",
       "1",
@@ -146,14 +153,5 @@
     "route_template"
   ],
   "attempt_window_hours": 24,
-  "sensitive_values": "Never allowed; see collection-retention.md",
-  "properties": {
-    "quality": [
-      "excellent",
-      "good",
-      "poor",
-      "lost",
-      "unknown"
-    ]
-  }
+  "sensitive_values": "Never allowed; see collection-retention.md"
 }

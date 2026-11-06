@@ -2930,18 +2930,38 @@
     "reason": "Technical JSX attribute className"
   },
   {
+    "english": "Unavailable",
+    "source_location": "frontend/src/pages/Operations.tsx:10",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "Verified",
-    "source_location": "frontend/src/pages/Operations.tsx:7",
+    "source_location": "frontend/src/pages/Operations.tsx:15",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Incomplete",
+    "source_location": "frontend/src/pages/Operations.tsx:15",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "Failed",
+    "source_location": "frontend/src/pages/Operations.tsx:15",
+    "reason": "Keyboard or state matching set"
+  },
+  {
+    "english": "Pending",
+    "source_location": "frontend/src/pages/Operations.tsx:15",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Disabled",
-    "source_location": "frontend/src/pages/Operations.tsx:10",
+    "source_location": "frontend/src/pages/Operations.tsx:19",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Telegram",
-    "source_location": "frontend/src/pages/Operations.tsx:10",
+    "source_location": "frontend/src/pages/Operations.tsx:19",
     "reason": "Technical JSX attribute value"
   },
   {
