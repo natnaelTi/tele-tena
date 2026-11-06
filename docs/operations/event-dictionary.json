@@ -1,5 +1,5 @@
 {
-  "version": "operations-v1",
+  "version": "operations-v1.1",
   "events": {
     "application.started": "browser",
     "application.resumed": "browser",
@@ -49,7 +49,8 @@
     "support.resolved": "server",
     "operations.error_observed": "server",
     "operations.failure": "server",
-    "operations.recovery": "server"
+    "operations.recovery": "server",
+    "consultation.quality": "browser"
   },
   "allowed_properties": {
     "step": [
@@ -145,5 +146,14 @@
     "route_template"
   ],
   "attempt_window_hours": 24,
-  "sensitive_values": "Never allowed; see collection-retention.md"
+  "sensitive_values": "Never allowed; see collection-retention.md",
+  "properties": {
+    "quality": [
+      "excellent",
+      "good",
+      "poor",
+      "lost",
+      "unknown"
+    ]
+  }
 }

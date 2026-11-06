@@ -1226,22 +1226,17 @@
   },
   {
     "english": "consultation {connected ? \"room-connected\" : \"room-preflight\"} {connected && audioOnly ? \"room-audio-layout\" : \"\"} {expanded ? \"room-expanded\" : \"\"} {sharedRoom?\"room-shared-layout\":\"\"} {sharedRoom&&info?.role===\"patient\"?\"shared-patient-view\":\"\"}",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:466",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:469",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:472",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:475",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:472",
-    "reason": "Keyboard or machine-code comparison"
-  },
-  {
-    "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:473",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:475",
     "reason": "Keyboard or machine-code comparison"
   },
   {
@@ -1251,67 +1246,72 @@
   },
   {
     "english": "Ended",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:480",
-    "reason": "Keyboard or machine-code comparison"
-  },
-  {
-    "english": "Finalized",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:481",
-    "reason": "Keyboard or machine-code comparison"
-  },
-  {
-    "english": "Completed",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:481",
-    "reason": "Keyboard or machine-code comparison"
-  },
-  {
-    "english": "button primary",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:482",
-    "reason": "Technical JSX attribute className"
-  },
-  {
-    "english": "Finalized",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:482",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:479",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Ended",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:483",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Finalized",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:484",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Completed",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:484",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "button primary",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:485",
+    "reason": "Technical JSX attribute className"
+  },
+  {
+    "english": "Finalized",
     "source_location": "frontend/src/features/consultations/Consultation.tsx:485",
     "reason": "Keyboard or machine-code comparison"
   },
   {
+    "english": "Ended",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:488",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "button secondary",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:526",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:529",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "media-stage {audioSurface?\"audio-only\":\"\"} {expanded?\"expanded\":\"\"}",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:531",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:534",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "audio-avatar {speaking?\"speaking\":\"\"}",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:533",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:536",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "room-session-details {audioOnly||sharedRoom?\"room-optional-details\":\"\"}",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:578",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:581",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:578",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:581",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:579",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:582",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/features/consultations/Consultation.tsx:580",
+    "source_location": "frontend/src/features/consultations/Consultation.tsx:583",
     "reason": "Keyboard or machine-code comparison"
   },
   {
@@ -1411,7 +1411,7 @@
   },
   {
     "english": "Missing session provider",
-    "source_location": "frontend/src/hooks/useSession.tsx:62",
+    "source_location": "frontend/src/hooks/useSession.tsx:64",
     "reason": "Internal provider diagnostic; user-facing recovery copy is separate"
   },
   {
@@ -3433,6 +3433,36 @@
     "english": "Expired",
     "source_location": "frontend/src/pages/Vetting.tsx:329",
     "reason": "Technical JSX attribute value"
+  },
+  {
+    "english": "Stopped",
+    "source_location": "frontend/src/replay-safety.ts:11",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Starting",
+    "source_location": "frontend/src/replay-safety.ts:22",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Recorded Locally",
+    "source_location": "frontend/src/replay-safety.ts:25",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Active",
+    "source_location": "frontend/src/replay-safety.ts:34",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Admitted",
+    "source_location": "frontend/src/replay-safety.ts:35",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
+    "english": "Recording",
+    "source_location": "frontend/src/replay-safety.ts:37",
+    "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "%d %b %Y %H:%M",

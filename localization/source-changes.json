@@ -1,29 +1,17 @@
 {
   "added": [
-    "copy.archivereplay.masked_archived_interactions_playback_cannot_perform_live_account_acti",
-    "copy.archivereplay.play_private_replay",
-    "copy.archivereplay.private_replay",
-    "copy.archivereplay.private_replay_player",
-    "copy.archivereplay.the_private_replay_could_not_be_loaded",
-    "copy.archivereplay.the_private_replay_player_did_not_become_ready",
-    "copy.archivereplay.this_recording_format_could_not_be_played_safely",
-    "copy.archivereplay.this_recording_is_unavailable_or_awaiting_verification",
-    "copy.backend_validation_archive.pause",
-    "copy.backend_validation_archive.play",
-    "copy.backend_validation_archive.private_element_blocked",
-    "copy.backend_validation_archive.replay_interaction_unavailable",
-    "copy.backend_validation_archive.replay_timeline",
-    "copy.backend_validation_archive.unsupported_or_incomplete_recording",
-    "copy.backend_validation_booking_notifications.sign_in",
-    "copy.backend_validation_booking_notifications.teletena_appointment_status_time_timezone_reference_reference_sign_in_",
-    "copy.backend_validation_booking_notifications.this_records_a_payment_activity_open_the_link_for_the_current_payment_",
-    "copy.backend_validation_email_templates.demonstration_environment_no_real_payments_or_clinical_care",
-    "copy.backend_validation_email_templates.for_your_privacy_detailed_decisions_documents_and_consultation_informa",
-    "copy.backend_validation_email_templates.open_teletena",
-    "copy.operations.archive_playback_requires_complete_export_and_independent_playback_ver",
-    "copy.operations.replay_is_unavailable_until_its_verification_gates_pass"
+    "copy.backend_validation_operations.enable_verified_archive_exports_before_enabling_replay_or_disable_repl",
+    "copy.backend_validation_operations.masked_replay_could_not_continue_other_care_features_are_unaffected",
+    "copy.operationstelemetry.allow_masked_interaction_replay",
+    "copy.operationstelemetry.optional_journey_analytics_uses_safe_action_categories_not_your_medica_d6855c31",
+    "copy.operationstelemetry.replay_masks_entered_text_and_blocks_documents_payment_evidence_and_co",
+    "copy.replay_projection.html_head_body_div_span_section_article_main_header_footer_nav_h1_h2_h",
+    "copy.replay_projection.none_auto_block_inline_inline_block_contents_flex_grid_absolute_relati",
+    "copy.replay_projection.width_height_min_width_max_width_min_height_max_height_padding_margin_",
+    "copy.replay_safety.disabled",
+    "copy.replay_safety.private_proof_operator_activation_site_flags_and_per_user_consent_requ"
   ],
   "stale": [
-    "copy.operations.archive_playback_remains_unavailable_a_provider_link_or_metadata_row_i"
+    "copy.operationstelemetry.optional_journey_analytics_uses_safe_action_categories_not_your_medica"
   ]
 }
