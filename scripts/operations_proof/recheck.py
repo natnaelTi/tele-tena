@@ -14,6 +14,22 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from tele_tena.operations.proof import ProofRun, ProofBlocked
 
 
+def deletion_keys(manifest, config, identifier):
+    """One explicit credential-corrected retry of a known403; never unknown I/O."""
+    key = 'provider-delete-' + identifier
+    prior = manifest['actions'].get(key)
+    if not prior or prior.get('http_status') != 403:
+        return key, 'provider-delete-confirm-' + identifier
+    row = next(x for x in manifest['recordings'] if x['id'] == identifier)
+    current = hashlib.sha256(config.get('posthog_delete_key', '').encode()).hexdigest()
+    if (not row.get('deletion_retry_authorized')
+            or not row.get('denied_key_observed_sha256')
+            or (current == row['denied_key_observed_sha256']
+                and not row.get('deletion_permission_change_confirmed'))):
+        raise ProofBlocked('corrected_delete_key_and_owner_confirmation_required')
+    return 'provider-delete-retry-1-' + identifier, 'provider-delete-confirm-retry-1-' + identifier
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', type=Path, required=True)
@@ -76,12 +92,12 @@ def main():
         identifier = recording['id']
         path = '/api/projects/' + str(config['posthog_project_id']) + '/session_recordings/' + identifier + '/'
         manifest, config = run.checked()
-        key = 'provider-delete-' + identifier
+        key, confirm_key = deletion_keys(manifest, config, identifier)
         if key not in manifest['actions']:
             status, _ = run.request(key, 'posthog_api', path, method='DELETE',
                                     costs={'recording_deletes': 1}, maximum=65536)
             print('New test recording DELETE HTTP status:', status)
-        key = 'provider-delete-confirm-' + identifier
+        key = confirm_key
         manifest, config = run.checked()
         if key not in manifest['actions']:
             status, _ = run.request(key, 'posthog_api', path,
