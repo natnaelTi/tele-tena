@@ -1,3 +1,20 @@
+## Final Local Package — 6 November2026
+
+Installation/build: `5b78294a251efdc6a9cd4238a3a41a80f312856a`. Preview8017 serves this exact release; later
+documentation/evidence changes do not change runtime assets/backend.
+v1.54 fresh/repeat and populated preservation pass;16capture,19operations and
+30communications tests,8budget,6cleanup-retry,5native-budget,1due-time guard,
+localization5+2, build/lint and exact private-asset/hash scans pass. Current frontend
+lint retains existing warnings, zero errors. The strengthened built PWA check
+verifies obsolete public-cache eviction as well as API/private denial and
+offline→online recovery. Restart uses only owned preview processes; final financial
+reconciliation11patients/2clinicians/22accounts has zero mismatches.
+
+[Current matrix](acceptance-matrix.json), [actual V2/due command](live-verification-results-v2.md),
+[remaining gaps](implementation-gaps.md), [Selfmade guide](../selfmade-operations-update.md)
+and [Sprint2 handoff](operator-and-sprint2.md) are authoritative over historical
+status descriptions below. Sprint1/operational90day archive are not complete.
+
 > **Latest V2 status:** actual native SDK→gateway→worker ingestion and provisional
 > export/playback pass. Its settled native archive/cleanup checkpoint is due
 > **8November2026,00:28:39Africa/Nairobi**, not scheduled or passed.
