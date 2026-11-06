@@ -25,6 +25,12 @@ class NativeRun(ProofRun):
   if kind not in ('posthog_api','posthog_ingest'):raise ProofBlocked('native_destination_not_approved')
   m,c=self.checked()
   if kind=='posthog_api':
+   method=kwargs.get('method','GET');costs=kwargs.get('costs',{})
+   if method=='DELETE':
+    if costs!={'recording_deletes':1}:raise ProofBlocked('native_delete_cost_required')
+   elif method=='GET':
+    if costs not in ({'posthog_admin_gets':1},{'deletion_confirmation_gets':1}):raise ProofBlocked('native_read_cost_required')
+   else:raise ProofBlocked('native_api_method_not_approved')
    prefixes=tuple('/api/'+family+'/'+str(c['posthog_project_id'])+'/session_recordings/'+r['id']+'/' for family in ('projects','environments') for r in m.get('recordings',[]))
    if not prefixes or not path.startswith(prefixes):raise ProofBlocked('native_recording_only')
   else:

@@ -22,13 +22,16 @@ class NativeBudget(Budget):
   with self.assertRaises(ProofBlocked):self.native.request('error','bugsink_ingest','/store/')
  def test_native_ingestion_requires_snapshot_and_exact_cost(self):
   with self.assertRaises(ProofBlocked):self.native.request('bad','posthog_ingest','/s/',method='POST',payload={'event':'unapproved'},costs={})
+ def test_native_read_and_delete_costs_cannot_be_omitted(self):
+  for method,costs in [('GET',{}),('DELETE',{}),('PATCH',{'posthog_admin_gets':1})]:
+   with self.assertRaises(ProofBlocked):self.native.request('unmetered','posthog_api','/api/projects/335848/session_recordings/unrelated/',method=method,costs=costs)
  def test_native_cannot_read_unrelated_recordings(self):
   with self.assertRaises(ProofBlocked):self.native.request('read','posthog_api','/api/projects/335848/session_recordings/unrelated/')
 
 # Explicit load avoids rerunning inherited V1 tests against closed fixtures.
 def load_tests(loader,tests,pattern):
  import unittest
- return unittest.TestSuite(NativeBudget(name) for name in ('test_native_counter_does_not_reopen_original','test_native_cannot_send_errors_or_other_provider','test_native_cannot_read_unrelated_recordings','test_native_ingestion_requires_snapshot_and_exact_cost'))
+ return unittest.TestSuite(NativeBudget(name) for name in ('test_native_counter_does_not_reopen_original','test_native_cannot_send_errors_or_other_provider','test_native_cannot_read_unrelated_recordings','test_native_ingestion_requires_snapshot_and_exact_cost','test_native_read_and_delete_costs_cannot_be_omitted'))
 if __name__=='__main__':
  import unittest
  unittest.main()
