@@ -96,8 +96,8 @@ Optional private fields: `archive_directory` (dedicated700directory;600objects),
 A template is outside Git at
 `/home/frappe/teletena-operations-config/replay-activation.template.json`.
 Do not copy over populated working configuration or bind/activate during update.
-Project proof is not consent or permanent test authorization. The current original
-proof is incomplete because deletion still returns403. Native gateway live proof
+Project proof is not consent or permanent test authorization. The original
+settled export/playback/deletion proof is complete and unbound. Native gateway live proof
 and explicit activation remain required. Each eligible authenticated user must
 separately accept noticev2 replay; guests remain ineligible. No old choice is silently
 upgraded. Retain owner_account empty and current alert recipients.

@@ -52,7 +52,7 @@
     "frappe16_operations": 19,
     "communications": 30,
     "preflight": 7,
-    "budget": 7,
+    "budget": 8,
     "replay_format": 3,
     "export": 2,
     "error_frames": 2,
@@ -63,7 +63,7 @@
     "actual_export_playback": "72 events, seek ends, zero network",
     "frappe16_capture": 14,
     "replay_export": 3,
-    "recheck_retry": 5,
+    "recheck_retry": 6,
     "private_checkpoint": 2,
     "actual_route_browser": "Patient/clinician/reviewer native gateway,390/768/1440; no provider egress",
     "archive_browser": "Actual backend playback, Escape/focus, actual200% X11 screen capture",
@@ -91,13 +91,18 @@
     "independent_playback": "VerifiedOffline",
     "deletion_http_statuses": [
       403,
-      403
+      403,
+      204
     ],
     "confirmation_http_statuses": [
       200,
-      200
+      200,
+      200,
+      404
     ],
-    "certificate_bound": false
+    "certificate_bound": false,
+    "original_authorization": "Completed",
+    "unbound_certificate": true
   },
   "preservation_v154": {
     "main_tables": 122,

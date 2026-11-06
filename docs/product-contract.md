@@ -4,7 +4,7 @@ Additivev1.54 implements gated eligible authenticated replay, native private spo
 complete-source export, inert independent playback, quotas/retries and capture-time
 retention. Local real-backend/browser/clock/preservation evidence is recorded in
 [the current report](operations/replay-integration-v154.md). Actual original settled
-export/playback passed; provider cleanup403 and new-gateway live proof remain gates.
+export/playback and provider deletion are verified; new-gateway live proof remains a gate.
 Guests remain ineligible. Production collection is disabled; no operational90-day
 archive or final Sprint1 acceptance is claimed. See [all requirements](operations/acceptance-matrix.json).
 

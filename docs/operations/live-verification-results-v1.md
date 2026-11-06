@@ -1,8 +1,8 @@
 > **Current continuation — 6 November 2026:** v1.54 native replay admission,
 > masking, private spooling/export, independent player and retention are implemented
 > and locally verified. The original live recording passed its settled25-hour
-> export/playback; provider deletion still returns403, including the explicitly
-> authorized permission-correction retry. The actual new native gateway has no
+> export/playback; deletion was accepted204 after corrected permissions, and a
+> separately approved follow-up read returned404. PlanV1 is closed. The actual new native gateway has no
 > live ingestion proof yet. Production capture/export remain disabled.
 > [Current requirement matrix](acceptance-matrix.json),
 > [implementation gaps](implementation-gaps.md) and
@@ -219,3 +219,18 @@ amended email receipts. **No further messages are authorized or needed.**
 The saved authorization stays AwaitingSettledRecheck; live_test_authorized returns
 false after each exact request. Owner_account remains blank. Tokens, private IDs,
 raw responses and recipient values remain outside repository/evidence.
+
+## Final Cleanup — Complete
+
+After the second owner-confirmed correction, the final original DELETE was204.
+Its immediate confirmation was200. The owner explicitly authorized exactly one
+additional original-recording read:404. Removal is verified. The original saved
+recheck then reused settled artifacts and independent playback locally, wrote an
+unbound private proof certificate, removed only owned raw synthetic proof files
+and closed the one-run authorization. Production collection stays disabled.
+
+Final usage changes:3/3deletes,3/3original confirmation reads, plus1/1separately
+approved deletion readback (charged1admin GET, total12/60). All other usage is
+unchanged. **No further PlanV1 calls are permitted after Completed.** A new gateway
+live proof needs an explicit separate amendment; no approval inferred from key
+correction replies. The original25hour checkpoint and cleanup are no longer pending.

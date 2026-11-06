@@ -7,8 +7,8 @@ lists are historical. See [every original requirement](acceptance-matrix.json).
 | --- | --- | --- |
 | Authenticated eligible actual-route masking, native capture/spool/worker, local archive/player | Implemented and locally verified | Actual native-gateway live proof under a bounded amendment; production stays disabled |
 | Original selected-project settled export and independent playback | Verified against EU335848 after25hours | No new capture/export experiment needed |
-| Original test-recording provider deletion | Actual DELETE403 twice; exact readbacks200 | Owner confirm project335848 token has session_recording:write and the token owner's project deletion authority; one original delete/readback slot remains, no automatic retry |
-| Operational90day archival | Native clock/storage/retry/deletion/restore tests pass; not available for production | Complete provider cleanup, gateway proof, separate code-bound activation and storage sizing |
+| Original test-recording provider deletion | Verified204 then404 after two permission denials; extra read explicitly approved | Complete; original one-run authorization closed, unbound certificate only |
+| Operational90day archival | Native clock/storage/retry/deletion/restore tests pass; not available for production | Complete gateway proof, separate code-bound activation and storage sizing |
 | Anonymous guest replay | Not implemented; guests explicitly ineligible | Protected guest-consent protocol is needed before guest recording; do not count missing coverage as zero traffic |
 | Ongoing backup-freshness telemetry | Not implemented; health shows Unavailable | Operator supply trustworthy backup-success metadata; deployment backup integrity tools already work |
 | Dedicated production private volume | Adapter implemented; local private volume tested | Choose capacity/location/backup expiry,700directory/600objects, disk headroom; no paid provisioning |

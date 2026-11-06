@@ -125,8 +125,8 @@
     {
       "id": "7.2",
       "requirement": "PlanV1 settled export/playback/deletion",
-      "status": "Implemented but awaiting verification",
-      "evidence_or_dependency": "Settled export1source/72events/4061B and offline playback passed after due time. DELETE403 twice, confirmation200; cleanup blocked on actual project/token authorization."
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Actual due-time settled1source/72events/4061B export and offline playback; third original DELETE204, separately approved delayed confirmation404. PlanV1 closed; certificate unbound."
     },
     {
       "id": "7.3",
@@ -155,8 +155,8 @@
     {
       "id": "8.3",
       "requirement": "Actual provider deletion acceptance",
-      "status": "External/operator dependency",
-      "evidence_or_dependency": "Actual same-recording DELETE403 twice, including owner-confirmed permission correction. One original delete/readback slot remains; no blind retry or certificate."
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Actual same-recording deletion accepted204 and absent404. Original3/3delete+confirmation plus approved extra1/1read charged. Earlier403diagnostics retained."
     },
     {
       "id": "8.4",
@@ -237,5 +237,5 @@
       "evidence_or_dependency": "DraftPR52 preserved; guide must pin final build after checks. No merge/deploy/production activation; owner visual and launch acceptance remain separate."
     }
   ],
-  "overall": "Native continuation verified; Sprint1 and operational90day archive not complete; actual provider cleanup/gateway proof and operator gates remain."
+  "overall": "Native continuation verified; original provider proof complete. Sprint1/operational90day archive still gated by new native-gateway live proof, guest-consent coverage and operator prerequisites."
 }

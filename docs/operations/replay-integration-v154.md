@@ -127,3 +127,19 @@ original fixture does not establish its live-provider compatibility. See the
 The third deletion slot is now the last remaining one; successful original cleanup
 would consume it. Any subsequent live gateway proof must therefore explicitly
 amend deletion/confirmation caps rather than quietly reuse/reset them.
+
+### Final Original-Proof Resolution
+
+The owner confirmed a further scoped permission correction. The third/final
+original DELETE returned204; its immediate readback still returned200. A separately
+approved **single** extra confirmation read later returned404. Counters remain
+charged at3/3deletes,3/3original confirmation reads plus1/1approved extra read
+(also charged1administrative GET, now12/60). Original settled exports/playback were
+reused without extra provider reads. The same saved recheck then generated an
+**unbound** private `archive-proof-v1.json`, erased only that experiment's raw
+synthetic artifacts and closed PlanV1. No activation, site binding or new recording.
+The403 observations above remain historical diagnostics, now resolved.
+
+The native-gateway amendment is still unapproved. It must preserve the closed
+original authorization and explicitly authorize its own one-run phase/caps; no
+original errors/events/maps/messages or already-cleaned references may be reused.
