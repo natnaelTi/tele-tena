@@ -12,6 +12,6 @@ class Format(unittest.TestCase):
   two=self.blob([self.meta,self.full]);two['0']+=b'\n'+b'\n'.join(json.dumps(['second-window',e]).encode() for e in (self.meta,self.full))
   with self.assertRaisesRegex(ReplayFormatError,'multi_window_player_unverified'):normalize(self.sources,two)
  def test_missing_malformed_unknown_and_unsafe_compression_are_rejected(self):
-  for sources,blobs in [(self.sources,{}),(self.sources,{'0':b'{broken'}),([{'source':'realtime','blob_key':'0'}],self.blob([self.meta,self.full])),(self.sources,self.blob([self.full])),(self.sources,self.blob([self.meta,{**self.full,'cv':'unknown'}]))]:
+  for sources,blobs in [(self.sources,{}),(self.sources,{'0':b'{broken'}),([{'source':'realtime','blob_key':'0'}],self.blob([self.meta,self.full])),(self.sources,self.blob([self.full])),(self.sources,self.blob([{**self.meta,'timestamp':float('nan')},self.full])),(self.sources,self.blob([self.meta,{**self.full,'cv':'unknown'}]))]:
    with self.assertRaises(ReplayFormatError):normalize(sources,blobs)
 if __name__=='__main__':unittest.main()

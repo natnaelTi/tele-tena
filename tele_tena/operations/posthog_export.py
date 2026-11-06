@@ -18,6 +18,7 @@ def export_recording(project,recording,fetch):
  if status!=200:raise ExportError('source_manifest_http_'+str(status))
  try:sources=json.loads(raw)['sources'];keys=source_keys(sources)
  except (ValueError,KeyError,TypeError):raise ExportError('source_manifest_unsupported') from None
+ if len(keys)>20:raise ExportError('source_budget_exceeded')
  blobs={};hashes={};total=0
  for key in keys:
   status,raw=fetch(base+'?'+urlencode({'source':'blob_v2','start_blob_key':key,'end_blob_key':key,'decompress':'true'}),MAX_BYTES)

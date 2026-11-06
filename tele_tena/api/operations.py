@@ -27,7 +27,7 @@ def configure(values,revision):
  if int(revision)!=old['revision']:fail('Settings changed. Reload before saving.','operations_conflict')
  for key in ('native_events','analytics','errors','replay','archive','alerts'):
   if key in values and type(values[key]) is not bool:fail('Use an explicit enabled or disabled setting.')
- limits={'events_per_day':(100,100000),'event_total_limit':(1000,1000000),'alert_messages_per_day':(1,1000),'errors_per_day':(10,2000),'replays_per_day':(1,5000),'archive_bytes':(10485760,5*1024**3),'recording_bytes':(1024,50*1024**2),'export_queue':(1,5000),'retry_budget':(1,10),'replay_days':(90,90),'event_days':(7,90),'sample_percent':(1,100),'cooldown_minutes':(5,1440)}
+ limits={'replay_chunks_per_day':(100,100000),'replay_pending_chunks':(10,5000),'replay_chunks_per_record':(10,2000),'events_per_day':(100,100000),'event_total_limit':(1000,1000000),'alert_messages_per_day':(1,1000),'errors_per_day':(10,2000),'replays_per_day':(1,5000),'archive_bytes':(10485760,5*1024**3),'recording_bytes':(1024,50*1024**2),'export_queue':(1,5000),'retry_budget':(1,10),'replay_days':(90,90),'event_days':(7,90),'sample_percent':(1,100),'cooldown_minutes':(5,1440)}
  for k,(low,high) in limits.items():
   if k in values and (type(values[k]) is not int or not low<=values[k]<=high):fail('A storage, retention or collection limit is outside its supported range.','operations_limit_invalid')
  if values.get('alert_email') and (not isinstance(values['alert_email'],str) or len(values['alert_email'])>254 or not re.fullmatch(r'[^@\s,]+@[^@\s,]+\.[^@\s,]+',values['alert_email'])):fail('Enter one valid owner alert email address.')
@@ -44,16 +44,16 @@ def configure(values,revision):
  audit(user,'OperationsConfigured',{'changed':sorted(values),'prior_revision':old['revision']});return configuration()
 @frappe.whitelist(allow_guest=True,methods=['GET'])
 def collection():
- c=rt.config();user=frappe.session.user;pref=rows('SELECT analytics,replay FROM tt_ops_preference WHERE actor=%s',(rt.pseudonym(user),)) if user!='Guest' else []
- return {'schema':'operations-v1.1','subject':rt.pseudonym(user) if user!='Guest' else None,'analytics':c['native_events'],'errors':c['errors'],'csrf_token':(__import__('frappe.sessions',fromlist=['get_csrf_token']).get_csrf_token() if getattr(frappe.local,'request',None) else None),'external_analytics_enabled':c['analytics'],'replay_configured':bool(c['replay'] and c['archive'] and capture.capability()),'role':rt.role(),'revision':c['revision'],'replay_status':'Unavailable until project masking and compatibility verification','notice_version':'operations-notice-draft-v1','preference':{'analytics':bool(pref and pref[0].analytics),'replay':bool(pref and pref[0].replay)},'sample_percent':c['sample_percent']}
+ c=rt.config();user=frappe.session.user;pref=rows('SELECT analytics,replay,version FROM tt_ops_preference WHERE actor=%s',(rt.pseudonym(user),)) if user!='Guest' else []
+ return {'schema':'operations-v1.1','subject':rt.pseudonym(user) if user!='Guest' else None,'analytics':c['native_events'],'errors':c['errors'],'csrf_token':(__import__('frappe.sessions',fromlist=['get_csrf_token']).get_csrf_token() if getattr(frappe.local,'request',None) else None),'external_analytics_enabled':c['analytics'],'replay_configured':bool(c['replay'] and c['archive'] and capture.capability()),'role':rt.role(),'revision':c['revision'],'replay_status':'Unavailable until project masking and compatibility verification','notice_version':'operations-notice-draft-v2','preference':{'analytics':bool(pref and pref[0].analytics),'replay':bool(pref and pref[0].replay and pref[0].version=='operations-notice-draft-v2')},'replay_preference_needs_review':bool(pref and pref[0].replay and pref[0].version!='operations-notice-draft-v2'),'sample_percent':c['sample_percent']}
 @command
 def preference(analytics,replay=False):
  user=actor()
  if type(analytics) is not bool or type(replay) is not bool:fail('Review your collection choices.')
- frappe.db.sql('INSERT INTO tt_ops_preference VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE analytics=VALUES(analytics),replay=VALUES(replay),version=VALUES(version),modified=VALUES(modified)',(rt.pseudonym(user),int(analytics),int(replay),'operations-notice-draft-v1',rt.now()))
+ frappe.db.sql('INSERT INTO tt_ops_preference VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE analytics=VALUES(analytics),replay=VALUES(replay),version=VALUES(version),modified=VALUES(modified)',(rt.pseudonym(user),int(analytics),int(replay),'operations-notice-draft-v2',rt.now()))
  if not analytics:frappe.db.sql("UPDATE tt_ops_event SET delivery='Disabled' WHERE actor=%s AND delivery IN ('Pending','Unconfigured')",(rt.pseudonym(user),))
  if not replay:capture.revoke_owner()
- audit(user,'CollectionPreferenceChanged',{'analytics':analytics,'replay':replay,'notice_version':'operations-notice-draft-v1'});return collection()
+ audit(user,'CollectionPreferenceChanged',{'analytics':analytics,'replay':replay,'notice_version':'operations-notice-draft-v2'});return collection()
 def _capture_call(fn,*args):
  try:return fn(*args)
  except ValueError:fail('Masked replay could not continue. Other care features are unaffected.','replay_unavailable')
@@ -128,6 +128,9 @@ def archive_list():rt.reviewer();return archive.status()
 @command
 def archive_delete(id):
  rt.reviewer();one('SELECT id FROM tt_ops_archive WHERE id=%s',(id,));archive.tombstone(id,'UserDeleted');audit(id,'ReplayDeleted',{});return {'state':'Expired','provider_deletion':'Pending'}
+@command
+def archive_retry(id):
+ result=_capture_call(archive.retry_export,id);audit(id,'ReplayRetryRequested',{'state':result['state']});return result
 @command
 def archive_playback(id):
  rt.reviewer();audit(id,'ReplayAccessAttempted',{})

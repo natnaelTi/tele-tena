@@ -10,8 +10,9 @@ def available():
  return bool(getattr(frappe.local,'site',None)) and bool(frappe.db.sql("SHOW TABLES LIKE 'tt_ops_config'"))
 def config():
  from tele_tena.patches.v1_53_operations import DEFAULTS
+ from tele_tena.patches.v1_54_replay_capture import CAPTURE_DEFAULTS
  row=frappe.db.sql('SELECT revision,payload FROM tt_ops_config WHERE id=1',as_dict=True)
- return {**DEFAULTS,**json.loads(row[0].payload),'revision':row[0].revision}
+ return {**DEFAULTS,**CAPTURE_DEFAULTS,**json.loads(row[0].payload),'revision':row[0].revision}
 def reviewer():
  from tele_tena.api.journey import actor
  user=actor()

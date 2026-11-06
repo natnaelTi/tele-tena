@@ -77,6 +77,29 @@ class Capture(Operations):
   r=self.recording();ops.replay_chunk(r['id'],str(uuid.uuid4()),self.frames(),'/patient');self.assertEqual(ops.replay_loss(r['id'],'projection')['state'],'Incomplete')
   with patch('tele_tena.operations.providers.replay_snapshot') as send:capture.tick();send.assert_not_called()
   self.assertEqual(j.one('SELECT state FROM tt_ops_archive WHERE id=%s',(r['id'],)).state,'Incomplete')
+ def test_chunk_count_limit_is_visible_and_does_not_admit_more_data(self):
+  r=self.recording();self.config['replay_chunks_per_record']=0
+  self.assertEqual(ops.replay_chunk(r['id'],str(uuid.uuid4()),self.frames(),'/patient')['state'],'Limited')
+  self.assertEqual(j.one('SELECT COUNT(*) n FROM tt_ops_chunk WHERE capture_id=%s',(r['id'],)).n,0)
+  self.assertEqual(j.one('SELECT failure_code FROM tt_ops_archive WHERE id=%s',(r['id'],)).failure_code,'client_capacity')
+ def test_old_unavailable_replay_choice_is_preserved_but_not_activated(self):
+  frappe.db.sql("UPDATE tt_ops_preference SET version='operations-notice-draft-v1' WHERE actor=%s",(rt.pseudonym(frappe.session.user),))
+  self.assertFalse(ops.collection()['preference']['replay']);self.assertTrue(ops.collection()['replay_preference_needs_review']);self.assertEqual(self.recording()['state'],'Disabled')
+  self.assertEqual(j.one('SELECT replay FROM tt_ops_preference WHERE actor=%s',(rt.pseudonym(frappe.session.user),)).replay,1)
+ def test_reviewer_retry_preserves_buffer_and_denies_patient(self):
+  r=self.recording();ops.replay_chunk(r['id'],str(uuid.uuid4()),self.frames(),'/patient');ops.replay_close(r['id'])
+  with patch('tele_tena.operations.providers.replay_snapshot',return_value='ProviderAccepted'):capture.tick()
+  before=j.one('SELECT * FROM tt_ops_archive WHERE id=%s',(r['id'],));clock=rt.now()+timedelta(hours=26)
+  with patch('tele_tena.operations.runtime.now',return_value=clock),patch('tele_tena.operations.providers.archive_export',side_effect=providers.ProviderUnavailable('timeout')):archive.export_tick()
+  with self.assertRaises(frappe.PermissionError):ops.archive_retry(r['id'])
+  frappe.set_user(users['reviewer'])
+  with patch('tele_tena.operations.providers.archive_capability',return_value=True):self.assertEqual(ops.archive_retry(r['id'])['state'],'Pending')
+  after=j.one('SELECT * FROM tt_ops_archive WHERE id=%s',(r['id'],));self.assertEqual(after.captured,before.captured);self.assertEqual(after.expires,before.expires);self.assertGreater(after.next_try,clock)
+ def test_expired_orphan_restore_is_erased_and_tombstoned(self):
+  import gzip
+  id='d'*64;clock=rt.now();payload={'format':'teletena-web-replay-v1','teletena_archive_id':id,'provider_recording_id':str(uuid.uuid4()),'captured_at':(clock-timedelta(days=95)).isoformat()+'Z','events':[]}
+  key=storage.put(gzip.compress(json.dumps(payload).encode()),100000,1000000,'replay')
+  result=archive.scan_orphans(clock+timedelta(hours=2),full=True);self.assertEqual(result['deleted'],1);self.assertTrue(archive.deleted(id));self.assertFalse((Path(self.tmp.name)/('replay-'+key)).exists())
  def test_inherited_suite_not_duplicated(self):pass
 # Run only new tests; original operations suite is run once separately.
 if __name__=='__main__':

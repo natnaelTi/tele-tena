@@ -53,8 +53,10 @@ def _enqueue():
 def queue(user, event, context_kind, context_ref, event_key, in_app=True, external=True):
     """Internal call only, from an already-authorized durable transition."""
     from tele_tena.operations.runtime import safe_record
-    mapped={'ScopeApproved':'application.scope_decision','ScopeRejected':'application.scope_decision','ScopeClarification':'application.scope_decision','ApplicationApproved':'application.professional_decision','ApplicationRejected':'application.professional_decision','LanguageReviewUpdated':'application.language_decision','OfferReceived':'request.offer_received'}
-    if event in mapped:safe_record(mapped[event],event_key,user=user)
+    mapped={'ScopeApproved':'application.scope_decision','ScopeRejected':'application.scope_decision','ScopeClarification':'application.scope_decision','ScopeSuspended':'application.scope_decision','ScopeExpired':'application.scope_decision','ScopeAppealDecision':'application.scope_decision','ApplicationReviewUpdate':'application.professional_decision','ApplicationApproved':'application.professional_decision','ApplicationRejected':'application.professional_decision','LanguageReviewUpdated':'application.language_decision','OfferReceived':'request.offer_received'}
+    if event in mapped:
+        outcomes={'ApplicationApproved':'Approved','ApplicationRejected':'Rejected','ScopeApproved':'Approved','ScopeRejected':'Rejected','ScopeClarification':'Clarification','ScopeSuspended':'Suspended','ScopeExpired':'Expired'}
+        safe_record(mapped[event],event_key,{'outcome':outcomes[event]} if event in outcomes else {},user=user)
     if event not in EVENTS or context_kind not in ('application','scope','language','request','offer','support','operations'):
         raise ValueError('Unsupported communication context')
     if not isinstance(event_key,str) or not 0<len(event_key)<=180:

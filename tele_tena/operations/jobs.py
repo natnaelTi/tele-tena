@@ -91,6 +91,9 @@ def watch():
  a=__import__('tele_tena.operations.archive',fromlist=['status']).status()
  rt.incident('archive_capacity_near_limit','Warning',recovery=not(a['used_bytes'] is not None and a['used_bytes']*100>=a['limit_bytes']*80))
  rt.incident('archive_export_delayed','Warning',recovery=not a['export_warning'])
+ pending=sum(x.n for x in a['chunks'] if x.state in ('Pending','Retry'))
+ waiting=sum(x.n for x in a['states'] if x.state in ('Capturing','Pending','Failed','Incomplete'))
+ rt.incident('replay_queue_near_limit','Warning',recovery=not(pending*100>=rt.config()['replay_pending_chunks']*80 or waiting*100>=rt.config()['export_queue']*80))
  send_alerts();send_digest()
  frappe.db.commit()
 

@@ -91,9 +91,13 @@ def archive_export(recording):
  if host!='https://eu.posthog.com' or not c.get('posthog_read_key'):raise Unconfigured('archive_project_unconfigured')
  import requests
  from .posthog_export import export_recording
+ import time
+ deadline=time.monotonic()+40
  def fetch(path,maximum):
   try:
+   if time.monotonic()>=deadline:raise ProviderUnavailable('archive_wall_budget')
    response=requests.get(host+path,headers={'Authorization':'Bearer '+c['posthog_read_key']},timeout=(2,10),allow_redirects=False,stream=True)
+   if response.status_code==429:raise ProviderUnavailable('archive_rate_limited')
    raw=b''
    for block in response.iter_content(65536):
     raw+=block

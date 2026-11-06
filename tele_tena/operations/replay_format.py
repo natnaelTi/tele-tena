@@ -2,7 +2,7 @@
 Reference contract: pinned PostHog37babfa, snapshot API blob_v2 + cv2024-10.
 Reject missing sources or malformed lines instead of silently omitting content.
 """
-import gzip,hashlib,io,json
+import gzip,hashlib,io,json,math
 FORMAT='teletena-web-replay-v1'
 MAX_BYTES=10*1024**2
 class ReplayFormatError(ValueError):pass
@@ -48,7 +48,7 @@ def normalize(sources,blobs):
    if not isinstance(window,str) or not window or len(window)>100:raise ReplayFormatError('window_identifier_invalid')
    for event in frames:
     event=unpack(event)
-    if not isinstance(event,dict) or type(event.get('timestamp')) not in (int,float) or event.get('type') not in (0,1,2,3,4,5):raise ReplayFormatError('event_version_unsupported')
+    if not isinstance(event,dict) or type(event.get('timestamp')) not in (int,float) or not math.isfinite(event['timestamp']) or event.get('type') not in (0,1,2,3,4,5):raise ReplayFormatError('event_version_unsupported')
     if event.get('type')==3 and event.get('data',{}).get('source') not in (0,1,2,3,4,5,6,8):raise ReplayFormatError('incremental_version_unsupported')
     event={**event,'windowId':window};digest=hashlib.sha256(json.dumps(event,sort_keys=True).encode()).hexdigest()
     if digest in seen:continue
