@@ -1,3 +1,9 @@
+> **Latest V2 status:** actual native SDK→gateway→worker ingestion and provisional
+> export/playback pass. Its settled native archive/cleanup checkpoint is due
+> **8November2026,00:28:39Africa/Nairobi**, not scheduled or passed.
+> Original PlanV1 settled proof/cleanup is complete and closed. Production remains
+> disabled. See [exact results and resume command](live-verification-results-v2.md).
+
 > **Current continuation — 6 November 2026:** v1.54 native replay admission,
 > masking, private spooling/export, independent player and retention are implemented
 > and locally verified. The original live recording passed its settled25-hour
@@ -87,3 +93,11 @@ Retry Export is bounded and never restores expired/deleted data. Do not retry
 booking/payment commands or adjust balances to repair telemetry. Acknowledge
 incidents once, observe deduplicated recovery and keep provider failures distinct
 from an application outage. Unconfigured integrations are not healthy integrations.
+
+### V2 Scheduled-Time Handoff
+
+The native gateway has actual provider acceptance/provisional export/player proof.
+Use the saved [native resume checkpoint](live-verification-results-v2.md) on/after
+8Nov00:28:39EAT; it is not automatically scheduled. Continue native APIs/UI work in
+Sprint2 while preserving this exact recording/ledger and disabled production flags.
+Do not reuse Completed PlanV1 to create new tests.

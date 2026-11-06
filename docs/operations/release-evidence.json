@@ -67,7 +67,9 @@
     "private_checkpoint": 2,
     "actual_route_browser": "Patient/clinician/reviewer native gateway,390/768/1440; no provider egress",
     "archive_browser": "Actual backend playback, Escape/focus, actual200% X11 screen capture",
-    "pwa": "Controller/update, private/API cache denial, offline/online deep link"
+    "pwa": "Controller/update, private/API cache denial, offline/online deep link",
+    "native_budget": 3,
+    "native_resume_guard": 1
   },
   "receipt_confirmation": {
     "telegram_alert": true,
@@ -112,12 +114,25 @@
     "private_config_credentials": "Hashes unchanged",
     "fresh_latest_combined": "Frappe16 release site passed with repeat and flags off"
   },
-  "new_gateway_live_verified": false,
+  "new_gateway_live_verified": true,
   "remaining_gates": "docs/operations/implementation-gaps.md",
   "acceptance_matrix": "docs/operations/acceptance-matrix.json",
   "measured_local_route_bytes": [
     134418,
     134106,
     133886
-  ]
+  ],
+  "new_gateway_settled_verified": false,
+  "live_results_v2": "docs/operations/live-verification-results-v2.md",
+  "native_v2": {
+    "snapshot_posts": 3,
+    "wire_bytes": 839255,
+    "events": 6,
+    "sources": 1,
+    "provisional_compressed_bytes": 91822,
+    "independent_playback": "VerifiedOffline",
+    "settled_due_utc": "2026-11-07T21:28:39.095385+00:00",
+    "settled_automatically_scheduled": false,
+    "production_activation": false
+  }
 }

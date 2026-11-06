@@ -1,3 +1,10 @@
+## Native Replay Proof Follow-Up — 6 November2026
+
+Actual V2 native gateway/worker ingestion and provisional independent playback pass.
+[The new settled native archive checkpoint](operations/live-verification-results-v2.md)
+is due8Nov00:28:39EAT. Production collection remains disabled; no operational90day
+archive or full Sprint1 acceptance is claimed.
+
 ## Operations Continuation — 6 November2026
 
 Additivev1.54 implements gated eligible authenticated replay, native private spooling,

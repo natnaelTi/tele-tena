@@ -1,3 +1,9 @@
+> **Latest V2 status:** actual native SDK→gateway→worker ingestion and provisional
+> export/playback pass. Its settled native archive/cleanup checkpoint is due
+> **8November2026,00:28:39Africa/Nairobi**, not scheduled or passed.
+> Original PlanV1 settled proof/cleanup is complete and closed. Production remains
+> disabled. See [exact results and resume command](live-verification-results-v2.md).
+
 > **Current continuation — 6 November 2026:** v1.54 native replay admission,
 > masking, private spooling/export, independent player and retention are implemented
 > and locally verified. The original live recording passed its settled25-hour

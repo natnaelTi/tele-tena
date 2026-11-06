@@ -17026,11 +17026,11 @@
       "/admin/support",
       "/support"
     ],
-    "functional": "v1.54 native actual-route capture/masking/lifecycle/quotas/retries/archive/player locally verified; original actual settled export/playback passed; original provider deletion204/404 verified; new native-gateway live proof remains gated; production disabled",
+    "functional": "v1.54 native masking/lifecycle/archive/quotas locally verified; V1 settled proof/deletion complete; actual V2 native ingestion/provisional playback pass, new settled native archive/cleanup pending due time; production disabled",
     "visual": "Codex inspected 390/768/1440 and actual200% screenshots; owner acceptance pending",
     "evidence": "docs/operations/verification.md",
     "external": [
-      "New native gateway needs bounded live amendment; no new recordings/events/errors/messages sent",
+      "V2 settled native archive/playback/cleanup due8Nov2026,00:28:39EAT; immediate proof complete; no additional events/errors/messages",
       "Guests ineligible pending protected anonymous-consent design; no ongoing backup freshness source",
       "Production storage sizing, backup expiry and persistent independent alert launcher",
       "Production-bundle private source-map release workflow; synthetic pair verified",
@@ -17041,6 +17041,7 @@
     "provider_configuration_followup": "docs/operations/configuration-readiness.md",
     "live_verification_plan": "docs/operations/live-verification-plan-v1.md",
     "live_results": "docs/operations/live-verification-results-v1.md",
-    "requirement_matrix": "docs/operations/acceptance-matrix.json"
+    "requirement_matrix": "docs/operations/acceptance-matrix.json",
+    "live_results_v2": "docs/operations/live-verification-results-v2.md"
   }
 }

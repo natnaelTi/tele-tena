@@ -143,3 +143,12 @@ The403 observations above remain historical diagnostics, now resolved.
 The native-gateway amendment is still unapproved. It must preserve the closed
 original authorization and explicitly authorize its own one-run phase/caps; no
 original errors/events/maps/messages or already-cleaned references may be reused.
+
+## Approved V2 Continuation
+
+[Actual native-gateway live results](live-verification-results-v2.md) supersede the
+earlier unapproved/pending-gateway statements:3accepted chunks, actual provisional
+export and independent playback pass. Its new settled native archive/cleanup is
+due8Nov00:28:39EAT. No original recording recreated or budget reset. The player
+CSS regression found in actual playback is fixed and retested; current player
+requires V2 settled certification before activation.

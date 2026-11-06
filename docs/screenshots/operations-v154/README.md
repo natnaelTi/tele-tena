@@ -16,3 +16,9 @@ actual X11 screen capture with Chromium's200% indicator; Playwright's zoomed ras
 capture was blank despite a painted window, so it is not used as visual evidence.
 Owner visual approval remains separate. Earlier Overview/Support/Reports screenshots
 remain in `../operations-sprint-1/` and provider fixture in `../operations-provider-proof/`.
+
+[Actual V2 provisional independent playback](native-v2-provisional-playback.png)
+uses exported masked data and the corrected owned-CSS player. It is not the settled
+archive certificate. All screenshot variants were refreshed after the CSS/control
+fix and visually reinspected; current screenshots replace earlier unstyled-player
+images. Safe controls and scrolling remain usable at390px and actual200% zoom.

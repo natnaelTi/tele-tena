@@ -113,8 +113,8 @@
     {
       "id": "6.3",
       "requirement": "New native gateway against actual PostHog",
-      "status": "Implemented but awaiting verification",
-      "evidence_or_dependency": "Locally verified payload/transport pipeline; actual project proof remains isolated fixture. Additional bounded scope amendment required before real gateway ingestion."
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Approved V2: actual native gateway and enqueued worker accepted3snapshot POSTs/839255B; actual provisional1source/6event/91822B export and independent playback. No existing data, events/errors/messages sent."
     },
     {
       "id": "7.1",
@@ -138,7 +138,13 @@
       "id": "7.4",
       "requirement": "Production project/storage activation",
       "status": "External/operator dependency",
-      "evidence_or_dependency": "Proof certificate and separate code-hash-bound activation required; keep collection disabled. Dedicated volume is optional, private default volume is implemented."
+      "evidence_or_dependency": "Production remains disabled; V2 due-time native archive/settled proof must match current player before separate explicit activation/storage sizing."
+    },
+    {
+      "id": "7.5",
+      "requirement": "V2 native settled archive, playback and cleanup",
+      "status": "Implemented but awaiting verification",
+      "evidence_or_dependency": "Due2026-11-07T21:28:39.095385Z (8Nov00:28:39EAT). Exact NativeRun ledger/reference/caps and native_resume.py; not run early or automatically scheduled."
     },
     {
       "id": "8.1",
@@ -237,5 +243,5 @@
       "evidence_or_dependency": "DraftPR52 preserved; guide must pin final build after checks. No merge/deploy/production activation; owner visual and launch acceptance remain separate."
     }
   ],
-  "overall": "Native continuation verified; original provider proof complete. Sprint1/operational90day archive still gated by new native-gateway live proof, guest-consent coverage and operator prerequisites."
+  "overall": "Native foundation and actual gateway/provisional proof verified; Sprint1/operational90day archive pending V2 settled checkpoint and operator/coverage prerequisites."
 }

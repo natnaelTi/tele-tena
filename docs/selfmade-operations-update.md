@@ -612,8 +612,9 @@ Do not deploy this checkpoint as a final provider-connected launch release.
 
 This package delivers the native foundation with production collection disabled.
 Do not bind the local proof file or enable replay/archive as part of updating code.
-Actual settled fixture export/playback/deletion passed; actual new-gateway live
-proof remains outstanding. See [acceptance](operations/acceptance-matrix.json).
+Actual settled fixture export/playback/deletion and new native-gateway provisional
+proof passed. V2 settled native archive/cleanup remains due8Nov00:28:39EAT; no
+production activation is included. See [acceptance](operations/acceptance-matrix.json).
 No seed, provider/payment-mode change, shared repair or new monitor is part of this update.
 
 The checkpoint helper additionally protects any bound external provider file,
