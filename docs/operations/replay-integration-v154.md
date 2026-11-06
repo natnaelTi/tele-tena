@@ -152,3 +152,12 @@ export and independent playback pass. Its new settled native archive/cleanup is
 due8Nov00:28:39EAT. No original recording recreated or budget reset. The player
 CSS regression found in actual playback is fixed and retested; current player
 requires V2 settled certification before activation.
+
+### Final Metadata-Cap Verification
+
+16/16capture/lifecycle tests and19/19operations tests pass after adding the explicit
+100000-entry default index cap and80%independent warning. The cap counts retained
+expired/deleted metadata, preserves tombstones and never changes business data.
+This adds no schema column or ingestion-payload change. Two new UI labels are in
+`localization/operations-v154-index-delta.csv`; full export9036rows, zero fabricated
+approvals. Existing30communications checks are reused unchanged.

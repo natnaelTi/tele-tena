@@ -83,3 +83,13 @@ and never replace it with an older copy. Merge validated tombstone records, then
 run the stopped-site retention recovery command in the deployment guide. Bounded
 orphan scans continue in normal jobs. Backup copies require an operator-approved
 expiry policy; no claim of immediate physical erasure from retained backups.
+
+### Bounded Retained Index
+
+The configurable replay-index entry limit defaults100000 (reviewer range1000–1000000).
+All archive states count, including expired/tombstoned rows; no new admission occurs
+at the cap. The independent watch warns at80%. This bounds normal capture metadata
+without deleting restore safeguards or inventing backup/audit expiry policy. Lowering
+a limit preserves existing records and blocks only new capture. Chunk rows expire
+after91days. Reclaiming old audit/deletion indexes requires an explicit operator
+backup-expiry/recovery policy; it is not an automatic silent cleanup.

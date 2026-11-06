@@ -61,14 +61,14 @@
     "localization_extraction": 2,
     "hostile_player": "Passed",
     "actual_export_playback": "72 events, seek ends, zero network",
-    "frappe16_capture": 14,
+    "frappe16_capture": 16,
     "replay_export": 3,
     "recheck_retry": 6,
     "private_checkpoint": 2,
     "actual_route_browser": "Patient/clinician/reviewer native gateway,390/768/1440; no provider egress",
     "archive_browser": "Actual backend playback, Escape/focus, actual200% X11 screen capture",
     "pwa": "Controller/update, private/API cache denial, offline/online deep link",
-    "native_budget": 3,
+    "native_budget": 4,
     "native_resume_guard": 1
   },
   "receipt_confirmation": {
@@ -134,5 +134,8 @@
     "settled_due_utc": "2026-11-07T21:28:39.095385+00:00",
     "settled_automatically_scheduled": false,
     "production_activation": false
-  }
+  },
+  "localization_catalog_rows": 9036,
+  "replay_index_default_limit": 100000,
+  "replay_index_warning_percent": 80
 }

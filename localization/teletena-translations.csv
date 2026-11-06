@@ -5104,6 +5104,8 @@ copy.operations.quarterly_reports,Operations,Quarterly Reports,,,frontend/src/pa
 copy.operations.raw_replay_retention,Operations,Raw Replay Retention,,,frontend/src/pages/Operations.tsx:10,[],6da9050c5f716a7f2e9d740aa475aacaadec652e5097656c4a0665bde014a824,missing,
 copy.operations.replay_archive,Operations,Replay Archive,,,frontend/src/pages/Operations.tsx:2; frontend/src/pages/Operations.tsx:6; frontend/src/pages/Operations.tsx:9,[],da0346a3b0c46cb2bdcf6f5bb4d94655c3b4090ded4541bd7d57f7fa787a24e6,missing,
 copy.operations.replay_archive_exports,Operations,Replay Archive Exports,,,frontend/src/pages/Operations.tsx:19,[],c8aabd5338be18aebebe1198d410c0de824a4b4cc5a91d771d3bd0053c1f9e19,missing,
+copy.operations.replay_index_entries,Operations,Replay Index Entries,,,frontend/src/pages/Operations.tsx:10,[],f294f1c8d9fb5d281da4f53f95316318eebca491e081b6d805fd8266effca26f,missing,
+copy.operations.replay_index_entry_limit,Operations,Replay Index Entry Limit,,,frontend/src/pages/Operations.tsx:19,[],4feb5c587ce3291799458f7f9893ac88078011599fcb94dbf00b36b90414b487,missing,
 copy.operations.retry,Operations,Retry,እንደገና ሞክር,Irra deebi'ii yaali,frontend/src/pages/Operations.tsx:4,[],942087cc2d41e01304b7195558d093d10c72af8e838c7556d6a02d471ee71852,provisional,
 copy.operations.retry_budget,Operations,Retry Budget,,,frontend/src/pages/Operations.tsx:19,[],1a398744115a2cf9ad12612ff22ebc365512056d0b683a0b5e0aab47e74d0898,missing,
 copy.operations.retry_export,Operations,Retry Export,,,frontend/src/pages/Operations.tsx:15,[],ea653e76e392ba3cf3e723be86eb52c070249be67128a167b27822c5bde0d613,missing,

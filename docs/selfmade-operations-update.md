@@ -1,8 +1,8 @@
-> Provider follow-up: [Plan V1 actual results](operations/live-verification-results-v1.md).
-> Do not bind the proof configuration or enable replay/archive while following this
-> update. The native demo release is separate from provider activation. Owner
-> receipts are confirmed; settled replay completeness/deletion and application-wide
-> capture integration remain pending. Preserve all existing provider settings.
+> Current proof: [V1 closed](operations/live-verification-results-v1.md) and
+> [V2 native gateway results/pending due time](operations/live-verification-results-v2.md).
+> Application-wide eligible capture is implemented and locally verified; V2 native
+> ingestion/provisional playback passed. Settled native archive/cleanup remains due
+>8Nov00:28:39EAT. Preserve provider settings; no production activation in this update.
 
 # Selfmade Operations Sprint 1 — Incremental Update
 
@@ -13,18 +13,17 @@ legal-policy, native-language or real-payment readiness. Final localization stil
 requires genuine independent approvals, validated import and a new verified pin.
 
 Installation pin: `47cd8f899e3026d5fc3c80e1c851e0ced5f43387`, branch `feat/operations-journey-insights`,
-draft PR dependent on PR51/50. The native v1.53 migration adds private operations
-command tables only. Existing clinical, financial, evidence and preference values
+draft PR dependent on PR51/50. The additivev1.53/v1.54 migrations add private operations/capture/chunk
+command tables and indexes only. Existing clinical, financial, evidence and preference values
 remain unchanged. No Python requirements change; frontend adds locked PostHog JS
 1.446.0 in quarantine, with replay/capture disabled. Bugsink uses the existing
 Frappe Sentry SDK through an isolated, sanitized client. No provider is enabled.
 
 See [Sprint1 evidence](operations/verification.md), [configuration](operations/configuration.md),
 [collection contract](operations/collection-retention.md) and [operator walkthrough](operations/operator-and-sprint2.md).
-Synthetic event/error ingestion, original-line mapping, provisional single-window
-export/playback and owner alert receipt passed. Settled completeness/deletion,
-application-wide capture integration, representative production capacity and
-external monitor setup remain gates. This package is a
+Synthetic event/error ingestion, original-line mapping, original settled export/playback/deletion and owner alert receipt passed. V2 native
+gateway/provisional proof passed; its settled native archive/cleanup, representative
+production capacity and external monitor setup remain gates. This package is a
 native operations review candidate, not a claim that those gates or launch acceptance passed.
 The alert recipient stays privately configured and unlinked to demo accounts.
 

@@ -150,7 +150,7 @@
       "id": "8.1",
       "requirement": "Byte/count/storage quotas and visible loss",
       "status": "Complete and verified",
-      "evidence_or_dependency": "Per-record/day/pending-chunk limits; daily replay cap; disk guard; measured capacity/states/drop counters and queue/storage warnings."
+      "evidence_or_dependency": "Configurable per-record/day/pending-chunk/byte caps plus100000-entry retained index cap and80%independent warning;16capture tests, no tombstone deletion or business mutation."
     },
     {
       "id": "8.2",

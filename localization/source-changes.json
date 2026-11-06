@@ -1,10 +1,7 @@
 {
   "added": [
-    "copy.backend_validation_archive.actual_project_settled_export_and_independent_playback_verification_re",
-    "copy.backend_validation_archive.measured_compressed_samples_inspect_collection_coverage_and_duration_b",
-    "copy.backend_validation_archive.no_verified_recording_samples_on_this_site",
-    "copy.backend_validation_archive.observed_compressed_archives_only_short_or_synthetic_sessions_are_not_",
-    "copy.backend_validation_archive.project_format_verified_site_collection_export_activation_remains_expl"
+    "copy.operations.replay_index_entries",
+    "copy.operations.replay_index_entry_limit"
   ],
   "stale": []
 }

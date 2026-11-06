@@ -1,0 +1,3 @@
+key,context,english,amharic,afaan_oromo,source_location,placeholders,source_hash,review_status,translator_notes
+copy.operations.replay_index_entries,Operations,Replay Index Entries,,,frontend/src/pages/Operations.tsx:10,[],f294f1c8d9fb5d281da4f53f95316318eebca491e081b6d805fd8266effca26f,missing,
+copy.operations.replay_index_entry_limit,Operations,Replay Index Entry Limit,,,frontend/src/pages/Operations.tsx:19,[],4feb5c587ce3291799458f7f9893ac88078011599fcb94dbf00b36b90414b487,missing,
