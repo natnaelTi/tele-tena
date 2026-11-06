@@ -27,7 +27,14 @@ def deletion_keys(manifest, config, identifier):
             or (current == row['denied_key_observed_sha256']
                 and not row.get('deletion_permission_change_confirmed'))):
         raise ProofBlocked('corrected_delete_key_and_owner_confirmation_required')
-    return 'provider-delete-retry-1-' + identifier, 'provider-delete-confirm-retry-1-' + identifier
+    attempt = row.get('deletion_retry_authorized_attempts', 1)
+    if type(attempt) is not int or attempt not in (1, 2):
+        raise ProofBlocked('bounded_delete_retry_authorization_required')
+    if attempt == 2:
+        previous = manifest['actions'].get('provider-delete-retry-1-' + identifier, {})
+        if previous.get('state') != 'HTTPResponse' or previous.get('http_status') != 403:
+            raise ProofBlocked('known_denial_required_for_next_retry')
+    return 'provider-delete-retry-' + str(attempt) + '-' + identifier, 'provider-delete-confirm-retry-' + str(attempt) + '-' + identifier
 
 
 def main():

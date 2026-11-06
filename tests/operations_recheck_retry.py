@@ -20,6 +20,11 @@ class RetryTests(unittest.TestCase):
     def test_one_stable_retry_key(self):
         self.row['deletion_retry_authorized'] = True
         self.assertEqual(deletion_keys(self.m, {'posthog_delete_key': 'new'}, 'synthetic'), ('provider-delete-retry-1-synthetic', 'provider-delete-confirm-retry-1-synthetic'))
+    def test_final_pair_requires_explicit_authorization_and_known_denial(self):
+        self.row.update(deletion_retry_authorized=True, deletion_permission_change_confirmed=True, deletion_retry_authorized_attempts=2)
+        with self.assertRaises(ProofBlocked): deletion_keys(self.m, {'posthog_delete_key':'old'}, 'synthetic')
+        self.m['actions']['provider-delete-retry-1-synthetic']={'state':'HTTPResponse','http_status':403}
+        self.assertEqual(deletion_keys(self.m, {'posthog_delete_key':'old'}, 'synthetic')[0], 'provider-delete-retry-2-synthetic')
     def test_unknown_not_resent(self):
         self.m['actions']['provider-delete-synthetic'] = {'state': 'Unknown'}
         self.assertEqual(deletion_keys(self.m, {}, 'synthetic')[0], 'provider-delete-synthetic')

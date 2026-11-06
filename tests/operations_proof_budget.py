@@ -36,6 +36,12 @@ class Budget(unittest.TestCase):
   m=json.loads(self.run.manifest.read_text());m['amendments']={'source_map_line_readback':{'approved':True,'limit':1}};self.run._write(self.run.manifest,m)
   self.run.reserve('line-check',{'source_map_line_readback':1})
   with self.assertRaisesRegex(ProofBlocked,'approved_limit_reached'):self.run.reserve('extra-line-check',{'source_map_line_readback':1})
+ def test_extra_deletion_read_requires_separate_amendment(self):
+  m=json.loads(self.run.manifest.read_text());m['phase']='AwaitingSettledRecheck';self.run._write(self.run.manifest,m)
+  with self.assertRaisesRegex(ProofBlocked,'approved_limit_reached'):self.run.reserve('provider-delete-confirm-owner-amendment-test',{'deletion_readback_amendment':1})
+  m=json.loads(self.run.manifest.read_text());m['amendments']={'deletion_readback':{'approved':True,'limit':1}};self.run._write(self.run.manifest,m)
+  self.run.reserve('provider-delete-confirm-owner-amendment-test',{'deletion_readback_amendment':1})
+  with self.assertRaisesRegex(ProofBlocked,'approved_limit_reached'):self.run.reserve('provider-delete-confirm-extra-test',{'deletion_readback_amendment':1})
  def test_unapproved_and_arbitrary_hosts_cannot_send(self):
   with self.assertRaises(ProofBlocked):self.run.request('no','unknown','/anything')
   m=json.loads(self.run.manifest.read_text());m['approved']=False;self.run._write(self.run.manifest,m)

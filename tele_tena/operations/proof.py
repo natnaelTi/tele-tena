@@ -42,13 +42,15 @@ class ProofRun:
    m,c=self.checked()
    if m.get('phase')=='AwaitingSettledRecheck':
     allowed=key.startswith('export-settled-') or key.startswith('provider-delete-')
-    if not allowed or set(costs)-{'posthog_admin_gets','recording_deletes','deletion_confirmation_gets'}:raise ProofBlocked('immediate_phase_closed')
+    if not allowed or set(costs)-{'posthog_admin_gets','recording_deletes','deletion_confirmation_gets','deletion_readback_amendment'}:raise ProofBlocked('immediate_phase_closed')
    if key in m['actions']:raise ProofBlocked('action_already_reserved')
    limits={**m['caps']}
    amendment=m.get('amendments',{}).get('email_recipient',{})
    if amendment.get('approved'):limits['email_amendment_messages']=amendment['limit']
    line_amendment=m.get('amendments',{}).get('source_map_line_readback',{})
    if line_amendment.get('approved'):limits['source_map_line_readback']=line_amendment['limit']
+   deletion_amendment=m.get('amendments',{}).get('deletion_readback',{})
+   if deletion_amendment.get('approved'):limits['deletion_readback_amendment']=deletion_amendment['limit']
    for kind,n in costs.items():
     if type(n) is not int or n<0 or kind not in limits or m['usage'].get(kind,0)+n>limits[kind]:raise ProofBlocked('approved_limit_reached')
    for kind,n in costs.items():m['usage'][kind]=m['usage'].get(kind,0)+n
