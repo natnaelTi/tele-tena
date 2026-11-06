@@ -1,6 +1,6 @@
 ## Final Local Package — 6 November2026
 
-Installation/build: `5b78294a251efdc6a9cd4238a3a41a80f312856a`. Preview8017 serves this exact release; later
+Installation/build: `fbd3b09d5ff64bfb7e1f57c0deb4a5d489b373ce`. Preview8017 serves this exact release; later
 documentation/evidence changes do not change runtime assets/backend.
 v1.54 fresh/repeat and populated preservation pass;16capture,19operations and
 30communications tests,8budget,6cleanup-retry,5native-budget,1due-time guard,

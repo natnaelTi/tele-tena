@@ -1,7 +1,7 @@
 {
   "baseline": "de27a6fbd6e2ed8c23d74471d98b8c357178890a",
   "schema": "v1.54",
-  "packaged_source": "5b78294a251efdc6a9cd4238a3a41a80f312856a",
+  "packaged_source": "fbd3b09d5ff64bfb7e1f57c0deb4a5d489b373ce",
   "frontend_lock_sha256": "efe3613bc3acba82e24a2a0d581a1c991e87babfd7b81522d542bae5b749051a",
   "translation_dictionary_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
   "human_approved_workbook_imports": 0,
@@ -46,9 +46,9 @@
   },
   "live_results": "docs/operations/live-verification-results-v1.md",
   "replay_settled_checkpoint_due_utc": "2026-11-06T19:50:28.731000+00:00",
-  "installation_commit": "5b78294a251efdc6a9cd4238a3a41a80f312856a",
-  "packaged_source_commit": "5b78294a251efdc6a9cd4238a3a41a80f312856a",
-  "packaged_release_json_sha256": "05d9f5773447b817e4fdcb8ed0ff49cbd454bd5563fd7cb67ce5a3a7b5cba6e2",
+  "installation_commit": "fbd3b09d5ff64bfb7e1f57c0deb4a5d489b373ce",
+  "packaged_source_commit": "fbd3b09d5ff64bfb7e1f57c0deb4a5d489b373ce",
+  "packaged_release_json_sha256": "0354330a1fcce6c0c492d3e1bb2cebdeeae6a58dd43e7a9abac5e0b62c23ae78",
   "latest_local_tests": {
     "frappe16_operations": 19,
     "communications": 30,
@@ -79,7 +79,7 @@
     "amended_email_recovery": true
   },
   "production_capture_enabled": false,
-  "previous_packaged_source": "15a051c271ddbe1a5e73b62d1f8d9c1afbd0fa74",
+  "previous_packaged_source": "79fcebde6a940d3c12e9b5df7be2eb03ab788ac7",
   "local_restart_financial_reconciliation": {
     "patient_owners": 11,
     "clinician_owners": 2,
@@ -139,5 +139,6 @@
   "localization_catalog_rows": 9036,
   "replay_index_default_limit": 100000,
   "replay_index_warning_percent": 80,
-  "source_build_difference": "Subsequent documentation/evidence changes only; runtime files match installation pin."
+  "source_build_difference": "Subsequent documentation/evidence changes only; runtime files match installation pin.",
+  "continuation_baseline_source": "2f80119e8433505e7ca295e7259f95759a8b9405"
 }
