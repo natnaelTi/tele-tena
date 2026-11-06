@@ -27,8 +27,8 @@ def posthog_event(event):
  c=settings();host=c.get('posthog_host');token=c.get('posthog_token')
  if host not in ('https://us.i.posthog.com','https://eu.i.posthog.com') or not isinstance(token,str):raise Unconfigured('posthog_unconfigured')
  # Construct from owned allowlist only; never forward an SDK envelope/raw request.
- from .contract import properties
- props={**properties(json.loads(event.properties)),**{k:event[k] for k in ('source','role','locale','device','environment','release_id','payment_mode','route')},'distinct_id':event.actor,'$insert_id':event.id,'attempt':event.attempt,'schema':'operations-v1','$geoip_disable':True}
+ from .contract import properties,VERSION
+ props={**properties(json.loads(event.properties)),**{k:event[k] for k in ('source','role','locale','device','environment','release_id','payment_mode','route')},'distinct_id':event.actor,'$insert_id':event.id,'attempt':event.attempt,'schema':VERSION,'$geoip_disable':True}
  import requests
  try:
   response=requests.post(host+'/capture/',json={'api_key':token,'event':event.name,'properties':props,'timestamp':event.created.isoformat()+'Z'},timeout=(2,3),allow_redirects=False)
@@ -131,4 +131,16 @@ def telegram(message):
   r=requests.post('https://api.telegram.org/bot'+c['telegram_token']+'/sendMessage',json={'chat_id':c['telegram_chat'],'text':message,'disable_web_page_preview':True},timeout=(2,3),allow_redirects=False)
   if r.status_code!=200 or not r.json().get('ok'):raise ProviderUnavailable('mobile_rejected')
  except requests.RequestException:raise ProviderUnavailable('mobile_unknown') from None
+ return 'ProviderAccepted'
+
+def replay_snapshot(session, chunk, events):
+ """Only gateway-projected snapshots. Stable UUID and timestamps make retries safe."""
+ c=settings();host=c.get('posthog_host');token=c.get('posthog_token')
+ if host not in ('https://eu.i.posthog.com','https://us.i.posthog.com') or not token:raise Unconfigured('replay_unconfigured')
+ import requests,uuid
+ payload={'event':'$snapshot','uuid':str(uuid.UUID(chunk['id'][:32])),'timestamp':session['captured'].isoformat()+'Z','properties':{'token':token,'distinct_id':session['owner_actor'],'$session_id':session['provider_id'],'$window_id':session['window_id'],'$snapshot_data':events,'$lib':'web','$lib_version':'1.446.0','$snapshot_host':'replay.invalid','$geoip_disable':True,'schema':'teletena-masked-web-v2','role':session['role'],'locale':session['locale'],'device':session['device'],'release':session['release_id'],'environment':session['environment'],'payment_mode':session['payment_mode'],'synthetic':'yes' if session['synthetic'] else 'no'}}
+ try:
+  response=requests.post(host+'/s/',json=[payload],timeout=(2,3),allow_redirects=False)
+  if response.status_code not in (200,201,202):raise ProviderUnavailable('snapshot_rate_limited' if response.status_code==429 else 'snapshot_rejected')
+ except requests.RequestException:raise ProviderUnavailable('snapshot_unknown') from None
  return 'ProviderAccepted'

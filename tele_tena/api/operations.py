@@ -3,7 +3,7 @@ import hashlib,json,re,uuid
 from pathlib import Path
 import frappe
 from tele_tena.api.journey import actor,command,query,rows,one,fail,audit
-from tele_tena.operations import runtime as rt,support as desk,jobs,reports,archive,providers
+from tele_tena.operations import runtime as rt,support as desk,jobs,reports,archive,providers,capture
 
 @frappe.whitelist(allow_guest=True,methods=['GET'])
 def liveness():
@@ -19,7 +19,7 @@ def liveness():
  return Response('TELETENA_APPLICATION_READY' if ready else 'TELETENA_UNAVAILABLE',status=200 if ready else 503,content_type='text/plain',headers={'Cache-Control':'no-store'})
 @query()
 def configuration():
- rt.reviewer();return {'config':rt.config(),'providers':providers.status(),'archive':archive.status()}
+ rt.reviewer();return {'config':rt.config(),'providers':providers.status(),'archive':archive.status(),'replay_capability':capture.capability(),'archive_capability':providers.archive_capability()}
 @command
 def configure(values,revision):
  user=rt.reviewer();old=rt.config()
@@ -34,9 +34,10 @@ def configure(values,revision):
  if values.get('owner'):
   if not frappe.db.get_value('User',values['owner'],'enabled'):fail('Choose an enabled account for the consenting owner alert subscription.')
  if values.get('mobile_channel',old['mobile_channel']) not in ('Disabled','Telegram') or values.get('environment',old['environment']) not in ('review','staging','production'):fail('Choose a supported environment and alert channel.')
- if values.get('replay'):fail('Session replay is unavailable until project masking and capture verification pass.','replay_unverified')
- if values.get('archive'):fail('Archive export is unavailable until the selected project passes complete export and independent playback verification.','archive_unverified')
+ if values.get('replay') and not capture.capability():fail('Session replay is unavailable until project masking and capture verification pass.','replay_unverified')
+ if values.get('archive') and not providers.archive_capability():fail('Archive export is unavailable until the selected project passes complete export and independent playback verification.','archive_unverified')
  data={**old,**values};data.pop('revision',None)
+ if data['replay'] and not data['archive']:fail('Enable verified archive exports before enabling replay, or disable replay first.','replay_archive_required')
  frappe.db.sql('SELECT id FROM tt_ops_config WHERE id=1 FOR UPDATE')
  if rt.config()['revision']!=old['revision']:fail('Settings changed. Reload before saving.','operations_conflict')
  frappe.db.sql('UPDATE tt_ops_config SET payload=%s,revision=revision+1,modified=%s WHERE id=1',(json.dumps(data),rt.now()))
@@ -44,14 +45,34 @@ def configure(values,revision):
 @frappe.whitelist(allow_guest=True,methods=['GET'])
 def collection():
  c=rt.config();user=frappe.session.user;pref=rows('SELECT analytics,replay FROM tt_ops_preference WHERE actor=%s',(rt.pseudonym(user),)) if user!='Guest' else []
- return {'schema':'operations-v1','subject':rt.pseudonym(user) if user!='Guest' else None,'analytics':c['native_events'],'errors':c['errors'],'csrf_token':(__import__('frappe.sessions',fromlist=['get_csrf_token']).get_csrf_token() if getattr(frappe.local,'request',None) else None),'external_analytics_enabled':c['analytics'],'replay_configured':False,'replay_status':'Unavailable until project masking and compatibility verification','notice_version':'operations-notice-draft-v1','preference':{'analytics':bool(pref and pref[0].analytics),'replay':bool(pref and pref[0].replay)},'sample_percent':c['sample_percent']}
+ return {'schema':'operations-v1.1','subject':rt.pseudonym(user) if user!='Guest' else None,'analytics':c['native_events'],'errors':c['errors'],'csrf_token':(__import__('frappe.sessions',fromlist=['get_csrf_token']).get_csrf_token() if getattr(frappe.local,'request',None) else None),'external_analytics_enabled':c['analytics'],'replay_configured':bool(c['replay'] and c['archive'] and capture.capability()),'role':rt.role(),'revision':c['revision'],'replay_status':'Unavailable until project masking and compatibility verification','notice_version':'operations-notice-draft-v1','preference':{'analytics':bool(pref and pref[0].analytics),'replay':bool(pref and pref[0].replay)},'sample_percent':c['sample_percent']}
 @command
 def preference(analytics,replay=False):
  user=actor()
  if type(analytics) is not bool or type(replay) is not bool:fail('Review your collection choices.')
  frappe.db.sql('INSERT INTO tt_ops_preference VALUES (%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE analytics=VALUES(analytics),replay=VALUES(replay),version=VALUES(version),modified=VALUES(modified)',(rt.pseudonym(user),int(analytics),int(replay),'operations-notice-draft-v1',rt.now()))
  if not analytics:frappe.db.sql("UPDATE tt_ops_event SET delivery='Disabled' WHERE actor=%s AND delivery IN ('Pending','Unconfigured')",(rt.pseudonym(user),))
+ if not replay:capture.revoke_owner()
  audit(user,'CollectionPreferenceChanged',{'analytics':analytics,'replay':replay,'notice_version':'operations-notice-draft-v1'});return collection()
+def _capture_call(fn,*args):
+ try:return fn(*args)
+ except ValueError:fail('Masked replay could not continue. Other care features are unaffected.','replay_unavailable')
+
+@command
+def replay_admit(provider_id,window_id):
+ return _capture_call(capture.admit,provider_id,window_id)
+@command
+def replay_chunk(id,chunk_id,events,route):
+ return _capture_call(capture.chunk,id,chunk_id,events,route)
+@command
+def replay_loss(id,reason):
+ return _capture_call(capture.loss,id,reason)
+@command
+def replay_close(id):
+ return _capture_call(capture.close,id)
+@command
+def replay_delete(id):
+ row=capture._owned(id,require_scope=False);archive.tombstone(row.id,'UserDeleted');audit(id,'OwnReplayDeleted',{});return {'state':'Expired'}
 @frappe.whitelist(allow_guest=True,methods=['POST'])
 def events(items):
  # Guest is allowed only allowlisted interaction events, never confirmed outcomes.

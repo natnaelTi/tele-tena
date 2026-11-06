@@ -13,7 +13,7 @@ def schedule():
  except Exception:rt.incident('operations_enqueue_failed')
 def process():
  if not rt.available():return
- from . import reports,archive,storage,providers
+ from . import reports,archive,storage,providers,capture
  beat('worker_started');reports.aggregate(500)
  for file in list(storage.root().glob('error-*'))[:25]:
   try:
@@ -36,7 +36,12 @@ def process():
    except providers.Unconfigured:state='Unconfigured'
    except Exception:state='Unknown'
    frappe.db.sql('UPDATE tt_ops_error SET state=%s,tries=tries+1 WHERE id=%s',(state,event.id))
- archive.retention();archive.process_provider_deletions();archive.export_tick()
+ archive_failed=False
+ for lifecycle in (capture.tick,archive.retention,archive.process_provider_deletions,archive.export_tick):
+  try:lifecycle()
+  except (ValueError,OSError,providers.Unconfigured,providers.ProviderUnavailable):
+   archive_failed=True;rt.incident('archive_lifecycle_unavailable');beat('archive_lifecycle',{'state':'Unavailable'})
+ if not archive_failed:rt.incident('archive_lifecycle_unavailable',recovery=True);beat('archive_lifecycle',{'state':'Current'})
  # Aggregate before raw structured-event expiry. Business/support/audit rows are never deleted here.
  frappe.db.sql('DELETE FROM tt_ops_event WHERE aggregated=1 AND created<%s LIMIT 1000',(rt.now()-timedelta(days=c['event_days']),))
  removed=frappe.db._cursor.rowcount
@@ -64,7 +69,7 @@ def _after_job(method=None,kwargs=None,result=None):
  beat('app_job_completed');frappe.db.commit()
 
 def health():
- c=rt.config();beats={x.name:{'at':x.at,'age_seconds':max(0,int((rt.now()-x.at).total_seconds()))} for x in frappe.db.sql('SELECT name,at FROM tt_ops_heartbeat WHERE name IN (\'scheduler\',\'worker_started\',\'worker_completed\',\'retention\',\'app_job_completed\')',as_dict=True)}
+ c=rt.config();beats={x.name:{'at':x.at,'age_seconds':max(0,int((rt.now()-x.at).total_seconds()))} for x in frappe.db.sql('SELECT name,at FROM tt_ops_heartbeat WHERE name IN (\'scheduler\',\'worker_started\',\'worker_completed\',\'retention\',\'app_job_completed\',\'archive_lifecycle\')',as_dict=True)}
  queue={'state':'Unavailable','pending':None,'oldest_age_seconds':None}
  try:
   from frappe.utils.background_jobs import get_queue
@@ -75,7 +80,7 @@ def health():
    job=Job.fetch(ids[0],connection=q.connection)
    if job.enqueued_at:queue['oldest_age_seconds']=max(0,int((rt.now()-job.enqueued_at.replace(tzinfo=None)).total_seconds()))
  except Exception:pass
- return {'release':rt.release(),'environment':c['environment'],'database':'Ready','beats':beats,'queue':queue,'alert_states':frappe.db.sql('SELECT state,COUNT(*) n FROM tt_ops_alert GROUP BY state',as_dict=True),'notification_states':frappe.db.sql("SELECT state,COUNT(*) n,MIN(created) oldest FROM tt_booking_notice WHERE channel IN ('email','sms') GROUP BY state",as_dict=True),'backup':'Unavailable — No Verified Backup-Freshness Metadata','freshness':'Stale' if any(beats.get(k,{}).get('age_seconds',999999)>240 for k in ('scheduler','worker_completed')) else 'Current','providers':__import__('tele_tena.operations.providers',fromlist=['status']).status()}
+ return {'release':rt.release(),'environment':c['environment'],'database':'Ready','beats':beats,'queue':queue,'alert_states':frappe.db.sql('SELECT state,COUNT(*) n FROM tt_ops_alert GROUP BY state',as_dict=True),'notification_states':frappe.db.sql("SELECT state,COUNT(*) n,MIN(created) oldest FROM tt_booking_notice WHERE channel IN ('email','sms') GROUP BY state",as_dict=True),'backup':'Unavailable — No Verified Backup-Freshness Metadata','freshness':'Stale' if any(beats.get(k,{}).get('age_seconds',999999)>240 for k in ('scheduler','worker_completed')) else 'Current','archive':__import__('tele_tena.operations.archive',fromlist=['status']).status(),'providers':__import__('tele_tena.operations.providers',fromlist=['status']).status()}
 
 def watch():
  """CLI operator runner; no RQ dependency for critical technical alert delivery."""
@@ -83,6 +88,9 @@ def watch():
  status=health();rt.incident('operations_worker_stale','Warning',recovery=status['freshness']=='Current')
  failures=frappe.db.sql("SELECT COUNT(*) n,COUNT(DISTINCT actor) people FROM tt_ops_event WHERE name='validation.failed' AND created>DATE_SUB(UTC_TIMESTAMP(6),INTERVAL 5 MINUTE) AND JSON_UNQUOTE(JSON_EXTRACT(properties,'$.step')) IN ('payment','schedule') AND JSON_UNQUOTE(JSON_EXTRACT(properties,'$.error_code')) IN ('network','timeout','unavailable')",as_dict=True)[0]
  rt.incident('widespread_booking_payment_failure','Critical',recovery=not(failures.n>=10 and failures.people>=3))
+ a=__import__('tele_tena.operations.archive',fromlist=['status']).status()
+ rt.incident('archive_capacity_near_limit','Warning',recovery=not(a['used_bytes'] is not None and a['used_bytes']*100>=a['limit_bytes']*80))
+ rt.incident('archive_export_delayed','Warning',recovery=not a['export_warning'])
  send_alerts();send_digest()
  frappe.db.commit()
 

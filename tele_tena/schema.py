@@ -184,3 +184,5 @@ def install():
     application_flow()
     from tele_tena.patches.v1_53_operations import execute as operations
     operations()
+    from tele_tena.patches.v1_54_replay_capture import execute as replay_capture
+    replay_capture()

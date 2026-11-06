@@ -73,3 +73,5 @@ tele_tena.patches.v1_51_communications
 tele_tena.patches.v1_52_application_flow
 
 tele_tena.patches.v1_53_operations
+
+tele_tena.patches.v1_54_replay_capture

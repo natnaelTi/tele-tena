@@ -257,6 +257,9 @@ export default function Consultation({
         const active = Boolean(remoteSpeaker);
         setSpeaking(active); setLevel(active ? Math.min(1, remoteSpeaker?.audioLevel || 0) : 0);
       });
+      connectedRoom.on(RoomEvent.ConnectionQualityChanged, (quality,participant) => {
+        if(current()&&participant===connectedRoom.localParticipant){const value=String(quality).toLowerCase();observe('consultation.quality',{quality:['excellent','good','poor','lost'].includes(value)?value:'unknown',step:'room'});}
+      });
       connectedRoom.on(RoomEvent.ParticipantConnected, () => {
         if (current()) setRemotePresent(connectedRoom.remoteParticipants.size > 0);
       });
