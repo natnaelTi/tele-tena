@@ -1,3 +1,13 @@
+> **Current continuation — 6 November 2026:** v1.54 native replay admission,
+> masking, private spooling/export, independent player and retention are implemented
+> and locally verified. The original live recording passed its settled25-hour
+> export/playback; provider deletion still returns403, including the explicitly
+> authorized permission-correction retry. The actual new native gateway has no
+> live ingestion proof yet. Production capture/export remain disabled.
+> [Current requirement matrix](acceptance-matrix.json),
+> [implementation gaps](implementation-gaps.md) and
+> [v1.54 evidence](replay-integration-v154.md) supersede older status statements below.
+
 # Collection and Retention Contract
 
 Version operations-v1. The executable allowlist is `tele_tena/operations/contract.py`;
@@ -48,3 +58,22 @@ extend raw retention. No measured production replay capacity estimate is availab
 no actual project recordings exist. Archive status returns null estimates rather
 than invented bytes/session. Measure completed masked recordings and publish p50/p95,
 compressed bytes/day and90-day projection before enabling capture.
+
+## v1.54 Limits and Restore Rules
+
+Current defaults add5000chunks/day,500pendingchunks and1000chunks/recording;
+500recordings/day and10MiB/recording remain independent caps. A recording lease is
+bounded to15minutes. Export waits25hours from completion/last-delivery; maximum
+20sources/40seconds per attempt, retry budget5, exponential1/2/4/8/16hour delays.
+Missing/lost chunks and unsupported formats remain Incomplete, never Verified.
+All raw objects expire from original capture+90days; source deletion or owner
+withdrawal records tombstones. Aggregate/report/support/business retention is
+separate. Consent withdrawal drops unsent chunks, including closed tabs; already
+transmitted history requires the explicit deletion lifecycle and cannot be recalled
+from a viewer's memory.
+
+Before restoring any database/private backup, preserve the latest deletion journal
+and never replace it with an older copy. Merge validated tombstone records, then
+run the stopped-site retention recovery command in the deployment guide. Bounded
+orphan scans continue in normal jobs. Backup copies require an operator-approved
+expiry policy; no claim of immediate physical erasure from retained backups.

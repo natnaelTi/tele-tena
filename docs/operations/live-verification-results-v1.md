@@ -1,3 +1,13 @@
+> **Current continuation — 6 November 2026:** v1.54 native replay admission,
+> masking, private spooling/export, independent player and retention are implemented
+> and locally verified. The original live recording passed its settled25-hour
+> export/playback; provider deletion still returns403, including the explicitly
+> authorized permission-correction retry. The actual new native gateway has no
+> live ingestion proof yet. Production capture/export remain disabled.
+> [Current requirement matrix](acceptance-matrix.json),
+> [implementation gaps](implementation-gaps.md) and
+> [v1.54 evidence](replay-integration-v154.md) supersede older status statements below.
+
 # Plan V1 — Actual Results and Pending Settled Check
 
 5 November 2026. This supplements the immutable approved
@@ -180,3 +190,32 @@ at http://127.0.0.1:8017/teletena/. The shared Selfmade environment was not chan
 The [incremental update guide](../selfmade-operations-update.md) pins this native
 review candidate and preserves existing site/provider switches. This is not an
 instruction to deploy or activate capture before owner review.
+
+## Settled Checkpoint and Permission-Corrected Cleanup — 6 November2026
+
+The due time passed and the exact saved command ran against the original manifest:
+
+```bash
+PYTHONPATH="$PWD" ../../env/bin/python scripts/operations_proof/recheck.py \
+  --root /home/frappe/teletena-operations-config \
+  --output /home/frappe/teletena-operations-proof --delete-verified-tests
+```
+
+Settled complete export:1source/72events/4061compressed bytes; independent playback
+VerifiedOffline, all events/seek ends/zero requests. This is an actual passed
+elapsed-time checkpoint. Provider DELETE403 and confirmationGET200 blocked cleanup.
+After the owner confirmed same-token permission changes, exactly one further
+same-record DELETE and confirmationGET ran:403/200 again. No certificate/activation.
+Do not rerun for a third attempt without a newly confirmed permission correction.
+The command resumes existing verified artifacts, not a replacement recording.
+
+Current PlanV1 usage:2/12custom events;5/5errors;1/3recordings;1/300snapshot posts
+(37064bytes/30MiB);11/60administrative GETs;2/6queries;2/3recording deletes and
+2/3exact deletion-confirmation GETs; original Bugsink reads10/10 plus approved
+line-read1/1; source-map pair985bytes; Telegram2/2; originalemail2/2 plus amended
+email2/2. Failed403 calls stay charged. Owner confirmed both Telegram and both
+amended email receipts. **No further messages are authorized or needed.**
+
+The saved authorization stays AwaitingSettledRecheck; live_test_authorized returns
+false after each exact request. Owner_account remains blank. Tokens, private IDs,
+raw responses and recipient values remain outside repository/evidence.

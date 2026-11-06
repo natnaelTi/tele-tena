@@ -12,7 +12,7 @@ English fallbacks. It imports no workbook drafts and does not claim clinical,
 legal-policy, native-language or real-payment readiness. Final localization still
 requires genuine independent approvals, validated import and a new verified pin.
 
-Installation pin: `79fcebde6a940d3c12e9b5df7be2eb03ab788ac7`, branch `feat/operations-journey-insights`,
+Installation pin: `47cd8f899e3026d5fc3c80e1c851e0ced5f43387`, branch `feat/operations-journey-insights`,
 draft PR dependent on PR51/50. The native v1.53 migration adds private operations
 command tables only. Existing clinical, financial, evidence and preference values
 remain unchanged. No Python requirements change; frontend adds locked PostHog JS
@@ -46,7 +46,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=79fcebde6a940d3c12e9b5df7be2eb03ab788ac7
+RELEASE_SHA=47cd8f899e3026d5fc3c80e1c851e0ced5f43387
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 OLD_SHA=$(git -C apps/tele_tena rev-parse HEAD)
 printf 'Installed TeleTena: %s\n' "$OLD_SHA"
@@ -111,7 +111,7 @@ installed release predates de27a6f or is on unrelated ancestry, stop: collect th
 installed SHA and `git diff "$OLD_SHA" "$RELEASE_SHA" -- tele_tena/patches.txt
 pyproject.toml frontend/package-lock.json` for a baseline-specific functional/schema
 upgrade plan. The candidate includes older features, but unknown older migrations
-must not be silently treated as this verified v1.53 incremental delta.
+must not be silently treated as this verified v1.54 incremental delta.
 
 ## 3. Initialize Once, or Resume the Retained Bundle
 
@@ -129,7 +129,7 @@ printf '%s\n' "$RELEASE_SHA" > "$UPDATE_BACKUP/candidate.sha"
 printf '%s\n' "$RELEASE_PURPOSE" > "$UPDATE_BACKUP/purpose.txt"
 TOOLS="$UPDATE_BACKUP/tools"
 mkdir -m 700 "$TOOLS"
-for TOOL in dependency_checkpoint.py release_preflight.py check_frappe_lock.py backup_review_release.py verify_release_backup.py restore_review_release.py export_loaded_supervisor.py release_preservation.py check_financial_owners.py; do
+for TOOL in dependency_checkpoint.py release_preflight.py check_frappe_lock.py backup_review_release.py verify_release_backup.py restore_review_release.py export_loaded_supervisor.py release_preservation.py check_financial_owners.py operations_archive_checkpoint.py operations_restore_retention.py; do
   git -C apps/tele_tena show "$RELEASE_SHA:scripts/$TOOL" > "$TOOLS/$TOOL"
 done
 printf 'RETAIN THIS EXACT BACKUP PATH: %s\n' "$UPDATE_BACKUP"
@@ -147,7 +147,7 @@ umask 077
 cd /home/smcs/frappe-bench
 SITE=teletena.selfmadecs.com
 BENCH_CLI=/home/smcs/.pyenv/versions/3.14.2/bin/bench
-RELEASE_SHA=79fcebde6a940d3c12e9b5df7be2eb03ab788ac7
+RELEASE_SHA=47cd8f899e3026d5fc3c80e1c851e0ced5f43387
 RELEASE_PURPOSE=demo # only demo or localized; localized additionally requires complete approved coverage
 UPDATE_BACKUP=/home/smcs/teletena-before-operations.RETAINED_PATH
 TOOLS="$UPDATE_BACKUP/tools"
@@ -167,6 +167,8 @@ env/bin/python "$TOOLS/verify_release_backup.py" "$UPDATE_BACKUP/site-backups"
 test -s "$UPDATE_BACKUP/preserved-state.json"
 test -s "$UPDATE_BACKUP/dependencies/packages.json"
 sha256sum --check "$UPDATE_BACKUP/private-state.sha256"
+env/bin/python "$TOOLS/operations_archive_checkpoint.py" verify \
+  --directory "$UPDATE_BACKUP/operations-private"
 ```
 
 If interrupted before backup completion, inspect and finish only that unfinished
@@ -273,6 +275,11 @@ tar --create --file "$UPDATE_BACKUP/private-state.tar" --exclude='./files' --exc
 tar --list --file "$UPDATE_BACKUP/private-state.tar" > "$UPDATE_BACKUP/private-state.files"
 sha256sum "$UPDATE_BACKUP/private-state.tar" > "$UPDATE_BACKUP/private-state.sha256"
 sha256sum --check "$UPDATE_BACKUP/private-state.sha256"
+env/bin/python "$TOOLS/operations_archive_checkpoint.py" snapshot \
+  --bench /home/smcs/frappe-bench --site "$SITE" \
+  --directory "$UPDATE_BACKUP/operations-private"
+env/bin/python "$TOOLS/operations_archive_checkpoint.py" verify \
+  --directory "$UPDATE_BACKUP/operations-private"
 cp -a apps/tele_tena/tele_tena/public/review "$UPDATE_BACKUP/review-assets"
 env/bin/python "$TOOLS/release_preservation.py" snapshot --bench /home/smcs/frappe-bench \
   --site "$SITE" --snapshot "$UPDATE_BACKUP/preserved-state.json"
@@ -352,7 +359,7 @@ env/bin/python "$TOOLS/check_financial_owners.py" --bench /home/smcs/frappe-benc
 "$BENCH_CLI" --site "$SITE" clear-website-cache
 ```
 
-v1.53 adds operations tables only. Every original protected value remains strict:
+v1.53/v1.54 add operations/capture/chunk tables and indexes only. No new shared Python dependency change is required from the preceding Sprint1 candidate; the dry-run still protects unknown installed baselines. Every original protected value remains strict:
 users/auth, professional/scope/language decisions, evidence, files, credentials,
 provider/payment settings, disclosure preferences and financial history. No legacy
 recovery allowance is used for the verified de27a6f-or-newer baseline. Do not skip
@@ -600,3 +607,48 @@ Only authorized isolated provider tests may advance connectivity/export/playback
 evidence. UptimeRobot stays separate. Source maps, useful masked capture, complete
 export/normalization and independent playback are not complete implementations yet.
 Do not deploy this checkpoint as a final provider-connected launch release.
+
+## v1.54 Replay-Specific Deployment and Recovery Boundaries
+
+This package delivers the native foundation with production collection disabled.
+Do not bind the local proof file or enable replay/archive as part of updating code.
+Actual settled fixture export/playback passed; provider deletion403 and actual
+new-gateway live proof remain outstanding. See [acceptance](operations/acceptance-matrix.json).
+No seed, provider/payment-mode change, shared repair or new monitor is part of this update.
+
+The checkpoint helper additionally protects any bound external provider file,
+project-proof/activation certificates, current deletion journal and optional private
+archive volume. It refuses symlinks, unsafe modes, changed checksums or missing
+members and never prints secrets. Default local archives are also within the
+private-state TAR; an external volume must be in the manifest and protected backup.
+Choose volume sizing/backup expiry deliberately before production activation.
+
+### Post-Migration Restore Must Preserve Later Replay Deletions
+
+Before deciding to restore DB/private state, stop the same verified writers and
+preserve the **latest** `sites/$SITE/private/teletena-operations/deletions.jsonl`
+(if it exists) in a separate700/600 recovery bundle. Also retain current private
+objects/configuration and post-deployment business activity for the operator's
+reconciliation decision. Do not replace a live private volume with an old snapshot
+or undo new payments/clinical activity without an explicit recovery decision.
+
+After the already-documented database/public/private/config restore, merge the
+latest validated deletion records into the restored journal before reopening.
+The journal contains only64hex replay IDs, reason and timestamp; reject malformed
+records, preserve attribution and keep600permissions. Never overwrite the latest
+journal with its backup copy. With all writers still stopped and maintenance on:
+
+```bash
+env/bin/python apps/tele_tena/scripts/operations_restore_retention.py \
+  --bench /home/smcs/frappe-bench --site "$SITE" \
+  --confirm-stopped-site "$SITE"
+```
+
+Run this using the restored compatiblev1.54 code/schema, before code rollback to
+an older schema version. It expires original-capture-age objects, applies retained
+tombstones and scans orphaned private archives; it does not contact providers or
+delete business records. Then retain the deletion journal separately through any
+older-code recovery, repeat protected-state/reconciliation checks, and follow the
+scoped service recovery. Pending provider deletions require a working scoped key;
+do not describe them as completed. A database restore is an operator recovery
+operation, not equivalent to checking out an old commit.

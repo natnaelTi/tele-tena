@@ -1,6 +1,6 @@
 {
   "baseline": "de27a6fbd6e2ed8c23d74471d98b8c357178890a",
-  "schema": "v1.53",
+  "schema": "v1.54",
   "packaged_source": "79fcebde6a940d3c12e9b5df7be2eb03ab788ac7",
   "frontend_lock_sha256": "efe3613bc3acba82e24a2a0d581a1c991e87babfd7b81522d542bae5b749051a",
   "translation_dictionary_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
@@ -16,7 +16,11 @@
     "support-preview-1440.png": "7fc0fa19c2e8810a34fec6f0bf7a824e5939c16e685ac44712fbb155db384e60",
     "support-resolved-1440.png": "f7a35d31c8cb7c7aca126f8872f22ea32d87db9cc719d38034cedb161a313be2",
     "support-review-390.png": "fc84b46fb7232b66c2ae76d63bee71df38fb53af90334e5b6c6e6690bf09ed2c",
-    "provider-proof/independent-playback.png": "388f59b171c5c96e10cd7823d8386c2c5974724f977cb7f8bee8faaa6a9778d0"
+    "provider-proof/independent-playback.png": "388f59b171c5c96e10cd7823d8386c2c5974724f977cb7f8bee8faaa6a9778d0",
+    "v154/archive-playback-768.png": "8341485aa49e02f037e63a068538f675528a380be9c86464aab5066b21c37b3b",
+    "v154/archive-200-percent-screen.png": "89863dba765cba110b1d46a9d5adc5818919a2b2d78f972095d89d0158c66634",
+    "v154/archive-playback-390.png": "5ac96da921251da80bed3753638e7fe5ffea17ca21aa77cfe01e72d2bca812d1",
+    "v154/archive-playback-1440.png": "ed9b9a0c8ac68b7c7fc7835dca51fba9bdb87ca3a8d736c47153768f87ef904d"
   },
   "provider_ingestion_verified": true,
   "replay_archive_available": false,
@@ -56,7 +60,14 @@
     "localization_exchange": 5,
     "localization_extraction": 2,
     "hostile_player": "Passed",
-    "actual_export_playback": "72 events, seek ends, zero network"
+    "actual_export_playback": "72 events, seek ends, zero network",
+    "frappe16_capture": 14,
+    "replay_export": 3,
+    "recheck_retry": 5,
+    "private_checkpoint": 2,
+    "actual_route_browser": "Patient/clinician/reviewer native gateway,390/768/1440; no provider egress",
+    "archive_browser": "Actual backend playback, Escape/focus, actual200% X11 screen capture",
+    "pwa": "Controller/update, private/API cache denial, offline/online deep link"
   },
   "receipt_confirmation": {
     "telegram_alert": true,
@@ -71,5 +82,37 @@
     "clinician_owners": 2,
     "accounts": 22,
     "mismatches": 0
-  }
+  },
+  "settled_live_replay": {
+    "export": "Complete",
+    "sources": 1,
+    "events": 72,
+    "compressed_bytes": 4061,
+    "independent_playback": "VerifiedOffline",
+    "deletion_http_statuses": [
+      403,
+      403
+    ],
+    "confirmation_http_statuses": [
+      200,
+      200
+    ],
+    "certificate_bound": false
+  },
+  "preservation_v154": {
+    "main_tables": 122,
+    "main_rows": 19311,
+    "populated_final_repeat_tables": 124,
+    "populated_final_repeat_rows": 19133,
+    "private_config_credentials": "Hashes unchanged",
+    "fresh_latest_combined": "Frappe16 release site passed with repeat and flags off"
+  },
+  "new_gateway_live_verified": false,
+  "remaining_gates": "docs/operations/implementation-gaps.md",
+  "acceptance_matrix": "docs/operations/acceptance-matrix.json",
+  "measured_local_route_bytes": [
+    134418,
+    134106,
+    133886
+  ]
 }

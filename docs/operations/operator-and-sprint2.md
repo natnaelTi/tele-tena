@@ -1,3 +1,13 @@
+> **Current continuation — 6 November 2026:** v1.54 native replay admission,
+> masking, private spooling/export, independent player and retention are implemented
+> and locally verified. The original live recording passed its settled25-hour
+> export/playback; provider deletion still returns403, including the explicitly
+> authorized permission-correction retry. The actual new native gateway has no
+> live ingestion proof yet. Production capture/export remain disabled.
+> [Current requirement matrix](acceptance-matrix.json),
+> [implementation gaps](implementation-gaps.md) and
+> [v1.54 evidence](replay-integration-v154.md) supersede older status statements below.
+
 > Current provider proof and remaining implementation boundaries:
 > [Plan V1 results](live-verification-results-v1.md). Owner Telegram/email receipts
 > are confirmed. The settled replay checkpoint is pending; application-wide capture
@@ -47,3 +57,33 @@ External prerequisites: selected provider projects/scoped credentials, storage a
 private player-format proof, owner opt-in receipt test, independent alert launcher,
 UptimeRobot account/monitor setup, human language/policy/visual acceptance. No second
 browser recorder or invented snapshot converter is authorized as a fallback.
+
+## v1.54 API Handoff
+
+Use existing `tele_tena.api.operations` functions: reviewer `archive_list`,
+`archive_retry(id)`, `archive_delete(id)`, `archive_playback(id)`, and
+`archive_player(locale)`; authenticated owner `replay_admit(provider_id,window_id)`,
+`replay_chunk(id,chunk_id,events,route)`, `replay_loss(id,reason)`,
+`replay_close(id)`, `replay_delete(id)`. These are command APIs with server checks,
+not generic DocType access. Inspect exact signatures before wiring new controls.
+Archive status includes capacity, measured samples, pending/incomplete/retry/loss
+and oldest-unarchived timestamps. Never turn null/Unavailable into zero/Healthy.
+
+The client reuses `operations-replay.ts`, strict replay projection and existing
+Dialog; the backend reuses runtime/config/audit/storage, native custom queue and
+existing notification outbox. No second recorder/provider or competing business
+state. Per-tab records deliberately do not reconstruct a cross-tab identity graph.
+Sprint2 can consume structured insights/reports/support and these status APIs now;
+full portal/heatmaps remain its scope. Raw private replays cannot be public links.
+
+### Investigate a Failed Journey
+
+Inspect server-confirmed outcomes and coverage first; correlate safe attempt/error
+references, release/locale/device and actual queue freshness. Open authorized
+support context only when needed, keeping internal replies separate. A replay
+failure does not invalidate a confirmed business transaction. For an incomplete
+archive inspect its safe failure code, chunk loss and export deadline; reviewer
+Retry Export is bounded and never restores expired/deleted data. Do not retry
+booking/payment commands or adjust balances to repair telemetry. Acknowledge
+incidents once, observe deduplicated recovery and keep provider failures distinct
+from an application outage. Unconfigured integrations are not healthy integrations.

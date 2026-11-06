@@ -87,3 +87,28 @@ Current readiness and exact remaining implementation gaps are in
 been bound to the presentation site or activated. Follow only the owner-approved
 [bounded live plan](live-verification-plan-v1.md); credential presence is not consent
 to send, capture, upload, delete or change global flags.
+
+## v1.54 Explicit Activation and Storage
+
+Optional private fields: `archive_directory` (dedicated700directory;600objects),
+`archive_proof_file` (selected-project settled proof,600), and
+`replay_activation_file` (separate owner-approved code-hash-bound certificate,600).
+A template is outside Git at
+`/home/frappe/teletena-operations-config/replay-activation.template.json`.
+Do not copy over populated working configuration or bind/activate during update.
+Project proof is not consent or permanent test authorization. The current original
+proof is incomplete because deletion still returns403. Native gateway live proof
+and explicit activation remain required. Each eligible authenticated user must
+separately accept noticev2 replay; guests remain ineligible. No old choice is silently
+upgraded. Retain owner_account empty and current alert recipients.
+
+UptimeRobot remains manual: create HTTPS keyword monitor for the minimal application
+liveness response and a separate `/teletena/` built-shell check; compare served
+release/assets in the operator smoke test so a generic200 maintenance shell is not
+mistaken for a healthy app. Confirm current free-plan commercial use/interval/channel
+and heartbeat entitlement in the selected account before relying on it; do not
+purchase or assume unsupported heartbeat integration. Point alerts only at the
+owner's explicit destinations and validate by an opt-in bounded operator test.
+Native independent watch detects queue/stale processing separately; arrange an
+approved persistent launcher for `operations_service.py` before launch. No monitor,
+system service or production provider setting was created by this sprint.

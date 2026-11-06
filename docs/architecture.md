@@ -1,3 +1,13 @@
+## Operations Continuation — 6 November2026
+
+Additivev1.54 implements gated eligible authenticated replay, native private spooling,
+complete-source export, inert independent playback, quotas/retries and capture-time
+retention. Local real-backend/browser/clock/preservation evidence is recorded in
+[the current report](operations/replay-integration-v154.md). Actual original settled
+export/playback passed; provider cleanup403 and new-gateway live proof remain gates.
+Guests remain ineligible. Production collection is disabled; no operational90-day
+archive or final Sprint1 acceptance is claimed. See [all requirements](operations/acceptance-matrix.json).
+
 ## Operations Architecture — 5 November 2026
 
 Native private support, reviewer operations/health, allowlisted outcome metrics, bounded

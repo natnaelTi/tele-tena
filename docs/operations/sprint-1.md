@@ -1,3 +1,13 @@
+> **Current continuation — 6 November 2026:** v1.54 native replay admission,
+> masking, private spooling/export, independent player and retention are implemented
+> and locally verified. The original live recording passed its settled25-hour
+> export/playback; provider deletion still returns403, including the explicitly
+> authorized permission-correction retry. The actual new native gateway has no
+> live ingestion proof yet. Production capture/export remain disabled.
+> [Current requirement matrix](acceptance-matrix.json),
+> [implementation gaps](implementation-gaps.md) and
+> [v1.54 evidence](replay-integration-v154.md) supersede older status statements below.
+
 # Sprint 1 — Operations & Journey Insights
 
 Requested 5 November 2026. Baseline source de27a6fbd6e2ed8c23d74471d98b8c357178890a,

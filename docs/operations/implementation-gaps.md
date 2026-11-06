@@ -1,0 +1,23 @@
+# Sprint 1 Remaining Implementation and Acceptance Boundaries
+
+6 November2026. This is the complete current gap report; older missing-implementation
+lists are historical. See [every original requirement](acceptance-matrix.json).
+
+| Capability | Accurate State | Required Resolution |
+| --- | --- | --- |
+| Authenticated eligible actual-route masking, native capture/spool/worker, local archive/player | Implemented and locally verified | Actual native-gateway live proof under a bounded amendment; production stays disabled |
+| Original selected-project settled export and independent playback | Verified against EU335848 after25hours | No new capture/export experiment needed |
+| Original test-recording provider deletion | Actual DELETE403 twice; exact readbacks200 | Owner confirm project335848 token has session_recording:write and the token owner's project deletion authority; one original delete/readback slot remains, no automatic retry |
+| Operational90day archival | Native clock/storage/retry/deletion/restore tests pass; not available for production | Complete provider cleanup, gateway proof, separate code-bound activation and storage sizing |
+| Anonymous guest replay | Not implemented; guests explicitly ineligible | Protected guest-consent protocol is needed before guest recording; do not count missing coverage as zero traffic |
+| Ongoing backup-freshness telemetry | Not implemented; health shows Unavailable | Operator supply trustworthy backup-success metadata; deployment backup integrity tools already work |
+| Dedicated production private volume | Adapter implemented; local private volume tested | Choose capacity/location/backup expiry,700directory/600objects, disk headroom; no paid provisioning |
+| External monitoring/persistent independent alert launcher | Prepared, not installed remotely | UptimeRobot account/HTTPS monitors and approved persistent operations_service launcher |
+| Bugsink/error/events/owner alerts | Actual bounded events/errors/map capability and receipts verified | Restore intended provider automatic alert policy manually; no further tests sent |
+| Real release source maps | Synthetic pair capability verified | Separate private production-bundle upload procedure/authorization; no public maps |
+| Human review | Pending | Owner UI, native-language and collection-policy approval; no legal/linguistic approval fabricated |
+
+No new purchases, recording of existing users, real payments or remote deployment.
+Sprint1 is **not complete** and90-day service availability is **not claimed** while
+these acceptance gates remain. Native APIs and components are ready for Sprint2
+without replacing support/audit/outbox or business state machines.
