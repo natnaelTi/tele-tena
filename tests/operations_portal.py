@@ -16,6 +16,10 @@ class Portal(unittest.TestCase):
   c=rt.config()
   with patch('tele_tena.operations.providers.settings',return_value={'posthog_host':'https://eu.i.posthog.com','posthog_token':'CANARY-SECRET'}),patch('tele_tena.operations.providers.archive_capability',return_value=False):
    value=ops.integration_status();self.assertTrue(value['items'][0]['site_configured']);self.assertNotIn('CANARY-SECRET',json.dumps(value,default=str));self.assertEqual(value['items'][0]['enabled'],c['analytics'])
+ def test_mobile_disabled_channel_is_not_effective_even_with_credentials(self):
+  frappe.set_user(users['reviewer']);base=rt.config();private={'telegram_token':'synthetic-secret','telegram_chat':'synthetic-chat','owner_alert_email':'owner@ops-review.invalid'}
+  with patch('tele_tena.operations.providers.settings',return_value=private),patch('tele_tena.operations.providers.archive_capability',return_value=False),patch('tele_tena.operations.runtime.config',return_value={**base,'alerts':True,'mobile_channel':'Disabled'}):
+   mobile=next(x for x in ops.integration_status()['items'] if x['key']=='mobile');self.assertTrue(mobile['site_configured']);self.assertTrue(mobile['enabled']);self.assertFalse(mobile['effective'])
  def test_empty_filtered_journey_has_no_completion_percent(self):
   frappe.set_user(users['reviewer']);d=ops.journey_insights(locale='om',device='tablet',family='consultation',days=1)
   if d['observed_attempts']==0:self.assertIsNone(d['completion_percent']);self.assertEqual(d['sample_state'],'No Eligible Data')
