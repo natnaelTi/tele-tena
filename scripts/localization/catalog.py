@@ -23,6 +23,10 @@ def extract():
         for name,item in json.loads(evidence.read_text()).items():
             for field in ('status','scope'):
                 entries.append({'english':item[field],'context':'Operations integration verification / '+name,'source_location':str(evidence.relative_to(ROOT))})
+    statuses=ROOT/'localization/operations-status-source.json'
+    if statuses.exists():
+        for label,context in json.loads(statuses.read_text()).items():
+            entries.append({'english':label,'context':'Operations status / '+context,'source_location':str(statuses.relative_to(ROOT))})
     for file in sorted((ROOT/'tele_tena').rglob('*.py')):
         if '/localization/' in str(file):continue
         tree=ast.parse(file.read_text())

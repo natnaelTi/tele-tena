@@ -1,4 +1,8 @@
 {
-  "added": [],
+  "added": [
+    "copy.operations_status_no_complete_scheduler_worker_observation_exists.not_observed",
+    "copy.operations_status_stored_delivery_outcomes_do_not_establish_curre.recorded_outcomes_only",
+    "copy.operationsportalviews.no_queued_jobs"
+  ],
   "stale": []
 }

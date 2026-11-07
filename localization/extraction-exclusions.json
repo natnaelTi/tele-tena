@@ -3045,43 +3045,48 @@
     "reason": "Technical JSX attribute value"
   },
   {
+    "english": "Observed",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:343",
+    "reason": "Keyboard or machine-code comparison"
+  },
+  {
     "english": "Stale",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:365",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:369",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Current",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:365",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:369",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "ops-panel ops-filters",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:524",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:528",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Native Collection Enabled",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:682",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:686",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Disabled",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:683",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:687",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "ops-panel ops-report",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:826",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:830",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Partial Quarter",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:833",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:837",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Completed Quarter",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:834",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:838",
     "reason": "Technical JSX attribute value"
   },
   {

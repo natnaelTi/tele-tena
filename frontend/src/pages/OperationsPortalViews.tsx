@@ -340,7 +340,11 @@ export function HealthOverview({ data }: { data: any }) {
           <dt>{w("Oldest Queued Job Age")}</dt>
           <dd>
             {data.queue.oldest_age_seconds === null
-              ? w("Unknown")
+              ? w(
+                  data.queue.state === "Observed" && data.queue.pending === 0
+                    ? "No Queued Jobs"
+                    : "Unknown",
+                )
               : `${data.queue.oldest_age_seconds} ${w("Seconds")}`}
           </dd>
         </dl>
