@@ -1,7 +1,19 @@
 {
   "added": [
-    "copy.operationsportalviews.current_queues",
-    "copy.operationsportalviews.window"
+    "copy.operationsportalviews.attempts",
+    "copy.operationsportalviews.booking_confirmation",
+    "copy.operationsportalviews.completed_later",
+    "copy.operationsportalviews.completion_follows_the_versioned_journey_definition",
+    "copy.operationsportalviews.completion_means_a_confirmed_booking_not_a_click_or_an_unverified_paym",
+    "copy.operationsportalviews.completion_means_a_request_converted_to_an_appointment_payment_verific",
+    "copy.operationsportalviews.completion_means_documentation_recorded_connection_leaving_and_clinici",
+    "copy.operationsportalviews.completion_means_professional_application_submission_reviewer_approval",
+    "copy.operationsportalviews.consultation_documentation",
+    "copy.operationsportalviews.journey_attempt_summary",
+    "copy.operationsportalviews.mean_completion_time",
+    "copy.operationsportalviews.no_eligible_attempt_summaries_in_this_report_this_is_not_zero_activity",
+    "copy.operationsportalviews.professional_application_submission",
+    "copy.operationsportalviews.request_converted_to_appointment"
   ],
   "stale": []
 }

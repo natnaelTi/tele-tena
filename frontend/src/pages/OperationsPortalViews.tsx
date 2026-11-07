@@ -581,6 +581,23 @@ function JourneyResults({ filters }: { filters: Record<string, string> }) {
           <OpsState value={d.sample_state} />
         </div>
         <p>
+          {w(
+            (
+              {
+                application:
+                  "Completion means professional application submission. Reviewer approval and individual scope or language decisions are separate.",
+                booking:
+                  "Completion means a confirmed booking, not a click or an unverified payment claim.",
+                request:
+                  "Completion means a request converted to an appointment. Payment verification, confirmation and permission to join remain separate.",
+                consultation:
+                  "Completion means documentation recorded. Connection, leaving and clinician End are separate outcomes.",
+              } as Record<string, string>
+            )[d.family] ||
+              "Completion follows the versioned journey definition.",
+          )}
+        </p>
+        <p>
           {w("Sample Size")}: {d.observed_attempts} {w("Observed Attempts")}
         </p>
         <p>
@@ -930,6 +947,57 @@ export function QuarterlyReader({
             <p>
               {w(
                 "No Eligible Measured Events. This Does Not Establish Zero Activity.",
+              )}
+            </p>
+          )}
+          <h3>{w("Journey Attempt Summary")}</h3>
+          {selected.data.attempts?.length ? (
+            <div className="ops-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{w("Journey")}</th>
+                    <th>{w("State")}</th>
+                    <th>{w("Attempts")}</th>
+                    <th>{w("Completed Within 24 Hours")}</th>
+                    <th>{w("Completed Later")}</th>
+                    <th>{w("Mean Completion Time")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selected.data.attempts.map((x: any, i: number) => (
+                    <tr key={i}>
+                      <td>
+                        {w(
+                          (
+                            {
+                              application:
+                                "Professional Application Submission",
+                              booking: "Booking Confirmation",
+                              request: "Request Converted to Appointment",
+                              consultation: "Consultation Documentation",
+                            } as Record<string, string>
+                          )[x.family] || x.family,
+                        )}
+                      </td>
+                      <td>{w(x.state)}</td>
+                      <td>{x.n}</td>
+                      <td>{x.completed_in_window}</td>
+                      <td>{x.completed_later}</td>
+                      <td>
+                        {x.seconds === null
+                          ? w("Unavailable")
+                          : `${Math.round(Number(x.seconds) / 60)} ${w("Minutes")}`}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p>
+              {w(
+                "No Eligible Attempt Summaries in This Report. This Is Not Zero Activity.",
               )}
             </p>
           )}
