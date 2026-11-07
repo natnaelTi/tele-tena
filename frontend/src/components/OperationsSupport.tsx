@@ -1,3 +1,4 @@
+import { operationsTime } from "./operationsLabels";
 import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLocale } from "../hooks/useLocale";
@@ -133,7 +134,7 @@ function QueueRows({
                 <th>{w("Report")}</th>
                 <th>{w("Status")}</th>
                 <th>{w("Priority")}</th>
-                <th>{w("Owner")}</th>
+                <th>{w("Assigned Reviewer")}</th>
                 <th>{w("Age")}</th>
               </tr>
             </thead>
@@ -151,7 +152,9 @@ function QueueRows({
                   <td>{w(x.priority)}</td>
                   <td>{x.assignee_name || w("Unassigned")}</td>
                   <td>
-                    <time title={String(x.created)}>
+                    <time
+                      title={operationsTime(x.created) + " · Africa/Nairobi"}
+                    >
                       {age(String(x.created))}
                     </time>
                   </td>
@@ -257,7 +260,7 @@ export function SupportRecord({
         <div className="ops-chip-list">
           <span>{w(d.priority)}</span>
           <span>
-            {w("Created")}: {String(d.created)}
+            {w("Created")}: {operationsTime(d.created)} · Africa/Nairobi
           </span>
         </div>
         {d.attachments.map((f: any) => (
@@ -297,7 +300,7 @@ export function SupportRecord({
               )}
             </strong>
             <p className="prewrap">{x.body}</p>
-            <time>{String(x.created)}</time>
+            <time>{operationsTime(x.created)} · Africa/Nairobi</time>
           </article>
         ))}
       </section>

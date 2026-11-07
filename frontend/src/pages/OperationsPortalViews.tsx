@@ -1,3 +1,4 @@
+import { eventLabel, operationsTime } from "../components/operationsLabels";
 import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -30,6 +31,14 @@ export function humanBytes(n: number | null | undefined) {
 }
 export function OpsState({ value }: { value: string }) {
   const { w } = useLocale();
+  const label =
+    (
+      {
+        "No Eligible Data": w("No Eligible Data"),
+        "Insufficient Sample": w("Insufficient Sample"),
+        Observed: w("Observed"),
+      } as Record<string, string>
+    )[value] || w(value);
   return (
     <span
       className={
@@ -43,7 +52,7 @@ export function OpsState({ value }: { value: string }) {
             : "is-neutral")
       }
     >
-      {w(value)}
+      {label}
     </span>
   );
 }
@@ -247,6 +256,14 @@ export function IntegrationCards() {
                   </dd>
                   <dt>{w("Measured Health")}</dt>
                   <dd>{w(x.health)}</dd>
+                  <dt>{w("Current Build Verification")}</dt>
+                  <dd>
+                    {w(
+                      x.current_build_verified
+                        ? "Verified"
+                        : "Not Verified for This Build",
+                    )}
+                  </dd>
                   <dt>{w("Last Verification")}</dt>
                   <dd>
                     {w(x.last_verified.status)} · {x.last_verified.verified_on}
@@ -342,7 +359,7 @@ export function HealthOverview({ data }: { data: any }) {
               {Object.entries(data.beats).map(([name, x]: any) => (
                 <tr key={name}>
                   <td>{name.replaceAll("_", " ")}</td>
-                  <td>{String(x.at)}</td>
+                  <td>{operationsTime(x.at)}</td>
                   <td>{x.age_seconds}</td>
                   <td>
                     <OpsState
@@ -420,98 +437,102 @@ function JourneyControls({ synthetic }: { synthetic: boolean }) {
       source: "all",
       include_synthetic: synthetic ? "1" : "0",
     });
+  const controls = [
+    [
+      "family",
+      "Journey",
+      [
+        ["application", "Clinician Applications"],
+        ["booking", "Scheduled Booking"],
+        ["request", "Immediate Requests"],
+        ["consultation", "Consultations"],
+      ],
+    ],
+    [
+      "days",
+      "Time Window",
+      [
+        ["1", "Last 24 Hours"],
+        ["7", "Last 7 Days"],
+        ["30", "Last 30 Days"],
+        ["90", "Last 90 Days"],
+      ],
+    ],
+    [
+      "include_synthetic",
+      "Data Scope",
+      [
+        ["0", "Exclude Synthetic and Staff"],
+        ["1", "Include Labelled Synthetic and Staff"],
+      ],
+    ],
+    [
+      "locale",
+      "Interface Locale",
+      [
+        ["all", "All Locales"],
+        ["en", "English"],
+        ["am", "Amharic"],
+        ["om", "Afaan Oromo"],
+      ],
+    ],
+    [
+      "device",
+      "Device",
+      [
+        ["all", "All Devices"],
+        ["mobile", "Mobile"],
+        ["tablet", "Tablet"],
+        ["desktop", "Desktop"],
+        ["unknown", "Unknown"],
+      ],
+    ],
+    [
+      "payment_mode",
+      "Payment Mode",
+      [
+        ["all", "All Modes"],
+        ["Offline", "Offline Direct Payment"],
+        ["Wallet", "Wallet / Integrated Flow"],
+      ],
+    ],
+    [
+      "source",
+      "Event Source",
+      [
+        ["all", "All Sources"],
+        ["server", "Server-Confirmed Outcomes"],
+        ["browser", "Browser Interactions"],
+      ],
+    ],
+  ] as const;
+  const control = ([key, label, options]: (typeof controls)[number]) => (
+    <Select
+      key={key}
+      label={w(label)}
+      value={filters[key]}
+      onChange={(e) => setFilters({ ...filters, [key]: e.target.value })}
+    >
+      {options.map(([v, l]) => (
+        <option key={v} value={v}>
+          {w(l)}
+        </option>
+      ))}
+    </Select>
+  );
   return (
     <>
       <section className="ops-panel ops-filters">
         <h2>{w("Explore a Journey")}</h2>
         <div className="ops-filter-grid">
-          {(
-            [
-              [
-                "family",
-                "Journey",
-                [
-                  ["application", "Clinician Applications"],
-                  ["booking", "Scheduled Booking"],
-                  ["request", "Immediate Requests"],
-                  ["consultation", "Consultations"],
-                ],
-              ],
-              [
-                "days",
-                "Time Window",
-                [
-                  ["1", "Last 24 Hours"],
-                  ["7", "Last 7 Days"],
-                  ["30", "Last 30 Days"],
-                  ["90", "Last 90 Days"],
-                ],
-              ],
-              [
-                "locale",
-                "Interface Locale",
-                [
-                  ["all", "All Locales"],
-                  ["en", "English"],
-                  ["am", "Amharic"],
-                  ["om", "Afaan Oromo"],
-                ],
-              ],
-              [
-                "device",
-                "Device",
-                [
-                  ["all", "All Devices"],
-                  ["mobile", "Mobile"],
-                  ["tablet", "Tablet"],
-                  ["desktop", "Desktop"],
-                  ["unknown", "Unknown"],
-                ],
-              ],
-              [
-                "payment_mode",
-                "Payment Mode",
-                [
-                  ["all", "All Modes"],
-                  ["Offline", "Offline Direct Payment"],
-                  ["Wallet", "Wallet / Integrated Flow"],
-                ],
-              ],
-              [
-                "source",
-                "Event Source",
-                [
-                  ["all", "All Sources"],
-                  ["server", "Server-Confirmed Outcomes"],
-                  ["browser", "Browser Interactions"],
-                ],
-              ],
-              [
-                "include_synthetic",
-                "Data Scope",
-                [
-                  ["0", "Exclude Synthetic and Staff"],
-                  ["1", "Include Labelled Synthetic and Staff"],
-                ],
-              ],
-            ] as const
-          ).map(([key, label, options]) => (
-            <Select
-              key={key}
-              label={w(label)}
-              value={filters[key]}
-              onChange={(e) =>
-                setFilters({ ...filters, [key]: e.target.value })
-              }
-            >
-              {options.map(([v, l]) => (
-                <option key={v} value={v}>
-                  {w(l)}
-                </option>
-              ))}
-            </Select>
-          ))}
+          {controls.slice(0, 3).map(control)}
         </div>
+        <details>
+          <summary>{w("Advanced Filters")}</summary>
+          <div className="ops-filter-grid">
+            {controls.slice(3).map(control)}
+          </div>
+        </details>
       </section>
       <JourneyResults key={JSON.stringify(filters)} filters={filters} />
     </>
@@ -547,7 +568,11 @@ function JourneyResults({ filters }: { filters: Record<string, string> }) {
           <OpsState value={d.sample_state} />
         </div>
         <p>
-          {w("Cohort starts")}: {String(d.since)} → {String(d.through)} UTC
+          {w("Sample Size")}: {d.observed_attempts} {w("Observed Attempts")}
+        </p>
+        <p>
+          {w("Cohort starts")}: {operationsTime(d.since)} →{" "}
+          {operationsTime(d.through)} · Africa/Nairobi
         </p>
         <div className="ops-metrics">
           <div className="ops-metric">
@@ -628,7 +653,7 @@ function JourneyResults({ filters }: { filters: Record<string, string> }) {
             <tbody>
               {d.events.map((x: any) => (
                 <tr key={x.name + x.source}>
-                  <td>{x.name.replaceAll(".", " · ").replaceAll("_", " ")}</td>
+                  <td>{w(eventLabel(x.name))}</td>
                   <td>
                     {w(
                       x.source === "server"
@@ -788,6 +813,7 @@ export function QuarterlyReader({
             {items.map((x) => (
               <Button
                 key={x.id}
+                data-report-id={x.id}
                 variant={selected?.id === x.id ? "primary" : "secondary"}
                 onClick={() => void open(x.id)}
               >
@@ -849,11 +875,13 @@ export function QuarterlyReader({
             </InlineNotice>
           )}
           <p>
-            {w("Covered Dates")}: {selected.data.start_utc} →{" "}
-            {selected.data.generated_through_utc} UTC
+            {w("Covered Dates")}: {operationsTime(selected.data.start_utc)} →{" "}
+            {operationsTime(selected.data.generated_through_utc)} ·
+            Africa/Nairobi
           </p>
           <p>
-            {w("Quarter End, Exclusive")}: {selected.data.end_utc_exclusive} UTC
+            {w("Quarter End, Exclusive")}:{" "}
+            {operationsTime(selected.data.end_utc_exclusive)} · Africa/Nairobi
           </p>
           <div className="ops-metrics">
             <div className="ops-metric">
@@ -878,7 +906,7 @@ export function QuarterlyReader({
                 <tbody>
                   {Object.entries(selected.data.events).map(([k, n]: any) => (
                     <tr key={k}>
-                      <td>{k.replaceAll(".", " · ").replaceAll("_", " ")}</td>
+                      <td>{w(eventLabel(k))}</td>
                       <td>{n}</td>
                     </tr>
                   ))}

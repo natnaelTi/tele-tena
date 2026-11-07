@@ -22,7 +22,7 @@ def integrations():
   if key=='posthog':observed=frappe.db.sql('SELECT delivery state,COUNT(*) n,MAX(created) at FROM tt_ops_event GROUP BY delivery',as_dict=True)
   if key=='bugsink':observed=frappe.db.sql('SELECT state,COUNT(*) n,MAX(created) at FROM tt_ops_error GROUP BY state',as_dict=True)
   if key=='mobile':observed=frappe.db.sql("SELECT state,COUNT(*) n,MAX(modified) at FROM tt_ops_alert WHERE channel='telegram' GROUP BY state",as_dict=True)
-  result.append({'key':key,'site_configured':configured[key],'enabled':enabled,'effective':bool(configured[key] and enabled),'configuration_state':('Not Verified for This Build' if key=='source_maps' else 'Configured' if configured[key] else 'Unconfigured'),'health':'Not Observed' if not observed else 'Recorded Outcomes Only','observed':observed,'last_verified':history[key],'next_action':('Before binding private configuration, review and disable saved external analytics, errors, alerts, replay and export switches. Binding credentials while switches are enabled can activate delivery; obtain separate activation approval.' if not bound else 'Review prerequisites and effective settings before explicitly enabling this capability.'),'current_build_verified':False})
+  result.append({'key':key,'site_configured':configured[key],'enabled':enabled,'effective':bool(configured[key] and enabled),'configuration_state':('Configured' if configured[key] else 'Unconfigured'),'health':'Not Observed' if not observed else 'Recorded Outcomes Only','observed':observed,'last_verified':history[key],'next_action':('Before binding private configuration, review and disable saved external analytics, errors, alerts, replay and export switches. Binding credentials while switches are enabled can activate delivery; obtain separate activation approval.' if not bound else 'Review prerequisites and effective settings before explicitly enabling this capability.'),'current_build_verified':False})
  return {'site_binding_present':bound,'private_configuration_loaded':bool(c),'observed_at':rt.now(),'environment':saved['environment'],'release':rt.release(),'scenario':bool(frappe.conf.get('tele_tena_ops_review_scenario')),'items':result}
 
 def journeys(family='application',days=7,locale='all',device='all',payment_mode='all',source='all',include_synthetic=0):
@@ -69,7 +69,7 @@ def assign(id,state,priority,assignee=None):
  if state not in STATES or priority not in ('Low','Normal','High','Critical') or assignee and assignee!='Administrator' and assignee not in reviewers():fail('Choose an authorized reviewer, status and priority.')
  frappe.db.sql('SELECT id FROM tt_ops_support WHERE id=%s FOR UPDATE',(id,))
  frappe.db.sql('UPDATE tt_ops_support SET state=%s,priority=%s,assignee=%s,modified=%s,resolved_at=IF(%s=\'Resolved\',COALESCE(resolved_at,%s),resolved_at) WHERE id=%s',(state,priority,assignee or None,rt.now(),state,rt.now(),id))
- audit(id,'SupportAssigned',{'state':state,'priority':priority,'assigned':bool(assignee)})
+ audit(id,'SupportAssigned',{'state':state,'priority':priority,'assigned':bool(assignee),'assignee':assignee or None})
  rt.safe_record('support.resolved' if state=='Resolved' else 'support.triaged',id+':'+state)
  return {'saved':True}
 

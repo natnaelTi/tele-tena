@@ -1,3 +1,4 @@
+import { operationsTime } from "./operationsLabels";
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../api";
 import { useResource } from "../hooks/useResource";
@@ -122,8 +123,8 @@ function RecordRows({
             <span>{humanBytes(x.size_bytes)}</span>
           </div>
           <p>
-            {w("Captured")}: {String(x.captured)} · {w("Expires")}:{" "}
-            {String(x.expires)}
+            {w("Captured")}: {operationsTime(x.captured)} · {w("Expires")}:{" "}
+            {operationsTime(x.expires)} · Africa/Nairobi
           </p>
           {x.failure_code && (
             <p>

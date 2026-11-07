@@ -21,7 +21,7 @@ if manifest.exists():
 assert not frappe.conf.get('tele_tena_operations_config_file') and not frappe.conf.get('tele_tena_operations')
 assert not any(rt.config()[k] for k in ('analytics','errors','alerts','replay','archive'))
 assert not frappe.db.sql("SELECT id FROM tt_ops_event LIMIT 1"),'Use an empty disposable operations site; existing metrics are not overwritten.'
-sitefile=BENCH/'sites'/SITE/'site_config.json';conf=json.loads(sitefile.read_text());conf['tele_tena_ops_review_scenario']='operations-portal-review-v1';sitefile.write_text(json.dumps(conf,indent=2)+'\n');sitefile.chmod(0o600);frappe.conf.tele_tena_ops_review_scenario=conf['tele_tena_ops_review_scenario']
+sitefile=BENCH/'sites'/SITE/'site_config.json';conf=json.loads(sitefile.read_text());conf['tele_tena_ops_review_scenario']='operations-portal-review-v1';conf.update(tele_tena_review_enabled=True,tele_tena_review_site=SITE);sitefile.write_text(json.dumps(conf,indent=2)+'\n');sitefile.chmod(0o600);frappe.conf.tele_tena_ops_review_scenario=conf['tele_tena_ops_review_scenario']
 accounts={};owned=[]
 from frappe.utils.password import update_password
 for role,frappe_role in [('reviewer','Tele Tena Approver'),('patient','Tele Tena Patient'),('clinician','Tele Tena Clinician')]:
@@ -54,7 +54,7 @@ source=[{'source':'blob_v2','blob_key':'0'}];events=[{'type':4,'timestamp':1000,
 normalized=normalize(source,{'0':b'\n'.join(json.dumps(['review',e]).encode() for e in events)})
 import gzip
 content=gzip.compress(json.dumps(normalized).encode());key=storage.put(content,rt.config()['recording_bytes'],rt.config()['archive_bytes'],kind='replay');id=hashlib.sha256(b'operations-portal-review-local-replay-v1').hexdigest()
-frappe.db.sql("INSERT INTO tt_ops_archive (id,provider_id,captured,expires,state,size_bytes,sha256,format_version,player_version,object_key,verified,modified) VALUES (%s,'local-review-only',%s,%s,'Verified',%s,%s,%s,%s,%s,%s,%s)",(id,clock,clock+timedelta(days=90),len(content),normalized['sha256'],normalized['format'],'local-review-only',key,clock,clock))
+frappe.db.sql("INSERT INTO tt_ops_archive (id,provider_id,captured,expires,state,size_bytes,sha256,format_version,player_version,object_key,verified,modified) VALUES (%s,'local-review-only',%s,%s,'Verified',%s,%s,%s,%s,%s,%s,%s)",(id,clock,clock+timedelta(days=90),len(content),hashlib.sha256(content).hexdigest(),normalized['format'],'local-review-only',key,clock,clock))
 # This local fixture is only playable through the explicitly isolated WSGI harness.
-frappe.db.commit();manifest.write_text(json.dumps({'dataset':'operations-portal-review-v1','site':SITE,'accounts':accounts,'support':owned,'report':report['id'],'local_replay':id,'created':str(clock)},indent=2));manifest.chmod(0o600);frappe.destroy()
+frappe.db.commit();manifest.write_text(json.dumps({'dataset':'operations-portal-review-v1','site':SITE,'accounts':accounts,'support':owned,'report':report['id'],'local_replay':id,'created':str(clock)},indent=2));manifest.chmod(0o600);frappe.clear_cache();frappe.destroy()
 print('Isolated Operations scenario created; private account manifest written. No provider I/O or business/financial scenarios created.')

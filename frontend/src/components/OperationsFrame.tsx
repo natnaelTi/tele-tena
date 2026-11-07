@@ -1,3 +1,4 @@
+import { operationsTime } from "./operationsLabels";
 import { useCallback, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardCheck, Files, ArrowUpRight, ShieldCheck } from "lucide-react";
@@ -64,10 +65,9 @@ export function OperationsFrame({
             <span>
               {w("Observed")}:{" "}
               {r.data?.observed_at
-                ? new Date(
-                    String(r.data.observed_at).replace(" ", "T") + "Z",
-                  ).toLocaleString()
-                : w("Unavailable")}
+                ? operationsTime(r.data.observed_at)
+                : w("Unavailable")}{" "}
+              · Africa/Nairobi
             </span>
             <span>{w("Current Database")}</span>
           </div>

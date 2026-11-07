@@ -32,7 +32,10 @@ def extract():
                 if not isinstance(node,ast.Constant) or not isinstance(node.value,str) or ' ' not in node.value:continue
                 parent=parents.get(node)
                 if isinstance(parent,ast.Expr):continue
-                if file.name=='portal.py' and not (isinstance(parent,ast.Dict) and any(isinstance(k,ast.Constant) and k.value in ('next_action','correlation_note','coverage_scope') and v is node for k,v in zip(parent.keys,parent.values))):continue
+                if file.name=='portal.py':
+                    anchor=node;owner=parent
+                    while isinstance(owner,ast.IfExp):anchor=owner;owner=parents.get(owner)
+                    if not (isinstance(owner,ast.Dict) and any(isinstance(k,ast.Constant) and k.value in ('next_action','correlation_note','coverage_scope') and v is anchor for k,v in zip(owner.keys,owner.values))):continue
                 if file.name=='backup_status.py' and not (isinstance(parent,ast.Dict) and any(isinstance(k,ast.Constant) and k.value=='reason' and v is node for k,v in zip(parent.keys,parent.values))):continue
                 entries.append({'english':node.value,'context':'Policy disclosure or operational status / '+file.stem,'source_location':str(file.relative_to(ROOT))+':'+str(node.lineno)})
         if file.name in ('notifications.py','booking_notifications.py','public_content_defaults.py','email_delivery.py','sms.py','communications.py','email_templates.py'):

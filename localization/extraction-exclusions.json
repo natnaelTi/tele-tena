@@ -716,47 +716,47 @@
   },
   {
     "english": "Verified",
-    "source_location": "frontend/src/components/OperationsArchiveRecords.tsx:132",
+    "source_location": "frontend/src/components/OperationsArchiveRecords.tsx:133",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Failed",
-    "source_location": "frontend/src/components/OperationsArchiveRecords.tsx:139",
+    "source_location": "frontend/src/components/OperationsArchiveRecords.tsx:140",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Incomplete",
-    "source_location": "frontend/src/components/OperationsArchiveRecords.tsx:139",
+    "source_location": "frontend/src/components/OperationsArchiveRecords.tsx:140",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "operations-page operations-portal ph-no-capture",
-    "source_location": "frontend/src/components/OperationsFrame.tsx:24",
+    "source_location": "frontend/src/components/OperationsFrame.tsx:25",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "ops-panel ops-list",
-    "source_location": "frontend/src/components/OperationsSupport.tsx:120",
+    "source_location": "frontend/src/components/OperationsSupport.tsx:121",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "ops-reply ",
-    "source_location": "frontend/src/components/OperationsSupport.tsx:287",
+    "source_location": "frontend/src/components/OperationsSupport.tsx:290",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Internal",
-    "source_location": "frontend/src/components/OperationsSupport.tsx:287",
+    "source_location": "frontend/src/components/OperationsSupport.tsx:290",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Internal",
-    "source_location": "frontend/src/components/OperationsSupport.tsx:311",
+    "source_location": "frontend/src/components/OperationsSupport.tsx:314",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "User",
-    "source_location": "frontend/src/components/OperationsSupport.tsx:312",
+    "source_location": "frontend/src/components/OperationsSupport.tsx:315",
     "reason": "Technical JSX attribute value"
   },
   {
@@ -2981,107 +2981,107 @@
   },
   {
     "english": "ops-state ",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:35",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:44",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Ready",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:36",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:45",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Current",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:36",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:45",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Resolved",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:36",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:45",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Verified",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:36",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:45",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Completed",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:36",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:45",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Failed",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:40",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:49",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Stale",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:40",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:49",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Error",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:40",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:49",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Critical",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:40",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:49",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:130",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:139",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Native Collection Enabled",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:174",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:183",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Disabled",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:175",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:184",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Stale",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:348",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:365",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Current",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:348",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:365",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "ops-panel ops-filters",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:424",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:524",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Native Collection Enabled",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:657",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:682",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Disabled",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:658",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:683",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "ops-panel ops-report",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:800",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:826",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Partial Quarter",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:807",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:833",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Completed Quarter",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:808",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:834",
     "reason": "Technical JSX attribute value"
   },
   {
