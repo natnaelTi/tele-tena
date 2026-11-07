@@ -1051,17 +1051,17 @@
   },
   {
     "english": "operations-page ph-no-capture",
-    "source_location": "frontend/src/components/SupportDesk.tsx:4",
+    "source_location": "frontend/src/components/SupportDesk.tsx:7",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "User",
-    "source_location": "frontend/src/components/SupportDesk.tsx:4",
+    "source_location": "frontend/src/components/SupportDesk.tsx:7",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Internal",
-    "source_location": "frontend/src/components/SupportDesk.tsx:4",
+    "source_location": "frontend/src/components/SupportDesk.tsx:7",
     "reason": "Technical JSX attribute value"
   },
   {
@@ -2886,12 +2886,12 @@
   },
   {
     "english": "guided-panel onboarding-guided {!clinician&&step===3?\"onboarding-ready-page\":\"\"}",
-    "source_location": "frontend/src/pages/Onboarding.tsx:189",
+    "source_location": "frontend/src/pages/Onboarding.tsx:191",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "scope-picker onboarding-scope-picker",
-    "source_location": "frontend/src/pages/Onboarding.tsx:293",
+    "source_location": "frontend/src/pages/Onboarding.tsx:295",
     "reason": "Technical JSX attribute className"
   },
   {
@@ -2911,57 +2911,57 @@
   },
   {
     "english": "operations-page ph-no-capture",
-    "source_location": "frontend/src/pages/Operations.tsx:4",
+    "source_location": "frontend/src/pages/Operations.tsx:9",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/Operations.tsx:5",
+    "source_location": "frontend/src/pages/Operations.tsx:18",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "ops-state ",
-    "source_location": "frontend/src/pages/Operations.tsx:6",
+    "source_location": "frontend/src/pages/Operations.tsx:19",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Current",
-    "source_location": "frontend/src/pages/Operations.tsx:6",
+    "source_location": "frontend/src/pages/Operations.tsx:19",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Unavailable",
-    "source_location": "frontend/src/pages/Operations.tsx:10",
+    "source_location": "frontend/src/pages/Operations.tsx:23",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Verified",
-    "source_location": "frontend/src/pages/Operations.tsx:15",
+    "source_location": "frontend/src/pages/Operations.tsx:28",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Incomplete",
-    "source_location": "frontend/src/pages/Operations.tsx:15",
+    "source_location": "frontend/src/pages/Operations.tsx:28",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Failed",
-    "source_location": "frontend/src/pages/Operations.tsx:15",
+    "source_location": "frontend/src/pages/Operations.tsx:28",
     "reason": "Keyboard or state matching set"
   },
   {
     "english": "Pending",
-    "source_location": "frontend/src/pages/Operations.tsx:15",
+    "source_location": "frontend/src/pages/Operations.tsx:28",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Disabled",
-    "source_location": "frontend/src/pages/Operations.tsx:19",
+    "source_location": "frontend/src/pages/Operations.tsx:32",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Telegram",
-    "source_location": "frontend/src/pages/Operations.tsx:19",
+    "source_location": "frontend/src/pages/Operations.tsx:32",
     "reason": "Technical JSX attribute value"
   },
   {

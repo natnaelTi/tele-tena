@@ -22,6 +22,13 @@ def extract():
         if '/localization/' in str(file):continue
         tree=ast.parse(file.read_text())
         parents={child:parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)}
+        if file.name in ('disclosure.py','backup_status.py'):
+            for node in ast.walk(tree):
+                if not isinstance(node,ast.Constant) or not isinstance(node.value,str) or ' ' not in node.value:continue
+                parent=parents.get(node)
+                if isinstance(parent,ast.Expr):continue
+                if file.name=='backup_status.py' and not (isinstance(parent,ast.Dict) and any(isinstance(k,ast.Constant) and k.value=='reason' and v is node for k,v in zip(parent.keys,parent.values))):continue
+                entries.append({'english':node.value,'context':'Policy disclosure or operational status / '+file.stem,'source_location':str(file.relative_to(ROOT))+':'+str(node.lineno)})
         if file.name in ('notifications.py','booking_notifications.py','public_content_defaults.py','email_delivery.py','sms.py','communications.py','email_templates.py'):
             for node in ast.walk(tree):
                 if isinstance(node,ast.Constant) and isinstance(node.value,str) and re.search('[A-Za-z]',node.value) and (' ' in node.value or re.fullmatch('[A-Z][a-z]+',node.value)) and not re.match(r'(?i)^(https?://|SELECT |INSERT |UPDATE |DELETE |CREATE |ALTER |\s*SELECT |\s*INSERT |\s*UPDATE )',node.value) and len(node.value)<50000:
