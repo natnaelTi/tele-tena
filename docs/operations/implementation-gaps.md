@@ -21,3 +21,8 @@ No new purchases, recording of existing users, real payments or remote deploymen
 Sprint1 is **not complete** and90-day service availability is **not claimed** while
 these acceptance gates remain. Native APIs and components are ready for Sprint2
 without replacing support/audit/outbox or business state machines.
+
+
+Reviewer portal implementation and verification are tracked separately in
+[sprint-2-verification.md](sprint-2-verification.md). This does not close any
+Sprint1 provider/storage/policy/monitoring gate above.

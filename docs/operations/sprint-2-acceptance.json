@@ -1,0 +1,108 @@
+{
+  "sprint": 2,
+  "baseline_source": "cf53c4f8b5498089fd808daee50f1bd919307ad2",
+  "packaged_source": "39816601c9d21d59f8758a08efbdda4c723069e4",
+  "requirements": [
+    {
+      "requirement": "Runtime reconciliation",
+      "status": "Implemented and locally verified",
+      "evidence": "actual web API, process configuration and completed read-only dedicated-worker probe"
+    },
+    {
+      "requirement": "Reviewer authorization",
+      "status": "Implemented and locally verified",
+      "evidence": "9portal tests + real guest/patient/clinician denials"
+    },
+    {
+      "requirement": "Shared navigation",
+      "status": "Implemented and locally verified",
+      "evidence": "all7destinations, click/deep-link/refresh/history, local recovery and compact mobile native selection"
+    },
+    {
+      "requirement": "Overview decisions",
+      "status": "Implemented and locally verified",
+      "evidence": "current-queue window, freshness, existing application/service/payment/support links and incidents"
+    },
+    {
+      "requirement": "Journey Insights",
+      "status": "Implemented and locally verified",
+      "evidence": "bounded server filters, sample/cohort denominator, window definitions, independent events and empty state"
+    },
+    {
+      "requirement": "System Health",
+      "status": "Implemented and locally verified",
+      "evidence": "ready/not-observed/stale/unavailable/zero distinctions; scoped provider evidence"
+    },
+    {
+      "requirement": "Replay Archive",
+      "status": "Implemented and locally verified",
+      "evidence": "bounded server lookup/paging, capacity/expiry, authorized existing player; isolated generated object only"
+    },
+    {
+      "requirement": "Quarterly Reports",
+      "status": "Implemented and locally verified",
+      "evidence": "real compile/read/compare/export, dates/partial/scope/attempts/coverage/annotations"
+    },
+    {
+      "requirement": "Operational Settings",
+      "status": "Implemented and locally verified",
+      "evidence": "groups, saved vs effective, optimistic revision and no credential UI"
+    },
+    {
+      "requirement": "User Support",
+      "status": "Implemented and locally verified",
+      "evidence": "queue/owner/age/priority, triage/private vs visible replies, resolution and real delayed-response regression"
+    },
+    {
+      "requirement": "Synthetic isolation",
+      "status": "Implemented and locally verified",
+      "evidence": "separate DB/private files and disabled provider harness; idempotent new local fixture, no main reseed"
+    },
+    {
+      "requirement": "Responsive/accessibility",
+      "status": "Implemented and locally verified",
+      "evidence": "390/768/1440, actual200%, native keyboard, Escape/focus and long labels"
+    },
+    {
+      "requirement": "Localization/Terms/PWA",
+      "status": "Implemented and locally verified",
+      "evidence": "exchange5/extraction2, no approval imports; Terms and built PWA regressions"
+    },
+    {
+      "requirement": "Financial/protected preservation",
+      "status": "Implemented and locally verified",
+      "evidence": "12hashes unchanged; Offline retained;11patients/2clinicians/22accounts zero discrepancies"
+    }
+  ],
+  "external": [
+    {
+      "requirement": "V2 settled checkpoint due8Nov00:28:39EAT; no automatic schedule",
+      "status": "External/operator or human prerequisite"
+    },
+    {
+      "requirement": "Approved production replay/storage/backup expiry and explicit activation",
+      "status": "External/operator or human prerequisite"
+    },
+    {
+      "requirement": "UptimeRobot and persistent independent processing/alert launcher",
+      "status": "External/operator or human prerequisite"
+    },
+    {
+      "requirement": "Recurring verified backup metadata source",
+      "status": "External/operator or human prerequisite"
+    },
+    {
+      "requirement": "Owner/physical-device/accessibility/language/policy acceptance",
+      "status": "External/operator or human prerequisite"
+    }
+  ],
+  "conditional_not_implemented": [
+    {
+      "requirement": "Public heatmap renderer/capture",
+      "reason": "No approved interaction coordinates; unavailable state implemented, private screens excluded; no capture added."
+    }
+  ],
+  "sprint1_complete": false,
+  "production_collection_enabled": false,
+  "new_live_provider_operations": 0
+}

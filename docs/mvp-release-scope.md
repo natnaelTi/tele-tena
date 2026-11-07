@@ -1,3 +1,13 @@
+## Reviewer Operations Portal — 7 November 2026
+
+Sprint2 adds the decision-focused seven-section reviewer workspace on existing
+native operations/support/report/archive foundations. No new provider capture,
+financial mode, clinical approval or schema change. Local running-site vs historical
+provider-test status is explicit. Public heatmaps stay unavailable without approved
+coordinates; production replay remains disabled. See
+[acceptance and operator/human prerequisites](operations/sprint-2-verification.md).
+This does not claim that the separate roadmap website was updated or close Sprint1.
+
 ## Operations Sprint 1 — 5 November 2026
 
 Native private support, reviewer operations/health, allowlisted outcome metrics, bounded

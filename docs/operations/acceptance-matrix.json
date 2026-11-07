@@ -255,5 +255,7 @@
       "evidence_or_dependency": "Built8017 reviewer all7sections click/direct/reload/history; delayed Overview\u2192Insights regression, HTTP/render errors retain navigation and Retry; empty/disabled/unavailable states. No provider calls."
     }
   ],
-  "overall": "Native foundation and actual gateway/provisional proof verified; Sprint1/operational90day archive pending V2 settled checkpoint and operator/coverage prerequisites."
+  "overall": "Native foundation and actual gateway/provisional proof verified; Sprint1/operational90day archive pending V2 settled checkpoint and operator/coverage prerequisites.",
+  "sprint2_portal": "docs/operations/sprint-2-verification.md",
+  "runtime_reconciliation": "docs/operations/sprint-1-runtime-reconciliation.md"
 }

@@ -17044,5 +17044,13 @@
     "requirement_matrix": "docs/operations/acceptance-matrix.json",
     "live_results_v2": "docs/operations/live-verification-results-v2.md",
     "followup": "docs/operations/terms-navigation-followup.md"
+  },
+  "operations_sprint_2": {
+    "status": "Implemented and locally verified; owner acceptance pending",
+    "runtime_source": "39816601c9d21d59f8758a08efbdda4c723069e4",
+    "requirement_matrix": "docs/operations/sprint-2-acceptance.json",
+    "verification": "docs/operations/sprint-2-verification.md",
+    "screenshots": "docs/screenshots/operations-portal/README.md",
+    "sprint_1_closed": false
   }
 }
