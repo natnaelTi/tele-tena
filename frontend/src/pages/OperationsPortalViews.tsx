@@ -87,6 +87,15 @@ export function DecisionOverview({
   ] as const;
   return (
     <>
+      <div className="ops-overview-context">
+        <span>
+          {w("Window")}: <strong>{w("Current Queues")}</strong>
+        </span>
+        <span>
+          {w("Processing Freshness")}:{" "}
+          <OpsState value={data.health.freshness} />
+        </span>
+      </div>
       <section className="ops-section-intro">
         <div>
           <h2>{w("What Needs Attention")}</h2>

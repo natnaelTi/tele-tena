@@ -3031,62 +3031,62 @@
   },
   {
     "english": "Open",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:139",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:148",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Native Collection Enabled",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:183",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:192",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Disabled",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:184",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:193",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Observed",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:343",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:352",
     "reason": "Keyboard or machine-code comparison"
   },
   {
     "english": "Stale",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:369",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:378",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Current",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:369",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:378",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "ops-panel ops-filters",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:528",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:537",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Native Collection Enabled",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:686",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:695",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Disabled",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:687",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:696",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "ops-panel ops-report",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:830",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:839",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Partial Quarter",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:837",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:846",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "Completed Quarter",
-    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:838",
+    "source_location": "frontend/src/pages/OperationsPortalViews.tsx:847",
     "reason": "Technical JSX attribute value"
   },
   {

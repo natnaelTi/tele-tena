@@ -9,3 +9,5 @@
 
 .ops-mobile-section{display:none}
 @media(max-width:850px){.ops-sidebar .ops-tabs{display:none}.ops-mobile-section{display:block}.ops-mobile-section .field{margin:0}.ops-mobile-section select{width:100%}.ops-review-links{margin-top:12px;padding-top:4px}.ops-sidebar{margin-bottom:20px}.ops-review-links>a{padding:8px;min-height:44px}}
+
+.ops-overview-context{display:flex;gap:12px 24px;align-items:center;flex-wrap:wrap;margin:0 0 24px;font-size:13px;color:var(--muted)}.ops-overview-context strong{color:var(--ink);font-weight:550}
