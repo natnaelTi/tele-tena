@@ -102,8 +102,8 @@ class Operations(unittest.TestCase):
   with self.assertRaises(frappe.ValidationError):ops.events([item])
   self.assertNotIn('PRIVATE-CANARY',str(frappe.db.sql('SELECT route,properties FROM tt_ops_event')))
  def test_health_marks_missing_or_stale_execution_and_disabled_provider_honestly(self):
-  frappe.db.sql('DELETE FROM tt_ops_heartbeat');h=jobs.health();self.assertEqual(h['freshness'],'Stale');self.assertEqual(h['providers']['posthog'],'Unconfigured')
-  jobs.beat('scheduler');jobs.beat('worker_completed');self.assertEqual(jobs.health()['freshness'],'Current')
+  frappe.db.sql('DELETE FROM tt_ops_heartbeat');h=jobs.health();self.assertEqual(h['freshness'],'Not Observed');self.assertEqual(h['providers']['posthog'],'Unconfigured')
+  jobs.beat('scheduler');self.assertEqual(jobs.health()['freshness'],'Not Observed');jobs.beat('worker_completed');self.assertEqual(jobs.health()['freshness'],'Current')
   frappe.db.sql("UPDATE tt_ops_heartbeat SET at=DATE_SUB(UTC_TIMESTAMP(6),INTERVAL 1 HOUR) WHERE name='worker_completed'");self.assertEqual(jobs.health()['freshness'],'Stale')
  def test_verified_archive_payload_private_player_headers_and_withdrawal(self):
   import gzip,hashlib

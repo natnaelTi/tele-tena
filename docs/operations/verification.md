@@ -1,3 +1,10 @@
+## Current Reviewer Portal — Sprint 2
+
+[Full current evidence, source/build, screenshots and walkthrough](sprint-2-verification.md)
+and [actual runtime reconciliation](sprint-1-runtime-reconciliation.md).
+Sprint1 remains open at its settled V2/operator/policy gates. No new live tests,
+production activation, merge or deployment. Earlier package pins below are historical.
+
 ## Terms, Navigation and Backup Follow-Up — 7 November 2026
 
 Verified installation/build: `4e5b12613eb7702ca7c2844716605a094d558ef6`. Preview

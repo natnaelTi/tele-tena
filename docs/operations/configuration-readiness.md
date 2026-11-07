@@ -1,3 +1,14 @@
+## Current Portal Reconciliation — 7 November 2026
+
+The populated provider file is valid; the actual presentation web and worker are
+unbound and effectively inactive. Saved analytics/errors/alerts are on in review,
+replay/archive off. Historical synthetic ingestion/maps/receipts remain verified
+within their documented scopes, not running-site health. See [the exact matrix](sprint-1-runtime-reconciliation.md)
+and [current portal evidence](sprint-2-verification.md). Disable/review external
+switches before a separately authorized credential binding. No activation here.
+
+Earlier dated entries below are historical where superseded.
+
 > **Latest V2 status:** actual native SDK→gateway→worker ingestion and provisional
 > export/playback pass. Its settled native archive/cleanup checkpoint is due
 > **8November2026,00:28:39Africa/Nairobi**, not scheduled or passed.

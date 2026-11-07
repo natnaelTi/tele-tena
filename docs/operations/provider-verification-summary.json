@@ -1,0 +1,7 @@
+{
+ "posthog":{"status":"Verified in Isolated Tests","scope":"Two approved synthetic analytics events and one native synthetic replay in EU project 335848; no running-site activation.","verified_on":"2026-11-06","evidence":"live-verification-results-v1.md; live-verification-results-v2.md"},
+ "bugsink":{"status":"Verified in Isolated Tests","scope":"Five approved synthetic errors, grouping and original TypeScript source line; no current production-bundle proof.","verified_on":"2026-11-06","evidence":"live-verification-results-v1.md"},
+ "mobile":{"status":"Receipt Confirmed by Owner","scope":"Two bounded Telegram messages and two amended emails received. No continuous running-site health measurement.","verified_on":"2026-11-06","evidence":"live-verification-results-v1.md"},
+ "archive":{"status":"Settled Native Verification Pending","scope":"Independent provisional playback passed; V2 settled checkpoint due 8 November 2026 at 00:28:39 Africa/Nairobi. Production storage and activation remain separate.","verified_on":"2026-11-06","evidence":"live-verification-results-v2.md"},
+ "source_maps":{"status":"Verified in Isolated Tests","scope":"One private synthetic source-map pair resolved the original source line. Current application build has not been privately uploaded and verified.","verified_on":"2026-11-06","evidence":"live-verification-results-v1.md"}
+}

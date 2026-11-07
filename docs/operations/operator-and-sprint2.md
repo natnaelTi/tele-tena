@@ -1,3 +1,12 @@
+## Sprint 2 Portal Available for Local Review
+
+[Current verification and walkthrough](sprint-2-verification.md),
+[site-vs-test reconciliation](sprint-1-runtime-reconciliation.md), and
+[acceptance matrix](sprint-2-acceptance.json) supersede the earlier UI handoff below.
+The native APIs, outbox, audit and private playback remain authoritative. No
+provider activation or Sprint1 completion is implied. Sidebar/native mobile
+navigation now expose all7sections and existing application queues.
+
 > **Latest V2 status:** actual native SDK→gateway→worker ingestion and provisional
 > export/playback pass. Its settled native archive/cleanup checkpoint is due
 > **8November2026,00:28:39Africa/Nairobi**, not scheduled or passed.

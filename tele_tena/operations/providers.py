@@ -22,7 +22,7 @@ def settings():
 
 def status():
  c=settings()
- return {'posthog':'Configured — Ingestion Unverified' if c.get('posthog_token') and c.get('posthog_host') else 'Unconfigured','bugsink':'Configured — Ingestion Unverified' if c.get('bugsink_dsn') else 'Unconfigured','mobile':'Configured — Receipt Unverified' if c.get('telegram_token') and c.get('telegram_chat') else 'Unconfigured','archive':'Unavailable — Project Export and Independent Playback Not Verified','source_maps':'Unavailable — Private Upload Not Verified'}
+ return {'posthog':'Configured — Ingestion Unverified' if c.get('posthog_token') and c.get('posthog_host') else 'Unconfigured','bugsink':'Configured — Ingestion Unverified' if c.get('bugsink_dsn') else 'Unconfigured','mobile':'Configured — Receipt Unverified' if c.get('telegram_token') and c.get('telegram_chat') else 'Unconfigured','archive':'Project Proof Verified — Site Activation Separate' if archive_capability() else 'Unavailable — Project Export and Independent Playback Not Verified','source_maps':'Not Verified for This Build — Synthetic Upload Proven Separately'}
 def posthog_event(event):
  c=settings();host=c.get('posthog_host');token=c.get('posthog_token')
  if host not in ('https://us.i.posthog.com','https://eu.i.posthog.com') or not isinstance(token,str):raise Unconfigured('posthog_unconfigured')

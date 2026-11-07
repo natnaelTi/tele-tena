@@ -18,15 +18,28 @@ def source_key(english,context,previous,reserved,allocated):
 
 def extract():
     raw=json.loads(subprocess.check_output(['node',str(ROOT/'scripts/localization/extract.cjs')],text=True));entries=raw['entries'];translations=raw['translations']
+    evidence=ROOT/'docs/operations/provider-verification-summary.json'
+    if evidence.exists():
+        for name,item in json.loads(evidence.read_text()).items():
+            for field in ('status','scope'):
+                entries.append({'english':item[field],'context':'Operations integration verification / '+name,'source_location':str(evidence.relative_to(ROOT))})
+    statuses=ROOT/'localization/operations-status-source.json'
+    if statuses.exists():
+        for label,context in json.loads(statuses.read_text()).items():
+            entries.append({'english':label,'context':'Operations status / '+context,'source_location':str(statuses.relative_to(ROOT))})
     for file in sorted((ROOT/'tele_tena').rglob('*.py')):
         if '/localization/' in str(file):continue
         tree=ast.parse(file.read_text())
         parents={child:parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)}
-        if file.name in ('disclosure.py','backup_status.py'):
+        if file.name in ('disclosure.py','backup_status.py','portal.py'):
             for node in ast.walk(tree):
                 if not isinstance(node,ast.Constant) or not isinstance(node.value,str) or ' ' not in node.value:continue
                 parent=parents.get(node)
                 if isinstance(parent,ast.Expr):continue
+                if file.name=='portal.py':
+                    anchor=node;owner=parent
+                    while isinstance(owner,ast.IfExp):anchor=owner;owner=parents.get(owner)
+                    if not (isinstance(owner,ast.Dict) and any(isinstance(k,ast.Constant) and k.value in ('next_action','correlation_note','coverage_scope') and v is anchor for k,v in zip(owner.keys,owner.values))):continue
                 if file.name=='backup_status.py' and not (isinstance(parent,ast.Dict) and any(isinstance(k,ast.Constant) and k.value=='reason' and v is node for k,v in zip(parent.keys,parent.values))):continue
                 entries.append({'english':node.value,'context':'Policy disclosure or operational status / '+file.stem,'source_location':str(file.relative_to(ROOT))+':'+str(node.lineno)})
         if file.name in ('notifications.py','booking_notifications.py','public_content_defaults.py','email_delivery.py','sms.py','communications.py','email_templates.py'):

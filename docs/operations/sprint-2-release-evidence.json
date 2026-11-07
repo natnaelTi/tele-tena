@@ -1,0 +1,41 @@
+{
+  "runtime_source": "39816601c9d21d59f8758a08efbdda4c723069e4",
+  "served": [
+    {
+      "port": 8017,
+      "release_json_sha256": "d69c77ba54f0eedf43fb4c3a5b691677843f38daba907b804da4f78af6e1e70e",
+      "matches_packaged": true
+    },
+    {
+      "port": 8023,
+      "release_json_sha256": "d69c77ba54f0eedf43fb4c3a5b691677843f38daba907b804da4f78af6e1e70e",
+      "matches_packaged": true
+    }
+  ],
+  "backend_tests": 9,
+  "operations_regressions": 19,
+  "protected_hashes_unchanged": 12,
+  "external_provider_calls_this_sprint": 0,
+  "sprint_1_closed": false,
+  "v2_settled_checkpoint": "Pending until 2026-11-08T00:28:39.095385+03:00",
+  "screenshots": {
+    "overview-390.png": "62df6a6acd94eafe564406653cf00e20262e112b395d9004aa1ab6f0b11cdae9",
+    "health-1440.png": "a6b2144b02d7ad351ce96fcb1385eedc1268aee5c5dba07f2ca052fed3ba965e",
+    "settings-1440.png": "468ddd225185dc3e198c572a5f447b4fe49956e7a7316d62bc0cc7a4e9c60119",
+    "quarterly-report-1440.png": "aef6ce260af6b8d6aa7f2740e3b82e367ddb99686c63a7f82da1bcd7f54ad6ca",
+    "real-empty-insights-1440.png": "a5a0eeb9906149ea3e1aa247a958d650600bef64f1d553e4ab40954acf74e2c1",
+    "insights-390.png": "8a5c59290637b3876759b5c666c994d931c706b24a36a127ddf82f3769623047",
+    "local-replay-1440.png": "10fd8a86d4964489e7db39617b4604446f939d9e8737d6378dab68375a4a6b64",
+    "before-insights-1440.png": "0f53f1115b1ac082b304e89ee8b07003fe9f3eeea4ade57c4cce418d5a107944",
+    "support-queue-1440.png": "c0a4a58a6d31d0694e00ab176e2897a1b3f6aaa7cfa57baf65d30ece5b26adda",
+    "locale-am-768.png": "101913c1659a6baed2e3a475a3246e3de9bf2091038d7557872a8a91c208c99f",
+    "insights-1440.png": "6ccad6f3300ac6a853cbfeaaf57662770cfe4f68189d76dfda55ae53fea248c4",
+    "locale-om-768.png": "ceb41fc9ce82ce7e82afc75d0726f1e73ce035903fad8f63d93d6a1b613e2210",
+    "support-detail-1440.png": "06a1d60fd018539da96afb12c28efa90e95a68abc194b59d00b32571468fb40b",
+    "overview-1440.png": "e7221c0b79e156ef4db9358dc5fe8b4cf1c8dc3c766731f9d3f148139b0c6a46",
+    "recoverable-error-1440.png": "3bb478b394f4d1cd1a193919a78bf3d17825495484ddd4bda982221e77f4113b",
+    "overview-768.png": "481c954f24e2c20752b8e3b6d55b599b82154d8f083721f370d252f809179afe",
+    "insights-200-percent-screen.png": "635e12937302f8977dbcab5dcc7d9e78d4d8e08844d9d95878508ba1b62dbf40",
+    "settings-200-percent-screen.png": "a96baf3fdc50293a500d6e8336700175f1a9b6c80492007ddb6cca120ca59b89"
+  }
+}

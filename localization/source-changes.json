@@ -1,42 +1,10 @@
 {
   "added": [
-    "copy.onboarding.terms_privacy_and_consent_65a21345",
-    "copy.operations.no_eligible_journey_events_in_this_window",
-    "copy.operations.no_quarterly_reports_yet",
-    "copy.operationsnavigation.journey_insights",
-    "copy.operationsnavigation.operational_settings",
-    "copy.operationsnavigation.operations_sections",
-    "copy.operationsnavigation.overview",
-    "copy.operationsnavigation.quarterly_reports",
-    "copy.operationsnavigation.replay_archive",
-    "copy.operationsnavigation.system_health",
-    "copy.operationsnavigation.user_support",
-    "copy.operationstelemetry.guests_currently_have_no_terms_acceptance_step_and_are_not_recorded_re",
-    "copy.operationstelemetry.read_the_terms_replay_disclosure",
-    "copy.policy_disclosure_or_operational_status_backup_status.complete_native_backup_integrity_was_verified_at_creation_current_prot",
-    "copy.policy_disclosure_or_operational_status_backup_status.no_verified_backup_source_configured",
-    "copy.policy_disclosure_or_operational_status_backup_status.verified_backup_metadata_is_missing_invalid_or_no_longer_matches_the_a",
-    "copy.policy_disclosure_or_operational_status_disclosure.eligible_masked_session_replay_helps_teletena_investigate_technical_pr",
-    "copy.policy_disclosure_or_operational_status_disclosure.optional_masked_session_replay",
-    "copy.policy_disclosure_or_operational_status_disclosure.passwords_verification_codes_authentication_tokens_medical_history_cli",
-    "copy.policy_disclosure_or_operational_status_disclosure.posthog_is_the_selected_provider_for_eligible_masked_replay_accepted_r",
-    "copy.policy_disclosure_or_operational_status_disclosure.replay_providers_and_retention",
-    "copy.policy_disclosure_or_operational_status_disclosure.see_the_privacy_notice_section_on_replay_providers_and_retention_produ",
-    "copy.policy_disclosure_or_operational_status_disclosure.the_proposed_private_teletena_archive_is_separate_from_posthog_retenti",
-    "copy.policy_disclosure_or_operational_status_disclosure.these_sections_are_review_drafts_they_do_not_establish_legal_approval_",
-    "copy.policy_disclosure_or_operational_status_disclosure.turning_replay_off_stops_future_capture_and_discards_unsent_buffers_pr",
-    "copy.policy_disclosure_or_operational_status_disclosure.visiting_teletena_dismissing_a_notice_or_accepting_an_earlier_terms_ve",
-    "copy.policy_disclosure_or_operational_status_disclosure.when_replay_becomes_available_signed_in_users_can_manage_their_separat",
-    "copy.replaypolicydisclosure.message",
-    "copy.replaypolicydisclosure.noopener_noreferrer",
-    "copy.replaypolicydisclosure.read_replay_provider_and_retention_details_in_the_privacy_notice",
-    "copy.replaypolicydisclosure.review_draft"
+    "copy.operationsportalviews.open_email_assistance_requests",
+    "copy.operationsportalviews.professional_applications_awaiting_review",
+    "copy.operationsportalviews.service_applications_awaiting_review"
   ],
   "stale": [
-    "copy.onboarding.terms_privacy_and_consent",
-    "copy.operations.operations_sections",
-    "copy.operations.overview",
-    "copy.operations.user_support",
-    "copy.operationstelemetry.optional_guest_collection_is_currently_disabled_sign_in_to_manage_your"
+    "copy.operationsportalviews.applications_awaiting_review"
   ]
 }
