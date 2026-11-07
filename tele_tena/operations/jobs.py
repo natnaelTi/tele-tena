@@ -69,6 +69,8 @@ def _after_job(method=None,kwargs=None,result=None):
  beat('app_job_completed');frappe.db.commit()
 
 def health():
+ from .backup_status import status as backup_status
+ backup=backup_status()
  c=rt.config();beats={x.name:{'at':x.at,'age_seconds':max(0,int((rt.now()-x.at).total_seconds()))} for x in frappe.db.sql('SELECT name,at FROM tt_ops_heartbeat WHERE name IN (\'scheduler\',\'worker_started\',\'worker_completed\',\'retention\',\'app_job_completed\',\'archive_lifecycle\')',as_dict=True)}
  queue={'state':'Unavailable','pending':None,'oldest_age_seconds':None}
  try:
@@ -80,12 +82,12 @@ def health():
    job=Job.fetch(ids[0],connection=q.connection)
    if job.enqueued_at:queue['oldest_age_seconds']=max(0,int((rt.now()-job.enqueued_at.replace(tzinfo=None)).total_seconds()))
  except Exception:pass
- return {'release':rt.release(),'environment':c['environment'],'database':'Ready','beats':beats,'queue':queue,'alert_states':frappe.db.sql('SELECT state,COUNT(*) n FROM tt_ops_alert GROUP BY state',as_dict=True),'notification_states':frappe.db.sql("SELECT state,COUNT(*) n,MIN(created) oldest FROM tt_booking_notice WHERE channel IN ('email','sms') GROUP BY state",as_dict=True),'backup':'Unavailable — No Verified Backup-Freshness Metadata','freshness':'Stale' if any(beats.get(k,{}).get('age_seconds',999999)>240 for k in ('scheduler','worker_completed')) else 'Current','archive':__import__('tele_tena.operations.archive',fromlist=['status']).status(),'providers':__import__('tele_tena.operations.providers',fromlist=['status']).status()}
+ return {'release':rt.release(),'environment':c['environment'],'database':'Ready','beats':beats,'queue':queue,'alert_states':frappe.db.sql('SELECT state,COUNT(*) n FROM tt_ops_alert GROUP BY state',as_dict=True),'notification_states':frappe.db.sql("SELECT state,COUNT(*) n,MIN(created) oldest FROM tt_booking_notice WHERE channel IN ('email','sms') GROUP BY state",as_dict=True),'backup':backup['status'],'backup_details':backup,'freshness':'Stale' if any(beats.get(k,{}).get('age_seconds',999999)>240 for k in ('scheduler','worker_completed')) else 'Current','archive':__import__('tele_tena.operations.archive',fromlist=['status']).status(),'providers':__import__('tele_tena.operations.providers',fromlist=['status']).status()}
 
 def watch():
  """CLI operator runner; no RQ dependency for critical technical alert delivery."""
  if not rt.available():return
- status=health();rt.incident('operations_worker_stale','Warning',recovery=status['freshness']=='Current')
+ status=health();rt.incident('backup_stale_or_unverified','Warning',recovery=status.get('backup_details',{}).get('status') not in ('Unknown','Stale'));rt.incident('operations_worker_stale','Warning',recovery=status['freshness']=='Current')
  failures=frappe.db.sql("SELECT COUNT(*) n,COUNT(DISTINCT actor) people FROM tt_ops_event WHERE name='validation.failed' AND created>DATE_SUB(UTC_TIMESTAMP(6),INTERVAL 5 MINUTE) AND JSON_UNQUOTE(JSON_EXTRACT(properties,'$.step')) IN ('payment','schedule') AND JSON_UNQUOTE(JSON_EXTRACT(properties,'$.error_code')) IN ('network','timeout','unavailable')",as_dict=True)[0]
  rt.incident('widespread_booking_payment_failure','Critical',recovery=not(failures.n>=10 and failures.people>=3))
  a=__import__('tele_tena.operations.archive',fromlist=['status']).status()

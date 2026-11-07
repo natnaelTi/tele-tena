@@ -21,6 +21,10 @@ def load(path):
 
 def validate(data):
  invalid=[]
+ if data.get('verified_backup_directory'):
+  folder=Path(str(data['verified_backup_directory']))
+  if not folder.is_absolute() or any(p.is_symlink() for p in (folder,*folder.parents)) or not folder.is_dir() or folder.stat().st_uid!=os.geteuid() or folder.stat().st_mode&0o077:invalid.append('verified_backup_directory')
+ if 'backup_max_age_hours' in data and (type(data['backup_max_age_hours']) is not int or not 1<=data['backup_max_age_hours']<=168):invalid.append('backup_max_age_hours')
  if data.get('schema')!='teletena-operations-config-v1':invalid.append('schema')
  invalid.extend(k for k in REQUIRED if not isinstance(data.get(k),(str,int)) or not str(data[k]).strip())
  hosts={'https://eu.i.posthog.com':'https://eu.posthog.com','https://us.i.posthog.com':'https://us.posthog.com'}

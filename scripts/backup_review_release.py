@@ -4,6 +4,7 @@ Run with the Bench Python. The local command-builder wrapper writes a temporary
 client option file; no framework source or site credentials are modified.
 """
 import argparse
+from datetime import datetime,timezone
 import os
 from pathlib import Path
 import tempfile
@@ -25,6 +26,7 @@ def main():
     assert 'tele_tena' in frappe.get_installed_apps(),'Expected TeleTena site'
     assert not frappe.get_system_settings('encrypt_backup'),'Encrypted backup policy enabled: stop for a verified encrypted backup procedure; do not disable encryption'
     assert frappe.conf.db_type in (None,'mariadb'),'Only tested MariaDB backup path supported'
+    started=datetime.now(timezone.utc)
     original=frappe.database.get_command
     try:
         with tempfile.TemporaryDirectory(prefix='client-',dir=dest) as tmp:
@@ -51,6 +53,8 @@ def main():
         import json
         fd=os.open(dest/'verified-manifest.json',os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
         with os.fdopen(fd,'w') as stream:json.dump(result,stream,indent=2)
+        from tele_tena.operations.backup_status import observe
+        observe(dest,args.site,started,result)
         print('PASS: complete native database/public/private/config backup verified; destination:',dest)
     finally:frappe.destroy()
 
