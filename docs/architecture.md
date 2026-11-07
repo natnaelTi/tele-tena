@@ -1,3 +1,14 @@
+## Terms and Operations Follow-Up — 7 November 2026
+
+Draft replay disclosure is part of the existing versioned Terms/Privacy flow.
+Effective policy IDs bind the original source version and complete addendum;
+historical source bodies and acceptances are preserved. Terms acknowledgement
+alone never activates optional replay. No guest acceptance point exists, so guests
+remain unrecorded without a new popup or acceptance button. Production remains
+disabled pending wording/model review. Read-only backup health consumes only
+protected complete-backup observations; absent source is Unavailable.
+See [current acceptance/evidence](operations/terms-navigation-followup.md).
+
 ## Native Replay Proof Follow-Up — 6 November2026
 
 Actual V2 native gateway/worker ingestion and provisional independent playback pass.

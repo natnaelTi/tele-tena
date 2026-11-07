@@ -1,6 +1,6 @@
 # Sprint 1 Remaining Implementation and Acceptance Boundaries
 
-6 November2026. This is the complete current gap report; older missing-implementation
+7 November2026. This is the complete current gap report; older missing-implementation
 lists are historical. See [every original requirement](acceptance-matrix.json).
 
 | Capability | Accurate State | Required Resolution |
@@ -9,8 +9,8 @@ lists are historical. See [every original requirement](acceptance-matrix.json).
 | Original selected-project settled export and independent playback | Verified against EU335848 after25hours | No new capture/export experiment needed |
 | Original test-recording provider deletion | Verified204 then404 after two permission denials; extra read explicitly approved | Complete; original one-run authorization closed, unbound certificate only |
 | Operational90day archival | Native clock/storage/retry/deletion/restore tests pass; not available for production | Complete V2 settled native archive/playback/deletion, separate code-bound activation and storage sizing |
-| Anonymous guest replay | Not implemented; guests explicitly ineligible | Protected guest-consent protocol is needed before guest recording; do not count missing coverage as zero traffic |
-| Ongoing backup-freshness telemetry | Not implemented; health shows Unavailable | Operator supply trustworthy backup-success metadata; deployment backup integrity tools already work |
+| Guest Terms disclosure | Implemented and locally verified; anonymous capture remains unavailable | Existing guest flow has no acceptance point. Keep guests unrecorded under owner7Nov direction; no new popup/acceptance button. Draft Terms/Privacy and consent model await human review |
+| Backup-freshness telemetry | Implemented and locally verified with actual complete Frappe16 backup | Production latest-bundle pointer/recurring backup source not configured; Unavailable is honest until supplied |
 | Dedicated production private volume | Adapter implemented; local private volume tested | Choose capacity/location/backup expiry,700directory/600objects, disk headroom; no paid provisioning |
 | External monitoring/persistent independent alert launcher | Prepared, not installed remotely | UptimeRobot account/HTTPS monitors and approved persistent operations_service launcher |
 | Bugsink/error/events/owner alerts | Actual bounded events/errors/map capability and receipts verified | Restore intended provider automatic alert policy manually; no further tests sent |

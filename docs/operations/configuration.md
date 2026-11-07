@@ -112,3 +112,35 @@ owner's explicit destinations and validate by an opt-in bounded operator test.
 Native independent watch detects queue/stale processing separately; arrange an
 approved persistent launcher for `operations_service.py` before launch. No monitor,
 system service or production provider setting was created by this sprint.
+
+
+## Read-Only Backup Freshness Source
+
+After `scripts/backup_review_release.py --bench BENCH --site SITE --destination NEW_PRIVATE_BUNDLE`
+finishes successfully, the new bundle includes `backup-observation.json` alongside
+`verified-manifest.json`, database/public/private archives and configuration. The
+observation is emitted only after required archive and checksum checks pass.
+The existing helper refuses an occupied destination; never overwrite retained backups.
+
+An operator may set optional server-only `verified_backup_directory` to that
+completed absolute private bundle and `backup_max_age_hours` to1–168(default24).
+Use700directory/600files owned by the application user. No path or configuration
+contents appear in health responses. Point to the latest successful bundle after
+each backup; a schedule/pointer updater is **not installed** by this release.
+A successful old-backup recheck does not renew its original capture-start time.
+Legacy bundles without observations show Unknown; no source shows Unavailable.
+Changed/incomplete/cross-site/unsafe bundles show Unknown. Current means creation
+integrity metadata and unchanged file statistics match, not a current restore drill
+or proof of cross-site atomicity. Large archives are not rehashed on health polling.
+
+## Terms Disclosure and Guest Coverage
+
+The current Terms/Privacy API returns an effective version derived from the original
+published source version plus the complete application-owned draft replay addendum.
+Original published bodies and immutable historical acceptances remain intact.
+The same disclosure appears before the existing onboarding acknowledgements;
+changed versions clear stale checked draft values. Terms acceptance alone does not
+enable optional replay. Existing signed-in collection preferences remain independent.
+Guests have no Terms acceptance point and therefore remain unrecorded. Reading,
+dismissal and legacy acceptance are not consent. No guest popup or extra acceptance
+button was introduced. Production replay stays disabled pending wording/model review.

@@ -1,3 +1,14 @@
+## Current Terms Model — 7 November 2026
+
+The owner's replacement direction supersedes any earlier standalone guest-consent
+proposal. Draft disclosure now appears in existing Terms/Privacy and at onboarding's
+existing acknowledgements. No new replay popup or second acceptance exists. Guests
+have no Terms acceptance point and remain unrecorded; no acceptance is inferred
+from visiting, dismissal or an older version. Optional account replay preferences
+remain separate. PostHog retention requires checking the actual project; proposed
+TeleTena rolling90days is separate and unavailable pending activation gates.
+See [follow-up verification](terms-navigation-followup.md).
+
 > **Latest V2 status:** actual native SDK→gateway→worker ingestion and provisional
 > export/playback pass. Its settled native archive/cleanup checkpoint is due
 > **8November2026,00:28:39Africa/Nairobi**, not scheduled or passed.

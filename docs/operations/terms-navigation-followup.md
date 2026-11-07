@@ -53,8 +53,40 @@ No source was bound or provider configuration changed on the presentation site.
 
 ## Evidence
 
-Backend policy/guest, native backup/status and browser checks are recorded after
-implementation. Before screenshot/first exception are retained privately under
+New focused verification:19Frappe16 rollback operations tests;6Terms/guest tests;
+3policy-localization regressions;6complete-backup/status tests;7provider preflight;
+localization exchange5/extraction2; frontend lint zero errors and production build.
+Actual disposable Frappe16 backup included DB/public/private/config, all integrity
+checks and reviewer health Current; Guest detailed health denied. Main remains
+Unavailable without configuration. Financial audit is read-only:11patient owners,
+2clinician owners,22accounts, zero projection/obligation/journal mismatches.
+
+Real reviewer8017 browser covers all7sections click/direct/reload/back-forward,
+delayed first Insights response, recoverable HTTP503 and malformed-response render
+failure, empty Insights/support, disabled replay controls and unavailable backup.
+Guest/patient/clinician real backend denials pass. No failed assets or unexpected
+browser exceptions. No external/replay requests. Terms browser checks390/768/1440,
+fake guest acceptance cookies/dismissal still off, real sign-in/out and authorization.
+The **onboarding draft response/profile absence/access-switch responses alone are
+synthetic**, to display an unfinished account without modifying presentation accounts
+or registration switches; current Terms API and old-version validation are real.
+No application submitted and no real acceptance/preferences overwritten.
+
+Actual Chromium200% zoom (1440physical/720CSS/DPR2) tested Insights/Terms and keyboard
+navigation of7tabs, no page overflow. Screenshots were visually inspected; responsive
+navigation wraps, text remains readable and content scrolls. A long effective-version
+summary wrapped incorrectly at390; applying existing policy-version wrapping fixed it.
+Policy anchors retain heading space below sticky navigation.
+
+Unchanged application-wide replay canary/lifecycle/PWA, quarter-clock/reporting,
+retention/deletion/restore, fresh/repeatv1.54 migration and business journeys reuse
+[earlier evidence](replay-integration-v154.md); they were not all rerun for these
+route/policy/read-only metadata changes. No new DDL/dependencies, financial mode,
+provider setting or historical record changes. No new provider ingestion, native
+language/legal approval, physical devices or live delivery are claimed.
+
+Private screenshots/logs are retained; a safe public/synthetic subset is linked in
+[the verification report](verification.md). Before screenshot/first exception are retained privately under
 `/home/frappe/teletena-operations-proof/terms-navigation/`. Only synthetic/public
 screenshots may be committed. No raw support, identity, payment or clinical content.
 The saved V2 recording/authorization remain unchanged; its checkpoint is due

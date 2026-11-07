@@ -1,5 +1,5 @@
 {
-  "version": "sprint1-acceptance-2026-11-06",
+  "version": "sprint1-acceptance-2026-11-07",
   "status_definitions": [
     "Complete and verified",
     "Implemented but awaiting verification",
@@ -88,9 +88,9 @@
     },
     {
       "id": "5.3",
-      "requirement": "Anonymous guest-consent protocol",
-      "status": "Not implemented",
-      "evidence_or_dependency": "Guests intentionally remain ineligible; no anonymous capture or identity graph. A protected guest-consent design would need separate review."
+      "requirement": "Guest Terms disclosure and no-acceptance fallback",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Owner7Nov direction implemented: versioned draft Terms/Privacy addendum at existing onboarding acknowledgement; no anonymous acceptance point exists, so guests remain unrecorded. Reading/dismissal/fake cookies/older Terms cannot opt in; optional signed-in control remains. Anonymous recording itself is not implemented or claimed."
     },
     {
       "id": "5.4",
@@ -208,9 +208,9 @@
     },
     {
       "id": "12.2",
-      "requirement": "Trustworthy automatic backup freshness",
-      "status": "Not implemented",
-      "evidence_or_dependency": "UI explicitly unavailable; no evidence source exists. Native validated deployment backup tools are separate from ongoing backup monitoring."
+      "requirement": "Read-only verified complete-backup freshness",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Native complete-backup helper emits protected observation only after DB/public/private/config integrity verification.6tests plus actual Frappe16 backup/API: Current/Stale from capture start; Unknown invalid/incomplete/changed; Unavailable unconfigured. Recurring production source setup is separate."
     },
     {
       "id": "13.1",
@@ -241,6 +241,18 @@
       "requirement": "Incremental update and owner acceptance",
       "status": "External/operator dependency",
       "evidence_or_dependency": "DraftPR52 preserved; guide must pin final build after checks. No merge/deploy/production activation; owner visual and launch acceptance remain separate."
+    },
+    {
+      "id": "12.3",
+      "requirement": "Production recurring backup source configuration",
+      "status": "External/operator dependency",
+      "evidence_or_dependency": "Operator must bind latest complete protected backup bundle and maintain its pointer after successful recurring backups; no source or job configured on presentation/remote."
+    },
+    {
+      "id": "14.3",
+      "requirement": "Operations tab resource lifecycle and local recovery",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Built8017 reviewer all7sections click/direct/reload/history; delayed Overview\u2192Insights regression, HTTP/render errors retain navigation and Retry; empty/disabled/unavailable states. No provider calls."
     }
   ],
   "overall": "Native foundation and actual gateway/provisional proof verified; Sprint1/operational90day archive pending V2 settled checkpoint and operator/coverage prerequisites."

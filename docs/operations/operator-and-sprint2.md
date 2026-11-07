@@ -101,3 +101,16 @@ Use the saved [native resume checkpoint](live-verification-results-v2.md) on/aft
 8Nov00:28:39EAT; it is not automatically scheduled. Continue native APIs/UI work in
 Sprint2 while preserving this exact recording/ledger and disabled production flags.
 Do not reuse Completed PlanV1 to create new tests.
+
+
+### 7 November Follow-Up APIs and Components
+
+`OperationsNavigation` is shared across all7sections; keyed per-method resources and
+local error boundaries retain navigation and Retry. Reuse these in Sprint2 rather
+than reproducing resource-state leakage between tabs. `health.backup_details`
+returns only safe state/reason/age/verification metadata from protected complete
+backup observations; never infer backup success from arbitrary file timestamps.
+See [source configuration](configuration.md#read-only-backup-freshness-source).
+`policies.current` exposes original source versions plus effective version-bound
+replay disclosure. Guests remain ineligible because no acceptance point exists;
+anonymous coverage is not zero traffic. Draft policy/model approval remains external.
