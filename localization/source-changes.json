@@ -1,13 +1,4 @@
 {
-  "added": [
-    "copy.operationsframe.journey_insights",
-    "copy.operationsframe.operational_settings",
-    "copy.operationsframe.operations_sections",
-    "copy.operationsframe.overview",
-    "copy.operationsframe.quarterly_reports",
-    "copy.operationsframe.replay_archive",
-    "copy.operationsframe.system_health",
-    "copy.operationsframe.user_support"
-  ],
+  "added": [],
   "stale": []
 }
