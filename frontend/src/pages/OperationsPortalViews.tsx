@@ -66,12 +66,19 @@ export function DecisionOverview({
   const { w } = useLocale();
   const queues = [
     [
-      "Applications Awaiting Review",
+      "Professional Applications Awaiting Review",
       data.applications,
       "/admin/applications",
       CheckCircle2,
     ],
-    ["Clarification Replies", data.scope_replies, "/admin/vetting", Clock3],
+    [
+      "Service Applications Awaiting Review",
+      Number.isFinite(data.scope_pending)
+        ? data.scope_pending + data.scope_replies
+        : null,
+      "/admin/vetting",
+      Clock3,
+    ],
     [
       "Payments Awaiting Verification",
       data.payment_reviews,
@@ -116,14 +123,26 @@ export function DecisionOverview({
               <Icon size={20} />
               {w(label)}
             </span>
-            <strong>{n}</strong>
+            <strong>{n ?? "—"}</strong>
+            {label === "Service Applications Awaiting Review" && (
+              <small>
+                {w("Clarification Replies")}: {data.scope_replies}
+              </small>
+            )}
             <small>
-              {w(n ? "Open Queue" : "No Items Awaiting Action")}
+              {w(n === 0 ? "No Items Awaiting Action" : "Open Queue")}
               <ArrowRight size={16} />
             </small>
           </Link>
         ))}
       </div>
+      {data.assistance_requests > 0 && (
+        <InlineNotice>
+          <Link to="/admin/applications">
+            {w("Open Email-Assistance Requests")}: {data.assistance_requests} →
+          </Link>
+        </InlineNotice>
+      )}
       <section className="ops-panel">
         <div className="ops-section-intro">
           <div>

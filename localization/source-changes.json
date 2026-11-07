@@ -1,13 +1,10 @@
 {
   "added": [
-    "copy.backend_validation_portal.review_the_saved_triage_before_applying_changes",
-    "copy.backend_validation_portal.this_report_was_changed_by_another_reviewer_reload_saved_triage_before",
-    "copy.operationssupport.reload_saved_triage",
-    "copy.operationssupport.reloading_saved_triage_replaces_unsaved_triage_choices_your_response_d",
-    "copy.operationssupport.saved_triage_could_not_be_reloaded_your_choices_remain_here",
-    "copy.operationssupport.saved_triage_reloaded",
-    "copy.operationssupport.this_report_was_changed_by_another_reviewer_reload_saved_triage_before",
-    "copy.operationssupport.triage_updated"
+    "copy.operationsportalviews.open_email_assistance_requests",
+    "copy.operationsportalviews.professional_applications_awaiting_review",
+    "copy.operationsportalviews.service_applications_awaiting_review"
   ],
-  "stale": []
+  "stale": [
+    "copy.operationsportalviews.applications_awaiting_review"
+  ]
 }

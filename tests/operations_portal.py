@@ -20,6 +20,11 @@ class Portal(unittest.TestCase):
   frappe.set_user(users['reviewer']);base=rt.config();private={'telegram_token':'synthetic-secret','telegram_chat':'synthetic-chat','owner_alert_email':'owner@ops-review.invalid'}
   with patch('tele_tena.operations.providers.settings',return_value=private),patch('tele_tena.operations.providers.archive_capability',return_value=False),patch('tele_tena.operations.runtime.config',return_value={**base,'alerts':True,'mobile_channel':'Disabled'}):
    mobile=next(x for x in ops.integration_status()['items'] if x['key']=='mobile');self.assertTrue(mobile['site_configured']);self.assertTrue(mobile['enabled']);self.assertFalse(mobile['effective'])
+ def test_overview_counts_include_submitted_scopes_replies_and_assistance(self):
+  frappe.set_user(users['reviewer']);d=ops.overview()
+  self.assertEqual(d['scope_pending'],frappe.db.sql("SELECT COUNT(*) FROM `tabTele Tena Vetting Scope Application` WHERE status='Submitted'")[0][0])
+  self.assertEqual(d['scope_replies'],frappe.db.sql("SELECT COUNT(*) FROM `tabTele Tena Vetting Scope Application` WHERE status='Resubmitted'")[0][0])
+  self.assertEqual(d['assistance_requests'],frappe.db.sql("SELECT COUNT(*) FROM tt_assistance_case WHERE state='Open'")[0][0])
  def test_empty_filtered_journey_has_no_completion_percent(self):
   frappe.set_user(users['reviewer']);d=ops.journey_insights(locale='om',device='tablet',family='consultation',days=1)
   if d['observed_attempts']==0:self.assertIsNone(d['completion_percent']);self.assertEqual(d['sample_state'],'No Eligible Data')
