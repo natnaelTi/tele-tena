@@ -35,6 +35,7 @@ class Portal(unittest.TestCase):
  def test_support_assignment_without_visible_reply_and_owner_boundary(self):
   frappe.set_user(users['patient']);r=ops.support_submit('Technical','Synthetic portal queue report',False,'portal-'+str(uuid.uuid4()),{'route':'/patient'})
   frappe.set_user(users['reviewer']);ops.support_assign(r['id'],'In Progress','High',users['reviewer']);q=ops.support_queue(ownership='mine');self.assertIn(r['id'],[x.id for x in q['items']]);self.assertNotIn('description',q['items'][0]);self.assertEqual(ops.support_detail(r['id'])['replies'],[]);ops.support_reply(r['id'],'Private follow-up note','Internal','portal-preserve',preserve_triage=True);self.assertEqual(ops.support_detail(r['id'])['priority'],'High');self.assertEqual(ops.support_detail(r['id'])['assignee'],users['reviewer'])
+  with self.assertRaises(frappe.ValidationError):ops.support_assign(r['id'],'Resolved','High',users['reviewer'],expected={'state':'New','priority':'Normal','assignee':None})
   with self.assertRaises(frappe.ValidationError):ops.support_assign(r['id'],'Resolved','High',users['patient'])
   frappe.set_user(users['counselor'])
   with self.assertRaises(frappe.PermissionError):ops.support_detail(r['id'])

@@ -61,13 +61,17 @@ def support_queue(state='all',priority='all',ownership='all',offset=0):
  items=frappe.db.sql("SELECT s.id,s.category,s.state,s.priority,s.assignee,COALESCE(u.full_name,s.assignee) assignee_name,s.created,s.modified FROM tt_ops_support s LEFT JOIN tabUser u ON u.name=s.assignee"+where+" ORDER BY FIELD(s.priority,'Critical','High','Normal','Low'),s.created,s.id LIMIT 30 OFFSET %s",(*args,offset),as_dict=True)
  return {'items':items,'total':total,'offset':offset,'page_size':30,'reviewers':frappe.db.sql("SELECT name id,full_name label FROM tabUser WHERE name IN %s ORDER BY full_name,name",(reviewers() or ['Administrator'],),as_dict=True),'observed_at':rt.now()}
 
-def assign(id,state,priority,assignee=None):
+def assign(id,state,priority,assignee=None,expected=None):
  user=rt.reviewer()
  from .support import allowed,STATES,reviewers
  from tele_tena.api.journey import audit
  allowed(id)
  if state not in STATES or priority not in ('Low','Normal','High','Critical') or assignee and assignee!='Administrator' and assignee not in reviewers():fail('Choose an authorized reviewer, status and priority.')
  frappe.db.sql('SELECT id FROM tt_ops_support WHERE id=%s FOR UPDATE',(id,))
+ current=allowed(id)
+ if expected is not None:
+  if not isinstance(expected,dict) or set(expected)!={'state','priority','assignee'}:fail('Review the saved triage before applying changes.')
+  if expected!={'state':current.state,'priority':current.priority,'assignee':current.assignee or None}:fail('This report was changed by another reviewer. Reload saved triage before applying your changes.','operations_conflict')
  frappe.db.sql('UPDATE tt_ops_support SET state=%s,priority=%s,assignee=%s,modified=%s,resolved_at=IF(%s=\'Resolved\',COALESCE(resolved_at,%s),resolved_at) WHERE id=%s',(state,priority,assignee or None,rt.now(),state,rt.now(),id))
  audit(id,'SupportAssigned',{'state':state,'priority':priority,'assigned':bool(assignee),'assignee':assignee or None})
  rt.safe_record('support.resolved' if state=='Resolved' else 'support.triaged',id+':'+state)

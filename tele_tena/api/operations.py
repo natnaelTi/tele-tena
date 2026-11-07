@@ -178,9 +178,9 @@ def support_queue(state='all',priority='all',ownership='all',offset=0):
  from tele_tena.operations.portal import support_queue as listing
  return listing(state,priority,ownership,offset)
 @command
-def support_assign(id,state,priority,assignee=None):
+def support_assign(id,state,priority,assignee=None,expected=None):
  from tele_tena.operations.portal import assign
- return assign(id,state,priority,assignee)
+ return assign(id,state,priority,assignee,expected)
 @query()
 def archive_records(state='all',reference='',offset=0):
  from tele_tena.operations.portal import archive_records as listing

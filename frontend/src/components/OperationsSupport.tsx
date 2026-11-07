@@ -1,10 +1,10 @@
 import { operationsTime } from "./operationsLabels";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useLocale } from "../hooks/useLocale";
 import { useSession } from "../hooks/useSession";
 import { useResource } from "../hooks/useResource";
-import { api } from "../api";
+import { api, ApiError } from "../api";
 import { Select, Button, InlineNotice, Skeleton } from "./ui";
 import { AttachmentPreview } from "./AttachmentPreview";
 import { OpsState } from "../pages/OperationsPortalViews";
@@ -202,17 +202,24 @@ export function SupportRecord({
   id?: string;
   reviewer: boolean;
 }) {
+  const latest = useRef<any>(null);
   const { w } = useLocale(),
     { session } = useSession(),
-    load = useCallback(
-      () =>
-        api<any>(
-          prefix + (id ? "support_detail" : "support_list"),
-          id ? { id } : {},
-          !!id,
-        ),
-      [id],
-    ),
+    load = useCallback(async () => {
+      const next = await api<any>(
+        prefix + (id ? "support_detail" : "support_list"),
+        id ? { id } : {},
+        !!id,
+      );
+      if (!id) return next;
+      if (
+        latest.current &&
+        String(latest.current.modified) > String(next.modified)
+      )
+        return latest.current;
+      latest.current = next;
+      return next;
+    }, [id]),
     r = useResource(load),
     [body, setBody] = useState(""),
     [audience, setAudience] = useState("Internal"),
@@ -275,13 +282,7 @@ export function SupportRecord({
           </p>
         ))}
       </section>
-      {reviewer && (
-        <Assignment
-          key={d.id + String(d.modified)}
-          data={d}
-          refresh={r.refresh}
-        />
-      )}
+      {reviewer && <Assignment key={d.id} data={d} refresh={r.refresh} />}
       <section className="ops-panel">
         <h2>{w("Response History")}</h2>
         {!d.replies.length && <p>{w("No Responses Yet")}</p>}
@@ -401,6 +402,7 @@ function Assignment({
     [assignee, setAssignee] = useState(data.assignee || ""),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
+    [notice, setNotice] = useState(""),
     load = useCallback(() => api<any>(prefix + "support_queue"), []),
     r = useResource(load);
   return (
@@ -443,6 +445,7 @@ function Assignment({
         </Select>
       </div>
       {error && <InlineNotice tone="danger">{w(error)}</InlineNotice>}
+      {notice && <InlineNotice tone="success">{w(notice)}</InlineNotice>}
       <Button
         variant="secondary"
         loading={busy}
@@ -451,13 +454,29 @@ function Assignment({
           setError("");
           void api(
             prefix + "support_assign",
-            { id: data.id, state, priority, assignee: assignee || null },
+            {
+              id: data.id,
+              state,
+              priority,
+              assignee: assignee || null,
+              expected: {
+                state: data.state,
+                priority: data.priority,
+                assignee: data.assignee || null,
+              },
+            },
             true,
           )
-            .then(refresh)
-            .catch(() =>
+            .then(async () => {
+              await refresh();
+              setNotice("Triage Updated");
+            })
+            .catch((error) =>
               setError(
-                "Assignment could not be saved. Your choices remain here.",
+                error instanceof ApiError &&
+                  error.code === "operations_conflict"
+                  ? "This report was changed by another reviewer. Reload saved triage before applying your changes."
+                  : "Assignment could not be saved. Your choices remain here.",
               ),
             )
             .finally(() => setBusy(false));
@@ -465,6 +484,33 @@ function Assignment({
       >
         {w("Save Triage")}
       </Button>
+      <Button
+        variant="quiet"
+        disabled={busy}
+        onClick={() =>
+          void api<any>(prefix + "support_detail", { id: data.id }, true)
+            .then(async (next) => {
+              setState(next.state);
+              setPriority(next.priority);
+              setAssignee(next.assignee || "");
+              setError("");
+              setNotice("Saved Triage Reloaded");
+              await refresh();
+            })
+            .catch(() =>
+              setError(
+                "Saved triage could not be reloaded. Your choices remain here.",
+              ),
+            )
+        }
+      >
+        {w("Reload Saved Triage")}
+      </Button>
+      <p>
+        {w(
+          "Reloading saved triage replaces unsaved triage choices. Your response draft remains here.",
+        )}
+      </p>
       <p>
         {w(
           "Triage changes do not send the private report or notes to an external provider. Use a visible reply when the reporter needs an update.",

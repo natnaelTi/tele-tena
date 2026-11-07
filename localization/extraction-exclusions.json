@@ -741,22 +741,22 @@
   },
   {
     "english": "ops-reply ",
-    "source_location": "frontend/src/components/OperationsSupport.tsx:290",
+    "source_location": "frontend/src/components/OperationsSupport.tsx:291",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Internal",
-    "source_location": "frontend/src/components/OperationsSupport.tsx:290",
+    "source_location": "frontend/src/components/OperationsSupport.tsx:291",
     "reason": "Technical JSX attribute className"
   },
   {
     "english": "Internal",
-    "source_location": "frontend/src/components/OperationsSupport.tsx:314",
+    "source_location": "frontend/src/components/OperationsSupport.tsx:315",
     "reason": "Technical JSX attribute value"
   },
   {
     "english": "User",
-    "source_location": "frontend/src/components/OperationsSupport.tsx:315",
+    "source_location": "frontend/src/components/OperationsSupport.tsx:316",
     "reason": "Technical JSX attribute value"
   },
   {
