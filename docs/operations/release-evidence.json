@@ -1,7 +1,7 @@
 {
   "baseline": "de27a6fbd6e2ed8c23d74471d98b8c357178890a",
   "schema": "v1.54",
-  "packaged_source": "fbd3b09d5ff64bfb7e1f57c0deb4a5d489b373ce",
+  "packaged_source": "4e5b12613eb7702ca7c2844716605a094d558ef6",
   "frontend_lock_sha256": "efe3613bc3acba82e24a2a0d581a1c991e87babfd7b81522d542bae5b749051a",
   "translation_dictionary_sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
   "human_approved_workbook_imports": 0,
@@ -21,7 +21,17 @@
     "v154/archive-200-percent-screen.png": "020e5842b6e66448a8894b0b43d461276617a137d86efddaecf955b43952e28b",
     "v154/archive-playback-390.png": "27134862aee2a38477e98846c339eb4bed36dd7c2d5e1c7c2de96cf94ccbbaf2",
     "v154/archive-playback-1440.png": "64785ad0f54d4a5ef7267078d952db18586d280dba11076604bfccee4564bec1",
-    "v154/native-v2-provisional-playback.png": "2a6bbce771bd94a1d8e9656149dbd9d8dbc9d1a19330c59a483f8571c252dd6b"
+    "v154/native-v2-provisional-playback.png": "2a6bbce771bd94a1d8e9656149dbd9d8dbc9d1a19330c59a483f8571c252dd6b",
+    "terms-navigation/before-navigation-1440.png": "d8b2754d5b0e4c3b438994fc8868560f421fc89e42a03063cdb1f295f569ebcd",
+    "terms-navigation/after-insights-1440.png": "0f53f1115b1ac082b304e89ee8b07003fe9f3eeea4ade57c4cce418d5a107944",
+    "terms-navigation/public-terms-390.png": "0286db650b8bfa4aa04053c62b8909c029ae9496dcc53704aa6e8e6a20144c44",
+    "terms-navigation/public-terms-768.png": "c6b6b199543270c3efa431d482b5542b7477bda7500941ead001644de9c9890d",
+    "terms-navigation/public-terms-1440.png": "e084d2af66464b9f8e76df83acfc6649a4f69237cbd7506750b7f5f4c2aea909",
+    "terms-navigation/onboarding-terms-panel.png": "b995365eaa77438ecb1d809e4560d2cd394ed4bdee5f1ee1f4cab79a32a36750",
+    "terms-navigation/after-archive-768.png": "8e0b34c4fd5325a12194719eb3a9cfd8627c7ccba4961721222bb2750c9e2406",
+    "terms-navigation/insights-200-percent-screen.png": "5b5dfe28d38e2de9db71327c394c4436a07cc415c6554837853418bb2d5ce946",
+    "terms-navigation/after-archive-390.png": "0c0e1ee57913c01c7c58a9ed25f7473ba322893385c1471d85cf931ed78819cc",
+    "terms-navigation/terms-200-percent-screen.png": "d1aff7b639bfa8e3c92ec1480a039d5823b6549860bc8be83d4b014937e21101"
   },
   "provider_ingestion_verified": true,
   "replay_archive_available": false,
@@ -46,9 +56,9 @@
   },
   "live_results": "docs/operations/live-verification-results-v1.md",
   "replay_settled_checkpoint_due_utc": "2026-11-06T19:50:28.731000+00:00",
-  "installation_commit": "fbd3b09d5ff64bfb7e1f57c0deb4a5d489b373ce",
-  "packaged_source_commit": "fbd3b09d5ff64bfb7e1f57c0deb4a5d489b373ce",
-  "packaged_release_json_sha256": "0354330a1fcce6c0c492d3e1bb2cebdeeae6a58dd43e7a9abac5e0b62c23ae78",
+  "installation_commit": "4e5b12613eb7702ca7c2844716605a094d558ef6",
+  "packaged_source_commit": "4e5b12613eb7702ca7c2844716605a094d558ef6",
+  "packaged_release_json_sha256": "3227445b9b7d88d352869a224243a22c77fda3427c58d4a7555ac8af1aa37e75",
   "latest_local_tests": {
     "frappe16_operations": 19,
     "communications": 30,
@@ -140,5 +150,18 @@
   "replay_index_default_limit": 100000,
   "replay_index_warning_percent": 80,
   "source_build_difference": "Subsequent documentation/evidence changes only; runtime files match installation pin.",
-  "continuation_baseline_source": "2f80119e8433505e7ca295e7259f95759a8b9405"
+  "continuation_baseline_source": "2f80119e8433505e7ca295e7259f95759a8b9405",
+  "terms_navigation_followup": {
+    "date": "2026-11-07",
+    "report": "docs/operations/terms-navigation-followup.md",
+    "new_terms_tests": 6,
+    "new_backup_tests": 6,
+    "operations_tests": 19,
+    "production_browser_all_seven_tabs": true,
+    "guest_capture": false,
+    "production_collection": false,
+    "provider_calls": 0,
+    "schema_change": false,
+    "financial_reconciliation_mismatches": 0
+  }
 }

@@ -1,3 +1,41 @@
+## Terms, Navigation and Backup Follow-Up — 7 November 2026
+
+Verified installation/build: `4e5b12613eb7702ca7c2844716605a094d558ef6`. Preview
+http://127.0.0.1:8017/teletena/ serves this exact production package; later commits
+contain documentation/evidence only. Release JSON SHA256:
+`3227445b9b7d88d352869a224243a22c77fda3427c58d4a7555ac8af1aa37e75`.
+No dependency, schema or patch-list change in this continuation.
+
+[Exact new checks and inherited evidence](terms-navigation-followup.md),
+[current requirement matrix](acceptance-matrix.json),
+[source configuration](configuration.md#read-only-backup-freshness-source).
+Built final browser checks passed all7tabs click/direct/reload/history, local
+HTTP/render recovery, empty/disabled/unavailable states, server role denials and
+Terms old-version/non-consent boundaries. Responsive390/768/1440 and actual200%
+zoom/keyboard screenshots inspected. Backend6Terms +19operations,6backup,
+3policy-localization,7preflight and localization5+2 pass. Production build/lint
+(zero errors; existing warnings) and311artifact hashes/private credential scan pass.
+Read-only11patient/2clinician/22account reconciliation has zero mismatches.
+
+Safe rendered evidence:
+[Before: first Insights crash](../screenshots/operations/terms-navigation/before-navigation-1440.png),
+[After: Insights](../screenshots/operations/terms-navigation/after-insights-1440.png),
+[Mobile Operations](../screenshots/operations/terms-navigation/after-archive-390.png),
+[Public Terms mobile](../screenshots/operations/terms-navigation/public-terms-390.png),
+[Existing acknowledgement section](../screenshots/operations/terms-navigation/onboarding-terms-panel.png),
+[Actual200% Operations](../screenshots/operations/terms-navigation/insights-200-percent-screen.png),
+[Actual200% Terms](../screenshots/operations/terms-navigation/terms-200-percent-screen.png).
+Screenshots contain public copy or fictional presentation identities only.
+
+Guests remain unrecorded because the current guest flow has no Terms acceptance
+point. Draft wording/consent model approval remains pending; production stays off.
+V1 remains closed; V2 ledger still AwaitingSettledRecheck with unchanged usage and
+8Nov2026,00:28:39Africa/Nairobi due time. No new provider operation or automatic
+schedule. UptimeRobot, production storage/expiry, independent launcher and recurring
+backup-source setup remain operator prerequisites. No merge or remote deployment.
+
+## Historical Evidence (Superseded Where Noted Above)
+
 ## Final Local Package — 6 November2026
 
 Installation/build: `fbd3b09d5ff64bfb7e1f57c0deb4a5d489b373ce`. Preview8017 serves this exact release; later
