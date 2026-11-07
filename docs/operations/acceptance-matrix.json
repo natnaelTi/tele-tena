@@ -1,0 +1,259 @@
+{
+  "version": "sprint1-acceptance-2026-11-07",
+  "status_definitions": [
+    "Complete and verified",
+    "Implemented but awaiting verification",
+    "Not implemented",
+    "External/operator dependency"
+  ],
+  "scope": "Original15Sprint1groups; local verification is distinct from actual provider and owner acceptance.",
+  "requirements": [
+    {
+      "id": "1.1",
+      "requirement": "Baseline, ancestry and environments",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Observed source2f80119, draftPR52\u219251; Frappe15 retained and exact Frappe16 compatibility bench. No resets/framework edits."
+    },
+    {
+      "id": "1.2",
+      "requirement": "Preserve business data and credentials",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Main122tables/19311rows unchanged across additive+repeat; compatibility populated upgrade and fresh/repeat; private/config hashes and22-account reconciliation."
+    },
+    {
+      "id": "2.1",
+      "requirement": "Separate provider adapters and private configuration",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "PostHog/Bugsink/Telegram/SMTP separate; server-only secrets; native replay gateway; no broad Bench telemetry."
+    },
+    {
+      "id": "2.2",
+      "requirement": "Actual provider error/event/alert proof",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Inherited PlanV1:2stored events,5stored errors/grouping/original source line;2Telegram+2amended email receipts confirmed."
+    },
+    {
+      "id": "2.3",
+      "requirement": "UptimeRobot external monitoring",
+      "status": "External/operator dependency",
+      "evidence_or_dependency": "Manual account/HTTPS monitors and channel entitlements must be configured and validated; no monitor created."
+    },
+    {
+      "id": "3.1",
+      "requirement": "Reviewer super-admin authorization and audits",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Server reviewer checks, patient/clinician denials, config/export/support/replay access audit; existing clinical permissions unchanged."
+    },
+    {
+      "id": "3.2",
+      "requirement": "Alert ownership, cooldown, grouping and recovery",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Owner subscription remains unlinked; configured recipient retained. Native controlled tests and actual bounded receipts. No new sends."
+    },
+    {
+      "id": "3.3",
+      "requirement": "Production independent alert launcher",
+      "status": "External/operator dependency",
+      "evidence_or_dependency": "Native operations_service/watch controls prepared; operator must arrange approved persistent launcher and external outage monitor."
+    },
+    {
+      "id": "4.1",
+      "requirement": "Versioned safe events and confirmed outcome dedupe",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "operations-v1.1; separate browser intent/server outcomes, native transaction keys,24h attempts, consent/synthetic segmentation."
+    },
+    {
+      "id": "4.2",
+      "requirement": "Onboarding/review/request/booking/call instrumentation",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Existing hooks retained; outcome-labelled review notifications and local-only call quality enum added. Critical changed hooks rerun."
+    },
+    {
+      "id": "4.3",
+      "requirement": "Real-device quality and multi-release production measurements",
+      "status": "External/operator dependency",
+      "evidence_or_dependency": "No new physical call or production funnel acceptance; native metrics do not infer motives or clinical competence."
+    },
+    {
+      "id": "5.1",
+      "requirement": "Pre-egress privacy projection",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Pinned recorder; reconstructed DOM/events; text/values masked; selected checkbox values suppressed; private/media nodes blocked; only trusted public CSS injected server-side."
+    },
+    {
+      "id": "5.2",
+      "requirement": "Versioned explicit optional replay preference",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Noticev2; old unavailable v1 choice preserved but not activated; no automatic opt-in; quotas/activation gate and server checks on every chunk."
+    },
+    {
+      "id": "5.3",
+      "requirement": "Guest Terms disclosure and no-acceptance fallback",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Owner7Nov direction implemented: versioned draft Terms/Privacy addendum at existing onboarding acknowledgement; no anonymous acceptance point exists, so guests remain unrecorded. Reading/dismissal/fake cookies/older Terms cannot opt in; optional signed-in control remains. Anonymous recording itself is not implemented or claimed."
+    },
+    {
+      "id": "5.4",
+      "requirement": "Approved collection policies/native-language approval",
+      "status": "External/operator dependency",
+      "evidence_or_dependency": "Draft notice remains truthful; no legal or native-language approval fabricated."
+    },
+    {
+      "id": "6.1",
+      "requirement": "Actual application eligible replay lifecycle",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Production-built patient/clinician/reviewer actual routes with real native gateway; dynamic dialogs/canaries, SPA navigation, distinct tabs, sign-out/account/offline/reload stops; no live egress."
+    },
+    {
+      "id": "6.2",
+      "requirement": "Consultation media and private documents excluded",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Media, canvas, document/upload/preview, clinical-note/history regions blocked; quality only self-side enumerated events."
+    },
+    {
+      "id": "6.3",
+      "requirement": "New native gateway against actual PostHog",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Approved V2: actual native gateway and enqueued worker accepted3snapshot POSTs/839255B; actual provisional1source/6event/91822B export and independent playback. No existing data, events/errors/messages sent."
+    },
+    {
+      "id": "7.1",
+      "requirement": "Complete-source export and safe independent player",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Versioned blob-v2 adapter, all listed segments/stable manifests/checksums, strict malformed/unsupported rejection; actual provisional72event playback and local actual-route archives."
+    },
+    {
+      "id": "7.2",
+      "requirement": "PlanV1 settled export/playback/deletion",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Actual due-time settled1source/72events/4061B export and offline playback; third original DELETE204, separately approved delayed confirmation404. PlanV1 closed; certificate unbound."
+    },
+    {
+      "id": "7.3",
+      "requirement": "Archive admission/index/export worker",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Server-owned recording IDs, private per-tab scope, durable chunks, dedicated worker processing, bounded retry/backoff, idempotent data,40s/20source export limit, reviewer retry policy."
+    },
+    {
+      "id": "7.4",
+      "requirement": "Production project/storage activation",
+      "status": "External/operator dependency",
+      "evidence_or_dependency": "Production remains disabled; V2 due-time native archive/settled proof must match current player before separate explicit activation/storage sizing."
+    },
+    {
+      "id": "7.5",
+      "requirement": "V2 native settled archive, playback and cleanup",
+      "status": "Implemented but awaiting verification",
+      "evidence_or_dependency": "Due2026-11-07T21:28:39.095385Z (8Nov00:28:39EAT). Exact NativeRun ledger/reference/caps and native_resume.py; not run early or automatically scheduled."
+    },
+    {
+      "id": "8.1",
+      "requirement": "Byte/count/storage quotas and visible loss",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Configurable per-record/day/pending-chunk/byte caps plus100000-entry retained index cap and80%independent warning;16capture tests, no tombstone deletion or business mutation."
+    },
+    {
+      "id": "8.2",
+      "requirement": "Capture-time90day expiry and restore safeguards",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Test-clock expiry, private objects, deletion journal, denied restored access, orphan scan/post-restore command; unrelated clinical/financial/support data retained."
+    },
+    {
+      "id": "8.3",
+      "requirement": "Actual provider deletion acceptance",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Actual same-recording deletion accepted204 and absent404. Original3/3delete+confirmation plus approved extra1/1read charged. Earlier403diagnostics retained."
+    },
+    {
+      "id": "8.4",
+      "requirement": "Production storage sizing and backup expiry policy",
+      "status": "External/operator dependency",
+      "evidence_or_dependency": "3short actual-route local archives measured~134KB each, not production average. Operator must size volume/backup policy and validate disk headroom."
+    },
+    {
+      "id": "9.1",
+      "requirement": "Continuous aggregates and quarterly reports",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Native worker aggregates before raw expiry; Nairobi quarter boundaries, repeat-safe versioned reports, samples/synthetic exclusion/partial periods, human annotations and JSON export."
+    },
+    {
+      "id": "10.1",
+      "requirement": "Bugsink browser/backend/job redaction",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Safe trusted filenames/lines, no messages/locals/requests; controlled transports and5actual stored synthetic errors; unexpected-only behavior preserved."
+    },
+    {
+      "id": "10.2",
+      "requirement": "Private source-map capability",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "One actual synthetic pair resolves TypeScript line2; pinned private CLI. No maps in public assets."
+    },
+    {
+      "id": "10.3",
+      "requirement": "Production-bundle map upload/alert settings",
+      "status": "External/operator dependency",
+      "evidence_or_dependency": "No production-bundle upload authorized. Operator release workflow and intended provider alert settings must be reviewed; automatic test alerts remain owner-disabled."
+    },
+    {
+      "id": "11.1",
+      "requirement": "Native support queue and private attachments",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Real browser submission/triage/internal vs user replies/resolution, owner access, explicit screenshot consent, audit and abuse/idempotency checks; inherited and touched-route evidence."
+    },
+    {
+      "id": "12.1",
+      "requirement": "Overview/health/execution freshness",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Current native APIs, actual enqueued dedicated-worker execution, distinct stale/disabled/unconfigured states, notification queues and release identity."
+    },
+    {
+      "id": "12.2",
+      "requirement": "Read-only verified complete-backup freshness",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Native complete-backup helper emits protected observation only after DB/public/private/config integrity verification.6tests plus actual Frappe16 backup/API: Current/Stale from capture start; Unknown invalid/incomplete/changed; Unavailable unconfigured. Recurring production source setup is separate."
+    },
+    {
+      "id": "13.1",
+      "requirement": "Fail-safe async operation and emergency controls",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "No business retries; independent ops queue/watch; private bounded spools; replay/archive activation gated; toggles stop collection; backpressure/integrity errors visible."
+    },
+    {
+      "id": "14.1",
+      "requirement": "Focused backend/browser/schema/asset checks",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Frappe16 operations/capture/communications, fresh+repeat/populated preservation; production build/lint/private scans and actual route browser evidence. See dated verification for exact counts."
+    },
+    {
+      "id": "14.2",
+      "requirement": "Responsive, keyboard, zoom and PWA final pass",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Actual backend archive dialog390/768/1440, actual200% Chromium zoom, iframe Escape/focus restoration; visually inspected. Built PWA update/private-cache denial/offline\u2192online deep-link recovery pass."
+    },
+    {
+      "id": "15.1",
+      "requirement": "Native Sprint2 foundation and API handoff",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Existing support/overview/metrics/health/reports plus capture/archive/quotas/retry APIs; full portal/heatmaps intentionally Sprint2."
+    },
+    {
+      "id": "15.2",
+      "requirement": "Incremental update and owner acceptance",
+      "status": "External/operator dependency",
+      "evidence_or_dependency": "DraftPR52 preserved; guide must pin final build after checks. No merge/deploy/production activation; owner visual and launch acceptance remain separate."
+    },
+    {
+      "id": "12.3",
+      "requirement": "Production recurring backup source configuration",
+      "status": "External/operator dependency",
+      "evidence_or_dependency": "Operator must bind latest complete protected backup bundle and maintain its pointer after successful recurring backups; no source or job configured on presentation/remote."
+    },
+    {
+      "id": "14.3",
+      "requirement": "Operations tab resource lifecycle and local recovery",
+      "status": "Complete and verified",
+      "evidence_or_dependency": "Built8017 reviewer all7sections click/direct/reload/history; delayed Overview\u2192Insights regression, HTTP/render errors retain navigation and Retry; empty/disabled/unavailable states. No provider calls."
+    }
+  ],
+  "overall": "Native foundation and actual gateway/provisional proof verified; Sprint1/operational90day archive pending V2 settled checkpoint and operator/coverage prerequisites."
+}

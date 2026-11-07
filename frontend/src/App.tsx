@@ -1,3 +1,6 @@
+import Operations,{SupportShell} from './pages/Operations';
+import{SupportPage}from'./components/SupportDesk';
+import{OperationsTelemetry}from'./components/OperationsTelemetry';
 import {ScopeApplicationList,ScopeApplicationDetail,NewScopeApplication,AssistedApplication,ScopeReviewDecision} from './pages/ScopeApplications';
 import {NotificationsProvider} from './hooks/useNotifications';
 import PaymentActivityAlerts from './components/PaymentActivityAlerts';
@@ -97,6 +100,7 @@ export default function App() {
             </Route>
             </Route>
             <Route element={<RequireSession />}>
+              <Route path="/support" element={<SupportShell/>}><Route index element={<SupportPage/>}/><Route path=":id" element={<SupportPage/>}/></Route>
               <Route path="/admin/rubrics" element={<MedicalLeadLayout />}><Route index element={<VettingRubricManagementPage />} /><Route path="account" element={<ReviewerAccount/>}/></Route>
               <Route path="/consultation/:id/room" element={<><div className="demo-bar" role="note">Demonstration environment — no real payments or clinical care.</div><ConsultationRoomPage /></>} />
               <Route path="/clinic" element={<WorkspaceLayout kind="clinic" />}>
@@ -160,7 +164,7 @@ export default function App() {
                 <Route path="affiliations" element={<ClinicianAffiliations />} />
               </Route>
               <Route path="/admin" element={<WorkspaceLayout kind="admin" />}>
-                <Route index element={<AdminOverview />} />
+                <Route index element={<AdminOverview />} /><Route path="operations" element={<Operations/>}/><Route path="operations/:section" element={<Operations/>}/><Route path="support" element={<SupportPage/>}/><Route path="support/:id" element={<SupportPage/>}/>
                 <Route path="account" element={<ReviewerAccount />} />
                 <Route path="applications" element={<Applications />} />
                 <Route path="applications/:applicationId" element={<Applications />} />
@@ -186,7 +190,7 @@ export default function App() {
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          <HelpTools/>
+          <HelpTools/><OperationsTelemetry/>
         </NotificationsProvider></LocaleProvider>
       </SessionProvider>
     </BrowserRouter>

@@ -22,7 +22,8 @@ def secure_link(destination):
 def render(body, title=None, link=None, locale=None, code=None):
     from tele_tena.localization import translate
     locale=locale or getattr(body,'locale','en')
-    title=title or getattr(body,'title','TeleTena Update')
+    title=title or getattr(body,'title',None)
+    if not isinstance(title,str):title='TeleTena Update'
     link=link if link is not None else getattr(body,'link','')
     # Only server-owned internal links enter the email CTA. No auth tokens.
     if link:

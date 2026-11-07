@@ -63,7 +63,9 @@ def query(method='GET'):
                 return fn(*args, **kwargs)
             except (frappe.PermissionError, frappe.ValidationError):
                 raise
-            except Exception:
+            except Exception as error:
+                from tele_tena.operations.runtime import unexpected
+                unexpected(error)
                 if getattr(frappe.local, 'request', None):
                     frappe.local.form_dict.clear()
                     fail('Operation unavailable; retry later')
@@ -79,14 +81,21 @@ def command(fn):
         savepoint = 'tt_' + uuid.uuid4().hex
         frappe.db.savepoint(savepoint)
         try:
-            return fn(*args, **kwargs)
+            result=fn(*args, **kwargs)
+            try:
+                from tele_tena.operations.runtime import outcome
+                outcome(fn,args,kwargs,result)
+            except Exception:pass
+            return result
         except frappe.QueryDeadlockError:
             frappe.db.rollback()
             fail('Concurrent update; retry with the same submission key', 'concurrent_update')
         except (frappe.PermissionError, frappe.ValidationError):
             frappe.db.rollback(save_point=savepoint)
             raise
-        except Exception:
+        except Exception as error:
+            from tele_tena.operations.runtime import unexpected
+            unexpected(error)
             frappe.db.rollback(save_point=savepoint)
             if getattr(frappe.local, 'request', None):
                 frappe.local.form_dict.clear()

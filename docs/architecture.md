@@ -1,3 +1,42 @@
+## Terms and Operations Follow-Up — 7 November 2026
+
+Draft replay disclosure is part of the existing versioned Terms/Privacy flow.
+Effective policy IDs bind the original source version and complete addendum;
+historical source bodies and acceptances are preserved. Terms acknowledgement
+alone never activates optional replay. No guest acceptance point exists, so guests
+remain unrecorded without a new popup or acceptance button. Production remains
+disabled pending wording/model review. Read-only backup health consumes only
+protected complete-backup observations; absent source is Unavailable.
+See [current acceptance/evidence](operations/terms-navigation-followup.md).
+
+## Native Replay Proof Follow-Up — 6 November2026
+
+Actual V2 native gateway/worker ingestion and provisional independent playback pass.
+[The new settled native archive checkpoint](operations/live-verification-results-v2.md)
+is due8Nov00:28:39EAT. Production collection remains disabled; no operational90day
+archive or full Sprint1 acceptance is claimed.
+
+## Operations Continuation — 6 November2026
+
+Additivev1.54 implements gated eligible authenticated replay, native private spooling,
+complete-source export, inert independent playback, quotas/retries and capture-time
+retention. Local real-backend/browser/clock/preservation evidence is recorded in
+[the current report](operations/replay-integration-v154.md). Actual original settled
+export/playback and provider deletion are verified; new-gateway live proof remains a gate.
+Guests remain ineligible. Production collection is disabled; no operational90-day
+archive or final Sprint1 acceptance is claimed. See [all requirements](operations/acceptance-matrix.json).
+
+## Operations Architecture — 5 November 2026
+
+Native private support, reviewer operations/health, allowlisted outcome metrics, bounded
+errors/alerts and quarterly reports are additive v1.53. Every reviewer has operational
+authority without an additional role; this grants no new clinical/evidence access.
+Provider integrations remain disabled until explicitly configured. Replay capture,
+complete export and independent playback remain unavailable pending selected-project
+proof; this is not a claim of usable90-day archive retention. Public heatmaps and the
+full operations-portal redesign remain Sprint2. See [scope and collection contract](operations/sprint-1.md),
+[verification](operations/verification.md) and [update guide](selfmade-operations-update.md).
+
 ## Application Workflow v1.52
 
 Four additive command tables store typed information requests/responses, assistance cases and email-authorized submission provenance. Existing transaction gate plus request/case locks serialize submissions; response digests and unique request/case IDs make identical retries safe. License PDF/JPEG/PNG evidence keeps validated original bytes/hash and is linked by type; historical submissions/evidence stay intact. Cross-table assistance joins normalize comparison collation without altering framework tables. Case-scoped reviewer commands preserve actual authorship and existing ID-reviewer restrictions. Existing outbox handles neutral acknowledgement channels; no shared package or provider configuration change.

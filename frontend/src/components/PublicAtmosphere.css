@@ -70,3 +70,5 @@
 /* Compensate for the transparent asset margin on wide screens without cutting
    the actual stage. The foreground may pass over the wave into the next section. */
 @media(min-width:1201px){.care-atmosphere>img,.clinician-atmosphere>.clinician-stage{transform:scale(1.15);transform-origin:right bottom}}
+/* Policy anchors retain their heading below the shared sticky navigation. */
+.policy-replay-disclosure{scroll-margin-top:120px}

@@ -89,6 +89,9 @@ def submit_selected_scopes(user, services, recovery=False, assisted_actor=None):
                           (application.submitted_at,result['name']))
         journey.audit(actor(), 'ScopeIntakeRecovered' if recovery else 'OnboardingScopeSubmitted',
                       {'application':result['name'],'clinician':user,'service':service})
+        if not recovery:
+            from tele_tena.operations.runtime import safe_record
+            safe_record('application.scope_created',result['name'],user=user)
         results.append(result)
     return results
 

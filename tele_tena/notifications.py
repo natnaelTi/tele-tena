@@ -39,6 +39,9 @@ KINDS={**EVENTS,
 
 def emit(user,event_key,kind,appointment=None):
     """Internal only. Caller supplies a stable durable event key, never clinical text."""
+    from tele_tena.operations.runtime import safe_record
+    mapped={'Confirmed':'booking.confirmed','Cancelled':'booking.cancelled','Expired':'booking.expired','CallEnded':'consultation.ended','Completed':'consultation.documentation_completed'}
+    if kind in mapped:safe_record(mapped[kind],appointment if kind=='Confirmed' else event_key,user=user)
     if kind not in KINDS or not isinstance(event_key,str) or not 0<len(event_key)<=180:
         raise ValueError('Unsupported notification event')
     frappe.db.sql('''INSERT IGNORE INTO tt_user_notification

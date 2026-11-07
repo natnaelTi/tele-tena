@@ -1,3 +1,4 @@
+import{observe}from'../../operations-telemetry';
 import {IdentityName} from '../../components/ProfilePhoto';
 import { Brand } from "../../components/Brand";
 import { Dialog, Button } from "../../components/ui";
@@ -247,7 +248,7 @@ export default function Consultation({
         if (current()) setMediaStatus("callReconnecting");
       });
       connectedRoom.on(RoomEvent.Reconnected, () => {
-        if (current()) setMediaStatus("callConnected");
+        if (current()) {setMediaStatus("callConnected");observe("consultation.rejoined");}
       });
       connectedRoom.on(RoomEvent.ActiveSpeakersChanged, speakers => {
         if (!current()) return;
@@ -255,6 +256,9 @@ export default function Consultation({
         setParticipantLevels(Object.fromEntries([...connectedRoom.remoteParticipants.values()].map(p=>[p.identity,speakers.some(s=>s.identity===p.identity)&&p.isMicrophoneEnabled?Math.min(1,p.audioLevel):0])));
         const active = Boolean(remoteSpeaker);
         setSpeaking(active); setLevel(active ? Math.min(1, remoteSpeaker?.audioLevel || 0) : 0);
+      });
+      connectedRoom.on(RoomEvent.ConnectionQualityChanged, (quality,participant) => {
+        if(current()&&participant===connectedRoom.localParticipant){const value=String(quality).toLowerCase();observe('consultation.quality',{quality:['excellent','good','poor','lost'].includes(value)?value:'unknown',step:'room'});}
       });
       connectedRoom.on(RoomEvent.ParticipantConnected, () => {
         if (current()) setRemotePresent(connectedRoom.remoteParticipants.size > 0);
@@ -320,8 +324,9 @@ export default function Consultation({
       }
       setMuted(false);
       setCameraOn(!audioOnly);
-      setMediaStatus("callConnected");
+      setMediaStatus("callConnected");observe("consultation.connected");
     } catch (error) {
+      observe("consultation.connection_failed",{error_code:"unavailable"});
       if (room) {
         if (roomRef.current === room) roomRef.current = null;
         await disposeRoom(room);
@@ -342,6 +347,7 @@ export default function Consultation({
     }
   }
   async function leave(showStatus = true) {
+    if(showStatus)observe("consultation.left");
     generation.current++;
     joining.current = false;
     const room = roomRef.current;

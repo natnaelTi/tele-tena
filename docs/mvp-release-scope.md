@@ -1,3 +1,14 @@
+## Operations Sprint 1 — 5 November 2026
+
+Native private support, reviewer operations/health, allowlisted outcome metrics, bounded
+errors/alerts and quarterly reports are additive v1.53. Every reviewer has operational
+authority without an additional role; this grants no new clinical/evidence access.
+Provider integrations remain disabled until explicitly configured. Replay capture,
+complete export and independent playback remain unavailable pending selected-project
+proof; this is not a claim of usable90-day archive retention. Public heatmaps and the
+full operations-portal redesign remain Sprint2. See [scope and collection contract](operations/sprint-1.md),
+[verification](operations/verification.md) and [update guide](selfmade-operations-update.md).
+
 ## Application Workflow Refinement — 4 November 2026
 
 This bounded MVP revision adds clinician service-application tracking, focused requested-information dialogs, reviewer queue/detail/decision routes and recorded email-authorized reviewer entry. It preserves individual scope/language/general decisions, identity-file access restrictions and all financial/clinical workflows. See application-workflow-revision-2026-11-04.md for actual checks, screenshot comparisons, current candidate and external limits. Owner acceptance and native-language approval remain separate.

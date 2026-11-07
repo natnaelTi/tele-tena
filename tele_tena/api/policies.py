@@ -20,7 +20,9 @@ def current(locale='en'):
         localized.append(item)
     content={**content,'documents':localized}
     versions={item['key']:item['version'] for item in content['documents']}
-    return {'review_only':True,'terms_version':versions.get('terms',TERMS),'privacy_version':versions.get('privacy',PRIVACY),'documents':content['documents'],
+    from tele_tena.operations import disclosure
+    terms=versions.get('terms',TERMS);privacy=versions.get('privacy',PRIVACY)
+    return {'review_only':True,'terms_version':disclosure.version(terms,'terms'),'privacy_version':disclosure.version(privacy,'privacy'),'terms_source_version':terms,'privacy_source_version':privacy,'replay_disclosure':disclosure.public(),'documents':content['documents'],
       'notice':'Policy content is under review. This demonstration is not real clinical care or real payments. Approved production Terms and Privacy content is not yet available.',
       'sharing_notice':'Only the identity, text and individual files you affirmatively approve for this encounter are shared with its treating clinician. Previously viewed material cannot be recalled.'}
 

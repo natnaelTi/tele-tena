@@ -1,3 +1,4 @@
+import{ReplayPolicyDisclosure,type ReplayDisclosure}from'../components/ReplayPolicyDisclosure';
 import {AssistanceEntry} from './ScopeApplications';
 import ApplicationAttachments from '../components/ApplicationAttachments';
 import {CareLanguageEditor,languageName} from '../components/CareLanguages';
@@ -41,6 +42,7 @@ type Answers = {
   requested_services?: string[];
 };
 export default function Onboarding() {
+  const [replayDisclosure,setReplayDisclosure]=useState<ReplayDisclosure|null>(null);
   const { session, refresh } = useSession();
   const { w,setLocale,locale } = useLocale();
   const navigate = useNavigate();
@@ -79,7 +81,7 @@ export default function Onboarding() {
         setAnswers({share_name:true,share_history:true,...draft.answers});
         if(params.get('intent')==='clinician'||draft.kind==='clinician'){void api<ApplicationState>('tele_tena.api.professional.application').then(state=>{setProfessionalState(state);setProfessional(state.payload);}).catch(()=>setError('Your professional application could not be loaded. Reload before editing.'));}
         setReady(true);
-        void api<{terms_version:string;privacy_version:string}>('tele_tena.api.policies.current').then(policy=>setAnswers(previous=>({...previous,terms_version:policy.terms_version,privacy_version:policy.privacy_version})));
+        void api<{terms_version:string;privacy_version:string;replay_disclosure:ReplayDisclosure}>('tele_tena.api.policies.current').then(policy=>{setReplayDisclosure(policy.replay_disclosure);setAnswers(previous=>({...previous,terms_version:policy.terms_version,privacy_version:policy.privacy_version,terms_accepted:previous.terms_version===policy.terms_version&&!!previous.terms_accepted,privacy_acknowledged:previous.privacy_version===policy.privacy_version&&!!previous.privacy_acknowledged}));});
       })
       .catch(() =>
         setError(
@@ -343,7 +345,7 @@ export default function Onboarding() {
             </>
           )}
           {!clinician&&step===0&&<TextField label={w('Your clinician-facing alias')} value={answers.care_alias||''} placeholder={w('Choose an alias')} onChange={event=>update({care_alias:event.target.value})}/>}
-          {step===3&&<section className="onboarding-review-panel"><h2>{w('Terms,privacy and Consent')}</h2><p>{w('Review-only policy content;approved production policies are still pending.')}</p><Link to="/policies" target="_blank">{w('Read Terms and Privacy review versions')}</Link><Checkbox label={w('I accept the displayed review Terms version')} required checked={!!answers.terms_accepted} onChange={event=>update({terms_accepted:event.target.checked})}/><Checkbox label={w('I acknowledge the displayed Privacy version')} required checked={!!answers.privacy_acknowledged} onChange={event=>update({privacy_acknowledged:event.target.checked})}/><p>{w('Your earlier care consent is separate. Each encounter has its own sharing preview;global preferences do not share records with unknown recipients.')}</p><Checkbox label={w('Optional marketing updates')} checked={!!answers.marketing} onChange={event=>update({marketing:event.target.checked})}/></section>}
+          {step===3&&<section className="onboarding-review-panel"><h2>{w('Terms, Privacy and Consent')}</h2><p>{w('Review-only policy content;approved production policies are still pending.')}</p><Link to="/policies" target="_blank">{w('Read Terms and Privacy review versions')}</Link>{replayDisclosure&&<ReplayPolicyDisclosure value={replayDisclosure}/>}<Checkbox label={w('I accept the displayed review Terms version')} required checked={!!answers.terms_accepted} onChange={event=>update({terms_accepted:event.target.checked})}/><Checkbox label={w('I acknowledge the displayed Privacy version')} required checked={!!answers.privacy_acknowledged} onChange={event=>update({privacy_acknowledged:event.target.checked})}/><p>{w('Your earlier care consent is separate. Each encounter has its own sharing preview;global preferences do not share records with unknown recipients.')}</p><Checkbox label={w('Optional marketing updates')} checked={!!answers.marketing} onChange={event=>update({marketing:event.target.checked})}/></section>}
           <div className="form-actions" data-tour={step===3&&clinician?"applicant-submit":undefined}>
             {step > 0 && (
               <Button

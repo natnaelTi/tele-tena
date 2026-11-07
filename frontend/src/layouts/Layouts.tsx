@@ -175,6 +175,8 @@ const applicantNav = [
   ["/clinician/account", "Account", Settings2],
 ] as const;
 const adminNav = [
+  ["/admin/operations", "Operations", Settings2],
+  ["/admin/support", "User Support", ClipboardCheck],
   ["/admin", "Overview", Home],
   ["/admin/applications", "Applications", ClipboardCheck],
   ["/admin/scopes", "Service Authorizations", Stethoscope],
@@ -242,7 +244,7 @@ export function WorkspaceLayout({
   };
   const groups = [
     {name:kind === "admin"?"Applications & approval":"Care & appointments", items:mobileMore.filter(([to])=> /appointments|care$|requests$|offers$|couples$|applications|scopes$|vetting$/.test(to))},
-    {name:kind === "admin"?"Services & operations":"Practice & affiliations", items:mobileMore.filter(([to])=> /availability$|services$|affiliations$|clinics$|clinic-access$|matching$|exceptions$|clinic$|calendar$/.test(to))},
+    {name:kind === "admin"?"Services & operations":"Practice & affiliations", items:mobileMore.filter(([to])=> /availability$|services$|affiliations$|clinics$|clinic-access$|matching$|exceptions$|operations$|support$|clinic$|calendar$/.test(to))},
     {name:"Payments",items:mobileMore.filter(([to])=> /payments$|earnings$|financial-disputes$/.test(to))},
   ];
   const groupedMore = <nav className="workspace-more-links" aria-label={w("Additional workspace links")}>{groups.filter(group=>group.items.length).map(group=><section key={group.name} className="workspace-more-group"><h3>{w(group.name)}</h3>{group.items.map(item=>renderNavLink(item,true))}</section>)}</nav>;

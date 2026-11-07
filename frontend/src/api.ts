@@ -1,3 +1,4 @@
+import{telemetryHeader,intent,failed}from'./operations-telemetry';
 export class ApiError extends Error {
   code: string
   status: number
@@ -22,18 +23,21 @@ async function classifyError(response: Response, method: string): Promise<ApiErr
 export async function api<T>(method: string, data: Record<string, unknown> = {}, post = false, signal?: AbortSignal): Promise<T> {
   const path = method.startsWith('frappe.') || method.startsWith('tele_tena.') ? '/api/method/' + method : '/api/method/tele_tena.api.journey.' + method
   const query = new URLSearchParams(Object.entries(data).map(([k, v]) => [k, String(v)]))
+  if(/(?:logout|sign_out|verify_code|verify_otp|complete_registration)$/.test(method))window.dispatchEvent(new Event('teletena-auth-changing'));
+  intent(method);
   const response = await fetch(path + (!post && query.size ? '?' + query : ''), {
     method: post ? 'POST' : 'GET', credentials: 'same-origin', cache: 'no-store', signal,
-    headers: post ? { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': csrf,'X-TeleTena-Locale':interfaceLocale } : {'X-TeleTena-Locale':interfaceLocale},
+    headers: post ? { 'Content-Type': 'application/json', 'X-Frappe-CSRF-Token': csrf,'X-TeleTena-Locale':interfaceLocale,...telemetryHeader(method) } : {'X-TeleTena-Locale':interfaceLocale,...telemetryHeader(method)},
     body: post ? JSON.stringify(data) : undefined,
-  })
+  }).catch(error=>{failed(method,'network');throw error})
   if (!response.ok) {
-    throw await classifyError(response, method)
+    const error=await classifyError(response,method);failed(method,error.code,error.status);throw error
   }
   const result = await response.json()
   return result.message as T
 }
 export async function signIn(email: string, password: string) {
+  window.dispatchEvent(new Event('teletena-auth-changing'));
   let response: Response
   try {
     response = await fetch('/api/method/login', { method: 'POST', credentials: 'same-origin', cache: 'no-store',
@@ -50,6 +54,7 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function phoneAuth<T>(method: string, data: Record<string, unknown>, csrf?: string): Promise<T> {
+  window.dispatchEvent(new Event('teletena-auth-changing'));
   const bootstrap = method === 'csrf_token'
   const response = await fetch('/api/method/tele_tena.api.phone_auth.' + method, {
     method: bootstrap ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store',

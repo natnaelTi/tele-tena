@@ -48,9 +48,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   useEffect(()=>{
     const hide=()=>{if(previousActor.current)document.documentElement.dataset.sessionHidden='true';};
     const show=(event:PageTransitionEvent)=>{if(!event.persisted)return;setLoading(true);void refresh().catch(()=>undefined).finally(()=>requestAnimationFrame(()=>{delete document.documentElement.dataset.sessionHidden;}));};
+    const scopeChannel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('teletena-replay-scope-v2'):null;
+    if(scopeChannel)scopeChannel.onmessage=e=>{if(e.data?.type==='invalidate')void refresh().catch(()=>undefined)};
     const timer=setInterval(()=>{if(previousActor.current&&document.visibilityState==='visible')void refresh().catch(()=>undefined);},30000);
     window.addEventListener('pagehide',hide);window.addEventListener('pageshow',show);
-    return()=>{clearInterval(timer);window.removeEventListener('pagehide',hide);window.removeEventListener('pageshow',show);};
+    return()=>{scopeChannel?.close();clearInterval(timer);window.removeEventListener('pagehide',hide);window.removeEventListener('pageshow',show);};
   },[refresh]);
   return (
     <Context.Provider value={{ session, loading, error, refresh }}>

@@ -1,7 +1,7 @@
 {
   "version": 3,
-  "release_branch": "feat/application-tracker-assisted-entry",
-  "source_checkpoint": "0d1a3c37e68f4154f96bb809f6a3b60c11acd567",
+  "release_branch": "feat/operations-journey-insights",
+  "source_checkpoint": "15a051c271ddbe1a5e73b62d1f8d9c1afbd0fa74",
   "scope_document": "docs/mvp-release-scope.md",
   "note": "Single authoritative MVP matrix. Current bounded polish/portable dataset evidence is in final-mvp-polish-verification.md. Historical per-screen evidence is retained. Owner visual acceptance and external device/provider/native-language checks remain separate.",
   "screens": [
@@ -17013,5 +17013,36 @@
     "screenshots": "screenshots/assisted-polish/README.md",
     "scope": "Offline payments have no platform wallet disputes; direct follow-up only payer/clinician, earlier wallet obligations remain authorized under original rules",
     "external": "Owner Selfmade retest; no direct remote reproduction or live delivery; locale approvals pending"
+  },
+  "operations_sprint_1": {
+    "requirements": "docs/operations/sprint-1.md",
+    "routes": [
+      "/admin/operations",
+      "/admin/operations/insights",
+      "/admin/operations/health",
+      "/admin/operations/archive",
+      "/admin/operations/reports",
+      "/admin/operations/settings",
+      "/admin/support",
+      "/support"
+    ],
+    "functional": "v1.54 native masking/lifecycle/archive/quotas locally verified; V1 settled proof/deletion complete; actual V2 native ingestion/provisional playback pass, new settled native archive/cleanup pending due time; production disabled",
+    "visual": "Codex inspected 390/768/1440 and actual200% screenshots; owner acceptance pending",
+    "evidence": "docs/operations/verification.md",
+    "external": [
+      "V2 settled native archive/playback/cleanup due8Nov2026,00:28:39EAT; immediate proof complete; no additional events/errors/messages",
+      "Guest recording unavailable: no Terms acceptance point; draft existing-Terms disclosure implemented. Verified complete-backup freshness adapter implemented; production recurring source setup pending",
+      "Production storage sizing, backup expiry and persistent independent alert launcher",
+      "Production-bundle private source-map release workflow; synthetic pair verified",
+      "UptimeRobot separate account/monitor setup",
+      "Native-language/policy and owner acceptance"
+    ],
+    "existing_mvp": "Prior requirements/evidence retained unchanged; no broad reacceptance claim",
+    "provider_configuration_followup": "docs/operations/configuration-readiness.md",
+    "live_verification_plan": "docs/operations/live-verification-plan-v1.md",
+    "live_results": "docs/operations/live-verification-results-v1.md",
+    "requirement_matrix": "docs/operations/acceptance-matrix.json",
+    "live_results_v2": "docs/operations/live-verification-results-v2.md",
+    "followup": "docs/operations/terms-navigation-followup.md"
   }
 }

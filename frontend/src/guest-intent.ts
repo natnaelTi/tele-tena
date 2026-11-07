@@ -1,3 +1,4 @@
+import{observe}from'./operations-telemetry';
 /** Durable allowlisted navigation only. Health text/files never enter Web Storage. */
 import {discoveryFilters} from './care-intent';
 type Language=string;type Format='audio'|'video';
@@ -10,8 +11,8 @@ export function rememberReturn(value:ReturnIntent){const filters=discoveryFilter
 export function clearReturn(){memory=null;try{sessionStorage.removeItem(key);}catch{}}
 export function returnPath(){const value=returnIntent();return value?.kind==='booking-link'?'/patient/book-link/'+value.ref:value?.kind==='offering'?'/patient/book/'+value.ref:value?.kind==='request'?'/patient/requests'+(value.ref?'/'+value.ref:''):'';}
 export type RequestDraft={request_text:string;service?:string;service_label?:string;language?:string;format?:Format;urgency?:'immediate'|'scheduled'};
-let draft:RequestDraft|null=null;
-export function rememberGuestDraft(value:RequestDraft){startGuestTiming();draft={...value,request_text:value.request_text.slice(0,2000)};}
+let draft:RequestDraft|null=null;let lastDraftObservation=0;
+export function rememberGuestDraft(value:RequestDraft){startGuestTiming();if(Date.now()-lastDraftObservation>30000){observe('request.draft_progressed');lastDraftObservation=Date.now()}draft={...value,request_text:value.request_text.slice(0,2000)};}
 export function guestDraft(){return draft;}
 export function discardGuestDraft(){draft=null;clearReturn();}
 export function clearGuestDraft(){draft=null;guestStarted=null;authStarted=null;}
