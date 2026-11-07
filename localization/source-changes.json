@@ -1,13 +1,13 @@
 {
   "added": [
-    "copy.operationsarchiverecords.africa_nairobi",
-    "copy.operationsframe.africa_nairobi",
-    "copy.operationssupport.africa_nairobi",
-    "copy.operationssupport.africa_nairobi_1a678b9c",
-    "copy.policy_disclosure_or_operational_status_portal.before_binding_private_configuration_review_and_disable_saved_external",
-    "copy.policy_disclosure_or_operational_status_portal.review_prerequisites_and_effective_settings_before_explicitly_enabling"
+    "copy.operationsframe.journey_insights",
+    "copy.operationsframe.operational_settings",
+    "copy.operationsframe.operations_sections",
+    "copy.operationsframe.overview",
+    "copy.operationsframe.quarterly_reports",
+    "copy.operationsframe.replay_archive",
+    "copy.operationsframe.system_health",
+    "copy.operationsframe.user_support"
   ],
-  "stale": [
-    "copy.operationsportalviews.utc"
-  ]
+  "stale": []
 }

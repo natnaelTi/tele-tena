@@ -731,7 +731,7 @@
   },
   {
     "english": "operations-page operations-portal ph-no-capture",
-    "source_location": "frontend/src/components/OperationsFrame.tsx:25",
+    "source_location": "frontend/src/components/OperationsFrame.tsx:31",
     "reason": "Technical JSX attribute className"
   },
   {

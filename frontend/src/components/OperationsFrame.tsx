@@ -1,6 +1,7 @@
 import { operationsTime } from "./operationsLabels";
 import { useCallback, type ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Select } from "./ui";
 import { ClipboardCheck, Files, ArrowUpRight, ShieldCheck } from "lucide-react";
 import { useResource } from "../hooks/useResource";
 import { useLocale } from "../hooks/useLocale";
@@ -16,6 +17,11 @@ export function OperationsFrame({
   description: string;
   children: ReactNode;
 }) {
+  const location = useLocation(),
+    navigate = useNavigate();
+  const active = location.pathname.startsWith("/admin/support")
+    ? "/admin/support"
+    : location.pathname;
   const { w } = useLocale(),
     load = useCallback(
       () => api<any>("tele_tena.api.operations.integration_status"),
@@ -33,6 +39,27 @@ export function OperationsFrame({
           </div>
         </div>
         <p className="ops-nav-group">{w("Manage and Understand")}</p>
+        <div className="ops-mobile-section">
+          <Select
+            label={w("Operations Sections")}
+            value={active}
+            onChange={(e) => navigate(e.target.value)}
+          >
+            {[
+              ["/admin/operations", "Overview"],
+              ["/admin/operations/insights", "Journey Insights"],
+              ["/admin/operations/health", "System Health"],
+              ["/admin/operations/archive", "Replay Archive"],
+              ["/admin/operations/reports", "Quarterly Reports"],
+              ["/admin/operations/settings", "Operational Settings"],
+              ["/admin/support", "User Support"],
+            ].map(([path, label]) => (
+              <option key={path} value={path}>
+                {w(label)}
+              </option>
+            ))}
+          </Select>
+        </div>
         <OperationsNavigation />
         <p className="ops-nav-group">{w("Review Applications")}</p>
         <nav className="ops-review-links" aria-label={w("Application Queues")}>
