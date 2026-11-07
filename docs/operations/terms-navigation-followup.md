@@ -78,7 +78,11 @@ navigation wraps, text remains readable and content scrolls. A long effective-ve
 summary wrapped incorrectly at390; applying existing policy-version wrapping fixed it.
 Policy anchors retain heading space below sticky navigation.
 
-Unchanged application-wide replay canary/lifecycle/PWA, quarter-clock/reporting,
+The final built PWA test also passed: controller/update and obsolete-cache eviction,
+API/private cache denial, offline fallback and online deep-link recovery on the
+isolated site, with no provider traffic.
+
+Unchanged application-wide replay canary/lifecycle, quarter-clock/reporting,
 retention/deletion/restore, fresh/repeatv1.54 migration and business journeys reuse
 [earlier evidence](replay-integration-v154.md); they were not all rerun for these
 route/policy/read-only metadata changes. No new DDL/dependencies, financial mode,

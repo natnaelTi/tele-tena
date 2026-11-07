@@ -16,6 +16,8 @@ zoom/keyboard screenshots inspected. Backend6Terms +19operations,6backup,
 3policy-localization,7preflight and localization5+2 pass. Production build/lint
 (zero errors; existing warnings) and311artifact hashes/private credential scan pass.
 Read-only11patient/2clinician/22account reconciliation has zero mismatches.
+Final built PWA update/cache-denial/offline-to-online deep-link recovery also passed
+on the isolated site, without provider traffic.
 
 Safe rendered evidence:
 [Before: first Insights crash](../screenshots/operations/terms-navigation/before-navigation-1440.png),
