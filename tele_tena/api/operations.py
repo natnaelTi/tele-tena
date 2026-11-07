@@ -118,7 +118,11 @@ def support_detail(id):return desk.detail(id)
 @command
 def support_submit(category,description,followup,retry_key,context,attachment=None):return desk.submit(category,description,followup,retry_key,context,attachment)
 @command
-def support_reply(id,body,audience,retry_key,state=None,priority='Normal',assignee=None):return desk.reply(id,body,audience,retry_key,state,priority,assignee)
+def support_reply(id,body,audience,retry_key,state=None,priority='Normal',assignee=None,preserve_triage=False):
+ if preserve_triage:
+  rt.reviewer();one('SELECT id FROM tt_ops_support WHERE id=%s FOR UPDATE',(id,));current=desk.allowed(id)
+  state,priority,assignee=current.state,current.priority,current.assignee
+ return desk.reply(id,body,audience,retry_key,state,priority,assignee)
 @frappe.whitelist(methods=['GET'])
 def support_file(id):
  result=desk.download(id);frappe.db.commit() # GET read plus this access audit only; no business writes.
@@ -141,7 +145,7 @@ def archive_player(locale=None):
 @query()
 def reports_list():rt.reviewer();return rows('SELECT id,period,version,created FROM tt_ops_report ORDER BY created DESC LIMIT 40')
 @command
-def report_compile(period):rt.reviewer();result=reports.compile_report(period);audit(result['id'],'QuarterReportCompiled',{'period':period});return result
+def report_compile(period,include_synthetic=0):rt.reviewer();result=reports.compile_report(period,include_synthetic=str(include_synthetic)=='1');audit(result['id'],'QuarterReportCompiled',{'period':period});return result
 @command
 def report_detail(id):
  rt.reviewer();row=one('SELECT * FROM tt_ops_report WHERE id=%s',(id,));audit(id,'QuarterReportAccessed',{});return {'id':id,'version':row.version,'data':json.loads(row.payload),'annotation':row.annotation}
@@ -159,3 +163,25 @@ def report_export(id):
 @command
 def acknowledge(id):
  user=rt.reviewer();frappe.db.sql('UPDATE tt_ops_incident SET acknowledged_by=%s,acknowledged_at=%s WHERE id=%s',(user,rt.now(),id));audit(id,'IncidentAcknowledged',{});return {'acknowledged':True}
+
+@query()
+def integration_status():
+ rt.reviewer()
+ from tele_tena.operations.portal import integrations
+ return integrations()
+@query()
+def journey_insights(family='application',days=7,locale='all',device='all',payment_mode='all',source='all',include_synthetic=0):
+ from tele_tena.operations.portal import journeys
+ return journeys(family,days,locale,device,payment_mode,source,include_synthetic)
+@query()
+def support_queue(state='all',priority='all',ownership='all',offset=0):
+ from tele_tena.operations.portal import support_queue as listing
+ return listing(state,priority,ownership,offset)
+@command
+def support_assign(id,state,priority,assignee=None):
+ from tele_tena.operations.portal import assign
+ return assign(id,state,priority,assignee)
+@query()
+def archive_records(state='all',reference='',offset=0):
+ from tele_tena.operations.portal import archive_records as listing
+ return listing(state,reference,offset)

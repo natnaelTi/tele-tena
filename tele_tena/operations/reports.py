@@ -29,21 +29,23 @@ def insights(include_synthetic=False):
   if not include_synthetic and x.dimensions['synthetic']!='no':continue
   result.append(x)
  return {'events':result,'window_days':90,'completion_window_hours':24,'interpretation':'Incomplete and saved attempts are not assumed abandoned. Event counts are not unique people.','coverage':frappe.db.sql('SELECT day,kind,n FROM tt_ops_counter WHERE day>=DATE_SUB(CURDATE(),INTERVAL 7 DAY)',as_dict=True),'first_collected':frappe.db.sql('SELECT MIN(day) day FROM tt_ops_daily',as_dict=True)[0].day,'include_synthetic':include_synthetic}
-def compile_report(period,clock=None):
+def compile_report(period,clock=None,include_synthetic=False):
+ if include_synthetic and not frappe.conf.get('tele_tena_ops_review_scenario'):raise ValueError('synthetic_report_isolated_site_required')
  start,end=quarter_bounds(period);clock=clock or rt.now()
  if clock<start:raise ValueError('future_quarter')
  rows=frappe.db.sql('SELECT day,name,dimensions,n FROM tt_ops_daily WHERE day>=%s AND day<%s ORDER BY day,name,id',(start.replace(tzinfo=timezone.utc).astimezone(ZONE).date(),end.replace(tzinfo=timezone.utc).astimezone(ZONE).date()),as_dict=True)
  events={};excluded=0;segments={};patterns={}
  for r in rows:
   d=json.loads(r.dimensions)
-  if d.get('synthetic')!='no':excluded+=r.n;continue
+  if d.get('synthetic')!='no' and not include_synthetic:excluded+=r.n;continue
   events[r.name]=events.get(r.name,0)+r.n
   if r.name in ('validation.failed','upload.failed','support.submitted'):
    pattern=json.dumps({k:d[k] for k in ('step','document','error_code','category') if k in d},sort_keys=True);patterns[pattern]=patterns.get(pattern,0)+r.n
   key=json.dumps({k:d[k] for k in ('locale','device','release_id')},sort_keys=True);segments[key]=segments.get(key,0)+r.n
- attempts=frappe.db.sql("SELECT family,state,COUNT(*) n,SUM(completed IS NOT NULL AND TIMESTAMPDIFF(SECOND,started,completed)<=86400) completed_in_window,SUM(completed IS NOT NULL AND TIMESTAMPDIFF(SECOND,started,completed)>86400) completed_later,AVG(CASE WHEN TIMESTAMPDIFF(SECOND,started,completed)<=86400 THEN TIMESTAMPDIFF(SECOND,started,completed) END) seconds FROM tt_ops_attempt WHERE started>=%s AND started<%s AND JSON_UNQUOTE(JSON_EXTRACT(dimensions,'$.synthetic'))='no' GROUP BY family,state",(start,min(end,clock)),as_dict=True)
+ attempts=frappe.db.sql("SELECT family,state,COUNT(*) n,SUM(completed IS NOT NULL AND TIMESTAMPDIFF(SECOND,started,completed)<=86400) completed_in_window,SUM(completed IS NOT NULL AND TIMESTAMPDIFF(SECOND,started,completed)>86400) completed_later,AVG(CASE WHEN TIMESTAMPDIFF(SECOND,started,completed)<=86400 THEN TIMESTAMPDIFF(SECOND,started,completed) END) seconds FROM tt_ops_attempt WHERE started>=%s AND started<%s "+("" if include_synthetic else " AND JSON_UNQUOTE(JSON_EXTRACT(dimensions,'$.synthetic'))='no'")+" GROUP BY family,state",(start,min(end,clock)),as_dict=True)
  # Attempt rows include synthetic activity. Never silently mix them into a production funnel.
  payload={'period':period,'timezone':'Africa/Nairobi','start_utc':str(start),'end_utc_exclusive':str(end),'incomplete_period':clock<end,'events':events,'sample_size':sum(events.values()),'excluded_synthetic_events':excluded,'segments':segments,'validation_upload_support_patterns':patterns,'support_resolution':frappe.db.sql('SELECT category,COUNT(*) n,AVG(TIMESTAMPDIFF(SECOND,created,resolved_at)) seconds FROM tt_ops_support WHERE created>=%s AND created<%s GROUP BY category',(start,min(end,clock)),as_dict=True),'attempts':attempts,'attempt_segmentation_limit':'Attempts are bounded correlation groups, not unique people. Staff/demo are excluded.','coverage':frappe.db.sql('SELECT day,kind,n FROM tt_ops_counter WHERE day>=%s AND day<%s',(start.date(),end.date()),as_dict=True),'recurring_issues_lifetime_snapshot':frappe.db.sql('SELECT code,state,n,first_seen,last_seen FROM tt_ops_incident WHERE first_seen<%s AND last_seen>=%s',(end,start),as_dict=True),'archive':frappe.db.sql('SELECT state,COUNT(*) n,SUM(size_bytes) bytes FROM tt_ops_archive GROUP BY state',as_dict=True),'notes':'Measured events only. Delays do not establish confusion or abandonment. No AI interpretation.','generated_through_utc':str(min(clock,end))}
+ if include_synthetic:payload['data_scope']='Isolated Synthetic Review Report'
  canonical=json.dumps(payload,sort_keys=True,default=str);digest=hashlib.sha256(json.dumps({k:v for k,v in payload.items() if k!='generated_through_utc'},sort_keys=True,default=str).encode()).hexdigest();old=frappe.db.sql('SELECT id,version FROM tt_ops_report WHERE period=%s AND digest=%s',(period,digest),as_dict=True)
  if old:return dict(old[0],idempotent=True)
  frappe.db.sql('SELECT id FROM tt_ops_config WHERE id=1 FOR UPDATE')
